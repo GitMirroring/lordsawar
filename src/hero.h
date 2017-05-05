@@ -1,5 +1,5 @@
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2017 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -98,6 +98,9 @@ class Hero : public Army
 
         //! Return the gender of the hero.
         guint32 getGender() const {return d_gender;}
+
+        //! Can the hero fly?
+        bool isFlyer() const;
 
         /**
 	 * Returns a stat of the hero.  See Army::Stat, and Army::getStat.

@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2017 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -212,4 +212,15 @@ int Hero::gainLevel(Stat stat)
 bool Hero::hasQuest() const
 {
   return QuestsManager::getInstance()->getHeroQuest(getId()) != NULL;
+}
+
+bool Hero::isFlyer() const
+{
+  bool flying = false;
+  if (d_backpack)
+    {
+      if (d_backpack->countStackFlightGivers() > 0)
+        flying = true;
+    }
+  return flying;
 }

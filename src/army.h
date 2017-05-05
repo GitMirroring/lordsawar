@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2017 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -242,7 +242,7 @@ class Army :public ArmyBase, public UniquelyIdentified, public Ownable, public s
 	virtual Glib::ustring getName() const;
 
         //! Does this army unit have wings?
-        bool isFlyer();
+        virtual bool isFlyer() const;
 
 	//Methods that operate on class data and modify the class data
         /** 
