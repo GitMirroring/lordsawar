@@ -1841,6 +1841,7 @@ void MainWindow::on_remove_all_stacks_activated()
   if (num_stacks)
     {
       Gtk::Dialog *dialog = new Gtk::Dialog();
+      dialog->property_transient_for() = window;
       dialog->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
       dialog->add_button(Gtk::Stock::OK, Gtk::RESPONSE_ACCEPT);
       Gtk::Box *box = dialog->get_content_area ();
