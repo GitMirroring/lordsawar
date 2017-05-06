@@ -602,7 +602,7 @@ void BattleCalculatorDialog::on_fight100_clicked()
                                   "The attacker won %1 battles and lost %2.",
                                   attacker_wins),
                          attacker_wins, defender_wins);
-      Gtk::Label l = Gtk::Label();
+      Gtk::Label l;
       l.set_text (s);
       l.set_margin_left (10);
       l.set_margin_right (10);

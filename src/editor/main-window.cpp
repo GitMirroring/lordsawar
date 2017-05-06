@@ -1867,7 +1867,7 @@ void MainWindow::on_remove_all_stacks_activated()
                                   "This will remove %1 stacks.\nAre you sure?",
                                   num_stacks),
                          num_stacks);
-      Gtk::Label l = Gtk::Label();
+      Gtk::Label l;
       l.set_text (s);
       l.set_margin_left (10);
       l.set_margin_right (10);
