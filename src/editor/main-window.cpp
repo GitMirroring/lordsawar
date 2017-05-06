@@ -92,6 +92,7 @@
 #include "road-editor-tip.h"
 #include "rnd.h"
 #include "stacklist.h"
+#include "battle-calculator-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &MainWindow::x)
 
@@ -287,6 +288,9 @@ MainWindow::MainWindow(Glib::ustring load_filename)
 		     random_unnamed_signs_menuitem);
     random_unnamed_signs_menuitem->signal_activate().connect
        (method(on_random_unnamed_signs_activated));
+    xml->get_widget ("battle_calculator_menuitem", battle_calculator_menuitem);
+    battle_calculator_menuitem->signal_activate().connect
+      (method(on_battle_calculator_activated));
     xml->get_widget ("help_about_menuitem", help_about_menuitem);
     help_about_menuitem->signal_activate().connect
       (method(on_help_about_activated));
@@ -1890,4 +1894,10 @@ void MainWindow::on_road_edited(Vector<int> pos, int type)
   Road *road = new Road (pos, Road::Type(type));
   GameMap::getInstance()->putRoad(road, false);
   redraw();
+}
+
+void MainWindow::on_battle_calculator_activated()
+{
+  BattleCalculatorDialog d (*window);
+  d.run();
 }

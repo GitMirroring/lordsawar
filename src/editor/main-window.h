@@ -97,6 +97,7 @@ class MainWindow: public sigc::trackable
     Gtk::MenuItem *random_unnamed_temples_menuitem;
     Gtk::MenuItem *random_all_signs_menuitem;
     Gtk::MenuItem *random_unnamed_signs_menuitem;
+    Gtk::MenuItem *battle_calculator_menuitem;
     Gtk::MenuItem *help_about_menuitem;
     Gtk::Viewport *terrain_tile_style_viewport;
     Gtk::Grid *terrain_tile_style_grid;
@@ -238,6 +239,7 @@ class MainWindow: public sigc::trackable
     bool on_bigmap_scrolled(GdkEventScroll* event);
     void redraw();
     void fill_players();
+    void on_battle_calculator_activated();
 
     struct PlayerItem
     {

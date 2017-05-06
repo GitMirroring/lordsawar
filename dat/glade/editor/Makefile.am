@@ -42,7 +42,8 @@ shieldset-window.ui \
 smallmap-editor-dialog.ui \
 editor-splash-window.ui \
 fight-order-editor-dialog.ui \
-road-editor-tip.ui
+road-editor-tip.ui \
+battle-calculator-dialog.ui
 
 EXTRA_DIST = $(glade_DATA) \
 README
