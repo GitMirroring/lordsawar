@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: lordawar-0.3.0-pre3\n"
 "Report-Msgid-Bugs-To: bug-gnu-gettext@gnu.org\n"
 "POT-Creation-Date: 2014-07-09 10:19-0400\n"
-"PO-Revision-Date: 2016-10-26 11:35+0200\n"
+"PO-Revision-Date: 2017-05-06 20:48+0100\n"
 "Language-Team: James Manez <arasmo.wanadoo.fr>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.6.10\n"
 "Last-Translator: \n"
 
 #: ../dat/glade/about-dialog.ui.h:1
@@ -41,19 +41,16 @@ msgstr "Le site de LodrsAWar"
 #: ../dat/glade/about-dialog.ui.h:6
 msgid ""
 "LordsAWar! is licensed under the GNU General Public License version 3,\n"
-"or (at your option) any later version of the license.  This license "
-"extends \n"
+"or (at your option) any later version of the license.  This license extends \n"
 "to all source code, artwork assets and music and sound assets.\n"
 "\n"
 "To see the terms of the license, visit: http://www.gnu.org/licenses/gpl"
 msgstr ""
 "LordsAWar! utilise la licence générale publique GNU version 3 \n"
 "mais vous pouvez recourir à une version plus récente de la licence.\n"
-"Cette licence s'applique au code source, aux ressources graphiques et "
-"sonores.\n"
+"Cette licence s'applique au code source, aux ressources graphiques et sonores.\n"
 "\n"
-"Pour consulter les termes de la licence, visitez :  http://www.gnu.org/"
-"licenses/gpl"
+"Pour consulter les termes de la licence, visitez :  http://www.gnu.org/licenses/gpl"
 
 #. TRANSLATORS: Replace this string with your names, one name per line.
 #: ../dat/glade/about-dialog.ui.h:12
@@ -135,7 +132,7 @@ msgstr "Acheter Production"
 #: ../dat/glade/editor/cityset-info-dialog.ui.h:2
 #: ../dat/glade/editor/shieldset-info-dialog.ui.h:2
 msgid "Cancel"
-msgstr "Annuler\t"
+msgstr "Annuler"
 
 #: ../dat/glade/buy-production-dialog.ui.h:3
 msgid "Buy"
@@ -268,7 +265,7 @@ msgstr "Acheter une capacité de production"
 
 #: ../dat/glade/city-window.ui.h:6
 msgid "Vector..."
-msgstr "Vectoriser..."
+msgstr "Transférer..."
 
 #: ../dat/glade/city-window.ui.h:7
 msgid "Set destination for produced armies"
@@ -304,14 +301,14 @@ msgstr "Tour d'après :"
 
 #: ../dat/glade/destination-dialog.ui.h:9
 msgid "Vector"
-msgstr "Vecteur"
+msgstr "Transfert"
 
 #: ../dat/glade/destination-dialog.ui.h:10
 msgid ""
 "Click here to vector to\n"
 "a new city"
 msgstr ""
-"Cliquer ici pour vectoriser\n"
+"Cliquer ici pour transférer\n"
 "vers une nouvelle cité"
 
 #: ../dat/glade/destination-dialog.ui.h:12
@@ -481,7 +478,7 @@ msgstr "Quêtes :"
 
 #: ../dat/glade/game-options-dialog.ui.h:17
 msgid "Affecting Difficulty"
-msgstr "Affectent la difficulté"
+msgstr "Affectant la difficulté"
 
 #: ../dat/glade/game-options-dialog.ui.h:18
 msgid "Intense Combat"
@@ -537,7 +534,7 @@ msgstr "Avancé"
 
 #: ../dat/glade/game-preferences-dialog.ui.h:4
 msgid "I am the Lord Of War!"
-msgstr "Je suis le seigneur de la guerre !"
+msgstr "Je suis le maitre de la guerre !"
 
 #: ../dat/glade/game-preferences-dialog.ui.h:5
 #: ../dat/glade/editor/new-map-dialog.ui.h:4
@@ -752,7 +749,7 @@ msgstr "Cités"
 
 #: ../dat/glade/game-window.ui.h:39
 msgid "Vectoring"
-msgstr "Vectoriser"
+msgstr "Transférer"
 
 #: ../dat/glade/game-window.ui.h:40 ../dat/glade/new-random-map-dialog.ui.h:21
 #: ../dat/glade/editor/new-map-dialog.ui.h:17
@@ -1513,15 +1510,15 @@ msgstr "Tours :"
 
 #: ../dat/glade/editor/armyset-window.ui.h:18
 msgid "The cost to make a single instance of this unit type."
-msgstr "Le coût de création de cette unité."
+msgstr "Le cout de création de cette unité."
 
 #: ../dat/glade/editor/armyset-window.ui.h:19
 msgid "Cost:"
-msgstr "Coût :"
+msgstr "Cout :"
 
 #: ../dat/glade/editor/armyset-window.ui.h:20
 msgid "The ongoing cost of this unit per turn."
-msgstr "Le coût de cette unité à payer chaque tour."
+msgstr "Le cout de cette unité à payer chaque tour."
 
 #: ../dat/glade/editor/armyset-window.ui.h:21
 msgid "Upkeep:"
@@ -1557,11 +1554,11 @@ msgstr "est attribué aux héros comme récompense"
 
 #: ../dat/glade/editor/armyset-window.ui.h:29
 msgid "The cost of this unit type in the buy production dialog."
-msgstr "Le coût de ce type d'unité dans le dialogue d'achat de production."
+msgstr "Le cout de ce type d'unité dans le dialogue d'achat de production."
 
 #: ../dat/glade/editor/armyset-window.ui.h:30
 msgid "New Cost:"
-msgstr "Nouveau coût :"
+msgstr "Nouveau cout :"
 
 #: ../dat/glade/editor/armyset-window.ui.h:31
 msgid "The distance this unit can see on a fog map (in tiles.)"
@@ -1763,7 +1760,7 @@ msgstr "Revenu :"
 
 #: ../dat/glade/editor/city-editor-dialog.ui.h:10
 msgid "Burned down"
-msgstr "Brûlé"
+msgstr "Brulé"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:1
 msgid "Anywhere"
@@ -1867,7 +1864,7 @@ msgstr "Tue toutes les unités de Vers Géants"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:28
 msgid "Burns Bridge"
-msgstr "Brûle pont"
+msgstr "Brule pont"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:29
 msgid "Capture Ruin Keeper"
@@ -1883,7 +1880,7 @@ msgstr "Maudit une ville"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:32
 msgid "Pick Up Bags"
-msgstr "Ramasse des saccs"
+msgstr "Ramasse des sacs"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:33
 msgid "Add Movement Points"
@@ -2802,12 +2799,8 @@ msgstr "Un lot de cités à la taille doublée, lié au scénario Dol de LordsAW
 
 #: ../dat/army/bigdefault/bigdefault.lwa.in.h:2
 #: ../dat/army/default/default.lwa.in.h:2
-msgid ""
-"The default armyset of LordsAWar! Initally created by Sune Theodorsen of "
-"Fata Morgana in 2007 specifically for this game."
-msgstr ""
-"Le lot d'armées par défaut de LordsAWar! Créé initialement par Sune "
-"Theodorsen of Fata Morgana en 2007 spécifiquement pour ce jeu."
+msgid "The default armyset of LordsAWar! Initally created by Sune Theodorsen of Fata Morgana in 2007 specifically for this game."
+msgstr "Le lot d'armées par défaut de LordsAWar! Créé initialement par Sune Theodorsen of Fata Morgana en 2007 spécifiquement pour ce jeu."
 
 #: ../dat/army/bigdefault/bigdefault.lwa.in.h:3
 #: ../dat/army/default/default.lwa.in.h:3
@@ -3481,33 +3474,20 @@ msgid "The Second Punic War"
 msgstr "La deuxième guerre punique"
 
 #: ../dat/map/2ndPunic37/2ndPunic37.map.in.h:123
-msgid ""
-"Carthage has lost her dominance on the sea and you, Hannibal, are convinced "
-"that the only hope of avoiding the destruction of your city is to move to "
-"the attack - through Spain and across the Alps."
-msgstr ""
-"Carthage a perdu le contrôle des mers et vous, Hannibal, êtes convaincu que "
-"la seule chance d'éviter la destruction de votre cité est de porter la "
-"guerre chez l'ennemi, en traversant l'Espagne et les Alpes."
+msgid "Carthage has lost her dominance on the sea and you, Hannibal, are convinced that the only hope of avoiding the destruction of your city is to move to the attack - through Spain and across the Alps."
+msgstr "Carthage a perdu le contrôle des mers et vous, Hannibal, êtes convaincu que la seule chance d'éviter la destruction de votre cité est de porter la guerre chez l'ennemi, en traversant l'Espagne et les Alpes."
 
 #: ../src/armysetlist.cpp:186
 msgid "Error!  armyset: `%1' is malformed.  Skipping."
 msgstr "Erreur ! Lot d'armées : `%1' est malformé. Évité."
 
 #: ../src/armysetlist.cpp:192
-msgid ""
-"Error!  armyset: `%1' shares a duplicate armyset basename `%2' with `%3'.  "
-"Skipping."
-msgstr ""
-"Erreur ! lot d'armées : `%1' partage un nom de lots d'armés dupliqué `%2' "
-"avec `%3'.  Évité."
+msgid "Error!  armyset: `%1' shares a duplicate armyset basename `%2' with `%3'.  Skipping."
+msgstr "Erreur ! lot d'armées : `%1' partage un nom de lots d'armés dupliqué `%2' avec `%3'.  Évité."
 
 #: ../src/armysetlist.cpp:200
-msgid ""
-"Error!  armyset: `%1' shares a duplicate armyset id with `%2'.  Skipping."
-msgstr ""
-"Erreur !  lot d'armées: `%1' partage un id de lot d'armés dupliqué avec `"
-"%2'.  Évité."
+msgid "Error!  armyset: `%1' shares a duplicate armyset id with `%2'.  Skipping."
+msgstr "Erreur !  lot d'armées: `%1' partage un id de lot d'armés dupliqué avec `%2'.  Évité."
 
 #: ../src/GameScenario.cpp:344
 msgid "Northwestern map"
@@ -3550,11 +3530,8 @@ msgid "saved game file has wrong version.  expecting %1 but got %2."
 msgstr "Mauvaise version du fichier de sauvegarde. Attend %1 mais a obtenu %2."
 
 #: ../src/GameScenario.cpp:860
-msgid ""
-"Error! can't rename the temporary file `%1' to the autosave file `%2'.  %3"
-msgstr ""
-"Erreur ! Impossible de renommer le fichier temporaire `%1' vers le fichier "
-"de sauvegarde automatique `%2'.  %3"
+msgid "Error! can't rename the temporary file `%1' to the autosave file `%2'.  %3"
+msgstr "Erreur ! Impossible de renommer le fichier temporaire `%1' vers le fichier de sauvegarde automatique `%2'.  %3"
 
 #: ../src/GameScenario.cpp:903
 msgid "There must be at least 2 players in the scenario."
@@ -3703,31 +3680,20 @@ msgid "unknown"
 msgstr "inconnu"
 
 #: ../src/GameMap.cpp:280
-msgid ""
-"Error!  Map Generator and Game Map tile sizes differ.  %1 != %2 || %3 != "
-"%4.  Exiting."
-msgstr ""
-"Erreur ! les tailles de tuiles de la carte de jeu et du générateur de cartes "
-"diffèrent. %1 != %2 || %3 != %4.  Sortie."
+msgid "Error!  Map Generator and Game Map tile sizes differ.  %1 != %2 || %3 != %4.  Exiting."
+msgstr "Erreur ! les tailles de tuiles de la carte de jeu et du générateur de cartes diffèrent. %1 != %2 || %3 != %4.  Sortie."
 
 #: ../src/citysetlist.cpp:126
 msgid "Error!  cityset: `%1' is malformed.  Skipping."
 msgstr "Erreur !  lot de cités : `%1' est malformé.  Évité."
 
 #: ../src/citysetlist.cpp:133
-msgid ""
-"Error!  cityset: `%1' shares a duplicate cityset basename `%2' with `%3'.  "
-"Skipping."
-msgstr ""
-"Erreur ! Lot de cités `%1' a un nom de base de lot de cités `%2' qui fait "
-"doublon avec `%3'. Évité."
+msgid "Error!  cityset: `%1' shares a duplicate cityset basename `%2' with `%3'.  Skipping."
+msgstr "Erreur ! Lot de cités `%1' a un nom de base de lot de cités `%2' qui fait doublon avec `%3'. Évité."
 
 #: ../src/citysetlist.cpp:141
-msgid ""
-"Error!  cityset `%1' shares a duplicate cityset id with `%2'.  Skipping."
-msgstr ""
-"Erreur ! Lot de cités `%1' a une id de lot de cités qui fait doublon avec `"
-"%2'. Évité."
+msgid "Error!  cityset `%1' shares a duplicate cityset id with `%2'.  Skipping."
+msgstr "Erreur ! Lot de cités `%1' a une id de lot de cités qui fait doublon avec `%2'. Évité."
 
 #: ../src/citysetlist.cpp:149
 msgid "Error!  cityset: `%1' has a duplicate cityset id with `%2'.  Skipping."
@@ -3776,25 +3742,16 @@ msgid "Error!  Tileset: `%1' is malformed.  Skipping."
 msgstr "Erreur ! Lot de tuiles : `%1' est malformé. Évité."
 
 #: ../src/tilesetlist.cpp:127
-msgid ""
-"Error!  tileset: `%1' shares a duplicate tileset subdir `%2' with `%3'. "
-"Skipping."
-msgstr ""
-"Erreur ! Lot de tuiles : `%1' a un sous-répertoire de lot de tuiles `%2' qui "
-"fait doublon avec `%3'. Évité."
+msgid "Error!  tileset: `%1' shares a duplicate tileset subdir `%2' with `%3'. Skipping."
+msgstr "Erreur ! Lot de tuiles : `%1' a un sous-répertoire de lot de tuiles `%2' qui fait doublon avec `%3'. Évité."
 
 #: ../src/tilesetlist.cpp:135
-msgid ""
-"Error!  tileset: `%1' shares a duplicate tileset id with `%2'.  Skipping."
-msgstr ""
-"Erreur ! Lot de tuiles :  `%1' a un id de lot de tuile qui fait doublon avec "
-"`%2'. Évité."
+msgid "Error!  tileset: `%1' shares a duplicate tileset id with `%2'.  Skipping."
+msgstr "Erreur ! Lot de tuiles :  `%1' a un id de lot de tuile qui fait doublon avec `%2'. Évité."
 
 #: ../src/Configuration.cpp:192
 msgid "Configuration file has wrong version.  expected %1, but got %2"
-msgstr ""
-"Le fichier de configuration n'a pas la bonne version :  %1 était attendu, et "
-"non pas %2"
+msgstr "Le fichier de configuration n'a pas la bonne version :  %1 était attendu, et non pas %2"
 
 #: ../src/Configuration.cpp:195
 msgid "backing up config file `%1' to `%2'."
@@ -3802,8 +3759,7 @@ msgstr "Sauvegarde du fichier de configuration `%1' vers `%2'."
 
 #: ../src/Configuration.cpp:292
 msgid "Error!  couldn't save configuration file `%1'.  Exiting."
-msgstr ""
-"Erreur ! Impossible de sauvegarder fichier de configuration `%1'.  Sortie."
+msgstr "Erreur ! Impossible de sauvegarder fichier de configuration `%1'.  Sortie."
 
 #: ../src/Configuration.cpp:296
 msgid "created default configuration file `%1'."
@@ -3811,13 +3767,11 @@ msgstr "création du fichier de configuration par défaut  `%1'."
 
 #: ../src/Configuration.cpp:309
 msgid "Error!  Couldn't create armyset directory `%1'.  Exiting."
-msgstr ""
-"Erreur ! Impossible de créer le répertoire de lot d'armées `%1'. Sortie. "
+msgstr "Erreur ! Impossible de créer le répertoire de lot d'armées `%1'. Sortie. "
 
 #: ../src/Configuration.cpp:315
 msgid "Error!  Couldn't create tileset directory `%1'.  Exiting."
-msgstr ""
-"Erreur ! Impossible de créer le répertoire de lot de tuiles `%1'. Sortie. "
+msgstr "Erreur ! Impossible de créer le répertoire de lot de tuiles `%1'. Sortie. "
 
 #: ../src/Configuration.cpp:322
 msgid "Error!  Couldn't create map directory `%1'.  Exiting."
@@ -3825,40 +3779,27 @@ msgstr "Erreur ! Impossible de créer le répertoire de la carte `%1'. Sortie. "
 
 #: ../src/Configuration.cpp:329
 msgid "Error!  Couldn't create shieldset directory `%1'.  Exiting."
-msgstr ""
-"Erreur ! Impossible de créer le répertoire de lot de boucliers `%1'. Sortie. "
+msgstr "Erreur ! Impossible de créer le répertoire de lot de boucliers `%1'. Sortie. "
 
 #: ../src/Configuration.cpp:336
 msgid "Error!  Couldn't create cityset directory `%1'.  Exiting."
-msgstr ""
-"Erreur ! Impossible de créer le répertoire de lot de cités `%1'. Sortie. "
+msgstr "Erreur ! Impossible de créer le répertoire de lot de cités `%1'. Sortie. "
 
 #: ../src/shieldsetlist.cpp:118
 msgid "Error!  shieldset: `%1' is malformed.  Skipping."
 msgstr "Erreur ! Lot de boucliers :  `%1' est malformé.  Évité."
 
 #: ../src/shieldsetlist.cpp:125
-msgid ""
-"Error!  shieldset: `%1' shares a duplicate shieldset basename `%2' with `"
-"%3'.  Skipping."
-msgstr ""
-"Erreur ! Lot de boucliers : `%1'  a un nom de base de lot de boucliers `%2' "
-"qui fait doublon avec `%3'. Évité."
+msgid "Error!  shieldset: `%1' shares a duplicate shieldset basename `%2' with `%3'.  Skipping."
+msgstr "Erreur ! Lot de boucliers : `%1'  a un nom de base de lot de boucliers `%2' qui fait doublon avec `%3'. Évité."
 
 #: ../src/shieldsetlist.cpp:136
-msgid ""
-"Error!  shieldset: `%1' shares a duplicate shieldset name `%2' with `%3'.  "
-"Skipping."
-msgstr ""
-"Erreur ! Jeu de tuiles : `%1' a un nom de lot de boucliers  `%2' qui fait "
-"doublon avec `%3'. Évité."
+msgid "Error!  shieldset: `%1' shares a duplicate shieldset name `%2' with `%3'.  Skipping."
+msgstr "Erreur ! Jeu de tuiles : `%1' a un nom de lot de boucliers  `%2' qui fait doublon avec `%3'. Évité."
 
 #: ../src/shieldsetlist.cpp:145
-msgid ""
-"Error!  shieldset: `%1' shares a duplicate shieldset id with `%2'.  Skipping."
-msgstr ""
-"Erreut ! Lot de bouliers :  `%1' a un id de lot de boucliers qui fait "
-"doublon avec`%2'. Évité."
+msgid "Error!  shieldset: `%1' shares a duplicate shieldset id with `%2'.  Skipping."
+msgstr "Erreut ! Lot de bouliers :  `%1' a un id de lot de boucliers qui fait doublon avec`%2'. Évité."
 
 #: ../src/MapGenerator.cpp:171
 msgid "flattening plains..."
@@ -4594,8 +4535,7 @@ msgstr "Fichier de sauvegarde corrompu."
 
 #: ../src/gui/game-window.cpp:1013 ../src/gui/driver.cpp:887
 msgid "Can't load networked game from file."
-msgstr ""
-"Impossible de charger la partie en réseau sauvegardée depuis le fichier."
+msgstr "Impossible de charger la partie en réseau sauvegardée depuis le fichier."
 
 #: ../src/gui/game-window.cpp:1060
 msgid "Change the message on this sign:"
@@ -4858,74 +4798,51 @@ msgstr "Ô Grand Conquérant !"
 
 #: ../src/gui/game-window.cpp:2544
 msgid "This battle will surely be as simple as butchering sleeping cattle!"
-msgstr ""
-"Cette bataille tournera certainement au jeu de massacre ! Je plains vos "
-"ennemis !"
+msgstr "Cette bataille tournera certainement au jeu de massacre ! Je plains vos ennemis !"
 
 #: ../src/gui/game-window.cpp:2546 ../src/gui/game-window.cpp:2552
 msgid "A battle here would be as simple as butchering sleeping cattle!"
-msgstr ""
-"Une bataille livrée ici devrait tourner au jeu de massacre ! Je plains vos "
-"ennemis !"
+msgstr "Une bataille livrée ici devrait tourner au jeu de massacre ! Je plains vos ennemis !"
 
 #: ../src/gui/game-window.cpp:2548
-msgid ""
-"I believe this battle will surely be as simple as butchering sleeping cattle!"
-msgstr ""
-"Je crois que cette bataille tournera certainement au jeu de massacre ! Je "
-"plains vos ennemis !"
+msgid "I believe this battle will surely be as simple as butchering sleeping cattle!"
+msgstr "Je crois que cette bataille tournera certainement au jeu de massacre ! Je plains vos ennemis !"
 
 #: ../src/gui/game-window.cpp:2550
 msgid "This battle would be as simple as butchering sleeping cattle!"
-msgstr ""
-"Cette bataille pourrait tourner au jeu de massacre ! Je plains vos ennemis !"
+msgstr "Cette bataille pourrait tourner au jeu de massacre ! Je plains vos ennemis !"
 
 #: ../src/gui/game-window.cpp:2554
 msgid "I believe this battle will be as simple as butchering sleeping cattle!"
-msgstr ""
-"Je crois que cette bataille tournera au jeu de massacre ! Je plains vos "
-"ennemis !"
+msgstr "Je crois que cette bataille tournera au jeu de massacre ! Je plains vos ennemis !"
 
 #: ../src/gui/game-window.cpp:2556
 msgid "This battle shall be as simple as butchering sleeping cattle!"
-msgstr ""
-"Cette bataille devrait tourner au jeu de massacre ! Je plais vos ennemis !"
+msgstr "Cette bataille devrait tourner au jeu de massacre ! Je plais vos ennemis !"
 
 #: ../src/gui/game-window.cpp:2561
 msgid "This battle will surely be an easy victory!  We cannot lose!"
-msgstr ""
-"Cette bataille sera certainement une victoire facile ! Nous ne pouvons pas "
-"perdre !"
+msgstr "Cette bataille sera certainement une victoire facile ! Nous ne pouvons pas perdre !"
 
 #: ../src/gui/game-window.cpp:2563 ../src/gui/game-window.cpp:2569
 msgid "A battle here would be an easy victory!  We cannot lose!"
-msgstr ""
-"Une bataille ici devrait être une victoire facile ! Nous ne pouvons pas "
-"perdre !"
+msgstr "Une bataille ici devrait être une victoire facile ! Nous ne pouvons pas perdre !"
 
 #: ../src/gui/game-window.cpp:2565
 msgid "I believe this battle will surely be an easy victory!  We cannot lose!"
-msgstr ""
-"Je crois que cette bataille sera certainement une victoire facile ! Nous ne "
-"pouvons pas perdre !"
+msgstr "Je crois que cette bataille sera certainement une victoire facile ! Nous ne pouvons pas perdre !"
 
 #: ../src/gui/game-window.cpp:2567
 msgid "This battle would be an easy victory!  We cannot lose!"
-msgstr ""
-"Cette bataille pourrait être une victoire facile ! Nous ne pouvons pas "
-"perdre !"
+msgstr "Cette bataille pourrait être une victoire facile ! Nous ne pouvons pas perdre !"
 
 #: ../src/gui/game-window.cpp:2571
 msgid "I believe this battle will be an easy victory!  We cannot lose!"
-msgstr ""
-"Je crois que cette bataille pourrait être une victoire facile ! Nous ne "
-"pouvons pas perdre !"
+msgstr "Je crois que cette bataille pourrait être une victoire facile ! Nous ne pouvons pas perdre !"
 
 #: ../src/gui/game-window.cpp:2573
 msgid "This battle shall be an easy victory!  We cannot lose!"
-msgstr ""
-"Cette bataille devrait être une victoire facile ! Nous ne pouvons pas "
-"perdre !"
+msgstr "Cette bataille devrait être une victoire facile ! Nous ne pouvons pas perdre !"
 
 #: ../src/gui/game-window.cpp:2578
 msgid "This battle will surely be a comfortable victory!"
@@ -4937,8 +4854,7 @@ msgstr "Une bataille ici pourrait être une victoire confortable !"
 
 #: ../src/gui/game-window.cpp:2582
 msgid "I believe this battle will surely be a comfortable victory!"
-msgstr ""
-"Je crois que cette bataille sera certainement une victoire confortable !"
+msgstr "Je crois que cette bataille sera certainement une victoire confortable !"
 
 #: ../src/gui/game-window.cpp:2584
 msgid "This battle would be a comfortable victory!"
@@ -4961,11 +4877,8 @@ msgid "A battle here would be a hard fought victory! But we shall win!"
 msgstr "Une bataille ici pourrait une victoire acquise de haute lutte !"
 
 #: ../src/gui/game-window.cpp:2599
-msgid ""
-"I believe this battle will surely be a hard fought victory! But we shall win!"
-msgstr ""
-"Je crois que cette bataille sera certainement une victoire acquise de haute "
-"lutte !"
+msgid "I believe this battle will surely be a hard fought victory! But we shall win!"
+msgstr "Je crois que cette bataille sera certainement une victoire acquise de haute lutte !"
 
 #: ../src/gui/game-window.cpp:2601
 msgid "This battle would be a hard fought victory! But we shall win!"
@@ -5012,11 +4925,8 @@ msgid "A battle here would be difficult but not impossible to win!"
 msgstr "Gagner une bataille ici pourrait être difficile, mais pas impossible !"
 
 #: ../src/gui/game-window.cpp:2633
-msgid ""
-"I believe this battle will surely be difficult but not impossible to win!"
-msgstr ""
-"Je pense que gagner cette bataille sera certainement difficile, mais pas "
-"impossible !"
+msgid "I believe this battle will surely be difficult but not impossible to win!"
+msgstr "Je pense que gagner cette bataille sera certainement difficile, mais pas impossible !"
 
 #: ../src/gui/game-window.cpp:2635
 msgid "This battle would be difficult but not impossible to win!"
@@ -5024,8 +4934,7 @@ msgstr "Gagner cette bataille pourrait être difficile, mais pas impossible !"
 
 #: ../src/gui/game-window.cpp:2639
 msgid "I believe this battle will be difficult but not impossible to win!"
-msgstr ""
-"Je pense que gagner cette bataille sera difficile, mais pas impossible !"
+msgstr "Je pense que gagner cette bataille sera difficile, mais pas impossible !"
 
 #: ../src/gui/game-window.cpp:2641
 msgid "This battle shall be difficult but not impossible to win!"
@@ -5040,10 +4949,8 @@ msgid "A battle here would be a brave choice! I leave it to thee!"
 msgstr "Livrer bataille ici pourrait être un choix téméraire !"
 
 #: ../src/gui/game-window.cpp:2650
-msgid ""
-"I believe this battle will surely be a brave choice! I leave it to thee!"
-msgstr ""
-"Je crois que livrer cette bataille sera certainement un choix téméraire !"
+msgid "I believe this battle will surely be a brave choice! I leave it to thee!"
+msgstr "Je crois que livrer cette bataille sera certainement un choix téméraire !"
 
 #: ../src/gui/game-window.cpp:2652
 msgid "This battle would be a brave choice! I leave it to thee!"
@@ -5067,8 +4974,7 @@ msgstr "Livrer bataille ici pourrait être une décision stupide !"
 
 #: ../src/gui/game-window.cpp:2667
 msgid "I believe this battle will surely be a foolish decision!"
-msgstr ""
-"Je crois que livrer cette bataille sera certainement une décision stupide !"
+msgstr "Je crois que livrer cette bataille sera certainement une décision stupide !"
 
 #: ../src/gui/game-window.cpp:2669
 msgid "This battle would be a foolish decision!"
@@ -5084,35 +4990,27 @@ msgstr "Livrer cette bataille risque d'être une décision stupide !"
 
 #: ../src/gui/game-window.cpp:2680
 msgid "This battle will surely be sheerest folly!  Thou shouldst not attack!"
-msgstr ""
-"Livrer cette bataille sera certainement une pure folie ! N'attaquez pas !"
+msgstr "Livrer cette bataille sera certainement une pure folie ! N'attaquez pas !"
 
 #: ../src/gui/game-window.cpp:2682 ../src/gui/game-window.cpp:2688
 msgid "A battle here would be sheerest folly!  Thou shouldst not attack!"
 msgstr "Livrer cette bataille sera  une pure folie ! N'attaquez pas !"
 
 #: ../src/gui/game-window.cpp:2684
-msgid ""
-"I believe this battle will surely be sheerest folly!  Thou shouldst not "
-"attack!"
-msgstr ""
-"Je crois que livrer cette bataille sera certainement une pure folie ! "
-"N'attaquez pas !"
+msgid "I believe this battle will surely be sheerest folly!  Thou shouldst not attack!"
+msgstr "Je crois que livrer cette bataille sera certainement une pure folie ! N'attaquez pas !"
 
 #: ../src/gui/game-window.cpp:2686
 msgid "This battle would be sheerest folly!  Thou shouldst not attack!"
 msgstr "Livrer cette bataille pourrait être une pure folie ! N'attaquez pas !"
 
 #: ../src/gui/game-window.cpp:2690
-msgid ""
-"I believe this battle will be sheerest folly!  Thou shouldst not attack!"
-msgstr ""
-"Je crois que livrer cette bataille sera une pure folie ! N'attaquez pas !"
+msgid "I believe this battle will be sheerest folly!  Thou shouldst not attack!"
+msgstr "Je crois que livrer cette bataille sera une pure folie ! N'attaquez pas !"
 
 #: ../src/gui/game-window.cpp:2692
 msgid "This battle shall be sheerest folly!  Thou shouldst not attack!"
-msgstr ""
-"Livrer cette bataille risque de s'avérer une pure folie ! N'attaquez pas !"
+msgstr "Livrer cette bataille risque de s'avérer une pure folie ! N'attaquez pas !"
 
 #: ../src/gui/game-window.cpp:2697
 msgid "This battle will surely be complete and utter suicide!"
@@ -5184,8 +5082,7 @@ msgstr[1] "%1 unités de %2 ont été recrutées à %3."
 msgid "%1 unit in %2 have been persuaded to fly your flag!"
 msgid_plural "%1 units in %2 have been persuaded to fly your flag!"
 msgstr[0] "%1 unité sur %2 a été persuadée de se ranger sous votre bannière !"
-msgstr[1] ""
-"%1 unités sur %2 ont été persuadées de se ranger sous votre bannière !"
+msgstr[1] "%1 unités sur %2 ont été persuadées de se ranger sous votre bannière !"
 
 #: ../src/gui/game-window.cpp:2891
 msgid "The citizens of %1 have been persuaded to fly your flag!"
@@ -5208,26 +5105,16 @@ msgstr[1] "%1 unités de %2 ont été bannies par %3 !"
 #: ../src/gui/game-window.cpp:2931
 msgid "%1 movement point was added to %2 and accompanying units!"
 msgid_plural "%1 movement points were added to %2 and accompanying units!"
-msgstr[0] ""
-"%1 point de mouvement a été ajouté à %2 et aux unités qui l'accompagnent !"
-msgstr[1] ""
-"%1 points de mouvement ont été ajoutés à %2 et aux unités qui "
-"l'accompagnent !"
+msgstr[0] "%1 point de mouvement a été ajouté à %2 et aux unités qui l'accompagnent !"
+msgstr[1] "%1 points de mouvement ont été ajoutés à %2 et aux unités qui l'accompagnent !"
 
 #: ../src/gui/load-scenario-dialog.cpp:104
 msgid "Random Scenario"
 msgstr "Scénario aléatoire"
 
 #: ../src/gui/load-scenario-dialog.cpp:126
-msgid ""
-"Play a new scenario with a random map.  You get to decide the number of "
-"players, and number of cities on the map.  You can also control the amount "
-"of the map that is covered in forest, water, swamps and mountains."
-msgstr ""
-"Jouez un nouveau scénario avec une carte aléatoire. Vous pouvez décider du "
-"nombre de joueurs et du nombre de cités sur la carte. Vous pouvez aussi "
-"contrôler l'étendue des foêts, des marais, des zones d'eau et des montagnes "
-"sur la carte."
+msgid "Play a new scenario with a random map.  You get to decide the number of players, and number of cities on the map.  You can also control the amount of the map that is covered in forest, water, swamps and mountains."
+msgstr "Jouez un nouveau scénario avec une carte aléatoire. Vous pouvez décider du nombre de joueurs et du nombre de cités sur la carte. Vous pouvez aussi contrôler l'étendue des foêts, des marais, des zones d'eau et des montagnes sur la carte."
 
 #: ../src/gui/load-scenario-dialog.cpp:164
 msgid "Select a scenario file to add to the library"
@@ -5652,11 +5539,8 @@ msgid "There must be at least one hero in the armyset."
 msgstr "Il faut au moins un héros dans ce lot d'armées."
 
 #: ../src/editor/armyset-window.cpp:565
-msgid ""
-"There must be at least one army unit with a production cost of more than "
-"zero."
-msgstr ""
-"Au moins une unité d'armée doit avoir un coût de production supérieur à zéro."
+msgid "There must be at least one army unit with a production cost of more than zero."
+msgstr "Au moins une unité d'armée doit avoir un coût de production supérieur à zéro."
 
 #: ../src/editor/armyset-window.cpp:568
 msgid "There must be at least one army unit than can defend a ruin."
@@ -5701,9 +5585,7 @@ msgstr "Erreur ! Impossible de sauvegarder le lot d'armées."
 
 #: ../src/editor/armyset-window.cpp:695
 msgid "Armyset is invalid, and is also the current working armyset."
-msgstr ""
-"Le lot d'armées est invalide et il est aussi le lot en cours de "
-"fonctionnement."
+msgstr "Le lot d'armées est invalide et il est aussi le lot en cours de fonctionnement."
 
 #: ../src/editor/armyset-window.cpp:758
 msgid "Select a Ship image"
@@ -5805,9 +5687,7 @@ msgstr "Erreur ! Impossible de sauvegarder le lot de cités."
 
 #: ../src/editor/cityset-window.cpp:421
 msgid "Cityset is invalid, and is also the current working cityset."
-msgstr ""
-"Le lot de cités est invalide et il est aussi le lot de cités en cours de "
-"fonctionnement."
+msgstr "Le lot de cités est invalide et il est aussi le lot de cités en cours de fonctionnement."
 
 #: ../src/editor/cityset-window.cpp:516
 msgid "Error!  The version of cityset is unsupported."
@@ -5983,9 +5863,7 @@ msgstr "Montre cet écran d'aide"
 
 #: ../src/editor/main.cpp:81 ../src/main.cpp:154
 msgid "FILE can be a saved game file (.sav), or a map (.map) file."
-msgstr ""
-"Le FICHIER peut être un fichier de sauvegarde de partie (.sav) ou de carte (."
-"map)."
+msgstr "Le FICHIER peut être un fichier de sauvegarde de partie (.sav) ou de carte (.map)."
 
 #: ../src/editor/main.cpp:83 ../src/main.cpp:156 ../src/gls/main.cpp:89
 #: ../src/gls/gls-client-main.cpp:128 ../src/ghs/main.cpp:99
@@ -6124,8 +6002,7 @@ msgstr "Erreur ! Impossible de sauvegarder le lot de tuiles."
 
 #: ../src/editor/tileset-window.cpp:624
 msgid "Tileset is invalid, and is also the current working tileset."
-msgstr ""
-"Le lot de tuiles est invalide et il est aussi le lots de tuiles en fonction."
+msgstr "Le lot de tuiles est invalide et il est aussi le lots de tuiles en fonction."
 
 #: ../src/editor/tileset-window.cpp:1039
 msgid "Choose an Image"
@@ -6184,17 +6061,12 @@ msgid "There must be at least one tilestyleset in the %1 tile."
 msgstr "Un style de tuile doit tuile %1 doit"
 
 #: ../src/editor/tileset-window.cpp:1493
-msgid ""
-"The image %1.png file of the %2 tile does not have a width as a multiple of "
-"its height."
-msgstr ""
-"la largeur du fichier d'image %1.png de la tuile %2 n'est pas un multiple de "
-"sa hauteur."
+msgid "The image %1.png file of the %2 tile does not have a width as a multiple of its height."
+msgstr "la largeur du fichier d'image %1.png de la tuile %2 n'est pas un multiple de sa hauteur."
 
 #: ../src/editor/tileset-window.cpp:1505 ../src/editor/tileset-window.cpp:1512
 msgid "The %1 tile does not have enough of the right kind of tile styles."
-msgstr ""
-"La tuile %1 ne possède pas suffisamment de styles de tuiles appropriés."
+msgstr "La tuile %1 ne possède pas suffisamment de styles de tuiles appropriés."
 
 #: ../src/editor/tileset-window.cpp:1518
 msgid "Only one tile can have a sunken radial pattern."
@@ -6242,18 +6114,15 @@ msgstr "Les trois images de %1 doivent être spécifiées."
 
 #: ../src/editor/shieldset-window.cpp:306
 msgid "The height or width of a small shield image is zero."
-msgstr ""
-"La hauteur ou la largeur de cette image de petit bouclier est égale à zéro."
+msgstr "La hauteur ou la largeur de cette image de petit bouclier est égale à zéro."
 
 #: ../src/editor/shieldset-window.cpp:309
 msgid "The height or width of a medium shield image is zero."
-msgstr ""
-"La hauteur ou la largeur de cette image de bouclier moyen est égale à zéro."
+msgstr "La hauteur ou la largeur de cette image de bouclier moyen est égale à zéro."
 
 #: ../src/editor/shieldset-window.cpp:312
 msgid "The height or width of a large shield image is zero."
-msgstr ""
-"La hauteur ou la largeur de cette image de grand bouclier est égale à zéro."
+msgstr "La hauteur ou la largeur de cette image de grand bouclier est égale à zéro."
 
 #: ../src/editor/shieldset-window.cpp:320
 msgid "The shieldset is valid."
@@ -6366,8 +6235,7 @@ msgstr "DéGrp"
 
 #: ../src/herotemplates.cpp:119
 msgid "Error!  can't load heronames file `%1'.  Exiting."
-msgstr ""
-"Erreur ! Impossible de charger le fichier des noms de héros  `%1. Sortie."
+msgstr "Erreur ! Impossible de charger le fichier des noms de héros  `%1. Sortie."
 
 #: ../src/xmlhelper.cpp:61
 msgid "Error opening `%1' for reading.  Exiting."
@@ -6379,48 +6247,35 @@ msgstr "Erreur à l'ouverture de `%1' pour écriture. Sortie"
 
 #: ../src/xmlhelper.cpp:393
 msgid "Error!  couldn't get Gdk::RGBA value from xml tag `%1'."
-msgstr ""
-"Erreur ! Impossible d'obtenir la valeur Gdk::RGBA depuis l'étiquette xml `"
-"%1'."
+msgstr "Erreur ! Impossible d'obtenir la valeur Gdk::RGBA depuis l'étiquette xml `%1'."
 
 #: ../src/xmlhelper.cpp:440
 msgid "Error!  couldn't get Glib::ustring value from xml tag `%1'."
-msgstr ""
-"Erreur ! Impossible d'obtenir la valeur Glib::ustring  depuis l'étiquette "
-"xml `%1'."
+msgstr "Erreur ! Impossible d'obtenir la valeur Glib::ustring  depuis l'étiquette xml `%1'."
 
 #: ../src/xmlhelper.cpp:460
 msgid "Error!  couldn't get bool value from xml tag `%1'."
-msgstr ""
-"Erreur ! Impossible d'obtenir la valeur bool (booléen) depuis l'étiquette "
-"xml `%1'."
+msgstr "Erreur ! Impossible d'obtenir la valeur bool (booléen) depuis l'étiquette xml `%1'."
 
 #: ../src/xmlhelper.cpp:490
 msgid "Error!  couldn't get int value from xml tag `%1'."
-msgstr ""
-"Erreur ! Impossible d'obtenir la valeur int (nombre entier) depuis "
-"l'étiquette xml `%1'."
+msgstr "Erreur ! Impossible d'obtenir la valeur int (nombre entier) depuis l'étiquette xml `%1'."
 
 #: ../src/xmlhelper.cpp:509
 msgid "Error!  couldn't get guint32 value from xml tag `%1'."
-msgstr ""
-"Erreur ! Impossible d'obtenir la valeur guint32 depuis l'étiquette xml `%1'."
+msgstr "Erreur ! Impossible d'obtenir la valeur guint32 depuis l'étiquette xml `%1'."
 
 #: ../src/xmlhelper.cpp:530
 msgid "Error!  couldn't get double value from xml tag `%1'."
-msgstr ""
-"Erreur ! Impossible d'obtenir la valeur double depuis l'étiquette xml `%1'."
+msgstr "Erreur ! Impossible d'obtenir la valeur double depuis l'étiquette xml `%1'."
 
 #: ../src/xmlhelper.cpp:624 ../src/xmlhelper.cpp:692
 msgid "%1: Callback for xml tag returned false.  Stop parsing document."
-msgstr ""
-"%1 : le Callback pour l'étiquette xml a retourné une valeur fausse. Arrêt du "
-"traitement du document."
+msgstr "%1 : le Callback pour l'étiquette xml a retourné une valeur fausse. Arrêt du traitement du document."
 
 #: ../src/snd.cpp:70
 msgid "Error loading music descriptions; disabling music."
-msgstr ""
-"Erreur de chargement des descriptions de musiques ; musique désactivée."
+msgstr "Erreur de chargement des descriptions de musiques ; musique désactivée."
 
 #: ../src/armybase.cpp:83
 msgid "+1 str in open"
@@ -6566,8 +6421,7 @@ msgstr "Impossible de trouver des lots de cités (*%1) dans `%2'."
 
 #: ../src/Itemlist.cpp:59
 msgid "Could not parse item description file `%1'.  Exiting."
-msgstr ""
-"Impossible de traiter le fichier de description d'objets e `%1'. Sortie."
+msgstr "Impossible de traiter le fichier de description d'objets e `%1'. Sortie."
 
 #: ../src/armyset.cpp:495
 msgid "Error!  can't load armyset `%1'."
@@ -6638,9 +6492,7 @@ msgstr "Erreur : Impossible de spécifier -s et -t simultanément."
 
 #: ../src/main.cpp:184
 msgid "Error: Must specify a file to load when specifying --turn."
-msgstr ""
-"Erreur : Vous devez spécifier un fichier à charger au moment de spécifier --"
-"turn."
+msgstr "Erreur : Vous devez spécifier un fichier à charger au moment de spécifier --turn."
 
 #: ../src/QCitySack.cpp:93
 msgid "The priests thank you for sacking this evil place."
@@ -6810,22 +6662,18 @@ msgstr "Arrêter le serveur"
 
 #: ../src/gls/gls-client-main.cpp:124
 msgid ""
-"Specifying a profile id of -1 to the --remove-all option will remove all "
-"games \n"
+"Specifying a profile id of -1 to the --remove-all option will remove all games \n"
 "from the game list."
 msgstr ""
-"Spécifier une id de profil de -1 à option --remove-all effacera toutes les "
-"parties \n"
+"Spécifier une id de profil de -1 à option --remove-all effacera toutes les parties \n"
 "de la liste des parties."
 
 #: ../src/gls/gls-client-main.cpp:126
 msgid ""
-"If HOST is not specified on the command-line, this tool will try to connect "
-"to \n"
+"If HOST is not specified on the command-line, this tool will try to connect to \n"
 "the game-list server at 127.0.0.1."
 msgstr ""
-"Si HOST n'est pas spécifié dans la ligne de commande, cet outil tentera de "
-"se connecter \n"
+"Si HOST n'est pas spécifié dans la ligne de commande, cet outil tentera de se connecter \n"
 "au serveur de liste de parties à 127.0.0.1"
 
 #: ../src/gls/gls-client-tool.cpp:72
@@ -6919,8 +6767,7 @@ msgstr "Héberger une partie."
 
 #: ../src/ghs/ghs-client-main.cpp:116
 msgid ""
-"If HOST is not specified on the command-line, this tool will try to connect "
-"to \n"
+"If HOST is not specified on the command-line, this tool will try to connect to \n"
 "the game-host server at 127.0.0.1."
 msgstr ""
 "Si HOST n'est pas spécifié dans ligne de commande, cet outil tentera de se \n"
@@ -7007,11 +6854,8 @@ msgid "Error: %1 could not be upgraded."
 msgstr "Erreur : %1 n'a pas pu être mis à niveau."
 
 #: ../src/upgrade-file.cpp:168
-msgid ""
-"Error: The --identify and --rewrite options cannot be used at the same time."
-msgstr ""
-"Erreur : les options --identify et --rewrite ne peuvent être utilisées en "
-"même temps"
+msgid "Error: The --identify and --rewrite options cannot be used at the same time."
+msgstr "Erreur : les options --identify et --rewrite ne peuvent être utilisées en même temps"
 
 #: ../src/file-compat.cpp:459 ../src/file-compat.cpp:472
 msgid "unknown file"
@@ -8274,3 +8118,4 @@ msgstr "Jouez à un clone de Warlords II"
 #: ../dat/lordsawar-editor.desktop.in.in.h:2
 msgid "Scenario Editor for LordsAWar!"
 msgstr "Éditeur de scénarios pour LordsAWar"
+
