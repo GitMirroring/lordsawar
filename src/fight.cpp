@@ -69,88 +69,60 @@ void Fight::orderArmies(std::list<Stack*> stacks, std::vector<Army*> &armies)
 Fight::Fight(Stack* attacker, Stack* defender, FightType type)
     : d_turn(0), d_result(DRAW), d_type(type)
 {
+  std::list<Stack *> attackers;
+  std::list<Stack *> defenders;
 
-    debug("Fight between " <<attacker->getId() <<" and " <<defender->getId())
-    
-    // Duel case: two stacks fight each other; Nothing further to be done
-    // Important: We always assume that the attacking/defending stacks are
-    // the first in the list!!!
-    d_attackers.push_back(attacker);
-    d_defenders.push_back(defender);
+  debug("Fight between " <<attacker->getId() <<" and " <<defender->getId());
 
-    // What we do here: In the setup, we need to find out all armies that
-    // participate in the fight.  If a city is being attacked then the
-    // defender gets any other stacks in the cities.
-    //
+  // Duel case: two stacks fight each other; Nothing further to be done
+  // Important: We always assume that the attacking/defending stacks are
+  // the first in the list!!!
+  attackers.push_back(attacker);
+  defenders.push_back(defender);
 
-    City *city = GameMap::getCity(defender->getPos());
-    //Vector<int> p = defender->getPos();
+  // What we do here: In the setup, we need to find out all armies that
+  // participate in the fight.  If a city is being attacked then the
+  // defender gets any other stacks in the cities.
+  //
 
-    if (city && city->isBurnt() == false && 
-        city->getOwner() == defender->getOwner())
-      {
-        /* we check the owner here because:
-         * StackInfoDialog does a fight for kicks with a neutral scout, 
-         * on the tile of the selected stack, which could be in a city.
-         */
-        std::vector<Stack*> stacks = city->getDefenders();
-        for (std::vector<Stack*>::iterator it = stacks.begin();
-             it != stacks.end(); it++)
-          {
-            Stack *s = *it;
-            if (s == d_defenders.front())
-              continue;
-            d_defenders.push_back(s);
-          }
-      }
-    else if ((!city || city->isBurnt() == true) &&
-             defender->getOwner() != Playerlist::getInstance()->getNeutral())
-      {
-        Vector<int> pos = defender->getPos();
-        std::vector<Stack*> stacks =
-          GameMap::getStacks(pos)->getEnemyStacks(attacker->getOwner());
-        for (std::vector<Stack*>::iterator it = stacks.begin();
-             it != stacks.end(); it++)
-          {
-            Stack *s = *it;
-            if (s == d_defenders.front())
-              continue;
-            d_defenders.push_back(s);
-          }
-      }
-	
-    std::list<Stack*>::iterator it;
-    
-    //setup fighters
-    it = d_defenders.begin();
-    std::vector<Army*> def;
-    orderArmies (d_defenders, def);
-    for (std::vector<Army*>::iterator ait = def.begin(); ait != def.end(); ait++)
-      {
-	Fighter* f = new Fighter((*ait), (*it)->getPos());
-	d_def_close.push_back(f);
-      }
+  Maptile *mtile = GameMap::getInstance()->getTile(defender->getPos());
+  City *city = GameMap::getCity(defender->getPos());
+  //Vector<int> p = defender->getPos();
 
-    it = d_attackers.begin();
-    std::vector<Army*> att;
-    orderArmies (d_attackers, att);
-    for (std::vector<Army*>::iterator ait = att.begin(); ait != att.end(); ait++)
-      {
-	Fighter* f = new Fighter((*ait), (*it)->getPos());
-	d_att_close.push_back(f);
-      }
+  if (city && city->isBurnt() == false &&
+      city->getOwner() == defender->getOwner())
+    {
+      /* we check the owner here because:
+       * StackInfoDialog does a fight for kicks with a neutral scout,
+       * on the tile of the selected stack, which could be in a city.
+       */
+      std::vector<Stack*> stacks = city->getDefenders();
+      for (std::vector<Stack*>::iterator it = stacks.begin();
+           it != stacks.end(); it++)
+        {
+          Stack *s = *it;
+          if (s == d_defenders.front())
+            continue;
+          defenders.push_back(s);
+        }
+    }
+  else if ((!city || city->isBurnt() == true) &&
+           defender->getOwner() != Playerlist::getInstance()->getNeutral())
+    {
+      Vector<int> pos = defender->getPos();
+      std::vector<Stack*> stacks =
+        GameMap::getStacks(pos)->getEnemyStacks(attacker->getOwner());
+      for (std::vector<Stack*>::iterator it = stacks.begin();
+           it != stacks.end(); it++)
+        {
+          Stack *s = *it;
+          if (s == d_defenders.front())
+            continue;
+          defenders.push_back(s);
+        }
+    }
 
-  fillInInitialHPs();
-  for (auto f : d_att_close)
-    d_initial_att_close.push_back(new Fighter(*f));
-  for (auto f : d_def_close)
-    d_initial_def_close.push_back(new Fighter(*f));
-
-  // Before the battle starts, calculate the bonuses
-  // bonuses remain even if the unit providing a stackwide bonus dies
-
-
-  calculateBonus();
+  setupFight (attackers, defenders, city != NULL, mtile->getType(), type);
 }
 
 Fight::Fight(std::list<Stack*> attackers, std::list<Stack*> defenders,
@@ -163,9 +135,38 @@ Fight::Fight(std::list<Stack*> attackers, std::list<Stack*> defenders,
   fillInInitialHPs();
 }
 
+void Fight::setupFight(std::list<Stack*> attackers, std::list<Stack*> defenders, bool city, Tile::Type terrain, FightType type)
+{
+  d_type = type;
+  d_attackers = attackers;
+  d_defenders = defenders;
+  std::vector<Army*> def;
+  orderArmies (d_defenders, def);
+  for (auto a : def)
+    d_def_close.push_back(new Fighter(a, defenders.front()->getPos()));
+  std::vector<Army*> att;
+  orderArmies (d_attackers, att);
+  for (auto a : att)
+    d_att_close.push_back(new Fighter(a, attackers.front()->getPos()));
+  fillInInitialHPs();
+  for (auto f : d_att_close)
+    d_initial_att_close.push_back(new Fighter(*f));
+  for (auto f : d_def_close)
+    d_initial_def_close.push_back(new Fighter(*f));
+  Maptile *mtile = new Maptile(-1, -1, terrain);
+  if (city)
+    mtile->setBuilding(Maptile::CITY);
+  calculateBonus(mtile);
+  delete mtile;
+}
+
+Fight::Fight(std::list<Stack*> attackers, std::list<Stack*> defenders, bool city, Tile::Type terrain, FightType type)
+{
+  setupFight (attackers, defenders, city, terrain, type);
+}
+
 Fight::~Fight()
 {
-      
   d_attackers.clear();
   d_defenders.clear();
 
@@ -324,35 +325,37 @@ void Fight::calculateBaseStrength(std::list<Fighter*> fighters)
     }
 }
 
-void Fight::calculateTerrainModifiers(std::list<Fighter*> fighters, bool tower)
-{ 
+void Fight::calculateTerrainModifiers(std::list<Fighter*> fighters, Maptile *mtile, bool defender)
+{
   guint32 army_bonus;
-  Maptile *mtile;
   std::list<Fighter*>::iterator fit;
   for (fit = fighters.begin(); fit != fighters.end(); fit++)
     {
       if ((*fit)->army->getStat(Army::SHIP))
 	continue;
 
+      bool tower = false;
+      if (defender)
+        tower = (*fit)->army->getFortified();
       mtile = GameMap::getInstance()->getTile((*fit)->pos);
       army_bonus = (*fit)->army->getStat(Army::ARMY_BONUS);
 
-      if (army_bonus & Army::ADD1STRINOPEN && mtile->isOpenTerrain() && !tower)
+      if (army_bonus & Army::ADD1STRINOPEN && mtile->isOpenTerrain() == Tile::GRASS && !tower)
 	(*fit)->terrain_strength += 1;
 
-      if (army_bonus & Army::ADD1STRINFOREST && 
+      if (army_bonus & Army::ADD1STRINFOREST &&
 	  mtile->getType() == Tile::FOREST && !mtile->isCityTerrain() && !tower)
 	(*fit)->terrain_strength += 1;
 
-      if (army_bonus & Army::ADD2STRINFOREST && 
+      if (army_bonus & Army::ADD2STRINFOREST &&
 	  mtile->getType() == Tile::FOREST && !mtile->isCityTerrain() && !tower)
 	(*fit)->terrain_strength += 2;
 
-      if (army_bonus & Army::ADD1STRINHILLS && mtile->isHillyTerrain() && 
+      if (army_bonus & Army::ADD1STRINHILLS && mtile->isHillyTerrain() &&
           !tower)
 	(*fit)->terrain_strength += 1;
 
-      if (army_bonus & Army::ADD2STRINHILLS && mtile->isHillyTerrain() && 
+      if (army_bonus & Army::ADD2STRINHILLS && mtile->isHillyTerrain() &&
           !tower)
 	(*fit)->terrain_strength += 2;
 
@@ -371,13 +374,13 @@ void Fight::calculateTerrainModifiers(std::list<Fighter*> fighters, bool tower)
     }
 }
 
-void Fight::calculateModifiedStrengths (std::list<Fighter*>friendly, 
-					std::list<Fighter*>enemy, 
+void Fight::calculateModifiedStrengths (std::list<Fighter*>friendly,
+					std::list<Fighter*>enemy,
 					bool friendlyIsDefending,
-					Hero *strongestHero)
+					Hero *strongestHero,
+                                        Maptile *mtile)
 {
   guint32 army_bonus;
-  Maptile *mtile;
   std::list<Fighter*>::iterator fit;
 
   //find highest non-hero bonus
@@ -389,7 +392,6 @@ void Fight::calculateModifiedStrengths (std::list<Fighter*>friendly,
 	continue;
       if ((*fit)->army->getStat(Army::SHIP))
         continue;
-      mtile = GameMap::getInstance()->getTile((*fit)->pos);
       army_bonus = (*fit)->army->getStat(Army::ARMY_BONUS);
 
       if (army_bonus & Army::ADD1STACKINHILLS && mtile->isHillyTerrain())
@@ -458,7 +460,7 @@ void Fight::calculateModifiedStrengths (std::list<Fighter*>friendly,
       City *c = Citylist::getInstance()->getNearestCity((*fit)->pos);
       if (c && mtile->getBuilding() == Maptile::CITY)
         {
-          if (c->isBurnt()) 
+          if (c->isBurnt())
             city_bonus = 0;
           else
             city_bonus = c->getDefenseLevel() - 1;
@@ -498,7 +500,7 @@ void Fight::calculateModifiedStrengths (std::list<Fighter*>friendly,
         }
     }
 
-  guint32 total_bonus = highest_non_hero_bonus + hero_bonus + fortify_bonus + 
+  guint32 total_bonus = highest_non_hero_bonus + hero_bonus + fortify_bonus +
     city_bonus;
 
   if (total_bonus > 5) //total bonus can't exceed 5
@@ -542,7 +544,7 @@ void Fight::calculateFinalStrengths (std::list<Fighter*> friendly, std::list<Fig
     }
 }
 
-void Fight::calculateBonus()
+void Fight::calculateBonus(Maptile *mtile)
 {
   // If there is a hero, add a +1 strength bonus
   std::list<Stack*>::const_iterator it;
@@ -555,21 +557,17 @@ void Fight::calculateBonus()
   calculateBaseStrength (d_att_close);
   calculateBaseStrength (d_def_close);
 
-  // now determine the terrain strength by adding the terrain modifiers 
+  // now determine the terrain strength by adding the terrain modifiers
   // to the base strength
   // naval units always have a strength of 4
-  bool tower = false;
-  if (d_def_close.size())
-    tower =
-      d_def_close.front()->army->getStat(Army::ARMY_BONUS) & Army::FORTIFY;
-  calculateTerrainModifiers (d_att_close, tower);
-  calculateTerrainModifiers (d_def_close, tower);
+  calculateTerrainModifiers (d_att_close, mtile, false);
+  calculateTerrainModifiers (d_def_close, mtile, true);
 
   //calculate hero, non-hero, city, and fortify bonuses
   it = d_attackers.begin();
   Army *a = (*it)->getStrongestHero();
   Hero *h = dynamic_cast<Hero*>(a);
-  calculateModifiedStrengths (d_att_close, d_def_close, false, h);
+  calculateModifiedStrengths (d_att_close, d_def_close, false, h, mtile);
   Hero *strongestHero = 0;
   guint32 highest_strength = 0;
   for (it = d_defenders.begin(); it != d_defenders.end(); it++)
@@ -584,7 +582,8 @@ void Fight::calculateBonus()
 	  strongestHero = h;
 	}
     }
-  calculateModifiedStrengths (d_def_close, d_att_close, true, strongestHero);
+  calculateModifiedStrengths (d_def_close, d_att_close, true, strongestHero,
+                              mtile);
 
   calculateFinalStrengths (d_att_close, d_def_close);
   calculateFinalStrengths (d_def_close, d_att_close);
@@ -601,12 +600,12 @@ void Fight::fightArmies(Fighter* attacker, Fighter* defender)
   Army *a = attacker->army;
   Army *d = defender->army;
 
-  debug("Army " << a->getId() << " attacks " << d->getId())
+  debug("Army " << a->getId() << " attacks " << d->getId());
 
-    if (d_intense_combat == true)
-      sides = BATTLE_DICE_SIDES_INTENSE;
-    else
-      sides = BATTLE_DICE_SIDES_NORMAL;
+  if (d_intense_combat == true)
+    sides = BATTLE_DICE_SIDES_INTENSE;
+  else
+    sides = BATTLE_DICE_SIDES_NORMAL;
 
   // factor used for some calculation regarding gaining medals
   double xp_factor = a->getXpReward() / d->getXpReward();
@@ -722,7 +721,7 @@ void Fight::fillInInitialHPs()
        i != d_attackers.end(); ++i)
     for (Stack::iterator j = (*i)->begin(); j != (*i)->end(); ++j)
       initial_hps[(*j)->getId()] = (*j)->getHP();
-  
+
   for (std::list<Stack *>::iterator i = d_defenders.begin();
        i != d_defenders.end(); ++i)
     for (Stack::iterator j = (*i)->begin(); j != (*i)->end(); ++j)

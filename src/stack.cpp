@@ -306,31 +306,15 @@ Army* Stack::getStrongestHero() const
 {
   Army *strongest = 0;
   guint32 highest_strength = 0;
-  bool water = 
-    GameMap::getInstance()->getTile(getPos())->getType() == Tile::WATER;
-  if (GameMap::getBridge(getPos()))
-    water = false;
   for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isHero())
         {
-          if (!water)
-            {
-              if ((*it)->getStat(Army::STRENGTH) > highest_strength)
+          if ((*it)->getStat(Army::STRENGTH) > highest_strength)
 
-                {
-                  highest_strength = (*it)->getStat(Army::STRENGTH);
-                  strongest = *it;
-                }
-            }
-          else
             {
-              if ((*it)->getStat(Army::SHIP) &&
-                  (*it)->getStat(Army::BOAT_STRENGTH) > highest_strength)
-                {
-                  highest_strength = (*it)->getStat(Army::STRENGTH);
-                  strongest = *it;
-                }
+              highest_strength = (*it)->getStat(Army::STRENGTH);
+              strongest = *it;
             }
         }
     }
@@ -657,7 +641,7 @@ guint32 Stack::calculateMoveBonus() const
       if ((*it)->isHero())
 	{
 	  Hero *h = dynamic_cast<Hero*>(*it);
-	  if (h->getBackpack()->countStackFlightGivers() > 0)
+	  if (h->isFlyer())
 	    {
 	      d_bonus = Tile::isFlying();
 	      return d_bonus;

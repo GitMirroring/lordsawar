@@ -30,11 +30,13 @@
 #include <map>
 #include "vector.h"
 #include "LocationBox.h"
+#include "Tile.h"
 
 class Stack;
 class Fighter;
 class Hero;
 class Army;
+class Maptile;
 
 //! A description of a round of casualties during a Fight.
 /** 
@@ -76,10 +78,10 @@ class Fight
 	   * Although it is in the enumeration, every fight should always
 	   * have a winner.  No draws allowed because MAX_ROUNDS is 0.
 	   */
-	  DRAW = 0, 
+	  DRAW = 0,
 
 	  //! The attacking list of stacks won the battle.
-	  ATTACKER_WON = 1, 
+	  ATTACKER_WON = 1,
 
 	  //! The defending list of stacks won the battle.
 	  DEFENDER_WON = 2
@@ -92,7 +94,7 @@ class Fight
 	   * @note This value is used to assist in the implementation of the
 	   *       `Miltary Advisor' feature.
 	   */
-	  FOR_KICKS = 0, 
+	  FOR_KICKS = 0,
 
 	  //! The fight is real.  If an army dies, it stays dead.
 	  FOR_KEEPS = 1
@@ -109,7 +111,10 @@ class Fight
         // construct from serialized action
         Fight(std::list<Stack*> attackers, std::list<Stack*> defenders,
               std::list<FightItem> history);
-        
+
+        // construct for the battle calculator
+        Fight(std::list<Stack*> attackers, std::list<Stack*> defenders, bool city, Tile::Type terrain, FightType type = FOR_KEEPS);
+
 	//! Destructor.
         ~Fight();
 
@@ -124,19 +129,19 @@ class Fight
         void battle(bool intense);
 
         Result battleFromHistory();
-        
+
         //! Returns the result of the fight.
         Result getResult() const {return d_result;}
 
         //! Returns the list of things that happened in chronological order.
         std::list<FightItem> getCourseOfEvents() const {return d_actions;};
-        
+
         //! Returns the participating attacker stacks.
         std::list<Stack*> getAttackers() const {return d_attackers;}
 
         //! Returns the participating defender stacks.
         std::list<Stack*> getDefenders() const {return d_defenders;}
-        
+
         //! Returns the participating attacker armies.
         std::list<Fighter*> getAttackerFighters() const { return d_initial_att_close;};
         //! Returns the participating defender armies.
@@ -157,11 +162,11 @@ class Fight
 	/**
 	 * @note This is used for calculation and display purposes.
 	 */
-        static void orderArmies(std::list<Stack*> stacks, 
+        static void orderArmies(std::list<Stack*> stacks,
 				std::vector<Army*> &armies);
 
         std::map<guint32, guint32> getInitialHPs() { return initial_hps; }
-        
+
 	static LocationBox calculateFightBox(Fight &fight);
     private:
 	//! Calculates one round of the fight.
@@ -172,22 +177,23 @@ class Fight
         bool doRound();
 
         //! Calculates the attack/defense bonus of the armies.
-        void calculateBonus();
+        void calculateBonus(Maptile *mtile);
 
 	//! Calculates the base strength of the armies fighting in the battle.
         void calculateBaseStrength(std::list<Fighter*> fighters);
 
 	//! Add the bonuses provided by terrain.
-        void calculateTerrainModifiers(std::list<Fighter*> fighters, bool defenders_in_tower);
+        void calculateTerrainModifiers(std::list<Fighter*> fighters, Maptile *mtile, bool defender);
 
 	//! Add the bonuses by opponents.
-        void calculateModifiedStrengths (std::list<Fighter*>friendly, 
-                                         std::list<Fighter*>enemy, 
+        void calculateModifiedStrengths (std::list<Fighter*>friendly,
+                                         std::list<Fighter*>enemy,
                                          bool friendlyIsDefending,
-                                         Hero *strongestHero);
+                                         Hero *strongestHero,
+                                         Maptile *mtile);
 
 	//! Subtract stack bonuses of the opponent.
-        void calculateFinalStrengths (std::list<Fighter*> friendly, 
+        void calculateFinalStrengths (std::list<Fighter*> friendly,
 				      std::list<Fighter*> enemy);
 
         /** 
@@ -205,8 +211,10 @@ class Fight
 
         void fillInInitialHPs();
 
+        void setupFight(std::list<Stack*> attackers, std::list<Stack*> defenders, bool city, Tile::Type terrain, FightType type);
+
         Army *findArmyById(const std::list<Stack *> &l, guint32 id);
-        
+
         // DATA
 
 	//! The attackers.
@@ -214,7 +222,7 @@ class Fight
 
 	//! The defenders.
         std::list<Stack*> d_defenders;
-        
+
 	//!The attackers in the fight, afterwards.
         std::list<Fighter*> d_att_close;
 	//!The attackers in the fight, beforehand.
@@ -226,10 +234,10 @@ class Fight
         std::list<Fighter*> d_initial_def_close;
 
         std::map<guint32, guint32> initial_hps;
-        
+
 	//! The list of fight events that gets calculated.
         std::list<FightItem> d_actions;
-        
+
 	//! The round of the fight.
         int d_turn;
 
@@ -252,7 +260,7 @@ class Fighter
     public:
         Fighter(Army* a, Vector<int> p);
         Fighter(const Fighter &f);
-        
+
         Army* army;
         Vector<int> pos;       // location on the map (needed to calculate boni)
         int terrain_strength;
