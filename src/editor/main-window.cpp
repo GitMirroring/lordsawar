@@ -93,6 +93,7 @@
 #include "rnd.h"
 #include "stacklist.h"
 #include "battle-calculator-dialog.h"
+#include "stacktile.h"
 
 #define method(x) sigc::mem_fun(*this, &MainWindow::x)
 
@@ -1678,6 +1679,11 @@ void MainWindow::clear_save_file_of_scenario_specific_data()
       (*i)->setGold(1000);
       (*i)->revive();
     }
+  //group all stacks, because the editor doesn't have a way to represent
+  //many stacks on the same tile.
+  for (auto p : *Playerlist::getInstance())
+    for (auto pos : p->getStacklist()->getPositions())
+      GameMap::getStacks(pos)->group(p);
 }
 
 void MainWindow::on_import_map_activated()
