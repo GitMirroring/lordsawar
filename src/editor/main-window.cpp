@@ -188,6 +188,8 @@ MainWindow::MainWindow(Glib::ustring load_filename)
 			      EditorBigMap::BRIDGE, 1);
     setup_pointer_radiobutton(xml, "draw_bag", "button_bag",
 			      EditorBigMap::BAG, 1);
+    setup_pointer_radiobutton(xml, "fight", "button_fight",
+			      EditorBigMap::FIGHT, 1);
 
     xml->get_widget("players_hbox", players_hbox);
     on_pointer_radiobutton_toggled();
@@ -301,6 +303,10 @@ MainWindow::MainWindow(Glib::ustring load_filename)
 
 MainWindow::~MainWindow()
 {
+  for (auto a : battle_calculator_attackers)
+    delete a;
+  for (auto d : battle_calculator_defenders)
+    delete d;
   delete bigmap;
   delete smallmap;
   delete game_scenario;
@@ -1305,6 +1311,7 @@ void MainWindow::init_maps()
     bigmap->map_changed.connect(method(on_bigmap_changed));
     bigmap->map_water_changed.connect (method(on_smallmap_water_changed));
     bigmap->bag_selected.connect (method(on_bag_selected));
+    bigmap->stack_selected_for_battle_calculator.connect(method(on_stack_selected_for_battle_calculator));
                                        
 
     // grid is on by default
@@ -1855,8 +1862,13 @@ void MainWindow::on_remove_all_stacks_activated()
       dialog->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
       dialog->add_button(Gtk::Stock::OK, Gtk::RESPONSE_ACCEPT);
       Gtk::Box *box = dialog->get_content_area ();
-      Gtk::Label l =
-        Gtk::Label(String::ucompose(ngettext("This will remove %1 stack.\nAre you sure?", "This will remove %1 stacks.\nAre you sure?", num_stacks), num_stacks));
+      Glib::ustring s =
+        String::ucompose(ngettext("This will remove %1 stack.\nAre you sure?",
+                                  "This will remove %1 stacks.\nAre you sure?",
+                                  num_stacks),
+                         num_stacks);
+      Gtk::Label l = Gtk::Label();
+      l.set_text (s);
       l.set_margin_left (10);
       l.set_margin_right (10);
       l.set_margin_top (10);
@@ -1904,6 +1916,73 @@ void MainWindow::on_road_edited(Vector<int> pos, int type)
 
 void MainWindow::on_battle_calculator_activated()
 {
-  BattleCalculatorDialog d (*window);
+  BattleCalculatorDialog d (*window, battle_calculator_attackers,
+                            battle_calculator_defenders);
   d.run();
+}
+    
+void MainWindow::on_stack_selected_for_battle_calculator(Stack *s)
+{
+  Gtk::Menu *menu = manage(new Gtk::Menu);
+    {
+      Glib::ustring str = _("Set as attacking stack");
+      Gtk::MenuItem *item = manage(new Gtk::MenuItem(str));
+      item->signal_activate().connect
+        (sigc::bind(method(add_attacker_to_battle_calculator), s));
+      item->show();
+      menu->add(*item);
+    }
+    {
+      Glib::ustring str = _("Set as defending stack");
+      Gtk::MenuItem *item = manage(new Gtk::MenuItem(str));
+      item->signal_activate().connect
+        (sigc::bind(method(add_defender_to_battle_calculator), s));
+      item->show();
+      menu->add(*item);
+    }
+    {
+      Glib::ustring str = _("Append to defenders");
+      Gtk::MenuItem *item = manage(new Gtk::MenuItem(str));
+      item->signal_activate().connect
+        (sigc::bind(method(append_defender_to_battle_calculator), s));
+      item->set_sensitive(battle_calculator_defenders.size() + s->size() <= 32);
+      item->show();
+      menu->add(*item);
+    }
+  menu->popup(button_event->button, button_event->time);
+}
+
+void MainWindow::add_attacker_to_battle_calculator(Stack *s)
+{
+  for (auto a: battle_calculator_attackers)
+    delete a;
+  battle_calculator_attackers.clear();
+  for (auto a: *s)
+    {
+      if (a->isHero())
+        battle_calculator_attackers.push_back(new Hero (*dynamic_cast<Hero*>(a)));
+      else
+        battle_calculator_attackers.push_back(new Army (*a, a->getOwner()));
+    }
+  on_battle_calculator_activated();
+}
+
+void MainWindow::add_defender_to_battle_calculator(Stack *s)
+{
+  for (auto a: battle_calculator_defenders)
+    delete a;
+  battle_calculator_defenders.clear();
+  append_defender_to_battle_calculator (s);
+}
+
+void MainWindow::append_defender_to_battle_calculator(Stack *s)
+{
+  for (auto a: *s)
+    {
+      if (a->isHero())
+        battle_calculator_defenders.push_back(new Hero (*dynamic_cast<Hero*>(a)));
+      else
+        battle_calculator_defenders.push_back(new Army (*a, a->getOwner()));
+    }
+  on_battle_calculator_activated();
 }

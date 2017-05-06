@@ -531,6 +531,12 @@ void EditorBigMap::change_map_under_cursor()
         bag_selected.emit(tile);
       break;
 
+    case FIGHT:
+        {
+          Stack *s = GameMap::getStack(tile);
+          stack_selected_for_battle_calculator.emit(s);
+        }
+      break;
     }
 
   if (changed_tiles.w > 0 && changed_tiles.h > 0)
@@ -773,9 +779,24 @@ void EditorBigMap::after_draw()
 	    pic->blit(buffer, pos);
 	    break;
 	  case BAG:
-	    pic = ImageCache::getInstance()->getBagPic();
-	    pic->blit(buffer, pos);
+              {
+                pic = ImageCache::getInstance()->getBagPic();
+                Vector<int> offset = Vector<int>(tilesize,tilesize) - 
+                  Vector<int>(pic->get_width(), pic->get_height());
+                pic->blit(buffer, pos + (offset / 2));
+              }
 	    break;
+          case FIGHT:
+              {
+                pic =
+                  ImageCache::getInstance()->getCursorPic(ImageCache::SWORD);
+                PixMask *copy = pic->copy();
+                PixMask::scale (copy, tilesize * 0.66, tilesize * 0.66);
+                copy->blit(buffer, pos +
+                           Vector<int>(tilesize * 0.165, tilesize * 0.165));
+                delete copy;
+              }
+            break;
 	  }
       }
     return;

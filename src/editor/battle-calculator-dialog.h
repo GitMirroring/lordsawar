@@ -29,10 +29,14 @@ class Army;
 class Player;
 
 //! Scenario editor.  Simulate a battle and see the results.
+/*
+ * The lists of armies belong the caller, and the caller is expected to 
+ * delete them.
+ */
 class BattleCalculatorDialog: public LwEditorDialog
 {
  public:
-    BattleCalculatorDialog(Gtk::Window &parent);
+    BattleCalculatorDialog(Gtk::Window &parent, std::list<Army*> &attackers, std::list<Army *> &defenders);
     ~BattleCalculatorDialog() {};
 
     int run();
@@ -94,8 +98,8 @@ class BattleCalculatorDialog: public LwEditorDialog
     void on_attacker_player_changed();
     void on_defender_player_changed();
 
-    void add_attacker_army(Army *a);
-    void add_defender_army(Army *a);
+    void add_attacker_army(Army *a, bool add);
+    void add_defender_army(Army *a, bool add);
     void set_button_sensitivity();
     void cell_data_attacker_strength(Gtk::CellRenderer *renderer, const Gtk::TreeIter& i);
     void on_attacker_strength_edited(const Glib::ustring &path, const Glib::ustring &new_text);
@@ -109,6 +113,9 @@ class BattleCalculatorDialog: public LwEditorDialog
 
     Player *get_attacker_player();
     Player *get_defender_player();
+
+    std::list<Army *> &d_attackers;
+    std::list<Army *> &d_defenders;
 };
 
 #endif

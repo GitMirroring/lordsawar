@@ -42,10 +42,11 @@
 
 #define method(x) sigc::mem_fun(*this, &BattleCalculatorDialog::x)
 
-BattleCalculatorDialog::BattleCalculatorDialog(Gtk::Window &parent)
+BattleCalculatorDialog::BattleCalculatorDialog(Gtk::Window &parent, std::list<Army*> &attackers, std::list<Army *> &defenders)
  : LwEditorDialog(parent, "battle-calculator-dialog.ui"),
     attacker_strength_column(_("Strength"), attacker_strength_renderer),
-    defender_strength_column(_("Strength"), defender_strength_renderer)
+    defender_strength_column(_("Strength"), defender_strength_renderer),
+    d_attackers(attackers), d_defenders(defenders)
 {
   attacker_player_combobox = NULL;
   attacker_player_combobox = manage(new Gtk::ComboBoxText);
@@ -136,6 +137,10 @@ BattleCalculatorDialog::BattleCalculatorDialog(Gtk::Window &parent)
   terrain_combobox->set_active(0);
   terrain_box->pack_start(*terrain_combobox, Gtk::PACK_SHRINK);
   xml->get_widget("die_sides_combobox", die_sides_combobox);
+  for (auto a : d_attackers)
+    add_attacker_army (a, false);
+  for (auto a : d_defenders)
+    add_defender_army (a, false);
   set_button_sensitivity();
 }
 
@@ -168,7 +173,7 @@ void BattleCalculatorDialog::on_attacker_copy_clicked()
       Army *army = (*i)[combatant_columns.army];
       Army *new_army = new Army(*army, player);
       new_army->assignNewId();
-      add_attacker_army(new_army);
+      add_attacker_army(new_army, true);
     }
 
   set_button_sensitivity();
@@ -187,11 +192,11 @@ void BattleCalculatorDialog::on_attacker_add_clicked()
         {
           HeroProto *hp = new HeroProto(*army);
           hp->setOwnerId(player->getId());
-          add_attacker_army(new Hero(*hp));
+          add_attacker_army(new Hero (*hp), true);
           delete hp;
         }
       else
-        add_attacker_army(new Army(*army, player));
+        add_attacker_army(new Army(*army, player), true);
     }
 }
     
@@ -214,15 +219,19 @@ void BattleCalculatorDialog::on_attacker_remove_clicked()
   if (i)
     {
       Army *army = (*i)[combatant_columns.army];
+      d_attackers.erase(std::remove (d_attackers.begin(), d_attackers.end(), army), d_attackers.end());
       delete army;
       attackers_list->erase(i);
+
     }
 
   set_button_sensitivity();
 }
 
-void BattleCalculatorDialog::add_attacker_army(Army *a)
+void BattleCalculatorDialog::add_attacker_army(Army *a, bool add)
 {
+  if (add)
+    d_attackers.push_back(a);
   ImageCache *gc = ImageCache::getInstance();
   Gtk::TreeIter i = attackers_list->append();
   (*i)[combatant_columns.army] = a;
@@ -230,8 +239,6 @@ void BattleCalculatorDialog::add_attacker_army(Army *a)
     gc->getArmyPic(a->getOwner()->getArmyset(), a->getTypeId(), a->getOwner(),
                    NULL)->to_pixbuf();
   (*i)[combatant_columns.strength] = a->getStat(Army::STRENGTH, false);
-  //(*i)[combatant_columns.augmented_strength] =
-    //a->getStat(Army::STRENGTH, false);
   (*i)[combatant_columns.hp] = a->getStat(Army::HP, false);
 
   attackers_treeview->get_selection()->select(i);
@@ -351,7 +358,7 @@ void BattleCalculatorDialog::on_defender_copy_clicked()
       Army *army = (*i)[combatant_columns.army];
       Army *new_army = new Army(*army, player);
       new_army->assignNewId();
-      add_defender_army(new_army);
+      add_defender_army(new_army, true);
     }
 
   set_button_sensitivity();
@@ -370,11 +377,11 @@ void BattleCalculatorDialog::on_defender_add_clicked()
         {
           HeroProto *hp = new HeroProto(*army);
           hp->setOwnerId(player->getId());
-          add_defender_army(new Hero(*hp));
+          add_defender_army(new Hero(*hp), true);
           delete hp;
         }
       else
-        add_defender_army(new Army(*army, player));
+        add_defender_army(new Army(*army, player), true);
     }
 }
 
@@ -396,6 +403,7 @@ void BattleCalculatorDialog::on_defender_remove_clicked()
   if (i)
     {
       Army *army = (*i)[combatant_columns.army];
+      d_defenders.erase(std::remove (d_defenders.begin(), d_defenders.end(), army), d_defenders.end());
       delete army;
       defenders_list->erase(i);
     }
@@ -403,8 +411,10 @@ void BattleCalculatorDialog::on_defender_remove_clicked()
   set_button_sensitivity();
 }
 
-void BattleCalculatorDialog::add_defender_army(Army *a)
+void BattleCalculatorDialog::add_defender_army(Army *a, bool add)
 {
+  if (add)
+    d_defenders.push_back(a);
   ImageCache *gc = ImageCache::getInstance();
   Gtk::TreeIter i = defenders_list->append();
   (*i)[combatant_columns.army] = a;
@@ -543,6 +553,17 @@ Fight::Result BattleCalculatorDialog::run_battle ()
       Army *army = (*d)[combatant_columns.army];
       army->setHP(initial_hitpoints[army->getId()]);
     }
+  //delete the stacks we made, but keep the armies
+  for (auto s: attackers)
+    {
+      s->clear();
+      delete s;
+    }
+  for (auto d: defenders)
+    {
+      d->clear();
+      delete d;
+    }
   return f.getResult();
 }
 
@@ -576,8 +597,13 @@ void BattleCalculatorDialog::on_fight100_clicked()
       d->property_transient_for() = dialog;
       d->add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_ACCEPT);
       Gtk::Box *box = d->get_content_area ();
-      Gtk::Label l =
-        Gtk::Label(String::ucompose(ngettext("The attacker won %1 battle and lost %2.", "The attacker won %1 battles and lost %2.", attacker_wins), attacker_wins, defender_wins));
+      Glib::ustring s = 
+        String::ucompose(ngettext("The attacker won %1 battle and lost %2.",
+                                  "The attacker won %1 battles and lost %2.",
+                                  attacker_wins),
+                         attacker_wins, defender_wins);
+      Gtk::Label l = Gtk::Label();
+      l.set_text (s);
       l.set_margin_left (10);
       l.set_margin_right (10);
       l.set_margin_top (10);

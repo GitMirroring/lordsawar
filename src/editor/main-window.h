@@ -251,11 +251,18 @@ class MainWindow: public sigc::trackable
     void update_window_title();
     void on_bag_selected(Vector<int> pos);
     void on_road_edited(Vector<int> pos, int new_type);
+    void on_stack_selected_for_battle_calculator(Stack *s);
+    void add_attacker_to_battle_calculator(Stack *s);
+    void add_defender_to_battle_calculator(Stack *s);
+    void append_defender_to_battle_calculator(Stack *s);
+
 
     int d_width;
     int d_height;
     Glib::ustring d_load_filename;// filename given on the command line.
     RoadEditorTip *road_editor_tip;
+    std::list<Army*> battle_calculator_attackers;
+    std::list<Army*> battle_calculator_defenders;
     
 };
 
