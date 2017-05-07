@@ -534,7 +534,8 @@ void EditorBigMap::change_map_under_cursor()
     case FIGHT:
         {
           Stack *s = GameMap::getStack(tile);
-          stack_selected_for_battle_calculator.emit(s);
+          if (s)
+            stack_selected_for_battle_calculator.emit(s);
         }
       break;
     }
