@@ -103,10 +103,10 @@ SplashWindow::SplashWindow()
       int decorations = 24 * 3;
       if (Gdk::Screen::get_default()->get_height() - decorations < 
           bg->get_height())
-        window->set_default_size(Gdk::Screen::get_default()->get_width(),
-                                 Gdk::Screen::get_default()->get_height());
+        window->set_size_request (Gdk::Screen::get_default()->get_width(),
+                                  Gdk::Screen::get_default()->get_height());
       else
-        window->set_default_size(bg->get_width(), bg->get_height());
+        window->set_size_request (bg->get_width(), bg->get_height());
     }
 }
 
