@@ -3,7 +3,7 @@ MAINTAINERCLEANFILES = Makefile.in
 lordsawartilesetdir = $(datadir)/lordsawar/tilesets
 
 bigdefault.lwt: bigdefault.lwt.in
-	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/bigdefault.lwt.in $(builddir)/bigdefault.lwt
+	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/bigdefault.lwt.in $(builddir)/bigdefault.lwt && \
 	$(top_srcdir)/create-lw-file $(builddir)/bigdefault.lwt $(IMAGES)
 
 DISTCLEANFILES = bigdefault.lwt 

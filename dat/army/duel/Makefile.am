@@ -3,7 +3,7 @@ MAINTAINERCLEANFILES = Makefile.in
 lordsawararmydir = $(datadir)/lordsawar/army
 
 duel.lwa: duel.lwa.in
-	cp $(srcdir)/duel.lwa.in $(builddir)/duel.lwa
+	cp $(srcdir)/duel.lwa.in $(builddir)/duel.lwa && \
 	$(top_srcdir)/create-lw-file $(builddir)/duel.lwa $(IMAGES)
 
 DISTCLEANFILES = duel.lwa 

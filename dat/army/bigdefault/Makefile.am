@@ -3,7 +3,7 @@ MAINTAINERCLEANFILES = Makefile.in
 lordsawararmydir = $(datadir)/lordsawar/army
 
 bigdefault.lwa: bigdefault.lwa.in
-	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/bigdefault.lwa.in $(builddir)/bigdefault.lwa
+	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/bigdefault.lwa.in $(builddir)/bigdefault.lwa && \
 	$(top_srcdir)/create-lw-file $(builddir)/bigdefault.lwa $(IMAGES)
 
 DISTCLEANFILES = bigdefault.lwa 

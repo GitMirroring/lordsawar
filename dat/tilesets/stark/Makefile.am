@@ -3,7 +3,7 @@ MAINTAINERCLEANFILES = Makefile.in
 lordsawartilesetdir = $(datadir)/lordsawar/tilesets
 
 stark.lwt: stark.lwt.in
-	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/stark.lwt.in $(builddir)/stark.lwt
+	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/stark.lwt.in $(builddir)/stark.lwt && \
 	$(top_srcdir)/create-lw-file $(builddir)/stark.lwt $(IMAGES)
 
 DISTCLEANFILES = stark.lwt 

@@ -3,7 +3,7 @@ MAINTAINERCLEANFILES = Makefile.in
 lordsawarcitysetdir = $(datadir)/lordsawar/citysets
 
 bigdol.lwc: bigdol.lwc.in
-	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/bigdol.lwc.in $(builddir)/bigdol.lwc
+	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/bigdol.lwc.in $(builddir)/bigdol.lwc && \
 	$(top_srcdir)/create-lw-file $(builddir)/bigdol.lwc $(IMAGES)
 
 DISTCLEANFILES = bigdol.lwc 

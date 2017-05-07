@@ -3,7 +3,7 @@ MAINTAINERCLEANFILES = Makefile.in
 lordsawarshielddir = $(datadir)/lordsawar/shield
 
 dol.lws: dol.lws.in
-	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/dol.lws.in $(builddir)/dol.lws
+	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/dol.lws.in $(builddir)/dol.lws && \
 	$(top_srcdir)/create-lw-file $(builddir)/dol.lws $(IMAGES)
 
 DISTCLEANFILES = dol.lws 
