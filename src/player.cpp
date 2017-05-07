@@ -1243,7 +1243,7 @@ void Player::cleanupAfterFight(std::list<Stack*> &attackers,
 Fight* Player::stackFight(Stack** attacker, Stack** defender)
 {
     debug("stackFight: player = " << getName()<<" at position "
-          <<(*defender)->getPos().x<<","<<(*defender)->getPos().y << " with stack " << (*attacker)->getId());
+          <<(*defender)->getPos().x<<","<<(*defender)->getPos().y << " with stack " << (*attacker)->getId() << " against " << (*defender)->getId() << " which is player = " <<(*defender)->getOwner()->getName());
 
     // I suppose, this should be always true, but one can never be sure
     bool attacker_active = *attacker == d_stacklist->getActivestack();

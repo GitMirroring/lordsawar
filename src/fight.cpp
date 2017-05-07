@@ -101,7 +101,7 @@ Fight::Fight(Stack* attacker, Stack* defender, FightType type)
            it != stacks.end(); it++)
         {
           Stack *s = *it;
-          if (s == d_defenders.front())
+          if (s == defenders.front())
             continue;
           defenders.push_back(s);
         }
@@ -116,7 +116,7 @@ Fight::Fight(Stack* attacker, Stack* defender, FightType type)
            it != stacks.end(); it++)
         {
           Stack *s = *it;
-          if (s == d_defenders.front())
+          if (s == defenders.front())
             continue;
           defenders.push_back(s);
         }
