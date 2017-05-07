@@ -17,7 +17,8 @@ if [ "x$tmpdir" != "x" ]; then
           tmpfiles="$tmpfiles `basename $f`"
   done
   #we want to use --clamp-mtime but it is too new. (requires GNU tar version 1.29)
-  tar -cvf $tarball $tmpfiles --sort=name --mtime="@${SOURCE_DATE_EPOCH:-$(date +%s)}" --mode=go=rX,u+rw,a-s --owner=root --group=root --numeric-owner
+  #we want to use --sort=name but it is too new.
+  tar -cvf $tarball $tmpfiles --mtime="@${SOURCE_DATE_EPOCH:-$(date +%s)}" --mode=go=rX,u+rw,a-s --owner=root --group=root --numeric-owner
   cd $origdir
   cp -f $tmpdir/$tarball $1
   rm -f $tmpdir/*
