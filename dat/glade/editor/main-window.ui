@@ -544,6 +544,21 @@
               </packing>
             </child>
             <child>
+              <object class="GtkRadioToolButton" id="fight_radiobutton2">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Add stacks to the Battle Calculator</property>
+                <property name="use_underline">True</property>
+                <property name="icon_name">gtk-missing</property>
+                <property name="active">False</property>
+                <property name="group">pointer_radiobutton2</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkRadioToolButton" id="draw_stack_radiobutton2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -662,21 +677,6 @@
                 <property name="tooltip_text" translatable="yes">Add a bag</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">gtk-missing</property>
-                <property name="group">pointer_radiobutton2</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkRadioToolButton" id="fight_radiobutton2">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_text" translatable="yes">Add stacks to the Battle Calculator.</property>
-                <property name="use_underline">True</property>
-                <property name="icon_name">gtk-missing</property>
-                <property name="active">True</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
