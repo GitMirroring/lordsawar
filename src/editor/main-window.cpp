@@ -1144,6 +1144,7 @@ void MainWindow::setup_tile_style_buttons(Tile::Type terrain)
           PixMask *pix = tilestyle->getImage()->copy();
           PixMask::scale(pix, 40, 40);
           item.button->add(*manage(new Gtk::Image(pix->to_pixbuf())));
+          delete pix;
           item.tile_style_id = tilestyle->getId();
 
           tile_style_items.push_back(item);
