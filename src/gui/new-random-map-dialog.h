@@ -37,9 +37,9 @@ class NewRandomMapDialog: public LwDialog
 
     Glib::ustring getRandomMapFilename() const {return d_filename;};
 
-    //Glib::ustring create_and_dump_scenario(const Glib::ustring &file, const GameParameters &g);
-static Glib::ustring create_and_dump_scenario(const Glib::ustring &file,
-                                                         const GameParameters &g, sigc::slot<void> *pulse);
+    static Glib::ustring create_and_dump_scenario(const Glib::ustring &file,
+                                                  const GameParameters &g,
+                                                  sigc::slot<void> *pulse);
     
  private:
 

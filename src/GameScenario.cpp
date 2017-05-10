@@ -393,6 +393,7 @@ bool GameScenario::setupItemRewards()
       const ItemProto* templateItem = iter.second;
       Item *newItem = new Item(*templateItem, count); //instantiate it
       Reward_Item *newReward = new Reward_Item(newItem); //make a reward
+      delete newItem;
       newReward->setName(newReward->getDescription());
       Rewardlist::getInstance()->push_back(newReward); //add it
       count++;

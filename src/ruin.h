@@ -126,11 +126,13 @@ class Ruin : public NamedLocation, public sigc::trackable
         void setType(int type) {d_type = type;};
 
         //! Change whether or not the ruin has been successfully searched.
-        void setSearched(bool searched) {d_searched = searched; 
-	  d_reward = NULL;}
+        void setSearched(bool searched) {d_searched = searched; }
         
         //! Set the keeper of the ruin.
-        void setOccupant(Stack* occupant) {d_occupant = occupant;}
+        void setOccupant(Stack* occupant);
+
+        //! Remove the keeper.
+        void clearOccupant();
         
         //! Change the "hidden" flag of the ruin.
         void setHidden (bool hidden) {d_hidden = hidden;}
@@ -142,7 +144,7 @@ class Ruin : public NamedLocation, public sigc::trackable
 	void setOwner(Player *owner) {d_owner = owner;}
 
 	//! Sets the reward for this ruin.
-	void setReward(Reward *r) {d_reward = r;}
+	void setReward(Reward *r);
 
 
 	// Methods that operate on class data and modify the class.
@@ -154,6 +156,11 @@ class Ruin : public NamedLocation, public sigc::trackable
 	 */
 	void populateWithRandomReward();
 
+
+	// Methods that operate on class data and modify the class.
+
+        //! Steal the pointer to the reward and set the ruin's reward to nil.
+        Reward *takeReward();
 
 	// Methods that operate on class data and do not modify the class.
 	

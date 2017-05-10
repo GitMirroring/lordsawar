@@ -58,7 +58,6 @@ AI_Analysis::~AI_Analysis()
 {
     instance = 0;
 
-    d_threats->flClear();
     delete d_threats;
     delete d_stacks;
 

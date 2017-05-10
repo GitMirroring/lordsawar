@@ -31,8 +31,8 @@
 
 class NetworkServer;
 class Participant;
-class NetworkAction;
-class NetworkHistory;
+class Action;
+class History;
 class Player;
 class XML_Helper;
 class GameScenario;
@@ -83,8 +83,8 @@ protected:
 private:
   GameScenario *d_game_scenario;
   bool d_game_has_begun;
-  void onActionDone(NetworkAction *action);
-  void onHistoryDone(NetworkHistory *history);
+  void onActionDone(Action *action, guint32 id);
+  void onHistoryDone(History *history, guint32 id);
 
   void join(void *conn, Glib::ustring payload);
   void notifyJoin (Glib::ustring nickname);

@@ -41,8 +41,8 @@ Itemlist* Itemlist::getInstance()
 
 Itemlist* Itemlist::getInstance(XML_Helper *helper)
 {
-    if (!d_instance)
-        d_instance = new Itemlist();
+    if (d_instance)
+      delete d_instance;
 
     d_instance = new Itemlist(helper);
     return d_instance;

@@ -336,7 +336,7 @@ Game::~Game()
       connections[i].clear();
     }
     delete d_gameScenario;
-    //delete d_nextTurn;
+    delete d_nextTurn;
     
     HeroTemplates::deleteInstance();
 }

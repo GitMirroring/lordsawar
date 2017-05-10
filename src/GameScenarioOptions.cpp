@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2014 Ben Asselstine
+// Copyright (C) 2008, 2014, 2017 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -46,12 +46,12 @@ GameScenarioOptions::GameScenarioOptions()
 {
 }
 
-int GameScenarioOptions::calculate_difficulty_rating(GameParameters g)
+int GameScenarioOptions::calculate_difficulty_rating(const GameParameters g)
 {
   float total_difficulty = 0;
   int max_player_difficulty = 73;
   int players_on = 0;
-  for (std::vector<GameParameters::Player>::iterator it = g.players.begin(); 
+  for (std::vector<GameParameters::Player>::const_iterator it = g.players.begin();
        it != g.players.end(); it++)
     {
       if ((*it).type != GameParameters::Player::OFF)
@@ -67,7 +67,7 @@ int GameScenarioOptions::calculate_difficulty_rating(GameParameters g)
     player_difficulty = (float)max_player_difficulty / (float)players_on;
 
   //go through all players, adding up difficulty points for each
-  for (std::vector<GameParameters::Player>::iterator i = g.players.begin(); 
+  for (std::vector<GameParameters::Player>::const_iterator i = g.players.begin();
        i != g.players.end(); i++)
     {
       if ((*i).type == GameParameters::Player::HUMAN || 

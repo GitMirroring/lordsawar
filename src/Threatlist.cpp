@@ -33,51 +33,19 @@ Threatlist::Threatlist()
 {
 }
 
+Threatlist::~Threatlist()
+{
+  flClear();
+}
+
 bool Threatlist::compareValue(const Threat *lhs, const Threat *rhs)  
 {
   return lhs->getValue() > rhs->getValue(); 
 }
+
 void Threatlist::sortByValue()
 {
   sort(compareValue);
-  /*
-  int count = 0;
-  for (Threatlist::iterator it = begin(); it != end(); it++)
-    {
-      if ((*it)->isCity())
-        {
-      printf ("%d. %f (%f)\n", count, (*it)->getValue(), (*it)->getStrength());
-              count++;
-                }
-    }
-  */
-  /*
-    // bubble sort is the easiest thing I remember
-    bool sorted = false;
-
-    while (!sorted)
-    {
-        sorted = true;
-
-        // setup
-        iterator it = begin();
-        iterator nextit = it;
-        nextit++;
-
-        // now loop through the list
-        for (; nextit != end(); it++, nextit++)
-            if ((*it)->value() < (*nextit)->value())
-            {
-                // exchange the two threats
-                sorted = false;
-                Threat* tmp = (*nextit);
-                erase(nextit);
-                nextit = it;
-
-                it = insert(nextit, tmp);
-            }
-    }
-    */
 }
 
 void Threatlist::sortByDistance(Vector<int> pos)

@@ -173,6 +173,7 @@ Reward_Gold::Reward_Gold(guint32 gold)
 Reward_Gold::Reward_Gold(XML_Helper* helper)
     :Reward(helper)
 {
+  d_type = Reward::GOLD;
   helper->getData(d_gold, "gold");
 }
 
@@ -232,6 +233,7 @@ Reward_Allies::Reward_Allies(const ArmyProto *army, guint32 count)
 Reward_Allies::Reward_Allies(XML_Helper* helper)
     :Reward(helper)
 {
+  d_type = Reward::ALLIES;
   helper->getData(d_count, "num_allies");
   helper->getData(d_army_type, "ally_type");
   helper->getData(d_army_set, "ally_armyset");
@@ -360,6 +362,7 @@ bool Reward_Item::loadItem(Glib::ustring tag, XML_Helper* helper)
 Reward_Item::Reward_Item(XML_Helper* helper)
  : Reward(helper)
 {
+  d_type = Reward::ITEM;
   helper->registerTag(Item::d_tag, sigc::mem_fun(this, &Reward_Item::loadItem));
 }
 
@@ -407,6 +410,7 @@ Reward_Ruin::Reward_Ruin(Ruin *ruin)
 Reward_Ruin::Reward_Ruin(XML_Helper* helper)
     :Reward(helper)
 {
+  d_type = Reward::RUIN;
   guint32 x;
   guint32 y;
   helper->getData(x, "x");

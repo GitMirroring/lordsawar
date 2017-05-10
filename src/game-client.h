@@ -80,10 +80,10 @@ private:
   bool onGotMessage(int type, Glib::ustring message);
   void on_torn_down();
 
-  void onActionDone(NetworkAction *action);
+  void onActionDone(Action *action, guint32 id);
   void sendActions();
 
-  void onHistoryDone(NetworkHistory *history);
+  void onHistoryDone(History *history, guint32 id);
   void sendHistories();
 
   void gotTurnOrder (Glib::ustring payload);

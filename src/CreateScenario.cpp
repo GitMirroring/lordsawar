@@ -107,14 +107,7 @@ CreateScenario::~CreateScenario()
 
     if (d_scenario)
         delete d_scenario;
-    if (d_citynames)
-      delete d_citynames;
-    if (d_templenames)
-      delete d_templenames;
-    if (d_ruinnames)
-      delete d_ruinnames;
-    if (d_signposts)
-      delete d_signposts;
+    cleanup();
 }
 
 void CreateScenario::on_progress()

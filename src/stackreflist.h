@@ -57,9 +57,9 @@ public:
     void changeOwnership(Player *new_owner);
 
     bool getIdOfStack(Stack *stack, guint32 &id);
+    Stack *getStackById(guint32 id) const;
 private:
 
-    Stack *getStackById(guint32 id) const;
 
     typedef std::map<guint32, Stack*> IdMap;
     //! A map to quickly lookup the stack by it's unique id.

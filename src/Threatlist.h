@@ -40,7 +40,7 @@ class Threatlist : public std::list<Threat*>
         Threatlist();
 
 	//! Destructor.
-        ~Threatlist() {};
+        ~Threatlist();
 
 	// Methods that operate on class data and modify the class.
 
@@ -72,9 +72,6 @@ class Threatlist : public std::list<Threat*>
         //! sort into a list with value divded by distance.
         void sortByDistanceAndValue(Vector<int> pos);
 
-        //! Behaves like std::list::clear(), but frees pointers as well
-        void flClear();
-
         //! Behaves like std::list::erase(), but frees pointers as well
         iterator flErase(iterator object);
 
@@ -89,6 +86,9 @@ class Threatlist : public std::list<Threat*>
         void changeOwnership(Player *old_owner, Player *new_owner);
 
     private:
+
+        //! Behaves like std::list::clear(), but frees pointers as well
+        void flClear();
 
         static bool compareValue(const Threat *lhs, const Threat *rhs);
 };

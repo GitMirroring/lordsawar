@@ -67,6 +67,7 @@ class CreateScenarioRandomize
 	//! Get the default player name for the given shield colour.
 	static Glib::ustring getPlayerName(Shield::Colour id);
 
+        void cleanup();
     protected:
         //the namelists
 	NameList *d_citynames;

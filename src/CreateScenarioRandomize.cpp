@@ -220,3 +220,15 @@ Glib::ustring CreateScenarioRandomize::getPlayerName(Shield::Colour id)
     }
   return name;
 }
+
+void CreateScenarioRandomize::cleanup()
+{
+  if (d_citynames)
+    delete d_citynames;
+  if (d_signposts)
+    delete d_signposts;
+  if (d_templenames)
+    delete d_templenames;
+  if (d_ruinnames)
+    delete d_ruinnames;
+}

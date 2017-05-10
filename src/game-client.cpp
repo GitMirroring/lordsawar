@@ -310,8 +310,9 @@ void GameClient::gotKillPlayer(Player *player)
   player->kill(false);
 }  
 
-void GameClient::onHistoryDone(NetworkHistory *history)
+void GameClient::onHistoryDone(History *h, guint32 id)
 {
+  NetworkHistory *history = new NetworkHistory (h, id);
   Glib::ustring desc = history->toString();
   std::cerr << String::ucompose("Game Client got %1", desc) << std::endl;
 
@@ -323,8 +324,9 @@ void GameClient::onHistoryDone(NetworkHistory *history)
   clearNetworkHistorylist(histories);
 }
 
-void GameClient::onActionDone(NetworkAction *action)
+void GameClient::onActionDone(Action *a, guint32 id)
 {
+  NetworkAction *action = new NetworkAction(a, id);
   Glib::ustring desc = action->toString();
   std::cerr << String::ucompose("Game Client got %1", desc) << std::endl;
 

@@ -96,9 +96,9 @@ bool Ruinlist::load(Glib::ustring tag, XML_Helper* helper)
 
     //! since the ruin has only now been copied to its final state, we need
     //to register the callback for the occupants here.
-    helper->registerTag(Stack::d_tag, sigc::mem_fun(*begin(), &Ruin::load));
+    helper->registerTag(Stack::d_tag, sigc::mem_fun(*back(), &Ruin::load));
     // same with rewards in ruins
-    helper->registerTag(Reward::d_tag, sigc::mem_fun(*begin(), &Ruin::load));
+    helper->registerTag(Reward::d_tag, sigc::mem_fun(*back(), &Ruin::load));
 
     return true;
 }

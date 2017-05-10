@@ -409,10 +409,11 @@ void GameServer::onLocalNonNetworkedActionDone(NetworkAction *action)
   delete action;
 }
 
-void GameServer::onActionDone(NetworkAction *action)
+void GameServer::onActionDone(Action *a, guint32 id)
 {
   if (d_stop)
     return;
+  NetworkAction *action = new NetworkAction (a, id);
   Player *p = Playerlist::getInstance()->getPlayer(action->getOwnerId());
   if (p->getType() != Player::NETWORKED)
     onLocalNonNetworkedActionDone(action);
@@ -462,8 +463,9 @@ void GameServer::onLocalNetworkedHistoryDone(NetworkHistory *history)
   delete history;
 }
 
-void GameServer::onHistoryDone(NetworkHistory *history)
+void GameServer::onHistoryDone(History *h, guint32 id)
 {
+  NetworkHistory *history = new NetworkHistory(h, id);
   Player *p = Playerlist::getInstance()->getPlayer(history->getOwnerId());
   if (p->getType() != Player::NETWORKED)
     onLocalNonNetworkedHistoryDone(history);

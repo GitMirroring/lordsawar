@@ -58,8 +58,8 @@ protected:
   GameStation();
   virtual ~GameStation() {};
 
-  virtual void onActionDone(NetworkAction *action) = 0;
-  virtual void onHistoryDone(NetworkHistory *history) = 0;
+  virtual void onActionDone(Action *action, guint32 id) = 0;
+  virtual void onHistoryDone(History *history, guint32 id) = 0;
 
   void clearNetworkActionlist(std::list<NetworkAction*> &actions);
   void clearNetworkHistorylist(std::list<NetworkHistory*> &histories);

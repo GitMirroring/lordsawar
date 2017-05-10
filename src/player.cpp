@@ -555,17 +555,13 @@ bool Player::load(Glib::ustring tag, XML_Helper* helper)
 void Player::addAction(Action *action)
 {
   d_actions.push_back(action);
-  NetworkAction *copy = new NetworkAction(action, getId());
-  acting.emit(copy);
-  //free'd in game-server
+  acting.emit (action, getId());
 }
 
 void Player::addHistory(History *history)
 {
   d_history.push_back(history);
-  NetworkHistory *copy = new NetworkHistory(history, getId());
-  history_written.emit(copy);
-  //free'd in game-server
+  history_written.emit(history, getId());
 }
 
 guint32 Player::getScore() const
@@ -1425,11 +1421,14 @@ Fight::Result Player::stackRuinFight (Stack **attacker, Stack **defender,
 void Player::doStackSearchRuin(Stack *s, Ruin *r, Fight::Result result)
 {
   if (result == Fight::DEFENDER_WON)
-    r->setSearched(false);
+    {
+      r->setSearched(false);
+      return;
+    }
   else if (result == Fight::ATTACKER_WON)
     {
       r->setSearched(true);
-      r->setOccupant(0);
+      r->clearOccupant();
       r->setOwner(s->getOwner());
     }
   return;
@@ -1437,7 +1436,6 @@ void Player::doStackSearchRuin(Stack *s, Ruin *r, Fight::Result result)
 
 Reward* Player::stackSearchRuin(Stack* s, Ruin* r, bool &stackdied)
 {
-  Reward *reward = NULL;
   std::list<History*> attacker_history;
   std::list<History*> defender_history;
   Stack *keeper = r->getOccupant();
@@ -1445,11 +1443,17 @@ Reward* Player::stackSearchRuin(Stack* s, Ruin* r, bool &stackdied)
     {
       Fight::Result result = stackRuinFight(&s, &keeper, stackdied,
                                             attacker_history, defender_history);
+      //we delete it here because keepers are not in any players' stacklist.
+      if (result == Fight::ATTACKER_WON)
+        delete keeper;
       for (std::list<History*>::iterator i = attacker_history.begin();
            i != attacker_history.end(); i++)
         addHistory(*i);
       clearHistorylist(defender_history);
 
+      if (result == Fight::ATTACKER_WON &&
+          r->getReward() == NULL && r->hasSage() == false)
+        r->populateWithRandomReward();
       doStackSearchRuin(s, r, result);
       if (result == Fight::DEFENDER_WON)
         {
@@ -1458,13 +1462,13 @@ Reward* Player::stackSearchRuin(Stack* s, Ruin* r, bool &stackdied)
         }
     }
   else
-    doStackSearchRuin(s, r, Fight::ATTACKER_WON);
+    {
+      if (r->getReward() == NULL && r->hasSage() == false)
+        r->populateWithRandomReward();
+      doStackSearchRuin(s, r, Fight::ATTACKER_WON);
+    }
 
-  if (r->getReward() == NULL && r->hasSage() == false)
-    r->populateWithRandomReward();
-  reward = r->getReward();
-  r->setReward(0);
-
+  Reward *reward = r->takeReward();
   addAction(new Action_Ruin(r, s));
   if (r->isSearched())
     {
@@ -3496,6 +3500,7 @@ void Player::pruneCityProductions(std::list<Action*> &actions)
       if (find (keepers.begin(), keepers.end(), (*bit)) == keepers.end())
 	{
 	  total++;
+          delete *bit;
 	  actions.erase (bit);
 	  bit = actions.begin();
 	  continue;
@@ -3542,6 +3547,7 @@ void Player::pruneCityVectorings(std::list<Action*> &actions)
       if (find (keepers.begin(), keepers.end(), (*bit)) == keepers.end())
 	{
 	  total++;
+          delete *bit;
 	  actions.erase (bit);
 	  bit = actions.begin();
 	  continue;
@@ -4201,7 +4207,7 @@ bool Player::doHeroUseItem(Hero *hero, Item *item, Player *victim,
             {
               Glib::ustring name = ruin->getOccupant()->front()->getName();
               addStack(ruin->getOccupant());
-              ruin->setOccupant(0);
+              ruin->clearOccupant();
               keeper_captured.emit(hero, ruin, name);
             }
         }

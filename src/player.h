@@ -1440,8 +1440,8 @@ class Player: public sigc::trackable
 
         sigc::signal<void, Item*> using_item;
 
-        sigc::signal<void, NetworkAction *> acting;
-        sigc::signal<void, NetworkHistory *> history_written;
+        sigc::signal<void, Action *, guint32> acting;
+        sigc::signal<void, History *, guint32> history_written;
 
         //! Results of using items
         sigc::signal<void, Player*, guint32> stole_gold;

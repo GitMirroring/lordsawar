@@ -124,6 +124,7 @@ bool AI_Smart::startTurn()
     }
 
   delete analysis;
+  analysis = NULL;
   d_stacklist->setActivestack(0);
 
   diplomacy.makeProposals();

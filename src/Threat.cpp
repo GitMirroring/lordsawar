@@ -167,18 +167,22 @@ Vector<int> Threat::getClosestPoint(Vector<int> location) const
 
 void Threat::deleteStack(guint32 id)
 {
-    d_stacks->removeStack(id);
-    if (d_city && d_city->getOwner() != Playerlist::getInstance()->getNeutral())
-      calculateStrength();
+  Stack *s = d_stacks->getStackById(id);
+  d_stacks->removeStack(id);
+  delete s;
+  if (d_city && d_city->getOwner() != Playerlist::getInstance()->getNeutral())
+    calculateStrength();
 }
 
 void Threat::deleteStack(Stack* s)
 {
+  Stack *ss = d_stacks->getStackById(s->getId());
   d_stacks->removeStack(s->getId());
+  delete ss;
   if (d_city && d_city->getOwner() != Playerlist::getInstance()->getNeutral())
     calculateStrength();
 }
-          
+
 void Threat::addDanger(float danger)
 { 
   d_danger += danger; 

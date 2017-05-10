@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2014 Ben Asselstine
+// Copyright (C) 2008, 2014, 2017 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ class GameScenarioOptions: public sigc::trackable
 
         static unsigned int s_round;
 
-	static int calculate_difficulty_rating(GameParameters g);
+	static int calculate_difficulty_rating(const GameParameters g);
 
     private:
 };

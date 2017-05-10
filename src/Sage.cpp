@@ -198,16 +198,16 @@ Sage::~Sage ()
   //get rid of the allies reward we made, unless it's selected
   if (d_allies_ruin && d_reward != d_allies_ruin)
     {
-      delete d_allies_reward;
-      d_allies_ruin->getRuin()->setReward(NULL);
+      Reward *reward = d_allies_ruin->getRuin()->takeReward();
+      delete reward;
       if (d_allies_ruin_popped)
         Rewardlist::getInstance()->push_back(d_allies_ruin);
     }
 
   if (d_item_ruin && d_reward != d_item_ruin)
     {
-      Rewardlist::getInstance()->push_back(d_item_reward);
-      d_item_ruin->getRuin()->setReward(NULL);
+      Reward *reward = d_item_ruin->getRuin()->takeReward();
+      Rewardlist::getInstance()->push_back(reward);
       if (d_item_ruin_popped)
         Rewardlist::getInstance()->push_back(d_item_ruin);
     }

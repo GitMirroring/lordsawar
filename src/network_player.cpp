@@ -555,7 +555,7 @@ void NetworkPlayer::decodeActionRuin(const Action_Ruin *action)
       clearHistorylist(defender_history);
     }
 
-  doStackSearchRuin(explorer, r, result);
+   doStackSearchRuin(explorer, r, result);
 
   //the reward is given to the player via the decodeActionReward method.
   supdatingStack.emit(0);

@@ -82,16 +82,7 @@ Driver::Driver(bool start_editor, Glib::ustring load_filename)
     splash_window = NULL;
     download_window = NULL;
     editor_window = NULL;
-  game_scenario_downloaded = "";
-    splash_window = new SplashWindow;
-    splash_window->new_game_requested.connect(method(on_new_game_requested));
-    splash_window->new_hosted_network_game_requested.connect
-      (method(on_new_hosted_network_game_requested));
-    splash_window->new_remote_network_game_requested.connect
-      (method(on_new_remote_network_game_requested));
-    splash_window->load_requested.connect(method(on_load_requested));
-    splash_window->editor_requested.connect(method(on_editor_requested));
-    splash_window->quit_requested.connect(method(on_quit_requested));
+    game_scenario_downloaded = "";
 
     d_load_filename = load_filename;
 
@@ -143,6 +134,17 @@ Driver::Driver(bool start_editor, Glib::ustring load_filename)
           serve (game_scenario);
         return;
       }
+
+    splash_window = new SplashWindow;
+    splash_window->new_game_requested.connect(method(on_new_game_requested));
+    splash_window->new_hosted_network_game_requested.connect
+      (method(on_new_hosted_network_game_requested));
+    splash_window->new_remote_network_game_requested.connect
+      (method(on_new_remote_network_game_requested));
+    splash_window->load_requested.connect(method(on_load_requested));
+    splash_window->editor_requested.connect(method(on_editor_requested));
+    splash_window->quit_requested.connect(method(on_quit_requested));
+
     if (start_editor)
       {
         on_editor_requested(load_filename);
@@ -1034,6 +1036,7 @@ void Driver::on_quit_requested()
     if (game_window)
 	game_window->hide();
 
+    Snd::deleteInstance();
     Main::instance().stop_main_loop();
 }
 
@@ -1179,11 +1182,14 @@ void Driver::stress_test()
   g.shield_theme = "default";
   g.city_theme = "default";
   g.process_armies = GameParameters::PROCESS_ARMIES_AT_PLAYERS_TURN;
-  g.difficulty = GameScenario::calculate_difficulty_rating(g);
   g.cities_can_produce_allies = false;
   g.cusp_of_war = false;
   g.see_opponents_stacks = true;
   g.see_opponents_production = true;
+  g.vectoring_mode = GameParameters::VECTORING_ALWAYS_TWO_TURNS;
+  g.build_production_mode = GameParameters::BUILD_PRODUCTION_ALWAYS;
+  g.sacking_mode = GameParameters::SACKING_ALWAYS;
+  g.difficulty = GameScenario::calculate_difficulty_rating(g);
       
   bool broken = false;
   Glib::ustring path;
@@ -1223,8 +1229,9 @@ void Driver::stress_test()
                                         Main::instance().random_number_seed));
   game_scenario->saveGame(s + SAVE_EXT);
 
+  //nextTurn and game_scenario get deleted in game.
 }
-	
+
 void Driver::lordsawaromatic(Glib::ustring host, unsigned short port, Player::Type type, int num_players)
 {
   GameClient *game_client = GameClient::getInstance();

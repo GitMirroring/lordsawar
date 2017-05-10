@@ -310,6 +310,7 @@ MainWindow::~MainWindow()
   delete bigmap;
   delete smallmap;
   delete game_scenario;
+  d_create_scenario_names->cleanup();
   delete d_create_scenario_names;
   delete window;
 }

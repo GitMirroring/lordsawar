@@ -47,20 +47,28 @@ Ruin::Ruin(Vector<int> pos, guint32 width, Glib::ustring name, int type, Stack* 
 
 Ruin::Ruin(const Ruin& ruin)
     :NamedLocation(ruin), sigc::trackable(ruin), d_searched(ruin.d_searched), 
-    d_type(ruin.d_type), d_occupant(ruin.d_occupant), d_hidden(ruin.d_hidden), 
-    d_owner(ruin.d_owner), d_sage(ruin.d_sage), d_reward(ruin.d_reward)
+    d_type(ruin.d_type), d_hidden(ruin.d_hidden), d_owner(ruin.d_owner),
+    d_sage(ruin.d_sage)
 {
   if (ruin.d_occupant)
     d_occupant = new Stack(*ruin.d_occupant);
+  if (ruin.d_reward)
+    d_reward = Reward::copy (ruin.d_reward);
+  else
+    d_reward = NULL;
 }
 
 Ruin::Ruin(const Ruin& ruin, Vector<int> pos)
     :NamedLocation(ruin, pos), d_searched(ruin.d_searched), 
-    d_type(ruin.d_type), d_occupant(ruin.d_occupant), d_hidden(ruin.d_hidden), 
-    d_owner(ruin.d_owner), d_sage(ruin.d_sage), d_reward(ruin.d_reward)
+    d_type(ruin.d_type), d_hidden(ruin.d_hidden), d_owner(ruin.d_owner),
+    d_sage(ruin.d_sage)
 {
   if (ruin.d_occupant)
     d_occupant = new Stack(*ruin.d_occupant);
+  if (ruin.d_reward)
+    d_reward = Reward::copy (ruin.d_reward);
+  else
+    d_reward = NULL;
 }
 
 Ruin::Ruin(XML_Helper* helper, guint32 width)
@@ -96,10 +104,10 @@ Ruin::Ruin(XML_Helper* helper, guint32 width)
 
 Ruin::~Ruin()
 {
-    if (d_reward)
-        delete d_reward;
-    if (d_occupant)
-        delete d_occupant;
+  if (d_reward)
+    delete d_reward;
+  if (d_occupant)
+    delete d_occupant;
 }
 
 bool Ruin::save(XML_Helper* helper) const
@@ -203,5 +211,34 @@ void Ruin::setSage(bool sage)
     d_type = SAGE;
   else
     d_type = RUIN;
+}
+
+void Ruin::setOccupant(Stack* occupant)
+{
+  if (d_occupant)
+    delete d_occupant;
+  d_occupant = occupant;
+}
+
+void Ruin::setReward (Reward *reward)
+{
+  if (d_reward)
+    delete d_reward;
+  d_reward = reward;
+}
+
+Reward *Ruin::takeReward()
+{
+  Reward *reward = d_reward;
+  d_reward = NULL;
+  return reward;
+}
+
+void Ruin::clearOccupant()
+{
+  //the idea here is that the occupant has been killed in a ruinfight.
+  //in cleaning up from that fight, the stack gets deleted.
+  //and now we need to make sure this pointer isn't hanging around.
+  d_occupant = NULL;
 }
 // End of file
