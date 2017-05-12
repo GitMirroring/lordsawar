@@ -728,6 +728,8 @@ bool Player::stackSplitAndMoveToJoin(Stack* s, Stack *join, Stack *& new_stack)
 
   if (ids.size() == 0)
     return false;
+  if (s->fliesWithItemAndNonFlyersOverWaterOrMountains())
+    return false;
   //okay, ids.size armies can make the move.  but can that tile accept it?
   new_stack = stackSplitArmies(s, ids);
   if (new_stack)
@@ -750,6 +752,8 @@ bool Player::stackSplitAndMoveToAttack(Stack* s, Stack *& new_stack)
     return false;
   if (ids.size() == s->size())
     return stackMove(s);
+  if (s->fliesWithItemAndNonFlyersOverWaterOrMountains())
+    return false;
 
   new_stack = stackSplitArmies(s, ids);
   if (new_stack)

@@ -52,7 +52,7 @@ class NextTurn: public sigc::trackable
         /**
            \brief destructor
          */
-        ~NextTurn() {};
+        virtual ~NextTurn() {};
         
         /**
            \brief start a new game

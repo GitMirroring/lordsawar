@@ -156,7 +156,8 @@ void Game::addPlayer(Player *p)
       
       
   //now do all of the common connections
-      
+  connections[p->getId()].push_back
+    (p->save_game.connect(sigc::mem_fun(this, &Game::on_save_game)));
   connections[p->getId()].push_back
     (p->getStacklist()->snewpos.connect
      (sigc::mem_fun(stack_moves, &sigc::signal<void, Stack*, Vector<int> >::emit)));
@@ -1422,4 +1423,9 @@ void Game::on_ruinfight_finished(Fight::Result result)
 {
   if (Playerlist::getActiveplayer()->isComputer() == false)
     ruinfight_finished.emit(result);
+}
+
+void Game::on_save_game(Glib::ustring filename)
+{
+  getScenario()->saveGame(filename);
 }

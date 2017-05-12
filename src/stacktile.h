@@ -87,6 +87,9 @@ public:
     //! Set all stacks on this tile to be parked.
     void setParked(Player *owner, bool parked);
 
+    //! Merge all stacks on this tile (for the editor)
+    void group ();
+
     //! Merge all stacks on this tile belonging to the given player.
     Stack *group(Player *owner);
 

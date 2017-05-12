@@ -106,7 +106,8 @@ int AI_Allocation::allocateStackToCapacityBuilding(Threat *threat, City *first_c
   bool killed = false;
   //only take what we need.
   std::list<guint32> armies = attacker->determineStrongArmies(3.0);
-  if (armies.size() > 0 && armies.size() != attacker->size())
+  if (armies.size() > 0 && armies.size() != attacker->size() &&
+      !attacker->fliesWithItemAndNonFlyersOverWaterOrMountains())
     {
       Stack *stack = d_owner->stackSplitArmies(attacker, armies);
       moved = moveStack(stack, dest, killed);
@@ -791,6 +792,8 @@ int AI_Allocation::allocateDefensiveStacksToCity(City *city)
       Stack *defender = *it;
       if (defender->getParked() == true)
         continue;
+      if (defender->fliesWithItemAndNonFlyersOverWaterOrMountains())
+        continue;
       //shuffleStacksWithinCity(city, defender, Vector<int>(0,0));
       float stackStrength = d_analysis->assessStackStrength(defender);
       debug("Player " << d_owner->getName() << " assigns some or all of stack " << defender->getId() << " with strength " << stackStrength
@@ -850,6 +853,8 @@ int AI_Allocation::allocateDefensiveStacksToCity(City *city)
       debug("Stack " << s->getId() << " at " << s->getPos().x << "," << s->getPos().y << " should return to " << city->getName() << " to defend")
         Vector<int> dest = getFreeSpotInCity(city, s->size());
       if (dest == Vector<int>(-1,-1))
+        break;
+      if (s->fliesWithItemAndNonFlyersOverWaterOrMountains())
         break;
       float stackStrength = d_analysis->assessStackStrength(s);
       totalDefenderStrength += stackStrength;

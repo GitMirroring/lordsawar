@@ -453,6 +453,7 @@ void MainWindow::show_initial_map()
       if (d_create_scenario_names)
 	delete d_create_scenario_names;
       d_create_scenario_names = new CreateScenarioRandomize();
+      clear_save_file_of_scenario_specific_data();
       if (broken == false)
 	{
 	  init_map_state();
@@ -1685,14 +1686,18 @@ void MainWindow::clear_save_file_of_scenario_specific_data()
       (*i)->clearActionlist();
       (*i)->clearHistorylist();
       (*i)->clearFogMap();
-      (*i)->setGold(1000);
       (*i)->revive();
     }
   //group all stacks, because the editor doesn't have a way to represent
   //many stacks on the same tile.
   for (auto p : *Playerlist::getInstance())
     for (auto pos : p->getStacklist()->getPositions())
-      GameMap::getStacks(pos)->group(p);
+      {
+        Maptile *mtile = GameMap::getInstance()->getTile(pos);
+        std::vector<Stack*> stacks = mtile->getStacks()->getStacks();
+        if (stacks.size() > 1)
+          GameMap::getStacks(pos)->group();
+      }
 }
 
 void MainWindow::on_import_map_activated()

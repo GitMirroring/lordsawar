@@ -89,8 +89,6 @@ void StackTile::add(Stack *stack)
   struct StackTileRecord rec;
   rec.stack_id = stack->getId();
   rec.player_id = stack->getOwner()->getId();
-  if (rec.stack_id == 4322)
-  printf("4322 on %d,%d has an owner of %d\n", tile.x, tile.y, rec.player_id);
   push_back(rec);
   //i could stack->setpos here, but i prefer to let Stack::moveToDest do that because it's movement related, and this class is not movement related.
 }
@@ -302,4 +300,26 @@ void StackTile::setParked(Player *owner, bool parked)
             (*it)->getOwner()->stackUnpark((*it));
         }
     }
+}
+
+void StackTile::group()
+{
+  Player *old = Playerlist::getActiveplayer();
+  for (auto p : *Playerlist::getInstance())
+    {
+      Playerlist::getInstance()->setActiveplayer(p);
+      std::vector<Stack *> stacks = getFriendlyStacks(p);
+      if (stacks.size() > 1)
+        {
+          Stack *stack = stacks[0];
+          for (guint32 i = 1; i < stacks.size(); i++)
+            {
+              remove (stacks[i]);
+              p->stackJoin(stack, stacks[i]);
+            }
+        }
+    }
+  Playerlist::getInstance()->setActiveplayer(old);
+  for (auto p : *Playerlist::getInstance())
+    p->setActivestack(0);
 }

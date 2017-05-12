@@ -252,6 +252,7 @@ class Game
     void on_stack_starts_moving();
 
     bool ask_if_treachery(Stack *stack, Player *them, Vector<int> pos);
+    void on_save_game(Glib::ustring filename);
 
     GameScenario* d_gameScenario;
     NextTurn* d_nextTurn;

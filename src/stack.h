@@ -367,6 +367,9 @@ class Stack : public ::UniquelyIdentified, public Movable, public Ownable, publi
 	//! Calculate if the Stack has the gift of flight.
         bool isFlying () const;
 
+        //! Check if splitting a stack would strand army units.
+        bool fliesWithItemAndNonFlyersOverWaterOrMountains() const;
+
 	//! Calculate if the Stack is in a boat.
         bool hasShip () const;
 

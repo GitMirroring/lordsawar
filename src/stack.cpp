@@ -1352,4 +1352,35 @@ bool Stack::removeArmiesWithoutArmyType(guint32 armyset)
     }
   return removedArmy;
 }
+
+/*
+ * the idea here is that a hero has a stack flight item, and we don't want
+ * to split the stack when it is in the precarious position of stranding
+ * army units in water or mountains.
+ *
+ * this routine just detects when splitting a stack would strand an army unit.
+ *
+ * we could do a better job detecting the non-flyers in the stack.
+ */
+bool Stack::fliesWithItemAndNonFlyersOverWaterOrMountains() const
+{
+  Maptile *mtile = GameMap::getInstance()->getTile(getPos());
+  bool on_water = mtile->getType() == Tile::WATER &&
+    mtile->getBuilding() != Maptile::BRIDGE;
+  bool on_mountains = mtile->getType() == Tile::MOUNTAIN &&
+    mtile->getBuilding() != Maptile::ROAD;
+  if (!on_water && !on_mountains)
+    return false;
+  bool flies_with_item = false;
+  std::vector<guint32> ids;
+  getHeroes(ids);
+  for (auto id : ids)
+    {
+      Army *a = getArmyById(id);
+      Hero *h = dynamic_cast<Hero*>(a);
+      if (h->getBackpack()->countStackFlightGivers() > 0)
+        flies_with_item = true;
+    }
+  return flies_with_item && size() > 1 && (on_water || on_mountains);
+}
 // End of file

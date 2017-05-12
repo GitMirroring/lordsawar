@@ -1457,6 +1457,7 @@ class Player: public sigc::trackable
         sigc::signal<void, Hero *, Glib::ustring, guint32> city_persuaded;
         sigc::signal<void, Hero *, Glib::ustring> stack_teleported;
         
+        sigc::signal<void, Glib::ustring> save_game;
 	//! Check the history to see if we ever conquered the given city.
 
 
