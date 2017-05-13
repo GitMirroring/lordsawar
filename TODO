@@ -7,6 +7,9 @@ calculate to city should be different for enemy cities
   friendly should go to the free spot that we can merge with
   while enemy should go to the nearest corner
 
+it would be nice if ai path movement didn't always take the same path
+often, we can take the same number of moves to get to a different tile beside a city
+
 
 bug: showing neutral battles *Again*
 favour cheaper army units for production when we don't have much money
