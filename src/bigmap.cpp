@@ -70,7 +70,7 @@ BigMap::BigMap(bool headless)
 
 BigMap::~BigMap()
 {
-    if (buffer == true)
+    if (buffer)
       buffer.clear();
 
     delete d_renderer;
@@ -112,7 +112,7 @@ void BigMap::set_view(Rectangle new_view)
     // this represents a 1 tile border around the outside of the picture.
     // it gets rid of the black border.
 
-    if (buffer == true)
+    if (buffer)
       buffer.clear();
     
     buffer_view.dim = view.dim + Vector<int>(2, 2);
@@ -122,7 +122,7 @@ void BigMap::set_view(Rectangle new_view)
     buffer_gc = Cairo::Context::create(buffer);
 
     //now create the part that will go out to the gtk::image
-    if (outgoing == true)
+    if (outgoing)
       outgoing.clear();
     outgoing = Cairo::Surface::create(buffer, Cairo::CONTENT_COLOR_ALPHA, image.get_width(), image.get_height());
 
