@@ -1,4 +1,5 @@
 
+remove pbm xslt
  scp lordsawar-0.1.8.tar.gz benasselstine@dl.sv.nongnu.org:/releases/lordsawar/
 
 
