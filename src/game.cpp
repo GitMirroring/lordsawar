@@ -159,6 +159,8 @@ void Game::addPlayer(Player *p)
   connections[p->getId()].push_back
     (p->save_game.connect(sigc::mem_fun(this, &Game::on_save_game)));
   connections[p->getId()].push_back
+    (p->get_round.connect(sigc::mem_fun(this, &Game::on_get_round)));
+  connections[p->getId()].push_back
     (p->getStacklist()->snewpos.connect
      (sigc::mem_fun(stack_moves, &sigc::signal<void, Stack*, Vector<int> >::emit)));
   connections[p->getId()].push_back
@@ -1427,5 +1429,14 @@ void Game::on_ruinfight_finished(Fight::Result result)
 
 void Game::on_save_game(Glib::ustring filename)
 {
-  getScenario()->saveGame(filename);
+  if (getScenario())
+    getScenario()->saveGame(filename);
+}
+
+guint32 Game::on_get_round()
+{
+  if (getScenario())
+    return getScenario()->getRound();
+  else
+    return 0;
 }

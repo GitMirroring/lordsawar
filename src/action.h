@@ -1516,7 +1516,7 @@ class Action_InitTurn: public Action
 {
     public:
 	//! Make a new initialize turn action.
-        Action_InitTurn();
+        Action_InitTurn(guint32 order);
 	//! Copy constructor
 	Action_InitTurn(const Action_InitTurn &action);
 	//! Load a new initialize turn action from an opened saved-game file.
@@ -1529,6 +1529,11 @@ class Action_InitTurn: public Action
 
 	//! Save this action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
+
+        //! Return the turn order
+        guint32 getTurnOrder() const {return d_order;}
+    private:
+        guint32 d_order;
 };
 
 //-----------------------------------------------------------------------------

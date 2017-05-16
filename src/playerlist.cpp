@@ -961,3 +961,15 @@ void Playerlist::updateViewingPlayer ()
   else
     viewingplayer = getNeutral();
 }
+
+guint32 Playerlist::getTurnOrderNumber(const Player *p)
+{
+  guint32 count = 1;
+  for (const_iterator i = begin(); i != end(); i++)
+    {
+      if ((*i) == p)
+        break;
+      count++;
+    }
+  return count;
+}

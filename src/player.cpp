@@ -307,11 +307,12 @@ void Player::initTurn()
       //printf("\t%s %s\n", Action::actionTypeToString(i->getType()).c_str(), i->dump().c_str());
     //}
 
-  GameActionlist::getInstance()->add(new TurnActionlist(this, d_actions));
+  GameActionlist::getInstance()->add(new TurnActionlist (this, d_actions));
   clearActionlist();
   History_StartTurn* item = new History_StartTurn();
   addHistory(item);
-  Action_InitTurn* action = new Action_InitTurn();
+  guint32 order = Playerlist::getInstance()->getTurnOrderNumber(this);
+  Action_InitTurn* action = new Action_InitTurn(order);
   addAction(action);
 }
 
@@ -1013,7 +1014,7 @@ MoveResult *Player::stackMove(Stack* s, Vector<int> dest, bool follow)
             moveResult->setFightResult(result);
             finishStackFight(fight, &s, &target);
             delete fight;
-            if (!target)
+            if (result == Fight::ATTACKER_WON)
 	      {
                 if (stackMoveOneStep(s))
 		  stepCount++;

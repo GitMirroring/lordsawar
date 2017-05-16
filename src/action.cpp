@@ -2023,31 +2023,32 @@ bool Action_CityTooPoorToProduce::doSave(XML_Helper* helper) const
 //-----------------------------------------------------------------------------
 //Action_InitTurn
 
-Action_InitTurn::Action_InitTurn()
-:Action(Action::INIT_TURN)
+Action_InitTurn::Action_InitTurn(guint32 order)
+:Action(Action::INIT_TURN), d_order(order)
 {
 }
 
 Action_InitTurn::Action_InitTurn(const Action_InitTurn &action)
-: Action(action)
+: Action(action), d_order(action.d_order)
 {
 }
 
 Action_InitTurn::Action_InitTurn(XML_Helper* helper)
 :Action(helper)
 {
+  helper->getData(d_order, "order");
 }
 
 Glib::ustring Action_InitTurn::dump() const
 {
-  return "initializing turn\n";
+  return String::ucompose("Initializing turn!  order is %1.\n", d_order);
 }
 
 bool Action_InitTurn::doSave(XML_Helper* helper) const
 {
-  if (helper)
-    return true;
-  return false;
+  bool retval = true;
+  retval &= helper->saveData("order", d_order);
+  return retval;
 }
 
 //-----------------------------------------------------------------------------

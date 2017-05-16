@@ -1140,7 +1140,9 @@ void Driver::stress_test()
   GameParameters::Player p;
   for (unsigned int i = 0; i < MAX_PLAYERS; i++)
     {
-      p.type = GameParameters::Player::HARD;
+      //p.type = GameParameters::Player::HARD;
+      p.type = i % 2 == 0 ? GameParameters::Player::EASY:
+        GameParameters::Player::HARD;
       p.id = i;
       switch (p.id)
 	{
