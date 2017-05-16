@@ -26,6 +26,7 @@
 #include "Configuration.h"
 #include "sidebar-stats.h"
 #include "stack-tile-box.h"
+#include "tartan-progress-bar.h"
 
 class StackTileBox;
 class StackTile;
@@ -37,7 +38,7 @@ class StatusBox: public Gtk::Box
     StatusBox(BaseObjectType* base, const Glib::RefPtr<Gtk::Builder> &xml);
 
     //!Destructor.
-    ~StatusBox(){};
+    ~StatusBox();
 
     static StatusBox * create(guint32 factor);
 
@@ -77,8 +78,8 @@ class StatusBox: public Gtk::Box
     Gtk::Box *stack_info_container;
     Gtk::Box *stack_tile_box_container;
     Gtk::Box *stats_box;
-    Gtk::Box *progress_box;
-    Gtk::ProgressBar *turn_progressbar;
+    Gtk::Box *tartan_box;
+    TartanProgressBar *turn_progressbar;
     Gtk::Label *progress_status_label;
     Glib::TimeVal last_pulsed;
 

@@ -107,3 +107,11 @@ void Shieldsetlist::uninstantiateImages()
   for (iterator it = begin(); it != end(); it++)
     (*it)->uninstantiateImages();
 }
+
+void Shieldsetlist::getTartan(guint32 shieldset, guint32 colour, Tartan::Type type, PixMask **image, PixMask **mask) const
+{
+  Shieldset *s = get(shieldset);
+  if (!s)
+    return;
+  s->lookupTartanImage(colour, type, image, mask);
+}

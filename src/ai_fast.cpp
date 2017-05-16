@@ -108,9 +108,6 @@ void AI_Fast::abortTurn()
 
 bool AI_Fast::startTurn()
 {
-
-    sbusy.emit();
-
     sbusy.emit();
     if (getStacklist()->getHeroes().size() == 0 &&
         Citylist::getInstance()->countCities(this) == 1)
@@ -131,7 +128,6 @@ bool AI_Fast::startTurn()
             exit (0);
           }
       }
-    sbusy.emit();
 
     debug(getName() << ": AI_Fast::start_turn")
     debug("being in " <<(d_maniac?"maniac":"normal") <<" mode")
@@ -162,8 +158,6 @@ bool AI_Fast::startTurn()
     if (!d_maniac)
 	AI_setupVectoring(18, 3, 30);
 
-    sbusy.emit();
-
     debug("trying to complete quests");
     //try to complete our quests
     std::vector<Quest*> q = QuestsManager::getInstance()->getPlayerQuests(this);
@@ -186,7 +180,6 @@ bool AI_Fast::startTurn()
 
     while (computerTurn() == true)
       {
-	sbusy.emit();
 	bool found = false;
     
 	//are there any stacks with paths that can move?
@@ -210,6 +203,7 @@ bool AI_Fast::startTurn()
 	    else if (s->getPath()->size() == 0 && s->getMoves() > 1)
 	      found = true;
 	  }
+	sbusy.emit();
 	if (!found)
 	  break;
 	if (found)
@@ -217,6 +211,11 @@ bool AI_Fast::startTurn()
 	if (abort_requested)
 	  break;
       }
+    parkAllStacks();
+    sbusy.emit();
+    Glib::usleep (50000);
+    while (g_main_context_iteration(NULL, FALSE)); //doEvents
+    Glib::usleep (50000);
 
     delete d_analysis;
     d_analysis = 0;

@@ -1172,8 +1172,6 @@ bool Player::stackMoveOneStep(Stack* s)
   if (!s)
     return false;
 
-  sbusy.emit();
-
   if (!s->enoughMoves())
     return false;
 
@@ -3270,7 +3268,6 @@ void Player::AI_setupVectoring(guint32 safe_mp, guint32 min_defenders,
 
   for (auto c: *Citylist::getInstance())
     {
-      sbusy.emit();
       if (c->getOwner() != this || c->isBurnt())
 	continue;
       Vector<int> dest = c->getVectoring();
@@ -3307,7 +3304,6 @@ void Player::AI_setupVectoring(guint32 safe_mp, guint32 min_defenders,
 
   for (auto c : *Citylist::getInstance())
     {
-      sbusy.emit();
       if (c->getOwner() != this || c->isBurnt())
 	continue;
       City *enemy_city = Citylist::getInstance()->getNearestEnemyCity(c->getPos());
@@ -4525,6 +4521,15 @@ void Player::stackPark(Stack *s)
 {
   doStackPark(s);
   addAction(new Action_ParkStack(s));
+}
+
+void Player::parkAllStacks()
+{
+  for (auto s : *getStacklist())
+    {
+      if (s->getParked() == false)
+        stackPark (s);
+    }
 }
 
 void Player::doStackUnpark(Stack *s)

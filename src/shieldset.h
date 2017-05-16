@@ -25,6 +25,7 @@
 #include <sigc++/trackable.h>
 
 #include "shield.h"
+#include "tartan.h"
 #include "set.h"
 #include "defs.h"
 
@@ -138,6 +139,14 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 	 *         parameters, NULL is returned.
 	 */
 	ShieldStyle* lookupShieldByTypeAndColour(guint32 type, guint32 colour) const;
+
+        //! Get the image and mask associated with the shield of a given colour.
+        /**
+         * This gets the left tartan image and mask for a player denoted by
+         * colour.
+         */
+        void lookupTartanImage(guint32 colour, Tartan::Type type,
+                               PixMask **image, PixMask **mask);
 
 	//! Get filenames in this shieldset, excepting the configuration file.
 	void getFilenames(std::list<Glib::ustring> &filenames) const;

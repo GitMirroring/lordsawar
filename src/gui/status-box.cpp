@@ -87,9 +87,8 @@ StatusBox::StatusBox(BaseObjectType* baseObject, const Glib::RefPtr<Gtk::Builder
   d_height_fudge_factor = 0;
   xml->get_widget("info_notebook", notebook);
   xml->get_widget("stats_box", stats_box);
-  xml->get_widget("progress_box", progress_box);
+  xml->get_widget("tartan_box", tartan_box);
   xml->get_widget("stack_info_container", stack_info_container);
-  xml->get_widget("turn_progressbar", turn_progressbar);
   xml->get_widget("progress_status_label", progress_status_label);
   xml->get_widget("cities_stats_image", cities_stats_image);
   cities_stats_image->property_pixbuf() = 
@@ -117,6 +116,13 @@ StatusBox::StatusBox(BaseObjectType* baseObject, const Glib::RefPtr<Gtk::Builder
                    &sigc::signal<void, Stack*>::emit));
   stack_tile_box->stack_tile_group_toggle.connect
     (sigc::mem_fun(stack_tile_group_toggle, &sigc::signal<void, bool>::emit));
+  turn_progressbar = NULL;
+}
+
+StatusBox::~StatusBox()
+{
+  if (turn_progressbar)
+    delete turn_progressbar;
 }
 
 void StatusBox::on_stack_info_changed(Stack *s)
@@ -152,11 +158,20 @@ void StatusBox::show_stats()
 
 void StatusBox::show_progress()
 {
+  notebook->set_current_page(2);
+  if (!turn_progressbar)
+    {
+      turn_progressbar = new TartanProgressBar (Playerlist::getActiveplayer());
+      tartan_box->add(*manage(turn_progressbar));
+      turn_progressbar->set_hexpand(true);
+      tartan_box->show_all();
+    }
+  else
+    turn_progressbar->pulse(Playerlist::getActiveplayer());
   if (Playerlist::getActiveplayer() == Playerlist::getInstance()->getNeutral())
     progress_status_label->set_text("");
   else
     progress_status_label->set_markup("<b>" + Playerlist::getActiveplayer()->getName() + "</b>");
-  notebook->set_current_page(2);
 }
 
 void StatusBox::show_stack(StackTile *s)
@@ -202,13 +217,8 @@ void StatusBox::set_progress_label(Glib::ustring s)
 
 void StatusBox::pulse()
 {
-  Glib::TimeVal now;
-  now.assign_current_time();
-  if (now.as_double() - last_pulsed.as_double() > 0.1)
-    {
-      turn_progressbar->pulse();
-      last_pulsed = now;
-    }
+  //warning: pulsing too quickly and can cause crashing bugs.
+  turn_progressbar->pulse(Playerlist::getActiveplayer());
 }
   
 void StatusBox::toggle_group_ungroup()
@@ -234,5 +244,11 @@ void StatusBox::enforce_height()
 
 void StatusBox::reset_progress()
 {
-  turn_progressbar->set_fraction(0.0);
+  if (turn_progressbar)
+    delete turn_progressbar;
+  turn_progressbar = new TartanProgressBar (Playerlist::getActiveplayer());
+  tartan_box->add(*manage(turn_progressbar));
+  turn_progressbar->set_hexpand(true);
+  tartan_box->show_all();
+  turn_progressbar->clear();
 }

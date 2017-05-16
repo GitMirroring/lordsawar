@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007-2010, 2014, 2015, 2017 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -53,6 +53,9 @@ class ShieldSetWindow: public sigc::trackable
     Gtk::Image *small_image;
     Gtk::Image *medium_image;
     Gtk::Image *large_image;
+    Gtk::Image *left_tartan_image;
+    Gtk::Image *center_tartan_image;
+    Gtk::Image *right_tartan_image;
     Gtk::MenuItem *new_shieldset_menuitem;
     Gtk::MenuItem *load_shieldset_menuitem;
     Gtk::MenuItem *save_shieldset_menuitem;
@@ -65,6 +68,9 @@ class ShieldSetWindow: public sigc::trackable
     Gtk::Button *change_smallpic_button;
     Gtk::Button *change_mediumpic_button;
     Gtk::Button *change_largepic_button;
+    Gtk::Button *change_left_tartan_button;
+    Gtk::Button *change_center_tartan_button;
+    Gtk::Button *change_right_tartan_button;
     Gtk::ColorButton *player_colorbutton;
     Gtk::Alignment *shield_alignment;
 
@@ -105,9 +111,14 @@ class ShieldSetWindow: public sigc::trackable
     void loadShield(Shield *shield);
     void update_window_title();
     void show_shield(ShieldStyle *ss, Shield *s, Gtk::Image *image);
+    void show_tartan(Shield *s, Glib::ustring f, Gtk::Image *image);
     void refresh_shields();
     void process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialog *d);
     Gtk::FileChooserDialog* shield_filechooser (Shield *s, ShieldStyle::Type t);
+
+    void on_left_tartan_changed();
+    void on_center_tartan_changed();
+    void on_right_tartan_changed();
 };
 
 #endif

@@ -36,7 +36,7 @@ Shield::Shield(XML_Helper* helper)
 }
 
 Shield::Shield(const Shield& s)
-: std::list<ShieldStyle*>(), sigc::trackable(s), d_owner(s.d_owner), 
+: std::list<ShieldStyle*>(), Tartan(s), sigc::trackable(s), d_owner(s.d_owner),
     d_color(s.d_color)
 {
   for (const_iterator it = s.begin(); it != s.end(); it++)
@@ -44,6 +44,7 @@ Shield::Shield(const Shield& s)
 }
 
 Shield::Shield(Shield::Colour owner, Gdk::RGBA color)
+:Tartan()
 {
   d_owner = guint32(owner);
   d_color = color;
@@ -125,6 +126,7 @@ bool Shield::save(XML_Helper *helper) const
   retval &= helper->saveData("color", d_color);
   for (const_iterator it = begin(); it != end(); it++)
     (*it)->save(helper);
+  retval &= saveTartan(helper);
   retval &= helper->closeTag();
   return retval;
 }
@@ -148,10 +150,32 @@ void Shield::instantiateImages(Shieldset *s, bool &broken)
               File::erase(pngfile);
             }
           else
-            return;
+            {
+              t.Close();
+              return;
+            }
         }
       count++;
     }
+  Glib::ustring l = t.getFile(getName(Tartan::LEFT) + ".png", broken);
+  if (broken)
+    {
+      t.Close();
+      return;
+    }
+  Glib::ustring c = t.getFile(getName(Tartan::CENTER) + ".png", broken);
+  if (broken)
+    {
+      t.Close();
+      return;
+    }
+  Glib::ustring r = t.getFile(getName(Tartan::RIGHT) + ".png", broken);
+  if (broken)
+    {
+      t.Close();
+      return;
+    }
+  instantiateTartanImages (l, c, r, broken);
   t.Close();
 }
 
@@ -159,6 +183,7 @@ void Shield::uninstantiateImages()
 {
   for (iterator it = begin(); it != end(); it++)
     (*it)->uninstantiateImages();
+  uninstantiateTartanImages();
 }
 
 ShieldStyle *Shield::getFirstShieldstyle(ShieldStyle::Type type)

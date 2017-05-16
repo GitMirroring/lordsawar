@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
 // Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2006-2011, 2014, 2015, 2017 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ class Temple;
 class Ruin;
 class Bridge;
 class Stack;
+class Shieldset;
 class SelectorPixMaskCacheItem;
 class ArmyPixMaskCacheItem;
 class FlagPixMaskCacheItem;
@@ -63,6 +64,7 @@ class BagPixMaskCacheItem;
 class ExplosionPixMaskCacheItem;
 class NewLevelPixMaskCacheItem;
 class DefaultTileStylePixMaskCacheItem;
+class TartanPixMaskCacheItem;
 
 //! Cache for generated army and map images.
 /** Soliton class for caching army and map images
@@ -301,6 +303,12 @@ class ImageCache
         PixMask* getDefaultTileStylePic(guint32 tilestyle_type, 
                                         guint32 tilesize);
 
+        /** Method for getting a picture of the tartan progess bar.
+         * The image will not be any wider than width, but can be less wide.
+         */
+        PixMask* getTartanPic (const Player *p, guint32 width,
+                               Shieldset *s);
+
         /** Method for getting a city picture
           * 
           * For simplicity we have extended the basic_image/mask style to
@@ -462,6 +470,7 @@ class ImageCache
         PixMaskCache<ExplosionPixMaskCacheItem> explosioncache;
         PixMaskCache<NewLevelPixMaskCacheItem> newlevelcache;
         PixMaskCache<DefaultTileStylePixMaskCacheItem> defaulttilestylecache;
+        PixMaskCache<TartanPixMaskCacheItem> tartancache;
 
         PixMask* d_diplomacy[2][DIPLOMACY_TYPES];
         PixMask* d_cursor[CURSOR_TYPES];
@@ -894,5 +903,23 @@ public:
 public:
     guint32 tilestyle_type;
     guint32 tilesize;
+};
+
+//! Helper class for tartan progress bar images in the ImageCache.
+/**
+ * These images appear on the screen when the computer player is moving
+ * to show how much more they have yet to move.
+ */
+class TartanPixMaskCacheItem
+{
+public:
+    static PixMask *generate(TartanPixMaskCacheItem item);
+    static void calculateWidth(TartanPixMaskCacheItem i, PixMask *left, PixMask *center, PixMask *right, guint32 &width, guint32 &centers, bool &include_right);
+    int comp(const TartanPixMaskCacheItem item) const;
+    bool operator == (const TartanPixMaskCacheItem &c) {return !comp(c);};
+    bool operator < (const TartanPixMaskCacheItem &c) const {return comp(c)<0;};
+    guint32 width;
+    guint32 player_id;
+    guint32 shieldset;
 };
 #endif

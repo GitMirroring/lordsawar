@@ -150,6 +150,9 @@ class Stacklist : public std::list<Stack*>, public sigc::trackable
         //! Return which stack and hero the item belongs to.
         bool getItemHolder(Item *item, Stack **stack, Hero **hero) const;
 
+        //! Count the stacks that can move.
+        guint32 countMovableStacks() const;
+
 	// Methods that operate on class data and modify the class.
 
 	//! remove all movement points from every army in every stack.

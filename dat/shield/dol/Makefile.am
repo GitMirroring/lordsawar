@@ -37,7 +37,10 @@ IMAGES = \
 	$(srcdir)/small-orange-shield.png \
 	$(srcdir)/small-red-shield.png \
 	$(srcdir)/small-white-shield.png \
-	$(srcdir)/small-yellow-shield.png
+	$(srcdir)/small-yellow-shield.png \
+	$(srcdir)/left-tartan.png \
+	$(srcdir)/center-tartan.png \
+	$(srcdir)/right-tartan.png
 
 EXTRA_DIST = \
 	dol.lws.in \

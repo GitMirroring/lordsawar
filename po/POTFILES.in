@@ -219,6 +219,7 @@ src/smallmap.cpp
 src/real_player.cpp
 src/Threat.cpp
 src/tileset.cpp
+src/tartan.cpp
 src/gui/image-helpers.cpp
 src/gui/city-window.cpp
 src/gui/preferences-dialog.cpp
@@ -260,6 +261,7 @@ src/gui/item-bonus-dialog.cpp
 src/gui/fight-window.cpp
 src/gui/new-random-map-dialog.cpp
 src/gui/use-item-on-city-dialog.cpp
+src/gui/tartan-progress-bar.cpp
 src/CreateScenarioRandomize.cpp
 src/vectoredunitlist.cpp
 src/editor/itemlist-dialog.cpp

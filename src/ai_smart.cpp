@@ -62,8 +62,6 @@ AI_Smart::AI_Smart(XML_Helper* helper)
 
 bool AI_Smart::startTurn()
 {
-  sbusy.emit();
-
   if (getStacklist()->getHeroes().size() == 0 &&
       Citylist::getInstance()->countCities(this) == 1)
     AI_maybeBuyScout(getFirstCity());
@@ -84,7 +82,6 @@ bool AI_Smart::startTurn()
 
   AI_setupVectoring(10, 3, 20);
 
-  sbusy.emit();
   //int loopCount = 0;
 
   AI_Analysis *analysis = new AI_Analysis(this);
@@ -106,8 +103,6 @@ bool AI_Smart::startTurn()
     build_capacity = true;
   while (true)
     {
-      sbusy.emit();
-
       AI_Allocation *allocation = new AI_Allocation(analysis, threats, this);
       allocation->sbusy.connect 
         (sigc::mem_fun (sbusy, &sigc::signal<void>::emit));
@@ -122,6 +117,12 @@ bool AI_Smart::startTurn()
       if (abort_requested)
         break;
     }
+
+  parkAllStacks();
+  sbusy.emit();
+  Glib::usleep (50000);
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
+  Glib::usleep (50000);
 
   delete analysis;
   analysis = NULL;

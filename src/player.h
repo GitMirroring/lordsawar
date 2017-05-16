@@ -846,6 +846,9 @@ class Player: public sigc::trackable
         //! Take them all!  (used for testing)
         void conquerAllCities();
 
+        //! Park all the stacks that aren't already parked.
+        void parkAllStacks();
+
         /** 
 	 * Callback to have the active player occupy a given city.
 	 * The player has defeated a City and now it has been decided

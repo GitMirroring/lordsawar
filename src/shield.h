@@ -24,6 +24,7 @@
 #include <sigc++/signal.h>
 
 #include "shieldstyle.h"
+#include "tartan.h"
 
 class XML_Helper;
 class Shieldset;
@@ -32,7 +33,7 @@ class Shieldset;
 /**
  *
  */
-class Shield : public std::list<ShieldStyle*>, public sigc::trackable
+class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::trackable
 {
     public:
 
@@ -70,7 +71,6 @@ class Shield : public std::list<ShieldStyle*>, public sigc::trackable
 
         //! Returns the colour of the player shield.
 	Gdk::RGBA getColor() const {return d_color;}
-
 
 	// Set Methods
 
@@ -138,6 +138,7 @@ class Shield : public std::list<ShieldStyle*>, public sigc::trackable
 	 * Mask portions of images are shaded in this colour.
 	 */
 	Gdk::RGBA d_color;
+
 };
 
 #endif // SHIELD_H

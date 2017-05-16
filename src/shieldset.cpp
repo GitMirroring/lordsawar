@@ -66,6 +66,8 @@ Shieldset::Shieldset(XML_Helper *helper, Glib::ustring directory)
 		      sigc::mem_fun((*this), &Shieldset::loadShield));
   helper->registerTag(ShieldStyle::d_tag, sigc::mem_fun((*this), 
 							&Shieldset::loadShield));
+  helper->registerTag(Tartan::d_tag, sigc::mem_fun((*this),
+                                                   &Shieldset::loadShield));
   clear();
 }
 
@@ -112,6 +114,15 @@ bool Shieldset::loadShield(Glib::ustring tag, XML_Helper* helper)
     {
       ShieldStyle *sh = new ShieldStyle(helper);
       (*back()).push_back(sh);
+      return true;
+    }
+  if (tag == Tartan::d_tag)
+    {
+      Tartan * t = new Tartan(helper);
+      back()->setName(Tartan::LEFT, t->getName(Tartan::LEFT));
+      back()->setName(Tartan::CENTER, t->getName(Tartan::CENTER));
+      back()->setName(Tartan::RIGHT, t->getName(Tartan::RIGHT));
+      delete t;
       return true;
     }
   return false;
@@ -362,7 +373,7 @@ void Shieldset::support_backward_compatibility()
   FileCompat::getInstance()->support_type(FileCompat::SHIELDSET, 
                                           file_extension, d_tag, true);
   FileCompat::getInstance()->support_version
-    (FileCompat::SHIELDSET, "0.2.0", LORDSAWAR_SHIELDSET_VERSION,
+    (FileCompat::SHIELDSET, "0.2.1", "0.3.2",
      sigc::ptr_fun(&Shieldset::upgrade));
 }
 
@@ -416,4 +427,36 @@ void Shieldset::setHeightsAndWidthsFromImages()
           }
       }
 }
+
+void Shieldset::lookupTartanImage(guint32 colour, Tartan::Type type,
+                                  PixMask **image, PixMask **mask)
+{
+  for (const_iterator it = begin(); it != end(); it++)
+    {
+      for (Shield::const_iterator i = (*it)->begin(); i != (*it)->end(); i++)
+	{
+	  if ((*it)->getOwner() == colour)
+            {
+              switch (type)
+                {
+                case Tartan::LEFT:
+                  *image = (*it)->getImage(Tartan::LEFT);
+                  *mask = (*it)->getMask(Tartan::LEFT);
+                  break;
+                case Tartan::CENTER:
+                  *image = (*it)->getImage(Tartan::CENTER);
+                  *mask = (*it)->getMask(Tartan::CENTER);
+                  break;
+                case Tartan::RIGHT:
+                  *image = (*it)->getImage(Tartan::RIGHT);
+                  *mask = (*it)->getMask(Tartan::RIGHT);
+                  break;
+                }
+              break;
+            }
+	}
+    }
+  return;
+}
+
 //End of file

@@ -26,6 +26,7 @@
 
 #include "setlist.h"
 #include "shieldset.h"
+#include "tartan.h"
 
 class Tar_Helper;
 class XML_Helper;
@@ -57,6 +58,8 @@ class Shieldsetlist : public SetList<Shieldset>, public sigc::trackable
 	//! Load all of the images associated with all of the shieldsets.
 	void instantiateImages(bool &broken);
 
+        //! Get the image and mask of the leftmost tartan.
+        void getTartan (guint32 shieldset, guint32 colour, Tartan::Type, PixMask **image, PixMask **mask) const;
 
         ShieldStyle *getShield(guint32 shieldset, guint32 type, guint32 colour) const;
 	// Static Methods

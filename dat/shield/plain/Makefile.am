@@ -16,7 +16,10 @@ IMAGES = \
 	$(srcdir)/medium-neutral-shield.png \
 	$(srcdir)/medium-shield.png \
 	$(srcdir)/small-neutral-shield.png \
-	$(srcdir)/small-shield.png
+	$(srcdir)/small-shield.png \
+	$(srcdir)/left-tartan.png \
+	$(srcdir)/center-tartan.png \
+	$(srcdir)/right-tartan.png
 
 EXTRA_DIST = \
 	plain.lws.in \

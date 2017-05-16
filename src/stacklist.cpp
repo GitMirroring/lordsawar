@@ -668,4 +668,21 @@ bool Stacklist::getItemHolder(Item *item, Stack **stack, Hero **hero) const
     }
   return false;
 }
+
+guint32 Stacklist::countMovableStacks() const
+{
+  guint32 count = 0;
+  for (const_iterator i = begin(); i != end(); i++)
+    {
+      if (!(*i)->getParked() && (*i)->canMove())
+        {
+          if ((*i)->getPath()->size() > 0 && (*i)->enoughMoves())
+            count++;
+          else if ((*i)->getPath()->size() == 0)
+            count++;
+        }
+    }
+  return count;
+}
+
 // End of file

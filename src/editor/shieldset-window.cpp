@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007-2012, 2014, 2015, 2017 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -45,6 +45,10 @@ Glib::ustring small_none = N_("no small shield set");
 Glib::ustring medium_none = N_("no medium shield set");
 Glib::ustring large_none = N_("no large shield set");
 
+Glib::ustring left_none = N_("no left tartan set");
+Glib::ustring center_none = N_("no center tartan set");
+Glib::ustring right_none = N_("no right tartan set");
+
 #define method(x) sigc::mem_fun(*this, &ShieldSetWindow::x)
 
 ShieldSetWindow::ShieldSetWindow(Glib::ustring load_filename)
@@ -90,12 +94,25 @@ ShieldSetWindow::ShieldSetWindow(Glib::ustring load_filename)
     xml->get_widget ("change_largepic_button", change_largepic_button);
     change_largepic_button->signal_clicked().connect
       (sigc::bind(method(on_shieldpic_changed), ShieldStyle::LARGE));
+    xml->get_widget ("change_left_tartan_button", change_left_tartan_button);
+    change_left_tartan_button->signal_clicked().connect
+      (method(on_left_tartan_changed));
+    xml->get_widget ("change_center_tartan_button", change_center_tartan_button);
+    change_center_tartan_button->signal_clicked().connect
+      (method(on_center_tartan_changed));
+    xml->get_widget ("change_right_tartan_button", change_right_tartan_button);
+    change_right_tartan_button->signal_clicked().connect
+      (method(on_right_tartan_changed));
     xml->get_widget ("player_colorbutton", player_colorbutton);
     player_colorbutton->signal_color_set().connect(method(on_player_color_changed));
 
     xml->get_widget ("small_image", small_image);
     xml->get_widget ("medium_image", medium_image);
     xml->get_widget ("large_image", large_image);
+
+    xml->get_widget ("left_tartan_image", left_tartan_image);
+    xml->get_widget ("center_tartan_image", center_tartan_image);
+    xml->get_widget ("right_tartan_image", right_tartan_image);
 
     window->signal_delete_event().connect(sigc::hide(method(on_delete_event)));
 
@@ -153,9 +170,15 @@ ShieldSetWindow::update_shield_panel()
       change_smallpic_button->set_label(small_none);
       change_mediumpic_button->set_label(medium_none);
       change_largepic_button->set_label(large_none);
+      change_left_tartan_button->set_label(left_none);
+      change_center_tartan_button->set_label(center_none);
+      change_right_tartan_button->set_label(right_none);
       small_image->clear();
       medium_image->clear();
       large_image->clear();
+      left_tartan_image->clear();
+      center_tartan_image->clear();
+      right_tartan_image->clear();
       player_colorbutton->set_rgba(Gdk::RGBA("black"));
       return;
     }
@@ -441,6 +464,34 @@ void ShieldSetWindow::on_shield_selected()
   update_shield_panel();
 }
 
+void ShieldSetWindow::show_tartan(Shield *s, Glib::ustring f, Gtk::Image *image)
+{
+  bool broken = false;
+  if (!s)
+    {
+      image->clear();
+      return;
+    }
+  std::vector<PixMask*> h = disassemble_row
+    (d_shieldset->getFileFromConfigurationFile(f + ".png"), 2,
+     broken);
+  if (!broken)
+    {
+      PixMask *i = ImageCache::applyMask(h[0], h[1], s->getColor());
+      if (i)
+        {
+          image->property_pixbuf() = i->to_pixbuf();
+          delete i;
+        }
+      else
+        image->clear();
+      delete h[0];
+      delete h[1];
+    }
+  else
+    image->clear();
+}
+
 void ShieldSetWindow::show_shield(ShieldStyle *ss, Shield *s, Gtk::Image *image)
 {
   bool broken = false;
@@ -498,6 +549,27 @@ void ShieldSetWindow::fill_shield_info(Shield*shield)
 	s = large_none;
       change_largepic_button->set_label(s);
       show_shield(ss, shield, large_image);
+
+      if (shield->getName(Tartan::LEFT).empty() == false)
+        s = shield->getName(Tartan::LEFT) + ".png";
+      else
+        s = left_none;
+      show_tartan (shield, shield->getName(Tartan::LEFT), left_tartan_image);
+      change_left_tartan_button->set_label(s);
+
+      if (shield->getName(Tartan::CENTER).empty() == false)
+        s = shield->getName(Tartan::CENTER) + ".png";
+      else
+        s = center_none;
+      show_tartan (shield, shield->getName(Tartan::CENTER), center_tartan_image);
+      change_center_tartan_button->set_label(s);
+
+      if (shield->getName(Tartan::RIGHT).empty() == false)
+        s = shield->getName(Tartan::RIGHT) + ".png";
+      else
+        s = right_none;
+      show_tartan (shield, shield->getName(Tartan::RIGHT), right_tartan_image);
+      change_right_tartan_button->set_label(s);
     }
 }
 
@@ -726,4 +798,19 @@ void ShieldSetWindow::process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialo
       td.run();
       td.hide();
     }
+}
+
+void
+ShieldSetWindow::on_left_tartan_changed()
+{
+}
+
+void
+ShieldSetWindow::on_center_tartan_changed()
+{
+}
+
+void
+ShieldSetWindow::on_right_tartan_changed()
+{
 }

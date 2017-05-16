@@ -249,7 +249,6 @@ int AI_Allocation::attackNearbyEnemies()
   int count = 0;
   for (auto city: *Citylist::getInstance())
     {
-      sbusy.emit();
       if (d_owner->abortRequested())
         return count;
       if (d_stacks->size() == 0)
@@ -284,6 +283,7 @@ int AI_Allocation::attackNearbyEnemies()
             }
           //break;
         }
+      sbusy.emit();
     }
   //return count;
   //attack nearby stacks in the field.
@@ -291,7 +291,6 @@ int AI_Allocation::attackNearbyEnemies()
   std::list<Vector<int> > pos = sl->getPositions();
   for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); i++)
     {
-      sbusy.emit();
       if (d_owner->abortRequested())
         return count;
       Stack *s = GameMap::getFriendlyStack(*i);
@@ -327,6 +326,7 @@ int AI_Allocation::attackNearbyEnemies()
           else
             break;
         }
+      sbusy.emit();
     }
   //don't leave heroes sitting around in cities.
   pos = sl->getPositions();
@@ -356,6 +356,7 @@ int AI_Allocation::attackNearbyEnemies()
                 deleteStack(s);
             }
         }
+      sbusy.emit();
     }
    //fixme: this should probably be commented out in favour of emptyOutCities
   //don't leave stacks of eight lying around in cities.
@@ -392,6 +393,7 @@ int AI_Allocation::attackNearbyEnemies()
                 deleteStack(s);
             }
         }
+      sbusy.emit();
     }
   return count;
 }
@@ -401,7 +403,6 @@ bool AI_Allocation::emptyOutCities()
   //everybody out on the dancefloor.
   for (auto c: *Citylist::getInstance())
     {
-      sbusy.emit();
       if (d_owner->abortRequested())
         return false;
       if (c->getOwner() != d_owner || c->isBurnt() == true)
@@ -438,6 +439,7 @@ bool AI_Allocation::emptyOutCities()
           if (bail)
             break;
         }
+      sbusy.emit();
     }
   return true;
 }
@@ -630,7 +632,6 @@ int AI_Allocation::move(City *first_city, bool take_neutrals)
 
   int count = 0;
 
-  sbusy.emit();
   if (d_owner->abortRequested())
     return count;
 
@@ -641,7 +642,6 @@ int AI_Allocation::move(City *first_city, bool take_neutrals)
   debug("Player " << d_owner->getName() << " still has " << d_stacks->size() << " stacks after allocating stacks to fulfilling quests");
   debug("Player " << d_owner->getName() << " moved " << moved << " stacks in quest mode.");
 
-  sbusy.emit();
   if (d_owner->abortRequested())
     return count;
 
@@ -652,7 +652,6 @@ int AI_Allocation::move(City *first_city, bool take_neutrals)
   debug("Player " << d_owner->getName() << " still has " << d_stacks->size() << " stacks after allocating stacks to visiting temples");
   debug("Player " << d_owner->getName() << " moved " << moved << " stacks in temple-visiting mode.");
 
-  sbusy.emit();
   if (d_owner->abortRequested())
     return count;
   //move hero stacks to ruins for searching.
@@ -662,7 +661,6 @@ int AI_Allocation::move(City *first_city, bool take_neutrals)
   debug("Player " << d_owner->getName() << " still has " << d_stacks->size() << " stacks after allocating stacks to visiting ruins");
   debug("Player " << d_owner->getName() << " moved " << moved << " stacks in ruin-visiting mode.");
 
-  sbusy.emit();
   if (d_owner->abortRequested())
     return count;
   //if we're near a bag of stuff, go pick it up.
@@ -672,7 +670,6 @@ int AI_Allocation::move(City *first_city, bool take_neutrals)
   debug("Player " << d_owner->getName() << " still has " << d_stacks->size() << " stacks after allocating stacks to picking up items");
   debug("Player " << d_owner->getName() << " moved " << moved << " stacks in pickup-items mode.");
 
-  sbusy.emit();
   if (d_owner->abortRequested())
     return count;
   // if a stack has a path for an enemy city and is outside of a city, then keep going.
@@ -683,7 +680,6 @@ int AI_Allocation::move(City *first_city, bool take_neutrals)
   debug("Player " << d_owner->getName() << " still has " << d_stacks->size() << " stacks after allocating stacks to continuing attacks");
   debug("Player " << d_owner->getName() << " moved " << moved << " stacks in continuing-attacks mode.");
 
-  sbusy.emit();
   if (d_owner->abortRequested())
     return count;
   // if a stack is 2 tiles away from another enemy city, then attack it.
@@ -693,7 +689,6 @@ int AI_Allocation::move(City *first_city, bool take_neutrals)
   debug("Player " << d_owner->getName() << " still has " << d_stacks->size() << " stacks after allocating stacks to attacking nearby stacks");
   debug("Player " << d_owner->getName() << " moved " << moved << " stacks in attack-nearby-stacks mode.");
 
-  sbusy.emit();
   if (d_owner->abortRequested())
     return count;
   //if (take_neutrals)
@@ -707,7 +702,6 @@ int AI_Allocation::move(City *first_city, bool take_neutrals)
       count+=moved;
     }
 
-  sbusy.emit();
   if (d_owner->abortRequested())
     return count;
   defensive_alloc = d_stacks->size();
@@ -724,7 +718,6 @@ int AI_Allocation::move(City *first_city, bool take_neutrals)
       return count;
     }
 
-  sbusy.emit();
   if (d_owner->abortRequested())
     return count;
   offensive_alloc = d_stacks->size();
@@ -741,7 +734,6 @@ int AI_Allocation::move(City *first_city, bool take_neutrals)
       return count;
     }
       
-  sbusy.emit();
   if (d_owner->abortRequested())
     return count;
   default_alloc = d_stacks->size();
@@ -751,7 +743,6 @@ int AI_Allocation::move(City *first_city, bool take_neutrals)
   debug("Player " << d_owner->getName() << " moved " << moved << " stacks in Default stack movements.");
   count+= moved;
 
-  sbusy.emit();
   if (d_owner->abortRequested())
     return count;
   //empty out the cities damnit.
@@ -900,7 +891,6 @@ int AI_Allocation::allocateDefensiveStacks(Citylist *cities)
       if (!city->isFriend(d_owner) || city->isBurnt())
 	continue;
       count += allocateDefensiveStacksToCity(city);
-      sbusy.emit();
       if (d_owner->abortRequested())
         return count;
 
@@ -997,7 +987,6 @@ int AI_Allocation::allocateStacksToThreats()
 
       if (d_stacks->size() == 0)
         break;
-      sbusy.emit();
       if (d_owner->abortRequested())
         return count;
 
@@ -1173,7 +1162,6 @@ int AI_Allocation::defaultStackMovements()
 
   while (d_stacks->size() > 0)
     {
-      sbusy.emit();
       if (d_owner->abortRequested())
         return count;
       Stack* s = d_stacks->front();
@@ -1269,6 +1257,7 @@ int AI_Allocation::defaultStackMovements()
           if (moved)
             count++;
         }
+      sbusy.emit();
     }
   return count;
 }
