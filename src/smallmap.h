@@ -45,6 +45,8 @@
 class SmallMap: public OverviewMap
 {
 public:
+    static bool s_quick;
+
     //! Default constructor.  Make a new SmallMap.
     SmallMap(bool headless);
 

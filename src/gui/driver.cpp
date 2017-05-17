@@ -72,6 +72,7 @@
 #include "new-network-game-dialog.h"
 #include "../editor/main-window.h"
 #include "../editor/editor-splash-window.h"
+#include "smallmap.h"
 
 #define method(x) sigc::mem_fun(*this, &Driver::x)
 
@@ -291,6 +292,7 @@ void Driver::run()
 {
   if (Main::instance().start_test_scenario) 
     {
+      SmallMap::s_quick = true;
       // quick load a test scenario
       GameParameters g;
       GameParameters::Player p;

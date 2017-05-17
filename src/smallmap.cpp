@@ -29,6 +29,8 @@
 #include "GameMap.h"
 #include "playerlist.h"
 
+bool SmallMap::s_quick = false;
+
 SmallMap::SmallMap(bool headless)
  : OverviewMap(headless)
 {
@@ -36,7 +38,10 @@ SmallMap::SmallMap(bool headless)
     sliding = false;
     view.pos = Vector<int>(0, 0);
     view.dim = Vector<int>(3, 3);
-    sleep_interval = TIMER_SMALLMAP_REFRESH;
+    if (s_quick)
+      sleep_interval = 0;
+    else
+      sleep_interval = TIMER_SMALLMAP_REFRESH;
 }
 
 void SmallMap::set_view(Rectangle new_view)
