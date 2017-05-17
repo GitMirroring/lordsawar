@@ -85,7 +85,8 @@ ImageCache::ImageCache()
     explosioncache((sigc::ptr_fun(&ExplosionPixMaskCacheItem::generate))),
     newlevelcache((sigc::ptr_fun(&NewLevelPixMaskCacheItem::generate))),
     defaulttilestylecache((sigc::ptr_fun(&DefaultTileStylePixMaskCacheItem::generate))),
-    tartancache((sigc::ptr_fun(&TartanPixMaskCacheItem::generate)))
+    tartancache((sigc::ptr_fun(&TartanPixMaskCacheItem::generate))),
+    emptytartancache((sigc::ptr_fun(&EmptyTartanPixMaskCacheItem::generate)))
 {
     loadDiplomacyImages();
     loadCursorImages();
@@ -408,6 +409,7 @@ void ImageCache::reset()
   newlevelcache.reset();
   defaulttilestylecache.reset();
   tartancache.reset();
+  emptytartancache.reset();
 
   d_cachesize = 0;
   return;
@@ -605,6 +607,13 @@ void ImageCache::checkPictures()
   if (tartancache.size() >= MAX_PLAYERS + 1)
     {
       d_cachesize -= tartancache.discardHalf();
+      if (d_cachesize < maxcache)
+        return;
+    }
+
+  if (emptytartancache.size() >= MAX_PLAYERS + 1)
+    {
+      d_cachesize -= emptytartancache.discardHalf();
       if (d_cachesize < maxcache)
         return;
     }
@@ -1157,6 +1166,20 @@ PixMask* ImageCache::getTartanPic(const Player *p, guint32 width, Shieldset *shi
   i.width = width;
   i.shieldset = shieldset->getId();
   PixMask *s = tartancache.get(i, added);
+  d_cachesize += added;
+  if (added)
+    checkPictures();
+  return s;
+}
+
+PixMask* ImageCache::getEmptyTartanPic(const Player *p, guint32 width, Shieldset *shieldset)
+{
+  guint added = 0;
+  EmptyTartanPixMaskCacheItem i;
+  i.player_id = p->getId();
+  i.width = width;
+  i.shieldset = shieldset->getId();
+  PixMask *s = emptytartancache.get(i, added);
   d_cachesize += added;
   if (added)
     checkPictures();
@@ -2108,17 +2131,17 @@ int DefaultTileStylePixMaskCacheItem::comp(const DefaultTileStylePixMaskCacheIte
     0;
 }
 
-void TartanPixMaskCacheItem::calculateWidth(TartanPixMaskCacheItem i, PixMask *left, PixMask *center, PixMask *right, guint32 &width, guint32 &centers, bool &include_right)
+void TartanPixMaskCacheItem::calculateWidth(guint32 iwidth, PixMask *left, PixMask *center, PixMask *right, guint32 &width, guint32 &centers, bool &include_right)
 {
   //calculate the width, ugh.
-  for (width = left->get_width(); width < i.width - right->get_width();
+  for (width = left->get_width(); width < iwidth - right->get_width();
        width += center->get_width())
     centers++;
   width += right->get_width();
   include_right = true;
   for (guint32 j = 0; j < centers; j++)
     {
-      if (width > i.width)
+      if (width > iwidth)
         {
           width -= center->get_width();
           if (centers)
@@ -2127,7 +2150,7 @@ void TartanPixMaskCacheItem::calculateWidth(TartanPixMaskCacheItem i, PixMask *l
       else
         break;
     }
-  if (width > i.width)
+  if (width > iwidth)
     {
       width -= right->get_width();
       include_right = false;
@@ -2163,7 +2186,7 @@ PixMask *TartanPixMaskCacheItem::generate(TartanPixMaskCacheItem i)
 
   guint32 w = 0, num_centers = 0;
   bool include_right = false;
-  calculateWidth(i, left, center, right, w, num_centers, include_right);
+  calculateWidth(i.width, left, center, right, w, num_centers, include_right);
   //okay w is the actual width of the image, which is the same or less than
   //the width we asked for.  it has NUM_CENTERS center pieces and it may or may
   //not have an ending piece (if we can fit it.)
@@ -2195,6 +2218,76 @@ PixMask *TartanPixMaskCacheItem::generate(TartanPixMaskCacheItem i)
 }
 
 int TartanPixMaskCacheItem::comp(const TartanPixMaskCacheItem item) const
+{
+  return
+    (player_id < item.player_id) ? -1 :
+    (player_id > item.player_id) ?  1 :
+    (width < item.width) ? -1 :
+    (width > item.width) ?  1 :
+    (shieldset < item.shieldset) ? -1 :
+    (shieldset > item.shieldset) ?  1 :
+    0;
+}
+
+PixMask *EmptyTartanPixMaskCacheItem::generate(EmptyTartanPixMaskCacheItem i)
+{
+  //okay, here's where we fashion the new image.
+  //we take the leftmost tartan image for this player
+  //and then we repeat the center tartan image a bunch of times
+  //and then finally we cap it off with the rightmost tartan image
+  //the images are all masked in the player's colour.
+
+  PixMask *image = NULL, *mask = NULL;
+  Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
+                                          Tartan::LEFT, &image, &mask);
+  PixMask *left = image->copy();
+  image = NULL;
+  mask = NULL;
+  Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
+                                          Tartan::CENTER, &image, &mask);
+  PixMask *center = image->copy();
+  image = NULL;
+  mask = NULL;
+  Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
+                                          Tartan::RIGHT, &image, &mask);
+  PixMask *right = image->copy();
+  //okay, so we have our left, right and center images, now we need to
+  //concatenate them together
+
+  guint32 w = 0, num_centers = 0;
+  bool include_right = false;
+  TartanPixMaskCacheItem::calculateWidth(i.width, left, center, right, w, num_centers, include_right);
+  //okay w is the actual width of the image, which is the same or less than
+  //the width we asked for.  it has NUM_CENTERS center pieces and it may or may
+  //not have an ending piece (if we can fit it.)
+  //we always have the leftmost piece though because we have to show something.
+  Glib::RefPtr<Gdk::Pixbuf> pixbuf
+    = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, w, left->get_height());
+  pixbuf->fill(0x00000000);
+  PixMask *tartan = PixMask::create(pixbuf);
+
+  //blit the left image
+  guint32 l = 0;
+  left->blit (tartan->get_pixmap(), l, 0);
+  l += left->get_width();
+
+  //blit the center images
+  for (guint32 j = 0; j < num_centers; j++)
+    {
+      center->blit (tartan->get_pixmap(), l, 0);
+      l += center->get_width();
+    }
+
+  //blit the right image
+  if (include_right)
+    right->blit (tartan->get_pixmap(), l, 0);
+  delete left;
+  delete center;
+  delete right;
+  return tartan;
+}
+
+int EmptyTartanPixMaskCacheItem::comp(const EmptyTartanPixMaskCacheItem item) const
 {
   return
     (player_id < item.player_id) ? -1 :

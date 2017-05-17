@@ -65,6 +65,7 @@ class ExplosionPixMaskCacheItem;
 class NewLevelPixMaskCacheItem;
 class DefaultTileStylePixMaskCacheItem;
 class TartanPixMaskCacheItem;
+class EmptyTartanPixMaskCacheItem;
 
 //! Cache for generated army and map images.
 /** Soliton class for caching army and map images
@@ -309,6 +310,12 @@ class ImageCache
         PixMask* getTartanPic (const Player *p, guint32 width,
                                Shieldset *s);
 
+        /** Method for getting a picture of the empty tartan progess bar.
+         * The image will not be any wider than width, but can be less wide.
+         */
+        PixMask* getEmptyTartanPic (const Player *p, guint32 width,
+                                    Shieldset *s);
+
         /** Method for getting a city picture
           * 
           * For simplicity we have extended the basic_image/mask style to
@@ -471,6 +478,7 @@ class ImageCache
         PixMaskCache<NewLevelPixMaskCacheItem> newlevelcache;
         PixMaskCache<DefaultTileStylePixMaskCacheItem> defaulttilestylecache;
         PixMaskCache<TartanPixMaskCacheItem> tartancache;
+        PixMaskCache<EmptyTartanPixMaskCacheItem> emptytartancache;
 
         PixMask* d_diplomacy[2][DIPLOMACY_TYPES];
         PixMask* d_cursor[CURSOR_TYPES];
@@ -914,10 +922,27 @@ class TartanPixMaskCacheItem
 {
 public:
     static PixMask *generate(TartanPixMaskCacheItem item);
-    static void calculateWidth(TartanPixMaskCacheItem i, PixMask *left, PixMask *center, PixMask *right, guint32 &width, guint32 &centers, bool &include_right);
+    static void calculateWidth(guint32 iwidth, PixMask *left, PixMask *center, PixMask *right, guint32 &width, guint32 &centers, bool &include_right);
     int comp(const TartanPixMaskCacheItem item) const;
     bool operator == (const TartanPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const TartanPixMaskCacheItem &c) const {return comp(c)<0;};
+    guint32 width;
+    guint32 player_id;
+    guint32 shieldset;
+};
+
+//! Helper class for empty tartan progress bar images in the ImageCache.
+/**
+ * These images appear on the screen when the computer player is moving
+ * to show how much more they have yet to move.
+ */
+class EmptyTartanPixMaskCacheItem
+{
+public:
+    static PixMask *generate(EmptyTartanPixMaskCacheItem item);
+    int comp(const EmptyTartanPixMaskCacheItem item) const;
+    bool operator == (const EmptyTartanPixMaskCacheItem &c) {return !comp(c);};
+    bool operator < (const EmptyTartanPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 width;
     guint32 player_id;
     guint32 shieldset;

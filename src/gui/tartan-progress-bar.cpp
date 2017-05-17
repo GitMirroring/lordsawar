@@ -67,20 +67,25 @@ bool TartanProgressBar::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
   Glib::RefPtr<Gdk::Window> window = get_window();
   if(window && get_parent() && player)
     {
-      Shieldset *ss = GameMap::getShieldset();
-      PixMask *i = NULL, *m = NULL;
-      ss->lookupTartanImage(player->getId(), Tartan::CENTER, &i, &m);
-      set_size_request(-1, i->get_height());
       PixMask *p = 
         ImageCache::getInstance()->getTartanPic (player, get_width() *
                                                  TARTAN_PERCENT_WIDTH,
                                                  GameMap::getShieldset());
 
-        cr->set_source(p->get_pixmap(), 0, 0);
-        if (percent < MIN_PERCENT) 
-          percent = MIN_PERCENT;
-        cr->rectangle(0, 0, p->get_width() * percent, p->get_height());
-        cr->fill();
+      set_size_request(-1, p->get_height());
+      cr->set_source(p->get_pixmap(), 0, 0);
+      if (percent < MIN_PERCENT) 
+        percent = MIN_PERCENT;
+      guint32 limit = (double)p->get_width() * percent;
+      cr->rectangle(0, 0, limit, p->get_height());
+      cr->fill();
+      p = 
+        ImageCache::getInstance()->getEmptyTartanPic (player, get_width() *
+                                                      TARTAN_PERCENT_WIDTH,
+                                                      GameMap::getShieldset());
+      cr->set_source(p->get_pixmap(), 0, 0);
+      cr->rectangle(limit, 0, p->get_width() - limit, p->get_height());
+      cr->fill();
     }
 
   return true;
