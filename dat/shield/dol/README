@@ -4,4 +4,6 @@ Use the `pnginfo' program from the www.stillhq.com/pngtools/ software package to
 
 The images in this directory were created specifically for lordsawar.
 
+The left-tartan.png, right-tartan.png and center-tartan.png files are modified versions of an image found at: https://opengameart.org/content/enemy-health-bars, and it is licensed under the public domain.  The originating project of the image is http://www.PhysHexGames.co.nr.
+
 dol.lws.in: Copyright (C) 2007, 2009 Ben Asselstine.  Licensed under the GPL Version 3 or later.
