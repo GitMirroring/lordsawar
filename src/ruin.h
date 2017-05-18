@@ -162,10 +162,10 @@ class Ruin : public NamedLocation, public sigc::trackable
         //! Steal the pointer to the reward and set the ruin's reward to nil.
         Reward *takeReward();
 
-	// Methods that operate on class data and do not modify the class.
-	
         //! Callback for loading the ruin data.
         bool load(Glib::ustring tag, XML_Helper* helper);
+
+	// Methods that operate on class data and do not modify the class.
 
         //! Saves the ruin data to an opened saved-game file.
         bool save(XML_Helper* helper) const;
