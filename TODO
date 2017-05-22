@@ -1,8 +1,6 @@
 are images not showing up when we search a ruin?
 do we really need the arrow images still?
 where are the defeat and victory sounds being played?
-do the random names + add a clear all names menuitem
-random->assign_capitals
 we're not actually loading the game-actionlist
 why are we passing turn_mode into GameScenario?
 
