@@ -1,7 +1,5 @@
 are images not showing up when we search a ruin?
 where are the defeat and victory sounds being played?
-we're not actually loading the game-actionlist
-why are we passing turn_mode into GameScenario?
 
  scp lordsawar-0.1.8.tar.gz benasselstine@dl.sv.nongnu.org:/releases/lordsawar/
 
