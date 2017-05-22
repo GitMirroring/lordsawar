@@ -56,6 +56,7 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
     xml->get_widget("signposts_scale", signposts_scale);
     xml->get_widget("accept_button", accept_button);
     xml->get_widget("random_roads_switch", random_roads_switch);
+    xml->get_widget("random_names_switch", random_names_switch);
 
     // fill in tile themes combobox
     
