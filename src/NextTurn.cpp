@@ -24,8 +24,8 @@
 #define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::flush<<std::endl;}
 //#define debug(x)
 
-NextTurn::NextTurn(bool turnmode, bool random_turns)
-    :d_turnmode(turnmode), d_random_turns (random_turns), d_stop(false)
+NextTurn::NextTurn()
+    :d_stop(false)
 {
   continuing_turn = false;
   

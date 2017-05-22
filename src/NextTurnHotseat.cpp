@@ -29,15 +29,15 @@
 #include "FogMap.h"
 #include "history.h"
 #include "QuestsManager.h"
-#include "ai_fast.h" //remove me
+#include "GameScenarioOptions.h"
 
 #include "path.h"
 
 #define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::flush<<std::endl;}
 //#define debug(x)
 
-NextTurnHotseat::NextTurnHotseat(bool turnmode, bool random_turns)
-    :NextTurn(turnmode, random_turns)
+NextTurnHotseat::NextTurnHotseat()
+    :NextTurn()
 {
   continuing_turn = false;
   
@@ -140,24 +140,6 @@ void NextTurnHotseat::startTurn()
   p->calculateUpkeep();
   p->calculateIncome();
 
-  //if turnmode is set, create/heal armies at player's turn
-  if (d_turnmode)
-    {
-
-      p->collectTaxesAndPayUpkeep();
-
-      //reset moves, and heal stacks
-      p->stacksReset();
-
-      //vector armies (needs to preceed city's next turn)
-      VectoredUnitlist::getInstance()->nextTurn(p);
-
-      //build new armies
-      Citylist::getInstance()->nextTurn(p);
-
-    }
-  p->calculateUpkeep();
-
   QuestsManager::getInstance()->nextTurn(p);
 }
 
@@ -176,32 +158,27 @@ void NextTurnHotseat::finishRound()
   //E.g. increase the round number in GameScenario. (this is done with
   //the snextRound signal, but useful for an example).
 
-  if (!d_turnmode)
+  for (auto it: *Playerlist::getInstance())
     {
-      //do this for all players at once
-      
-      for (auto it: *Playerlist::getInstance())
-	{
-	  if (it->isDead())
-	    continue;
+      if (it->isDead())
+        continue;
 
-          it->collectTaxesAndPayUpkeep();
+      it->collectTaxesAndPayUpkeep();
 
-	  //reset, and heal armies
-          it->stacksReset();
+      //reset, and heal armies
+      it->stacksReset();
 
-	  //vector armies (needs to preceed city's next turn)
-	  VectoredUnitlist::getInstance()->nextTurn(it);
+      //vector armies (needs to preceed city's next turn)
+      VectoredUnitlist::getInstance()->nextTurn(it);
 
-	  //produce new armies
-	  Citylist::getInstance()->nextTurn(it);
-	}
+      //produce new armies
+      Citylist::getInstance()->nextTurn(it);
     }
 
   // heal the stacks in the ruins
   Playerlist::getInstance()->getNeutral()->ruinsReset();
     
-  if (d_random_turns)
+  if (GameScenarioOptions::s_random_turns)
     {
       Playerlist::getInstance()->randomizeOrder();
       nextPlayer();

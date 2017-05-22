@@ -927,9 +927,7 @@ void GameWindow::on_game_stopped()
 	  return;
 	}
       if (game_scenario->getPlayMode() == GameScenario::HOTSEAT)
-	load_game(game_scenario, 
-		  new NextTurnHotseat(game_scenario->getTurnmode(),
-				      game_scenario->s_random_turns));
+	load_game(game_scenario, new NextTurnHotseat());
       else if (game_scenario->getPlayMode() == GameScenario::NETWORKED)
         {
           NewNetworkGameDialog nngd(*get_window(), true);

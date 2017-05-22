@@ -43,11 +43,8 @@ class NextTurn: public sigc::trackable
     public:
         /**
            \brief constructor
-
-           @param   turnmode    setting for the private variable d_turnmode
-           @param   random_turns change the order every round
          */
-        NextTurn(bool turnmode, bool random_turns);
+        NextTurn();
 
         /**
            \brief destructor
@@ -95,21 +92,6 @@ class NextTurn: public sigc::trackable
         sigc::signal<void> srequestAbort;
 
     protected:
-
-        /** \brief determines whether armies are healed/produced at the
-          * beginning of a round or at the beginning of each player's turn.
-          *
-          * If the value is set to true, the production/healing of armies takes
-          * place at the beginning of each player's turn (which is fairer); else
-          * all armies of all playes are healed when a new game round starts.
-          * The latter setting is a bit unfair, because the last player knows
-          * that his armies are healed immediately when he has finished his turn
-          * while the other player's armies may have to survive some attacks,
-          * but it may be useful in some circumstances.
-          */
-        bool d_turnmode;
-
-        bool d_random_turns;
 
         //! If set to true, the game is interrupted at the next occasion
         bool d_stop;

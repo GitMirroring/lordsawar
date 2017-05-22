@@ -33,12 +33,8 @@ class NextTurnNetworked: public NextTurn
     public:
         /**
            \brief constructor
-
-           @param   turnmode    setting for the private variable d_turnmode
-           @param   random_turns change the order every round
-
          */
-        NextTurnNetworked(bool turnmode, bool random_turns);
+        NextTurnNetworked();
 
         /**
            \brief destructor

@@ -66,7 +66,7 @@ class GameScenario: public GameScenarioOptions, public TarFile
           * @param comment  the comment for the scenario
           * @param turnmode the turnmode (see NextTurn for description)
           */
-        GameScenario(Glib::ustring name, Glib::ustring comment, bool turnmode,
+        GameScenario(Glib::ustring name, Glib::ustring comment,
 		     GameScenario::PlayMode playmode = GameScenario::HOTSEAT);
         
         /** Load the game scenario using a specified save game
@@ -81,9 +81,6 @@ class GameScenario: public GameScenarioOptions, public TarFile
         //! Returns the number of the current turn.
         unsigned int getRound() const {return s_round;}
 
-        //! Returns the turn mode. See NextTurn for a description.
-        bool getTurnmode() const {return d_turnmode;}
-        
 	Glib::ustring getId() const {return d_id;};
 
 	void setNewRandomId();
@@ -180,7 +177,6 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	  Glib::ustring d_comment;
 	  Glib::ustring d_copyright;
 	  Glib::ustring d_license;
-	  bool d_turnmode; //see NextTurn for a description of this option
 	  guint32 d_playmode;
 	  Glib::ustring d_id; //globally unique id identifying the scenario
 	  bool inhibit_autosave_removal;

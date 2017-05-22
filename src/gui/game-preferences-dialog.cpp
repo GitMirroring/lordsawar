@@ -361,8 +361,6 @@ void GamePreferencesDialog::on_start_game_clicked()
       g.players.push_back(p);
     }
 
-  g.process_armies = GameParameters::PROCESS_ARMIES_AT_PLAYERS_TURN;
-
   g.see_opponents_stacks = GameScenarioOptions::s_see_opponents_stacks;
   g.see_opponents_production = GameScenarioOptions::s_see_opponents_production;
   g.play_with_quests = GameScenarioOptions::s_play_with_quests;

@@ -180,7 +180,7 @@ void Driver::serve (GameScenario *game_scenario)
       return;
     }
   printf("Game Server is now listening on port %d\n", get_port());
-  NextTurnNetworked *next_turn = new NextTurnNetworked(game_scenario->getTurnmode(), game_scenario->s_random_turns);
+  NextTurnNetworked *next_turn = new NextTurnNetworked();
   game_server->round_ends.connect(sigc::mem_fun(next_turn, &NextTurnNetworked::finishRound));
   game_server->start_player_turn.connect(sigc::mem_fun(next_turn, &NextTurnNetworked::start_player));
   next_turn->srequestAbort.connect(sigc::mem_fun(game_server, &GameServer::on_turn_aborted));
@@ -277,7 +277,6 @@ void Driver::get_default(int num_players, GameParameters &g)
   g.tile_theme = "default";
   g.shield_theme = "default";
   g.city_theme = "default";
-  g.process_armies = GameParameters::PROCESS_ARMIES_AT_PLAYERS_TURN;
   g.cities_can_produce_allies = false;
   g.cusp_of_war = false;
   g.see_opponents_stacks = false;
@@ -342,7 +341,6 @@ void Driver::run()
       g.shield_theme = "default";
       g.city_theme = "default";
 
-      g.process_armies = GameParameters::PROCESS_ARMIES_AT_PLAYERS_TURN;
       g.see_opponents_stacks = true;
       g.see_opponents_production = true;
       g.play_with_quests = GameParameters::NO_QUESTING;
@@ -393,7 +391,6 @@ void Driver::run()
       g.shield_theme = "default";
       g.city_theme = "default";
 
-      g.process_armies = GameParameters::PROCESS_ARMIES_AT_PLAYERS_TURN;
       g.see_opponents_stacks = true;
       g.see_opponents_production = true;
       g.play_with_quests = GameParameters::NO_QUESTING;
@@ -750,7 +747,7 @@ void Driver::on_load_hosted_network_game_requested(GameScenario *game_scenario,
     }
   if (advertised)
     advertise_game(game_scenario, p);
-  NextTurnNetworked *next_turn = new NextTurnNetworked(game_scenario->getTurnmode(), game_scenario->s_random_turns);
+  NextTurnNetworked *next_turn = new NextTurnNetworked();
   game_server->round_ends.connect(sigc::mem_fun(next_turn, &NextTurnNetworked::finishRound));
   if (advertised)
     game_server->round_ends.connect (sigc::bind(method(on_advertised_game_round_ends), game_scenario, p));
@@ -888,7 +885,7 @@ void Driver::on_game_scenario_received(Glib::ustring path, Profile *p)
   RecentlyPlayedGameList::getInstance()->addNetworkedEntry(game_scenario, p, host, port);
   RecentlyPlayedGameList::getInstance()->save();
 
-  NextTurnNetworked *next_turn = new NextTurnNetworked(game_scenario->getTurnmode(), game_scenario->s_random_turns);
+  NextTurnNetworked *next_turn = new NextTurnNetworked();
   game_client->start_player_turn.connect(sigc::mem_fun(next_turn, &NextTurnNetworked::start_player));
   game_client->round_ends.connect(sigc::mem_fun(next_turn, &NextTurnNetworked::finishRound));
   if (game_lobby_dialog)
@@ -954,8 +951,7 @@ void Driver::on_new_game_requested(GameParameters g)
     if (splash_window)
 	splash_window->hide();
 
-    NextTurn *next_turn = new NextTurnHotseat(game_scenario->getTurnmode(),
-					      game_scenario->s_random_turns);
+    NextTurn *next_turn = new NextTurnHotseat();
     init_game_window();
     
     game_window->show();
@@ -980,8 +976,7 @@ void Driver::on_load_requested(Glib::ustring filename)
 
         game_window->show();
         game_window->load_game
-          (game_scenario, new NextTurnHotseat(game_scenario->getTurnmode(),
-                                              game_scenario->s_random_turns));
+          (game_scenario, new NextTurnHotseat());
       }
     else if (game_scenario->getPlayMode() == GameScenario::NETWORKED)
       {
@@ -1183,7 +1178,6 @@ void Driver::stress_test()
   g.tile_theme = "default";
   g.shield_theme = "default";
   g.city_theme = "default";
-  g.process_armies = GameParameters::PROCESS_ARMIES_AT_PLAYERS_TURN;
   g.cities_can_produce_allies = false;
   g.cusp_of_war = false;
   g.see_opponents_stacks = true;
@@ -1205,8 +1199,7 @@ void Driver::stress_test()
 
   Configuration::s_autosave_policy = Configuration::NO_SAVING;
   NextTurnHotseat *nextTurn;
-  nextTurn = new NextTurnHotseat(game_scenario->getTurnmode(),
-				 game_scenario->s_random_turns);
+  nextTurn = new NextTurnHotseat();
     
   nextTurn->snextRound.connect (method(stressTestNextRound));
   if (game_scenario->getRound() == 0)
@@ -1259,7 +1252,7 @@ void Driver::on_game_scenario_received_for_robots(Glib::ustring path)
   if (!game_scenario)
     return;
   GameClient *game_client = GameClient::getInstance();
-  NextTurnNetworked *next_turn = new NextTurnNetworked(game_scenario->getTurnmode(), game_scenario->s_random_turns);
+  NextTurnNetworked *next_turn = new NextTurnNetworked();
   game_client->start_player_turn.connect(sigc::mem_fun(next_turn, &NextTurnNetworked::start_player));
   game_client->round_ends.connect(sigc::mem_fun(next_turn, &NextTurnNetworked::finishRound));
 

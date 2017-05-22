@@ -79,11 +79,11 @@ Glib::ustring GameScenario::d_top_tag = PACKAGE;
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
-GameScenario::GameScenario(Glib::ustring name,Glib::ustring comment, bool turnmode,
+GameScenario::GameScenario(Glib::ustring name,Glib::ustring comment,
 			   GameScenario::PlayMode playmode)
     :TarFile(name, MAP_EXT), d_name(name),d_comment(comment), d_copyright(""),
-    d_license(""), d_turnmode(turnmode), d_playmode(playmode),
-    inhibit_autosave_removal(false), loaded_game_filename("")
+    d_license(""), d_playmode(playmode), inhibit_autosave_removal(false),
+    loaded_game_filename("")
 {
     Armysetlist::getInstance();
     Tilesetlist::getInstance();
@@ -98,7 +98,7 @@ GameScenario::GameScenario(Glib::ustring name,Glib::ustring comment, bool turnmo
 //savegame has an absolute path
 GameScenario::GameScenario(Glib::ustring savegame, bool& broken)
   :TarFile (File::get_basename (savegame, false),
-            File::get_extension (savegame)), d_turnmode(true),
+            File::get_extension (savegame)),
     d_playmode(GameScenario::HOTSEAT), inhibit_autosave_removal(false),
     loaded_game_filename("")
 {
@@ -752,7 +752,6 @@ bool GameScenario::saveWithHelper(XML_Helper &helper) const
   retval &= helper.saveData("copyright", d_copyright);
   retval &= helper.saveData("license", d_license);
   retval &= helper.saveData("turn", s_round);
-  retval &= helper.saveData("turnmode", d_turnmode);
   retval &= helper.saveData("view_enemies", s_see_opponents_stacks);
   retval &= helper.saveData("view_production", s_see_opponents_production);
   Glib::ustring quest_policy_str = Configuration::questPolicyToString(GameParameters::QuestPolicy(s_play_with_quests));
@@ -803,7 +802,6 @@ bool GameScenario::load(Glib::ustring tag, XML_Helper* helper)
       debug("loading scenario")
 
       helper->getData(d_id, "id");
-      helper->getData(d_turnmode, "turnmode");
       helper->getData(d_name, "name");
       helper->getData(d_comment, "comment");
       helper->getData(d_copyright, "copyright");

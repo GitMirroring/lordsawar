@@ -90,16 +90,6 @@ class CreateScenario : public CreateScenarioRandomize
         //! Set the height of the map
         void setHeight(int height);
 
-        /** Set the turn mode
-          * 
-          * @param turnmode     if set to true, several actions (healing armies
-          *                     and producng armies, respectively) take part at
-          *                     the beginning of the correpsonding player's turn,
-          *                     else they are done when all players have
-          *                     finished their round.
-          */
-        void setTurnmode(bool turnmode) {d_turnmode=turnmode;}
-      
         /** Add a player to the scenario
           * 
           * @param name     the name of the player
@@ -214,7 +204,6 @@ class CreateScenario : public CreateScenarioRandomize
         Glib::ustring d_citysetname;
         int d_width;
         int d_height;
-        bool d_turnmode;
 };
 
 #endif  //CREATE_SCENARIO_H

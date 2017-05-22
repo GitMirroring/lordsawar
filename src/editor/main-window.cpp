@@ -501,7 +501,7 @@ void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ust
     if (game_scenario)
       delete game_scenario;
     // sets up the lists
-    game_scenario = new GameScenario(_("Untitled"), _("No description"), true);
+    game_scenario = new GameScenario(_("Untitled"), _("No description"));
     if (d_create_scenario_names)
       delete d_create_scenario_names;
     d_create_scenario_names = new CreateScenarioRandomize();
@@ -616,7 +616,7 @@ void MainWindow::set_random_map(int width, int height,
     // sets up the lists
     if (game_scenario)
       delete game_scenario;
-    game_scenario = new GameScenario(_("Untitled"), _("No description"), true);
+    game_scenario = new GameScenario(_("Untitled"), _("No description"));
     if (d_create_scenario_names)
       delete d_create_scenario_names;
     d_create_scenario_names = new CreateScenarioRandomize();

@@ -55,12 +55,6 @@ public:
     Glib::ustring shield_theme;
     Glib::ustring city_theme;
 
-    enum ProcessArmies {
-	PROCESS_ARMIES_AT_PLAYERS_TURN = 0,
-	PROCESS_ARMIES_WHEN_ROUND_BEGINS
-    };
-    ProcessArmies process_armies;
-
     bool see_opponents_stacks;
     bool see_opponents_production;
     enum QuestPolicy {

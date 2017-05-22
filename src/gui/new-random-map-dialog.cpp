@@ -482,8 +482,6 @@ GameParameters NewRandomMapDialog::getParams()
     (Glib::filename_from_utf8(city_theme_combobox->get_active_text()),
      get_active_tile_size());
 
-  g.process_armies = GameParameters::PROCESS_ARMIES_AT_PLAYERS_TURN;
-
   g.see_opponents_stacks = GameScenarioOptions::s_see_opponents_stacks;
   g.see_opponents_production = GameScenarioOptions::s_see_opponents_production;
   g.play_with_quests = GameScenarioOptions::s_play_with_quests;
@@ -597,12 +595,6 @@ Glib::ustring NewRandomMapDialog::create_and_dump_scenario(const Glib::ustring &
   // more than 100%, so the thing is rather easy here
   creator.setPercentages(g.map.grass, g.map.water, g.map.forest, g.map.swamp,
                          g.map.hills, g.map.mountains);
-
-  // and tell it the turn mode
-  if (g.process_armies == GameParameters::PROCESS_ARMIES_AT_PLAYERS_TURN)
-    creator.setTurnmode(true);
-  else
-    creator.setTurnmode(false);
 
   // now create the map and dump the created map
   Glib::ustring path = File::getSaveFile(file);

@@ -64,7 +64,7 @@ setup_new_map (Glib::ustring name)
   GameMap::getInstance("default", "default", "default");
   Itemlist::createStandardInstance();
 
-  GameScenario *g = new GameScenario(name, String::ucompose(_("a scenario called %1 converted by lordsawar-import version %2"), name, VERSION), true);
+  GameScenario *g = new GameScenario(name, String::ucompose(_("a scenario called %1 converted by lordsawar-import version %2"), name, VERSION));
   for (unsigned int i = 0; i < MAX_PLAYERS + 1; i++)
     fl_counter->getNextId();
 
