@@ -114,9 +114,6 @@ class Cityset : public sigc::trackable, public Set
 	void setTowerImage(guint32 i, PixMask *p) {towerpics[i] = p;};
 	PixMask *getTowerImage(guint32 i) {return towerpics[i];};
 
-	//! get filenames in this cityset, excepting the configuration file.
-	void getFilenames(std::list<Glib::ustring> &files);
-
 	void instantiateImages(bool &broken);
 	void instantiateImages(Glib::ustring port_filename,
 			       Glib::ustring signpost_filename,

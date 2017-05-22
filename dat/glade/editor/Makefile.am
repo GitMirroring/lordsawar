@@ -43,7 +43,8 @@ smallmap-editor-dialog.ui \
 editor-splash-window.ui \
 fight-order-editor-dialog.ui \
 road-editor-tip.ui \
-battle-calculator-dialog.ui
+battle-calculator-dialog.ui \
+media-dialog.ui
 
 EXTRA_DIST = $(glade_DATA) \
 README

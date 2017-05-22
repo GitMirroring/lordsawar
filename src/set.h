@@ -21,25 +21,16 @@
 #include "File.h"
 #include "defs.h"
 #include "xmlhelper.h"
+#include "tarfile.h"
 
 //! Base class for Armyset, Tileset, Shieldset, and Cityset objects.
-class Set
+class Set: public TarFile
 {
 public:
-    enum Origin { SYSTEM, PERSONAL, SCENARIO, NONE};
     Set(Glib::ustring file_extension, guint32 id, Glib::ustring name, guint32 ts);
     Set(Glib::ustring file_extension, XML_Helper* helper);
     ~Set() {};
     Set(const Set &s);
-
-    Set::Origin getOrigin() {return origin;};
-    void setOrigin(Set::Origin origination) {origin = origination;};
-
-    Glib::ustring getDirectory() const {return dir;};
-    void setDirectory(Glib::ustring d) {dir = File::add_slash_if_necessary(d);};
-
-    Glib::ustring getFile(Glib::ustring file) const;
-    Glib::ustring getConfigurationFile() const;
 
     //! Returns the width and height in pixels of a square on the map.
     guint32 getTileSize() const {return d_tileSize * (double)d_scale;}
@@ -93,36 +84,14 @@ public:
      */
     void setInfo(Glib::ustring info) {d_info = info;}
 
-    //! Get the base name of the set.
-    /**
-     * This value does not contain a path (e.g. no slashes).  It is the
-     * name of an set directory inside army/ or shield/ etc.
-     *
-     * @return The basename of the file that the set is held in.
-     */
-    Glib::ustring getBaseName() const {return d_basename;}
-
-    //! Set the base name of the file that the set is in.
-    void setBaseName(Glib::ustring bname) {d_basename = bname;}
-
     bool save(XML_Helper *helper) const;
 
-    Glib::ustring getFileFromConfigurationFile(Glib::ustring file);
-    bool replaceFileInConfigurationFile(Glib::ustring file, Glib::ustring new_file);
-    bool addFileInConfigurationFile(Glib::ustring new_file);
-
-    void clean_tmp_dir() const;
-
-    bool saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring dest) const;
     //!Get the zoom level.
     double get_scale () const {return d_scale;};
 
     //!Set the zoom level.
     void set_scale (double d) {d_scale = d;};
 private:
-
-    Origin origin;
-    Glib::ustring dir;
 
     //! The unique Id of this set.
     /**
@@ -144,14 +113,6 @@ private:
     //! The license of the set.
     Glib::ustring d_license;
 
-    //! The basename of the set.
-    /**
-     * This is the base name of the file that the set files are
-     * residing in.  It does not contain a path (e.g. no slashes).
-     * set files sit in the army/, or shield/ etc directory.
-     */
-    Glib::ustring d_basename;
-
     //! The description of the set.
     /**
      * Equates to the <d_info> XML entity in the set
@@ -159,9 +120,6 @@ private:
      * This value is not used.
      */
     Glib::ustring d_info;
-
-    //! The file extension of the set.
-    Glib::ustring extension;
 
     //! The size of the graphic tiles in the Tileset.
     /**

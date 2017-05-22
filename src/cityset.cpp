@@ -227,17 +227,6 @@ Cityset *Cityset::create(Glib::ustring file, bool &unsupported_version)
   return d.cityset;
 }
 
-void Cityset::getFilenames(std::list<Glib::ustring> &files)
-{
-  files.push_back(d_cities_filename);
-  files.push_back(d_razedcities_filename);
-  files.push_back(d_port_filename);
-  files.push_back(d_signpost_filename);
-  files.push_back(d_ruins_filename);
-  files.push_back(d_temples_filename);
-  files.push_back(d_towers_filename);
-}
-
 bool Cityset::save(Glib::ustring filename, Glib::ustring ext) const
 {
   bool broken = false;

@@ -488,27 +488,6 @@ Tileset *Tileset::create(Glib::ustring file, bool &unsupported_version)
   return d.tileset;
 }
 
-void Tileset::getFilenames(std::list<Glib::ustring> &files)
-{
-  for (iterator it = begin(); it != end(); it++)
-    {
-      Tile *t = *it;
-      for (Tile::iterator sit = t->begin(); sit != t->end(); sit++)
-	{
-	  Glib::ustring file = (*sit)->getName();
-	  if (std::find(files.begin(), files.end(), file) == files.end())
-	    files.push_back(file);
-	}
-    }
-  files.push_back(d_small_selector);
-  files.push_back(d_large_selector);
-  files.push_back(d_explosion);
-  files.push_back(d_fog);
-  files.push_back(d_roads);
-  files.push_back(d_bridges);
-  files.push_back(d_flags);
-}
-
 void Tileset::uninstantiateImages()
 {
   for (iterator it = begin(); it != end(); it++)

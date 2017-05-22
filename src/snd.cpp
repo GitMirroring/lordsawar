@@ -29,6 +29,7 @@
 #include "xmlhelper.h"
 #include "timing.h"
 #include "rnd.h"
+#include "ScenarioMedia.h"
 
 #ifdef LW_SOUND
 #include <gstreamermm.h>
@@ -139,15 +140,18 @@ bool Snd::play(Glib::ustring piece, int nloops, bool fade)
     if (d_broken || !Configuration::s_musicenable)
       return true;
 
+  MusicItem *item = ScenarioMedia::getInstance()->getSoundEffect(piece);
+  if (!item)
+    item = d_musicMap[piece];
   // first, load the music piece
-  if (d_musicMap[piece] == 0)
+  if (item == NULL)
     return false;
 
 #ifdef LW_SOUND
   d_nloops = nloops;
   impl->effect->set_state(Gst::STATE_NULL);
   impl->effect->property_uri() = 
-    Glib::filename_to_uri(File::getMusicFile(d_musicMap[piece]->file));
+    Glib::filename_to_uri(File::getMusicFile(item->file));
   impl->effect->property_video_sink() = Gst::FakeSink::create();
   impl->effect->property_audio_sink() = Gst::ElementFactory::create_element("autoaudiosink", "output");
   if (fade)
@@ -264,16 +268,23 @@ void Snd::nextPiece()
     if (!d_background || !isMusicEnabled())
         return;
 
+    std::vector<Glib::ustring> bgmap = d_bgMap;
+    std::map<Glib::ustring, MusicItem*> map = d_musicMap;
+    if (ScenarioMedia::getInstance()->getBackgroundMusic().empty() == false)
+      {
+        bgmap = ScenarioMedia::getInstance()->getBackgroundMusic();
+        map = ScenarioMedia::getInstance()->getSounds();
+      }
 #ifdef LW_SOUND
     // select a random music piece from the list of background pieces
-    while (!d_bgMap.empty())
+    while (!map.empty())
       {
         int i = Rnd::rand() % d_bgMap.size();
-        if (!File::exists(File::getMusicFile(d_musicMap[d_bgMap[i]]->file)))
+        if (!File::exists(File::getMusicFile(map[bgmap[i]]->file)))
             continue;
         impl->back->set_state(Gst::STATE_NULL);
         impl->back->property_uri() = 
-          Glib::filename_to_uri(File::getMusicFile(d_musicMap[d_bgMap[i]]->file));
+          Glib::filename_to_uri(File::getMusicFile(map[bgmap[i]]->file));
         impl->back->property_video_sink() = Gst::FakeSink::create();
         impl->back->property_audio_sink() = Gst::ElementFactory::create_element("autoaudiosink", "output");
         impl->back->property_volume() = (double)Configuration::s_musicvolume/128.0;
@@ -316,4 +327,12 @@ void Snd::updateVolume()
   impl->effect->property_volume() = (double)Configuration::s_musicvolume/128.0;
   impl->back->property_volume() = (double)Configuration::s_musicvolume/128.0;
 #endif
+}
+
+Glib::ustring Snd::getFile(Glib::ustring piece)
+{
+  MusicItem *item = d_musicMap[piece];
+  if (!item)
+    return "";
+  return item->file;
 }

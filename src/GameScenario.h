@@ -27,6 +27,7 @@
 #include <sigc++/trackable.h>
 #include "GameScenarioOptions.h"
 
+#include "tarfile.h"
 class XML_Helper;
 class Tar_Helper;
 
@@ -42,7 +43,7 @@ class Tar_Helper;
  * a look at XML_Helper.
  */
 
-class GameScenario: public GameScenarioOptions
+class GameScenario: public GameScenarioOptions, public TarFile
 {
     public:
 
@@ -74,8 +75,6 @@ class GameScenario: public GameScenarioOptions
           * @param broken       set to true if something goes wrong
           */
         GameScenario(Glib::ustring savegame, bool& broken);
-
-        GameScenario(XML_Helper &helper, bool &broken);
 
         ~GameScenario();
 
@@ -123,7 +122,8 @@ class GameScenario: public GameScenarioOptions
           * @return true if all went well, false otherwise
           */
         bool saveGame(Glib::ustring filename, Glib::ustring extension = SAVE_EXT) const;
-        bool loadWithHelper(XML_Helper &helper);
+        bool dump (Glib::ustring filename, Glib::ustring extension = SAVE_EXT) const;
+        bool loadWithHelper(XML_Helper &helper, Glib::ustring dir);
         bool saveWithHelper(XML_Helper &helper) const;
 
         

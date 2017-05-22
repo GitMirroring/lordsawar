@@ -121,6 +121,7 @@
 [type: gettext/glade]dat/glade/editor/fight-order-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/road-editor-tip.ui
 [type: gettext/glade]dat/glade/editor/battle-calculator-dialog.ui
+[type: gettext/glade]dat/glade/editor/media-dialog.ui
 [type: gettext/glade]dat/glade/game-button-box-desktop.ui
 [type: gettext/glade]dat/glade/game-button-box-large-screen.ui
 [type: gettext/glade]dat/glade/game-button-box-netbook.ui
@@ -220,6 +221,7 @@ src/real_player.cpp
 src/Threat.cpp
 src/tileset.cpp
 src/tartan.cpp
+src/ScenarioMedia.cpp
 src/gui/image-helpers.cpp
 src/gui/city-window.cpp
 src/gui/preferences-dialog.cpp
@@ -307,6 +309,7 @@ src/editor/image-editor-dialog.cpp
 src/editor/masked-image-editor-dialog.cpp
 src/editor/fight-order-editor-dialog.cpp
 src/editor/battle-calculator-dialog.cpp
+src/editor/media-dialog.cpp
 src/utils/import.cpp
 src/gui/city-info-tip.cpp
 src/gui/game-lobby-dialog.cpp
@@ -318,6 +321,8 @@ src/gui/stack-tile-box.cpp
 src/NamedLocation.cpp
 src/herotemplates.cpp
 src/xmlhelper.cpp
+src/tarhelper.cpp
+src/tarfile.cpp
 src/action.cpp
 src/historymap.cpp
 src/snd.cpp

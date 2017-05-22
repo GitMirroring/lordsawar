@@ -39,6 +39,7 @@ class ImageEditorDialog: public LwEditorDialog
 
     Glib::ustring get_selected_filename() {return target_filename;};
     int run();
+    void hide();
 
     void set_title(Glib::ustring s) {dialog->set_title(s);};
     

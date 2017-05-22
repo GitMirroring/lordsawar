@@ -61,6 +61,11 @@ int ImageEditorDialog::run()
     return response;
 }
 
+void ImageEditorDialog::hide ()
+{
+  dialog->hide();
+}
+
 void ImageEditorDialog::on_image_chosen()
 {
   Glib::ustring selected_filename = filechooserbutton->get_filename();

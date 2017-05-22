@@ -71,6 +71,7 @@
 #include "Item.h"
 #include "rnd.h"
 #include "game-actionlist.h"
+#include "ScenarioMedia.h"
 
 Glib::ustring GameScenario::d_tag = "scenario";
 Glib::ustring GameScenario::d_top_tag = PACKAGE;
@@ -80,9 +81,9 @@ Glib::ustring GameScenario::d_top_tag = PACKAGE;
 
 GameScenario::GameScenario(Glib::ustring name,Glib::ustring comment, bool turnmode,
 			   GameScenario::PlayMode playmode)
-    :d_name(name),d_comment(comment), d_copyright(""), d_license(""),
-    d_turnmode(turnmode), d_playmode(playmode), inhibit_autosave_removal(false),
-    loaded_game_filename("")
+    :TarFile(name, MAP_EXT), d_name(name),d_comment(comment), d_copyright(""),
+    d_license(""), d_turnmode(turnmode), d_playmode(playmode),
+    inhibit_autosave_removal(false), loaded_game_filename("")
 {
     Armysetlist::getInstance();
     Tilesetlist::getInstance();
@@ -96,8 +97,10 @@ GameScenario::GameScenario(Glib::ustring name,Glib::ustring comment, bool turnmo
 
 //savegame has an absolute path
 GameScenario::GameScenario(Glib::ustring savegame, bool& broken)
-  :d_turnmode(true), d_playmode(GameScenario::HOTSEAT), 
-    inhibit_autosave_removal(false), loaded_game_filename("")
+  :TarFile (File::get_basename (savegame, false),
+            File::get_extension (savegame)), d_turnmode(true),
+    d_playmode(GameScenario::HOTSEAT), inhibit_autosave_removal(false),
+    loaded_game_filename("")
 {
   Tar_Helper t(savegame, std::ios::in, broken);
   if (broken == false)
@@ -112,7 +115,9 @@ GameScenario::GameScenario(Glib::ustring savegame, bool& broken)
       ext.push_back(SAVE_EXT);
       Glib::ustring filename = t.getFirstFile(ext, broken);
       XML_Helper helper(filename, std::ios::in);
-      broken = loadWithHelper(helper);
+      broken = loadWithHelper(helper, File::get_dirname(savegame));
+      ScenarioMedia::getInstance()->instantiateImages(t, broken);
+      ScenarioMedia::getInstance()->copySounds(t, broken);
       helper.close();
       File::erase(filename);
       t.Close();
@@ -181,13 +186,6 @@ bool GameScenario::loadShieldsets(Tar_Helper *t)
         Shieldsetlist::getInstance()->get(id)->instantiateImages(broken);
     }
   return !broken;
-}
-
-GameScenario::GameScenario(XML_Helper &helper, bool& broken)
-  : d_turnmode(true), d_playmode(GameScenario::HOTSEAT),
-    inhibit_autosave_removal(false), loaded_game_filename("")
-{
-  broken = loadWithHelper(helper);
 }
 
 void GameScenario::quickStartEvenlyDivided()
@@ -589,8 +587,9 @@ void GameScenario::setupDiplomacy(bool diplomacy)
       Playerlist::getInstance()->calculateDiplomaticRankings();
 }
 
-bool GameScenario::loadWithHelper(XML_Helper& helper)
+bool GameScenario::loadWithHelper(XML_Helper& helper, Glib::ustring dir)
 {
+  setDirectory(dir);
   Armysetlist::getInstance();
   Tilesetlist::getInstance();
   Shieldsetlist::getInstance();
@@ -614,6 +613,7 @@ bool GameScenario::loadWithHelper(XML_Helper& helper)
   helper.registerTag(Portlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
   helper.registerTag(VectoredUnitlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
   helper.registerTag(GameActionlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
+  helper.registerTag(ScenarioMedia::d_tag, sigc::mem_fun(this, &GameScenario::load));
 
   if (!helper.parseXML())
     broken = true;
@@ -650,7 +650,7 @@ Glib::ustring GameScenario::getComment() const
   return d_comment;
 }
 
-bool GameScenario::saveGame(Glib::ustring filename, Glib::ustring extension) const
+bool GameScenario::dump(Glib::ustring filename, Glib::ustring extension) const
 {
   bool retval = true;
   Glib::ustring goodfilename = File::add_ext_if_necessary(filename, extension);
@@ -680,7 +680,7 @@ bool GameScenario::saveGame(Glib::ustring filename, Glib::ustring extension) con
 
   Tileset *ts = GameMap::getTileset();
   t.saveFile(ts->getConfigurationFile());
-
+ 
   std::list<guint32> armysets;
   for (auto it: *Playerlist::getInstance())
     {
@@ -688,6 +688,7 @@ bool GameScenario::saveGame(Glib::ustring filename, Glib::ustring extension) con
       if (std::find(armysets.begin(), armysets.end(), armyset) == armysets.end())
 	armysets.push_back(armyset);
     }
+
   for (auto it: armysets)
     {
       Armyset *as = Armysetlist::getInstance()->get(it);
@@ -695,6 +696,26 @@ bool GameScenario::saveGame(Glib::ustring filename, Glib::ustring extension) con
     }
 
   return true;
+}
+
+bool GameScenario::saveGame(Glib::ustring filename, Glib::ustring extension) const
+{
+  bool retval = true;
+  Glib::ustring goodfilename = File::add_ext_if_necessary(filename, extension);
+  debug("saving game to " + goodfilename);
+
+  Glib::ustring tmpfile = File::get_tmp_file();
+  XML_Helper helper(tmpfile, std::ios::out);
+  retval &= saveWithHelper(helper);
+  helper.close();
+
+  if (retval == false)
+    return false;
+
+  Glib::ustring tmptar = File::get_tmp_file() + ".tar";
+  retval = saveTar(tmpfile, tmptar, goodfilename, true);
+
+  return retval;
 }
 
 bool GameScenario::saveWithHelper(XML_Helper &helper) const
@@ -758,6 +779,8 @@ bool GameScenario::saveWithHelper(XML_Helper &helper) const
   retval &= helper.saveData("playmode", playmode_str);
 
   retval &= helper.closeTag();
+
+  retval &= ScenarioMedia::getInstance()->save(&helper);
 
   retval &= helper.closeTag();
 
@@ -926,6 +949,12 @@ bool GameScenario::load(Glib::ustring tag, XML_Helper* helper)
       return true;
     }
 
+  if (tag == ScenarioMedia::d_tag)
+    {
+      ScenarioMedia::getInstance(helper);
+      return true;
+    }
+
   return false;
 }
 
@@ -1005,6 +1034,9 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
   num = Citylist::getInstance()->countCities();
   if (num < 2)
     errors.push_back(_("There must be at least 2 cities in the scenario."));
+
+  if (getName() == _("Untitled"))
+    errors.push_back(_("The scenario does not have a name."));
 
   for (auto it: *Playerlist::getInstance())
     {
@@ -1402,6 +1434,7 @@ void GameScenario::cleanup()
   VectoredUnitlist::deleteInstance();
   GameMap::deleteInstance();
   GameActionlist::deleteInstance();
+  ScenarioMedia::deleteInstance();
   if (fl_counter)
     {
       delete fl_counter;

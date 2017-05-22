@@ -160,9 +160,6 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         //! Get the first tile that has a certain pattern on the small map.
         Tile *getFirstTile(SmallTile::Pattern pattern) const;
 
-	//! Get filenames in this tileset, excepting the configuration file.
-	void getFilenames(std::list<Glib::ustring> &files);
-
         int countTilesWithPattern(SmallTile::Pattern pattern) const;
 
 	// Set Methods

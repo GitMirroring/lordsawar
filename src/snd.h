@@ -72,6 +72,8 @@ class Snd : public sigc::trackable
         //! Returns the music volume in the range 0..128
         int getMusicVolume();
 
+        //! Get the filename for the given piece.
+        Glib::ustring getFile(Glib::ustring piece);
 
 	// Set Methods
 

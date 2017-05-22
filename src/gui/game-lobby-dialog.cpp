@@ -68,7 +68,11 @@ void GameLobbyDialog::update_city_map()
     }
   else
     {
-      map_image->property_file() = File::getVariousFile("city_occupied.png");
+      Vector<int> dim = OverviewMap::calculate_smallmap_size();
+      Glib::RefPtr<Gdk::Pixbuf> hidden_map =
+        Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, dim.x, dim.y);
+      hidden_map->fill(0x00000000);
+      map_image->property_pixbuf() = hidden_map;
     }
 }
 

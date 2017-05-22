@@ -189,8 +189,6 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 	bool validateArmyUnitNames();
 	bool validateArmyUnitName(ArmyProto *a);
 	bool validateArmyTypeIds();
-	//! get filenames in this armyset, excepting the configuration file.
-	void getFilenames(std::list<Glib::ustring> &files);
 
 	void instantiateImages(bool &broken);
 	void uninstantiateImages();

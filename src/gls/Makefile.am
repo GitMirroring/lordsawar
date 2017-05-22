@@ -27,6 +27,7 @@ lordsawar_game_list_client_LDADD = \
                                   $(top_builddir)/src/liblordsawar.la \
                                   $(top_builddir)/src/liblordsawargamelist.la \
                                   $(top_builddir)/src/liblordsawarnet.la \
+                                  $(GSTREAMER_LIBS) \
                                   $(LIBSIGC_LIBS) \
                                   $(GTKMM_LIBS) \
                                   $(XSLT_LIBS) \
@@ -42,6 +43,7 @@ lordsawar_game_list_server_LDADD = \
                                   $(top_builddir)/src/liblordsawar.la \
                                   $(top_builddir)/src/liblordsawargamelist.la \
                                   $(top_builddir)/src/liblordsawarnet.la \
+                                  $(GSTREAMER_LIBS) \
                                   $(LIBSIGC_LIBS) \
                                   $(GTKMM_LIBS) \
                                   $(XSLT_LIBS) \

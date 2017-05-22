@@ -31,6 +31,7 @@
 #include "player.h"
 #include "PixMask.h"
 #include "maptile.h"
+#include "hero.h"
 
 class Road;
 class City;
@@ -422,6 +423,15 @@ class ImageCache
         PixMask* getGameButtonImage(guint32 type, int size);
         PixMask* getWaypointImage(guint32 type);
 
+        PixMask* getNextTurnPic ();
+        PixMask* getCityDefeatedPic ();
+        PixMask* getWinningPic();
+        PixMask* getHeroPic (Hero::Gender gender);
+        PixMask* getRuinSuccessPic();
+        PixMask* getRuinDefeatPic();
+        PixMask *getParleyOfferedPic();
+        PixMask *getParleyRefusedPic();
+
 	static PixMask* applyMask(PixMask* image, PixMask* mask, const Player* p);
 	static PixMask* applyMask(PixMask* image, PixMask* mask, Gdk::RGBA colour);
 
@@ -442,8 +452,8 @@ class ImageCache
         bool loadProdShieldImages();
         bool loadMoveBonusImages();
         bool loadNewLevelImages();
+        bool loadMedalImages(Glib::ustring sm, Glib::ustring lg);
         bool loadDefaultTileStyleImages();
-        bool loadMedalImages();
         bool loadWaypointImages();
         bool loadGameButtonImages();
 
@@ -500,6 +510,15 @@ class ImageCache
 	PixMask* d_small_temple;
         PixMask *d_waypoint[NUM_WAYPOINTS];
         PixMask *d_gamebuttons[3][NUM_GAME_BUTTON_IMAGES];
+        PixMask *d_nextturn;
+        PixMask *d_citydefeated;
+        PixMask *d_winning;
+        PixMask *d_malehero;
+        PixMask *d_femalehero;
+        PixMask *d_ruinsuccess;
+        PixMask *d_ruindefeat;
+        PixMask *d_parleyoffered;
+        PixMask *d_parleyrefused;
 };
 
 //! Helper class for selector box items in the ImageCache.

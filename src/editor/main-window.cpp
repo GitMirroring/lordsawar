@@ -94,6 +94,7 @@
 #include "stacklist.h"
 #include "battle-calculator-dialog.h"
 #include "stacktile.h"
+#include "media-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &MainWindow::x)
 
@@ -261,6 +262,9 @@ MainWindow::MainWindow(Glib::ustring load_filename)
     xml->get_widget("edit_rewards_menuitem", edit_rewards_menuitem);
     edit_rewards_menuitem->signal_activate().connect
       (method(on_edit_rewards_activated));
+    xml->get_widget("edit_scenario_media_menuitem", edit_scenario_media_menuitem);
+    edit_scenario_media_menuitem->signal_activate().connect
+      (method(on_edit_scenario_media_activated));
     xml->get_widget ("random_all_cities_menuitem", random_all_cities_menuitem);
     random_all_cities_menuitem->signal_activate().connect
       (method(on_random_all_cities_activated));
@@ -529,6 +533,10 @@ void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ust
 
     init_map_state();
     GameMap::getInstance()->calculateBlockedAvenues();
+    File::erase(getDefaultMapFilename());
+    Playerlist::getInstance()->setActiveplayer(Playerlist::getInstance()->getNeutral());
+    game_scenario->dump(getDefaultMapFilename(), MAP_EXT);
+    game_scenario->created(getDefaultMapFilename());
 }
 
 void MainWindow::set_random_map(int width, int height,
@@ -646,6 +654,10 @@ void MainWindow::set_random_map(int width, int height,
 	    }
 
     init_map_state();
+    File::erase(getDefaultMapFilename());
+    Playerlist::getInstance()->setActiveplayer(Playerlist::getInstance()->getNeutral());
+    game_scenario->dump(getDefaultMapFilename(), MAP_EXT);
+    game_scenario->created(getDefaultMapFilename());
 }
 
 void MainWindow::clear_map_state()
@@ -809,6 +821,7 @@ void MainWindow::on_load_map_activated()
 	if (game_scenario)
 	  delete game_scenario;
 	game_scenario = new GameScenario(current_save_filename, broken);
+        game_scenario->setDirectory(File::get_dirname(current_save_filename));
         Playerlist::getInstance()->syncNeutral();
 	if (d_create_scenario_names)
 	  delete d_create_scenario_names;
@@ -847,6 +860,7 @@ void MainWindow::on_save_map_activated()
           }
         else
           {
+            game_scenario->moved(current_save_filename);
             needs_saving = false;
             update_window_title();
           }
@@ -887,6 +901,7 @@ void MainWindow::on_save_map_as_activated()
           }
         else
           {
+            game_scenario->moved(current_save_filename);
             needs_saving = false;
             update_window_title();
           }
@@ -905,11 +920,16 @@ bool MainWindow::quit()
 
       else if (response == Gtk::RESPONSE_ACCEPT) // save and quit
 	on_save_map_activated();
-      //else if (Response == Gtk::CLOSE) // don't save just quit
+      game_scenario->clean_tmp_dir();
+      File::erase (getDefaultMapFilename());
       window->hide();
     }
   else
-    window->hide();
+    {
+      game_scenario->clean_tmp_dir();
+      File::erase (getDefaultMapFilename());
+      window->hide();
+    }
   editor_quit.emit();
   return true;
 }
@@ -1727,6 +1747,7 @@ void MainWindow::on_import_map_activated()
 	if (game_scenario)
 	  delete game_scenario;
 	game_scenario = new GameScenario(filename, broken);
+        game_scenario->setDirectory(File::get_dirname(filename));
 
 	if (broken)
 	{
@@ -1992,4 +2013,17 @@ void MainWindow::append_defender_to_battle_calculator(Stack *s)
         battle_calculator_defenders.push_back(new Army (*a, a->getOwner()));
     }
   on_battle_calculator_activated();
+}
+
+void MainWindow::on_edit_scenario_media_activated()
+{
+  MediaDialog d (*window, game_scenario);
+  d.run();
+  if (d.get_needs_saving())
+    needs_saving = true;
+}
+
+Glib::ustring MainWindow::getDefaultMapFilename()
+{
+  return File::add_slash_if_necessary(File::getCacheDir()) + "current.map";
 }

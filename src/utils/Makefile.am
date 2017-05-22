@@ -22,6 +22,7 @@ lordsawar_import_SOURCES = import.cpp
 lordsawar_import_LDADD = $(top_builddir)/src/gui/liblwgui.la \
                         $(top_builddir)/src/liblordsawargfx.la \
                         $(top_builddir)/src/liblordsawar.la \
+    			$(GSTREAMER_LIBS) \
 			$(GTKMM_LIBS) \
 			$(XMLPP_LIBS) \
 			$(XSLT_LIBS) \

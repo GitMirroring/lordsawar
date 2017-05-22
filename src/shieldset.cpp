@@ -194,17 +194,6 @@ Shieldset *Shieldset::create(Glib::ustring filename, bool &unsupported_version)
   return d.shieldset;
 }
 
-void Shieldset::getFilenames(std::list<Glib::ustring> &files) const
-{
-  for (const_iterator it = begin(); it != end(); it++)
-    for (Shield::const_iterator i = (*it)->begin(); i != (*it)->end(); i++)
-      {
-	Glib::ustring file = (*i)->getImageName();
-	if (std::find(files.begin(), files.end(), file) == files.end())
-	  files.push_back(file);
-      }
-}
-
 bool Shieldset::save(Glib::ustring filename, Glib::ustring ext) const
 {
   bool broken = false;

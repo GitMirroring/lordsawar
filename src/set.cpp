@@ -19,27 +19,20 @@
 #include "tarhelper.h"
 
 Set::Set(Glib::ustring ext, guint32 id, Glib::ustring name, guint32 ts)
-  : origin(SYSTEM), dir(""), d_id(id), d_name(name), d_license(""), 
-    d_basename(""), d_info(""), extension(ext), d_tileSize(ts), d_scale (1.0)
+  : TarFile("", ext), d_id(id), d_name(name), d_license(""), d_info(""),
+    d_tileSize(ts), d_scale (1.0)
 {
 }
 
 Set::Set(const Set &s)
-  : origin(s.origin), dir(s.dir), d_id(s.d_id), d_name(s.d_name), 
-    d_license(s.d_license), d_basename(s.d_basename), d_info(s.d_info),
-    extension(s.extension), d_tileSize(s.d_tileSize), d_scale(s.d_scale)
+  : TarFile(s), d_id(s.d_id), d_name(s.d_name), d_license(s.d_license),
+    d_info(s.d_info), d_tileSize(s.d_tileSize), d_scale(s.d_scale)
 {
-}
-
-Glib::ustring Set::getFile(Glib::ustring file) const
-{
-  return getDirectory() + file + ".png";
 }
 
 Set::Set(Glib::ustring ext, XML_Helper* helper)
- :d_scale(1.0)
+ :TarFile("", ext), d_scale(1.0)
 {
-  extension = ext;
   helper->getData(d_id, "id");
   helper->getData(d_name, "name");
   helper->getData(d_copyright, "copyright");
@@ -56,93 +49,4 @@ bool Set::save(XML_Helper *helper) const
   retval &= helper->saveData("license", d_license);
   retval &= helper->saveData("info", d_info);
   return retval;
-}
-
-Glib::ustring Set::getConfigurationFile() const
-{
-  return getDirectory() + getBaseName() + extension;
-}
-
-Glib::ustring Set::getFileFromConfigurationFile(Glib::ustring file)
-{
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken == false)
-    {
-      Glib::ustring filename = t.getFile(file, broken);
-      t.Close(false);
-  
-      if (broken == false)
-        return filename;
-    }
-  return "";
-}
-
-bool Set::replaceFileInConfigurationFile(Glib::ustring file, Glib::ustring new_file)
-{
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken == false)
-    {
-      broken = !t.replaceFile(file, new_file);
-      t.Close();
-    }
-  return !broken;
-}
-
-bool Set::addFileInConfigurationFile(Glib::ustring new_file)
-{
-  return replaceFileInConfigurationFile("", new_file);
-}
-
-void Set::clean_tmp_dir() const
-{
-  return Tar_Helper::clean_tmp_dir(getConfigurationFile());
-}
-
-bool Set::saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring dest) const
-{
-  bool broken = false;
-  Tar_Helper t(tmptar, std::ios::out, broken);
-  if (broken == true)
-    return false;
-  t.saveFile(tmpfile, File::get_basename(dest, true));
-  //now the images, go get 'em from the tarball we were made from.
-  std::list<Glib::ustring> delfiles;
-  Tar_Helper orig(getConfigurationFile(), std::ios::in, broken);
-  if (broken == false)
-    {
-      std::list<Glib::ustring> files = orig.getFilenamesWithExtension(".png");
-      for (std::list<Glib::ustring>::iterator it = files.begin(); 
-           it != files.end(); it++)
-        {
-          Glib::ustring pngfile = orig.getFile(*it, broken);
-          if (broken == false)
-            {
-              t.saveFile(pngfile);
-              delfiles.push_back(pngfile);
-            }
-          else
-            break;
-        }
-      orig.Close();
-    }
-  else
-    {
-      FILE *fileptr = fopen (getConfigurationFile().c_str(), "r");
-      if (fileptr)
-        fclose (fileptr);
-      else
-        broken = false;
-    }
-  t.Close();
-  for (std::list<Glib::ustring>::iterator it = delfiles.begin(); it != delfiles.end(); it++)
-    File::erase(*it);
-  File::erase(tmpfile);
-  if (broken == false)
-    {
-      if (File::copy(tmptar, dest) == true)
-        File::erase(tmptar);
-    }
-  return broken;
 }

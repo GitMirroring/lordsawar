@@ -32,11 +32,14 @@
  *
  * the shieldset is required to define the mask colours.
  *
+ * Resize the images when 9 (max players + 1) of them exceed MAX_IMAGES_WIDTH.
+ *
  */
 class Shieldset;
 class MaskedImageEditorDialog: public LwEditorDialog
 {
  public:
+    static const int MAX_IMAGES_WIDTH;
     MaskedImageEditorDialog(Gtk::Window &parent, Glib::ustring filename, Shieldset *shieldset = NULL);
     ~MaskedImageEditorDialog() {};
 
@@ -44,6 +47,7 @@ class MaskedImageEditorDialog: public LwEditorDialog
 
     Glib::ustring get_selected_filename() {return target_filename;};
     int run();
+    void hide();
     
  private:
     Glib::ustring target_filename;

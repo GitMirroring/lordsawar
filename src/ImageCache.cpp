@@ -38,6 +38,7 @@
 #include "bridge.h"
 #include "FogMap.h"
 #include "shieldset.h"
+#include "ScenarioMedia.h"
 
 ImageCache* ImageCache::s_instance = 0;
 
@@ -92,7 +93,8 @@ ImageCache::ImageCache()
     loadCursorImages();
     loadProdShieldImages();
     loadMoveBonusImages();
-    loadMedalImages();
+    loadMedalImages(ScenarioMedia::getDefaultSmallMedalsImageFilename(),
+                    ScenarioMedia::getDefaultBigMedalsImageFilename());
     d_smallruinedcity = loadMiscImage("smallruinedcity.png");
     d_smallhero = loadMiscImage("hero.png");
     d_smallbag = loadMiscImage("bag.png");
@@ -106,6 +108,15 @@ ImageCache::ImageCache()
     loadDefaultTileStyleImages();
     loadWaypointImages(); //only for game.  not for editors.
     loadGameButtonImages(); //only for game.  not for editors.
+    d_nextturn = NULL;
+    d_citydefeated = NULL;
+    d_winning = NULL;
+    d_malehero = NULL;
+    d_femalehero = NULL;
+    d_ruinsuccess = NULL;
+    d_ruindefeat = NULL;
+    d_parleyoffered = NULL;
+    d_parleyrefused = NULL;
 }
 
 bool ImageCache::loadDiplomacyImages()
@@ -217,14 +228,14 @@ bool ImageCache::loadNewLevelImages()
 {
   bool broken = false;
   std::vector<PixMask*> half;
-  half = disassemble_row(File::getVariousFile("hero-newlevel-male.png"), 
-			 2, broken);
+  half = disassemble_row
+    (ScenarioMedia::getDefaultHeroNewLevelMaleImageFilename(), 2, broken);
   if (broken)
     return false;
   d_newlevel_male = half[0];
   d_newlevelmask_male = half[1];
-  half = disassemble_row(File::getVariousFile("hero-newlevel-female.png"), 
-			 2, broken);
+  half = disassemble_row
+    (ScenarioMedia::getDefaultHeroNewLevelFemaleImageFilename(), 2, broken);
   if (broken)
     return false;
   d_newlevel_female = half[0];
@@ -245,24 +256,22 @@ bool ImageCache::loadDefaultTileStyleImages()
   return true;
 }
 
-bool ImageCache::loadMedalImages()
+bool ImageCache::loadMedalImages(Glib::ustring sm, Glib::ustring lg)
 {
   bool broken = false;
   //load the medal icons
   int ts = 40;
   std::vector<PixMask*> medal;
-  medal = disassemble_row(File::getVariousFile("medals_mask.png"),
-                          MEDAL_TYPES, broken);
+  medal = disassemble_row(sm, MEDAL_TYPES, broken);
   if (broken)
     return false;
   for (unsigned int i = 0; i < MEDAL_TYPES; i++)
     {
       if (medal[i]->get_width() != ts)
-	PixMask::scale(medal[i], ts, ts);
+        PixMask::scale(medal[i], ts, ts);
       d_medal[0][i] = medal[i];
     }
-  medal = disassemble_row(File::getVariousFile("bigmedals.png"),
-			      MEDAL_TYPES, broken);
+  medal = disassemble_row(lg, MEDAL_TYPES, broken);
   if (broken)
     return false;
   for (unsigned int i = 0; i < MEDAL_TYPES; i++)
@@ -378,6 +387,24 @@ ImageCache::~ImageCache()
       delete d_gamebuttons[2][i];
     }
 
+  if (d_nextturn)
+    delete d_nextturn;
+  if (d_citydefeated)
+    delete d_citydefeated;
+  if (d_winning)
+    delete d_winning;
+  if (d_malehero)
+    delete d_malehero;
+  if (d_femalehero)
+    delete d_femalehero;
+  if (d_ruinsuccess)
+    delete d_ruinsuccess;
+  if (d_ruindefeat)
+    delete d_ruindefeat;
+  if (d_parleyoffered)
+    delete d_parleyoffered;
+  if (d_parleyrefused)
+    delete d_parleyrefused;
   reset();
 }
 
@@ -1214,22 +1241,52 @@ PixMask *ImageCache::getProdShieldImage(int size, guint32 type)
 PixMask* ImageCache::getMedalImage(bool large, int type)
 {
   if (large)
-    return d_medal[1][type];
+    {
+      if (ScenarioMedia::getInstance()->getBigMedalsImageName() != "")
+        return ScenarioMedia::getInstance()->getBigMedalImage(type);
+      else
+        return d_medal[1][type];
+    }
   else
-    return d_medal[0][type];
+    {
+      if (ScenarioMedia::getInstance()->getSmallMedalsImageName() != "")
+        return ScenarioMedia::getInstance()->getSmallMedalImage(type);
+      else
+        return d_medal[0][type];
+    }
 }
 
 PixMask *ImageCache::getNewLevelImage(bool female, bool mask)
 {
   if (female && mask)
-    return d_newlevelmask_female;
+    {
+      if (ScenarioMedia::getInstance()->getHeroNewLevelFemaleMask())
+        return ScenarioMedia::getInstance()->getHeroNewLevelFemaleMask();
+      else
+        return d_newlevelmask_female;
+    }
   else if (female && !mask)
-    return d_newlevel_female;
+    {
+      if (ScenarioMedia::getInstance()->getHeroNewLevelFemaleImage())
+        return ScenarioMedia::getInstance()->getHeroNewLevelFemaleImage();
+      else
+        return d_newlevel_female;
+    }
 
   if (!female && mask)
-    return d_newlevelmask_male;
+    {
+      if (ScenarioMedia::getInstance()->getHeroNewLevelMaleMask())
+        return ScenarioMedia::getInstance()->getHeroNewLevelMaleMask();
+      else
+        return d_newlevelmask_male;
+    }
   else if (!female && !mask)
-    return d_newlevel_male;
+    {
+      if (ScenarioMedia::getInstance()->getHeroNewLevelMaleImage())
+        return ScenarioMedia::getInstance()->getHeroNewLevelMaleImage();
+      else
+        return d_newlevel_male;
+    }
   return NULL;
 }
 
@@ -1449,6 +1506,159 @@ PixMask* ImageCache::circled(PixMask* image, Gdk::RGBA colour, bool coloured, do
   result->draw_pixbuf(image->to_pixbuf(), 0, 0, 0, 0, width, height);
   delete copy;
   return result;
+}
+
+PixMask* ImageCache::getNextTurnPic ()
+{
+  PixMask *i = ScenarioMedia::getInstance()->getNextTurnImage();
+  if (i)
+    return i;
+  if (!d_nextturn)
+    {
+      bool broken = false;
+      i = PixMask::create(ScenarioMedia::getDefaultNextTurnImageFilename(),
+                          broken);
+      if (!broken)
+        d_nextturn = i;
+    }
+  return d_nextturn;
+}
+
+PixMask* ImageCache::getCityDefeatedPic ()
+{
+  PixMask *i = ScenarioMedia::getInstance()->getCityDefeatedImage();
+  if (i)
+    return i;
+  if (!d_citydefeated)
+    {
+      bool broken = false;
+      i = PixMask::create(ScenarioMedia::getDefaultCityDefeatedImageFilename(),
+                          broken);
+      if (!broken)
+        d_citydefeated = i;
+    }
+  return d_citydefeated;
+}
+
+PixMask * ImageCache::getWinningPic ()
+{
+  PixMask *i = ScenarioMedia::getInstance()->getWinningImage();
+  if (i)
+    return i;
+  if (!d_winning)
+    {
+      bool broken = false;
+      i = PixMask::create(ScenarioMedia::getDefaultWinningImageFilename(),
+                          broken);
+      if (!broken)
+        d_winning = i;
+    }
+  return d_winning;
+}
+
+PixMask * ImageCache::getHeroPic (Hero::Gender gender)
+{
+  switch (gender)
+    {
+    case Hero::NONE:
+    case Hero::MALE:
+        {
+          PixMask *i = ScenarioMedia::getInstance()->getMaleHeroImage();
+          if (i)
+            return i;
+          if (!d_malehero)
+            {
+              bool broken = false;
+              i = PixMask::create
+                (ScenarioMedia::getDefaultMaleHeroImageFilename(), broken);
+              if (!broken)
+                d_malehero = i;
+            }
+          return d_malehero;
+        }
+      break;
+    case Hero::FEMALE:
+        {
+          PixMask *i = ScenarioMedia::getInstance()->getFemaleHeroImage();
+          if (i)
+            return i;
+          if (!d_femalehero)
+            {
+              bool broken = false;
+              i = PixMask::create
+                (ScenarioMedia::getDefaultFemaleHeroImageFilename(), broken);
+              if (!broken)
+                d_femalehero = i;
+            }
+          return d_femalehero;
+        }
+      break;
+    }
+  return NULL;
+}
+
+PixMask *ImageCache::getRuinSuccessPic()
+{
+  PixMask *i = ScenarioMedia::getInstance()->getRuinSuccessImage();
+  if (i)
+    return i;
+  if (!d_ruinsuccess)
+    {
+      bool broken = false;
+      i = PixMask::create(ScenarioMedia::getDefaultRuinSuccessImageFilename(),
+                          broken);
+      if (!broken)
+        d_ruinsuccess = i;
+    }
+  return d_ruinsuccess;
+}
+
+PixMask *ImageCache::getRuinDefeatPic()
+{
+  PixMask *i = ScenarioMedia::getInstance()->getRuinDefeatImage();
+  if (i)
+    return i;
+  if (!d_ruindefeat)
+    {
+      bool broken = false;
+      i = PixMask::create(ScenarioMedia::getDefaultRuinDefeatImageFilename(),
+                          broken);
+      if (!broken)
+        d_ruindefeat = i;
+    }
+  return d_ruindefeat;
+}
+
+PixMask* ImageCache::getParleyOfferedPic ()
+{
+  PixMask *i = ScenarioMedia::getInstance()->getParleyOfferedImage();
+  if (i)
+    return i;
+  if (!d_parleyoffered)
+    {
+      bool broken = false;
+      i = PixMask::create(ScenarioMedia::getDefaultParleyOfferedImageFilename(),
+                          broken);
+      if (!broken)
+        d_parleyoffered = i;
+    }
+  return d_parleyoffered;
+}
+
+PixMask* ImageCache::getParleyRefusedPic ()
+{
+  PixMask *i = ScenarioMedia::getInstance()->getParleyRefusedImage();
+  if (i)
+    return i;
+  if (!d_parleyrefused)
+    {
+      bool broken = false;
+      i = PixMask::create(ScenarioMedia::getDefaultParleyRefusedImageFilename(),
+                          broken);
+      if (!broken)
+        d_parleyrefused = i;
+    }
+  return d_parleyrefused;
 }
 
 PixMask *SelectorPixMaskCacheItem::generate(SelectorPixMaskCacheItem i)

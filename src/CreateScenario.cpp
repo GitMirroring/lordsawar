@@ -324,7 +324,7 @@ bool CreateScenario::dump(Glib::ustring filename) const
     debug("CreateScenario::dump")
 
     if (d_scenario)
-        return d_scenario->saveGame(filename, "map");
+        return d_scenario->dump(filename, "map");
 
     return false;
 }

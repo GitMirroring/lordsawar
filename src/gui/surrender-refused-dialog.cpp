@@ -23,6 +23,7 @@
 
 #include "defs.h"
 #include "File.h"
+#include "ImageCache.h"
 
 SurrenderRefusedDialog::SurrenderRefusedDialog(Gtk::Window &parent)
  : LwDialog(parent, "surrender-refused-dialog.ui")
@@ -32,5 +33,6 @@ SurrenderRefusedDialog::SurrenderRefusedDialog(Gtk::Window &parent)
   xml->get_widget("image", image);
 
   label->set_text(_("Off with their heads!  I want it ALL!"));
-  image->property_file() = File::getVariousFile("parley_refused.png");
+  image->property_pixbuf() =
+    ImageCache::getInstance()->getParleyRefusedPic()->to_pixbuf();
 }

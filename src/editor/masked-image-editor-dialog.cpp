@@ -33,6 +33,8 @@
 
 #define method(x) sigc::mem_fun(*this, &MaskedImageEditorDialog::x)
 
+const int MaskedImageEditorDialog::MAX_IMAGES_WIDTH = 1000;
+
 MaskedImageEditorDialog::MaskedImageEditorDialog(Gtk::Window &parent, Glib::ustring filename, Shieldset *shieldset)
  : LwEditorDialog(parent, "masked-image-editor-dialog.ui")
 {
@@ -71,6 +73,10 @@ int MaskedImageEditorDialog::run()
     return response;
 }
 
+void MaskedImageEditorDialog::hide()
+{
+  dialog->hide();
+}
 void MaskedImageEditorDialog::on_image_chosen()
 {
   Glib::ustring selected_filename = filechooserbutton->get_filename();
@@ -107,6 +113,13 @@ void MaskedImageEditorDialog::show_image(Glib::ustring filename)
   std::vector<PixMask*> half = disassemble_row(filename, 2, broken);
   if (broken)
     return;
+  Vector<int> dim = Vector<int>(half[0]->get_width(), half[0]->get_height());
+  if (dim.x * (MAX_PLAYERS + 1) > MAX_IMAGES_WIDTH)
+    {
+      dim.x = MAX_IMAGES_WIDTH / (MAX_PLAYERS + 1);
+      dim.y = half[0]->get_height() *
+        (double)((double)dim.x / (double)half[0]->get_width());
+    }
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
       Gtk::Image *image = NULL;
@@ -128,6 +141,7 @@ void MaskedImageEditorDialog::show_image(Glib::ustring filename)
         d_shieldset = Shieldsetlist::getInstance()->get(1);
       Gdk::RGBA colour = d_shieldset->getColor(i);
       PixMask *army_image = ImageCache::applyMask(half[0],  half[1], colour);
+      PixMask::scale (army_image, dim.x, dim.y);
       image->property_pixbuf() = army_image->to_pixbuf();
       delete army_image;
     }

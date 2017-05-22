@@ -83,7 +83,8 @@ libeditor_la_SOURCES =\
 	editor-splash-window.cpp editor-splash-window.h \
 	fight-order-editor-dialog.cpp fight-order-editor-dialog.h \
 	road-editor-tip.cpp road-editor-tip.h \
-	battle-calculator-dialog.cpp battle-calculator-dialog.h
+	battle-calculator-dialog.cpp battle-calculator-dialog.h \
+	media-dialog.cpp media-dialog.h
 
 localedir = $(datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@

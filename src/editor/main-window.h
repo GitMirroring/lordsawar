@@ -89,6 +89,7 @@ class MainWindow: public sigc::trackable
     Gtk::MenuItem *edit_rewards_menuitem;
     Gtk::MenuItem *edit_smallmap_menuitem;
     Gtk::MenuItem *edit_remove_all_stacks_menuitem;
+    Gtk::MenuItem *edit_scenario_media_menuitem;
     Gtk::MenuItem *random_all_cities_menuitem;
     Gtk::MenuItem *random_unnamed_cities_menuitem;
     Gtk::MenuItem *random_all_ruins_menuitem;
@@ -148,6 +149,7 @@ class MainWindow: public sigc::trackable
     void on_edit_rewards_activated();
     void on_edit_fight_order_activated();
     void on_remove_all_stacks_activated();
+    void on_edit_scenario_media_activated();
 
     void on_fullscreen_activated();
     void on_grid_toggled();
@@ -240,6 +242,8 @@ class MainWindow: public sigc::trackable
     void redraw();
     void fill_players();
     void on_battle_calculator_activated();
+
+    Glib::ustring getDefaultMapFilename();
 
     struct PlayerItem
     {

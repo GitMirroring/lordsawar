@@ -1390,7 +1390,8 @@ void GameWindow::on_game_over(Player *winner)
   Gtk::Image *image;
   xml->get_widget("image", image);
 
-  image->property_pixbuf() = ImageCache::loadMiscImage("win.png")->to_pixbuf();
+  image->property_pixbuf() =
+    ImageCache::getInstance()->getWinningPic()->to_pixbuf();
 
   Gtk::Label *label;
   xml->get_widget("label", label);
@@ -1714,9 +1715,11 @@ void GameWindow::on_ruinfight_finished(Fight::Result result)
   Gtk::Image *image;
   xml->get_widget("image", image);
   if (result == Fight::ATTACKER_WON)
-    image->property_file() = File::getVariousFile("ruin_2.png");
+    image->property_pixbuf() =
+      ImageCache::getInstance()->getRuinSuccessPic()->to_pixbuf();
   else
-    image->property_file() = File::getVariousFile("ruin_1.png");
+    image->property_pixbuf() =
+      ImageCache::getInstance()->getRuinDefeatPic()->to_pixbuf();
   image->show();
 
   dialog.run_and_hide();
@@ -1966,7 +1969,8 @@ CityDefeatedAction GameWindow::on_city_defeated(City *city, int gold)
   Glib::RefPtr<Gtk::Builder> xml = dialog.get_builder();
   Gtk::Image *image;
   xml->get_widget("city_image", image);
-  image->property_file() = File::getVariousFile("city_occupied.png");
+  image->property_pixbuf() =
+    ImageCache::getInstance()->getCityDefeatedPic()->to_pixbuf();
   image->show();
 
   Gtk::Label *label;
@@ -2353,7 +2357,8 @@ void GameWindow::on_next_player_turn(Player *player, unsigned int turn_number)
   Glib::RefPtr<Gtk::Builder> xml = dialog.get_builder();
   Gtk::Image *image;
   xml->get_widget("image", image);
-  image->property_file() = File::getVariousFile("ship.png");
+  image->property_pixbuf() =
+    ImageCache::getInstance()->getNextTurnPic()->to_pixbuf();
 
   Gtk::Label *label;
   xml->get_widget("label", label);

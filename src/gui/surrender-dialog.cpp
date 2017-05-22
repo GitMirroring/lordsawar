@@ -21,6 +21,7 @@
 #include "surrender-dialog.h"
 #include "defs.h"
 #include "File.h"
+#include "ImageCache.h"
 
 SurrenderDialog::SurrenderDialog(Gtk::Window &parent, int numEnemies)
  : LwDialog (parent, "surrender-dialog.ui")
@@ -34,5 +35,6 @@ SurrenderDialog::SurrenderDialog(Gtk::Window &parent, int numEnemies)
                              numEnemies);
   s += _("Do you accept?");
   label->set_text(s);
-  image->property_file() = File::getVariousFile("parley_offered.png");
+  image->property_pixbuf() =
+    ImageCache::getInstance()->getParleyOfferedPic()->to_pixbuf();
 }

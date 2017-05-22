@@ -90,7 +90,10 @@ liblordsawar_la_SOURCES = action.cpp action.h AI_Analysis.cpp AI_Analysis.h \
 	PixMaskCache.h ImageCache.cpp ImageCache.h \
 	file-compat.cpp file-compat.h \
 	rnd.cpp rnd.h game-actionlist.cpp game-actionlist.h \
-	turn-actionlist.cpp turn-actionlist.h
+	turn-actionlist.cpp turn-actionlist.h \
+	ScenarioMedia.cpp ScenarioMedia.h \
+	tarfile.cpp tarfile.h \
+	snd.cpp snd.h
 
 liblordsawarnet_la_SOURCES = \
 	game-client.cpp game-client.h \
@@ -131,7 +134,7 @@ liblordsawargfx_la_SOURCES = \
 lordsawar_SOURCES = armymap.cpp armymap.h \
 	callback-enums.h defs.h game-parameters.h \
 	sidebar-stats.h game.cpp game.h gamebigmap.cpp gamebigmap.h \
-	snd.cpp snd.h main.cpp 
+	main.cpp 
 
 if WINDOWS_OS
 

@@ -148,9 +148,6 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
         void lookupTartanImage(guint32 colour, Tartan::Type type,
                                PixMask **image, PixMask **mask);
 
-	//! Get filenames in this shieldset, excepting the configuration file.
-	void getFilenames(std::list<Glib::ustring> &filenames) const;
-
 	//! Check to see if this shieldset can be used in the game.
 	bool validate() const;
 

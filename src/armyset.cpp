@@ -482,19 +482,6 @@ Armyset *Armyset::create(Glib::ustring filename, bool &unsupported_version)
   return d.armyset;
 }
 
-void Armyset::getFilenames(std::list<Glib::ustring> &files)
-{
-  for (iterator it = begin(); it != end(); it++)
-    {
-      for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
-	{
-	  Glib::ustring file = (*it)->getImageName(Shield::Colour(i));
-	  if (std::find(files.begin(), files.end(), file) == files.end())
-	    files.push_back(file);
-	}
-    }
-}
-	
 void Armyset::instantiateImages(bool &broken)
 {
   uninstantiateImages();

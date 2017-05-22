@@ -30,6 +30,7 @@
 #include "snd.h"
 #include "city.h"
 #include "playerlist.h"
+#include "ImageCache.h"
 
 #define method(x) sigc::mem_fun(*this, &HeroOfferDialog::x)
 
@@ -99,11 +100,10 @@ void HeroOfferDialog::on_toggled()
 {
   if (male_radiobutton->get_active())
     hero_image->property_pixbuf() = 
-      Gdk::Pixbuf::create_from_file(File::getVariousFile("recruit_male.png"));
+      ImageCache::getInstance()->getHeroPic(Hero::MALE)->to_pixbuf();
   else
     hero_image->property_pixbuf() =
-      Gdk::Pixbuf::create_from_file(File::getVariousFile("recruit_female.png"));
-
+      ImageCache::getInstance()->getHeroPic(Hero::FEMALE)->to_pixbuf();
 }
 
 bool HeroOfferDialog::run()
