@@ -153,6 +153,7 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
 	
     width_spinbutton->set_value(MAP_SIZE_TINY_WIDTH);
     height_spinbutton->set_value(MAP_SIZE_TINY_HEIGHT);
+    random_names_switch->set_active(true);
 }
 
 void NewMapDialog::run()
@@ -216,6 +217,7 @@ void NewMapDialog::run()
 	  map.temples = int(temples_scale->get_value());
 	  map.signposts = int(signposts_scale->get_value());
           map.generate_roads = random_roads_switch->get_active();
+          map.random_names = random_names_switch->get_active();
 	}
 
       map_set = true;
@@ -231,6 +233,7 @@ void NewMapDialog::on_fill_style_changed()
   bool random_selected = fill_style[row] == -1;
   random_map_container->set_sensitive(random_selected);
   random_roads_switch->set_sensitive(random_selected);
+  random_names_switch->set_sensitive(random_selected);
 }
 
 void NewMapDialog::on_map_size_changed()
