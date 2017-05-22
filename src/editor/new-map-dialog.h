@@ -49,6 +49,7 @@ class NewMapDialog: public LwEditorDialog
 	Glib::ustring armyset;
         bool generate_roads;
         bool random_names;
+        int num_players;
     };
 
     Map map;
@@ -79,6 +80,7 @@ class NewMapDialog: public LwEditorDialog
     Gtk::Button *accept_button;
     Gtk::Switch *random_roads_switch;
     Gtk::Switch *random_names_switch;
+    Gtk::SpinButton *num_players_spinbutton;
 
     enum { MAP_SIZE_NORMAL = 0, MAP_SIZE_SMALL, MAP_SIZE_TINY, 
       MAP_SIZE_CUSTOM };

@@ -57,6 +57,7 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
     xml->get_widget("accept_button", accept_button);
     xml->get_widget("random_roads_switch", random_roads_switch);
     xml->get_widget("random_names_switch", random_names_switch);
+    xml->get_widget("num_players_spinbutton", num_players_spinbutton);
 
     // fill in tile themes combobox
     
@@ -155,6 +156,7 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
     width_spinbutton->set_value(MAP_SIZE_TINY_WIDTH);
     height_spinbutton->set_value(MAP_SIZE_TINY_HEIGHT);
     random_names_switch->set_active(true);
+    num_players_spinbutton->set_value(8);
 }
 
 void NewMapDialog::run()
@@ -219,6 +221,7 @@ void NewMapDialog::run()
 	  map.signposts = int(signposts_scale->get_value());
           map.generate_roads = random_roads_switch->get_active();
           map.random_names = random_names_switch->get_active();
+          map.num_players = int(num_players_spinbutton->get_value());
 	}
 
       map_set = true;

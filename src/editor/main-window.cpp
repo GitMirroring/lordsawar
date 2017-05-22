@@ -295,6 +295,10 @@ MainWindow::MainWindow(Glib::ustring load_filename)
 		     random_unnamed_signs_menuitem);
     random_unnamed_signs_menuitem->signal_activate().connect
        (method(on_random_unnamed_signs_activated));
+    xml->get_widget ("random_assign_capital_cities_menuitem", 
+		     random_assign_capital_cities_menuitem);
+    random_assign_capital_cities_menuitem->signal_activate().connect
+       (method(on_random_assign_capital_cities_activated));
     xml->get_widget ("battle_calculator_menuitem", battle_calculator_menuitem);
     battle_calculator_menuitem->signal_activate().connect
       (method(on_battle_calculator_activated));
@@ -545,7 +549,8 @@ void MainWindow::set_random_map(int width, int height,
 				int cities, int ruins, int temples,
 				int signposts, Glib::ustring tileset,
 				Glib::ustring shieldset, Glib::ustring cityset,
-				Glib::ustring armyset, bool generate_roads)
+				Glib::ustring armyset, bool generate_roads,
+                                bool random_names)
 {
     clear_map_state();
 
@@ -658,6 +663,13 @@ void MainWindow::set_random_map(int width, int height,
     Playerlist::getInstance()->setActiveplayer(Playerlist::getInstance()->getNeutral());
     game_scenario->dump(getDefaultMapFilename(), MAP_EXT);
     game_scenario->created(getDefaultMapFilename());
+    if (random_names)
+      {
+        on_random_all_cities_activated();
+        on_random_all_ruins_activated();
+        on_random_all_temples_activated();
+        on_random_all_signs_activated();
+      }
 }
 
 void MainWindow::clear_map_state()
@@ -770,27 +782,39 @@ bool MainWindow::on_smallmap_mouse_motion_event(GdkEventMotion *e)
 
 void MainWindow::on_new_map_activated()
 {
-    current_save_filename = "";
+  current_save_filename = "";
 
-    NewMapDialog d(*window);
-    d.run();
+  NewMapDialog d(*window);
+  d.run();
 
-    if (d.map_set)
+  if (d.map_set)
     {
-	if (d.map.fill_style == -1)
-	    set_random_map(d.map.width, d.map.height,
-			   d.map.grass, d.map.water, d.map.swamp, d.map.forest,
-			   d.map.hills, d.map.mountains,
-			   d.map.cities, d.map.ruins, d.map.temples, 
-			   d.map.signposts, d.map.tileset, 
-			   d.map.shieldset, d.map.cityset, d.map.armyset,
-                           d.map.generate_roads);
-	else
-	    set_filled_map(d.map.width, d.map.height, d.map.fill_style, 
-			   d.map.tileset, d.map.shieldset, d.map.cityset,
-			   d.map.armyset);
-        needs_saving = true;
-        update_window_title();
+      if (d.map.fill_style == -1)
+        set_random_map(d.map.width, d.map.height,
+                       d.map.grass, d.map.water, d.map.swamp, d.map.forest,
+                       d.map.hills, d.map.mountains,
+                       d.map.cities, d.map.ruins, d.map.temples, 
+                       d.map.signposts, d.map.tileset, 
+                       d.map.shieldset, d.map.cityset, d.map.armyset,
+                       d.map.generate_roads, d.map.random_names);
+      else
+        set_filled_map(d.map.width, d.map.height, d.map.fill_style, 
+                       d.map.tileset, d.map.shieldset, d.map.cityset,
+                       d.map.armyset);
+      if (d.map.num_players)
+        {
+          for (int i = 0; i < d.map.num_players; i++)
+            {
+              Playerlist *pl = Playerlist::getInstance();
+              GameParameters::Player player;
+              player.name =
+                d_create_scenario_names->getPlayerName(Shield::Colour(i));
+              player.id = i;
+              pl->syncPlayer(player);
+            }
+        }
+      needs_saving = true;
+      update_window_title();
     }
 }
 
@@ -2026,4 +2050,61 @@ void MainWindow::on_edit_scenario_media_activated()
 Glib::ustring MainWindow::getDefaultMapFilename()
 {
   return File::add_slash_if_necessary(File::getCacheDir()) + "current.map";
+}
+    
+void MainWindow::change_city_ownership(City *city, Player *player)
+{
+  // set allegiance
+  city->setOwner(player);
+  //look for stacks in the city, and set them to this player
+  for (unsigned int x = 0; x < city->getSize(); x++)
+    {
+      for (unsigned int y = 0; y < city->getSize(); y++)
+	{
+	  Stack *s = GameMap::getStack(city->getPos() + Vector<int>(x,y));
+	  if (s)
+	    Stacklist::changeOwnership(s, player);
+	}
+    }
+}
+
+void MainWindow::on_random_assign_capital_cities_activated()
+{
+  //FIXME: CreateScenario::distributePlayers does a better job than this.
+
+  needs_saving = true;
+  //clear capitals
+  for (auto c : *Citylist::getInstance())
+    {
+      if (c->isCapital())
+        {
+          c->setCapital(false);
+          c->setCapitalOwner(NULL);
+        }
+    }
+
+  //for each player except neutral, pick a new capital
+  for (auto p : *Playerlist::getInstance())
+    {
+      if (p == Playerlist::getInstance()->getNeutral())
+        continue;
+      std::vector<City*> cities;
+      for (auto c : *Citylist::getInstance())
+        {
+          if (c->getOwner() == Playerlist::getInstance()->getNeutral() ||
+              c->getOwner() == p)
+            cities.push_back(c);
+        }
+          
+      //pick one.
+      if (cities.empty() == false)
+        {
+          City *capital = cities[Rnd::rand() % cities.size()];
+          change_city_ownership(capital, p);
+          capital->setCapital(true);
+          capital->setCapitalOwner(p);
+        }
+    }
+          
+  redraw();
 }

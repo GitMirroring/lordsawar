@@ -34,6 +34,7 @@ class SmallMap;
 class GameScenario;
 class CreateScenarioRandomize;
 class City;
+class Player;
 class Signpost;
 class Ruin;
 class RoadEditorTip;
@@ -98,6 +99,7 @@ class MainWindow: public sigc::trackable
     Gtk::MenuItem *random_unnamed_temples_menuitem;
     Gtk::MenuItem *random_all_signs_menuitem;
     Gtk::MenuItem *random_unnamed_signs_menuitem;
+    Gtk::MenuItem *random_assign_capital_cities_menuitem;
     Gtk::MenuItem *battle_calculator_menuitem;
     Gtk::MenuItem *help_about_menuitem;
     Gtk::Viewport *terrain_tile_style_viewport;
@@ -162,6 +164,7 @@ class MainWindow: public sigc::trackable
     void on_random_unnamed_temples_activated();
     void on_random_all_signs_activated();
     void on_random_unnamed_signs_activated();
+    void on_random_assign_capital_cities_activated();
 
     void on_help_about_activated();
     
@@ -213,7 +216,7 @@ class MainWindow: public sigc::trackable
 			int cities, int ruins, int temples, int signposts,
 			Glib::ustring tileset, Glib::ustring shieldset,
 			Glib::ustring cityset, Glib::ustring armyset,
-                        bool generate_roads);
+                        bool generate_roads, bool random_names);
 
     void clear_map_state();
     void init_map_state();
@@ -259,6 +262,8 @@ class MainWindow: public sigc::trackable
     void add_attacker_to_battle_calculator(Stack *s);
     void add_defender_to_battle_calculator(Stack *s);
     void append_defender_to_battle_calculator(Stack *s);
+
+    void change_city_ownership(City *city, Player *player);
 
 
     int d_width;
