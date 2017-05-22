@@ -4,8 +4,6 @@ MAINTAINERCLEANFILES= Makefile.in
 
 variousdir = $(datadir)/lordsawar/various
 various_DATA = \
-    arrows.png \
-    arrows-medium.png \
     waypoints.png \
     buttons.png \
     buttons-medium.png \
@@ -51,8 +49,6 @@ various_DATA = \
 
 EXTRA_DIST = \
     README \
-    arrows.png \
-    arrows-medium.png \
     waypoints.png \
     buttons.png \
     buttons-medium.png \
