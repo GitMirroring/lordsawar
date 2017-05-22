@@ -46,112 +46,113 @@ CityEditorDialog::CityEditorDialog(Gtk::Window &parent, City *cit, CreateScenari
     duration_column(_("Turns"), duration_renderer),
     upkeep_column(_("Upkeep"), upkeep_renderer)
 {
-    city = cit;
-    d_randomizer = randomizer;
-    
-    xml->get_widget("capital_switch", capital_switch);
-    capital_switch->set_active(city->isCapital());
+  city = cit;
+  d_randomizer = randomizer;
 
-    xml->get_widget("name_entry", name_entry);
-    name_entry->set_text(city->getName());
-    
-    xml->get_widget("income_spinbutton", income_spinbutton);
-    income_spinbutton->set_value(city->getGold());
+  xml->get_widget("capital_switch", capital_switch);
+  capital_switch->set_active(city->isCapital());
 
-    xml->get_widget("burned_switch", burned_switch);
-    burned_switch->set_active(city->isBurnt());
+  xml->get_widget("name_entry", name_entry);
+  name_entry->set_text(city->getName());
 
-    xml->get_widget("build_production_switch", build_production_switch);
-    build_production_switch->set_active(city->getBuildProduction());
-    
-    // setup the player combo
-    player_combobox = manage(new Gtk::ComboBoxText);
+  xml->get_widget("income_spinbutton", income_spinbutton);
+  income_spinbutton->set_value(city->getGold());
+
+  xml->get_widget("burned_switch", burned_switch);
+  burned_switch->set_active(city->isBurnt());
+
+  xml->get_widget("build_production_switch", build_production_switch);
+  build_production_switch->set_active(city->getBuildProduction());
+
+  // setup the player combo
+  player_combobox = manage(new Gtk::ComboBoxText);
 
 
-    int c = 0, player_no = 0;
-    for (Playerlist::iterator i = Playerlist::getInstance()->begin(),
-	     end = Playerlist::getInstance()->end(); i != end; ++i, ++c)
+  int c = 0, player_no = 0;
+  for (Playerlist::iterator i = Playerlist::getInstance()->begin(),
+       end = Playerlist::getInstance()->end(); i != end; ++i, ++c)
     {
-	Player *player = *i;
-	player_combobox->append(player->getName());
-	if (player == city->getOwner())
-	    player_no = c;
+      Player *player = *i;
+      player_combobox->append(player->getName());
+      if (player == city->getOwner())
+        player_no = c;
     }
 
-    player_combobox->set_active(player_no);
-    player_combobox->signal_changed().connect
-      (sigc::mem_fun(this, &CityEditorDialog::on_player_changed));
-    Gtk::Alignment *alignment;
-    xml->get_widget("player_alignment", alignment);
-    alignment->add(*player_combobox);
-    
-    
-    // setup the army list
-    army_list = Gtk::ListStore::create(army_columns);
+  player_combobox->set_active(player_no);
+  player_combobox->signal_changed().connect
+    (sigc::mem_fun(this, &CityEditorDialog::on_player_changed));
+  Gtk::Alignment *alignment;
+  xml->get_widget("player_alignment", alignment);
+  alignment->add(*player_combobox);
 
-    xml->get_widget("army_treeview", army_treeview);
-    army_treeview->set_model(army_list);
-    
-    army_treeview->append_column("", army_columns.image);
-    strength_renderer.property_editable() = true;
-    strength_renderer.signal_edited()
-      .connect(sigc::mem_fun(*this, &CityEditorDialog::on_strength_edited));
-    strength_column.set_cell_data_func
-	      ( strength_renderer, 
-		sigc::mem_fun(*this, &CityEditorDialog::cell_data_strength));
-    army_treeview->append_column(strength_column);
 
-    moves_renderer.property_editable() = true;
-    moves_renderer.signal_edited()
-      .connect(sigc::mem_fun(*this, &CityEditorDialog::on_moves_edited));
-    moves_column.set_cell_data_func
-	      ( moves_renderer, 
-		sigc::mem_fun(*this, &CityEditorDialog::cell_data_moves));
-    army_treeview->append_column(moves_column);
+  // setup the army list
+  army_list = Gtk::ListStore::create(army_columns);
 
-    upkeep_renderer.property_editable() = true;
-    upkeep_renderer.signal_edited()
-      .connect(sigc::mem_fun(*this, &CityEditorDialog::on_upkeep_edited));
-    upkeep_column.set_cell_data_func
-	      ( upkeep_renderer, 
-		sigc::mem_fun(*this, &CityEditorDialog::cell_data_upkeep));
-    army_treeview->append_column(upkeep_column);
+  xml->get_widget("army_treeview", army_treeview);
+  army_treeview->set_model(army_list);
 
-    duration_renderer.property_editable() = true;
-    duration_renderer.signal_edited()
-      .connect(sigc::mem_fun(*this, &CityEditorDialog::on_turns_edited));
-    duration_column.set_cell_data_func
-	      ( duration_renderer, 
-		sigc::mem_fun(*this, &CityEditorDialog::cell_data_turns));
+  army_treeview->append_column("", army_columns.image);
+  strength_renderer.property_editable() = true;
+  strength_renderer.signal_edited()
+    .connect(sigc::mem_fun(*this, &CityEditorDialog::on_strength_edited));
+  strength_column.set_cell_data_func
+    (strength_renderer, 
+     sigc::mem_fun(*this, &CityEditorDialog::cell_data_strength));
+  army_treeview->append_column(strength_column);
 
-    army_treeview->append_column(_("Name"), army_columns.name);
+  moves_renderer.property_editable() = true;
+  moves_renderer.signal_edited()
+    .connect(sigc::mem_fun(*this, &CityEditorDialog::on_moves_edited));
+  moves_column.set_cell_data_func
+    (moves_renderer, 
+     sigc::mem_fun(*this, &CityEditorDialog::cell_data_moves));
+  army_treeview->append_column(moves_column);
 
-    xml->get_widget("add_button", add_button);
-    xml->get_widget("remove_button", remove_button);
-    xml->get_widget("randomize_armies_button", randomize_armies_button);
-    xml->get_widget("randomize_name_button", randomize_name_button);
-    xml->get_widget("randomize_income_button", randomize_income_button);
+  upkeep_renderer.property_editable() = true;
+  upkeep_renderer.signal_edited()
+    .connect(sigc::mem_fun(*this, &CityEditorDialog::on_upkeep_edited));
+  upkeep_column.set_cell_data_func
+    (upkeep_renderer, 
+     sigc::mem_fun(*this, &CityEditorDialog::cell_data_upkeep));
+  army_treeview->append_column(upkeep_column);
 
-    add_button->signal_clicked().connect(
-	sigc::mem_fun(this, &CityEditorDialog::on_add_clicked));
-    remove_button->signal_clicked().connect(
-	sigc::mem_fun(this, &CityEditorDialog::on_remove_clicked));
-    randomize_armies_button->signal_clicked().connect(
-	sigc::mem_fun(this, &CityEditorDialog::on_randomize_armies_clicked));
-    randomize_name_button->signal_clicked().connect(
-	sigc::mem_fun(this, &CityEditorDialog::on_randomize_name_clicked));
-    randomize_income_button->signal_clicked().connect(
-	sigc::mem_fun(this, &CityEditorDialog::on_randomize_income_clicked));
+  duration_renderer.property_editable() = true;
+  duration_renderer.signal_edited()
+    .connect(sigc::mem_fun(*this, &CityEditorDialog::on_turns_edited));
+  duration_column.set_cell_data_func
+    (duration_renderer, 
+     sigc::mem_fun(*this, &CityEditorDialog::cell_data_turns));
 
-    army_treeview->get_selection()->signal_changed()
-	.connect(sigc::mem_fun(this, &CityEditorDialog::on_selection_changed));
+  army_treeview->append_column(_("Name"), army_columns.name);
 
-    for (unsigned int i = 0; i < city->getMaxNoOfProductionBases(); i++)
+  xml->get_widget("add_button", add_button);
+  xml->get_widget("remove_button", remove_button);
+  xml->get_widget("randomize_armies_button", randomize_armies_button);
+  xml->get_widget("randomize_name_button", randomize_name_button);
+  xml->get_widget("randomize_income_button", randomize_income_button);
+
+  add_button->signal_clicked().connect
+    (sigc::mem_fun(this, &CityEditorDialog::on_add_clicked));
+  remove_button->signal_clicked().connect
+    (sigc::mem_fun(this, &CityEditorDialog::on_remove_clicked));
+  randomize_armies_button->signal_clicked().connect
+    (sigc::mem_fun(this, &CityEditorDialog::on_randomize_armies_clicked));
+  randomize_name_button->signal_clicked().connect
+    (sigc::mem_fun(this, &CityEditorDialog::on_randomize_name_clicked));
+  randomize_income_button->signal_clicked().connect
+    (sigc::mem_fun(this, &CityEditorDialog::on_randomize_income_clicked));
+
+  army_treeview->get_selection()->signal_changed()
+    .connect(sigc::mem_fun(this, &CityEditorDialog::on_selection_changed));
+
+  for (unsigned int i = 0; i < city->getMaxNoOfProductionBases(); i++)
     {
-	const ArmyProdBase* a = city->getProductionBase(i);
-	if (a)
-	    add_army(a);
+      const ArmyProdBase* a = city->getProductionBase(i);
+      if (a)
+        add_army(a);
     }
+  update_buttons();
 }
 
 void CityEditorDialog::change_city_ownership()
@@ -185,16 +186,17 @@ int CityEditorDialog::run()
       bool capital = capital_switch->get_active();
       if (capital)
 	{
+          Player *player = get_selected_player();
 	  // make sure player doesn't have other capitals
 	  Citylist* cl = Citylist::getInstance();
 	  for (Citylist::iterator i = cl->begin(); i != cl->end(); ++i)
-	    if ((*i)->isCapital() && (*i)->getOwner() == city->getOwner())
+	    if ((*i)->isCapital() && (*i)->getOwner() == player)
 	      {
 		(*i)->setCapital(false);
 		(*i)->setCapitalOwner(NULL);
 	      }
 	  city->setCapital(true);
-	  city->setCapitalOwner(city->getOwner());
+	  city->setCapitalOwner(player);
 	}
       else
 	{
@@ -434,4 +436,12 @@ void CityEditorDialog::on_player_changed()
     }
   if (capital_switch->get_active())
     capital_switch->set_active(false);
+  update_buttons();
+}
+
+void CityEditorDialog::update_buttons ()
+{
+  Player *player = get_selected_player();
+  capital_switch->set_sensitive
+    (player != Playerlist::getInstance()->getNeutral());
 }
