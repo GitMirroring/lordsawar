@@ -2070,17 +2070,49 @@ void MainWindow::change_city_ownership(City *city, Player *player)
 
 void MainWindow::on_random_assign_capital_cities_activated()
 {
-  //FIXME: CreateScenario::distributePlayers does a better job than this.
-
-  needs_saving = true;
-  //clear capitals
-  for (auto c : *Citylist::getInstance())
+  bool capitals_set = false;
+  for (auto p : *Playerlist::getInstance())
     {
-      if (c->isCapital())
+      if (p == Playerlist::getInstance()->getNeutral())
+        continue;
+      if (Citylist::getInstance()->getCapitalCity(p))
         {
-          c->setCapital(false);
-          c->setCapitalOwner(NULL);
+          capitals_set = true;
+          break;
         }
+    }
+
+  bool only_capitals_set = false;
+  if (capitals_set)
+    {
+      only_capitals_set = true;
+      for (auto c : *Citylist::getInstance())
+        {
+          if (c->getOwner() == Playerlist::getInstance()->getNeutral())
+            continue;
+          if (c->isCapital() == false && c->isBurnt() == false)
+            {
+              only_capitals_set = false;
+              break;
+            }
+        }
+    }
+
+  //clear capitals
+  if (capitals_set)
+    {
+      for (auto c : *Citylist::getInstance())
+        {
+          if (c->isCapital())
+            {
+              c->setCapital(false);
+              c->setCapitalOwner(NULL);
+              if (only_capitals_set)
+                change_city_ownership
+                  (c, Playerlist::getInstance()->getNeutral());
+            }
+        }
+      needs_saving = true;
     }
 
   //for each player except neutral, pick a new capital
@@ -2103,8 +2135,9 @@ void MainWindow::on_random_assign_capital_cities_activated()
           change_city_ownership(capital, p);
           capital->setCapital(true);
           capital->setCapitalOwner(p);
+          needs_saving = true;
         }
     }
-          
+
   redraw();
 }
