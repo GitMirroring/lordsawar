@@ -95,6 +95,7 @@
 #include "battle-calculator-dialog.h"
 #include "stacktile.h"
 #include "media-dialog.h"
+#include "validation-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &MainWindow::x)
 
@@ -1705,20 +1706,7 @@ void MainWindow::on_validate_activated()
   std::list<Glib::ustring> errors;
   std::list<Glib::ustring> warnings;
   game_scenario->validate(errors, warnings);
-  if (errors.size())
-    s = errors.front();
-  else
-    {
-      if (warnings.size())
-	s = warnings.front();
-      else
-	s = _("No errors.");
-    }
-  if (errors.size() > 1)
-    s += String::ucompose(ngettext("\nThere is %1 more error", "\nThere are %1 more errors", errors.size() - 1), errors.size() - 1);
-  if (warnings.size())
-    s += String::ucompose(ngettext("\nThere is %1 warning", "\nThere are %1 warnings", warnings.size()), warnings.size());
-  TimedMessageDialog dialog(*window, s, 0);
+  ValidationDialog dialog(*window, errors, warnings);
   dialog.run_and_hide();
 }
       
