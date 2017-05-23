@@ -172,6 +172,7 @@ class MainWindow: public sigc::trackable
     {
 	Gtk::RadioToolButton *button;
 	EditorBigMap::Pointer pointer;
+        Glib::ustring image_file;
 	int size;
     };
 
@@ -262,8 +263,9 @@ class MainWindow: public sigc::trackable
     void add_attacker_to_battle_calculator(Stack *s);
     void add_defender_to_battle_calculator(Stack *s);
     void append_defender_to_battle_calculator(Stack *s);
-
     void change_city_ownership(City *city, Player *player);
+    void update_buttons();
+    void update_terrain_buttons();
 
 
     int d_width;

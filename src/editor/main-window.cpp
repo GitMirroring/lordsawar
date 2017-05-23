@@ -337,6 +337,7 @@ void MainWindow::setup_pointer_radiobutton(Glib::RefPtr<Gtk::Builder> xml,
     item.button->signal_toggled().connect(method(on_pointer_radiobutton_toggled));
     item.pointer = pointer;
     item.size = size;
+    item.image_file = image_file;
     pointer_items.push_back(item);
 
     Gtk::Image *image = new Gtk::Image(File::getEditorFile(image_file));
@@ -389,6 +390,7 @@ void MainWindow::setup_terrain_radiobuttons()
     }
 
     terrain_type_table->show_all();
+    update_terrain_buttons();
 }
 
 void MainWindow::show()
@@ -1269,6 +1271,7 @@ void MainWindow::on_terrain_radiobutton_toggled()
   setup_tile_style_buttons(get_terrain());
   on_pointer_radiobutton_toggled();
   auto_select_appropriate_pointer();
+  update_terrain_buttons();
 }
 
 void MainWindow::on_pointer_radiobutton_toggled()
@@ -1285,6 +1288,7 @@ void MainWindow::on_pointer_radiobutton_toggled()
 			    get_tile_style_id());
     players_hbox->set_sensitive (pointer == EditorBigMap::STACK || 
 				 pointer == EditorBigMap::CITY);
+    update_buttons();
 }
 
 Tile::Type MainWindow::get_terrain()
@@ -2128,4 +2132,52 @@ void MainWindow::on_random_assign_capital_cities_activated()
     }
 
   redraw();
+}
+
+void MainWindow::update_buttons()
+{
+  for (auto &i : pointer_items)
+    {
+      if (i.button->get_active())
+        {
+          PixMask *p =
+            ImageCache::add_border (File::getEditorFile(i.image_file),
+                                    Vector<int>(40, 40), 3.0);
+          Gtk::Image *image = new Gtk::Image(p->to_pixbuf());
+          i.button->set_icon_widget(*image);
+          delete p;
+        }
+      else
+        {
+          Gtk::Image *image = new Gtk::Image(File::getEditorFile(i.image_file));
+          i.button->set_icon_widget(*image);
+        }
+      i.button->show_all();
+    }
+}
+
+void MainWindow::update_terrain_buttons()
+{
+  for (auto i : terrain_items)
+    {
+      Tileset *ts = GameMap::getTileset();
+      Tile *tile = (*ts)[ts->getIndex(i.terrain)];
+      PixMask *px = (*(*(*tile).begin())->begin())->getImage()->copy();
+      PixMask::scale(px, 20, 20);
+      if (i.button->get_active())
+        {
+          PixMask *p =
+            ImageCache::add_border (px, Vector<int>(20, 20), 3.0);
+          Gtk::Image *image = new Gtk::Image(p->to_pixbuf());
+          i.button->set_image(*image);
+          delete p;
+        }
+      else
+        {
+          Gtk::Image *image = new Gtk::Image(px->to_pixbuf());
+          i.button->set_image(*image);
+        }
+      i.button->show_all();
+      delete px;
+    }
 }

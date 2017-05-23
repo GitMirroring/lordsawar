@@ -55,6 +55,7 @@ class SmallmapEditorDialog: public LwEditorDialog
     {
 	Gtk::RadioButton *button;
 	EditableSmallMap::Pointer pointer;
+        Glib::ustring image_file;
 	int size;
     };
 
@@ -90,6 +91,8 @@ class SmallmapEditorDialog: public LwEditorDialog
     void setup_pointer_radiobuttons(Glib::RefPtr<Gtk::Builder> xml);
 
     void update_cursor();
+    void update_terrain_buttons();
+    void update_buttons();
 
     Tile::Type get_terrain();
 

@@ -1661,6 +1661,38 @@ PixMask* ImageCache::getParleyRefusedPic ()
   return d_parleyrefused;
 }
 
+PixMask *ImageCache::add_border (PixMask *p, Vector<int> dim, double wid)
+{
+  Glib::RefPtr<Gdk::Pixbuf> pixbuf
+    = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, dim.x, dim.y);
+  pixbuf->fill(0x00000000);
+  PixMask *box = PixMask::create(pixbuf);
+  int width = p->get_width();
+  int height = p->get_height();
+  Vector<int> siz = Vector<int>(width, height);
+  //here we draw a square border on the outside of the image
+  p->blit (box->get_pixmap(), (dim-siz)/2);
+  Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(box->get_pixmap());
+
+  cr->set_line_width(wid);
+  //let's make it a yellow box
+  cr->set_source_rgb(1.0, 1.0, 0.0);
+  cr->rectangle(0, 0, dim.x, dim.y);
+  cr->stroke();
+  return box;
+}
+
+PixMask *ImageCache::add_border (Glib::ustring file, Vector<int> dim, double w)
+{
+  bool broken = false;
+  PixMask *copy = PixMask::create(file, broken);
+  if (broken)
+    return NULL;
+  PixMask *box = add_border (copy, dim, w);
+  delete copy;
+  return box;
+}
+
 PixMask *SelectorPixMaskCacheItem::generate(SelectorPixMaskCacheItem i)
 {
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);

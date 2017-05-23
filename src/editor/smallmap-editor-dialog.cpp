@@ -182,6 +182,7 @@ void SmallmapEditorDialog::setup_terrain_radiobuttons()
     }
 
   terrain_type_table->show_all();
+  update_terrain_buttons();
 }
 
 void SmallmapEditorDialog::on_terrain_radiobutton_toggled()
@@ -205,6 +206,7 @@ void SmallmapEditorDialog::on_terrain_radiobutton_toggled()
       else
         pointer_items[3].button->set_active();
     }
+  update_terrain_buttons();
 }
 
 void SmallmapEditorDialog::setup_pointer_radiobutton(Glib::RefPtr<Gtk::Builder> b,
@@ -220,6 +222,7 @@ void SmallmapEditorDialog::setup_pointer_radiobutton(Glib::RefPtr<Gtk::Builder> 
     item.button->signal_toggled().connect(method(on_pointer_radiobutton_toggled));
     item.pointer = pointer;
     item.size = siz;
+    item.image_file = image_file;
     pointer_items.push_back(item);
 
     Gtk::Image *image;
@@ -248,6 +251,7 @@ void SmallmapEditorDialog::setup_pointer_radiobuttons(Glib::RefPtr<Gtk::Builder>
 			      EditableSmallMap::CITY, 1);
     setup_pointer_radiobutton(b, "erase", "button_erase",
 			      EditableSmallMap::ERASE, 1);
+  update_buttons();
 }
 
 void SmallmapEditorDialog::on_pointer_radiobutton_toggled()
@@ -270,6 +274,7 @@ void SmallmapEditorDialog::on_pointer_radiobutton_toggled()
 	smallmap->set_pointer(pointer, size, get_terrain());
 
     update_cursor();
+    update_buttons();
 }
 
 void SmallmapEditorDialog::update_cursor()
@@ -337,4 +342,52 @@ void SmallmapEditorDialog::on_map_edited()
   if (get_terrain() == Tile::WATER)
     smallmap->resize();
   smallmap->check_road();
+}
+
+void SmallmapEditorDialog::update_buttons()
+{
+  for (auto &i : pointer_items)
+    {
+      if (i.button->get_active())
+        {
+          PixMask *p =
+            ImageCache::add_border (File::getEditorFile(i.image_file),
+                                    Vector<int>(40, 40), 3.0);
+          Gtk::Image *image = new Gtk::Image(p->to_pixbuf());
+          i.button->set_image(*image);
+          delete p;
+        }
+      else
+        {
+          Gtk::Image *image = new Gtk::Image(File::getEditorFile(i.image_file));
+          i.button->set_image(*image);
+        }
+      i.button->show_all();
+    }
+}
+
+void SmallmapEditorDialog::update_terrain_buttons()
+{
+  for (auto i : terrain_items)
+    {
+      Tileset *ts = GameMap::getTileset();
+      Tile *tile = (*ts)[ts->getIndex(i.terrain)];
+      PixMask *px = (*(*(*tile).begin())->begin())->getImage()->copy();
+      PixMask::scale(px, 40, 40);
+      if (i.button->get_active())
+        {
+          PixMask *p =
+            ImageCache::add_border (px, Vector<int>(40, 40), 3.0);
+          Gtk::Image *image = new Gtk::Image(p->to_pixbuf());
+          i.button->set_image(*image);
+          delete p;
+        }
+      else
+        {
+          Gtk::Image *image = new Gtk::Image(px->to_pixbuf());
+          i.button->set_image(*image);
+        }
+      i.button->show_all();
+      delete px;
+    }
 }
