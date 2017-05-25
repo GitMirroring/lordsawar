@@ -1,6 +1,6 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007-2010, 2014, 2015, 2017 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -178,6 +178,7 @@ bool Maptile::hasLandBuilding() const
     case Maptile::TEMPLE:
     case Maptile::SIGNPOST:
     case Maptile::ROAD:
+    case Maptile::STONE:
       return true;
       break;
     case Maptile::PORT:
@@ -200,6 +201,7 @@ bool Maptile::hasWaterBuilding() const
     case Maptile::TEMPLE:
     case Maptile::SIGNPOST:
     case Maptile::ROAD:
+    case Maptile::STONE:
       return false;
       break;
     case Maptile::PORT:
@@ -222,6 +224,7 @@ Maptile::Building Maptile::buildingFromString(Glib::ustring str)
   else if (str == "Maptile::ROAD") return Maptile::ROAD;
   else if (str == "Maptile::PORT") return Maptile::PORT;
   else if (str == "Maptile::BRIDGE") return Maptile::BRIDGE;
+  else if (str == "Maptile::STONE") return Maptile::STONE;
   return Maptile::NONE;
 }
 
@@ -237,6 +240,7 @@ Glib::ustring Maptile::buildingToString(const Maptile::Building bldg)
     case Maptile::ROAD: return "Maptile::ROAD";
     case Maptile::PORT: return "Maptile::PORT";
     case Maptile::BRIDGE: return "Maptile::BRIDGE";
+    case Maptile::STONE: return "Maptile::STONE";
     }
   return "Maptile::NONE";
 }
@@ -253,6 +257,7 @@ Glib::ustring Maptile::buildingToFriendlyName(const guint32 bldg)
     case Maptile::ROAD: return _("Road");
     case Maptile::PORT: return _("Port");
     case Maptile::BRIDGE: return _("Bridge");
+    case Maptile::STONE: return _("Stone");
     }
   return _("None");
 }

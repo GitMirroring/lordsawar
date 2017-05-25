@@ -58,6 +58,8 @@
 #include "signpost.h"
 #include "roadlist.h"
 #include "road.h"
+#include "stonelist.h"
+#include "stone.h"
 #include "bridgelist.h"
 #include "bridge.h"
 #include "portlist.h"
@@ -90,6 +92,7 @@
 #include "RenamableLocation.h"
 #include "fight-order-editor-dialog.h"
 #include "road-editor-tip.h"
+#include "stone-editor-tip.h"
 #include "rnd.h"
 #include "stacklist.h"
 #include "battle-calculator-dialog.h"
@@ -108,6 +111,7 @@ MainWindow::MainWindow(Glib::ustring load_filename)
   d_create_scenario_names = NULL;
   needs_saving = false;
   road_editor_tip = NULL;
+  stone_editor_tip = NULL;
   Glib::RefPtr<Gtk::Builder> xml = 
     BuilderCache::editor_get("main-window.ui");
 
@@ -188,6 +192,8 @@ MainWindow::MainWindow(Glib::ustring load_filename)
 			      EditorBigMap::PORT, 1);
     setup_pointer_radiobutton(xml, "draw_bridge", "button_bridge",
 			      EditorBigMap::BRIDGE, 1);
+    setup_pointer_radiobutton(xml, "draw_stone", "button_stone",
+			      EditorBigMap::STONE, 1);
     setup_pointer_radiobutton(xml, "draw_bag", "button_bag",
 			      EditorBigMap::BAG, 1);
     setup_pointer_radiobutton(xml, "fight", "button_fight",
@@ -657,6 +663,9 @@ void MainWindow::set_random_map(int width, int height,
 	    case Maptile::PORT:
 		Portlist::getInstance()->add(new Port(Vector<int>(i,j)));
 		break;
+	    case Maptile::STONE:
+		Stonelist::getInstance()->add(new Stone(Vector<int>(i,j)));
+		break;
 	    case Maptile::NONE:
 		break;
 	    }
@@ -730,6 +739,8 @@ bool MainWindow::on_bigmap_mouse_motion_event(GdkEventMotion *e)
 {
   static guint prev = 0;
   if (road_editor_tip)
+    return true;
+  if (stone_editor_tip)
     return true;
   if (bigmap)
     {
@@ -1421,6 +1432,8 @@ void MainWindow::on_objects_selected(std::vector<UniquelyIdentified *> objects)
 		s = _("Road");
 	    else if (dynamic_cast<MapBackpack*>(*i))
 		s = _("Bag");
+	    else if (dynamic_cast<Stone*>(*i))
+		s = _("Standing Stone");
 	    
 	    Gtk::MenuItem *item = manage(new Gtk::MenuItem(s));
 	    item->signal_activate().connect
@@ -1501,6 +1514,15 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object)
       MapTipPosition mpos = bigmap->map_tip_position(rd->getPos());
       road_editor_tip = new RoadEditorTip(bigmap_image, mpos, rd);
       road_editor_tip->road_picked.connect(method(on_road_edited));
+    }
+    else if (Stone *st = dynamic_cast<Stone*>(object))
+    {
+      if (stone_editor_tip)
+        delete stone_editor_tip;
+      MapTipPosition mpos = bigmap->map_tip_position(st->getPos());
+      Road *road = GameMap::getRoad(st->getPos());
+      stone_editor_tip = new StoneEditorTip(bigmap_image, mpos, st, road);
+      stone_editor_tip->stone_picked.connect(method(on_stone_edited));
     }
     else if (MapBackpack *b = dynamic_cast<MapBackpack*>(object))
       {
@@ -1955,6 +1977,16 @@ void MainWindow::on_road_edited(Vector<int> pos, int type)
   road_editor_tip = NULL;
   Road *road = new Road (pos, Road::Type(type));
   GameMap::getInstance()->putRoad(road, false);
+  redraw();
+}
+
+void MainWindow::on_stone_edited(Vector<int> pos, int type)
+{
+  needs_saving = true;
+  delete stone_editor_tip;
+  stone_editor_tip = NULL;
+  Stone *stone = GameMap::getStone(pos);
+  stone->setType(Stone::Type(type));
   redraw();
 }
 

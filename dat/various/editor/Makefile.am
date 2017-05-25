@@ -19,6 +19,7 @@ editor_DATA = button_selector.png \
 			button_port.png \
 			button_bag.png \
 			button_move.png \
-			button_fight.png
+			button_fight.png \
+			button_stone.png
 
 EXTRA_DIST = $(editor_DATA) README

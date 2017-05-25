@@ -53,6 +53,7 @@ Tileset::Tileset(guint32 id, Glib::ustring name)
   d_small_selector = "";
   d_fog = "";
   d_roads = "";
+  d_standing_stones = "";
   d_bridges = "";
   d_flags = "";
   d_road_color.set_rgba(0,0,0);
@@ -60,6 +61,8 @@ Tileset::Tileset(guint32 id, Glib::ustring name)
   d_temple_color.set_rgba(100,100,100);
   for (unsigned int i = 0; i < ROAD_TYPES; i++)
     roadpic[i] = NULL;
+  for (unsigned int i = 0; i < STONE_TYPES; i++)
+    stonepic[i] = NULL;
   for (unsigned int i = 0; i < BRIDGE_TYPES; i++)
     bridgepic[i] = NULL;
   for (unsigned int i = 0; i < FLAG_TYPES; i++)
@@ -84,6 +87,7 @@ Tileset::Tileset (const Tileset& t)
   d_small_selector = t.d_small_selector;
   d_fog = t.d_fog;
   d_roads = t.d_roads;
+  d_standing_stones = t.d_standing_stones;
   d_bridges = t.d_bridges;
   d_flags = t.d_flags;
   d_road_color = t.d_road_color;
@@ -95,6 +99,13 @@ Tileset::Tileset (const Tileset& t)
         roadpic[i] = t.roadpic[i]->copy();
       else
         roadpic[i] = NULL;
+    }
+  for (unsigned int i = 0; i < STONE_TYPES; i++)
+    {
+      if (t.stonepic[i])
+        stonepic[i] = t.stonepic[i]->copy();
+      else
+        stonepic[i] = NULL;
     }
   for (unsigned int i = 0; i < BRIDGE_TYPES; i++)
     {
@@ -176,6 +187,7 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   helper->getData(d_small_selector, "small_selector");
   helper->getData(d_explosion, "explosion");
   helper->getData(d_roads, "roads");
+  helper->getData(d_standing_stones, "standing_stones");
   helper->getData(d_bridges, "bridges");
   helper->getData(d_fog, "fog");
   helper->getData(d_flags, "flags");
@@ -188,6 +200,8 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   helper->registerTag(TileStyleSet::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
   for (unsigned int i = 0; i < ROAD_TYPES; i++)
     roadpic[i] = NULL;
+  for (unsigned int i = 0; i < STONE_TYPES; i++)
+    stonepic[i] = NULL;
   for (unsigned int i = 0; i < BRIDGE_TYPES; i++)
     bridgepic[i] = NULL;
   for (unsigned int i = 0; i < FLAG_TYPES; i++)
@@ -319,6 +333,7 @@ bool Tileset::save(XML_Helper *helper) const
   retval &= helper->saveData("small_selector", d_small_selector);
   retval &= helper->saveData("explosion", d_explosion);
   retval &= helper->saveData("roads", d_roads);
+  retval &= helper->saveData("standing_stones", d_standing_stones);
   retval &= helper->saveData("bridges", d_bridges);
   retval &= helper->saveData("fog", d_fog);
   retval &= helper->saveData("flags", d_flags);
@@ -500,6 +515,13 @@ void Tileset::uninstantiateImages()
       roadpic[i] = NULL;
     }
 
+  for (unsigned int i = 0; i < STONE_TYPES; i++)
+    {
+      if (stonepic[i] != NULL)
+        delete stonepic[i];
+      stonepic[i] = NULL;
+    }
+
   for (unsigned int i = 0; i < BRIDGE_TYPES; i++)
     {
       if (bridgepic[i] != NULL)
@@ -554,6 +576,7 @@ void Tileset::uninstantiateImages()
 
 void Tileset::instantiateImages(Glib::ustring explosion_filename,
 				Glib::ustring roads_filename,
+				Glib::ustring stones_filename,
 				Glib::ustring bridges_filename,
 				Glib::ustring fog_filename,
 				Glib::ustring flags_filename,
@@ -578,6 +601,21 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
             }
         }
 
+    }
+
+  if (stones_filename.empty() == false && !broken)
+    {
+      std::vector<PixMask* > stonepics;
+      stonepics = disassemble_row(stones_filename, STONE_TYPES, broken);
+      if (!broken)
+        {
+          for (unsigned int i = 0; i < STONE_TYPES ; i++)
+            {
+              if (stonepics[i]->get_width() != (int)getTileSize())
+                PixMask::scale(stonepics[i], getTileSize(), getTileSize());
+              setStoneImage(i, stonepics[i]);
+            }
+        }
     }
 
   if (bridges_filename.empty() == false && !broken)
@@ -685,6 +723,7 @@ void Tileset::instantiateImages(bool &broken)
     }
   Glib::ustring explosion_filename = "";
   Glib::ustring roads_filename = "";
+  Glib::ustring stones_filename = "";
   Glib::ustring bridges_filename = "";
   Glib::ustring fog_filename = "";
   Glib::ustring flags_filename = "";
@@ -695,6 +734,8 @@ void Tileset::instantiateImages(bool &broken)
     explosion_filename = t.getFile(getExplosionFilename() + ".png", broken);
   if (getRoadsFilename().empty() == false && !broken)
     roads_filename = t.getFile(getRoadsFilename() + ".png", broken);
+  if (getStonesFilename().empty() == false && !broken)
+    stones_filename = t.getFile(getStonesFilename() + ".png", broken);
   if (getBridgesFilename().empty() == false && !broken)
     bridges_filename = t.getFile(getBridgesFilename() + ".png", broken);
   if (getFogFilename().empty() == false && !broken)
@@ -707,13 +748,15 @@ void Tileset::instantiateImages(bool &broken)
     small_selector_filename = 
       t.getFile(getSmallSelectorFilename() + ".png", broken);
   if (!broken)
-    instantiateImages(explosion_filename, roads_filename, bridges_filename, 
-                      fog_filename, flags_filename, selector_filename, 
-                      small_selector_filename, broken);
+    instantiateImages(explosion_filename, roads_filename, stones_filename,
+                      bridges_filename, fog_filename, flags_filename,
+                      selector_filename, small_selector_filename, broken);
   if (explosion_filename.empty() == false)
     File::erase(explosion_filename);
   if (roads_filename.empty() == false)
     File::erase(roads_filename);
+  if (stones_filename.empty() == false)
+    File::erase(stones_filename);
   if (bridges_filename.empty() == false)
     File::erase(bridges_filename);
   if (fog_filename.empty() == false)
@@ -852,7 +895,7 @@ void Tileset::support_backward_compatibility()
   FileCompat::getInstance()->support_type(FileCompat::TILESET, file_extension, 
                                           d_tag, true);
   FileCompat::getInstance()->support_version
-    (FileCompat::TILESET, "0.2.0", LORDSAWAR_TILESET_VERSION,
+    (FileCompat::TILESET, "0.2.1", "0.3.2",
      sigc::ptr_fun(&Tileset::upgrade));
 }
 

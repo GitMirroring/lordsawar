@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2008-2010, 2012, 2014, 2015, 2017 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -74,6 +74,7 @@ class TileSetWindow: public sigc::trackable
     Gtk::MenuItem *validate_tileset_menuitem;
     Gtk::MenuItem *edit_tileset_info_menuitem;
     Gtk::MenuItem *roads_picture_menuitem;
+    Gtk::MenuItem *stones_picture_menuitem;
     Gtk::MenuItem *bridges_picture_menuitem;
     Gtk::MenuItem *fog_picture_menuitem;
     Gtk::MenuItem *flags_picture_menuitem;
@@ -153,6 +154,7 @@ class TileSetWindow: public sigc::trackable
     void on_army_unit_selector_activated();
     void on_explosion_picture_activated();
     void on_roads_picture_activated();
+    void on_stones_picture_activated();
     void on_bridges_picture_activated();
     void on_fog_picture_activated();
     void on_flags_picture_activated();

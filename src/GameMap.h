@@ -42,6 +42,7 @@ class MapGenerator;
 class XML_Helper;
 class Port;
 class Road;
+class Stone;
 class City;
 class Temple;
 class Bridge;
@@ -1147,6 +1148,11 @@ class GameMap: public sigc::trackable
          * @return Returns True if a Temple was erased.  Otherwise, False.
          */
 	bool removeTemple(Vector<int> pos);
+
+	static Stone* getStone(Vector<int> pos);
+	bool putStone(Stone *t);
+        bool putNewStone(Vector<int> tile);
+	bool removeStone(Vector<int> pos);
 
         /** Add a given Road tile to the map.
          *

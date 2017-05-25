@@ -58,6 +58,7 @@ const unsigned int TEMPLE_TYPES = 1;
 const unsigned int RUIN_TYPES = 3;
 const unsigned int DIPLOMACY_TYPES = 3;
 const unsigned int ROAD_TYPES = 15;
+const unsigned int STONE_TYPES = 88;
 const unsigned int FOG_TYPES = 15;
 const unsigned int BRIDGE_TYPES = 4;
 const unsigned int CURSOR_TYPES = 13;
@@ -185,5 +186,10 @@ const int MAX_LENGTH_FOR_NETWORKED_GAME_NAME = 20;
 const int MAX_LENGTH_FOR_ITEM_NAME = 20;
 const int MAX_LENGTH_FOR_RUIN_NAME = 20;
 const int MAX_LENGTH_FOR_ARMY_NAME = 20;
+
+//1 in x chance of standing stone being on a road tile for random map.
+const unsigned int ROAD_STONE_CHANCE = 150;
+//1 in x chance of standing stone being on a grass tile for random map.
+const unsigned int GRASS_STONE_CHANCE = 1500;
 #endif // DEFINITIONS_H
 

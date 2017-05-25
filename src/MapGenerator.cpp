@@ -3,7 +3,7 @@
 // Copyright (C) 2004 David Barnsdale
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015 Ben Asselstine
+// Copyright (C) 2006-2010, 2014, 2015, 2017 Ben Asselstine
 // Copyright (C) 2008 Janek Kozicki
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,8 @@
 #include "city.h"
 #include "roadlist.h"
 #include "road.h"
+#include "stonelist.h"
+#include "stone.h"
 #include "portlist.h"
 #include "port.h"
 #include "ruinlist.h"
@@ -241,6 +243,8 @@ void MapGenerator::makeMap(int width, int height, bool roads)
 
     makeCitiesAccessible();
 
+    makeStandingStones();
+
     debug("Done making map.");
 }
 
@@ -300,6 +304,18 @@ bool MapGenerator::canPlaceBridge(Vector<int> pos, int type, Vector<int> &src, V
       findBridgePurpose(pos, type, src, dest) == true)
     return true;
   return false;
+}
+
+void MapGenerator::makeStandingStones()
+{
+  for (int i = 0; i < d_height; i++)
+    for (int j = 0; j < d_width; j++)
+      if (d_terrain[j*d_width + i] == Tile::GRASS &&
+          d_building[j*d_width + i] == Maptile::NONE)
+        {
+          if (Rnd::rand() % GRASS_STONE_CHANCE == 0)
+            d_building[j*d_width + i] = Maptile::STONE;
+        }
 }
 
 void MapGenerator::makeBridges()
@@ -1191,6 +1207,7 @@ void MapGenerator::makeBuildings(Maptile::Building b, int building)
       case Maptile::NONE:
       case Maptile::SIGNPOST:
       case Maptile::ROAD:
+      case Maptile::STONE:
       case Maptile::PORT:
       case Maptile::BRIDGE:
 	width = 1;
@@ -1427,6 +1444,7 @@ bool MapGenerator::makeRoad2(Path *p)
 	    {
 	      if (d_building[it.y*d_width + it.x] == Maptile::NONE)
 		{
+                  GameMap *gm = GameMap::getInstance();
 		  d_building[it.y*d_width + it.x] = Maptile::ROAD;
                   Roadlist::getInstance()->add(new Road(Vector<int>(it)));
 		  calculateBlockedAvenue(it.x, it.y);

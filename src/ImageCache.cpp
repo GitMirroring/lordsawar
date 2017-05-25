@@ -764,15 +764,15 @@ PixMask* ImageCache::getCircledArmyPic(guint32 armyset, guint32 army_id,
   return s;
 }
 
-PixMask* ImageCache::getTilePic(int tile_style_id, int fog_type_id, bool has_bag, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid)
+PixMask* ImageCache::getTilePic(int tile_style_id, int fog_type_id, bool has_bag, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid, int stone_type)
 {
   guint32 tileset = GameMap::getInstance()->getTilesetId();
   guint32 cityset = GameMap::getInstance()->getCitysetId();
   guint32 shieldset = GameMap::getInstance()->getShieldsetId();
-  return getTilePic(tile_style_id, fog_type_id, has_bag, has_standard, standard_player_id, stack_size, stack_player_id, army_type_id, has_tower, has_ship, building_type, building_subtype, building_tile, building_player_id, tilesize, has_grid, tileset, cityset, shieldset);
+  return getTilePic(tile_style_id, fog_type_id, has_bag, has_standard, standard_player_id, stack_size, stack_player_id, army_type_id, has_tower, has_ship, building_type, building_subtype, building_tile, building_player_id, tilesize, has_grid, tileset, cityset, shieldset, stone_type);
 }
 
-PixMask* ImageCache::getTilePic(int tile_style_id, int fog_type_id, bool has_bag, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid, guint32 tileset, guint32 cityset, guint32 shieldset)
+PixMask* ImageCache::getTilePic(int tile_style_id, int fog_type_id, bool has_bag, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid, guint32 tileset, guint32 cityset, guint32 shieldset, int stone_type)
 {
   guint added = 0;
   TilePixMaskCacheItem i;
@@ -795,6 +795,7 @@ PixMask* ImageCache::getTilePic(int tile_style_id, int fog_type_id, bool has_bag
   i.tileset = tileset;
   i.cityset = cityset;
   i.shieldset = shieldset;
+  i.stone_type = stone_type;
   PixMask *s = tilecache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1908,22 +1909,37 @@ PixMask *TilePixMaskCacheItem::generate(TilePixMaskCacheItem i)
             }
           break;
         case Maptile::RUIN:
-          ImageCache::getInstance()->getRuinPic(i.building_subtype, i.cityset)->blit(i.building_tile, uts, pixmap); 
+          ImageCache::getInstance()->getRuinPic(i.building_subtype, i.cityset)->blit(i.building_tile, uts, pixmap);
           break;
         case Maptile::TEMPLE:
-          ImageCache::getInstance()->getTemplePic(i.building_subtype, i.cityset)->blit(i.building_tile, uts, pixmap); 
+          ImageCache::getInstance()->getTemplePic(i.building_subtype, i.cityset)->blit(i.building_tile, uts, pixmap);
           break;
         case Maptile::SIGNPOST:
-          ImageCache::getInstance()->getSignpostPic(i.cityset)->blit(i.building_tile, uts, pixmap); 
+          ImageCache::getInstance()->getSignpostPic(i.cityset)->blit(i.building_tile, uts, pixmap);
           break;
         case Maptile::ROAD:
-          ImageCache::getInstance()->getRoadPic(i.building_subtype)->blit(i.building_tile, uts, pixmap); 
+          ImageCache::getInstance()->getRoadPic(i.building_subtype)->blit(i.building_tile, uts, pixmap);
+          if (i.stone_type != -1)
+            {
+              Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
+              PixMask *p = ts->getStoneImage(i.stone_type);
+              if (p)
+                p->blit(i.building_tile, uts, pixmap);
+            }
+          break;
+        case Maptile::STONE:
+            {
+              Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
+              PixMask *p = ts->getStoneImage(i.stone_type);
+              if (p)
+                p->blit(i.building_tile, uts, pixmap);
+            }
           break;
         case Maptile::PORT:
-          ImageCache::getInstance()->getPortPic(i.cityset)->blit(i.building_tile, uts, pixmap); 
+          ImageCache::getInstance()->getPortPic(i.cityset)->blit(i.building_tile, uts, pixmap);
           break;
         case Maptile::BRIDGE:
-          ImageCache::getInstance()->getBridgePic(i.building_subtype)->blit(i.building_tile, uts, pixmap); 
+          ImageCache::getInstance()->getBridgePic(i.building_subtype)->blit(i.building_tile, uts, pixmap);
           break;
         case Maptile::NONE: default:
           break;
@@ -2020,6 +2036,8 @@ int TilePixMaskCacheItem::comp(const TilePixMaskCacheItem item) const
     (cityset > item.cityset) ?  1 :
     (shieldset < item.shieldset) ? -1 :
     (shieldset > item.shieldset) ?  1 :
+    (stone_type < item.stone_type) ? -1 :
+    (stone_type > item.stone_type) ?  1 :
     0;
 }
 

@@ -1,5 +1,5 @@
 #   Copyright (C) 2007, 2008 Ole Laursen
-#   Copyright (C) 2007, 2008, 2009, 2010, 2015 Ben Asselstine
+#   Copyright (C) 2007, 2008, 2009, 2010, 2015, 2017 Ben Asselstine
 #   Copyright (C) 2008 Barry deFreese
 # 
 #   This program is free software; you can redistribute it and/or modify
@@ -83,6 +83,7 @@ libeditor_la_SOURCES =\
 	editor-splash-window.cpp editor-splash-window.h \
 	fight-order-editor-dialog.cpp fight-order-editor-dialog.h \
 	road-editor-tip.cpp road-editor-tip.h \
+	stone-editor-tip.cpp stone-editor-tip.h \
 	battle-calculator-dialog.cpp battle-calculator-dialog.h \
 	media-dialog.cpp media-dialog.h \
 	validation-dialog.cpp validation-dialog.h

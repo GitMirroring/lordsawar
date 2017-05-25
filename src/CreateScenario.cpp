@@ -49,6 +49,8 @@
 #include "bridge.h"
 #include "roadlist.h"
 #include "road.h"
+#include "stonelist.h"
+#include "stone.h"
 #include "armysetlist.h"
 #include "citysetlist.h"
 #include "tilesetlist.h"
@@ -316,7 +318,22 @@ bool CreateScenario::create(const GameParameters &g)
   if (!setupSignposts(signpost_ratio))
     return false;
 
+  setupStandingStonesOnRoads();
   return true;
+}
+
+void CreateScenario::setupStandingStonesOnRoads()
+{
+  for (auto r : *Roadlist::getInstance())
+    {
+      if (Rnd::rand() % ROAD_STONE_CHANCE == 0)
+        {
+          Stone *stone =
+            new Stone (r->getPos(),
+                       Stone::getRandomType(Road::Type(r->getType())));
+          Stonelist::getInstance()->add(stone);
+        }
+    }
 }
 
 bool CreateScenario::dump(Glib::ustring filename) const
@@ -380,6 +397,9 @@ bool CreateScenario::createMap()
                     break;
                 case Maptile::BRIDGE:
                     Bridgelist::getInstance()->add(new Bridge(Vector<int>(x,y)));
+                    break;
+                case Maptile::STONE:
+                    Stonelist::getInstance()->add(new Stone(Vector<int>(x,y)));
                     break;
                 case Maptile::NONE:
 		    break;

@@ -1,5 +1,5 @@
 #   Copyright (C) 2008 Barry deFreese
-#   Copyright (C) 2009, 2010, 2011, 2015 Ben Asselstine
+#   Copyright (C) 2009, 2010, 2011, 2015, 2017 Ben Asselstine
 # 
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -67,6 +67,7 @@ liblordsawar_la_SOURCES = action.cpp action.h AI_Analysis.cpp AI_Analysis.h \
         real_player.cpp real_player.h Renamable.cpp Renamable.h \
         reward.h reward.cpp rewardlist.h rewardlist.cpp \
 	road.cpp road.h roadlist.cpp roadlist.h \
+	stone.cpp stone.h stonelist.cpp stonelist.h \
         ruin.cpp ruin.h ruinlist.cpp ruinlist.h \
 	tartan.cpp tartan.h \
         shield.cpp shield.h shieldset.cpp shieldset.h \

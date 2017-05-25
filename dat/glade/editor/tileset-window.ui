@@ -132,6 +132,14 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="stones_picture_menuitem">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Standing Stones Picture</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="bridges_picture_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>

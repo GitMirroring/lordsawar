@@ -1,6 +1,6 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014 Ben Asselstine
+// Copyright (C) 2007-2011, 2014, 2017 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -103,6 +103,9 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	//! Returns the basename of the file containing the road images.
 	Glib::ustring getRoadsFilename() {return d_roads;};
 
+	//! Returns the basename of the file containing the stone images.
+	Glib::ustring getStonesFilename() {return d_standing_stones;};
+
 	//! Returns the basename of the file containing the bridge images.
 	Glib::ustring getBridgesFilename() {return d_bridges;};
 
@@ -126,6 +129,9 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	//! Get a road image.  Pass in the index.
 	PixMask *getRoadImage(guint32 i) {return roadpic[i];};
+
+	//! Get a standing stone image.  Pass in the index.
+	PixMask *getStoneImage(guint32 i) {return stonepic[i];};
 
 	//! Get a bridge image.  Pass in the index.
 	PixMask *getBridgeImage(guint32 i) {return bridgepic[i];};
@@ -176,6 +182,9 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	//! Sets the basename of the file containing the road images.
 	void setRoadsFilename(Glib::ustring p){d_roads = p;};
 
+	//! Sets the basename of the file containing the standing stone images.
+	void setStonesFilename(Glib::ustring p){d_standing_stones = p;};
+
 	//! Sets the basename of the file containing the bridge images.
 	void setBridgesFilename(Glib::ustring p){d_bridges = p;};
 
@@ -199,6 +208,9 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	//! Sets a road image.
 	void setRoadImage(guint32 i, PixMask *p) {roadpic[i] = p;};
+
+	//! Sets a stpone image.
+	void setStoneImage(guint32 i, PixMask *p) {stonepic[i] = p;};
 
 	//! Sets a bridge image.
 	void setBridgeImage(guint32 i, PixMask *p) {bridgepic[i] = p;};
@@ -314,6 +326,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	//! Load the various images from the given filenames.
 	void instantiateImages(Glib::ustring explosion_filename,
 			       Glib::ustring roads_filename,
+			       Glib::ustring stones_filename,
 			       Glib::ustring bridges_filename,
 			       Glib::ustring fog_filename,
 			       Glib::ustring flags_filename,
@@ -330,7 +343,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	 * The image contains many animation frames, and is masked.
 	 *
 	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of 
+	 * a file extension.  It refers to a png file in the directory of
 	 * tileset.
 	 */
 	Glib::ustring d_small_selector;
@@ -343,7 +356,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	 * The image contains many animation frames, and is masked.
 	 *
 	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of 
+	 * a file extension.  It refers to a png file in the directory of
 	 * tileset.
 	 */
 	Glib::ustring d_large_selector;
@@ -354,7 +367,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	 * and it also appears in the fight window when an army unit dies.
 	 *
 	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of 
+	 * a file extension.  It refers to a png file in the directory of
 	 * tileset.
 	 */
 	Glib::ustring d_explosion;
@@ -363,11 +376,11 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	/**
 	 * The fog images appear on the bigmap when playing with a hidden map.
 	 *
-	 * The number and order of frames in the image correlates to the 
+	 * The number and order of frames in the image correlates to the
 	 * FogMap::ShadeType enumeration.
 	 *
 	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of 
+	 * a file extension.  It refers to a png file in the directory of
 	 * tileset.
 	 */
 	Glib::ustring d_fog;
@@ -377,25 +390,39 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	 * The road images appear on the bigmap overlaid on top of all kinds
 	 * of tiles except for water.
 	 *
-	 * The number and order of frames in the image correlates to the 
+	 * The number and order of frames in the image correlates to the
 	 * Road::Type enumeration.
 	 *
 	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of 
+	 * a file extension.  It refers to a png file in the directory of
 	 * tileset.
 	 */
 	Glib::ustring d_roads;
+
+	//! The basename of the standing stone image.
+	/**
+	 * The stone images appear on the bigmap overlaid on top of grass
+         * tiles without buildings except for roads.
+	 *
+	 * The number and order of frames in the image correlates to the
+	 * Stone::Type enumeration.
+	 *
+	 * This basename does not contain any slashes, and it does not contain
+	 * a file extension.  It refers to a png file in the directory of
+	 * tileset.
+	 */
+	Glib::ustring d_standing_stones;
 
 	//! The basename of the bridge image.
 	/**
 	 * The bridge images appear on the bigmap overlaid on top of certain
 	 * water tiles.
 	 *
-	 * The number and order of frames in the image correlates to the 
+	 * The number and order of frames in the image correlates to the
 	 * Bridge::Type enumeration.
 	 *
 	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of 
+	 * a file extension.  It refers to a png file in the directory of
 	 * tileset.
 	 */
 	Glib::ustring d_bridges;
@@ -409,7 +436,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	 * of army units in a stack.  See the FLAG_TYPES constant in defs.h.
 	 *
 	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of 
+	 * a file extension.  It refers to a png file in the directory of
 	 * tileset.
 	 */
 	Glib::ustring d_flags;
@@ -433,6 +460,9 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	//! The road images.
         PixMask* roadpic[ROAD_TYPES];
+
+	//! The standing stone images.
+        PixMask* stonepic[STONE_TYPES];
 
 	//! The bridge images.
         PixMask* bridgepic[BRIDGE_TYPES];

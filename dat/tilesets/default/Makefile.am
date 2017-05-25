@@ -20,6 +20,7 @@ IMAGES = \
 	$(srcdir)/hills.png \
 	$(srcdir)/mountains.png \
 	$(srcdir)/roads.png \
+	$(srcdir)/stones.png \
 	$(srcdir)/selector.png \
 	$(srcdir)/small_selector.png \
 	$(srcdir)/swamp.png \

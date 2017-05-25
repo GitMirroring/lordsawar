@@ -40,6 +40,8 @@
 #include "port.h"
 #include "roadlist.h"
 #include "road.h"
+#include "stonelist.h"
+#include "stone.h"
 #include "playerlist.h"
 #include "defs.h"
 #include "File.h"
@@ -54,6 +56,7 @@
 #include "backpack-editor-dialog.h"
 #include "citysetlist.h"
 #include "cityset.h"
+#include "tileset.h"
 
 
 EditorBigMap::EditorBigMap()
@@ -512,15 +515,18 @@ void EditorBigMap::change_map_under_cursor()
 
     case ROAD:
         {
+          bool had_stone = GameMap::getStone(tile) != NULL;
           if (GameMap::getRoad(tile) != NULL)
             GameMap::getInstance()->removeRoad(tile);
-
-          if (GameMap::getInstance()->getLocation(tile))
-            break;
 
           int type = CreateScenario::calculateRoadType(tile);
           Road *r = new Road(tile, type);
           GameMap::getInstance()->putRoad(r);
+          if (had_stone)
+            {
+              Stone *s = new Stone (tile, Road::Type(r->getType()));
+              GameMap::getInstance()->putStone(s);
+            }
 
           changed_tiles.pos -= Vector<int>(1, 1);
           changed_tiles.dim = Vector<int>(3, 3);
@@ -536,6 +542,25 @@ void EditorBigMap::change_map_under_cursor()
           Stack *s = GameMap::getStack(tile);
           if (s)
             stack_selected_for_battle_calculator.emit(s);
+        }
+      break;
+    case STONE:
+        {
+          if (GameMap::getStone(tile) != NULL)
+            {
+              map_selection_seq seq;
+              seq.push_back(GameMap::getStone(tile));
+              objects_selected.emit(seq);
+            }
+          else
+            {
+              int type = Stone::ROAD_E_AND_W_STONE_N;
+              Road *r = GameMap::getRoad(tile);
+              if (r)
+                type = Stone::getRandomType(Road::Type(r->getType()));
+              Stone *s = new Stone(tile, type);
+              GameMap::getInstance()->putStone(s);
+            }
         }
       break;
     }
@@ -566,6 +591,8 @@ void EditorBigMap::bring_up_details()
   MapBackpack *b = GameMap::getInstance()->getTile(tile)->getBackpack();
   if (b->empty() == false)
     seq.push_back(b);
+  if (Stone * st = GameMap::getStone(tile))
+    seq.push_back(st);
 
   if (!seq.empty())
     objects_selected.emit(seq);
@@ -601,6 +628,9 @@ void EditorBigMap::display_moving_building(Vector<int> src, Vector<int> dest)
     case Maptile::ROAD:
       pic = ImageCache::getInstance()->getRoadPic (GameMap::getRoad (src));
       break;
+    case Maptile::STONE:
+      pic = GameMap::getTileset()->getStoneImage (GameMap::getStone (src)->getType());
+      break;
     case Maptile::PORT:
       pic = ImageCache::getInstance()->getPortPic ();
       break;
@@ -612,6 +642,15 @@ void EditorBigMap::display_moving_building(Vector<int> src, Vector<int> dest)
     }
   if (pic)
     pic->blit(buffer, dest);
+  if (GameMap::getInstance()->getBuilding(src) == Maptile::ROAD)
+    {
+      if (GameMap::getStone(src))
+        {
+          PixMask *stone = GameMap::getTileset()->getStoneImage (GameMap::getStone (src)->getType());
+          if (stone)
+            stone->blit(buffer, dest);
+        }
+    }
 }
 
 void EditorBigMap::after_draw()
@@ -771,6 +810,26 @@ void EditorBigMap::after_draw()
                 pic->blit(buffer, pos);
               }
 	    break;
+          case STONE:
+              {
+                Tileset *t = GameMap::getTileset();
+                Stone *s = GameMap::getStone(*i);
+                if (s)
+                  pic = t->getStoneImage(s->getType());
+                else
+                  {
+                    Road *r = GameMap::getRoad(*i);
+                    if (r)
+                      pic = t->getStoneImage(Stone::getRandomType
+                                             (Road::Type(r->getType())));
+                    else
+                      pic = t->getStoneImage
+                        (Stone::ROAD_ALL_DIRECTIONS_STONES_NW_NE_SW_SE);
+                  }
+                if (pic)
+                  pic->blit(buffer, pos);
+              }
+            break;
 	  case PORT:
 	    pic = ImageCache::getInstance()->getPortPic();
 	    pic->blit(buffer, pos);

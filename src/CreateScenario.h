@@ -173,6 +173,7 @@ class CreateScenario : public CreateScenarioRandomize
         bool setupPlayers(bool random_turns, int base_gold);
 
 	bool setupRoads();
+        void setupStandingStonesOnRoads();
 	bool setupBridges();
 
 	void quickStart();

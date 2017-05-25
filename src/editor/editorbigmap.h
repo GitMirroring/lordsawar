@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2017 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -52,7 +52,8 @@ class EditorBigMap: public BigMap
 	PORT, 
 	BRIDGE,
 	BAG,
-	FIGHT
+	FIGHT,
+        STONE
     };
     void set_pointer(Pointer pointer, int size, Tile::Type terrain, 
 		     int tile_style_id);

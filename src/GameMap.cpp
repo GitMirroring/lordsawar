@@ -39,6 +39,8 @@
 #include "port.h"
 #include "roadlist.h"
 #include "road.h"
+#include "stonelist.h"
+#include "stone.h"
 #include "city.h"
 #include "ruin.h"
 #include "temple.h"
@@ -1038,6 +1040,14 @@ Ruin* GameMap::getRuin(Vector<int> pos)
   return Ruinlist::getInstance()->getObjectAt(pos);
 }
 
+Stone* GameMap::getStone(Vector<int> pos)
+{
+  if (getInstance()->getBuilding(pos) != Maptile::STONE &&
+      getInstance()->getBuilding(pos) != Maptile::ROAD)
+    return NULL;
+  return Stonelist::getInstance()->getObjectAt(pos);
+}
+
 Temple* GameMap::getTemple(Vector<int> pos)
 {
   if (getInstance()->getBuilding(pos) != Maptile::TEMPLE)
@@ -1475,6 +1485,14 @@ bool GameMap::canPutBuilding(Maptile::Building bldg, guint32 size, Vector<int> t
 	else
 	  return false;
 	break;
+      case Maptile::STONE:
+	if (getTerrainType(to) == Tile::GRASS &&
+            (getBuilding(to) == Maptile::ROAD ||
+             getBuilding(to) == Maptile::NONE))
+	  return true;
+        else
+          return false;
+        break;
       case Maptile::NONE: break;
     }
   return can_move;
@@ -1534,12 +1552,21 @@ bool GameMap::moveBuilding(Vector<int> from, Vector<int> to, guint32 new_width)
 	}
     case Maptile::ROAD:
 	{
+          bool had_stone = getStone(from) != NULL;
 	  Road *old_road = getRoad(getRoad(from)->getPos());
 	  Road *new_road = new Road(*old_road, to);
 	  removeRoad(old_road->getPos());
           if (new_width)
             new_road->setSize(new_width);
 	  putRoad(new_road);
+          if (had_stone)
+            {
+              Stone::Type type =
+                Stone::Type(Stone::getRandomType
+                            (Road::Type(new_road->getType())));
+              Stone *s = new Stone (to, type);
+              putStone(s);
+            }
 	  break;
 	}
     case Maptile::RUIN:
@@ -1572,6 +1599,16 @@ bool GameMap::moveBuilding(Vector<int> from, Vector<int> to, guint32 new_width)
 	  putCity(new_city, true);
 	  break;
 	}
+    case Maptile::STONE:
+	{
+	  Stone* old_stone = getStone(getStone(from)->getPos());
+	  Stone* new_stone = new Stone(*old_stone, to);
+	  removeStone(old_stone->getPos());
+          if (new_width)
+            new_stone->setSize(new_width);
+	  putStone(new_stone);
+	  break;
+	}
     }
   return moved;
 }
@@ -1595,6 +1632,7 @@ guint32 GameMap::getBuildingSize(Vector<int> tile)
     case Maptile::BRIDGE: return getBridge(tile)->getSize(); break;
     case Maptile::SIGNPOST: return getSignpost(tile)->getSize(); break;
     case Maptile::PORT: return getPort(tile)->getSize(); break;
+    case Maptile::STONE: return getStone(tile)->getSize(); break;
     case Maptile::NONE: break;
     }
 
@@ -1687,11 +1725,33 @@ bool GameMap::removeLocation (Vector<int> pos)
     case Maptile::BRIDGE: return removeBridge(pos);
     case Maptile::SIGNPOST: return removeSignpost(pos);
     case Maptile::PORT: return removePort(pos);
+    case Maptile::STONE: return removeStone(pos);
     case Maptile::NONE: break;
     }
   return false;
 }
 
+
+bool GameMap::removeStone(Vector<int> pos)
+{
+  Stone *s = GameMap::getStone(pos);
+  if (s)
+    {
+      removeBuilding(s);
+      Stonelist::getInstance()->subtract(s);
+      return true;
+    }
+  return false;
+}
+
+bool GameMap::putStone(Stone *s)
+{
+  Stonelist::getInstance()->add(s);
+  putTerrain(s->getArea(), Tile::GRASS);
+  if (getBuilding(s->getPos()) != Maptile::ROAD)
+    setBuilding(s->getPos(), Maptile::STONE);
+  return true;
+}
 
 bool GameMap::removeTemple(Vector<int> pos)
 {
@@ -1764,6 +1824,9 @@ bool GameMap::removeRoad(Vector<int> pos)
     {
       removeBuilding(r);
       Roadlist::getInstance()->subtract(r);
+      Stone *s = Stonelist::getInstance()->getObjectAt(pos);
+      if (s)
+        Stonelist::getInstance()->subtract(s);
       return true;
     }
   return false;
@@ -1969,6 +2032,19 @@ bool GameMap::putNewRuin(Vector<int> tile)
   return putRuin(r);
 }
 
+bool GameMap::putNewStone(Vector<int> tile)
+{
+  // check if we can place the stone
+  bool stone_placeable =
+    canPutBuilding (Maptile::STONE, 1, tile);
+
+  if (!stone_placeable)
+    return false;
+
+  Stone *t = new Stone(tile, 1);
+  return putStone(t);
+}
+
 bool GameMap::putNewTemple(Vector<int> tile)
 {
   Cityset *cs = GameMap::getCityset();
@@ -2049,6 +2125,7 @@ Location *GameMap::getLocation(Vector<int> tile)
     case Maptile::BRIDGE: return getBridge(tile);
     case Maptile::SIGNPOST: return getSignpost(tile);
     case Maptile::PORT: return getPort(tile);
+    case Maptile::STONE: return getStone(tile);
     case Maptile::NONE: break;
     }
   return NULL;
@@ -2326,6 +2403,9 @@ bool GameMap::eraseTile(Vector<int> tile)
       getTile(tile)->getBackpack()->removeAllFromBackpack();
       erased = true;
     }
+
+  // ... or a stone
+  erased |= removeStone(tile);
   return erased;
 }
 

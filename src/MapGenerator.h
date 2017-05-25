@@ -198,6 +198,10 @@ class MapGenerator
 	bool canPlaceBridge(Vector<int> pos, int type, Vector<int> &src, Vector<int> &dest);
 	void placeBridge(Vector<int> pos, int type);
         
+
+        //! put standing stones on grassy tiles.
+        void  makeStandingStones();
+
         /**
           * Once makeRivers() finds a connection path between two bodies of water
           * it calls this function to put water on that path.

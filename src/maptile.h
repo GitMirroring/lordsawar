@@ -1,7 +1,7 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015 Ben Asselstine
+// Copyright (C) 2006-2010, 2012, 2014, 2015, 2017 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -68,7 +68,9 @@ class Maptile: public Movable
 	  //! A Port is built here.
 	  PORT=7, 
 	  //! A Bridge is built here.
-	  BRIDGE=8
+	  BRIDGE=8,
+	  //! A Standing stone is built here.
+	  STONE=9
 	};
 
 	//! Default constructor.

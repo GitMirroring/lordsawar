@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2008-2012, 2014, 2015, 2017 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -160,6 +160,9 @@ TileSetWindow::TileSetWindow(Glib::ustring load_filename)
     xml->get_widget("roads_picture_menuitem", roads_picture_menuitem);
     roads_picture_menuitem->signal_activate().connect
       (method(on_roads_picture_activated));
+    xml->get_widget("stones_picture_menuitem", stones_picture_menuitem);
+    stones_picture_menuitem->signal_activate().connect
+      (method(on_stones_picture_activated));
     xml->get_widget("bridges_picture_menuitem", bridges_picture_menuitem);
     bridges_picture_menuitem->signal_activate().connect
       (method(on_bridges_picture_activated));
@@ -1260,6 +1263,33 @@ void TileSetWindow::on_roads_picture_activated()
           if (d_tileset->replaceFileInConfigurationFile(d_tileset->getRoadsFilename()+".png", d.get_selected_filename()))
             {
               d_tileset->setRoadsFilename (file);
+              needs_saving = true;
+              update_window_title();
+            }
+          else
+            show_add_file_error (d_tileset, *d.get_dialog(), file);
+        }
+    }
+}
+
+void TileSetWindow::on_stones_picture_activated()
+{
+  Glib::ustring filename = "";
+  if (d_tileset->getStonesFilename().empty() == false)
+    filename = d_tileset->getFileFromConfigurationFile(d_tileset->getStonesFilename() +".png");
+  ImageEditorDialog d(*window, filename, STONE_TYPES);
+  d.set_title(_("Select a standing stones image"));
+  int response = d.run();
+  if (filename.empty() == false)
+    File::erase(filename);
+  if (response == Gtk::RESPONSE_ACCEPT)
+    {
+      if (d.get_selected_filename() != filename)
+        {
+          Glib::ustring file = File::get_basename(d.get_selected_filename());
+          if (d_tileset->replaceFileInConfigurationFile(d_tileset->getStonesFilename()+".png", d.get_selected_filename()))
+            {
+              d_tileset->setStonesFilename (file);
               needs_saving = true;
               update_window_title();
             }

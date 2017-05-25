@@ -37,6 +37,7 @@
 #include "port.h"
 #include "bridge.h"
 #include "road.h"
+#include "stone.h"
 #include "playerlist.h"
 #include "File.h"
 #include "stacktile.h"
@@ -46,6 +47,7 @@
 #include "FogMap.h"
 #include "MapBackpack.h"
 #include "GameScenarioOptions.h"
+#include "tileset.h"
 
 #include <iostream>
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -450,6 +452,7 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
   Vector<int> building_tile = Vector<int>(-1,-1);
   int building_subtype = -1;
   int building_player_id = -1;
+  int stone_type = -1;
 
   if (fog_type_id == FogMap::ALL)
     {
@@ -459,7 +462,7 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
 		       player_standard_id, stack_size, stack_player_id, 
 		       army_type_id, has_tower, has_ship, building_type, 
 		       building_subtype, building_tile, building_player_id, 
-		       tilesize, d_grid_toggled);
+		       tilesize, d_grid_toggled, stone_type);
       pixmask->blit(surface, tile_to_buffer_pos(tile));
       return;
     }
@@ -568,6 +571,17 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
 	      Road *road = GameMap::getRoad(tile);
 	      building_tile = tile - road->getPos();
 	      building_subtype = road->getType();
+              Stone *stone = GameMap::getStone(tile);
+              if (stone)
+                stone_type = stone->getType();
+	    }
+	  break;
+	case Maptile::STONE:
+	    {
+              Stone *stone = GameMap::getStone(tile);
+	      building_tile = tile - stone->getPos();
+	      building_subtype = stone->getType();
+              stone_type = stone->getType();
 	    }
 	  break;
 	case Maptile::PORT:
@@ -587,12 +601,14 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
 	  break;
 	}
     }
+  if (GameMap::getTileset()->getStonesFilename().empty() == true)
+    stone_type = -1;
   PixMask *pixmask = 
     gc->getTilePic(tile_style_id, fog_type_id, has_bag, has_standard, 
 		   player_standard_id, stack_size, stack_player_id, 
 		   army_type_id, has_tower, has_ship, building_type, 
 		   building_subtype, building_tile, building_player_id, 
-		   tilesize, d_grid_toggled);
+		   tilesize, d_grid_toggled, stone_type);
   pixmask->blit(surface, tile_to_buffer_pos(tile));
 }
 
