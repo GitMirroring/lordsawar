@@ -186,6 +186,7 @@ class GameWindow: public sigc::trackable
 
     Game* game;
     GameButtonBox *game_button_box;
+    Gtk::Label *pos_label;
     
     bool on_delete_event();
 
@@ -310,6 +311,7 @@ class GameWindow: public sigc::trackable
     City *on_select_city_to_use_item_on(SelectCityMap::Type type);
     bool on_bigmap_scrolled(GdkEventScroll* event);
     void on_popup_stack_menu (Stack *stack);
+    void on_pointing_at_new_tile(Vector<int> tile);
 
     // quest manager callbacks
     void on_quest_completed(Quest *quest, Reward *reward);

@@ -726,6 +726,8 @@ void GameBigMap::mouse_motion_event(MouseMotionEvent e)
   Player *viewing = Playerlist::getViewingplayer();
   Stack* stack = active->getActivestack();
   Vector<int> tile = mouse_pos_to_tile(e.pos);
+  if (current_tile != tile && d_grid_toggled)
+    pointing_at_new_tile.emit (tile);
   current_tile = tile;
   if (tile.x < 0)
     tile.x = 0;

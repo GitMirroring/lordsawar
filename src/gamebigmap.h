@@ -79,6 +79,7 @@ class GameBigMap: public BigMap
     sigc::signal<void> path_set;
     // emitted when the cursor changes
     sigc::signal<void, ImageCache::CursorType> cursor_changed;
+    sigc::signal<void, Vector<int> > pointing_at_new_tile;
 
     void reset_path_calculator(Stack *s);
 

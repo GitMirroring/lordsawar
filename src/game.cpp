@@ -282,6 +282,8 @@ Game::Game(GameScenario* gameScenario, NextTurn *nextTurn, bool headless)
 	sigc::mem_fun(this, &Game::on_show_path_turns));
     bigmap->popup_stack_actions_menu.connect(
 	sigc::mem_fun(popup_stack_actions_menu, &sigc::signal<void, Stack*>::emit));
+    bigmap->pointing_at_new_tile.connect
+	(sigc::mem_fun(this, &Game::on_pointing_at_new_tile));
 
     // init the smallmap
     smallmap.reset(new SmallMap(headless));
@@ -1439,4 +1441,9 @@ guint32 Game::on_get_round()
     return getScenario()->getRound();
   else
     return 0;
+}
+
+void Game::on_pointing_at_new_tile (Vector<int> tile)
+{
+  pointing_at_new_tile.emit(tile);
 }

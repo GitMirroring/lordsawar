@@ -174,6 +174,7 @@ class Game
     sigc::signal<void, Hero *, Glib::ustring, guint32> city_persuaded;
     sigc::signal<void, Hero *, Glib::ustring> stack_teleported;
     sigc::signal<void, Stack*> popup_stack_actions_menu;
+    sigc::signal<void, Vector<int> > pointing_at_new_tile;
     
     void addPlayer(Player *p);
 
@@ -254,6 +255,7 @@ class Game
     bool ask_if_treachery(Stack *stack, Player *them, Vector<int> pos);
     void on_save_game(Glib::ustring filename);
     guint32 on_get_round();
+    void on_pointing_at_new_tile (Vector<int> tile);
 
     GameScenario* d_gameScenario;
     NextTurn* d_nextTurn;

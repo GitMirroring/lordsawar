@@ -294,6 +294,7 @@ GameWindow::GameWindow()
   xml->get_widget("online_help_menuitem", online_help_menuitem);
   online_help_menuitem->signal_activate().connect
     (method(on_online_help_activated));
+  xml->get_widget("pos_label", pos_label);
   d_quick_fights = false;
 }
 
@@ -599,6 +600,7 @@ void GameWindow::setup_signals(GameScenario *game_scenario)
 
   connections.push_back (game->remote_next_player_turn.connect
                          (method(on_remote_next_player_turn)));
+  connections.push_back (game->pointing_at_new_tile.connect (method(on_pointing_at_new_tile)));
 }
 
 void GameWindow::show_city_production_report (bool destitute)
@@ -2734,6 +2736,8 @@ void GameWindow::on_player_replaced(Player *p)
 void GameWindow::on_grid_toggled()
 {
   game->get_bigmap().toggle_grid();
+  if (game->get_bigmap().get_toggled() == false)
+    pos_label->set_text("");
 }
 
 void GameWindow::give_some_cheese(Player *winner)
@@ -3004,4 +3008,9 @@ void GameWindow::on_popup_stack_menu (Stack *stack)
   menu->add(*item);
   //menu->set_parent_window (window->get_window());
   menu->popup(3, 0);
+}
+
+void GameWindow::on_pointing_at_new_tile(Vector<int> tile)
+{
+  pos_label->set_text(String::ucompose("(%1, %2)", tile.x, tile.y));
 }
