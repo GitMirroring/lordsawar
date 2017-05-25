@@ -1,4 +1,7 @@
 where are the defeat and victory sounds being played?
+is there a way i can know the size of the screen in cm?
+  if so, then i could always display the tiles at the same size, and auto-pick a tile-size and zoom things accordingly.
+    ah, that's what dpi is all about.
 
  scp lordsawar-0.1.8.tar.gz benasselstine@dl.sv.nongnu.org:/releases/lordsawar/
 
