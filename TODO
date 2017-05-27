@@ -1,8 +1,11 @@
+maybe the move bonuses should be displayed in a dialog
 where are the defeat and victory sounds being played?
 is there a way i can know the size of the screen in cm?
   if so, then i could always display the tiles at the same size, and auto-pick a tile-size and zoom things accordingly.
     ah, that's what dpi is all about.
       i guess we need a more general scale to cm type of method in PixMask too
+  but the problem is that we have small screens.
+    sometimes we want to scale to cm, and sometimes we want to scale to fit.
 
  scp lordsawar-0.1.8.tar.gz benasselstine@dl.sv.nongnu.org:/releases/lordsawar/
 
