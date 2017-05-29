@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: lordsawar-0.3.2-pre2\n"
 "Report-Msgid-Bugs-To: bug-gnu-gettext@gnu.org\n"
 "POT-Creation-Date: 2017-05-03 13:54-0400\n"
-"PO-Revision-Date: 2017-05-27 09:32+0100\n"
+"PO-Revision-Date: 2017-05-28 22:13+0100\n"
 "Last-Translator: James Manez <arasmo@wanadoo.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -399,7 +399,7 @@ msgstr "Ordre de combat"
 
 #: ../dat/glade/fight-order-dialog.ui.h:4
 msgid "Reset"
-msgstr "Recommancer"
+msgstr "Recommencer"
 
 #: ../dat/glade/fight-order-dialog.ui.h:5
 msgid "Reverse Order"
@@ -1922,7 +1922,7 @@ msgstr "+5 Or par ville"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:26
 msgid "Steals Gold from Enemy"
-msgstr "Vole or à l'ennemi"
+msgstr "Vole de l'or à l'ennemi"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:27
 msgid "Sinks Enemy Ships"
@@ -1934,7 +1934,7 @@ msgstr "Brule pont"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:29
 msgid "Capture Ruin Keeper"
-msgstr "Capture gardien de ruine"
+msgstr "Capture le gardien de la ruine"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:30
 msgid "Disease City"
@@ -3364,11 +3364,11 @@ msgstr "Construction des villes..."
 
 #: ../src/MapGenerator.cpp:220 ../src/MapGenerator.cpp:1704
 msgid "paving roads..."
-msgstr "Pavage des routes;.."
+msgstr "Pavage des routes.."
 
 #: ../src/MapGenerator.cpp:226
 msgid "ruining ruins..."
-msgstr "Ruines ruinées..."
+msgstr "Création des ruines..."
 
 #: ../src/MapGenerator.cpp:229
 msgid "spawning temples..."
@@ -3401,7 +3401,7 @@ msgstr "Vous devrez massacrer %1 armés du traître %2."
 #. Initially give the first hero the player's standard.
 #: ../src/player.cpp:2472
 msgid "%1 Standard"
-msgstr "%1 Standard"
+msgstr "%1 bannière"
 
 #: ../src/player.cpp:2544
 msgid "Peace negotiated with %1."
@@ -3475,12 +3475,12 @@ msgstr "Moyen"
 
 #: ../src/ruin.cpp:32
 msgid " is inhabited by monsters and full of treasure!"
-msgstr "est habitée par des monstres est remplie de trésors !"
+msgstr "est habité(e) par des monstres et rempli(e) de trésors !"
 
 #: ../src/reward.cpp:548
 msgid "%1 Gold Piece"
 msgid_plural "%1 Gold Pieces"
-msgstr[0] "%1 Ppèce d'or"
+msgstr[0] "%1 pièce d'or"
 msgstr[1] "%1 pièces d'or"
 
 #: ../src/reward.cpp:556
@@ -3545,11 +3545,11 @@ msgstr "Vous devez conquérir la ville de \"%1\" et la réduire en cendres."
 
 #: ../src/temple.cpp:32
 msgid " can bless your armies or give you quests."
-msgstr "peut bénir vous armées ou vous confier des quêtes."
+msgstr "peut bénir vos armées ou vous confier des quêtes."
 
 #: ../src/tileset.cpp:449
 msgid "Error!  can't load tileset `%1'."
-msgstr "Erreur ! Impossible de charge le lot de tuiles : `%1'."
+msgstr "Erreur ! Impossible de charger le lot de tuiles : `%1'."
 
 #: ../src/gui/city-window.cpp:147
 msgid "Capital city of %1"
@@ -3589,7 +3589,7 @@ msgstr "Voulez-vous vraiment raser %1 ?"
 
 #: ../src/gui/city-window.cpp:477
 msgid "You won't be popular!"
-msgstr "Vous ne serez pas populaire !"
+msgstr "Votre popularité en pâtira !"
 
 #: ../src/gui/preferences-dialog.cpp:65
 msgid "Observe"
@@ -3665,7 +3665,7 @@ msgstr "où il n'y a rien !"
 #: ../src/gui/quest-completed-dialog.cpp:104
 #: ../src/gui/ruin-rewarded-dialog.cpp:75
 msgid "where gold can be found!"
-msgstr "qui est rempli d'or !"
+msgstr "où on trouve de l'or !"
 
 #. this one shouldn't happen
 #: ../src/gui/quest-completed-dialog.cpp:106
@@ -4185,7 +4185,7 @@ msgstr "%1, vous n'avez fait aucun quartier à la bataille de %2."
 
 #: ../src/gui/game-window.cpp:1994
 msgid "%1, you have slain the foe in the battle of %2."
-msgstr "%1, vous avez tué l'ennemi lors de la bataille de %2."
+msgstr "%1, vous avez vaincu l'ennemi lors de la bataille de %2."
 
 #: ../src/gui/game-window.cpp:2122
 msgid "%1 Looted"
@@ -4976,7 +4976,7 @@ msgstr "Géants des Tempêtes"
 
 #: ../src/CreateScenarioRandomize.cpp:203
 msgid "Horse Lords"
-msgstr "Seigneurs des Chevaux"
+msgstr "Maitres des Chevaux"
 
 #: ../src/CreateScenarioRandomize.cpp:206
 msgid "Grey Dwarves"
@@ -7438,143 +7438,143 @@ msgstr "Bienvenue aux visiteurs"
 
 #: ../dat/ruinnames.xml.in.h:1
 msgid "Creepy Dungeon"
-msgstr "Souterrain effrayant"
+msgstr "Le souterrain effrayant "
 
 #: ../dat/ruinnames.xml.in.h:2
 msgid "Dark Cellars"
-msgstr "Caves sombres"
+msgstr "Le sombre repaire "
 
 #: ../dat/ruinnames.xml.in.h:3
 msgid "Abandoned Temple"
-msgstr "Temple abandonné"
+msgstr "Le temple abandonné "
 
 #: ../dat/ruinnames.xml.in.h:4
 msgid "Dark Temple"
-msgstr "Temple ténébreux"
+msgstr "Le temple ténébreux "
 
 #: ../dat/ruinnames.xml.in.h:5
 msgid "Fallen Temple"
-msgstr "Temple délabré"
+msgstr "Le temple délabré "
 
 #: ../dat/ruinnames.xml.in.h:6
 msgid "Unholy Temple"
-msgstr "Temple impie"
+msgstr "Le temple impie "
 
 #: ../dat/ruinnames.xml.in.h:7
 msgid "Ruined Temple"
-msgstr "Temple en ruine"
+msgstr "Le temple en ruine "
 
 #: ../dat/ruinnames.xml.in.h:8
 msgid "Misty Maze"
-msgstr "Labyrinthe brumeux"
+msgstr "Le labyrinthe brumeux "
 
 #: ../dat/ruinnames.xml.in.h:9
 msgid "Ruined City"
-msgstr "Ville en ruine"
+msgstr "La ville en ruine "
 
 #: ../dat/ruinnames.xml.in.h:10
 msgid "Weird Ruins"
-msgstr "Ruines étranges"
+msgstr "La ruine étrange "
 
 #: ../dat/ruinnames.xml.in.h:11
 msgid "Dusty Caves"
-msgstr "Cavernes poudreuses"
+msgstr "La caverne poudreuse "
 
 #: ../dat/ruinnames.xml.in.h:12
 msgid "Silent Lair"
-msgstr "Antre silencieux"
+msgstr "L'antre silencieux "
 
 #: ../dat/ruinnames.xml.in.h:13
 msgid "Old Dragon's Lair"
-msgstr "Ancien Antre de dragon"
+msgstr "L'antre du vieux dragon "
 
 #: ../dat/ruinnames.xml.in.h:14
 msgid "Black Tomb"
-msgstr "Tombe noire"
+msgstr "La tombe noire "
 
 #: ../dat/ruinnames.xml.in.h:15
 msgid "Ancient Ruins"
-msgstr "Ruines antiques"
+msgstr "La ruine antique "
 
 #: ../dat/ruinnames.xml.in.h:16
 msgid "Deserted Monastery"
-msgstr "Monastère déserté"
+msgstr "Le monastère déserté "
 
 #: ../dat/ruinnames.xml.in.h:17
 msgid "Stormy Tower"
-msgstr "Tour orageuse"
+msgstr "La tour orageuse "
 
 #: ../dat/ruinnames.xml.in.h:18
 msgid "Dark Tower"
-msgstr "Tour sombre"
+msgstr "La tour sombre "
 
 #: ../dat/ruinnames.xml.in.h:19
 msgid "Savaged Castle"
-msgstr "Château assailli"
+msgstr "Le château dévasté "
 
 #: ../dat/ruinnames.xml.in.h:20
 msgid "Ruined Castle"
-msgstr "Château en ruine"
+msgstr "Le château en ruine "
 
 #: ../dat/ruinnames.xml.in.h:21
 msgid "Misty Ruins"
-msgstr "Ruines brumeuses"
+msgstr "La Ruine brumeuse "
 
 #: ../dat/ruinnames.xml.in.h:22
 msgid "Abandoned Village"
-msgstr "Village abandonné"
+msgstr "Le village abandonné "
 
 #: ../dat/ruinnames.xml.in.h:23
 msgid "Ghost Town"
-msgstr "Ville fantôme"
+msgstr "La ville fantôme "
 
 #: ../dat/ruinnames.xml.in.h:24
 msgid "Silent Farm"
-msgstr "Ferme silencieuse"
+msgstr "La ferme silencieuse "
 
 #: ../dat/ruinnames.xml.in.h:25
 msgid "Barren Ruins"
-msgstr "Ruine ravagée"
+msgstr "La ruine ravagée "
 
 #: ../dat/ruinnames.xml.in.h:26
 msgid "Forbidden Lair"
-msgstr "Antre interdit"
+msgstr "L'antre interdit "
 
 #: ../dat/ruinnames.xml.in.h:27
 msgid "Dark Hole"
-msgstr "Trou noir"
+msgstr "Le trou noir "
 
 #: ../dat/ruinnames.xml.in.h:28
 msgid "Dark Dungeon"
-msgstr "Sombre souterrain"
+msgstr "Le sombre souterrain "
 
 #: ../dat/ruinnames.xml.in.h:29
 msgid "Rampaged Village"
-msgstr "Village dévasté"
+msgstr "Le village dévasté "
 
 #: ../dat/ruinnames.xml.in.h:30
 msgid "Abandoned Town"
-msgstr "Ville abandonnée"
+msgstr "La ville abandonnée "
 
 #: ../dat/ruinnames.xml.in.h:31
 msgid "Goblin Hideout"
-msgstr "Cache gobeline"
+msgstr "La cache gobeline "
 
 #: ../dat/ruinnames.xml.in.h:32
 msgid "Orcish Hut"
-msgstr "Hutte orc"
+msgstr "La Hutte orc "
 
 #: ../dat/ruinnames.xml.in.h:33
 msgid "Bone-filled Pit"
-msgstr "Fosse aux ossements"
+msgstr "La fosse aux ossements "
 
 #: ../dat/ruinnames.xml.in.h:34
 msgid "Rat-filled Catacombs"
-msgstr "Catacombes aux dix mille rats"
+msgstr "La Catacombe aux dix-mille rats"
 
 #: ../dat/ruinnames.xml.in.h:35
 msgid "Creepy Crypt"
-msgstr "Crypte terrifiante"
+msgstr "La crypte terrifiante"
 
 #: ../dat/heronames.xml.in.h:1
 msgid "Endurien"
@@ -8125,7 +8125,7 @@ msgstr "Jouez à un clone de Warlords II"
 #~ msgstr "bouton "
 
 #~ msgid "Save a picture of the map showing just the terrain."
-#~ msgstr "Sauver une image de la carte montrant juste le terrain."
+#~ msgstr "Sauver une image de la carte montrant seulement le terrain."
 
 #~ msgid "Export Terrain Map As Image"
 #~ msgstr "Exporter le terrain comme image"
@@ -8449,7 +8449,7 @@ msgstr "Jouez à un clone de Warlords II"
 #~ msgstr "Erreur ! Lot de boucliers : `%1'  a un nom de base de lot de boucliers `%2' qui fait doublon avec `%3'. Évité."
 
 #~ msgid "Error!  shieldset: `%1' shares a duplicate shieldset id with `%2'.  Skipping."
-#~ msgstr "Erreut ! Lot de bouliers :  `%1' a un id de lot de boucliers qui fait doublon avec`%2'. Évité."
+#~ msgstr "Erreur ! Lot de bouliers :  `%1' a un id de lot de boucliers qui fait doublon avec`%2'. Évité."
 
 #~ msgid "Defence: %1"
 #~ msgstr "Défense : %1"
