@@ -515,21 +515,39 @@ void EditorBigMap::change_map_under_cursor()
 
     case ROAD:
         {
-          bool had_stone = GameMap::getStone(tile) != NULL;
-          if (GameMap::getRoad(tile) != NULL)
-            GameMap::getInstance()->removeRoad(tile);
-
-          int type = CreateScenario::calculateRoadType(tile);
-          Road *r = new Road(tile, type);
-          GameMap::getInstance()->putRoad(r);
-          if (had_stone)
+          Maptile::Building bldg =
+            GameMap::getInstance()->getTile(tile)->getBuilding();
+          switch (bldg)
             {
-              Stone *s = new Stone (tile, Road::Type(r->getType()));
-              GameMap::getInstance()->putStone(s);
-            }
+            case Maptile::ROAD:
+            case Maptile::STONE:
+            case Maptile::NONE:
+                {
+                  bool had_stone = GameMap::getStone(tile) != NULL;
+                  if (GameMap::getRoad(tile) != NULL)
+                    GameMap::getInstance()->removeRoad(tile);
 
-          changed_tiles.pos -= Vector<int>(1, 1);
-          changed_tiles.dim = Vector<int>(3, 3);
+                  int type = CreateScenario::calculateRoadType(tile);
+                  Road *r = new Road(tile, type);
+                  GameMap::getInstance()->putRoad(r);
+                  if (had_stone)
+                    {
+                      Stone *s = new Stone (tile, Road::Type(r->getType()));
+                      GameMap::getInstance()->putStone(s);
+                    }
+
+                  changed_tiles.pos -= Vector<int>(1, 1);
+                  changed_tiles.dim = Vector<int>(3, 3);
+                }
+              break;
+            case Maptile::CITY:
+            case Maptile::RUIN:
+            case Maptile::TEMPLE:
+            case Maptile::SIGNPOST:
+            case Maptile::PORT:
+            case Maptile::BRIDGE:
+              break;
+            }
           break;
         }
     case BAG:
