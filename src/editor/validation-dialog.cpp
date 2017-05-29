@@ -37,8 +37,13 @@ ValidationDialog::ValidationDialog(Gtk::Window &parent, std::list<Glib::ustring>
   Glib::ustring newline = ss.str();
   xml->get_widget("label", label);
   xml->get_widget("textview", textview);
+  xml->get_widget("scrolledwindow", scrolled_window);
   if (errors.size() == 0 && warnings.size() == 0)
-    label->set_text(_("No errors"));
+    {
+      label->set_text(_("No errors"));
+      scrolled_window->set_no_show_all (true);
+      scrolled_window->set_visible (false);
+    }
   else if (errors.size() && warnings.size() == 0)
     {
       label->set_text

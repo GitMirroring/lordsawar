@@ -33,6 +33,7 @@ class ValidationDialog: public LwEditorDialog
  private:
     Gtk::Label *label;
     Gtk::TextView *textview;
+    Gtk::ScrolledWindow *scrolled_window;
 };
 
 #endif
