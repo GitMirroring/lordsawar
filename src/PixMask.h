@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Ben Asselstine
+// Copyright (C) 2009-2012, 2014, 2015, 2017 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -62,6 +62,7 @@ class PixMask
       //blit a tile's worth of imagery from this pixmask to a pixmap.
      void blit(Vector<int> tile, int ts, Cairo::RefPtr<Cairo::Surface> pixmap, Vector<int> dest = Vector<int>(0,0));
 
+     Vector<int> get_dim() const;
      //! Destructor.
     ~PixMask();
  protected:

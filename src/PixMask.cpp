@@ -261,3 +261,8 @@ int PixMask::get_depth()
 {
     return 32;
 }
+     
+Vector<int> PixMask::get_dim() const
+{
+  return Vector<int>(width, height);
+}
