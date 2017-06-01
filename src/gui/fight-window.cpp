@@ -138,29 +138,38 @@ void FightWindow::add_army(Army *army, int initial_hp,
 {
   Gtk::Box *army_box;
   Gtk::Image *army_image;
-  Gtk::DrawingArea *water_drawingarea;
-  Gtk::EventBox *eventbox;
+  Gtk::Image *water_image;
 
   Glib::RefPtr<Gtk::Builder> xml = BuilderCache::get("fighter.ui");
 
   xml->get_widget("army_box", army_box);
-  xml->get_widget("eventbox", eventbox);
   xml->get_widget("army_image", army_image);
-  xml->get_widget("water_drawingarea", water_drawingarea);
+  xml->get_widget("water_image", water_image);
 
   // image
-  ImageCache *gc = ImageCache::getInstance();
-  Glib::RefPtr<Gdk::Pixbuf> pic = gc->getArmyPic(army)->to_pixbuf();
-  army_image->property_pixbuf() = pic;
-
-  water_drawingarea->property_width_request() = pic->get_width();
-  water_drawingarea->property_height_request() = 3;
-  if (army->getStat(Army::SHIP, false))
+  PixMask *armypic = ImageCache::getInstance()->getArmyPic(army);
+  army_image->property_pixbuf() = armypic->to_pixbuf();
+  int height = 3;
+  SmallTile *water =
+    Tilesetlist::getInstance()->getSmallTile(GameMap::getTileset()->getBaseName(), Tile::WATER);
+  if (army->getStat(Army::SHIP, false) && water)
     {
-      SmallTile *water = 
-        Tilesetlist::getInstance()->getSmallTile(GameMap::getTileset()->getBaseName(), Tile::WATER);
-      Gdk::RGBA watercolor = water->getColor();
-      water_drawingarea->override_background_color(watercolor, Gtk::STATE_FLAG_NORMAL);
+      Cairo::RefPtr<Cairo::Surface> surf = Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, armypic->get_width(), height);
+      Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(surf);
+      Gdk::RGBA w = water->getColor();
+      cr->set_source_rgb(w.get_red(), w.get_green(), w.get_blue());
+      cr->rectangle(0, 0, armypic->get_width(), height);
+      cr->paint();
+      Glib::RefPtr<Gdk::Pixbuf> p =
+        Gdk::Pixbuf::create(surf, 0, 0, armypic->get_width(), height);
+      water_image->property_pixbuf() = p;
+    }
+  else
+    {
+      Glib::RefPtr<Gdk::Pixbuf> empty =
+        Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, height, height);
+      empty->fill(0x00000000);
+      water_image->property_pixbuf() = empty;
     }
 
   // then add it to the right hbox
@@ -188,7 +197,7 @@ void FightWindow::add_army(Army *army, int initial_hp,
   ArmyItem item;
   item.army = army;
   item.hp = initial_hp;
-  item.box = eventbox;
+  item.water_image = water_image;
   item.image = army_image;
   item.exploding = false;
   army_items.push_back(item);
@@ -230,7 +239,7 @@ bool FightWindow::do_round()
             double fraction = double(i->hp) / i->army->getStat(Army::HP);
             if (fraction == 0.0)
               {
-                i->box->hide();
+                i->water_image->hide();
                 i->image->property_pixbuf() = expl;
                 i->exploding = true;
               }

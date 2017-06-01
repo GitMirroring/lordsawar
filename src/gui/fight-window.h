@@ -54,7 +54,7 @@ class FightWindow: public sigc::trackable
     {
 	Army *army;
 	int hp;
-        Gtk::EventBox *box;
+        Gtk::Image *water_image;
 	Gtk::Image *image;
         bool exploding;
     };
