@@ -51,7 +51,6 @@ SplashWindow::SplashWindow()
   window->set_icon_from_file(File::getVariousFile("castle_icon.png"));
   window->signal_delete_event().connect (sigc::hide(method(on_delete_event)));
 
-
   xml->get_widget("load_game_button", load_game_button);
   load_game_button->signal_clicked().connect (method(on_load_game_clicked));
   xml->get_widget("load_scenario_button", load_scenario_button);
