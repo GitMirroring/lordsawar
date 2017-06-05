@@ -144,6 +144,7 @@ Glib::ustring Tartan::getName(Type t) const
     case Tartan::RIGHT:
       return d_right_tartan_name;
     }
+  return d_left_tartan_name;
 }
 
 PixMask *Tartan::getImage(Type t) const
@@ -157,6 +158,7 @@ PixMask *Tartan::getImage(Type t) const
     case Tartan::RIGHT:
       return d_right_tartan_image;
     }
+  return d_left_tartan_image;
 }
 
 PixMask *Tartan::getMask(Type t) const
@@ -170,6 +172,7 @@ PixMask *Tartan::getMask(Type t) const
     case Tartan::RIGHT:
       return d_right_tartan_mask;
     }
+  return d_left_tartan_mask;
 }
 
 void Tartan::setName(Type t, Glib::ustring n)
