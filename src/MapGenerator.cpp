@@ -1444,7 +1444,6 @@ bool MapGenerator::makeRoad2(Path *p)
 	    {
 	      if (d_building[it.y*d_width + it.x] == Maptile::NONE)
 		{
-                  GameMap *gm = GameMap::getInstance();
 		  d_building[it.y*d_width + it.x] = Maptile::ROAD;
                   Roadlist::getInstance()->add(new Road(Vector<int>(it)));
 		  calculateBlockedAvenue(it.x, it.y);
