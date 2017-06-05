@@ -89,7 +89,6 @@ while IFS='' read -r line || [[ -n $line ]]; do
   echo $line | sed -e 's/^.\/lordsawar-windows\///g' >> $nsiscript
 done < "$filelist"
 echo "  CreateShortcut \"\$DESKTOP\\lordsawar.lnk\" \"\$INSTDIR\\lordsawar.exe\" \"\" \"\$INSTDIR\\various\\castle_icon.ico\"" >> $nsiscript
-echo "  CreateShortcut \"\$DESKTOP\\lordsawar-editor.lnk\" \"\$INSTDIR\\lordsawar-editor.exe\" \"\" \"\$INSTDIR\\various\\tileset_icon.ico\"" >> $nsiscript
 
 while IFS='' read -r line || [[ -n $line ]]; do
   if [ "x$line" == "x." ]; then
@@ -108,7 +107,6 @@ echo "Section \"Uninstall\"" >> $nsiscript
 echo "  RMDir /r \"\$INSTDIR\*.*\"" >> $nsiscript
 echo "  RMDir \"\$INSTDIR\"" >> $nsiscript
 echo "  delete \"\$DESKTOP\\lordsawar.lnk\"" >> $nsiscript
-echo "  delete \"\$DESKTOP\\lordsawar-editor.lnk\"" >> $nsiscript
 echo "  delete \"\$INSTDIR\\Uninstall.exe\"" >> $nsiscript
 echo "SectionEnd" >> $nsiscript
 

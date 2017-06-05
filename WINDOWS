@@ -1,6 +1,6 @@
-Cross-compiling LordsAWar! for Windows on Fedora 22
+Cross-compiling LordsAWar! for Windows on Fedora 24
 
-$ sudo yum install intltool automake autoconf m4 git libtool glib2-devel mingw32-filesystem mingw32-gcc-c++ mingw32-libarchive mingw32-cairomm mingw32-libsigc++20 mingw32-gettext mingw32-libxslt mingw32-libxml++ mingw32-gtkmm30 mingw32-nsis
+$ sudo dnf install intltool automake autoconf m4 git libtool glib2-devel mingw32-filesystem mingw32-gcc-c++ mingw32-libarchive mingw32-cairomm mingw32-libsigc++20 mingw32-gettext mingw32-libxslt mingw32-libxml++ mingw32-gtkmm30 mingw32-nsis
 
 $ git clone git://git.savannah.nongnu.org/lordsawar.git
 
@@ -11,6 +11,12 @@ $ ./autogen.sh
 $ mingw32-configure --disable-gls --disable-ghs --disable-sound --program-prefix=""
 
 $ LDFLAGS="-mwindows" LORDSAWAR_DATADIR="." make -e -j4
+
+
+We currently get this error at the end of compilation:
+libtool:   error: Could not determine the host path corresponding to
+libtool:   error:   '/usr/i686-w64-mingw32/sys-root/mingw/lib:/usr/i686-w64-mingw32/sys-root/mingw/bin:/home/ben/play/lordsawar.windows/lordsawar/src'
+libtool:   error: Continuing, but uninstalled executables may not work.
 
 $ sudo make install
 
@@ -29,8 +35,10 @@ The DLL blacklist for the program is:
     "advapi32.dll", "kernel32.dll", "msvcrt.dll", "ole32.dll", "user32.dll",
     "ws2_32.dll", "comdlg32.dll", "gdi32.dll", "imm32.dll", "oleaut32.dll",
     "shell32.dll", "winmm.dll", "winspool.drv", "wldap32.dll",
-    "ntdll.dll", "dnsapi.dll", "iphlpapi.dll", "shlwapi.dll", "msimg32.dll",
-    "gdiplus.dll", "usp10.dll", "comctl32.dll"
+    "ntdll.dll", "d3d9.dll", "mpr.dll", "crypt32.dll", "dnsapi.dll",
+    "shlwapi.dll", "version.dll", "iphlpapi.dll", "msimg32.dll", "setupapi.dll",
+    "gdiplus.dll", "usp10.dll", "comctl32.dll",
+
 
 To make mingw-bundledlls use this blacklist you have to modify the program.  Open the file and change the blacklist array at line 37.
 

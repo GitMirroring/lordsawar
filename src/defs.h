@@ -172,6 +172,7 @@ const Gdk::RGBA BEVELED_CIRCLE_LIGHT(LIGHT_GREY_COLOUR);
 const Gdk::RGBA ACTIVE_RUIN_BOX(YELLOW_COLOUR);
 #ifdef GDK_WINDOWING_WIN32
 const int SPEED_DELAY = 0;
+const double ZOOM_STEP = 0.1;
 #else
 const int SPEED_DELAY = 300000;
 const double ZOOM_STEP = 0.1;
@@ -191,5 +192,11 @@ const int MAX_LENGTH_FOR_ARMY_NAME = 20;
 const unsigned int ROAD_STONE_CHANCE = 150;
 //1 in x chance of standing stone being on a grass tile for random map.
 const unsigned int GRASS_STONE_CHANCE = 1500;
+
+
+//for mingw:
+#ifndef M_PI
+ # define M_PI 3.14159265358979323846 /* pi */
+#endif
 #endif // DEFINITIONS_H
 
