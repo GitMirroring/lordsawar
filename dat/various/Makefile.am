@@ -15,7 +15,7 @@ various_DATA = \
     recruit_male.png \
     ruin_1.png \
     ruin_2.png \
-    splash_screen.jpg \
+    splash_screen.png \
     win.png \
     lordsawar_logo.png \
     hero.png \

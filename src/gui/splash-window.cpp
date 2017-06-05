@@ -97,7 +97,7 @@ SplashWindow::SplashWindow()
 
   //set the window size.
   bool broken = false;
-  bg = PixMask::create (File::getVariousFile("splash_screen.jpg"), broken);
+  bg = PixMask::create (File::getVariousFile("splash_screen.png"), broken);
   if (broken == false)
     {
       int decorations = 24 * 3;

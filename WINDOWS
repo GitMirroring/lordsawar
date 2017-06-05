@@ -12,12 +12,6 @@ $ mingw32-configure --disable-gls --disable-ghs --disable-sound --program-prefix
 
 $ LDFLAGS="-mwindows" LORDSAWAR_DATADIR="." make -e -j4
 
-
-We currently get this error at the end of compilation:
-libtool:   error: Could not determine the host path corresponding to
-libtool:   error:   '/usr/i686-w64-mingw32/sys-root/mingw/lib:/usr/i686-w64-mingw32/sys-root/mingw/bin:/home/ben/play/lordsawar.windows/lordsawar/src'
-libtool:   error: Continuing, but uninstalled executables may not work.
-
 $ sudo make install
 
 The approach here is to set the datadir to ".", so that we can put all of the data files in the same directory as the exe.  Compiling "." as the datadir into the program means that the default configuration file will be written with this path -- and the data files will be found on the first run without the user having to manually munge the .lordsawarrc file.
@@ -37,7 +31,7 @@ The DLL blacklist for the program is:
     "shell32.dll", "winmm.dll", "winspool.drv", "wldap32.dll",
     "ntdll.dll", "d3d9.dll", "mpr.dll", "crypt32.dll", "dnsapi.dll",
     "shlwapi.dll", "version.dll", "iphlpapi.dll", "msimg32.dll", "setupapi.dll",
-    "gdiplus.dll", "usp10.dll", "comctl32.dll",
+    "gdiplus.dll", "usp10.dll", "comctl32.dll", "dwmapi.dll",
 
 
 To make mingw-bundledlls use this blacklist you have to modify the program.  Open the file and change the blacklist array at line 37.
@@ -54,3 +48,11 @@ The last step is to make the windows installer setup.exe.  The lordsawar-windows
 $ ./make-windows-installer.sh
 
 The setup.exe file should now be present in the current working directory.
+
+
+Try it in a virtual machine from: https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/
+
+Also try the game executable (not the setup) in wine:
+
+$ cd /usr/i686-w64-mingw32/sys-root/mingw/share/lordsawar
+$ wine /path/to/lordsawar.exe
