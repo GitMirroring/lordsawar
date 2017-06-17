@@ -53,6 +53,9 @@ The setup.exe file should now be present in the current working directory.
 Try it in a virtual machine from: https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/
 
 Also try the game executable (not the setup) in wine:
+[first install all of the required 32-bit libraries,
+even though we're on a 64 bit system
+you'll also need libcanberra-gtk3, and PackageKit-gtk3-module ]
 
 $ cd /usr/i686-w64-mingw32/sys-root/mingw/share/lordsawar
 $ wine /path/to/lordsawar.exe
