@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: lordsawar 0.3.2-pre3\n"
 "Report-Msgid-Bugs-To: bug-gnu-gettext@gnu.org\n"
 "POT-Creation-Date: 2017-06-03 07:50-0400\n"
-"PO-Revision-Date: 2017-06-18 00:04+0200\n"
+"PO-Revision-Date: 2017-06-19 15:18+0200\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -34,7 +34,7 @@ msgid ""
 "Our fundraising goal is $2000 USD.\n"
 msgstr ""
 "Överväg att donera till projektet så\n"
-"att vi kan få ny konst skapad.  \n"
+"att vi kan få nya bilder skapade.  \n"
 "Vårt insamlingsmål är $2000 USD.\n"
 
 #: ../dat/glade/about-dialog.ui.h:7
@@ -42,7 +42,6 @@ msgid "lordsawar.nongnu.org"
 msgstr "lordsawar.nongnu.org"
 
 #: ../dat/glade/about-dialog.ui.h:8
-#, fuzzy
 msgid ""
 "LordsAWar! is licensed under the GNU General Public License version 3,\n"
 "or (at your option) any later version of the license.  This license extends \n"
@@ -85,7 +84,6 @@ msgid "Close"
 msgstr "Stäng"
 
 #: ../dat/glade/army-gains-level-dialog.ui.h:1
-#, fuzzy
 msgid "Army Gained Level"
 msgstr "Armé gick upp en nivå"
 
@@ -96,7 +94,7 @@ msgstr "Välj"
 
 #: ../dat/glade/buy-production-dialog.ui.h:1
 msgid "Buy Production"
-msgstr "Köp produḱtion"
+msgstr "Köp produktion"
 
 #: ../dat/glade/buy-production-dialog.ui.h:2
 #: ../dat/glade/city-raze-dialog.ui.h:1 ../dat/glade/city-rename-dialog.ui.h:1
@@ -185,11 +183,11 @@ msgstr "Ockupera"
 
 #: ../dat/glade/city-defeated-dialog.ui.h:3
 msgid "Pillage"
-msgstr ""
+msgstr "Röva"
 
 #: ../dat/glade/city-defeated-dialog.ui.h:4
 msgid "Sack"
-msgstr ""
+msgstr "Skövla"
 
 #: ../dat/glade/city-defeated-dialog.ui.h:5 ../dat/glade/city-window.ui.h:17
 msgid "Raze"
@@ -225,16 +223,16 @@ msgstr "Fortsätt"
 
 #: ../dat/glade/city-looted-dialog.ui.h:2
 msgid "Your troops have looted the city!"
-msgstr ""
+msgstr "Dina trupper har plundrat staden!"
 
 #: ../dat/glade/city-pillaged-dialog.ui.h:2
 msgid "Your troops have pillaged the city!"
-msgstr ""
+msgstr "Dina trupper har rövat staden!"
 
 #: ../dat/glade/city-razed-dialog.ui.h:2
 #: ../dat/glade/city-sacked-dialog.ui.h:2
 msgid "Your troops have sacked the city!"
-msgstr ""
+msgstr "Dina trupper har skövlat staden!"
 
 #: ../dat/glade/city-raze-dialog.ui.h:2 ../dat/glade/city-rename-dialog.ui.h:2
 #: ../dat/glade/fight-order-dialog.ui.h:3
@@ -294,6 +292,7 @@ msgstr "Stridsbonus"
 msgid "Stop"
 msgstr "Stoppa"
 
+# TODO: Why in hero window as well??
 #: ../dat/glade/city-window.ui.h:12 ../dat/glade/hero-dialog.ui.h:13
 #: ../dat/glade/editor/backpack-editor-dialog.ui.h:5
 msgid "Stop producing armies"
@@ -303,9 +302,9 @@ msgstr "Stoppa produktion av arméer"
 msgid "Buy..."
 msgstr "Köp…"
 
+# TODO: Why in hero window as well??
 #: ../dat/glade/city-window.ui.h:14 ../dat/glade/hero-dialog.ui.h:15
 #: ../dat/glade/editor/backpack-editor-dialog.ui.h:7
-#, fuzzy
 msgid "Buy a production capability"
 msgstr "Köp en produktionskapabilitet"
 
@@ -327,7 +326,7 @@ msgstr "Välj destination"
 
 #: ../dat/glade/destination-dialog.ui.h:4
 msgid "4t"
-msgstr ""
+msgstr "4o"
 
 #: ../dat/glade/destination-dialog.ui.h:5
 msgid ""
@@ -342,15 +341,16 @@ msgid "Next Turn:"
 msgstr "Nästa omgång:"
 
 #: ../dat/glade/destination-dialog.ui.h:8
-#, fuzzy
 msgid "Turn After:"
-msgstr "Nästnästa omgång:"
+msgstr "Omgången efter:"
 
 #: ../dat/glade/destination-dialog.ui.h:9
 msgid ""
 "Click here to vector to\n"
 "a new city"
 msgstr ""
+"Klicka här för att lägga till\n"
+"en vektor till en ny stad"
 
 #: ../dat/glade/destination-dialog.ui.h:11
 msgid ""
@@ -418,7 +418,6 @@ msgid "Network Game"
 msgstr "Nätverksspel"
 
 #: ../dat/glade/game-lobby-dialog.ui.h:3
-#, fuzzy
 msgid "Play"
 msgstr "Spela"
 
@@ -594,7 +593,7 @@ msgstr "Rasering av städer"
 
 #: ../dat/glade/game-options-dialog.ui.h:31
 msgid "Cusp Of War"
-msgstr ""
+msgstr "På gränsen till krig"
 
 #: ../dat/glade/game-options-dialog.ui.h:32
 msgid "Affecting Difficulty"
@@ -617,7 +616,6 @@ msgid "Random Turns"
 msgstr "Slumpmässig turordning"
 
 #: ../dat/glade/game-options-dialog.ui.h:37
-#, fuzzy
 msgid "Build Production"
 msgstr "Bygg produktion"
 
@@ -626,10 +624,12 @@ msgid ""
 "Sacking &\n"
 "Pillaging"
 msgstr ""
+"Skövlande &\n"
+"rövande"
 
 #: ../dat/glade/game-options-dialog.ui.h:40 ../dat/glade/game-window.ui.h:41
 msgid "Vectoring"
-msgstr ""
+msgstr "Vektorer"
 
 #: ../dat/glade/game-options-dialog.ui.h:41
 msgid "Not Affecting Difficulty"
@@ -729,8 +729,8 @@ msgid ""
 "warrior?"
 msgstr ""
 "Är du säker på att du\n"
-"vill avsluta detta spel\n"
-"O store och tappre\n"
+"vill avsluta detta spel,\n"
+"o stora och tappra\n"
 "krigare?"
 
 #: ../dat/glade/game-window.ui.h:1
@@ -814,7 +814,7 @@ msgstr "Produktion"
 
 #: ../dat/glade/game-window.ui.h:22 ../dat/glade/report-dialog.ui.h:11
 msgid "Winning"
-msgstr ""
+msgstr "Vinnare"
 
 #: ../dat/glade/game-window.ui.h:24
 msgid "Quest"
@@ -920,7 +920,7 @@ msgid "End Turn"
 msgstr "Avsluta omgång"
 
 #: ../dat/glade/game-window.ui.h:53
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Turn: %6"
 msgstr "Omgång: %6"
 
@@ -933,14 +933,12 @@ msgid "Next Hero"
 msgstr "Nästa hjälte"
 
 #: ../dat/glade/hero-dialog.ui.h:4
-#, fuzzy
 msgid "Battle"
 msgstr "Strid"
 
 #: ../dat/glade/hero-dialog.ui.h:7
-#, fuzzy
 msgid "Command"
-msgstr "Kommando"
+msgstr "Ledarskap"
 
 #: ../dat/glade/hero-dialog.ui.h:8 ../src/gui/hero-levels-dialog.cpp:43
 msgid "Level"
@@ -1032,12 +1030,10 @@ msgstr "Spela musik"
 
 #: ../dat/glade/main-preferences-dialog.ui.h:8
 #: ../dat/glade/preferences-dialog.ui.h:3
-#, fuzzy
 msgid "Show Commentator"
 msgstr "Visa kommentator"
 
 #: ../dat/glade/medal-awarded-dialog.ui.h:1
-#, fuzzy
 msgid "Medal Awarded"
 msgstr "Medalj utdelad"
 
@@ -1092,7 +1088,6 @@ msgstr "Smeknamn:"
 
 #: ../dat/glade/next-player-turn-dialog.ui.h:1
 #: ../dat/glade/editor/media-dialog.ui.h:5
-#, fuzzy
 msgid "Next Turn"
 msgstr "Nästa omgång"
 
@@ -1131,12 +1126,10 @@ msgid "Clear All Games"
 msgstr "Rensa alla spel"
 
 #: ../dat/glade/pick-network-game-to-join-dialog.ui.h:10
-#, fuzzy
 msgid "Recently Joined Games"
 msgstr "Senast anslutna spel"
 
 #: ../dat/glade/player-died-dialog.ui.h:1
-#, fuzzy
 msgid "Game Lost"
 msgstr "Spelet förlorat"
 
@@ -1153,7 +1146,6 @@ msgstr ""
 "Låt fienden komma!"
 
 #: ../dat/glade/preferences-dialog.ui.h:4
-#, fuzzy
 msgid "Movement Speed"
 msgstr "Rörelsehastighet"
 
@@ -1231,9 +1223,8 @@ msgid "label"
 msgstr "etikett"
 
 #: ../dat/glade/ruin-rewarded-dialog.ui.h:2
-#, fuzzy
 msgid "The Sages show thee the site of X where Y can be found."
-msgstr "De vise visar dig platsen X där Y kan hittas."
+msgstr "Siarna visar dig platsen X där Y kan hittas."
 
 #: ../dat/glade/sage-dialog.ui.h:2
 msgid ""
@@ -1242,6 +1233,10 @@ msgid ""
 "I can show thee many things - items, money or maps.\n"
 "What wouldst thou ask of me\""
 msgstr ""
+"Siaren välkomnar dig varmt…\n"
+"”Välkommen, o sökare av kunskap.\n"
+"Jag kan visa dig många ting - föremål, pengar eller kartor.\n"
+"Vad vill du ha”"
 
 #: ../dat/glade/signpost-change-dialog.ui.h:3
 msgid "Message:"
@@ -1256,12 +1251,10 @@ msgid "Stack Info"
 msgstr "Stapelinfo"
 
 #: ../dat/glade/stack-info-dialog.ui.h:3 ../src/gui/game-window.cpp:2978
-#, fuzzy
 msgid "Group"
 msgstr "Gruppera"
 
 #: ../dat/glade/stack-info-dialog.ui.h:4 ../src/gui/game-window.cpp:2980
-#, fuzzy
 msgid "Ungroup"
 msgstr "Avgruppera"
 
@@ -1273,12 +1266,10 @@ msgid "Grp"
 msgstr "Grp"
 
 #: ../dat/glade/surrender-dialog.ui.h:1
-#, fuzzy
 msgid "An Offer of Peace!"
 msgstr "Ett fredserbjudande!"
 
 #: ../dat/glade/surrender-refused-dialog.ui.h:1
-#, fuzzy
 msgid "Surrender Refused!"
 msgstr "Kapitulation nekades!"
 
@@ -1298,10 +1289,9 @@ msgstr "Förräderi!"
 
 #: ../dat/glade/treachery-dialog.ui.h:2
 msgid "Whoops!  Pardon me, friend."
-msgstr "Hoppsan! Ursäkta gode vän."
+msgstr "Hoppsan! Ursäkta, min vän."
 
 #: ../dat/glade/treachery-dialog.ui.h:3
-#, fuzzy
 msgid "Attack!"
 msgstr "Attackera!"
 
@@ -1310,12 +1300,10 @@ msgid "Use"
 msgstr "Använd"
 
 #: ../dat/glade/use-item-on-player-dialog.ui.h:1
-#, fuzzy
 msgid "Select a Player to Target"
 msgstr "Välj en spelare som mål"
 
 #: ../dat/glade/use-item-on-player-dialog.ui.h:3
-#, fuzzy
 msgid "Which player do you want to target?"
 msgstr "Vilken spelare vill du ha som mål?"
 
@@ -1480,7 +1468,6 @@ msgstr "Redigera info för skölduppsättning"
 #: ../dat/glade/editor/tileset-info-dialog.ui.h:5
 #: ../dat/glade/editor/cityset-info-dialog.ui.h:5
 #: ../dat/glade/editor/shieldset-info-dialog.ui.h:5
-#, fuzzy
 msgid "Directory:"
 msgstr "Katalog:"
 
@@ -1548,7 +1535,6 @@ msgstr "Arméuppsättningsredigerare för LordsAWar!"
 #: ../dat/glade/editor/tileset-window.ui.h:2
 #: ../dat/glade/editor/cityset-window.ui.h:2
 #: ../dat/glade/editor/shieldset-window.ui.h:2
-#, fuzzy
 msgid "File"
 msgstr "Fil"
 
@@ -1606,7 +1592,6 @@ msgstr "Redigera bild för föremålssäck"
 #: ../src/gui/history-report-dialog.cpp:105
 #: ../src/gui/history-report-dialog.cpp:110
 #: ../src/editor/city-editor-dialog.cpp:46
-#, fuzzy
 msgid "Turns"
 msgstr "Omgångar"
 
@@ -1644,7 +1629,7 @@ msgstr "-1 Sty till fiendestapel"
 
 #: ../dat/glade/editor/armyset-window.ui.h:30
 msgid "Subtract All City Bonus"
-msgstr ""
+msgstr "Subtrahera all stadsbonus"
 
 #: ../dat/glade/editor/armyset-window.ui.h:31
 msgid "+1 to Stack In hills"
@@ -1723,12 +1708,10 @@ msgid "Defends Ruins"
 msgstr "Försvarar ruiner"
 
 #: ../dat/glade/editor/armyset-window.ui.h:51
-#, fuzzy
 msgid "Ruin Award"
-msgstr "Ruinutmärkelse"
+msgstr "Ruinbelöning"
 
 #: ../dat/glade/editor/armyset-window.ui.h:52
-#, fuzzy
 msgid "Sight"
 msgstr "Sikt"
 
@@ -1752,14 +1735,13 @@ msgstr "Ny kostnad"
 #: ../src/editor/city-editor-dialog.cpp:45
 #: ../src/editor/stack-editor-dialog.cpp:53
 msgid "Max Moves"
-msgstr ""
+msgstr "Max antal steg"
 
 #: ../dat/glade/editor/armyset-window.ui.h:59
 msgid "3"
 msgstr "3"
 
 #: ../dat/glade/editor/armyset-window.ui.h:60
-#, fuzzy
 msgid "Capabilities"
 msgstr "Förmågor"
 
@@ -1811,9 +1793,10 @@ msgid ""
 "Make All Pics\n"
 "Same As White"
 msgstr ""
+"Gör alla bilder\n"
+"samma som vit"
 
 #: ../dat/glade/editor/armyset-window.ui.h:75
-#, fuzzy
 msgid "All Same"
 msgstr "Alla samma"
 
@@ -1836,7 +1819,6 @@ msgid "Capital City"
 msgstr "Huvudstad"
 
 #: ../dat/glade/editor/city-editor-dialog.ui.h:6
-#, fuzzy
 msgid "Burned Down"
 msgstr "Nedbränd"
 
@@ -1846,7 +1828,7 @@ msgstr "Nedbränd"
 #: ../dat/glade/editor/ruin-editor-dialog.ui.h:5
 #: ../dat/glade/editor/signpost-editor-dialog.ui.h:4
 msgid "Randomize"
-msgstr ""
+msgstr "Slumpa"
 
 #: ../dat/glade/editor/city-editor-dialog.ui.h:10
 msgid "20"
@@ -1857,6 +1839,8 @@ msgid ""
 "Allow Building\n"
 "of New Production"
 msgstr ""
+"Tillåt byggande\n"
+"av ny produktion"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:1
 msgid "Anywhere"
@@ -1959,20 +1943,18 @@ msgid "Burns Bridge"
 msgstr "Bränner bro"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:29
-#, fuzzy
 msgid "Capture Ruin Keeper"
 msgstr "Fånga ruinvakt"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:30
 msgid "Disease City"
-msgstr ""
+msgstr "Sprid sjuka i stad"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:31
 msgid "Pick Up Bags"
 msgstr "Plocka upp säckar"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:32
-#, fuzzy
 msgid "Add Movement Points"
 msgstr "Lägg till förflyttningspoäng"
 
@@ -1990,9 +1972,8 @@ msgid "Summon Monster"
 msgstr "Åkalla monster"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:36
-#, fuzzy
 msgid "Raise Defenders in City"
-msgstr "Återuppliva försvarare i stad"
+msgstr "Animera försvarare i stad"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:37
 msgid ""
@@ -2059,15 +2040,14 @@ msgstr "Belöningar"
 
 #: ../dat/glade/editor/main-window.ui.h:17
 msgid "Smooth Screen"
-msgstr ""
+msgstr "Jämna ut skärm"
 
 #: ../dat/glade/editor/main-window.ui.h:18
 msgid "Smooth Entire Map"
-msgstr ""
+msgstr "Jämna ut hela kartan"
 
 #: ../dat/glade/editor/main-window.ui.h:19
 #: ../dat/glade/editor/switch-sets-dialog.ui.h:1
-#, fuzzy
 msgid "Switch Image Sets"
 msgstr "Växla bilduppsättningar"
 
@@ -2096,7 +2076,6 @@ msgid "Miniature Map"
 msgstr "Miniatyrkarta"
 
 #: ../dat/glade/editor/main-window.ui.h:27
-#, fuzzy
 msgid "Scenario Images & Sounds"
 msgstr "Bilder & ljud för scenario"
 
@@ -2336,7 +2315,6 @@ msgid "Edit Players"
 msgstr "Redigera spelare"
 
 #: ../dat/glade/editor/players-dialog.ui.h:4
-#, fuzzy
 msgid "Randomize Gold"
 msgstr "Slumpmässig guldmängd"
 
@@ -2396,7 +2374,6 @@ msgid "Y Coordinate"
 msgstr "Y-koordinat"
 
 #: ../dat/glade/editor/reward-editor-dialog.ui.h:20
-#, fuzzy
 msgid "Randomize Map"
 msgstr "Slumpmässig karta"
 
@@ -2417,7 +2394,6 @@ msgid "Hidden"
 msgstr "Dold"
 
 #: ../dat/glade/editor/ruin-editor-dialog.ui.h:12
-#, fuzzy
 msgid "Seen By"
 msgstr "Sedd av"
 
@@ -2455,13 +2431,11 @@ msgstr "Redigera stapel"
 
 #: ../dat/glade/editor/stack-editor-dialog.ui.h:5
 #: ../dat/glade/editor/battle-calculator-dialog.ui.h:11
-#, fuzzy
 msgid "Fortify"
-msgstr "Förstärk"
+msgstr "Befäst"
 
 #: ../dat/glade/editor/stack-editor-dialog.ui.h:8
 #: ../dat/glade/editor/battle-calculator-dialog.ui.h:8
-#, fuzzy
 msgid "Copy"
 msgstr "Kopiera"
 
@@ -2475,13 +2449,11 @@ msgid "Edit Temple"
 msgstr "Redigera tempel"
 
 #: ../dat/glade/editor/temple-editor-dialog.ui.h:5
-#, fuzzy
 msgid "Randomize Name"
 msgstr "Slumpmässigt namn"
 
 #: ../dat/glade/editor/tile-preview-dialog.ui.h:1
 #: ../dat/glade/editor/tileset-window.ui.h:21
-#, fuzzy
 msgid "Preview Tile"
 msgstr "Förhandsgranska ruta"
 
@@ -2491,12 +2463,11 @@ msgstr "Rutstils-ID:"
 
 #: ../dat/glade/editor/tileset-selector-editor-dialog.ui.h:1
 msgid "Selector Editor"
-msgstr ""
+msgstr "Redigerare för väljare"
 
 #: ../dat/glade/editor/tileset-selector-editor-dialog.ui.h:3
 #: ../dat/glade/editor/tileset-explosion-picture-editor-dialog.ui.h:3
 #: ../src/shieldstyle.cpp:85
-#, fuzzy
 msgid "Large"
 msgstr "Stor"
 
@@ -2555,7 +2526,6 @@ msgid "Tileset info"
 msgstr "Rutuppsättningsinfo"
 
 #: ../dat/glade/editor/tileset-window.ui.h:11
-#, fuzzy
 msgid "Army Unit Selector"
 msgstr "Arméenhetsväljare"
 
@@ -2588,7 +2558,6 @@ msgid "Organize TileStyles"
 msgstr "Organisera rutstilar"
 
 #: ../dat/glade/editor/tileset-window.ui.h:19
-#, fuzzy
 msgid "Mini-Map Building Colours"
 msgstr "Byggnadsfärger för minikarta"
 
@@ -2618,7 +2587,7 @@ msgstr "Ruta"
 
 #: ../dat/glade/editor/tileset-window.ui.h:33
 msgid "TileStyle Set Image"
-msgstr ""
+msgstr "Bild för rutstilsuppsättning"
 
 #: ../dat/glade/editor/tileset-window.ui.h:34
 #: ../dat/glade/editor/cityset-window.ui.h:24
@@ -2713,7 +2682,6 @@ msgstr "Tempelfärg"
 
 #: ../dat/glade/editor/cityset-window.ui.h:1
 #: ../src/editor/cityset-window.cpp:787
-#, fuzzy
 msgid "LordsAWar! Cityset Editor"
 msgstr "Stadsuppsättningsredigerare för LordsAWar!"
 
@@ -2826,13 +2794,12 @@ msgstr "Validera skölduppsättning"
 
 #: ../dat/glade/editor/shieldset-window.ui.h:10
 #: ../src/editor/shieldset-window.cpp:434
-#, fuzzy
 msgid "Edit Shieldset Information"
 msgstr "Redigera information för skölduppsättning"
 
 #: ../dat/glade/editor/shieldset-window.ui.h:11
 msgid "Copy White Shields Down"
-msgstr ""
+msgstr "Kopiera vita sköldar neråt"
 
 #: ../dat/glade/editor/shieldset-window.ui.h:14
 msgid "Small Shield Image"
@@ -2867,7 +2834,6 @@ msgid "Miniature Map Editor"
 msgstr "Redigerare för miniatyrkarta"
 
 #: ../dat/glade/editor/smallmap-editor-dialog.ui.h:3
-#, fuzzy
 msgid "Road Planner"
 msgstr "Vägplanerare"
 
@@ -2884,7 +2850,6 @@ msgid "Choose Point..."
 msgstr "Välj punkt…"
 
 #: ../dat/glade/editor/smallmap-editor-dialog.ui.h:8
-#, fuzzy
 msgid "Build Road"
 msgstr "Bygg väg"
 
@@ -2899,10 +2864,9 @@ msgstr "Var god vänta…"
 
 #: ../dat/glade/editor/fight-order-editor-dialog.ui.h:1
 msgid "Edit Fight Order"
-msgstr ""
+msgstr "Redigera stridsordning"
 
 #: ../dat/glade/editor/fight-order-editor-dialog.ui.h:3
-#, fuzzy
 msgid "Copy Order To All"
 msgstr "Kopiera ordning till alla"
 
@@ -2928,15 +2892,15 @@ msgstr "Försvarare"
 
 #: ../dat/glade/editor/battle-calculator-dialog.ui.h:12
 msgid "Fighting In City"
-msgstr ""
+msgstr "Strid i stad"
 
 #: ../dat/glade/editor/battle-calculator-dialog.ui.h:13
 msgid "Fighting on Terrain"
-msgstr ""
+msgstr "Strid i terräng"
 
 #: ../dat/glade/editor/battle-calculator-dialog.ui.h:14
 msgid "Fight"
-msgstr ""
+msgstr "Strid"
 
 #: ../dat/glade/editor/battle-calculator-dialog.ui.h:15
 msgid "Number of Sides on Die"
@@ -2944,11 +2908,11 @@ msgstr "Antal sidor på tärning"
 
 #: ../dat/glade/editor/battle-calculator-dialog.ui.h:16
 msgid "Fight x100"
-msgstr ""
+msgstr "Strid x100"
 
 #: ../dat/glade/editor/media-dialog.ui.h:1
 msgid "Scenario Media"
-msgstr ""
+msgstr "Scenariomedia"
 
 #: ../dat/glade/editor/media-dialog.ui.h:2
 msgid "Medals (Small)"
@@ -2957,7 +2921,7 @@ msgstr "Medaljer (små)"
 #: ../dat/glade/editor/media-dialog.ui.h:3 ../src/editor/media-dialog.cpp:101
 #: ../src/editor/media-dialog.cpp:109
 msgid "override default"
-msgstr ""
+msgstr "åsidosätt standard"
 
 #: ../dat/glade/editor/media-dialog.ui.h:4
 msgid "Medals (Big)"
@@ -2969,7 +2933,7 @@ msgstr "Stad erövrad"
 
 #: ../dat/glade/editor/media-dialog.ui.h:7
 msgid "Won Game"
-msgstr ""
+msgstr "Spel vunnet"
 
 #: ../dat/glade/editor/media-dialog.ui.h:8
 msgid "New Hero (Male)"
@@ -2988,22 +2952,18 @@ msgid "Hero Dies At Ruin"
 msgstr "Hjälte dör vid ruin"
 
 #: ../dat/glade/editor/media-dialog.ui.h:12
-#, fuzzy
 msgid "Hero Levels Up (Male)"
 msgstr "Hjälte går upp en nivå (Man)"
 
 #: ../dat/glade/editor/media-dialog.ui.h:13
-#, fuzzy
 msgid "Hero Levels Up (Female)"
 msgstr "Hjälte går upp en nivå (Kvinna)"
 
 #: ../dat/glade/editor/media-dialog.ui.h:14
-#, fuzzy
 msgid "Enemies Offer Parley"
 msgstr "Fiender erbjuder parlamentering"
 
 #: ../dat/glade/editor/media-dialog.ui.h:15
-#, fuzzy
 msgid "Enemy Parley Refused"
 msgstr "Fiendeparlamentering nekad"
 
@@ -3016,7 +2976,6 @@ msgid "Hero Arrives"
 msgstr "Hjälte anländer"
 
 #: ../dat/glade/editor/media-dialog.ui.h:19
-#, fuzzy
 msgid "Battle Ensuing"
 msgstr "Strid utbryter"
 
@@ -3056,7 +3015,6 @@ msgstr "Välj nästa stapel som kan förflytta sig."
 #: ../dat/glade/game-button-box-desktop.ui.h:3
 #: ../dat/glade/game-button-box-large-screen.ui.h:3
 #: ../dat/glade/game-button-box-netbook.ui.h:3
-#, fuzzy
 msgid "Finish moving this stack."
 msgstr "Slutför förflyttning för denna stapel."
 
@@ -3140,7 +3098,6 @@ msgid "The default cityset of LordsAWar"
 msgstr "Standardstadsuppsättningen för LordsAWar"
 
 #: ../dat/citysets/bigdefault/bigdefault.lwc.in.h:2
-#, fuzzy
 msgid "The doublesized default cityset of LordsAWar"
 msgstr "Standardstadsuppsättningen för LordsAWar med dubbel storlek"
 
@@ -3149,13 +3106,11 @@ msgid "The cityset that goes with the Dol scenario of LordsAWar"
 msgstr "Stadsuppsättningen som hör till Dol-scenariot i LordsAWar"
 
 #: ../dat/citysets/bigdol/bigdol.lwc.in.h:2
-#, fuzzy
 msgid "A doublesized cityset that goes with the Dol scenario of LordsAWar"
 msgstr "Stadsuppsättning med dubbel storlek som hör till Dol-scenariot i LordsAWar"
 
 #: ../dat/army/bigdefault/bigdefault.lwa.in.h:2
 #: ../dat/army/default/default.lwa.in.h:2
-#, fuzzy
 msgid "The default armyset of LordsAWar! Initally created by Sune Theodorsen of Fata Morgana in 2007 specifically for this game."
 msgstr "Standardarméuppsättningen för LordsAWar! som ursprungligen skapades av Sune Theodorsen från Fata Morgana i 2007 specifikt för detta spel."
 
@@ -3287,7 +3242,7 @@ msgstr "Demoner"
 #: ../dat/army/bigdefault/bigdefault.lwa.in.h:28
 #: ../dat/army/default/default.lwa.in.h:28
 msgid "Archons"
-msgstr ""
+msgstr "Arkonter"
 
 #: ../dat/army/bigdefault/bigdefault.lwa.in.h:29
 #: ../dat/army/default/default.lwa.in.h:29
@@ -3306,19 +3261,16 @@ msgstr "En rutuppsättning gjord av David Baumgart för LordsAWar"
 
 #: ../dat/tilesets/stark/stark.lwt.in.h:1
 #: ../dat/tilesets/bigstark/bigstark.lwt.in.h:1
-#, fuzzy
 msgid "Stark"
 msgstr "Bar"
 
 #: ../dat/tilesets/stark/stark.lwt.in.h:2
-#, fuzzy
 msgid "A stark and simple tileset"
 msgstr "En bar och enkel rutuppsättning"
 
 #: ../dat/tilesets/bigstark/bigstark.lwt.in.h:2
-#, fuzzy
 msgid "The doublesized stark tileset"
-msgstr "Bar rutuppsättning med dubbel storlek"
+msgstr "Den bara rutuppsättningen med dubbel storlek"
 
 #: ../dat/tilesets/wesnoth/wesnoth.lwt.in.h:1
 #: ../dat/tilesets/bigwesnoth/bigwesnoth.lwt.in.h:1
@@ -3330,7 +3282,6 @@ msgid "A tileset based on Wesnoth tileset"
 msgstr "En rutuppsättning baserad på Wesnoths rutuppsättning"
 
 #: ../dat/tilesets/bigwesnoth/bigwesnoth.lwt.in.h:2
-#, fuzzy
 msgid "The doublesized tileset based on Wesnoth tileset"
 msgstr "Rutuppsättningen med dubbel storlek baserad på Wesnoths rutuppsättning"
 
@@ -3422,7 +3373,6 @@ msgstr "Det måste finnas minst 2 städer i scenariot."
 #: ../src/editor/main-window.cpp:628 ../src/editor/tileset-info-dialog.cpp:59
 #: ../src/editor/tileset-window.cpp:777
 #: ../src/editor/shieldset-info-dialog.cpp:59 ../src/armyprotobase.cpp:40
-#, fuzzy
 msgid "Untitled"
 msgstr "Namnlös"
 
@@ -3562,7 +3512,6 @@ msgid "Turncoat"
 msgstr "Kappvändare"
 
 #: ../src/playerlist.cpp:319
-#, fuzzy
 msgid "Running Dog"
 msgstr "Lakej"
 
@@ -3581,11 +3530,11 @@ msgstr "Du har redan stulit %1 guldstycken."
 
 #: ../src/QPillageGold.cpp:80
 msgid "You have managed to sack and pillage %1 gold."
-msgstr ""
+msgstr "Du har lyckats skövla och röva %1 guld."
 
 #: ../src/QPillageGold.cpp:92
 msgid "You shall sack and pillage %1 gold from thy mighty foes."
-msgstr ""
+msgstr "Du ska skövla och röva %1 guld från dina mäktiga fiender."
 
 #: ../src/QCityOccupy.cpp:90 ../src/QCityRaze.cpp:89 ../src/QCitySack.cpp:90
 msgid "You aren't afraid of doing it, are you?"
@@ -3655,19 +3604,16 @@ msgid "Error!  Couldn't create cityset directory `%1'.  Exiting."
 msgstr "Fel! Det gick inte att skapa stadsuppsättningskatalogen ”%1”. Avslutar."
 
 #: ../src/game-server.cpp:481
-#, fuzzy
 msgid "%1 connected."
-msgstr "%1 ansluten."
+msgstr "%1 anslöt sig."
 
 #: ../src/game-server.cpp:494
-#, fuzzy
 msgid "%1 disconnected."
-msgstr "%1 frånkopplad."
+msgstr "%1 kopplades från."
 
 #: ../src/game-server.cpp:496
-#, fuzzy
 msgid "%1 disconnected"
-msgstr "%1 frånkopplad"
+msgstr "%1 kopplades från"
 
 #: ../src/MapGenerator.cpp:186
 msgid "flattening plains..."
@@ -3734,14 +3680,13 @@ msgid "You have managed to slaughter %1 armies."
 msgstr "Du har lyckats slakta %1 arméer."
 
 #: ../src/QEnemyArmies.cpp:140
-#, fuzzy
 msgid "You shall slaughter %1 armies of the treacherous %2."
 msgstr "Du ska slakta %1 arméer för den lömska %2."
 
 #. Initially give the first hero the player's standard.
 #: ../src/player.cpp:2479
 msgid "%1 Standard"
-msgstr ""
+msgstr "%1-baneret"
 
 #: ../src/player.cpp:2551
 msgid "Peace negotiated with %1."
@@ -3752,7 +3697,6 @@ msgid "War declared with %1."
 msgstr "Krig har förklarats med %1."
 
 #: ../src/maptile.cpp:252 ../src/maptile.cpp:262
-#, fuzzy
 msgid "None"
 msgstr "Ingen"
 
@@ -3837,7 +3781,6 @@ msgid "Item: %1"
 msgstr "Föremål: %1"
 
 #: ../src/reward.cpp:575
-#, fuzzy
 msgid "Site: %1"
 msgstr "Plats: %1"
 
@@ -3907,16 +3850,16 @@ msgstr "Invånarna är oregerliga!"
 
 #: ../src/gui/city-window.cpp:288
 msgid "%1t, then to %2"
-msgstr ""
+msgstr "%1o, sedan till %2"
 
+# Enheter går till lämnat baner
 #: ../src/gui/city-window.cpp:289 ../src/gui/report-dialog.cpp:386
-#, fuzzy
 msgid "Standard"
-msgstr "Standard"
+msgstr "Baner"
 
 #: ../src/gui/city-window.cpp:292 ../src/gui/destination-dialog.cpp:271
 msgid "%1t"
-msgstr ""
+msgstr "%1o"
 
 #: ../src/gui/city-window.cpp:433
 msgid "Rename City"
@@ -3939,7 +3882,6 @@ msgid "You won't be popular!"
 msgstr "Du kommer inte bli populär!"
 
 #: ../src/gui/preferences-dialog.cpp:65
-#, fuzzy
 msgid "Observe"
 msgstr "Observera"
 
@@ -3959,7 +3901,7 @@ msgstr "Dator"
 
 #: ../src/gui/preferences-dialog.cpp:73
 msgid "Networked"
-msgstr ""
+msgstr "Över nätverk"
 
 #: ../src/gui/quest-completed-dialog.cpp:48
 #: ../src/gui/quest-assigned-dialog.cpp:45
@@ -3984,7 +3926,6 @@ msgstr[0] "Du har belönats med %1 allierad."
 msgstr[1] "Du har belönats med %1 allierade."
 
 #: ../src/gui/quest-completed-dialog.cpp:80
-#, fuzzy
 msgid "You have been rewarded with the %1."
 msgstr "Du har belönats med %1."
 
@@ -3999,7 +3940,6 @@ msgstr "där mäktiga allierade kan hittas!"
 
 #: ../src/gui/quest-completed-dialog.cpp:96
 #: ../src/gui/ruin-rewarded-dialog.cpp:68
-#, fuzzy
 msgid "where the %1 can be found!"
 msgstr "där %1 kan hittas!"
 
@@ -4023,11 +3963,12 @@ msgstr "där guld kan hittas!"
 msgid "where something important can be found!"
 msgstr "där något viktigt kan hittas!"
 
+# TODO: 'a fate' for singular case.
 #: ../src/gui/triumphs-dialog.cpp:76
 msgid "%1 hero earned fates worthy of legend!"
 msgid_plural "%1 heroes earned fates worthy of legend!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 hjälte fick ett öde värt legender!"
+msgstr[1] "%1 hjältar fick öden värda legender!"
 
 #: ../src/gui/triumphs-dialog.cpp:81
 msgid "%1 so-called hero slaughtered without mercy!"
@@ -4038,50 +3979,50 @@ msgstr[1] "%1 så kallade hjältar slaktade utan nåd!"
 #: ../src/gui/triumphs-dialog.cpp:109
 msgid "%1 navy not currently in service!"
 msgid_plural "%1 navies not currently in service!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 flotta för tillfället ej i tjänst!"
+msgstr[1] "%1 flottor för tillfället ej i tjänst!"
 
 #: ../src/gui/triumphs-dialog.cpp:113
 msgid "%1 navy rests with the fishes!"
 msgid_plural "%1 navies rest with the fishes!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 flotta sover med fiskarna!"
+msgstr[1] "%1 flottor sover med fiskarna!"
 
 #: ../src/gui/triumphs-dialog.cpp:127
 msgid "%1 army died to ensure final victory!"
 msgid_plural "%1 armies died to ensure final victory!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 armé dog för att säkerställa slutgiltig seger!"
+msgstr[1] "%1 arméer dog för att säkerställa slutgiltig seger!"
 
 #: ../src/gui/triumphs-dialog.cpp:131
 msgid "%1 army smote like sheep!"
 msgid_plural "%1 armies smote like sheep!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 armé förgjord som får!"
+msgstr[1] "%1 arméer förgjorda som får!"
 
 #: ../src/gui/triumphs-dialog.cpp:146
 msgid "%1 unnatural creature returned from whence it came!"
 msgid_plural "%1 unnatural creatures returned from whence they came!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 onaturlig varelse återvände till var den kom från!"
+msgstr[1] "%1 onaturliga varelser återvände till var de kom från!"
 
 #: ../src/gui/triumphs-dialog.cpp:150
 msgid "%1 unnatural creature dispatched!"
 msgid_plural "%1 unnatural creatures dispatched!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 onaturlig varelse omhändertagen!"
+msgstr[1] "%1 onaturliga varelser omhändertagna!"
 
 #: ../src/gui/triumphs-dialog.cpp:175
 msgid "%1 standard betrayed by its guardian!"
 msgid_plural "%1 standards betrayed by its guardian!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 baner förrått av sin väktare!"
+msgstr[1] "%1 baner förrådda av sina väktare!"
 
 #: ../src/gui/triumphs-dialog.cpp:180
 msgid "%1 standard wrested from a vanquished foe!"
 msgid_plural "%1 standards wrested from a vanquished foe!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 baner taget från en besegrad fiende!"
+msgstr[1] "%1 baner tagna från besegrade fiender!"
 
 #. note to translators: %1 is ranged strength
 #. note to translators: %1 is melee strength
@@ -4094,19 +4035,16 @@ msgstr "Styrka: %1"
 
 #. note to translators: %1 is remaining moves, %2 is total moves
 #: ../src/gui/army-info-tip.cpp:92
-#, fuzzy
 msgid "Moves: %1/%2"
 msgstr "Steg: %1/%2"
 
 #: ../src/gui/army-info-tip.cpp:95 ../src/editor/select-army-dialog.cpp:174
-#, fuzzy
 msgid "Upkeep: %1"
 msgstr "Underhåll: %1"
 
 #. note to translators: %1 is total moves
 #: ../src/gui/army-info-tip.cpp:117 ../src/gui/army-gains-level-dialog.cpp:65
 #: ../src/editor/select-army-dialog.cpp:170
-#, fuzzy
 msgid "Moves: %1"
 msgstr "Steg: %1"
 
@@ -4115,13 +4053,11 @@ msgid "Time: %1"
 msgstr "Tid: %1"
 
 #: ../src/gui/army-info-tip.cpp:121 ../src/gui/army-info-tip.cpp:145
-#, fuzzy
 msgid "Cost: %1"
 msgstr "Kostnad: %1"
 
 #. note to translators: %1 is remaining moves, %2 is total moves
 #: ../src/gui/army-info-tip.cpp:141
-#, fuzzy
 msgid "Movement: %1"
 msgstr "Förflyttning: %1"
 
@@ -4131,12 +4067,12 @@ msgstr "Spel startat av %1"
 
 #: ../src/gui/destination-dialog.cpp:203 ../src/gui/destination-dialog.cpp:214
 msgid "+%1t to arrive at %2"
-msgstr ""
+msgstr "+%1o för att anlända vid %2"
 
+# NOTE: "standard" is the hero's flag that can be vectored to.
 #: ../src/gui/destination-dialog.cpp:204 ../src/gui/destination-dialog.cpp:216
-#, fuzzy
 msgid "standard"
-msgstr "standard"
+msgstr "baner"
 
 #: ../src/gui/army-bonus-dialog.cpp:40 ../src/gui/hero-levels-dialog.cpp:46
 #: ../src/gui/stack-info-dialog.cpp:196
@@ -4145,9 +4081,8 @@ msgstr "Sty"
 
 #: ../src/gui/army-bonus-dialog.cpp:41 ../src/gui/hero-levels-dialog.cpp:47
 #: ../src/gui/stack-info-dialog.cpp:200
-#, fuzzy
 msgid "Move"
-msgstr "Flytta"
+msgstr "Steg"
 
 #: ../src/gui/army-bonus-dialog.cpp:43 ../src/gui/stack-info-dialog.cpp:204
 #: ../src/gui/item-bonus-dialog.cpp:39
@@ -4187,7 +4122,6 @@ msgid "Gold History"
 msgstr "Guldhistorik"
 
 #: ../src/gui/history-report-dialog.cpp:381
-#, fuzzy
 msgid "Winner History"
 msgstr "Vinnarhistorik"
 
@@ -4223,96 +4157,80 @@ msgstr[0] "Vid omgång %1 hade du utforskat %2 ruin!"
 msgstr[1] "Vid omgång %1 hade du utforskat %2 ruiner!"
 
 #: ../src/gui/history-report-dialog.cpp:488
-#, fuzzy
 msgid "On turn %1 you are coming %2!"
 msgstr "Vid omgång %1 ligger du %2!"
 
 #: ../src/gui/history-report-dialog.cpp:490
-#, fuzzy
 msgid "On turn %1 you were coming %2!"
 msgstr "Vid omgång %1 låg du %2!"
 
 #: ../src/gui/history-report-dialog.cpp:517
 msgid "%1 %2 finds a sage!"
-msgstr ""
+msgstr "%1 %2 hittar en siare!"
 
 #: ../src/gui/history-report-dialog.cpp:525
-#, fuzzy
 msgid "%1 %2 emerges in %3"
 msgstr "%1 %2 dyker upp i %3"
 
 #: ../src/gui/history-report-dialog.cpp:533
-#, fuzzy
 msgid "%1 %2 begins a quest!"
 msgstr "%1 %2 påbörjar ett uppdrag!"
 
 #: ../src/gui/history-report-dialog.cpp:541
-#, fuzzy
 msgid "%1 %2 finishes a quest!"
 msgstr "%1 %2 slutför ett uppdrag!"
 
 #: ../src/gui/history-report-dialog.cpp:549
-#, fuzzy
 msgid "%1 %2 is killed in %3!"
 msgstr "%1 %2 dödas i %3!"
 
 #: ../src/gui/history-report-dialog.cpp:557
-#, fuzzy
 msgid "%1 %2 is killed in battle!"
 msgstr "%1 %2 dödas i strid!"
 
 #: ../src/gui/history-report-dialog.cpp:565
-#, fuzzy
 msgid "%1 %2 is killed while searching!"
 msgstr "%1 %2 dödas under sökning!"
 
 #: ../src/gui/history-report-dialog.cpp:573
-#, fuzzy
 msgid "%1 %2 conquers %3!"
 msgstr "%1 %2 erövrar %3!"
 
 #: ../src/gui/history-report-dialog.cpp:579
-#, fuzzy
 msgid "%1 %2 utterly vanquished!"
 msgstr "%1 %2 totalt utplånad!"
 
 #: ../src/gui/history-report-dialog.cpp:588
-#, fuzzy
 msgid "%1 %2 at peace with %3 %4!"
 msgstr "%1 %2 i fred med %3 %4!"
 
 #: ../src/gui/history-report-dialog.cpp:599
-#, fuzzy
 msgid "%1 %2 at war with %3 %4!"
 msgstr "%1 %2 i krig med %3 %4!"
 
 #: ../src/gui/history-report-dialog.cpp:610
 msgid "%1 Treachery on %2 %3!"
-msgstr ""
+msgstr "%1 Förräderi mot %2 %3!"
 
 #: ../src/gui/history-report-dialog.cpp:619
-#, fuzzy
 msgid "%1 %2 finds allies!"
 msgstr "%1 %2 hittar allierade!"
 
 #: ../src/gui/history-report-dialog.cpp:628
-#, fuzzy
 msgid "%1 %2 explores %3!"
 msgstr "%1 %2 utforskar %3!"
 
 #: ../src/gui/history-report-dialog.cpp:639
-#, fuzzy
 msgid "%1 %2 uses the %3 against %4 %5!"
 msgstr "%1 %2 använder %3 mot %4 %5!"
 
 #: ../src/gui/history-report-dialog.cpp:644
-#, fuzzy
 msgid "%1 %2 uses the %3!"
 msgstr "%1 %2 använder %3!"
 
 #: ../src/gui/sage-dialog.cpp:61 ../src/gui/ruin-rewarded-dialog.cpp:49
 msgid "A Sage!"
-msgstr ""
+msgstr "En siare!"
 
 #: ../src/gui/hero-dialog.cpp:113 ../src/editor/backpack-editor-dialog.cpp:50
 msgid "Attributes"
@@ -4324,10 +4242,9 @@ msgstr "Status"
 
 #: ../src/gui/hero-dialog.cpp:142
 msgid "%1 finds a sage!"
-msgstr ""
+msgstr "%1 hittar en siare!"
 
 #: ../src/gui/hero-dialog.cpp:148
-#, fuzzy
 msgid "%1 emerges in %2!"
 msgstr "%1 dyker upp i %2!"
 
@@ -4348,7 +4265,6 @@ msgid "%1 is killed in battle!"
 msgstr "%1 dödas i strid!"
 
 #: ../src/gui/hero-dialog.cpp:180
-#, fuzzy
 msgid "%1 is killed while searching!"
 msgstr "%1 dödas under sökning!"
 
@@ -4379,7 +4295,6 @@ msgid "Choose Game to Load"
 msgstr "Välj spel att läsa in"
 
 #: ../src/gui/game-window.cpp:770 ../src/gui/game-window.cpp:818
-#, fuzzy
 msgid "Army Saved Games (*.sav)"
 msgstr "Sparade arméspel (*.sav)"
 
@@ -4420,7 +4335,7 @@ msgstr "Är du säker på att du vill avgå?"
 
 #: ../src/gui/game-window.cpp:1189
 msgid "No ruins or temples to show!"
-msgstr "Inga ruiner eller tempel att visa"
+msgstr "Inga ruiner eller tempel att visa!"
 
 #: ../src/gui/game-window.cpp:1399
 msgid "Congratulations to %1 for conquering the world!"
@@ -4439,7 +4354,6 @@ msgstr ""
 "möjligt men slaget fortsätter!"
 
 #: ../src/gui/game-window.cpp:1422
-#, fuzzy
 msgid ""
 "Press `CTRL-P' to stop the war\n"
 "and visit the sites of thy old battles."
@@ -4464,24 +4378,20 @@ msgid "%1 finds %2 allies!"
 msgstr "%1 hittar %2 allierade!"
 
 #: ../src/gui/game-window.cpp:1654
-#, fuzzy
 msgid "%1 is given the %2!"
 msgstr "%1 får %2!"
 
 #: ../src/gui/game-window.cpp:1657
-#, fuzzy
 msgid "%1 finds the %2!"
 msgstr "%1 hittar %2!"
 
 #: ../src/gui/game-window.cpp:1665
-#, fuzzy
 msgid "%1 is given a %2!"
-msgstr "%1 får %2!"
+msgstr "%1 får en %2!"
 
 #: ../src/gui/game-window.cpp:1667
-#, fuzzy
 msgid "%1 finds a %2!"
-msgstr "%1 hittar %2!"
+msgstr "%1 hittar en %2!"
 
 #. so and so encounters a wolf...
 #: ../src/gui/game-window.cpp:1683
@@ -4489,19 +4399,16 @@ msgid "Searching"
 msgstr "Söker"
 
 #: ../src/gui/game-window.cpp:1689
-#, fuzzy
 msgid "%1 encounters some %2..."
-msgstr "%1 stöter på %2…"
+msgstr "%1 stöter på några %2…"
 
 #: ../src/gui/game-window.cpp:1701
-#, fuzzy
 msgid "Hero Victorious"
-msgstr "Hjälte segrande"
+msgstr "Hjälten segrade"
 
 #: ../src/gui/game-window.cpp:1703
-#, fuzzy
 msgid "Hero Defeated"
-msgstr "Hjälte besegrad"
+msgstr "Hjälten besegrades"
 
 #: ../src/gui/game-window.cpp:1710
 msgid "...and is victorious!"
@@ -4573,18 +4480,17 @@ msgstr "%1, du har dräpt fienden i slaget om %2."
 
 #: ../src/gui/game-window.cpp:2126
 msgid "%1 Looted"
-msgstr ""
+msgstr "%1 plundrat"
 
 #: ../src/gui/game-window.cpp:2133
 msgid "Your armies loot %1 gold piece."
 msgid_plural "Your armies loot %1 gold pieces."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Dina arméer plundrar %1 guldstycke."
+msgstr[1] "Dina arméer plundrar %1 guldstycken."
 
 #: ../src/gui/game-window.cpp:2146
-#, fuzzy
 msgid "Pillaged %1"
-msgstr "Plundrade %1"
+msgstr "Rövade %1"
 
 #: ../src/gui/game-window.cpp:2173
 msgid "The loot is worth %1 gold piece."
@@ -4594,7 +4500,7 @@ msgstr[1] "Krigsbytet är värt %1 guldstycken."
 
 #: ../src/gui/game-window.cpp:2188
 msgid "Sacked %1"
-msgstr ""
+msgstr "Skövlade %1"
 
 #: ../src/gui/game-window.cpp:2194
 msgid ""
@@ -4602,6 +4508,9 @@ msgid ""
 "for %2 gold!\n"
 "\n"
 msgstr ""
+"Staden %1 skövlas\n"
+"för %2 guld!\n"
+"\n"
 
 #: ../src/gui/game-window.cpp:2197
 msgid ""
@@ -4611,10 +4520,13 @@ msgid_plural ""
 "Ability to produce %1 units has been lost\n"
 "and only 1 unit remains"
 msgstr[0] ""
+"Förmåga att producera %1 enhet har förlorats\n"
+"och endast 1 enhet återstår"
 msgstr[1] ""
+"Förmåga att producera %1 enheter har förlorats\n"
+"och endast 1 enhet återstår"
 
 #: ../src/gui/game-window.cpp:2244
-#, fuzzy
 msgid "%1 gp"
 msgstr "%1 guld"
 
@@ -4631,29 +4543,26 @@ msgid ""
 "%1\n"
 "Turn %2"
 msgstr ""
+"%1\n"
+"Omgång %2"
 
 #: ../src/gui/game-window.cpp:2399
-#, fuzzy
 msgid "Your unit of %1 is awarded the avenger's medal of valour!"
-msgstr "Din enhet %1 tilldelas hämnarens djärvhetsmedalj!"
+msgstr "Din enhet av %1 tilldelas hämnarens djärvhetsmedalj!"
 
 #: ../src/gui/game-window.cpp:2401
-#, fuzzy
 msgid "Your unit of %1 is awarded the defender's medal of bravery!"
-msgstr "Din enhet %1 tilldelas försvararens tapperhetsmedalj!"
+msgstr "Din enhet av %1 tilldelas försvararens tapperhetsmedalj!"
 
 #: ../src/gui/game-window.cpp:2403
-#, fuzzy
 msgid "Your unit of %1 is awarded the veteran's medal!"
-msgstr "Din enhet %1 tilldelas veteranens medalj!"
+msgstr "Din enhet av %1 tilldelas veteranens medalj!"
 
 #: ../src/gui/game-window.cpp:2405
-#, fuzzy
 msgid "Your unit of %1 is awarded a medal!"
-msgstr "Din enhet %1 tilldelas en medalj!"
+msgstr "Din enhet av %1 tilldelas en medalj!"
 
 #: ../src/gui/game-window.cpp:2424
-#, fuzzy
 msgid "%1, your turn continues."
 msgstr "%1, din omgång fortsätter."
 
@@ -4932,14 +4841,14 @@ msgstr "Krigsherren säger…"
 #: ../src/gui/game-window.cpp:2818
 msgid "%1 gold piece was stolen from %2!"
 msgid_plural "%1 gold pieces were stolen from %2!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 guldstycke stals från %2!"
+msgstr[1] "%1 guldstycken stals från %2!"
 
 #: ../src/gui/game-window.cpp:2829
 msgid "%1 army unit was sunk to the watery depths!"
 msgid_plural "%1 army units were sunk to the watery depths!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 arméenhet sjönk till havets botten!"
+msgstr[1] "%1 arméenheter sjönk till havets botten!"
 
 #: ../src/gui/game-window.cpp:2840
 msgid "%1 bag was retrieved by %2!"
@@ -4953,62 +4862,61 @@ msgstr "%1 har bränt en bro! Ingen skall passera denna väg igen!"
 
 #: ../src/gui/game-window.cpp:2860
 msgid "%1 has turned a unit of %2 from %3!"
-msgstr ""
+msgstr "%1 har omvänt en enhet av %2 från %3!"
 
 #: ../src/gui/game-window.cpp:2870
 msgid "%1 unit in %2 have perished!"
 msgid_plural "%1 units in %2 have perished!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 enhet i %2 har gått under!"
+msgstr[1] "%1 enheter i %2 har gått under!"
 
+# TODO: "has been raised" for singular case.
 #: ../src/gui/game-window.cpp:2881
 msgid "%1 unit of %2 have been raised in %3!"
 msgid_plural "%1 units of %2 have been raised in %3!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 enhet av %2 har återupplivats i %3!"
+msgstr[1] "%1 enheter av %2 har återupplivats i %3!"
 
+# TODO: "has been" for singular case.
 #: ../src/gui/game-window.cpp:2896
 msgid "%1 unit in %2 have been persuaded to fly your flag!"
 msgid_plural "%1 units in %2 have been persuaded to fly your flag!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 enhet i %2 har övertalats att resa din flagga!"
+msgstr[1] "%1 enheter i %2 har övertalats att resa din flagga!"
 
 #: ../src/gui/game-window.cpp:2902
 msgid "The citizens of %1 have been persuaded to fly your flag!"
 msgstr "Invånarna i %1 har övertalats att resa din flagga!"
 
 #: ../src/gui/game-window.cpp:2911
-#, fuzzy
 msgid "%1 has teleported to %2!"
 msgstr "%1 har teleporterat till %2!"
 
 #: ../src/gui/game-window.cpp:2922
 msgid "A unit of %1 has come to the aid of %2!"
-msgstr ""
+msgstr "En enhet av %1 har kommit för att hjälpa %2!"
 
 #: ../src/gui/game-window.cpp:2931
 msgid "%1 unit of %2 was banished by %3!"
 msgid_plural "%1 units of %2 were banished by %3!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 enhet av %2 bannlystes av %3!"
+msgstr[1] "%1 enheter av %2 bannlystes av %3!"
 
 #: ../src/gui/game-window.cpp:2942
 msgid "%1 movement point was added to %2 and accompanying units!"
 msgid_plural "%1 movement points were added to %2 and accompanying units!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 förflyttningspoäng lades till för %2 och medföljande enheter!"
+msgstr[1] "%1 förflyttningspoäng lades till för %2 och medföljande enheter!"
 
 #: ../src/gui/game-window.cpp:2962
 msgid "Info..."
 msgstr "Info…"
 
 #: ../src/gui/game-window.cpp:2987
-#, fuzzy
 msgid "Travel Along Path"
 msgstr "Res längs stig"
 
 #: ../src/gui/game-window.cpp:3002
-#, fuzzy
 msgid "Defend"
 msgstr "Försvara"
 
@@ -5034,30 +4942,28 @@ msgid "LordsAWar Maps (*.map)"
 msgstr "LordsAWar-kartor (*.map)"
 
 #: ../src/gui/diplomacy-dialog.cpp:141
-#, fuzzy
 msgid "Propose peace"
 msgstr "Föreslå fred"
 
 #: ../src/gui/diplomacy-dialog.cpp:159
 msgid "Propose war on armies not in cities"
-msgstr ""
+msgstr "Föreslå krig mot arméer inte i städer"
 
 #: ../src/gui/diplomacy-dialog.cpp:178
 msgid "Propose war"
-msgstr ""
+msgstr "Föreslå krig"
 
 #: ../src/gui/driver.cpp:630
-#, fuzzy
 msgid ""
 "Could not connect to gamehost server:\n"
 "%1:%2"
 msgstr ""
-"Det gick inte att ansluta till värdserver:\n"
+"Det gick inte att ansluta till spelvärdsserver:\n"
 "%1:%2"
 
 #: ../src/gui/driver.cpp:651 ../src/gui/driver.cpp:682
 msgid "Gamehost Server Error: %1"
-msgstr ""
+msgstr "Spelvärdsserverfel: %1"
 
 #: ../src/gui/driver.cpp:653 ../src/gui/driver.cpp:684
 #: ../src/gui/driver.cpp:1377
@@ -5065,7 +4971,6 @@ msgid "Server Failure"
 msgstr "Serverfel"
 
 #: ../src/gui/driver.cpp:662
-#, fuzzy
 msgid "Uploading."
 msgstr "Skickar upp."
 
@@ -5074,9 +4979,8 @@ msgid "Server went away."
 msgstr "Servern försvann."
 
 #: ../src/gui/driver.cpp:813
-#, fuzzy
 msgid "Disconnected"
-msgstr "Kopplades från"
+msgstr "Frånkopplad"
 
 #: ../src/gui/driver.cpp:830
 msgid ""
@@ -5096,11 +5000,11 @@ msgstr ""
 
 #: ../src/gui/driver.cpp:1375
 msgid "Could not bind to port %1"
-msgstr ""
+msgstr "Det gick inte att binda till port %1"
 
 #: ../src/gui/hero-levels-dialog.cpp:44
 msgid "Exp"
-msgstr ""
+msgstr "Erf"
 
 # XP needed for next level
 #: ../src/gui/hero-levels-dialog.cpp:45
@@ -5109,11 +5013,11 @@ msgstr "Kvar"
 
 #: ../src/gui/ruin-rewarded-dialog.cpp:60
 msgid "The sages show thee the site of %1\n"
-msgstr ""
+msgstr "Siarna visar dig platsen %1\n"
 
 #: ../src/gui/ruin-rewarded-dialog.cpp:73
 msgid "where the location of a special place can be found!"
-msgstr ""
+msgstr "där positionen för en speciell plats kan hittas!"
 
 #: ../src/gui/surrender-refused-dialog.cpp:35
 msgid "Off with their heads!  I want it ALL!"
@@ -5139,7 +5043,6 @@ msgid "Stronghold"
 msgstr "Befästning"
 
 #: ../src/gui/ruin-report-dialog.cpp:135
-#, fuzzy
 msgid "It is especially well-guarded."
 msgstr "Det är speciellt välbevakat."
 
@@ -5210,9 +5113,8 @@ msgid "Production Report"
 msgstr "Produktionsrapport"
 
 #: ../src/gui/report-dialog.cpp:199
-#, fuzzy
 msgid "Winning Report"
-msgstr "Vinstrapport"
+msgstr "Vinnarrapport"
 
 #: ../src/gui/report-dialog.cpp:225
 msgid "You have %1 army!"
@@ -5281,7 +5183,6 @@ msgid "Choose an attribute to improve:"
 msgstr "Välj ett attribut att förbättra:"
 
 #: ../src/gui/army-gains-level-dialog.cpp:67
-#, fuzzy
 msgid "Sight: %1"
 msgstr "Sikt: %1"
 
@@ -5300,27 +5201,22 @@ msgid "A hero in %1 wants to join you!"
 msgstr "En hjälte i %1 vill ansluta sig till dig!"
 
 #: ../src/gui/new-random-map-dialog.cpp:503
-#, fuzzy
 msgid "Autogenerated"
 msgstr "Autogenererad"
 
 #: ../src/gui/use-item-on-city-dialog.cpp:55
-#, fuzzy
 msgid "Select a city to target."
 msgstr "Välj en stad som mål."
 
 #: ../src/gui/use-item-on-city-dialog.cpp:58
-#, fuzzy
 msgid "Select one of your cities to target."
 msgstr "Välj en av dina städer som mål."
 
 #: ../src/gui/use-item-on-city-dialog.cpp:61
-#, fuzzy
 msgid "Select an enemy city to target."
 msgstr "Välj en fiendestad som mål."
 
 #: ../src/gui/use-item-on-city-dialog.cpp:64
-#, fuzzy
 msgid "Select a neutral city to target."
 msgstr "Välj en neutral stad som mål."
 
@@ -5367,7 +5263,7 @@ msgstr "%1 ligger åt %2"
 
 #: ../src/CreateScenarioRandomize.cpp:194
 msgid "The Sirians"
-msgstr ""
+msgstr "Sirianerna"
 
 #: ../src/CreateScenarioRandomize.cpp:197
 msgid "Elvallie"
@@ -5379,7 +5275,7 @@ msgstr "Stormjättar"
 
 #: ../src/CreateScenarioRandomize.cpp:203
 msgid "Horse Lords"
-msgstr ""
+msgstr "Hästherrar"
 
 #: ../src/CreateScenarioRandomize.cpp:206
 msgid "Grey Dwarves"
@@ -5395,7 +5291,7 @@ msgstr "Kors orcher"
 
 #: ../src/CreateScenarioRandomize.cpp:215
 msgid "Lord Bane"
-msgstr ""
+msgstr "Lord Bane"
 
 #: ../src/CreateScenarioRandomize.cpp:218
 msgid "Neutrals"
@@ -5411,7 +5307,6 @@ msgstr "Ingen armétyp vald"
 #: ../src/editor/cityset-info-dialog.cpp:55
 #: ../src/editor/tileset-info-dialog.cpp:56
 #: ../src/editor/shieldset-info-dialog.cpp:56
-#, fuzzy
 msgid "untitled"
 msgstr "namnlös"
 
@@ -5451,7 +5346,7 @@ msgstr "Det måste finnas minst en hjälte i arméuppsättningen."
 
 #: ../src/editor/armyset-window.cpp:524
 msgid "There must be at least one army unit with a production cost of more than zero."
-msgstr "Det måste finnas minst en arméenhet med en produktionskostnade större än noll."
+msgstr "Det måste finnas minst en arméenhet med en produktionskostnad större än noll."
 
 # TODO: that?
 #: ../src/editor/armyset-window.cpp:527
@@ -5460,7 +5355,6 @@ msgstr "Det måste finnas minst en arméenhet som kan försvara en ruin."
 
 # TODO: that?
 #: ../src/editor/armyset-window.cpp:530
-#, fuzzy
 msgid "There must be at least one army unit than can be awarded to a hero."
 msgstr "Det måste finnas minst en arméenhet som kan ges som belöning till en hjälte."
 
@@ -5470,14 +5364,14 @@ msgstr "Skeppsbilden måste vara inställd."
 
 #: ../src/editor/armyset-window.cpp:536
 msgid "The hero's standard (the flag) image must be set."
-msgstr ""
+msgstr "Bilden för hjältens baner (flaggan) måste vara inställd."
 
 #: ../src/editor/armyset-window.cpp:539
 msgid "The picture for the bag of items must be set."
 msgstr "Bilden för föremålssäcken måste ställas in."
 
+# TODO: kanske colourToFriendlyName snarare än colourToString?
 #: ../src/editor/armyset-window.cpp:547
-#, fuzzy
 msgid "%1 does not have an image set for the %2 player"
 msgstr "%1 har inte en bild inställd för spelaren %2"
 
@@ -5500,7 +5394,7 @@ msgstr "Fel! Arméuppsättningen kunde inte sparas."
 
 #: ../src/editor/armyset-window.cpp:651
 msgid "Armyset is invalid, and is also the current working armyset."
-msgstr ""
+msgstr "Arméuppsättning är ogiltig, och är också den aktuellt använda armeuppsättningen."
 
 #: ../src/editor/armyset-window.cpp:712
 msgid "Select a Ship image"
@@ -5518,10 +5412,10 @@ msgstr "Välj en säckbild"
 msgid "Edit Armyset Information"
 msgstr "Redigera information för arméuppsättning"
 
+# %1 är en färg
 #: ../src/editor/armyset-window.cpp:1005
-#, fuzzy
 msgid "Select a %1 Army image"
-msgstr "Välj en %1-armébild"
+msgstr "Välj en %1 armébild"
 
 #: ../src/editor/armyset-window.cpp:1446
 msgid "Error!  The version of the armyset is unsupported."
@@ -5604,7 +5498,7 @@ msgstr "Fel! Stadsuppsättningen kunde inte sparas."
 
 #: ../src/editor/cityset-window.cpp:392
 msgid "Cityset is invalid, and is also the current working cityset."
-msgstr ""
+msgstr "Stadsuppsättning är ogiltig, och är också den aktuellt använda stadsuppsättningen."
 
 #: ../src/editor/cityset-window.cpp:485
 msgid "Error!  The version of cityset is unsupported."
@@ -5651,7 +5545,6 @@ msgid "Choose Map to Load"
 msgstr "Välj karta att läsa in"
 
 #: ../src/editor/main-window.cpp:871
-#, fuzzy
 msgid "Could not load map %1."
 msgstr "Kunde inte läsa in kartan %1."
 
@@ -5660,7 +5553,6 @@ msgid "Map was not saved!"
 msgstr "Kartan sparades inte!"
 
 #: ../src/editor/main-window.cpp:1174
-#, fuzzy
 msgid "Auto"
 msgstr "Auto"
 
@@ -5682,7 +5574,6 @@ msgid "Choose Game to Load Map from"
 msgstr "Välj spel att läsa in karta från"
 
 #: ../src/editor/main-window.cpp:1793
-#, fuzzy
 msgid "Could not load game %1."
 msgstr "Kunde inte läsa in spelet %1."
 
@@ -5701,17 +5592,14 @@ msgstr[1] ""
 "Är du säker?"
 
 #: ../src/editor/main-window.cpp:2004
-#, fuzzy
 msgid "Set as attacking stack"
 msgstr "Ställ in som attackerande stapel"
 
 #: ../src/editor/main-window.cpp:2012
-#, fuzzy
 msgid "Set as defending stack"
 msgstr "Ställ in som försvarande stapel"
 
 #: ../src/editor/main-window.cpp:2020
-#, fuzzy
 msgid "Append to defenders"
 msgstr "Lägg till bland försvarare"
 
@@ -5813,23 +5701,23 @@ msgstr "Okänd"
 
 #: ../src/editor/tileset-window.cpp:109
 msgid "Solid"
-msgstr ""
+msgstr "Enfärgad"
 
 #: ../src/editor/tileset-window.cpp:110
 msgid "Stippled"
-msgstr ""
+msgstr "Prickig"
 
 #: ../src/editor/tileset-window.cpp:111
 msgid "Randomized"
-msgstr ""
+msgstr "Slumpmässig"
 
 #: ../src/editor/tileset-window.cpp:112
 msgid "Sunken"
-msgstr ""
+msgstr "Nedsänkt"
 
 #: ../src/editor/tileset-window.cpp:113
 msgid "Tablecloth"
-msgstr ""
+msgstr "Bordsduk"
 
 #: ../src/editor/tileset-window.cpp:114
 msgid "Diagonal"
@@ -5837,15 +5725,15 @@ msgstr "Diagonal"
 
 #: ../src/editor/tileset-window.cpp:115
 msgid "Crosshatched"
-msgstr ""
+msgstr "Korsskuggad"
 
 #: ../src/editor/tileset-window.cpp:116
 msgid "Sunken Striped"
-msgstr ""
+msgstr "Nedsänkt randig"
 
 #: ../src/editor/tileset-window.cpp:117
 msgid "Sunken Radial"
-msgstr ""
+msgstr "Nedsänkt strålformad"
 
 #: ../src/editor/tileset-window.cpp:431
 msgid "Make a New Tileset"
@@ -5870,7 +5758,7 @@ msgstr "Fel! Rutuppsättningen kunde inte sparas."
 
 #: ../src/editor/tileset-window.cpp:587
 msgid "Tileset is invalid, and is also the current working tileset."
-msgstr ""
+msgstr "Rutuppsättning är ogiltig, och är också den aktuellt använda rutuppsättningen."
 
 #: ../src/editor/tileset-window.cpp:999
 msgid "Choose an Image"
@@ -5938,27 +5826,25 @@ msgstr "Det måste finnas en träskruta i rutuppsättningen."
 
 #: ../src/editor/tileset-window.cpp:1472
 msgid "There must be at least one tilestyleset in the %1 tile."
-msgstr ""
+msgstr "Det måste finnas minst en rutstilsuppsättning i rutan %1."
 
 #: ../src/editor/tileset-window.cpp:1476
-#, fuzzy
 msgid "The image %1.png file of the %2 tile does not have a width as a multiple of its height."
 msgstr "Bilden %1.png för rutan %2 har inte en bredd som en multipel av sin höjd."
 
 #: ../src/editor/tileset-window.cpp:1488 ../src/editor/tileset-window.cpp:1495
 msgid "The %1 tile does not have enough of the right kind of tile styles."
-msgstr ""
+msgstr "Rutan %1 har inte tillräckligt av rätt sorts rutstilar."
 
 #: ../src/editor/tileset-window.cpp:1501
 msgid "Only one tile can have a sunken radial pattern."
-msgstr ""
+msgstr "Endast en ruta kan ha ett nedsänkt strålformat mönster."
 
 #: ../src/editor/tileset-window.cpp:1509
 msgid "The tileset is valid."
 msgstr "Rutuppsättningen är giltig."
 
 #: ../src/editor/tilestyle-organizer-dialog.cpp:212
-#, fuzzy
 msgid "(%1 items)"
 msgstr "(%1 objekt)"
 
@@ -6034,7 +5920,7 @@ msgstr "Fel! Skölduppsättningen kunde inte sparas."
 
 #: ../src/editor/shieldset-window.cpp:388
 msgid "Shieldset is invalid, and is also the current working shieldset."
-msgstr ""
+msgstr "Skölduppsättning är ogiltig, och är också den aktuellt använda skölduppsättningen."
 
 #: ../src/editor/shieldset-window.cpp:589
 msgid "Error!  The version of the shieldset is not supported."
@@ -6044,10 +5930,10 @@ msgstr "Fel! Skölduppsättningens version stöds inte."
 msgid "Error!  Shieldset could not be loaded."
 msgstr "Fel! Skölduppsättningen kunde inte läsas in."
 
+# Ex: Välj en Liten Vit sköldbild
 #: ../src/editor/shieldset-window.cpp:764
-#, fuzzy
 msgid "Choose a %1 %2 Shield image"
-msgstr "Välj en %1 %2-sköldbild"
+msgstr "Välj en %1 %2 sköldbild"
 
 #: ../src/editor/tile-size-editor-dialog.cpp:33
 msgid "Do you want to change the tile size from %1 to %2?"
@@ -6072,7 +5958,7 @@ msgstr "Läser in skölduppsättningar"
 #: ../src/editor/battle-calculator-dialog.cpp:81
 #: ../src/editor/battle-calculator-dialog.cpp:96
 msgid "Augmented Str"
-msgstr ""
+msgstr "Modifierad sty"
 
 #: ../src/editor/battle-calculator-dialog.cpp:82
 #: ../src/editor/battle-calculator-dialog.cpp:97
@@ -6148,7 +6034,6 @@ msgstr "Importerar %1 ruiner & tempel."
 
 # TODO:unknown
 #: ../src/utils/import.cpp:706
-#, fuzzy
 msgid "Error: We got an unknkown temple/ruin type of %1 for %2 at %3,%4"
 msgstr "Fel: Vi fick en okänd tempel-/ruintyp %1 för %2 vid %3,%4"
 
@@ -6177,41 +6062,37 @@ msgid "An armyset called %1 converted by lordsawar-import %2."
 msgstr "En arméuppsättning med namnet %1 konverterades av lordsawar-import %2."
 
 #: ../src/utils/import.cpp:1102
-#, fuzzy
 msgid "Warning: unrecognized city bonus of %1 for %2"
 msgstr "Varning: okänd stadsbonus %1 för %2"
 
 #: ../src/utils/import.cpp:1113
-#, fuzzy
 msgid "Warning: unrecognized open bonus of %1 for %2"
 msgstr "Varning: okänd öppen terräng-bonus %1 för %2"
 
 #: ../src/utils/import.cpp:1124
-#, fuzzy
 msgid "Warning: unrecognized forest bonus of %1 for %2"
 msgstr "Varning: okänd skogsbonus %1 för %2"
 
 #: ../src/utils/import.cpp:1135
-#, fuzzy
 msgid "Warning: unrecognized hills bonus of %1 for %2"
 msgstr "Varning: okänd kullbonus %1 för %2"
 
 #: ../src/utils/import.cpp:1149
-#, fuzzy
 msgid "Warning: unrecognized enemy minus bonus of %1 for %2"
 msgstr "Varning: okänd ”fiende minus”-bonus %1 för %2"
 
 #: ../src/utils/import.cpp:1161
 msgid "Warning: unrecognized cancel bonus of %1 for %2"
-msgstr ""
+msgstr "Varning: okänd bonusupphävning %1 för %2"
 
+# osäker
 #: ../src/utils/import.cpp:1172
 msgid "Warning: unrecognized city plus flag of %1 for %2"
-msgstr ""
+msgstr "Varning: okänd stad plus flagga %1 för %2"
 
 #: ../src/utils/import.cpp:1191
 msgid "Warning: unrecognized ally flag of %1 for %2"
-msgstr ""
+msgstr "Varning: okänd allierad flagga %1 för %2"
 
 #: ../src/utils/import.cpp:1298
 msgid "Warning: no army file found.  Using default armyset."
@@ -6277,7 +6158,7 @@ msgstr "Fel: Det gick inte att hitta en .RD-fil i ”%1”"
 
 #: ../src/utils/import.cpp:1482
 msgid "Error: Could not find a .SGN file in `%1'"
-msgstr "Fel: Det gick inte att hitta en .RGN-fil i ”%1”"
+msgstr "Fel: Det gick inte att hitta en .SGN-fil i ”%1”"
 
 #: ../src/utils/import.cpp:1488
 msgid "Error: Could not find a .ITM file in `%1'"
@@ -6292,7 +6173,6 @@ msgid "Error: Could not open `%1'"
 msgstr "Fel: Det gick inte att öppna ”%1”"
 
 #: ../src/gui/city-info-tip.cpp:69
-#, fuzzy
 msgid "Razed!"
 msgstr "Raserad!"
 
@@ -6301,23 +6181,19 @@ msgid "Capital of\n"
 msgstr "Huvudstad för\n"
 
 #: ../src/gui/game-lobby-dialog.cpp:218
-#, fuzzy
 msgid "Player"
 msgstr "Spelare"
 
 #: ../src/gui/game-lobby-dialog.cpp:306
-#, fuzzy
 msgid "Sit Down"
 msgstr "Sitt ner"
 
 #: ../src/gui/game-lobby-dialog.cpp:746
-#, fuzzy
 msgid "People"
 msgstr "Personer"
 
 #: ../src/gui/network-game-selector-dialog.cpp:56
 #: ../src/gui/network-game-selector-dialog.cpp:76
-#, fuzzy
 msgid "Host"
 msgstr "Värd"
 
@@ -6356,7 +6232,6 @@ msgid "UnGrp"
 msgstr "AvGrp"
 
 #: ../src/herotemplates.cpp:134
-#, fuzzy
 msgid "Error!  can't load heronames file `%1'.  Exiting."
 msgstr "Fel! Kan inte läsa in hjältenamnsfilen ”%1”. Avslutar."
 
@@ -6393,7 +6268,6 @@ msgid "Error!  couldn't get double value from xml tag `%1'."
 msgstr "Fel! Det gick inte att få double-värde från xml-taggen ”%1”."
 
 #: ../src/xmlhelper.cpp:627 ../src/xmlhelper.cpp:695
-#, fuzzy
 msgid "%1: Callback for xml tag returned false.  Stop parsing document."
 msgstr "%1: återanrop för xml-tagg returnerade false. Sluta tolka dokument."
 
@@ -6451,12 +6325,10 @@ msgid "+1 stack in hills"
 msgstr "+1 stapel i kullar"
 
 #: ../src/armybase.cpp:122
-#, fuzzy
 msgid "Cancel city bonus"
-msgstr "Avbryt stadsbonus"
+msgstr "Upphäv stadsbonus"
 
 #: ../src/armybase.cpp:125
-#, fuzzy
 msgid "-3 enemy stack"
 msgstr "-3 fiendestapel"
 
@@ -6465,12 +6337,10 @@ msgid "-1 enemy stack"
 msgstr "-1 fiendestapel"
 
 #: ../src/armybase.cpp:131
-#, fuzzy
 msgid "-2 enemy stack"
 msgstr "-2 fiendestapel"
 
 #: ../src/armybase.cpp:134
-#, fuzzy
 msgid "+3 stack"
 msgstr "+3 stapel"
 
@@ -6479,19 +6349,18 @@ msgid "+1 stack"
 msgstr "+1 stapel"
 
 #: ../src/armybase.cpp:138
-#, fuzzy
 msgid "+2 stack"
 msgstr "+2 stapel"
 
+# cancel non-hero bonuses
 #: ../src/armybase.cpp:141
-#, fuzzy
 msgid "cancel non-hero"
-msgstr "avbryt icke-hjälte"
+msgstr "upphäv icke-hjältebonus"
 
+# cancel hero bonuses
 #: ../src/armybase.cpp:144
-#, fuzzy
 msgid "cancel hero"
-msgstr "avbryt hjälte"
+msgstr "upphäv hjältebonus"
 
 #: ../src/ItemProto.cpp:196
 msgid "Allows Flight"
@@ -6534,9 +6403,8 @@ msgid "Kills Defenders in a City"
 msgstr "Dödar försvarare i en stad"
 
 #: ../src/ItemProto.cpp:230
-#, fuzzy
 msgid "Summons %1 at a %2"
-msgstr "Åkallar %1 vid %2"
+msgstr "Åkallar %1 vid en/ett %2"
 
 #: ../src/ItemProto.cpp:233
 msgid "Summons %1"
@@ -6555,14 +6423,12 @@ msgid "Teleport Stack to a City"
 msgstr "Teleportera stapel till en stad"
 
 #: ../src/ItemProto.cpp:243
-#, fuzzy
 msgid "+%1 Battle"
 msgstr "+%1 strid"
 
 #: ../src/ItemProto.cpp:245
-#, fuzzy
 msgid "+%1 Command"
-msgstr "+%1 kommando"
+msgstr "+%1 ledarskap"
 
 #: ../src/ItemProto.cpp:247
 msgid "+%1 Gold per City"
@@ -6634,9 +6500,8 @@ msgid "missing argument for --turn"
 msgstr "saknar argument för --turn"
 
 #: ../src/main.cpp:173
-#, fuzzy
 msgid "Use FILE instead of %1"
-msgstr "Använd FIL istället för %1"
+msgstr "Använd FILE istället för %1"
 
 #: ../src/main.cpp:174
 msgid "Set the cache size for imagery to SIZE bytes"
@@ -6647,21 +6512,20 @@ msgid "Start with a test-scenario"
 msgstr "Starta med ett test-scenario"
 
 #: ../src/main.cpp:176
-#, fuzzy
 msgid "Use DIR instead of %1"
-msgstr "Använd KAT istället för %1"
+msgstr "Använd DIR istället för %1"
 
 #: ../src/main.cpp:177
 msgid "Seed the random number generator with NUMBER"
-msgstr ""
+msgstr "Använd NUMBER som frö till slumptalsgeneratorn"
 
 #: ../src/main.cpp:178
 msgid "Non-interactive stress test"
-msgstr ""
+msgstr "Icke-interaktivt belastningstest"
 
 #: ../src/main.cpp:179
 msgid "Non-interactive network stress test"
-msgstr ""
+msgstr "Icke-interaktivt nätverksbelastningstest"
 
 #: ../src/main.cpp:180
 msgid "Start a headless server"
@@ -6717,15 +6581,15 @@ msgstr "Fel: Det går inte att ange --editor och --host samtidigt."
 
 #: ../src/QCitySack.cpp:95
 msgid "The priests thank you for sacking this evil place."
-msgstr ""
+msgstr "Prästerna tackar dig för att du skövlat denna onda plats."
 
 #: ../src/QCitySack.cpp:101
 msgid "The sacking of \"%1\" could not be accomplished."
-msgstr ""
+msgstr "Skövlandet av staden ”%1” kunde inte slutföras."
 
 #: ../src/QCitySack.cpp:117
 msgid "You must take over and sack the city of \"%1\"."
-msgstr ""
+msgstr "Du måste ta över och skövla staden ”%1”."
 
 #: ../src/Tile.cpp:156
 msgid "Mountain"
@@ -6750,7 +6614,7 @@ msgstr "Kommer ingen hjälte att försvara din ära?"
 
 #: ../src/Commentator.cpp:78
 msgid "I see heroes are flocking to your banner!"
-msgstr "Jag ser att hjältar samlas kring ditt banér!"
+msgstr "Jag ser att hjältar samlas kring ditt baner!"
 
 #: ../src/Commentator.cpp:82
 msgid "Your enemies mock your feeble endeavours!"
@@ -6797,7 +6661,6 @@ msgid "Warlord!  Your progress is astounding!"
 msgstr "Krigsherre! Dina framsteg är enastående!"
 
 #: ../src/Commentator.cpp:102
-#, fuzzy
 msgid "So, Warlord, you show some merit!"
 msgstr "Så, krigsherre, du visar viss klass!"
 
@@ -6818,7 +6681,6 @@ msgid "Ahh, the expectation of a coming battle!"
 msgstr "Ahh, förväntan inför en kommande strid!"
 
 #: ../src/Commentator.cpp:123
-#, fuzzy
 msgid "Warlord... a mighty battle is brewing!"
 msgstr "Krigsherre… ett stort slag kommer!"
 
@@ -6827,17 +6689,14 @@ msgid "As your capital city has fallen, so shall you!"
 msgstr "Då din huvudstad har fallit, ska även du falla!"
 
 #: ../src/PixMask.cpp:138
-#, fuzzy
 msgid "Could not load image file `%1'."
 msgstr "Kunde inte läsa in bildfilen ”%1”."
 
 #: ../src/gls/main.cpp:86 ../src/ghs/main.cpp:94
-#, fuzzy
 msgid "Do not detach from the controlling terminal"
 msgstr "Lösgör inte från den styrande terminalen"
 
 #: ../src/gls/main.cpp:102 ../src/ghs/main.cpp:117
-#, fuzzy
 msgid "Could not detach from controlling terminal."
 msgstr "Det gick inte att lösgöra från styrande terminal."
 
@@ -6895,7 +6754,7 @@ msgid ""
 "the game-list server at 127.0.0.1."
 msgstr ""
 "Om VÄRD inte är angivet på kommandoraden kommer detta verktyg försöka ansluta \n"
-"till spellisteservern på 127.0.0.1."
+"till spellistservern på 127.0.0.1."
 
 #: ../src/gls/gls-client-tool.cpp:72
 msgid "Map File:"
@@ -6925,24 +6784,20 @@ msgid "Profile:"
 msgstr "Profil:"
 
 #: ../src/gls/gls-client-tool.cpp:180
-#, fuzzy
 msgid "Error: Could not remove advertised game %1"
 msgstr "Fel: Det gick inte att ta bort annonserat spel %1"
 
 #: ../src/gls/gls-client-tool.cpp:186
-#, fuzzy
 msgid "Removed advertised game %1"
 msgstr "Tog bort annonserat spel %1"
 
 #: ../src/gls/gls-client-tool.cpp:199
-#, fuzzy
 msgid "Error: Could not advertise game %1"
 msgstr "Fel: Det gick inte att annonsera spel %1"
 
 #: ../src/gls/gls-client-tool.cpp:205
-#, fuzzy
 msgid "Advertised game %1"
-msgstr "Annonserat spel %1"
+msgstr "Annonserade spel %1"
 
 #: ../src/gls/gls-client-tool.cpp:214 ../src/ghs/ghs-client-tool.cpp:116
 msgid "Could not connect to game list server"
@@ -6963,7 +6818,6 @@ msgid "permission denied"
 msgstr "åtkomst nekad"
 
 #: ../src/gls/gamelist-server.cpp:260
-#, fuzzy
 msgid "could not advertise game"
 msgstr "det gick inte att annonsera spel"
 
@@ -6976,14 +6830,12 @@ msgid "Allow the profile ids in this file to host games"
 msgstr "Tillåt profil-ID:n i denna fil att vara värd för spel"
 
 #: ../src/ghs/main.cpp:108
-#, fuzzy
 msgid "Error: could not find %1 program in path."
-msgstr "Fel: Det gick inte att hitta %1-program i sökväg."
+msgstr "Fel: det gick inte att hitta %1-program i sökväg."
 
 #: ../src/ghs/ghs-client-main.cpp:110
-#, fuzzy
 msgid "See a list of hosted games"
-msgstr "Se en lista över spel med värd"
+msgstr "Se en lista över spel"
 
 #: ../src/ghs/ghs-client-main.cpp:112
 msgid "Stop hosting a game (specified by scenario id)"
@@ -6999,10 +6851,9 @@ msgid ""
 "the game-host server at 127.0.0.1."
 msgstr ""
 "Om VÄRD inte anges på kommandoraden kommer detta verktyg att försöka ansluta till \n"
-"spelvärdservern på 127.0.0.1."
+"spelvärdsservern på 127.0.0.1."
 
 #: ../src/ghs/ghs-client-tool.cpp:133
-#, fuzzy
 msgid "Stopped hosting game %1"
 msgstr "Slutade vara värd för spel %1"
 
@@ -7024,7 +6875,7 @@ msgstr "det gick inte att lägga till spel i lista."
 
 #: ../src/ghs/gamehost-server.cpp:310
 msgid "malformed host new game message"
-msgstr ""
+msgstr "felformaterat värdmeddelande för nytt spel"
 
 #: ../src/ghs/gamehost-server.cpp:325
 msgid "Could not parse profile information."
@@ -7105,11 +6956,11 @@ msgstr "profilfil"
 
 #: ../src/file-compat.cpp:458
 msgid "recently played games file"
-msgstr ""
+msgstr "fil för senast spelade spel"
 
 #: ../src/file-compat.cpp:459
 msgid "recently hosted or recently advertised games file"
-msgstr ""
+msgstr "fil för senast spelade eller annonserade spel"
 
 #: ../src/file-compat.cpp:460
 msgid "armyset file"
@@ -7136,92 +6987,81 @@ msgid "decoding action: %1"
 msgstr "avkodar åtgärd: %1"
 
 #: ../src/game-client-decoder.cpp:55
-#, fuzzy
 msgid "warning, ignoring action for player %1"
-msgstr "varning, ignorerar åtgärd för spelare %1"
+msgstr "varning, ignorerar åtgärd för spelaren %1"
 
 #: ../src/game-client-decoder.cpp:98
 msgid "received history: %1"
 msgstr "mottog historik: %1"
 
 #: ../src/namelist.cpp:41
-#, fuzzy
 msgid "Error can't load namelist `%1'"
 msgstr "Fel: det går inte att läsa in namnlistan ”%1”"
 
 #: ../dat/various/items/items.xml.in.h:1
-#, fuzzy
 msgid "Shield of Courage"
 msgstr "Modets sköld"
 
 #: ../dat/various/items/items.xml.in.h:2
-#, fuzzy
 msgid "Troll Helm"
-msgstr "Trollhjälm"
+msgstr "Trollhjälmen"
 
 #: ../dat/various/items/items.xml.in.h:3
-#, fuzzy
 msgid "Icesword"
-msgstr "Issvärd"
+msgstr "Issvärdet"
 
 #: ../dat/various/items/items.xml.in.h:4
-#, fuzzy
 msgid "Armour of Gods"
-msgstr "Gudars rustning"
+msgstr "Gudarnas rustning"
 
 #: ../dat/various/items/items.xml.in.h:5
-#, fuzzy
 msgid "Crimson Banner"
-msgstr "Rött banér"
+msgstr "Blodröda baneret"
 
 #: ../dat/various/items/items.xml.in.h:6
 msgid "Crown of Loriel"
 msgstr "Loriels krona"
 
 #: ../dat/various/items/items.xml.in.h:7
-#, fuzzy
 msgid "Ring of Power"
 msgstr "Kraftens ring"
 
 #: ../dat/various/items/items.xml.in.h:8
 msgid "Horn of Ages"
-msgstr ""
+msgstr "Eonernas horn"
 
 #: ../dat/various/items/items.xml.in.h:9
 msgid "Staff of Ruling"
-msgstr ""
+msgstr "Härskandets stav"
 
 #: ../dat/various/items/items.xml.in.h:10
 msgid "Wings of Flying"
-msgstr ""
+msgstr "Flygandets vingar"
 
 #: ../dat/various/items/items.xml.in.h:11
 msgid "Wand of Flight"
-msgstr ""
+msgstr "Flygandets trollspö"
 
 #: ../dat/various/items/items.xml.in.h:12
 msgid "Ring of Travel"
-msgstr ""
+msgstr "Resandets ring"
 
 #: ../dat/various/items/items.xml.in.h:13
-#, fuzzy
 msgid "Phantom Steed"
-msgstr "Fantomhäst"
+msgstr "Fantomspringaren"
 
 #: ../dat/various/items/items.xml.in.h:14
 msgid "Staff of Movement"
-msgstr ""
+msgstr "Förflyttningens stav"
 
 #: ../dat/various/items/items.xml.in.h:15
-#, fuzzy
 msgid "Darksword"
-msgstr "Mörksvärd"
+msgstr "Mörkersvärdet"
 
 # TODO: berserker
 #: ../dat/various/items/items.xml.in.h:16
-#, fuzzy
 msgid "Beserker Helm"
-msgstr "Bärsärkarhjälm"
+msgstr "Bärsärkarhjälmen"
 
 #: ../dat/various/items/items.xml.in.h:17
 msgid "Bow of Eldros"
@@ -7232,21 +7072,20 @@ msgid "Sceptre of Loriel"
 msgstr "Loriels spira"
 
 #: ../dat/various/items/items.xml.in.h:19
-#, fuzzy
 msgid "Magic Carpet"
-msgstr "Flygande matta"
+msgstr "Flygande mattan"
 
 #: ../dat/various/items/items.xml.in.h:20
 msgid "Cup of Haste"
-msgstr ""
+msgstr "Brådskans bägare"
 
 #: ../dat/various/items/items.xml.in.h:21
 msgid "Boots of Speed"
-msgstr ""
+msgstr "Hastighetens skor"
 
 #: ../dat/various/items/items.xml.in.h:22
 msgid "Eldros's Pouch"
-msgstr ""
+msgstr "Eldros börs"
 
 #: ../dat/various/items/items.xml.in.h:23
 msgid "Spear of Ank"
@@ -7254,7 +7093,7 @@ msgstr "Anks spjut"
 
 #: ../dat/various/items/items.xml.in.h:24
 msgid "Lock of Safety"
-msgstr ""
+msgstr "Säkerhetens lås"
 
 #: ../dat/various/items/items.xml.in.h:25
 msgid "Horn of Siege"
@@ -7269,18 +7108,16 @@ msgid "Wings of the Eagle"
 msgstr "Örnens vingar"
 
 #: ../dat/various/items/items.xml.in.h:28
-#, fuzzy
 msgid "Everful Purse"
-msgstr "Ändlös börs"
+msgstr "Ändlösa börsen"
 
 #: ../dat/various/items/items.xml.in.h:29
 msgid "Okradon's Pouch"
-msgstr ""
+msgstr "Okradons börs"
 
 #: ../dat/various/items/items.xml.in.h:30
-#, fuzzy
 msgid "Firesword"
-msgstr "Eldsvärd"
+msgstr "Eldsvärdet"
 
 #: ../dat/various/items/items.xml.in.h:31
 msgid "Sword of Death"
@@ -7288,55 +7125,47 @@ msgstr "Dödens svärd"
 
 #: ../dat/various/items/items.xml.in.h:32
 msgid "Chimes of Safety"
-msgstr ""
+msgstr "Säkerhetens klockor"
 
 #: ../dat/various/items/items.xml.in.h:33
-#, fuzzy
 msgid "Lightsword"
-msgstr "Ljussvärd"
+msgstr "Ljussvärdet"
 
 #: ../dat/various/items/items.xml.in.h:34
-#, fuzzy
 msgid "Orb of Loriel"
 msgstr "Loriels riksäpple"
 
 #: ../dat/various/items/items.xml.in.h:35
-#, fuzzy
 msgid "Witch's Broom"
-msgstr "Häxkvast"
+msgstr "Häxans kvast"
 
 #: ../dat/various/items/items.xml.in.h:36
-#, fuzzy
 msgid "Silver Purse"
-msgstr "Silverbörs"
+msgstr "Silverbörsen"
 
 #: ../dat/various/items/items.xml.in.h:37
 msgid "Tome of War"
-msgstr ""
+msgstr "Krigsluntan"
 
 #: ../dat/various/items/items.xml.in.h:38
-#, fuzzy
 msgid "Horn of Plenty"
-msgstr "Ymnighetshorn"
+msgstr "Ymnighetshornet"
 
 #: ../dat/various/items/items.xml.in.h:39
-#, fuzzy
 msgid "Scroll of Thievery"
-msgstr "Tjuveriskriftrulle"
+msgstr "Tjuveriskriftrullen"
 
 #: ../dat/various/items/items.xml.in.h:40
-#, fuzzy
 msgid "Scroll of Great Tides"
-msgstr "Tidvattenskriftrulle"
+msgstr "Högvattenskriftrullen"
 
 #: ../dat/various/items/items.xml.in.h:41
-#, fuzzy
 msgid "Scroll of Retrieve Lost Items"
-msgstr "Skriftrulle för att hitta försvunna ting"
+msgstr "Skriftrullen för finnande av försvunna ting"
 
 #: ../dat/various/items/items.xml.in.h:42
 msgid "Staff of Many Steps"
-msgstr ""
+msgstr "De många stegens stav"
 
 #: ../dat/various/items/items.xml.in.h:43
 msgid "Staff of Saint Patrick"
@@ -7348,30 +7177,27 @@ msgstr "Brobrännarnas stav"
 
 #: ../dat/various/items/items.xml.in.h:45
 msgid "Staff of Charm Ruin Monster"
-msgstr ""
+msgstr "Staven för ruinmonsters förhäxande"
 
 #: ../dat/various/items/items.xml.in.h:46
 msgid "Whistle of Angelic Assistance"
-msgstr ""
+msgstr "Änglaassistansens visselpipa"
 
 #: ../dat/various/items/items.xml.in.h:47
 msgid "Wand of Urban Pestilence"
-msgstr ""
+msgstr "Stadsepidemins trollspö"
 
 #: ../dat/various/items/items.xml.in.h:48
-#, fuzzy
 msgid "Staff of Ghostly Defenders"
 msgstr "Spöklika försvararnas stav"
 
 #: ../dat/various/items/items.xml.in.h:49
-#, fuzzy
 msgid "Staff of Persuasion"
 msgstr "Övertygandets stav"
 
 #: ../dat/various/items/items.xml.in.h:50
-#, fuzzy
 msgid "Ring of Teleportation"
-msgstr "Teleporteringsring"
+msgstr "Teleporteringsringen"
 
 #: ../dat/citynames.xml.in.h:1
 msgid "Hellgate"
@@ -7856,7 +7682,7 @@ msgstr "De fallnas fristad"
 
 #: ../dat/templenames.xml.in.h:7
 msgid "Holy Place"
-msgstr ""
+msgstr "Heliga platsen"
 
 #: ../dat/templenames.xml.in.h:8
 msgid "Temple of Flame"
@@ -7864,11 +7690,11 @@ msgstr "Flamtemplet"
 
 #: ../dat/templenames.xml.in.h:9
 msgid "Order of Fire"
-msgstr ""
+msgstr "Eldens orden"
 
 #: ../dat/templenames.xml.in.h:10
 msgid "Order of Spirit"
-msgstr ""
+msgstr "Andens orden"
 
 #: ../dat/templenames.xml.in.h:11
 msgid "Brotherhood of Order"
@@ -7876,23 +7702,23 @@ msgstr "Ordningens brödraskap"
 
 #: ../dat/templenames.xml.in.h:12
 msgid "Cathedral"
-msgstr "Katedral"
+msgstr "Katedralen"
 
 #: ../dat/templenames.xml.in.h:13
 msgid "High Priest's seat"
-msgstr ""
+msgstr "Översteprästens säte"
 
 #: ../dat/templenames.xml.in.h:14
 msgid "Tomb of Kings"
-msgstr ""
+msgstr "Kungarnas grav"
 
 #: ../dat/templenames.xml.in.h:15
 msgid "Tomb of Warriors"
-msgstr ""
+msgstr "Krigarnas grav"
 
 #: ../dat/templenames.xml.in.h:16
 msgid "Small temple"
-msgstr "Litet tempel"
+msgstr "Lilla templet"
 
 #: ../dat/templenames.xml.in.h:17
 msgid "Peasant's church"
@@ -7920,11 +7746,11 @@ msgstr "Istemplet"
 
 #: ../dat/templenames.xml.in.h:23
 msgid "Garden of Peace"
-msgstr ""
+msgstr "Fredsgården"
 
 #: ../dat/templenames.xml.in.h:24
 msgid "Garden of Frost"
-msgstr ""
+msgstr "Frostgården"
 
 #: ../dat/templenames.xml.in.h:25
 msgid "Holy Wood"
@@ -7936,7 +7762,7 @@ msgstr "De små gudarnas hus"
 
 #: ../dat/templenames.xml.in.h:27
 msgid "Silent Monastery"
-msgstr "Tyst kloster"
+msgstr "Tysta klostret"
 
 #: ../dat/templenames.xml.in.h:28
 msgid "Holy Ghost's Archive"
@@ -7980,147 +7806,143 @@ msgstr "Besökare välkomnas"
 
 #: ../dat/ruinnames.xml.in.h:1
 msgid "Creepy Dungeon"
-msgstr "Kuslig håla"
+msgstr "Kusliga hålan"
 
 #: ../dat/ruinnames.xml.in.h:2
 msgid "Dark Cellars"
-msgstr "Mörka källare"
+msgstr "Mörka katakomberna"
 
 #: ../dat/ruinnames.xml.in.h:3
 msgid "Abandoned Temple"
-msgstr "Övergivet tempel"
+msgstr "Övergivna templet"
 
 #: ../dat/ruinnames.xml.in.h:4
 msgid "Dark Temple"
-msgstr "Mörkt tempel"
+msgstr "Mörka templet"
 
 #: ../dat/ruinnames.xml.in.h:5
 msgid "Fallen Temple"
-msgstr "Fallet tempel"
+msgstr "Fallna templet"
 
 #: ../dat/ruinnames.xml.in.h:6
 msgid "Unholy Temple"
-msgstr "Oheligt tempel"
+msgstr "Oheliga templet"
 
 #: ../dat/ruinnames.xml.in.h:7
 msgid "Ruined Temple"
-msgstr "Tempelruiner"
+msgstr "Tempelruinerna"
 
 #: ../dat/ruinnames.xml.in.h:8
 msgid "Misty Maze"
-msgstr "Dimmig labyrint"
+msgstr "Dimmiga labyrinten"
 
 #: ../dat/ruinnames.xml.in.h:9
 msgid "Ruined City"
-msgstr "Stadsruiner"
+msgstr "Stadsruinerna"
 
 #: ../dat/ruinnames.xml.in.h:10
 msgid "Weird Ruins"
-msgstr "Mystiska ruiner"
+msgstr "Mystiska ruinerna"
 
 #: ../dat/ruinnames.xml.in.h:11
 msgid "Dusty Caves"
-msgstr "Dammiga grottor"
+msgstr "Dammiga grottorna"
 
 #: ../dat/ruinnames.xml.in.h:12
-#, fuzzy
 msgid "Silent Lair"
-msgstr "Tyst lya"
+msgstr "Tysta lyan"
 
 #: ../dat/ruinnames.xml.in.h:13
-#, fuzzy
 msgid "Old Dragon's Lair"
-msgstr "Gammal draklya"
+msgstr "Gamla draklyan"
 
 #: ../dat/ruinnames.xml.in.h:14
 msgid "Black Tomb"
-msgstr "Svart grav"
+msgstr "Svarta graven"
 
 #: ../dat/ruinnames.xml.in.h:15
 msgid "Ancient Ruins"
-msgstr "Uråldriga ruiner"
+msgstr "Uråldriga ruinerna"
 
 #: ../dat/ruinnames.xml.in.h:16
 msgid "Deserted Monastery"
-msgstr "Övergivet kloster"
+msgstr "Övergivna klostret"
 
 #: ../dat/ruinnames.xml.in.h:17
 msgid "Stormy Tower"
-msgstr "Stormigt torn"
+msgstr "Stormiga tornet"
 
 #: ../dat/ruinnames.xml.in.h:18
 msgid "Dark Tower"
-msgstr "Mörkt torn"
+msgstr "Mörka tornet"
 
 #: ../dat/ruinnames.xml.in.h:19
 msgid "Savaged Castle"
-msgstr ""
+msgstr "Fallna slottet"
 
 #: ../dat/ruinnames.xml.in.h:20
 msgid "Ruined Castle"
-msgstr "Slottsruiner"
+msgstr "Slottsruinerna"
 
 #: ../dat/ruinnames.xml.in.h:21
 msgid "Misty Ruins"
-msgstr "Dimmiga ruiner"
+msgstr "Dimmiga ruinerna"
 
 #: ../dat/ruinnames.xml.in.h:22
 msgid "Abandoned Village"
-msgstr "Övergiven by"
+msgstr "Övergivna byn"
 
 #: ../dat/ruinnames.xml.in.h:23
 msgid "Ghost Town"
-msgstr "Spökstad"
+msgstr "Spökstaden"
 
 #: ../dat/ruinnames.xml.in.h:24
-#, fuzzy
 msgid "Silent Farm"
-msgstr "Tyst bondgård"
+msgstr "Tysta bondgården"
 
 #: ../dat/ruinnames.xml.in.h:25
 msgid "Barren Ruins"
-msgstr "Ödsliga ruiner"
+msgstr "Ödsliga ruinerna"
 
 #: ../dat/ruinnames.xml.in.h:26
-#, fuzzy
 msgid "Forbidden Lair"
-msgstr "Förbjuden lya"
+msgstr "Förbjudna lyan"
 
 #: ../dat/ruinnames.xml.in.h:27
 msgid "Dark Hole"
-msgstr "Mörkt hål"
+msgstr "Mörka hålet"
 
 #: ../dat/ruinnames.xml.in.h:28
 msgid "Dark Dungeon"
-msgstr "Mörk håla"
+msgstr "Mörka hålan"
 
 #: ../dat/ruinnames.xml.in.h:29
 msgid "Rampaged Village"
-msgstr "Härjad by"
+msgstr "Härjade byn"
 
 #: ../dat/ruinnames.xml.in.h:30
 msgid "Abandoned Town"
-msgstr "Övergiven stad"
+msgstr "Övergivna staden"
 
 #: ../dat/ruinnames.xml.in.h:31
 msgid "Goblin Hideout"
-msgstr "Goblingömställe"
+msgstr "Goblingömstället"
 
 #: ../dat/ruinnames.xml.in.h:32
 msgid "Orcish Hut"
-msgstr "Orchhydda"
+msgstr "Orchhyddan"
 
 #: ../dat/ruinnames.xml.in.h:33
 msgid "Bone-filled Pit"
-msgstr "Benfyllt hål"
+msgstr "Benfyllda hålet"
 
 #: ../dat/ruinnames.xml.in.h:34
 msgid "Rat-filled Catacombs"
-msgstr "Råttfyllda katakomber"
+msgstr "Råttfyllda katakomberna"
 
 #: ../dat/ruinnames.xml.in.h:35
 msgid "Creepy Crypt"
-msgstr "Kuslig krypta"
+msgstr "Kusliga kryptan"
 
 #: ../dat/heronames.xml.in.h:1
 msgid "Endurien"
