@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: lordsawar 0.3.2-pre3\n"
 "Report-Msgid-Bugs-To: bug-gnu-gettext@gnu.org\n"
 "POT-Creation-Date: 2017-06-03 07:50-0400\n"
-"PO-Revision-Date: 2017-06-19 15:18+0200\n"
+"PO-Revision-Date: 2017-07-08 02:40+0200\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Poedit 2.0.2\n"
 
 #: ../dat/glade/about-dialog.ui.h:1
 msgid ""
@@ -306,7 +306,7 @@ msgstr "Köp…"
 #: ../dat/glade/city-window.ui.h:14 ../dat/glade/hero-dialog.ui.h:15
 #: ../dat/glade/editor/backpack-editor-dialog.ui.h:7
 msgid "Buy a production capability"
-msgstr "Köp en produktionskapabilitet"
+msgstr "Köp en produktionsförmåga"
 
 #: ../dat/glade/city-window.ui.h:15
 msgid "Vector..."
@@ -589,7 +589,7 @@ msgstr "Diplomati"
 
 #: ../dat/glade/game-options-dialog.ui.h:30
 msgid "Razing Cities"
-msgstr "Rasering av städer"
+msgstr "Ödelägger städer"
 
 #: ../dat/glade/game-options-dialog.ui.h:31
 msgid "Cusp Of War"
@@ -7213,11 +7213,11 @@ msgstr "Skuggiga kullen"
 
 #: ../dat/citynames.xml.in.h:4
 msgid "Moonshine"
-msgstr "Moonshine"
+msgstr "Månstrålsta"
 
 #: ../dat/citynames.xml.in.h:5
 msgid "Devilian"
-msgstr "Devilian"
+msgstr "Djävlia"
 
 # TODO:Morpork
 #: ../dat/citynames.xml.in.h:6
@@ -7226,11 +7226,11 @@ msgstr "Ankh-Morpork"
 
 #: ../dat/citynames.xml.in.h:7
 msgid "Warportal"
-msgstr "Warportal"
+msgstr "Krigaport"
 
 #: ../dat/citynames.xml.in.h:8
 msgid "Fishbend"
-msgstr "Fishbend"
+msgstr "Fiskböje"
 
 #: ../dat/citynames.xml.in.h:9
 msgid "Meormon"
@@ -7262,7 +7262,7 @@ msgstr "Lan"
 
 #: ../dat/citynames.xml.in.h:16
 msgid "Scarpdale"
-msgstr "Scarpdale"
+msgstr "Brantdala"
 
 #: ../dat/citynames.xml.in.h:17
 msgid "Watchtower"
@@ -7270,11 +7270,11 @@ msgstr "Vakttornet"
 
 #: ../dat/citynames.xml.in.h:18
 msgid "Capewell"
-msgstr "Capewell"
+msgstr "Uddbrunne"
 
 #: ../dat/citynames.xml.in.h:19
 msgid "Ironfist"
-msgstr "Ironfist"
+msgstr "Järnnäva"
 
 #: ../dat/citynames.xml.in.h:20
 msgid "Forthmark"
@@ -7290,7 +7290,7 @@ msgstr "Tularean"
 
 #: ../dat/citynames.xml.in.h:23
 msgid "Stonegate"
-msgstr "Stonegate"
+msgstr "Stenaport"
 
 #: ../dat/citynames.xml.in.h:24
 msgid "Atwood"
@@ -7298,7 +7298,7 @@ msgstr "Atwood"
 
 #: ../dat/citynames.xml.in.h:25
 msgid "Heavensgate"
-msgstr "Heavensgate"
+msgstr "Himlaport"
 
 #: ../dat/citynames.xml.in.h:26
 msgid "Lyrean"
@@ -7306,11 +7306,11 @@ msgstr "Lyrean"
 
 #: ../dat/citynames.xml.in.h:27
 msgid "Thornsdale"
-msgstr "Thornsdale"
+msgstr "Taggdala"
 
 #: ../dat/citynames.xml.in.h:28
 msgid "West End"
-msgstr "West End"
+msgstr "Västände"
 
 #: ../dat/citynames.xml.in.h:29
 msgid "Banshire"
@@ -7322,7 +7322,7 @@ msgstr "Pelerine"
 
 #: ../dat/citynames.xml.in.h:31
 msgid "Casterbridge"
-msgstr "Casterbridge"
+msgstr "Casterbro"
 
 #: ../dat/citynames.xml.in.h:32
 msgid "Lankhmar"
@@ -7338,7 +7338,7 @@ msgstr "Lond Daer"
 
 #: ../dat/citynames.xml.in.h:35
 msgid "Welltown"
-msgstr "Welltown"
+msgstr "Brunnsby"
 
 #: ../dat/citynames.xml.in.h:36
 msgid "Remoldt"
@@ -7350,7 +7350,7 @@ msgstr "Hemmings"
 
 #: ../dat/citynames.xml.in.h:38
 msgid "Greystone"
-msgstr "Greystone"
+msgstr "Gråstena"
 
 #: ../dat/citynames.xml.in.h:39
 msgid "Hartons"
@@ -7374,7 +7374,7 @@ msgstr "Kadesh"
 
 #: ../dat/citynames.xml.in.h:44
 msgid "Highwater"
-msgstr "Highwater"
+msgstr "Högvattra"
 
 #: ../dat/citynames.xml.in.h:45
 msgid "Kurigalzu"
@@ -7402,7 +7402,7 @@ msgstr "Lobatse"
 
 #: ../dat/citynames.xml.in.h:51
 msgid "Shadowfallen"
-msgstr "Shadowfallen"
+msgstr "Skuggdunkla"
 
 #: ../dat/citynames.xml.in.h:52
 msgid "Nicaea"
@@ -7422,7 +7422,7 @@ msgstr "Yeol"
 
 #: ../dat/citynames.xml.in.h:56
 msgid "Coldpeak"
-msgstr "Coldpeak"
+msgstr "Kallsta"
 
 #: ../dat/citynames.xml.in.h:57
 msgid "Tebizond"
@@ -7430,7 +7430,7 @@ msgstr "Tebizond"
 
 #: ../dat/citynames.xml.in.h:58
 msgid "Goldvale"
-msgstr "Goldvale"
+msgstr "Gulddala"
 
 #: ../dat/citynames.xml.in.h:59
 msgid "Harnew"
@@ -7438,7 +7438,7 @@ msgstr "Harnew"
 
 #: ../dat/citynames.xml.in.h:60
 msgid "Yellowbone"
-msgstr "Yellowbone"
+msgstr "Gulben"
 
 #: ../dat/citynames.xml.in.h:61
 msgid "Hopwith"
@@ -7458,11 +7458,11 @@ msgstr "Hurldt"
 
 #: ../dat/citynames.xml.in.h:65
 msgid "Pewrash"
-msgstr "Pewrash"
+msgstr "Bänkströmme"
 
 #: ../dat/citynames.xml.in.h:66
 msgid "Howlfen"
-msgstr "Howlfen"
+msgstr "Ylfene"
 
 #: ../dat/citynames.xml.in.h:67
 msgid "Prig"
@@ -7470,7 +7470,7 @@ msgstr "Prig"
 
 #: ../dat/citynames.xml.in.h:68
 msgid "Shantytown"
-msgstr "Shantytown"
+msgstr "Kåkstaden"
 
 #: ../dat/citynames.xml.in.h:69
 msgid "Targastin"
@@ -7486,11 +7486,11 @@ msgstr "Kenquint"
 
 #: ../dat/citynames.xml.in.h:72
 msgid "Yearway"
-msgstr "Yearway"
+msgstr "Årsväga"
 
 #: ../dat/citynames.xml.in.h:73
 msgid "Meirstead"
-msgstr "Meirstead"
+msgstr "Mjödby"
 
 #: ../dat/citynames.xml.in.h:74
 msgid "Urko"
@@ -7498,15 +7498,15 @@ msgstr "Urko"
 
 #: ../dat/citynames.xml.in.h:75
 msgid "Millrock"
-msgstr "Millrock"
+msgstr "Kvarnstena"
 
 #: ../dat/citynames.xml.in.h:76
 msgid "Shadwill"
-msgstr "Shadwill"
+msgstr "Skuggvilje"
 
 #: ../dat/citynames.xml.in.h:77
 msgid "Poolstone"
-msgstr "Poolstone"
+msgstr "Pölstena"
 
 #: ../dat/citynames.xml.in.h:78
 msgid "Wending"
@@ -7534,15 +7534,15 @@ msgstr "Quordia"
 
 #: ../dat/citynames.xml.in.h:84
 msgid "Fogwell"
-msgstr "Fogwell"
+msgstr "Dimbrunna"
 
 #: ../dat/citynames.xml.in.h:85
 msgid "Sunstone"
-msgstr "Sunstone"
+msgstr "Solstena"
 
 #: ../dat/citynames.xml.in.h:86
 msgid "Cloudrock"
-msgstr "Cloudrock"
+msgstr "Molnstena"
 
 #: ../dat/citynames.xml.in.h:87
 msgid "Greddle"
@@ -7554,27 +7554,27 @@ msgstr "Farburg"
 
 #: ../dat/citynames.xml.in.h:89
 msgid "Tarfrey"
-msgstr "Tarfrey"
+msgstr "Tjäråker"
 
 #: ../dat/citynames.xml.in.h:90
 msgid "Meadford"
-msgstr "Meadford"
+msgstr "Mjödvaden"
 
 #: ../dat/citynames.xml.in.h:91
 msgid "Seastone"
-msgstr "Seastone"
+msgstr "Havsstena"
 
 #: ../dat/citynames.xml.in.h:92
 msgid "Highrock"
-msgstr "Highrock"
+msgstr "Högstena"
 
 #: ../dat/citynames.xml.in.h:93
 msgid "Lowstone"
-msgstr "Lowstone"
+msgstr "Lågstena"
 
 #: ../dat/citynames.xml.in.h:94
 msgid "Ringtown"
-msgstr "Ringtown"
+msgstr "Ringstad"
 
 #: ../dat/citynames.xml.in.h:95
 msgid "Gall"
@@ -7582,15 +7582,15 @@ msgstr "Gall"
 
 #: ../dat/citynames.xml.in.h:96
 msgid "Sandstone"
-msgstr "Sandstone"
+msgstr "Sandstena"
 
 #: ../dat/citynames.xml.in.h:97
 msgid "Lakerock"
-msgstr "Lakerock"
+msgstr "Sjöstena"
 
 #: ../dat/citynames.xml.in.h:98
 msgid "Woodring"
-msgstr "Woodring"
+msgstr "Trädringe"
 
 #: ../dat/citynames.xml.in.h:99
 msgid "Fenring"
@@ -7598,55 +7598,55 @@ msgstr "Fenring"
 
 #: ../dat/citynames.xml.in.h:100
 msgid "Three Marshes"
-msgstr "Three Marshes"
+msgstr "Trekärra"
 
 #: ../dat/citynames.xml.in.h:101
 msgid "Cliff Town"
-msgstr "Cliff Town"
+msgstr "Klippastad"
 
 #: ../dat/citynames.xml.in.h:102
 msgid "Blackstep"
-msgstr "Blackstep"
+msgstr "Svartesteg"
 
 #: ../dat/citynames.xml.in.h:103
 msgid "Whitestep"
-msgstr "Whitestep"
+msgstr "Vitsteg"
 
 #: ../dat/citynames.xml.in.h:104
 msgid "Redstep"
-msgstr "Redstep"
+msgstr "Rödsteg"
 
 #: ../dat/citynames.xml.in.h:105
 msgid "Ringstep"
-msgstr "Ringstep"
+msgstr "Mallsteg"
 
 #: ../dat/citynames.xml.in.h:106
 msgid "Swordstep"
-msgstr "Swordstep"
+msgstr "Svärdsteg"
 
 #: ../dat/citynames.xml.in.h:107
 msgid "Shieldstep"
-msgstr "Shieldstep"
+msgstr "Sköldasteg"
 
 #: ../dat/citynames.xml.in.h:108
 msgid "Redhelm"
-msgstr "Redhelm"
+msgstr "Rödehjelm"
 
 #: ../dat/citynames.xml.in.h:109
 msgid "Middlehelm"
-msgstr "Middlehelm"
+msgstr "Mittenhjelm"
 
 #: ../dat/citynames.xml.in.h:110
 msgid "Anvil"
-msgstr "Anvil"
+msgstr "Städe"
 
 #: ../dat/citynames.xml.in.h:111
 msgid "Blackfork"
-msgstr "Blackfork"
+msgstr "Svartegren"
 
 #: ../dat/citynames.xml.in.h:112
 msgid "Blueshell"
-msgstr "Blueshell"
+msgstr "Blåsköld"
 
 #: ../dat/citynames.xml.in.h:113
 msgid "Bolt"
@@ -7654,7 +7654,7 @@ msgstr "Bolt"
 
 #: ../dat/citynames.xml.in.h:114
 msgid "Skytower"
-msgstr "Skytower"
+msgstr "Himlatorn"
 
 #: ../dat/templenames.xml.in.h:1
 msgid "Shrine of the Paladin"
