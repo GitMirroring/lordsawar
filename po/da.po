@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the lordsawar package.
 # Joe Hansen <joedalton2@yahoo.dk>, 2008, 2009, 2010, 2011, 2014, 2016, 2017.
 # Korrekturlæsning: Lars Christian Jensen, 2009, 2010.
-# Korrekturlæsning: Ask Hjorth Larsen, 2009, 2010, 2016.
+# Korrekturlæsning: Ask Hjorth Larsen, 2009, 2010, 2016, 2017.
 # Korrekturlæsning: Torben Grøn Helligsø, 2011.
 #
 # Konventioner
@@ -29,7 +29,7 @@ msgstr ""
 "Project-Id-Version: lordsawar 0.3.2-pre3\n"
 "Report-Msgid-Bugs-To: bug-gnu-gettext@gnu.org\n"
 "POT-Creation-Date: 2017-06-03 07:50-0400\n"
-"PO-Revision-Date: 2017-06-05 08:55-0400\n"
+"PO-Revision-Date: 2017-07-06 08:55-0400\n"
 "Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
@@ -538,7 +538,7 @@ msgstr "Normalt"
 
 #: ../dat/glade/game-options-dialog.ui.h:11
 msgid "Seldom"
-msgstr "Sjælden"
+msgstr "Sjældent"
 
 #: ../dat/glade/game-options-dialog.ui.h:12
 msgid "Never"
@@ -633,7 +633,7 @@ msgstr "Militærrådgiver"
 
 #: ../dat/glade/game-options-dialog.ui.h:36
 msgid "Random Turns"
-msgstr "Tilfældige runder"
+msgstr "Bland runder"
 
 #: ../dat/glade/game-options-dialog.ui.h:37
 msgid "Build Production"
@@ -707,6 +707,11 @@ msgstr "Antal spillere"
 msgid "0"
 msgstr "0"
 
+# "difficulty rating" og "difficulty" (den ovenfor) står næppe ved siden
+# af hinanden; måske den ene er værktøjstip til den anden.  Jeg synes
+# sværhedsgradsbedømmelse fra før må kunne ændres til blot sværhedsgrad,
+# som denne.  Men kan ikke helt se det (har kun umiddelbart
+# debianpakkens kildekode)
 #: ../dat/glade/game-preferences-dialog.ui.h:12
 msgid "Difficulty Rating"
 msgstr "Sværhedsgradsbedømmelse"
@@ -1633,7 +1638,7 @@ msgid ""
 "Non-Hero Bonuses"
 msgstr ""
 "Fjern alle\n"
-"ikke-helte bonusser"
+"bonusser til ikke-helte"
 
 #: ../dat/glade/editor/armyset-window.ui.h:27
 msgid ""
@@ -1641,7 +1646,7 @@ msgid ""
 "Hero Bonuses"
 msgstr ""
 "Fjern alle\n"
-"helte bonusser"
+"heltebonusser"
 
 #: ../dat/glade/editor/armyset-window.ui.h:29
 msgid "-1 Str to Enemy Stack"
@@ -2003,8 +2008,8 @@ msgid ""
 "Kills All Units Of\n"
 "Giant Worms"
 msgstr ""
-"Dræber alle enheder\n"
-"af kæmpeorme"
+"Dræber alle\n"
+"kæmpeorme"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:39
 msgid "Persuade Neutral City"
@@ -2136,7 +2141,7 @@ msgstr "Unavngivne vejskilte"
 
 #: ../dat/glade/editor/main-window.ui.h:37
 msgid "Assign Capital Cities"
-msgstr "Til del hovedstæder"
+msgstr "Tildel hovedstæder"
 
 #: ../dat/glade/editor/main-window.ui.h:41
 msgid "Tools"
@@ -2145,7 +2150,7 @@ msgstr "Værktøjer"
 #: ../dat/glade/editor/main-window.ui.h:42
 #: ../dat/glade/editor/battle-calculator-dialog.ui.h:3
 msgid "Battle Calculator"
-msgstr "Kamplommeregner"
+msgstr "Kampberegning"
 
 #: ../dat/glade/editor/main-window.ui.h:44
 msgid "Pointer.  Click to inspect objects."
@@ -2205,11 +2210,11 @@ msgstr "Flyt objekt"
 
 #: ../dat/glade/editor/main-window.ui.h:58
 msgid "Add stacks to the Battle Calculator"
-msgstr "Tilføj stakke til kamplommeregneren"
+msgstr "Tilføj stakke til kampberegningen"
 
 #: ../dat/glade/editor/main-window.ui.h:59
 msgid "Add To Battle Calculator"
-msgstr "Tilføj til kamplommeregner"
+msgstr "Tilføj til kampberegningen"
 
 #: ../dat/glade/editor/main-window.ui.h:60
 msgid "Add a stack"
@@ -2249,7 +2254,7 @@ msgstr "Tilføj en port"
 
 #: ../dat/glade/editor/main-window.ui.h:69
 msgid "Add Port"
-msgstr "Tilføj port"
+msgstr "Tilføj havn"
 
 #: ../dat/glade/editor/main-window.ui.h:70
 msgid "Add a sign"
@@ -2327,7 +2332,7 @@ msgstr "Udfyldningsstil"
 
 #: ../dat/glade/editor/new-map-dialog.ui.h:30
 msgid "Random Roads"
-msgstr "Tilfældige veje"
+msgstr "Bland veje"
 
 # evt. bland
 #: ../dat/glade/editor/new-map-dialog.ui.h:31
@@ -2383,7 +2388,7 @@ msgstr "Ryd"
 
 #: ../dat/glade/editor/reward-editor-dialog.ui.h:14
 msgid "Ally Type"
-msgstr "Allierettype"
+msgstr "Type af allieret"
 
 #: ../dat/glade/editor/reward-editor-dialog.ui.h:15
 msgid "Number of Allies"
@@ -2476,7 +2481,7 @@ msgstr "Rediger tempel"
 # evt. bland
 #: ../dat/glade/editor/temple-editor-dialog.ui.h:5
 msgid "Randomize Name"
-msgstr "Bland navn"
+msgstr "Tilfældigt navn"
 
 #: ../dat/glade/editor/tile-preview-dialog.ui.h:1
 #: ../dat/glade/editor/tileset-window.ui.h:21
@@ -2833,7 +2838,7 @@ msgstr "Lille skjoldbillede"
 
 #: ../dat/glade/editor/shieldset-window.ui.h:15
 msgid "Medium Shield Image"
-msgstr "Mellem skjoldbillede"
+msgstr "Mellemstort skjoldbillede"
 
 #: ../dat/glade/editor/shieldset-window.ui.h:16
 msgid "Large Shield Image"
@@ -2972,7 +2977,7 @@ msgstr "Ny helt (kvinde)"
 
 #: ../dat/glade/editor/media-dialog.ui.h:10
 msgid "Hero Searches Ruin"
-msgstr "Helt undersøger ruin"
+msgstr "Helt undersøger ruinen"
 
 #: ../dat/glade/editor/media-dialog.ui.h:11
 msgid "Hero Dies At Ruin"
@@ -2992,7 +2997,7 @@ msgstr "Fjender tilbyder forhandling"
 
 #: ../dat/glade/editor/media-dialog.ui.h:15
 msgid "Enemy Parley Refused"
-msgstr "Fjendeforhandling nægtet"
+msgstr "Forhandling med fjende nægtet"
 
 #: ../dat/glade/editor/media-dialog.ui.h:17
 msgid "Stack Blessed"
@@ -3628,15 +3633,15 @@ msgstr "Fejl! Kunne ikke oprette mappen for bysættet »%1«. Afslutter."
 
 #: ../src/game-server.cpp:481
 msgid "%1 connected."
-msgstr "%1 tilkoblet."
+msgstr "%1 tilkoblede."
 
 #: ../src/game-server.cpp:494
 msgid "%1 disconnected."
-msgstr "%1 frakoblet."
+msgstr "%1 frakoblede."
 
 #: ../src/game-server.cpp:496
 msgid "%1 disconnected"
-msgstr "%1 frakoblet"
+msgstr "%1 frakoblede."
 
 #: ../src/MapGenerator.cpp:186
 msgid "flattening plains..."
@@ -4416,11 +4421,11 @@ msgstr "%1 finder %2!"
 
 #: ../src/gui/game-window.cpp:1665
 msgid "%1 is given a %2!"
-msgstr "%1 modtager en/et %2!"
+msgstr "%1 modtager %2!"
 
 #: ../src/gui/game-window.cpp:1667
 msgid "%1 finds a %2!"
-msgstr "%1 finder en/et %2!"
+msgstr "%1 finder %2!"
 
 #. so and so encounters a wolf...
 #: ../src/gui/game-window.cpp:1683
@@ -7457,7 +7462,7 @@ msgstr "Harnew"
 
 #: ../dat/citynames.xml.in.h:60
 msgid "Yellowbone"
-msgstr "Gulhavn"
+msgstr "Gulben"
 
 #: ../dat/citynames.xml.in.h:61
 msgid "Hopwith"
