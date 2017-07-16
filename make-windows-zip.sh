@@ -29,7 +29,7 @@ if [ "x$zip" == "x" ]; then
   exit 1
 fi
 
-if [ ! -d /usr/share/lordsawar ]; then
+if [ ! -d /usr/local/share/lordsawar ]; then
   echo "We need you to run \"make install\" before running this script."
   exit 1
 fi
@@ -39,10 +39,12 @@ cd lordsawar-windows
 echo Please wait while we collect icons from GNOME...
 ../copy-gnome-icons.sh
 cp ../src/.libs/lordsawar.exe ./
+cp ../src/editor/.libs/lordsawar-editor.exe ./
 echo Please wait while we collect DLLs...
 $bundledlls ./lordsawar.exe --copy
-cp -r /usr/share/lordsawar/* ./
+cp -r /usr/local/share/lordsawar/* ./
 mingw-strip ./lordsawar.exe
+mingw-strip ./lordsawar-editor.exe
 cd ..
 rm lordsawar-windows.zip 2>/dev/null >/dev/null
 $zip -9 -r lordsawar-windows.zip lordsawar-windows
