@@ -72,7 +72,7 @@ void MapRenderer::render_tile(Vector<int> draw, Vector<int> tile,
     }
   else
     {
-      if (style->getImage() == false)
+      if (style->getImage() == NULL)
 	{
 	  printf ("pic for style %d for tile %d at %d,%d is null\n",
 		  style->getType(), mtile->getType(), tile.x, tile.y);
