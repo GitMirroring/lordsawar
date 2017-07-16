@@ -144,7 +144,7 @@ void StackArmyButton::fill_army_button()
     {
       bool greyed_out = false;
       Stack *active_stack = p->getActivestack();
-      if (active_stack->getArmyById(d_army->getId()) == false)
+      if (active_stack->getArmyById(d_army->getId()) == NULL)
         greyed_out = true;
       army_image->property_pixbuf() =
         gc->getCircledArmyPic(p->getArmyset(), d_army->getTypeId(),
