@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -152,7 +152,7 @@ public:
 	if (!helper.parseXML())
 	  {
             unsupported = unsupported_version;
-            std::cerr << String::ucompose(_("Error!  can't load shieldet `%1'."), filename) << std::endl;
+            std::cerr << String::ucompose(_("Error!  can't load shieldset `%1'."), filename) << std::endl;
 	    if (shieldset != NULL)
 	      delete shieldset;
 	    shieldset = NULL;

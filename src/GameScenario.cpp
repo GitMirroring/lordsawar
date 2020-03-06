@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2006-2008, 2010, 2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006-2008, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -795,7 +795,7 @@ bool GameScenario::load(Glib::ustring tag, XML_Helper* helper)
     {
       if (helper->getVersion() != LORDSAWAR_SAVEGAME_VERSION)
 	{
-          std::cerr << String::ucompose(_("saved game file has wrong version.  expecting %1 but got %2."), LORDSAWAR_SAVEGAME_VERSION, helper->getVersion()) << std::endl;
+          std::cerr << String::ucompose(_("saved game file has wrong version.  Expecting %1 but got %2."), LORDSAWAR_SAVEGAME_VERSION, helper->getVersion()) << std::endl;
 	  return false;
 	}
       return true;

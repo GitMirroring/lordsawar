@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014, 2015 Ben Asselstine
+// Copyright (C) 2009, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ std::vector<Glib::ustring> Commentator::getComments(Player *player) const
     comments.push_back(_("You are sadly in need of gold!"));
   else if (player->getGold() > 2500)
     {
-      comments.push_back(_("Your wealth is greather than the mightiest of dragons!"));
+      comments.push_back(_("Your wealth is greater than the mightiest of dragons!"));
       comments.push_back(_("All your gold must surely be a burden!"));
     }
   std::list<Hero*> heroes = player->getHeroes();

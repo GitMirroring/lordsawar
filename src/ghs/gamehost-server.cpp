@@ -1,4 +1,4 @@
-// Copyright (C) 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -370,7 +370,7 @@ bool GamehostServer::onGotMessage(void *conn, int type, Glib::ustring payload)
           if (add_to_profiles_awaiting_maps(profile, scenario_id) == false)
             {
               delete profile;
-              err = _("Server too busy.  try again later.");
+              err = _("Server too busy.  Try again later.");
               network_server->send(conn, GHS_MESSAGE_COULD_NOT_HOST_GAME, 
                                    scenario_id + " " + err);
               return true;

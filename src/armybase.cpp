@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2015, 2020 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -94,7 +94,7 @@ Glib::ustring ArmyBase::getArmyBonusDescription() const
 			  _("+1 str in woods"));
   else if (bonus & ArmyBase::ADD2STRINFOREST)
     s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  _("+1 str in woods"));
+			  _("+2 str in woods"));
   if (bonus & ArmyBase::ADD1STRINHILLS && bonus & ArmyBase::ADD2STRINHILLS)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
 			  _("+3 str in hills"));

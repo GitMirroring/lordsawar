@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Ben Asselstine
+// Copyright (C) 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -703,7 +703,7 @@ import_ruins_and_temples (FILE *scn, FILE *spc)
           Ruinlist::getInstance()->add(r);
         }
       else
-        std::cerr << String::ucompose(_("Error: We got an unknkown temple/ruin type of %1 for %2 at %3,%4"), type, Glib::ustring(name),x,y) << std::endl;
+        std::cerr << String::ucompose(_("Error: We got an unknown temple/ruin type of %1 for %2 at %3,%4"), type, Glib::ustring(name),x,y) << std::endl;
     }
 }
 
@@ -1461,7 +1461,7 @@ main (int argc, char* argv[])
       std::list<Glib::ustring> map = File::scanForFiles(filename, ".MAP");
       if (map.size() == 0)
         {
-          std::cerr << String::ucompose (_("Error, Could not find a .MAP file in %1"), filename) << std::endl;
+          std::cerr << String::ucompose (_("Error: Could not find a .MAP file in %1"), filename) << std::endl;
           exit (EXIT_FAILURE);
         }
       std::list<Glib::ustring> scn = File::scanForFiles(filename, ".SCN");
