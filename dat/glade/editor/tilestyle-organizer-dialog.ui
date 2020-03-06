@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.2 -->
 <interface>
-  <requires lib="gtk+" version="3.0"/>
-  <!-- interface-naming-policy toplevel-contextual -->
+  <requires lib="gtk+" version="3.20"/>
   <object class="GtkListStore" id="liststore1"/>
   <object class="GtkListStore" id="liststore2"/>
   <object class="GtkListStore" id="liststore3"/>
@@ -13,14 +13,17 @@
     <property name="title" translatable="yes">Organize Tile Images</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox">
-        <property name="orientation">vertical</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">12</property>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area1">
+          <object class="GtkButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
@@ -48,21 +51,20 @@
         </child>
         <child>
           <object class="GtkBox" id="outer_hbox">
-            <property name="orientation">horizontal</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="spacing">24</property>
             <child>
               <object class="GtkBox" id="inner_vbox">
-                <property name="orientation">vertical</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
                 <property name="spacing">12</property>
                 <child>
                   <object class="GtkBox" id="vbox1">
-                    <property name="orientation">vertical</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkLabel" id="label1">
                         <property name="visible">True</property>
@@ -82,6 +84,7 @@
                       <object class="GtkIconView" id="categories_iconview">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="margin">0</property>
                         <property name="model">liststore2</property>
                         <property name="item_padding">2</property>
                       </object>
@@ -100,9 +103,9 @@
                 </child>
                 <child>
                   <object class="GtkBox" id="vbox2">
-                    <property name="orientation">vertical</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkLabel" id="category_label">
                         <property name="visible">True</property>
@@ -123,12 +126,11 @@
                         <property name="height_request">65</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="hscrollbar_policy">automatic</property>
-                        <property name="vscrollbar_policy">automatic</property>
                         <child>
                           <object class="GtkIconView" id="category_iconview">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <property name="margin">0</property>
                             <property name="selection_mode">multiple</property>
                             <property name="model">liststore1</property>
                             <property name="spacing">12</property>
@@ -151,9 +153,9 @@
                 </child>
                 <child>
                   <object class="GtkBox" id="vbox3">
-                    <property name="orientation">vertical</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkLabel" id="unsorted_label">
                         <property name="visible">True</property>
@@ -174,12 +176,11 @@
                         <property name="height_request">65</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="hscrollbar_policy">automatic</property>
-                        <property name="vscrollbar_policy">automatic</property>
                         <child>
                           <object class="GtkIconView" id="unsorted_iconview">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <property name="margin">0</property>
                             <property name="selection_mode">multiple</property>
                             <property name="model">liststore3</property>
                             <property name="spacing">50</property>
