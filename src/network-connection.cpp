@@ -91,7 +91,13 @@ bool NetworkConnection::on_got_input(Glib::IOCondition cond)
         {
           len = -1;
         }
-      //break;  fallthrough here on purpose.
+      if (len <= 0)
+        {
+          tear_down_connection();
+          connection_lost.emit();
+          return false;
+        }
+      break;
     case Glib::IO_ERR:
     case Glib::IO_HUP:
     case Glib::IO_NVAL:
