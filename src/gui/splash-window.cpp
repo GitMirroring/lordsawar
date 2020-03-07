@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007-2012, 2014-2016 Ben Asselstine
+//  Copyright (C) 2007-2012, 2014-2016, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -98,15 +98,7 @@ SplashWindow::SplashWindow()
   bool broken = false;
   bg = PixMask::create (File::getVariousFile("splash_screen.png"), broken);
   if (broken == false)
-    {
-      int decorations = 24 * 3;
-      if (Gdk::Screen::get_default()->get_height() - decorations < 
-          bg->get_height())
-        window->set_size_request (Gdk::Screen::get_default()->get_width(),
-                                  Gdk::Screen::get_default()->get_height());
-      else
-        window->set_size_request (bg->get_width(), bg->get_height());
-    }
+    main_box->set_size_request (bg->get_width(), bg->get_height());
 }
 
 bool SplashWindow::on_draw(const ::Cairo::RefPtr< ::Cairo::Context >& cr)
