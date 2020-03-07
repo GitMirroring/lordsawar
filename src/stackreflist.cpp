@@ -84,7 +84,6 @@ StackReflist::iterator StackReflist::eraseStack(StackReflist::iterator it)
       Stack *s = *it;
       if (s)
         {
-          typedef std::map<guint32, Stack*> IdMap;
           IdMap::iterator i = d_id.find(s->getId());
           if (i != d_id.end())
             d_id.erase(i);
