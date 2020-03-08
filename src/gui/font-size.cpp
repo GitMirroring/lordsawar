@@ -60,5 +60,9 @@ void FontSize::calculate_default_font_height_and_width ()
   layout->get_pixel_extents (ink, logical);
   d_height = ink.get_height ();
   d_width = ink.get_width ();
+  if (d_height == 0)
+    d_height = 11.0;
+  if (d_width == 0)
+    d_width = 7.0;
 }
 // End of file
