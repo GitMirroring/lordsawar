@@ -57,7 +57,7 @@ class FontSize
     private:
 
         //! Calculate the height of the default font in pixels.
-        double calculate_default_font_height_and_width ();
+        void calculate_default_font_height_and_width ();
 
 	// DATA
         double d_height;

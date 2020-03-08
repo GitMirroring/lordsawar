@@ -50,7 +50,7 @@ bool FontSize::recalculate ()
   return d_height != height || d_width != width;
 }
 
-void FontSize::calculate_default_font_height ()
+void FontSize::calculate_default_font_height_and_width ()
 {
   Gtk::HBox *box = new Gtk::HBox ();
   Glib::RefPtr <Pango::Context> cr = box->create_pango_context ();

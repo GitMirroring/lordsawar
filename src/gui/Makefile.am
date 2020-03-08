@@ -79,7 +79,8 @@ liblwgui_la_SOURCES = \
     stack-army-button.cpp stack-army-button.h \
     lw-dialog.cpp lw-dialog.h \
     builder-cache.cpp builder-cache.h \
-    tartan-progress-bar.cpp tartan-progress-bar.h
+    tartan-progress-bar.cpp tartan-progress-bar.h \
+    font-size.cpp font-size.h
 
 liblwgui_la_LIBADD = @LTLIBOBJS@
 
