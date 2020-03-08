@@ -60,7 +60,8 @@ DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 
 
 AM_CXXFLAGS = -Wall -Wshadow -Wextra -pedantic -Wno-deprecated-declarations \
-  -DPO_PATH=\"$(prefix)/share/locale/\" -std=c++11
+	      -Wno-deprecated-copy -DPO_PATH=\"$(prefix)/share/locale/\" \
+	      -std=c++11
 AM_CPPFLAGS = \
     $(SDL_CFLAGS) \
     $(LIBSIGC_CFLAGS) \

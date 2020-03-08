@@ -89,4 +89,5 @@ AM_CPPFLAGS = \
    $(GSTREAMER_CFLAGS) \
    -I$(top_srcdir)/src
 
-AM_CXXFLAGS = -Wall -Wshadow -Wextra -pedantic -Wno-deprecated-declarations -std=c++11
+AM_CXXFLAGS = -Wall -Wshadow -Wextra -pedantic -Wno-deprecated-declarations \
+	      -Wno-deprecated-copy -std=c++11
