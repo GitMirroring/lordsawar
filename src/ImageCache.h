@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
 // Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2006-2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006-2011, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -67,6 +67,10 @@ class NewLevelPixMaskCacheItem;
 class DefaultTileStylePixMaskCacheItem;
 class TartanPixMaskCacheItem;
 class EmptyTartanPixMaskCacheItem;
+class StatusPixMaskCacheItem;
+class GameButtonPixMaskCacheItem;
+class DialogPixMaskCacheItem;
+class MedalPixMaskCacheItem;
 
 //! Cache for generated army and map images.
 /** Soliton class for caching army and map images
@@ -130,6 +134,27 @@ class ImageCache
       END_TURN,
       GARRISON
     };
+  enum StatusBoxImageType
+    {
+      STATUS_CITY = 0,
+      STATUS_TREASURY,
+      STATUS_INCOME,
+      STATUS_UPKEEP,
+      STATUS_DEFENSE, //doesn't belong but we put it here anyway
+    };
+
+  enum DialogImageType
+    {
+      DIALOG_NEXT_TURN = 0,
+      DIALOG_NEW_HERO_MALE,
+      DIALOG_NEW_HERO_FEMALE,
+      DIALOG_CONQUERED_CITY,
+      DIALOG_WINNING,
+      DIALOG_RUIN_SUCCESS,
+      DIALOG_RUIN_DEFEAT,
+      DIALOG_PARLEY_OFFERED,
+      DIALOG_PARLEY_REFUSED,
+    };
 
         //! Method for getting/creating the soliton instance.
         static ImageCache* getInstance();
@@ -162,8 +187,10 @@ class ImageCache
         PixMask* getCircledArmyPic(guint32 armyset, guint32 army, 
                                    const Player* p, const bool* medals, 
                                    bool greyed, guint32 circle_colour_id,
-                                   bool show_army);
-        PixMask *getCircledArmyPic(Army *a, bool greyed, guint32 circle_colour_id, bool show_army);
+                                   bool show_army, guint32 font_size);
+        PixMask *getCircledArmyPic(Army *a, bool greyed,
+                                   guint32 circle_colour_id, bool show_army,
+                                   guint32 font_size);
 
         /** Method for getting the shield picture from the cache
           * 
@@ -178,10 +205,14 @@ class ImageCache
           * @param shieldset    the id of the shieldset to be used
 	  * @param type         the size of the shield: 0=sm, 1=med, 2=lg
           * @param colour       which player the shield is for
+          * @param map          whether or not this shield appears on a map
+          * @param font_size    for map=false, to calculate relative size
           * @return the image of the shield
           */
-        PixMask* getShieldPic(guint32 shieldset, guint32 type, guint32 colour);
-        PixMask* getShieldPic(guint32 type, Player *p);
+        PixMask* getShieldPic(guint32 shieldset, guint32 type, guint32 colour,
+                              bool map, guint32 font_size);
+        PixMask* getShieldPic(guint32 type, Player *p, bool map,
+                              guint32 font_size);
 
         /** Method for getting a ruin picture
           *
@@ -194,11 +225,13 @@ class ImageCache
 
         /** Method for getting a diplomacy icon
           *
-          * @param type         o = small, or 1 = large.
+          * @param type         0 = small, or 1 = large.
           * @param state        the diplomatic state.  e.g. peace, war, etc
+          * @font_size is the height of the default font in pixels.
           * @return image of the icon
           */
-        PixMask* getDiplomacyPic(int type, Player::DiplomaticState state);
+        PixMask* getDiplomacyPic(int type, Player::DiplomaticState state,
+                                 guint32 font_size);
 
         /** Method for getting a temple picture
           *
@@ -238,9 +271,10 @@ class ImageCache
         /** Method for getting a cursor picture
           *
           * @param type         the type of the cursor 
+          * @font_size          the height of the default font in pixels.
           * @return image of the cursor
           */
-        PixMask* getCursorPic(int type);
+        PixMask* getCursorPic(int type, guint32 font_size);
 
         /** Method for getting a ship picture.  This is the picture
 	  * that appears when the stack goes into the water.
@@ -295,9 +329,12 @@ class ImageCache
 	 * to increase a stat.
 	 *
 	 * @param p the player to colour the image as.
+         * @param gender male=1, female=2.
+         * @font_size is the height of the default font in pixels.
 	 * @return new-level image.
 	 */
-        PixMask* getNewLevelPic(const Player* p, guint32 gender);
+        PixMask* getNewLevelPic(const Player* p, guint32 gender,
+                                guint32 font_size);
 
         /** Method for getting a picture that represents a type of tile style.
          *  The parameter is related to tilestyle.h:TileStyle::Type.
@@ -382,13 +419,12 @@ class ImageCache
 	PixMask* getTilePic(int tile_style_id, int fog_type_id, bool has_bag, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid, int stone_type);
 
 
-        PixMask* getMoveBonusPic(guint32 bonus, bool has_ship);
+        PixMask* getMoveBonusPic(guint32 bonus, bool has_ship, guint32 font_size);
         /** Method for getting production shield pictures.
           *
           * As with the other methods, use solely this method to get the 
           * shield images. And DON'T modify the images!
           *
-          * @param size 0 or 1.  0 is small, and 1 is medium sized.
           * @param type home/away/destination/source/invalid.  
 	  * one sees home/away
 	  * normally, but when "see all" is turned on, one sees source/dest.
@@ -398,7 +434,9 @@ class ImageCache
 	  * note that type=invalid,production=true is used to show the symbol
 	  * that means no more units can be vectored to this city.
           */
-        PixMask* getProdShieldPic(int size, guint32 type, bool prod);
+        PixMask* getProdShieldPic(guint32 type, bool prod);
+
+        PixMask* getMedalPic(bool large, guint32 type, guint32 font_size);
 
         //! Erase cached graphics.
         void reset();
@@ -406,7 +444,7 @@ class ImageCache
         //these routines get a base image, not a cached image.
         PixMask* getDiplomacyImage(int type, Player::DiplomaticState state);
         PixMask* getCursorImage(int type);
-        PixMask *getProdShieldImage(int size, guint32 type);
+        PixMask *getProdShieldImage(guint32 type);
         PixMask* getMoveBonusImage(guint32 type);
         PixMask* getDefaultTileStyleImage(guint32 type);
         PixMask* getMedalImage(bool large, int type);
@@ -420,7 +458,14 @@ class ImageCache
         PixMask* getSmallRuinUnexploredImage();
         PixMask* getSmallStrongholdUnexploredImage();
         //! get an image for one of the buttons on the main game window.
-        PixMask* getGameButtonImage(guint32 type, int size);
+        PixMask* getStatusPic(guint32 type, guint32 font_size);
+        /** Method for getting main screen game button pictures.
+         *
+         * @param type is one of the enums.
+         * @font_size is the height of the default font in pixels.
+         */
+        PixMask* getGameButtonPic(guint32 type, guint32 font_size);
+        PixMask* getDialogPic(guint32 type, guint32 font_size);
         PixMask* getWaypointImage(guint32 type);
 
         PixMask* getNextTurnPic ();
@@ -431,6 +476,8 @@ class ImageCache
         PixMask* getRuinDefeatPic();
         PixMask *getParleyOfferedPic();
         PixMask *getParleyRefusedPic();
+
+        PixMask* getGameButtonImage(guint32 type);
 
 	static PixMask* applyMask(PixMask* image, PixMask* mask, const Player* p);
 	static PixMask* applyMask(PixMask* image, PixMask* mask, Gdk::RGBA colour);
@@ -444,6 +491,8 @@ class ImageCache
                                     double line_width);
         static PixMask* add_border (PixMask *p, Vector<int> dim,
                                     double line_width);
+
+        static int calculate_width_from_adjusted_height (PixMask *p, double new_height);
     private:
         ImageCache();
         ~ImageCache();
@@ -493,10 +542,14 @@ class ImageCache
         PixMaskCache<DefaultTileStylePixMaskCacheItem> defaulttilestylecache;
         PixMaskCache<TartanPixMaskCacheItem> tartancache;
         PixMaskCache<EmptyTartanPixMaskCacheItem> emptytartancache;
+        PixMaskCache<StatusPixMaskCacheItem> statuscache;
+        PixMaskCache<GameButtonPixMaskCacheItem> gamebuttoncache;
+        PixMaskCache<DialogPixMaskCacheItem> dialogcache;
+        PixMaskCache<MedalPixMaskCacheItem> medalcache;
 
         PixMask* d_diplomacy[2][DIPLOMACY_TYPES];
         PixMask* d_cursor[CURSOR_TYPES];
-        PixMask* d_prodshield[2][PRODUCTION_SHIELD_TYPES];
+        PixMask* d_prodshield[PRODUCTION_SHIELD_TYPES];
         PixMask* d_movebonus[MOVE_BONUS_TYPES];
 	PixMask *d_newlevel_male;
 	PixMask *d_newlevelmask_male;
@@ -513,7 +566,7 @@ class ImageCache
 	PixMask* d_small_ruin_explored;
 	PixMask* d_small_temple;
         PixMask *d_waypoint[NUM_WAYPOINTS];
-        PixMask *d_gamebuttons[3][NUM_GAME_BUTTON_IMAGES];
+        PixMask *d_gamebuttons[NUM_GAME_BUTTON_IMAGES];
         PixMask *d_nextturn;
         PixMask *d_citydefeated;
         PixMask *d_winning;
@@ -598,6 +651,7 @@ public:
     bool greyed;
     guint32 circle_colour_id;
     bool show_army;
+    guint32 font_size;
 };
 
 //! Helper class for big map tile items in the ImageCache.
@@ -708,6 +762,7 @@ public:
     bool operator < (const DiplomacyPixMaskCacheItem &c) const {return comp(c)<0;};
     int type;
     Player::DiplomaticState state;
+    guint32 font_size;
 };
 
 //! Helper class for road items in the ImageCache.
@@ -768,6 +823,7 @@ public:
     bool operator == (const CursorPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const CursorPixMaskCacheItem &c) const {return comp(c)<0;};
     int type;
+    guint32 font_size;
 };
 
 //! Helper class for shield items in the ImageCache.
@@ -784,6 +840,8 @@ public:
     guint32 shieldset;
     guint32 type;
     guint32 colour;
+    bool map;
+    guint32 font_size;
 };
 
 //! Helper class for production icon items in the ImageCache.
@@ -797,7 +855,6 @@ public:
     int comp(const ProdShieldPixMaskCacheItem item) const;
     bool operator == (const ProdShieldPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const ProdShieldPixMaskCacheItem &c) const {return comp(c)<0;};
-    int size;
     guint32 type;
     bool prod;
 };
@@ -814,6 +871,7 @@ public:
     bool operator == (const MoveBonusPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const MoveBonusPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 type; // 0=empty, 1=trees, 2=foothills, 3=hills+trees, 4=fly, 5=boat
+    guint32 font_size;
 };
 
 //! Helper class for boat items in the ImageCache.
@@ -919,6 +977,7 @@ public:
     bool operator < (const NewLevelPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 player_id;
     guint32 gender;
+    guint32 font_size;
 };
 
 //! Helper class for default tile style items in the ImageCache.
@@ -971,4 +1030,67 @@ public:
     guint32 player_id;
     guint32 shieldset;
 };
+
+//! Helper class for status images in the ImageCache.
+/**
+ * These status images include city, treasury, upkeep and income.
+ */
+class StatusPixMaskCacheItem
+{
+public:
+    static PixMask *generate(StatusPixMaskCacheItem item);
+    int comp(const StatusPixMaskCacheItem item) const;
+    bool operator == (const StatusPixMaskCacheItem &c) {return !comp(c);};
+    bool operator < (const StatusPixMaskCacheItem &c) const {return comp(c)<0;};
+    guint32 type;
+    guint32 font_size;
+};
+
+//! Helper class for the main screen button images in the ImageCache.
+/**
+ * These images include end turn, move all stacks, park, search and so on.
+ */
+class GameButtonPixMaskCacheItem
+{
+public:
+    static PixMask *generate(GameButtonPixMaskCacheItem item);
+    int comp(const GameButtonPixMaskCacheItem item) const;
+    bool operator == (const GameButtonPixMaskCacheItem &c) {return !comp(c);};
+    bool operator < (const GameButtonPixMaskCacheItem &c) const {return comp(c)<0;};
+    guint32 type;
+    guint32 font_size;
+};
+
+//! Helper class for the various images that appear on dialogs.
+/**
+ * These images include next turn, new hero, conquered city and so on.
+ */
+class DialogPixMaskCacheItem
+{
+public:
+    static PixMask *generate(DialogPixMaskCacheItem item);
+    int comp(const DialogPixMaskCacheItem item) const;
+    bool operator == (const DialogPixMaskCacheItem &c) {return !comp(c);};
+    bool operator < (const DialogPixMaskCacheItem &c) const {return comp(c)<0;};
+    guint32 type;
+    guint32 font_size;
+};
+
+//! Helper class for the medal images in the ImageCache.
+/**
+ * These images include the tiny medals that get awarded to armies,
+ * and then the large ones that appear on dialogs..
+ */
+class MedalPixMaskCacheItem
+{
+public:
+    static PixMask *generate(MedalPixMaskCacheItem item);
+    int comp(const MedalPixMaskCacheItem item) const;
+    bool operator == (const MedalPixMaskCacheItem &c) {return !comp(c);};
+    bool operator < (const MedalPixMaskCacheItem &c) const {return comp(c)<0;};
+    bool large;
+    guint32 type;
+    guint32 font_size;
+};
+
 #endif

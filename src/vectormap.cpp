@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -51,39 +51,52 @@ void VectorMap::draw_planted_standard(Vector<int> flag)
 
 void VectorMap::draw_city (City *c, guint32 &type, bool &prod)
 {
-  int csize = 0;
-  switch (Configuration::UiFormFactor(Configuration::s_ui_form_factor))
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      break;
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      csize = 1;
-      break;
-    }
-
   if (c->isVisible(Playerlist::getViewingplayer()) == false)
     return;
   PixMask *tmp;
   if (c->isBurnt() == true)
-    tmp = ImageCache::getInstance()->getSmallRuinedCityImage();
+    {
+      tmp = ImageCache::getInstance()->getSmallRuinedCityImage()->copy ();
+      //we need 78 of these per map height
+      double new_height = get_height () / 78.0;
+      int new_width = tmp->get_width () * (new_height / tmp->get_height ());
+
+      PixMask::scale (tmp, new_width, new_height);
+    }
   else
     {
       if (Playerlist::getInstance()->getViewingplayer() != c->getOwner())
 	{
 	  guint32 s = GameMap::getInstance()->getShieldsetId();
-	  tmp = ImageCache::getInstance()->getShieldPic(s, csize, c->getOwner()->getId());
+	  tmp = ImageCache::getInstance()->getShieldPic(s, 0,
+                                                        c->getOwner()->getId(),
+                                                        true, 0)->copy ();
+          //we need 39 of these per map height
+          double new_height = get_height () / 39.0;
+          int new_width = tmp->get_width () * (new_height / tmp->get_height ());
+
+          PixMask::scale (tmp, new_width, new_height);
 	}
       else
-	tmp = ImageCache::getInstance()->getProdShieldPic (csize, type, prod);
+        {
+          tmp = ImageCache::getInstance()->getProdShieldPic (type, prod)->copy ();
+          //we need 31.2 of these per map height
+          double new_height = get_height () / 31.2;
+          int new_width = tmp->get_width () * (new_height / tmp->get_height ());
+
+          PixMask::scale (tmp, new_width, new_height);
+        }
     }
 
   Vector<int> start;
   
-  start  = c->getPos();
+  start = c->getPos();
   start = mapToSurface(start);
   if (tmp)
-    tmp->blit_centered(surface, start);
+    {
+      tmp->blit_centered(surface, start);
+      delete tmp;
+    }
 }
 
 void VectorMap::draw_cities (std::list<City*> citylist, guint32 type)
@@ -134,6 +147,7 @@ void VectorMap::draw_vectoring_line(Vector<int> src, Vector<int> dest, bool to)
     line_colour = RECEIVE_VECTORED_UNIT_LINE_COLOUR;
   draw_line(start.x, start.y, end.x, end.y, line_colour);
 }
+
 void VectorMap::draw_vectoring_line_from_here_to (Vector<int> dest)
 {
   draw_vectoring_line (city->getPos(), dest, true);

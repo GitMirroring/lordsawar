@@ -484,8 +484,7 @@ Glib::ustring FileCompat::typeToCode(const FileCompat::Type type)
     }
   return "";
 }
-        
-        
+
 void FileCompat::support_version(guint32 k, Glib::ustring from, Glib::ustring to, FileCompat::Slot slot)
 {
   versions[FileCompat::Type(k)].push_back(UpgradeDetails(from, to, slot));

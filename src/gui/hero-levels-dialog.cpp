@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "hero.h"
 #include "ImageCache.h"
 #include "shield.h"
+#include "font-size.h"
 
 void HeroLevelsDialog::init(Player *theplayer)
 {
@@ -72,7 +73,7 @@ void HeroLevelsDialog::addHero(Hero *h)
   (*i)[heroes_columns.image] = 
     ImageCache::getInstance()->getCircledArmyPic
     (player->getArmyset(), h->getTypeId(), player, NULL, false, Shield::NEUTRAL, 
-     true)->to_pixbuf();
+     true, FontSize::getInstance()->get_height ())->to_pixbuf();
   (*i)[heroes_columns.level] = String::ucompose("%1", h->getLevel());
   (*i)[heroes_columns.exp] = (guint32)h->getXP();
   (*i)[heroes_columns.needs] = (guint32)h->getXpNeededForNextLevel();

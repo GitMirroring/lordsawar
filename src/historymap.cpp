@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -56,7 +56,8 @@ void HistoryMap::drawRuins()
         continue;
 
       PixMask* tmp = 
-        ImageCache::getInstance()->getShieldPic(1, ruin->getOwner())->copy();
+        ImageCache::getInstance()->getShieldPic(1, ruin->getOwner(),
+                                                true, 0)->copy();
       PixMask::scale(tmp, tmp->get_width()/2, tmp->get_height()/2);
   
       Vector<int> pos = ruin->getPos();
@@ -78,7 +79,8 @@ void HistoryMap::drawCities()
       if (it->isBurnt() == true)
         tmp = ImageCache::getInstance()->getSmallRuinedCityImage();
       else
-        tmp = ImageCache::getInstance()->getShieldPic(0, it->getOwner());
+        tmp = ImageCache::getInstance()->getShieldPic(0, it->getOwner(),
+                                                      true, 0);
 
       Vector<int> pos = it->getPos();
       pos = mapToSurface(pos);

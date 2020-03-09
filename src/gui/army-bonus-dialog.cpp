@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "armysetlist.h"
 #include "player.h"
 #include "ImageCache.h"
+#include "font-size.h"
 
 ArmyBonusDialog::ArmyBonusDialog(Gtk::Window &parent, Player *p)
  :LwDialog(parent, "army-bonus-dialog.ui")
@@ -60,11 +61,14 @@ void ArmyBonusDialog::addArmyType(guint32 army_type)
   (*i)[armies_columns.name] = a->getName();
   (*i)[armies_columns.image] = 
     gc->getCircledArmyPic(p->getArmyset(), army_type, p, NULL, false,
-                          p->getId(), true)->to_pixbuf();
+                          p->getId(), true,
+                          FontSize::getInstance ()->get_height ())->to_pixbuf();
   (*i)[armies_columns.str] = a->getStrength();
   (*i)[armies_columns.move] = a->getMaxMoves();
   guint32 b = a->getMoveBonus();
-  (*i)[armies_columns.move_image] = gc->getMoveBonusPic(b, false)->to_pixbuf();
+  (*i)[armies_columns.move_image] =
+    gc->getMoveBonusPic(b, false,
+                        FontSize::getInstance ()->get_height ())->to_pixbuf();
   (*i)[armies_columns.bonus] = "-";
 
   Glib::ustring s = a->getArmyBonusDescription();

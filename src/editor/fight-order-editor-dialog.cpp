@@ -1,4 +1,4 @@
-//  Copyright (C) 2015 Ben Asselstine
+//  Copyright (C) 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "armysetlist.h"
 #include "ImageCache.h"
 #include "playerlist.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &FightOrderEditorDialog::x)
 
@@ -87,7 +88,8 @@ void FightOrderEditorDialog::addArmyType(guint32 army_type, Player *player)
   (*i)[armies_columns.name] = a->getName();
   (*i)[armies_columns.image] = 
     gc->getCircledArmyPic(player->getArmyset(), army_type, player, NULL,
-                          false, player->getId(), true)->to_pixbuf();
+                          false, player->getId(), true,
+                          FontSize::getInstance ()->get_height ())->to_pixbuf();
   (*i)[armies_columns.army_type] = a->getId();
 }
 

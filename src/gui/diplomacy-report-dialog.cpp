@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "ImageCache.h"
 #include "playerlist.h"
 #include "player.h"
+#include "font-size.h"
 
 DiplomacyReportDialog::DiplomacyReportDialog(Gtk::Window &parent, Player *player)
  : LwDialog(parent, "diplomacy-report-dialog.ui")
@@ -60,7 +61,9 @@ DiplomacyReportDialog::DiplomacyReportDialog(Gtk::Window &parent, Player *player
 	continue;
       Player *p = pl->getPlayer(order[i]);
 
-      Glib::RefPtr<Gdk::Pixbuf> pix = gc->getShieldPic(2, p)->to_pixbuf();
+      Glib::RefPtr<Gdk::Pixbuf> pix =
+        gc->getShieldPic(2, p, false,
+                         FontSize::getInstance ()->get_height ())->to_pixbuf();
       Gtk::Image *im = manage(new Gtk::Image());
       im->property_pixbuf() = pix;
       d_table->attach(*im, 1, i+1, 1, 1);
@@ -76,7 +79,9 @@ DiplomacyReportDialog::DiplomacyReportDialog(Gtk::Window &parent, Player *player
 	    continue;
 	  Player::DiplomaticState state;
 	  state = p->getDiplomaticState(pl->getPlayer(order[j]));
-	  Glib::RefPtr<Gdk::Pixbuf> pix2 = gc->getDiplomacyPic(0, state)->to_pixbuf();
+	  Glib::RefPtr<Gdk::Pixbuf> pix2 =
+            gc->getDiplomacyPic
+            (0, state, FontSize::getInstance ()->get_height ())->to_pixbuf();
 	  Gtk::Image *im3 = manage(new Gtk::Image());
 	  im3->property_pixbuf() = pix2;
 	  d_table->attach(*im3, i + 2, j + 1, 1, 1);

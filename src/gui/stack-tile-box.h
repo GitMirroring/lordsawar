@@ -1,4 +1,4 @@
-//  Copyright (C) 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class StackTileBox: public Gtk::Box
     //!Destructor.
     ~StackTileBox();
 
-    static StackTileBox * create(guint32 factor);
+    static StackTileBox * create();
     void on_stack_info_changed(Stack *s);
     void setInhibit(bool inhibit) {d_inhibit = inhibit;};
     Stack * get_currently_selected_stack() const {return currently_selected_stack;};
@@ -55,13 +55,11 @@ class StackTileBox: public Gtk::Box
  protected:
 
  private:
-    guint32 d_factor;
     bool d_inhibit;
     Stack *currently_selected_stack;
     ArmyInfoTip *army_info_tip;
     typedef std::vector<StackArmyButton *> stack_army_buttons_type;
     stack_army_buttons_type stack_army_buttons;
-    static Glib::ustring get_file(Configuration::UiFormFactor factor);
     Gtk::Box *stack_info_box;
     Gtk::Box *stack_info_container;
     Gtk::Label *group_moves_label;

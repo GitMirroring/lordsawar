@@ -1,4 +1,7 @@
 
+Copyright 2011, 2020 Ben Asselstine
+This file is licensed under the GNU General Public License version 3, or at your option any later version.
+
 The xslt files in this directory assist in the backward compatibility.
 These files help this software support old versions of various files.
 
@@ -24,8 +27,8 @@ gs    - map or saved-game file
 Each version looks like 0.2.0, or 0.1.9, etc.
 The version number can contain double digits.  e.g. 0.1.10.
 
-Some of these xslt files operate on xml files found in ~/.lordsawar/.  Some xml files also appear inside of armyset, tileset, cityset, shieldset, map and saved-game files.  (These files are all implemented as tar files, and are normally found in ~/.lordsawar/, and ${PREFIX}/share/lordsawar/).
-The primary configuration file refers to the xml file located at ~/.lordsawarrc.
+Some of these xslt files operate on xml files found in ~/.local/share/lordsawar/.  Some xml files also appear inside of armyset, tileset, cityset, shieldset, map and saved-game files.  (These files are all implemented as tar files, and are normally found in ~/.local/share/lordsawar/, and ${PREFIX}/share/lordsawar/).
+The primary configuration file refers to the xml file located at ~/.config/lordsawar/lordsawarrc.
 
 See the lordsawar-upgrade-file program for more information on how to upgrade files.
 

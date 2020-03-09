@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007-2010, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007-2010, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@
 #include "citysetlist.h"
 #include "cityset.h"
 #include "tileset.h"
+#include "font-size.h"
 
 
 EditorBigMap::EditorBigMap()
@@ -867,7 +868,8 @@ void EditorBigMap::after_draw()
           case FIGHT:
               {
                 pic =
-                  ImageCache::getInstance()->getCursorPic(ImageCache::SWORD);
+                  ImageCache::getInstance()->getCursorPic
+                  (ImageCache::SWORD, FontSize::getInstance ()->get_height ());
                 PixMask *copy = pic->copy();
                 PixMask::scale (copy, tilesize * 0.66, tilesize * 0.66);
                 copy->blit(buffer, pos +

@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006-2011, 2014-2016 Ben Asselstine
+// Copyright (C) 2006-2011, 2014-2016, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -87,7 +87,11 @@ ImageCache::ImageCache()
     newlevelcache((sigc::ptr_fun(&NewLevelPixMaskCacheItem::generate))),
     defaulttilestylecache((sigc::ptr_fun(&DefaultTileStylePixMaskCacheItem::generate))),
     tartancache((sigc::ptr_fun(&TartanPixMaskCacheItem::generate))),
-    emptytartancache((sigc::ptr_fun(&EmptyTartanPixMaskCacheItem::generate)))
+    emptytartancache((sigc::ptr_fun(&EmptyTartanPixMaskCacheItem::generate))),
+    statuscache((sigc::ptr_fun(&StatusPixMaskCacheItem::generate))),
+    gamebuttoncache((sigc::ptr_fun(&GameButtonPixMaskCacheItem::generate))),
+    dialogcache((sigc::ptr_fun(&DialogPixMaskCacheItem::generate))),
+    medalcache((sigc::ptr_fun(&MedalPixMaskCacheItem::generate)))
 {
     loadDiplomacyImages();
     loadCursorImages();
@@ -173,10 +177,8 @@ bool ImageCache::loadProdShieldImages()
 {
   bool broken = false;
   //load the production shieldset
-  int smallxsize = SMALL_PRODUCTION_SHIELD_WIDTH;
-  int smallysize = SMALL_PRODUCTION_SHIELD_HEIGHT;
-  int mediumxsize = MEDIUM_PRODUCTION_SHIELD_WIDTH;
-  int mediumysize = MEDIUM_PRODUCTION_SHIELD_HEIGHT;
+  int xsize = SMALL_PRODUCTION_SHIELD_WIDTH;
+  int ysize = SMALL_PRODUCTION_SHIELD_HEIGHT;
   std::vector<PixMask*> prodshield;
   prodshield = disassemble_row
     (File::getVariousFile("prodshieldset.png"), PRODUCTION_SHIELD_TYPES,
@@ -185,22 +187,11 @@ bool ImageCache::loadProdShieldImages()
     return false;
   for (unsigned int i = 0; i < PRODUCTION_SHIELD_TYPES; i++)
     {
-      if (prodshield[i]->get_width() != smallxsize)
-	PixMask::scale(prodshield[i], smallxsize, smallysize);
-      d_prodshield[0][i] = prodshield[i];
+      if (prodshield[i]->get_width() != xsize)
+	PixMask::scale(prodshield[i], xsize, ysize);
+      d_prodshield[i] = prodshield[i];
     }
   prodshield.clear();
-  prodshield = disassemble_row 
-    (File::getVariousFile("prodshieldset-medium.png"), 
-     PRODUCTION_SHIELD_TYPES, broken);
-  if (broken)
-    return false;
-  for (unsigned int i = 0; i < PRODUCTION_SHIELD_TYPES; i++)
-    {
-      if (prodshield[i]->get_width() != mediumxsize)
-	PixMask::scale(prodshield[i], mediumxsize, mediumysize);
-      d_prodshield[1][i] = prodshield[i];
-    }
   return true;
 }
 
@@ -303,27 +294,9 @@ bool ImageCache::loadGameButtonImages()
   for (unsigned int i = 0; i < NUM_GAME_BUTTON_IMAGES; i++)
     PixMask::scale(images[i], w, h); 
   for (unsigned int i = 0; i < NUM_GAME_BUTTON_IMAGES; i++)
-    d_gamebuttons[0][i] = images[i]; 
+    d_gamebuttons[i] = images[i];
 
   images.clear();
-  images = disassemble_row(File::getVariousFile("buttons-medium.png"), 
-                           NUM_GAME_BUTTON_IMAGES, broken);
-  if (broken)
-    return false;
-  Gtk::IconSize::lookup(Gtk::IconSize(Gtk::ICON_SIZE_LARGE_TOOLBAR), w, h);
-  for (unsigned int i = 0; i < NUM_GAME_BUTTON_IMAGES; i++)
-    PixMask::scale(images[i], w, h); 
-  for (unsigned int i = 0; i < NUM_GAME_BUTTON_IMAGES; i++)
-    d_gamebuttons[1][i] = images[i];
-
-  images.clear();
-  images = disassemble_row(File::getVariousFile("buttons-medium.png"), 
-                           NUM_GAME_BUTTON_IMAGES, broken);
-  Gtk::IconSize::lookup(Gtk::IconSize(Gtk::ICON_SIZE_DIALOG), w, h);
-  for (unsigned int i = 0; i < NUM_GAME_BUTTON_IMAGES; i++)
-    PixMask::scale(images[i], w, h); 
-  for (unsigned int i = 0; i < NUM_GAME_BUTTON_IMAGES; i++)
-    d_gamebuttons[2][i] = images[i];
   return true;
 }
 
@@ -346,10 +319,7 @@ ImageCache::~ImageCache()
     delete d_cursor[i];
 
   for (unsigned int i = 0; i < PRODUCTION_SHIELD_TYPES; i++)
-    {
-      delete d_prodshield[0][i];
-      delete d_prodshield[1][i];
-    }
+    delete d_prodshield[i];
 
   for (unsigned int i = 0; i < MOVE_BONUS_TYPES; i++)
     delete d_movebonus[i];
@@ -381,11 +351,7 @@ ImageCache::~ImageCache()
     delete d_waypoint[i];
 
   for (unsigned int i = 0; i < NUM_GAME_BUTTON_IMAGES; i++)
-    {
-      delete d_gamebuttons[0][i];
-      delete d_gamebuttons[1][i];
-      delete d_gamebuttons[2][i];
-    }
+    delete d_gamebuttons[i];
 
   if (d_nextturn)
     delete d_nextturn;
@@ -437,6 +403,10 @@ void ImageCache::reset()
   defaulttilestylecache.reset();
   tartancache.reset();
   emptytartancache.reset();
+  statuscache.reset();
+  gamebuttoncache.reset();
+  dialogcache.reset();
+  medalcache.reset();
 
   d_cachesize = 0;
   return;
@@ -644,6 +614,34 @@ void ImageCache::checkPictures()
       if (d_cachesize < maxcache)
         return;
     }
+
+  if (statuscache.size() >= 6)
+    {
+      d_cachesize -= statuscache.discardHalf();
+      if (d_cachesize < maxcache)
+        return;
+    }
+
+  if (gamebuttoncache.size() >= 12)
+    {
+      d_cachesize -= gamebuttoncache.discardHalf();
+      if (d_cachesize < maxcache)
+        return;
+    }
+
+  if (dialogcache.size() >= 10)
+    {
+      d_cachesize -= dialogcache.discardHalf();
+      if (d_cachesize < maxcache)
+        return;
+    }
+
+  if (medalcache.size() >= 6)
+    {
+      d_cachesize -= medalcache.discardHalf();
+      if (d_cachesize < maxcache)
+        return;
+    }
 }
 
 PixMask* ImageCache::getSelectorPic(guint32 type, guint32 frame, 
@@ -732,17 +730,18 @@ PixMask* ImageCache::getFlagPic(const Stack* s, guint32 tileset)
   return getFlagPic(s->size(), s->getOwner(), tileset);
 }
 
-PixMask* ImageCache::getCircledArmyPic(Army *a, bool greyed, guint32 circle_colour_id, bool show_army)
+PixMask* ImageCache::getCircledArmyPic(Army *a, bool greyed, guint32 circle_colour_id, bool show_army, guint32 font_size)
 {
   return getCircledArmyPic(a->getOwner()->getArmyset(), a->getTypeId(), 
-		    a->getOwner(), NULL, greyed, circle_colour_id, show_army);
+		    a->getOwner(), NULL, greyed, circle_colour_id, show_army,
+                    font_size);
 }
 
 PixMask* ImageCache::getCircledArmyPic(guint32 armyset, guint32 army_id, 
                                              const Player* p, 
                                              const bool *medals, bool greyed, 
                                              guint32 circle_colour_id,
-                                             bool show_army)
+                                             bool show_army, guint32 font_size)
 {
   guint added = 0;
   CircledArmyPixMaskCacheItem i;
@@ -757,6 +756,7 @@ PixMask* ImageCache::getCircledArmyPic(guint32 armyset, guint32 army_id,
   i.greyed = greyed;
   i.circle_colour_id = circle_colour_id;
   i.show_army = show_army;
+  i.font_size = font_size;
   PixMask *s = circledarmycache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -903,12 +903,14 @@ PixMask* ImageCache::getRuinPic(int type, guint32 cityset)
   return s;
 }
 
-PixMask* ImageCache::getDiplomacyPic(int type, Player::DiplomaticState state)
+PixMask* ImageCache::getDiplomacyPic(int type, Player::DiplomaticState state,
+                                     guint32 font_size)
 {
   guint added = 0;
   DiplomacyPixMaskCacheItem i;
   i.type = type;
   i.state = state;
+  i.font_size = font_size;
   PixMask *s = diplomacycache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -980,11 +982,12 @@ PixMask* ImageCache::getBridgePic(int type, guint32 tileset)
   return s;
 }
 
-PixMask* ImageCache::getCursorPic(int type)
+PixMask* ImageCache::getCursorPic(int type, guint32 font_size)
 {
   guint added = 0;
   CursorPixMaskCacheItem i;
   i.type = type;
+  i.font_size = font_size;
   PixMask *s = cursorcache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -992,20 +995,24 @@ PixMask* ImageCache::getCursorPic(int type)
   return s;
 }
 
-PixMask* ImageCache::getShieldPic(guint32 type, Player *p)
+PixMask* ImageCache::getShieldPic(guint32 type, Player *p, bool map,
+                                  guint32 font_size)
 {
   guint32 shieldset = GameMap::getInstance()->getShieldsetId();
-  return getShieldPic(shieldset, type, p->getId());
+  return getShieldPic(shieldset, type, p->getId(), map, font_size);
 }
 
 PixMask* ImageCache::getShieldPic(guint32 shieldset, guint32 type, 
-                                        guint32 colour)
+                                        guint32 colour, bool map,
+                                        guint32 font_size)
 {
   guint added = 0;
   ShieldPixMaskCacheItem i;
   i.type = type;
   i.shieldset = shieldset;
   i.colour = colour;
+  i.map = map;
+  i.font_size = font_size;
   PixMask *s = shieldcache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1013,12 +1020,37 @@ PixMask* ImageCache::getShieldPic(guint32 shieldset, guint32 type,
   return s;
 }
 
-PixMask* ImageCache::getProdShieldPic(int size, guint32 type, bool prod)
+PixMask* ImageCache::getStatusPic(guint32 type, guint32 font_size)
+{
+  guint added = 0;
+  StatusPixMaskCacheItem i;
+  i.type = type;
+  i.font_size = font_size;
+  PixMask *s = statuscache.get(i, added);
+  d_cachesize += added;
+  if (added)
+    checkPictures();
+  return s;
+}
+
+PixMask* ImageCache::getGameButtonPic(guint32 type, guint32 font_size)
+{
+  guint added = 0;
+  GameButtonPixMaskCacheItem i;
+  i.type = type;
+  i.font_size = font_size;
+  PixMask *s = gamebuttoncache.get(i, added);
+  d_cachesize += added;
+  if (added)
+    checkPictures();
+  return s;
+}
+
+PixMask* ImageCache::getProdShieldPic(guint32 type, bool prod)
 {
   guint added = 0;
   ProdShieldPixMaskCacheItem i;
   i.type = type;
-  i.size = size;
   i.prod = prod;
   PixMask *s = prodshieldcache.get(i, added);
   d_cachesize += added;
@@ -1027,7 +1059,8 @@ PixMask* ImageCache::getProdShieldPic(int size, guint32 type, bool prod)
   return s;
 }
 
-PixMask* ImageCache::getMoveBonusPic(guint32 bonus, bool has_ship)
+PixMask* ImageCache::getMoveBonusPic(guint32 bonus, bool has_ship,
+                                     guint32 font_size)
 {
   guint added = 0;
   MoveBonusPixMaskCacheItem i;
@@ -1043,6 +1076,7 @@ PixMask* ImageCache::getMoveBonusPic(guint32 bonus, bool has_ship)
     i.type = 0;
   if (has_ship && bonus != Tile::isFlying()) // (what a) show boat
     i.type = 5;
+  i.font_size = font_size;
   PixMask *s = movebonuscache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1160,12 +1194,14 @@ PixMask* ImageCache::getExplosionPic(guint32 tileset)
   return s;
 }
 
-PixMask* ImageCache::getNewLevelPic(const Player* p, guint32 gender)
+PixMask* ImageCache::getNewLevelPic(const Player* p, guint32 gender,
+                                    guint32 font_size)
 {
   guint added = 0;
   NewLevelPixMaskCacheItem i;
   i.player_id = p->getId();
   i.gender = gender;
+  i.font_size = font_size;
   PixMask *s = newlevelcache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1214,6 +1250,19 @@ PixMask* ImageCache::getEmptyTartanPic(const Player *p, guint32 width, Shieldset
   return s;
 }
 
+PixMask* ImageCache::getDialogPic(guint32 type, guint32 font_size)
+{
+  guint added = 0;
+  DialogPixMaskCacheItem i;
+  i.type = type;
+  i.font_size = font_size;
+  PixMask *s = dialogcache.get(i, added);
+  d_cachesize += added;
+  if (added)
+    checkPictures();
+  return s;
+}
+
 PixMask* ImageCache::getDiplomacyImage(int type, Player::DiplomaticState state)
 {
   return d_diplomacy[type][state];
@@ -1234,9 +1283,9 @@ PixMask* ImageCache::getCursorImage(int type)
   return d_cursor[type];
 }
 
-PixMask *ImageCache::getProdShieldImage(int size, guint32 type)
+PixMask *ImageCache::getProdShieldImage(guint32 type)
 {
-  return d_prodshield[size][type];
+  return d_prodshield[type];
 }
 
 PixMask* ImageCache::getMedalImage(bool large, int type)
@@ -1291,16 +1340,30 @@ PixMask *ImageCache::getNewLevelImage(bool female, bool mask)
   return NULL;
 }
 
-PixMask* ImageCache::getGameButtonImage(guint32 type, int size)
+PixMask* ImageCache::getMedalPic(bool large, guint32 type,
+                                        guint32 font_size)
 {
-  return d_gamebuttons[size][type];
+  guint added = 0;
+  MedalPixMaskCacheItem i;
+  i.large = large;
+  i.type = type;
+  i.font_size = font_size;
+  PixMask *s = medalcache.get(i, added);
+  d_cachesize += added;
+  if (added)
+    checkPictures();
+  return s;
+}
+
+PixMask* ImageCache::getGameButtonImage(guint32 type)
+{
+  return d_gamebuttons[type];
 }
 
 PixMask* ImageCache::getWaypointImage(guint32 type)
 {
   return d_waypoint[type];
 }
-
 
 PixMask* ImageCache::getSmallRuinedCityImage()
 {
@@ -1694,6 +1757,11 @@ PixMask *ImageCache::add_border (Glib::ustring file, Vector<int> dim, double w)
   return box;
 }
 
+int ImageCache::calculate_width_from_adjusted_height (PixMask *p, double new_height)
+{
+  return p->get_width () * (new_height / p->get_height ());
+}
+
 PixMask *SelectorPixMaskCacheItem::generate(SelectorPixMaskCacheItem i)
 {
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
@@ -1863,6 +1931,8 @@ PixMask *CircledArmyPixMaskCacheItem::generate(CircledArmyPixMaskCacheItem i)
          i.circle_colour_id != Shield::NEUTRAL);
       delete empty;
     }
+  int dialogsize = i.font_size * 3.636363634;
+  PixMask::scale (s, dialogsize, dialogsize);
   return s;
 }
 
@@ -1883,6 +1953,8 @@ int CircledArmyPixMaskCacheItem::comp(const CircledArmyPixMaskCacheItem item) co
     (circle_colour_id > item.circle_colour_id) ?  1 :
     (show_army < item.show_army) ?  -1 :
     (show_army > item.show_army) ?  1 :
+    (font_size < item.font_size) ?  -1 :
+    (font_size > item.font_size) ?  1 :
     0;
 }
 
@@ -2113,7 +2185,25 @@ int RuinPixMaskCacheItem::comp(const RuinPixMaskCacheItem item) const
 
 PixMask *DiplomacyPixMaskCacheItem::generate(DiplomacyPixMaskCacheItem i)
 {
-  return ImageCache::getInstance()->getDiplomacyImage(i.type, Player::DiplomaticState(i.state - Player::AT_PEACE))->copy();
+  PixMask *p =
+    ImageCache::getInstance()->getDiplomacyImage
+    (i.type, Player::DiplomaticState(i.state - Player::AT_PEACE))->copy();
+  double ratio = 0;
+  switch (i.type)
+    {
+    case 0:
+      ratio = 3;
+      break;
+    case 1:
+      ratio = 5;
+      break;
+    }
+
+  double new_height = i.font_size * ratio;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height (p, new_height);
+  PixMask::scale (p, new_width, new_height);
+  return p;
 }
 
 int DiplomacyPixMaskCacheItem::comp(const DiplomacyPixMaskCacheItem item) const
@@ -2123,6 +2213,8 @@ int DiplomacyPixMaskCacheItem::comp(const DiplomacyPixMaskCacheItem item) const
     (type > item.type) ?  1 :
     (state < item.state) ? -1 :
     (state > item.state) ? 1 :
+    (font_size < item.font_size) ? -1 :
+    (font_size > item.font_size) ? 1 :
     0;
 }
 
@@ -2176,7 +2268,14 @@ int BridgePixMaskCacheItem::comp(const BridgePixMaskCacheItem item) const
 
 PixMask *CursorPixMaskCacheItem::generate(CursorPixMaskCacheItem i)
 {
-  return ImageCache::getInstance()->getCursorImage(i.type)->copy();
+  PixMask *p =
+    ImageCache::getInstance()->getCursorImage(i.type)->copy();
+  double ratio = 2.25; //was 1.5
+  double new_height = i.font_size * ratio;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height (p, new_height);
+  PixMask::scale (p, new_width, new_height);
+  return p;
 }
 
 int CursorPixMaskCacheItem::comp(const CursorPixMaskCacheItem item) const
@@ -2184,6 +2283,8 @@ int CursorPixMaskCacheItem::comp(const CursorPixMaskCacheItem item) const
   return
     (type < item.type) ? -1 :
     (type > item.type) ?  1 :
+    (font_size < item.font_size) ? -1 :
+    (font_size > item.font_size) ?  1 :
     0;
 }
 
@@ -2193,7 +2294,28 @@ PixMask *ShieldPixMaskCacheItem::generate(ShieldPixMaskCacheItem i)
                                                             i.type, i.colour);
   Gdk::RGBA colour = 
     Shieldsetlist::getInstance()->getColor(i.shieldset, i.colour);
-  return ImageCache::applyMask(sh->getImage(), sh->getMask(), colour);
+  PixMask *p = ImageCache::applyMask(sh->getImage(), sh->getMask(), colour);
+  if (i.map)
+    return p;
+  //okay now we size things accordingly.
+  double height_ratio = 1.0;
+  switch (i.type)
+    {
+    case 0:
+      height_ratio = 8.0 / 11.0;
+      break;
+    case 1:
+      height_ratio = 14.0 / 11.0;
+      break;
+    case 2:
+      height_ratio = 36.0 / 11.0;
+      break;
+    }
+  int new_height = i.font_size * height_ratio;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height (p, new_height);
+  PixMask::scale (p, new_width, new_height);
+  return p;
 }
 
 int ShieldPixMaskCacheItem::comp(const ShieldPixMaskCacheItem item) const
@@ -2205,6 +2327,8 @@ int ShieldPixMaskCacheItem::comp(const ShieldPixMaskCacheItem item) const
     (type > item.type) ?  1 :
     (colour < item.colour) ? -1 :
     (colour > item.colour) ?  1 :
+    (font_size < item.font_size) ? -1 :
+    (font_size > item.font_size) ?  1 :
     0;
 }
 
@@ -2214,27 +2338,27 @@ PixMask *ProdShieldPixMaskCacheItem::generate(ProdShieldPixMaskCacheItem i)
     {
     case 0: //home city
       if (i.prod) //production
-        return ImageCache::getInstance()->getProdShieldImage(i.size, 1)->copy();
+        return ImageCache::getInstance()->getProdShieldImage(1)->copy();
       else //no production
-        return ImageCache::getInstance()->getProdShieldImage(i.size, 0)->copy();
+        return ImageCache::getInstance()->getProdShieldImage(0)->copy();
       break;
     case 1: //away city
       if (i.prod) //production
-        return ImageCache::getInstance()->getProdShieldImage(i.size, 3)->copy();
+        return ImageCache::getInstance()->getProdShieldImage(3)->copy();
       else //no production
-        return ImageCache::getInstance()->getProdShieldImage(i.size, 2)->copy();
+        return ImageCache::getInstance()->getProdShieldImage(2)->copy();
       break;
     case 2: //destination city
       if (i.prod) //production
-        return ImageCache::getInstance()->getProdShieldImage(i.size, 5)->copy();
+        return ImageCache::getInstance()->getProdShieldImage(5)->copy();
       else //no production
-        return ImageCache::getInstance()->getProdShieldImage(i.size, 4)->copy();
+        return ImageCache::getInstance()->getProdShieldImage(4)->copy();
       break;
     case 3: //source city
-      return ImageCache::getInstance()->getProdShieldImage(i.size, 6)->copy();
+      return ImageCache::getInstance()->getProdShieldImage(6)->copy();
       break;
     case 4: //invalid
-      return ImageCache::getInstance()->getProdShieldImage(i.size, 7)->copy();
+      return ImageCache::getInstance()->getProdShieldImage(7)->copy();
       break;
     }
   return NULL;
@@ -2243,8 +2367,6 @@ PixMask *ProdShieldPixMaskCacheItem::generate(ProdShieldPixMaskCacheItem i)
 int ProdShieldPixMaskCacheItem::comp(const ProdShieldPixMaskCacheItem item) const
 {
   return
-    (size < item.size) ? -1 :
-    (size > item.size) ?  1 :
     (type < item.type) ? -1 :
     (type > item.type) ?  1 :
     (prod < item.prod) ? -1 :
@@ -2254,7 +2376,13 @@ int ProdShieldPixMaskCacheItem::comp(const ProdShieldPixMaskCacheItem item) cons
 
 PixMask *MoveBonusPixMaskCacheItem::generate(MoveBonusPixMaskCacheItem i)
 {
-  return ImageCache::getInstance()->getMoveBonusImage(i.type)->copy();
+  PixMask *p = ImageCache::getInstance()->getMoveBonusImage(i.type)->copy();
+  double ratio = 2;
+  double new_height = i.font_size * ratio;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height (p, new_height);
+  PixMask::scale (p, new_width, new_height);
+  return p;
 }
 
 int MoveBonusPixMaskCacheItem::comp(const MoveBonusPixMaskCacheItem item) const
@@ -2262,6 +2390,8 @@ int MoveBonusPixMaskCacheItem::comp(const MoveBonusPixMaskCacheItem item) const
   return
     (type < item.type) ? -1 :
     (type > item.type) ?  1 :
+    (font_size < item.font_size) ? -1 :
+    (font_size > item.font_size) ?  1 :
     0;
 }
 
@@ -2358,10 +2488,17 @@ int ExplosionPixMaskCacheItem::comp(const ExplosionPixMaskCacheItem item) const
 PixMask *NewLevelPixMaskCacheItem::generate(NewLevelPixMaskCacheItem i)
 {
   bool female = i.gender == Hero::FEMALE;
-  return ImageCache::applyMask
+  PixMask *p = ImageCache::applyMask
     (ImageCache::getInstance()->getNewLevelImage(female, false), 
      ImageCache::getInstance()->getNewLevelImage(female, true), 
      Playerlist::getInstance()->getPlayer(i.player_id));
+
+  double ratio = 23.0;
+  double new_height = i.font_size * ratio;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height (p, new_height);
+  PixMask::scale (p, new_width, new_height);
+  return p;
 }
 
 int NewLevelPixMaskCacheItem::comp(const NewLevelPixMaskCacheItem item) const
@@ -2371,6 +2508,8 @@ int NewLevelPixMaskCacheItem::comp(const NewLevelPixMaskCacheItem item) const
     (player_id > item.player_id) ?  1 :
     (gender < item.gender) ? -1 :
     (gender > item.gender) ?  1 :
+    (font_size < item.font_size) ? -1 :
+    (font_size > item.font_size) ?  1 :
     0;
 }
 
@@ -2559,3 +2698,171 @@ int EmptyTartanPixMaskCacheItem::comp(const EmptyTartanPixMaskCacheItem item) co
     0;
 }
 
+PixMask *StatusPixMaskCacheItem::generate(StatusPixMaskCacheItem i)
+{
+  Glib::ustring file = "";
+  switch (i.type)
+    {
+    case ImageCache::STATUS_CITY:
+      file = File::getVariousFile ("smallcity.png");
+      break;
+    case ImageCache::STATUS_TREASURY:
+      file = File::getVariousFile ("smalltreasury.png");
+      break;
+    case ImageCache::STATUS_INCOME:
+      file = File::getVariousFile ("smallincome.png");
+      break;
+    case ImageCache::STATUS_UPKEEP:
+      file = File::getVariousFile ("smallupkeep.png");
+      break;
+    case ImageCache::STATUS_DEFENSE:
+      file = File::getVariousFile ("smalldefense.png");
+      break;
+    }
+
+  bool broken = false;
+  PixMask *p = PixMask::create (file, broken);
+  if (!broken)
+    {
+      double ratio = 2.333;
+      if (i.type == ImageCache::STATUS_DEFENSE)
+        ratio = 1.3333;
+      double new_height = i.font_size * ratio;
+      int new_width =
+        ImageCache::calculate_width_from_adjusted_height (p, new_height);
+      PixMask::scale (p, new_width, new_height);
+    }
+  return p;
+}
+
+int StatusPixMaskCacheItem::comp(const StatusPixMaskCacheItem item) const
+{
+  return
+    (type < item.type) ? -1 :
+    (type > item.type) ?  1 :
+    (font_size < item.font_size) ? -1 :
+    (font_size > item.font_size) ?  1 :
+    0;
+}
+
+PixMask *GameButtonPixMaskCacheItem::generate(GameButtonPixMaskCacheItem i)
+{
+  PixMask *p =
+    ImageCache::getInstance ()->getGameButtonImage (i.type)->copy ();
+
+  if (p)
+    {
+      double ratio = 3.0;
+      double new_height = i.font_size * ratio;
+      int new_width =
+        ImageCache::calculate_width_from_adjusted_height (p, new_height);
+      PixMask::scale (p, new_width, new_height);
+    }
+  return p;
+}
+
+int GameButtonPixMaskCacheItem::comp(const GameButtonPixMaskCacheItem item) const
+{
+  return
+    (type < item.type) ? -1 :
+    (type > item.type) ?  1 :
+    (font_size < item.font_size) ? -1 :
+    (font_size > item.font_size) ?  1 :
+    0;
+}
+
+PixMask *DialogPixMaskCacheItem::generate(DialogPixMaskCacheItem i)
+{
+  PixMask *p = NULL;
+  double ratio = 1;
+  switch (i.type)
+    {
+    case ImageCache::DIALOG_NEXT_TURN:
+      p = ImageCache::getInstance ()->getNextTurnPic ()->copy ();
+      ratio = 23;
+      break;
+    case ImageCache::DIALOG_NEW_HERO_MALE:
+      p = ImageCache::getInstance ()->getHeroPic (Hero::MALE)->copy ();
+      ratio = 23;
+      break;
+    case ImageCache::DIALOG_NEW_HERO_FEMALE:
+      p = ImageCache::getInstance ()->getHeroPic (Hero::FEMALE)->copy ();
+      ratio = 23;
+      break;
+    case ImageCache::DIALOG_CONQUERED_CITY:
+      p = ImageCache::getInstance ()->getCityDefeatedPic ();
+      ratio = 23;
+      break;
+    case ImageCache::DIALOG_WINNING:
+      p = ImageCache::getInstance ()->getWinningPic();
+      ratio = 41;
+      break;
+    case ImageCache::DIALOG_RUIN_SUCCESS:
+      p = ImageCache::getInstance ()->getRuinSuccessPic();
+      ratio = 23;
+      break;
+    case ImageCache::DIALOG_RUIN_DEFEAT:
+      p = ImageCache::getInstance ()->getRuinDefeatPic();
+      ratio = 23;
+      break;
+    case ImageCache::DIALOG_PARLEY_OFFERED:
+      p = ImageCache::getInstance ()->getParleyOfferedPic();
+      ratio = 41;
+      break;
+    case ImageCache::DIALOG_PARLEY_REFUSED:
+      p = ImageCache::getInstance ()->getParleyRefusedPic();
+      ratio = 41;
+      break;
+
+    }
+  if (p)
+    {
+      double new_height = i.font_size * ratio;
+      int new_width =
+        ImageCache::calculate_width_from_adjusted_height (p, new_height);
+      PixMask::scale (p, new_width, new_height);
+    }
+  return p;
+}
+
+int DialogPixMaskCacheItem::comp(const DialogPixMaskCacheItem item) const
+{
+  return
+    (type < item.type) ? -1 :
+    (type > item.type) ?  1 :
+    (font_size < item.font_size) ? -1 :
+    (font_size > item.font_size) ?  1 :
+    0;
+}
+
+
+PixMask *MedalPixMaskCacheItem::generate(MedalPixMaskCacheItem i)
+{
+  PixMask *p =
+    ImageCache::getInstance ()->getMedalImage (i.large, i.type)->copy ();
+
+  if (i.large == false)
+    return p;
+
+  if (p)
+    {
+      double ratio = 19.0;
+      double new_height = i.font_size * ratio;
+      int new_width =
+        ImageCache::calculate_width_from_adjusted_height (p, new_height);
+      PixMask::scale (p, new_width, new_height);
+    }
+  return p;
+}
+
+int MedalPixMaskCacheItem::comp(const MedalPixMaskCacheItem item) const
+{
+  return
+    (large < item.large) ? -1 :
+    (large > item.large) ?  1 :
+    (type < item.type) ? -1 :
+    (type > item.type) ?  1 :
+    (font_size < item.font_size) ? -1 :
+    (font_size > item.font_size) ?  1 :
+    0;
+}

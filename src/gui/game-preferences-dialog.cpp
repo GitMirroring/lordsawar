@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "player.h"
 #include "game-parameters.h"
 #include "Configuration.h"
+#include "font-size.h"
 
 static bool inhibit_difficulty_combobox = false;
 
@@ -231,7 +232,9 @@ void GamePreferencesDialog::update_shields()
     {
       Gtk::Image *player_shield = new Gtk::Image ();
       player_shield->property_pixbuf() = 
-        ImageCache::getInstance()->getShieldPic(d_shieldset, 2, i)->to_pixbuf();
+        ImageCache::getInstance()->getShieldPic
+        (d_shieldset, 2, i, false,
+         FontSize::getInstance ()->get_height ())->to_pixbuf();
       player_shields.push_back(player_shield);
       Gtk::Box *player_hbox = static_cast<Gtk::Box*>(list[i+1]);
       player_hbox->pack_start(*manage(player_shield), Gtk::PACK_SHRINK, 10);

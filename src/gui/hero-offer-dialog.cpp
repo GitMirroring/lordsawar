@@ -1,5 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2015, 2017,
+//  2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -31,6 +32,7 @@
 #include "city.h"
 #include "playerlist.h"
 #include "ImageCache.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &HeroOfferDialog::x)
 
@@ -99,11 +101,15 @@ void HeroOfferDialog::on_name_changed()
 void HeroOfferDialog::on_toggled()
 {
   if (male_radiobutton->get_active())
-    hero_image->property_pixbuf() = 
-      ImageCache::getInstance()->getHeroPic(Hero::MALE)->to_pixbuf();
+    hero_image->property_pixbuf() =
+      ImageCache::getInstance()->getDialogPic
+      (ImageCache::DIALOG_NEW_HERO_MALE,
+       FontSize::getInstance ()->get_height ())->to_pixbuf();
   else
     hero_image->property_pixbuf() =
-      ImageCache::getInstance()->getHeroPic(Hero::FEMALE)->to_pixbuf();
+      ImageCache::getInstance()->getDialogPic
+      (ImageCache::DIALOG_NEW_HERO_FEMALE,
+       FontSize::getInstance ()->get_height ())->to_pixbuf();
 }
 
 bool HeroOfferDialog::run()

@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 #include "citylist.h"
 #include "playerlist.h"
 #include "GameScenarioOptions.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &CityWindow::x)
 
@@ -196,7 +197,8 @@ void CityWindow::update_toggle_picture(int slot)
   if (city->getArmytype(slot) == -1)
     pic = 
       gc->getCircledArmyPic(as, 0, player, NULL, false, 
-                            Shield::NEUTRAL, false)->to_pixbuf();
+                            Shield::NEUTRAL, false,
+                            FontSize::getInstance ()->get_height ())->to_pixbuf();
   else
     {
       int type = city->getArmytype(slot);
@@ -204,7 +206,8 @@ void CityWindow::update_toggle_picture(int slot)
         gc->getCircledArmyPic (as, type, player, NULL, false,
                                slot == city->getActiveProductionSlot() ? 
                                player->getId(): int(Shield::NEUTRAL), 
-                               true)->to_pixbuf();
+                               true,
+                               FontSize::getInstance ()->get_height ())->to_pixbuf();
     }
   Gtk::Image *image = new Gtk::Image();
   image->property_pixbuf() = pic;
@@ -255,7 +258,7 @@ void CityWindow::fill_in_production_info()
     ImageCache *gc = ImageCache::getInstance();
     int slot = city->getActiveProductionSlot();
     Glib::RefPtr<Gdk::Pixbuf> empty_pic =
-      ImageCache::getInstance()->getCircledArmyPic(as, 0, player, NULL, false, Shield::NEUTRAL, false)->to_pixbuf();
+      ImageCache::getInstance()->getCircledArmyPic(as, 0, player, NULL, false, Shield::NEUTRAL, false, FontSize::getInstance ()->get_height ())->to_pixbuf();
     
     Glib::ustring s1, s2, s3, s5;
     Glib::ustring s4 = _("Current:");
@@ -292,7 +295,8 @@ void CityWindow::fill_in_production_info()
           time_label->set_text (String::ucompose(_("%1t"),
                                                  city->getDuration()));
       pic = gc->getCircledArmyPic(as, a->getTypeId(), player, NULL, false,
-                                  Shield::NEUTRAL, true)->to_pixbuf();
+                                  Shield::NEUTRAL, true,
+                                  FontSize::getInstance ()->get_height ())->to_pixbuf();
       Glib::ustring bonus = a->getArmyBonusDescription();
       if (bonus == "")
         bonus = "--";

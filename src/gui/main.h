@@ -57,6 +57,7 @@ class Main: public sigc::trackable
  private:
     struct Impl;
     Impl *impl;
+    void override_font_size ();
 };
 
 

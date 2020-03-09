@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007-2009, 2011, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007-2009, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include "armysetlist.h"
 #include "playerlist.h"
 #include "shield.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &BuyProductionDialog::x)
 
@@ -115,7 +116,8 @@ BuyProductionDialog::fill_pixbuf (int i)
     selected = p->getId();
   Glib::RefPtr<Gdk::Pixbuf> pix
     = gc->getCircledArmyPic(p->getArmyset(), purchasables[i]->getId(), p, NULL,
-                            greyed_out, selected, true)->to_pixbuf();
+                            greyed_out, selected, true,
+                            FontSize::getInstance ()->get_height ())->to_pixbuf();
   Gtk::Image *image =
     dynamic_cast<Gtk::Image*>(production_toggles[i]->get_child());
   image->property_pixbuf() = pix;

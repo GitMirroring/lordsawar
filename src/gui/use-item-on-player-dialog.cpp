@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2012, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2010, 2012, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "ImageCache.h"
 #include "player.h"
 #include "playerlist.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &UseItemOnPlayerDialog::x)
 
@@ -92,7 +93,8 @@ void UseItemOnPlayerDialog::addPlayer(Player *player)
   Gtk::TreeIter i = players_list->append();
   (*i)[players_columns.name] = player->getName();
   (*i)[players_columns.image] = 
-    ImageCache::getInstance()->getShieldPic(2, player)->to_pixbuf();
+    ImageCache::getInstance()->getShieldPic
+    (2, player, false, FontSize::getInstance ()->get_height ())->to_pixbuf();
   (*i)[players_columns.player] = player;
 }
 

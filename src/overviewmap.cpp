@@ -1,5 +1,5 @@
 // Copyright (C) 2006, 2007 Ulf Lorenz
-// Copyright (C) 2006-2012, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006-2012, 2014, 2015, 2017, 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -41,6 +41,7 @@
 #include "bridgelist.h"
 #include "bridge.h"
 #include "rnd.h"
+#include "gui/font-size.h"
 
 OverviewMap::OverviewMap(bool headless)
 {
@@ -168,6 +169,7 @@ OverviewMap::draw_line(bool front, int src_x, int src_y, int dst_x, int dst_y, G
   choose_surface (front, surf, gc);
   gc->set_source_rgba(color.get_red(), color.get_green(), color.get_blue(), color.get_alpha());
   gc->move_to(src_x, src_y);
+  gc->set_line_width(pixels_per_tile / 1.5);
   gc->line_to(dst_x, dst_y);
 }
 
@@ -190,7 +192,7 @@ OverviewMap::draw_rect(bool front, int x, int y, int width, int height, const Gd
      gc->rel_line_to(0, height);
       gc->rel_line_to(-width, 0);
       gc->rel_line_to(0, -height);
-      gc->set_line_width(1.0);
+      gc->set_line_width(pixels_per_tile / 1.5);
       gc->stroke();
 }
 
@@ -324,37 +326,17 @@ void OverviewMap::draw_terrain_tile(Maptile *t, int i, int j)
 
 int OverviewMap::calculatePixelsPerTile(int width, int height)
 {
-  int pixels = 2;
-  if (GameMap::calculateTilesPerOverviewMapTile() == 1)
-    {
-      if (width <= (int)MAP_SIZE_TINY_WIDTH &&
-          height <= (int)MAP_SIZE_TINY_HEIGHT)
-        pixels = 4;
-      else if (width <= (int)MAP_SIZE_SMALL_WIDTH &&
-               height <= (int)MAP_SIZE_SMALL_HEIGHT)
-        pixels = 3;
-      else
-        pixels = 2;
-    }
-  else
-    {
-      int w = GameMap::getWidth () /
-        GameMap::calculateTilesPerOverviewMapTile();
-      pixels = int(300 / w);
-      if (pixels <= 0)
-        pixels = 1;
-    }
+  int pixels = 1;
 
-  switch (Configuration::UiFormFactor(Configuration::s_ui_form_factor))
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      break;
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      pixels++;
-      break;
-    }
-  return pixels;
+  (void)width;
+  int h = height /
+    GameMap::calculateTilesPerOverviewMapTile();
+
+  double ratio = 28.36; //overviewmaps are 28.36 font heights tall
+  for (;h * pixels < FontSize::getInstance ()->get_height () * ratio; pixels ++)
+    ;
+
+  return pixels + 1;
 }
 
 int OverviewMap::calculatePixelsPerTile()
@@ -665,15 +647,6 @@ Vector<int> OverviewMap::mapToSurface(Vector<int> pos)
 void OverviewMap::draw_cities (bool all_razed)
 {
   int csize = 0;
-  switch (Configuration::UiFormFactor(Configuration::s_ui_form_factor))
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      break;
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      csize = 1;
-      break;
-    }
 
   // Draw all cities as shields over the city location, in the colors of
   // the players.
@@ -685,13 +658,30 @@ void OverviewMap::draw_cities (bool all_razed)
       if (c->isVisible(Playerlist::getViewingplayer()) == false)
         continue;
       if (c->isBurnt() == true || all_razed == true)
-        tmp = ImageCache::getInstance()->getSmallRuinedCityImage();
+        {
+          tmp = ImageCache::getInstance()->getSmallRuinedCityImage()->copy ();
+
+          //we need 78 of these per map height
+          double new_height = get_height () / 78.0;
+          int new_width = tmp->get_width () * (new_height / tmp->get_height ());
+
+          PixMask::scale (tmp, new_width, new_height);
+        }
       else
-        tmp = ImageCache::getInstance()->getShieldPic(csize, c->getOwner());
+        {
+          tmp = ImageCache::getInstance()->getShieldPic(csize, c->getOwner(),
+                                                        true, 0)->copy ();
+          //we need 39 of these per map height
+          double new_height = get_height () / 39.0;
+          int new_width = tmp->get_width () * (new_height / tmp->get_height ());
+
+          PixMask::scale (tmp, new_width, new_height);
+        }
 
       Vector<int> pos = c->getPos();
       pos = mapToSurface(pos);
       tmp->blit_centered(surface, pos);
+      delete tmp;
   }
 }
 
@@ -709,21 +699,31 @@ void OverviewMap::draw_hero(Vector<int> pos, bool white)
 
     start += Vector<int>(int(pixels_per_tile/2), int(pixels_per_tile/2));
 
-    PixMask *heropic = ImageCache::getInstance()->getSmallHeroImage(white);
+    PixMask *heropic =
+      ImageCache::getInstance()->getSmallHeroImage(white)->copy ();
+
+    //we need 20.8 of these per map height
+    double new_height = get_height () / 20.8;
+    int new_width = heropic->get_width () * (new_height / heropic->get_height ());
+    PixMask::scale (heropic, new_width, new_height);
     heropic->blit_centered(surface, start);
+    delete heropic;
 }
 
 void OverviewMap::draw_target_box(Vector<int> pos, const Gdk::RGBA c)
 {
   Vector<int> start = mapToSurface(pos);
   start += Vector<int>(int(pixels_per_tile/2), int(pixels_per_tile/2));
-  int xsize = 8;
-  int ysize = 8;
+  double newsize = get_height () / 39.0; // 312 / 8
+  int xsize = int(newsize);
+  int ysize = int(newsize);
   //draw an 8 by 8 box, with a smaller box inside of it
   draw_rect(start.x - (xsize / 2), start.y - (ysize / 2),
 	    xsize, ysize, c);
-  xsize = 5;
-  ysize = 5;
+  //draw a 5 by 5 smaller box
+  newsize = get_height () / 62.4; // 312 / 5
+  xsize = int(newsize);
+  ysize = int(newsize);
   draw_filled_rect(start.x - (xsize / 2), start.y - (ysize / 2),
 		   xsize, ysize, c);
 }
@@ -732,12 +732,12 @@ void OverviewMap::draw_square_around_city(City *c, Gdk::RGBA colour)
 {
   Vector<int> start = c->getPos();
   start = mapToSurface(start);
-  Shieldset *ss = GameMap::getShieldset();
-  guint32 width = ss->getSmallWidth();
-  guint32 height = ss->getSmallHeight();
+  //we need 22.29 of these per map height
+  double height = get_height () / 22.29;
+  int width = 14.0 * (height / 14.0);
   start -= Vector<int>(width,height)/2;
   Vector<int> end = start + Vector<int>(width,height);
-  draw_rect (start.x-3, start.y-3, end.x-start.x+4, end.y-start.y+4, colour);
+  draw_rect (start.x-0, start.y-0, end.x-start.x+0, end.y-start.y+0, colour);
 }
 
 void OverviewMap::draw_radial_gradient(Cairo::RefPtr<Cairo::Surface> surface, Gdk::RGBA inner, Gdk::RGBA outer, int width, int height)

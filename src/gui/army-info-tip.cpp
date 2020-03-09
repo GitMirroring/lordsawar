@@ -1,5 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2015, 2016 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2015, 2016,
+//  2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,6 +35,7 @@
 #include "city.h"
 #include "File.h"
 #include "shield.h"
+#include "font-size.h"
 
 void ArmyInfoTip::init (Gtk::Widget *target, Glib::RefPtr<Gdk::Pixbuf> image, guint32 move_bonus, Glib::ustring info)
 {
@@ -55,7 +57,9 @@ void ArmyInfoTip::init (Gtk::Widget *target, Glib::RefPtr<Gdk::Pixbuf> image, gu
   ImageCache *gc = ImageCache::getInstance();
   Gtk::Image *terrain_image;
   xml->get_widget("terrain_image", terrain_image);
-  terrain_image->property_pixbuf() = gc->getMoveBonusPic(move_bonus, false)->to_pixbuf();
+  terrain_image->property_pixbuf() =
+    gc->getMoveBonusPic(move_bonus, false,
+                        FontSize::getInstance ()->get_height ())->to_pixbuf();
   Gtk::Label *info_label;
   xml->get_widget("info_label", info_label);
   info_label->set_text(info);
@@ -95,12 +99,14 @@ ArmyInfoTip::ArmyInfoTip(Gtk::Widget *target, const Army *army)
   s += String::ucompose(_("Upkeep: %1"), army->getUpkeep());
 
   init (target, 
-        ImageCache::getInstance()->getCircledArmyPic(army->getArmyset (), 
-                                                     army->getTypeId(), 
-                                                     army->getOwner(), 
-                                                     army->getMedalBonuses(), 
-                                                     false, Shield::NEUTRAL, 
-                                                     true)->to_pixbuf(),
+        ImageCache::getInstance()->getCircledArmyPic
+        (army->getArmyset (),
+         army->getTypeId(),
+         army->getOwner(),
+         army->getMedalBonuses(),
+         false, Shield::NEUTRAL,
+         true,
+         FontSize::getInstance ()->get_height ())->to_pixbuf(),
         army->getMoveBonus(), s);
 }
 
@@ -120,12 +126,14 @@ ArmyInfoTip::ArmyInfoTip(Gtk::Widget *target, const ArmyProdBase *army,
   s += "\n";
   s += String::ucompose(_("Cost: %1"), army->getProductionCost());
 
-  init (target, 
-        ImageCache::getInstance()->getCircledArmyPic(army->getArmyset (), 
-                                                     army->getTypeId(), 
-                                                     city->getOwner (), NULL, 
-                                                     false, Shield::NEUTRAL, 
-                                                     true)->to_pixbuf(),
+  init (target,
+        ImageCache::getInstance()->getCircledArmyPic
+        (army->getArmyset (),
+         army->getTypeId(),
+         city->getOwner (), NULL,
+         false, Shield::NEUTRAL,
+         true,
+         FontSize::getInstance ()->get_height ())->to_pixbuf(),
         army->getMoveBonus(), s);
 }
 
@@ -145,10 +153,12 @@ ArmyInfoTip::ArmyInfoTip(Gtk::Widget *target, const ArmyProto *army)
   s += String::ucompose(_("Cost: %1"), army->getUpkeep());
 
   Player *p = Playerlist::getInstance()->getActiveplayer();
-  init (target, 
-        ImageCache::getInstance()->getCircledArmyPic(army->getArmyset(), 
-                                                     army->getId(), p, NULL, 
-                                                     false, Shield::NEUTRAL, 
-                                                     true)->to_pixbuf(),
+  init (target,
+        ImageCache::getInstance()->getCircledArmyPic
+        (army->getArmyset(),
+         army->getId(), p, NULL,
+         false, Shield::NEUTRAL,
+         true,
+         FontSize::getInstance ()->get_height ())->to_pixbuf(),
         army->getMoveBonus(), s);
 }

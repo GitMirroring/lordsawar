@@ -77,7 +77,7 @@ Glib::ustring Configuration::s_gamelist_server_hostname = "";//lordsawar.com";
 guint32 Configuration::s_gamelist_server_port = LORDSAWAR_GAMELIST_PORT;
 Glib::ustring Configuration::s_gamehost_server_hostname = "";//lordsawar.com";
 guint32 Configuration::s_gamehost_server_port = LORDSAWAR_GAMEHOST_PORT;
-guint32 Configuration::s_ui_form_factor = Configuration::UI_FORM_FACTOR_DESKTOP;
+guint32 Configuration::s_font_size_override = 0;
 
 Configuration::Configuration()
 {
@@ -180,9 +180,8 @@ bool Configuration::saveConfigurationFile(Glib::ustring filename)
 			      s_gamehost_server_hostname);
     retval &= helper.saveData("gamehost_server_port", 
 			      s_gamehost_server_port);
-    Glib::ustring ui_str = 
-      uiFormFactorToString(Configuration::UiFormFactor(s_ui_form_factor));
-    retval &= helper.saveData("ui_form_factor", ui_str);
+    retval &= helper.saveData("font_size_override",
+			      s_font_size_override);
     retval &= helper.closeTag();
     
     if (!retval)
@@ -298,9 +297,7 @@ bool Configuration::parseConfiguration(XML_Helper* helper)
     helper->getData(s_gamelist_server_port, "gamelist_server_port");
     helper->getData(s_gamehost_server_hostname, "gamehost_server_hostname");
     helper->getData(s_gamehost_server_port, "gamehost_server_port");
-    Glib::ustring ui_str;
-    helper->getData(ui_str, "ui_form_factor");
-    s_ui_form_factor = uiFormFactorFromString(ui_str);
+    helper->getData(s_font_size_override, "font_size_override");
     return true;
 }
 
@@ -595,34 +592,6 @@ GameParameters::SackingMode Configuration::sackingModeFromString(Glib::ustring s
   return GameParameters::SACKING_ALWAYS;
 }
 
-Glib::ustring Configuration::uiFormFactorToString(const Configuration::UiFormFactor factor)
-{
-  switch (factor)
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-      return "Configuration::UI_FORM_FACTOR_DESKTOP";
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      return "Configuration::UI_FORM_FACTOR_NETBOOK";
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      return "Configuration::UI_FORM_FACTOR_LARGE_SCREEN";
-    }
-  return "Configuration::UI_FORM_FACTOR_DESKTOP";
-}
-
-Configuration::UiFormFactor Configuration::uiFormFactorFromString(Glib::ustring str)
-{
-  if (str.size() > 0 && isdigit(str.c_str()[0]))
-    return Configuration::UiFormFactor(atoi(str.c_str()));
-  if (str == "Configuration::UI_FORM_FACTOR_DESKTOP")
-    return Configuration::UI_FORM_FACTOR_DESKTOP;
-  else if (str == "Configuration::UI_FORM_FACTOR_NETBOOK")
-    return Configuration::UI_FORM_FACTOR_NETBOOK;
-  else if (str == "Configuration::UI_FORM_FACTOR_LARGE_SCREEN")
-    return Configuration::UI_FORM_FACTOR_LARGE_SCREEN;
-    
-  return Configuration::UI_FORM_FACTOR_DESKTOP;
-}
-
 bool Configuration::upgrade(Glib::ustring filename, Glib::ustring old_version,
                             Glib::ustring new_version)
 {
@@ -637,6 +606,6 @@ void Configuration::support_backward_compatibility()
   FileCompat::getInstance()->support_type (FileCompat::CONFIGURATION, ext, 
                                            d_tag, false);
   FileCompat::getInstance()->support_version
-    (FileCompat::CONFIGURATION, "0.2.0", LORDSAWAR_CONFIG_VERSION,
+    (FileCompat::CONFIGURATION, "0.2.1", LORDSAWAR_CONFIG_VERSION,
      sigc::ptr_fun(&Configuration::upgrade));
 }

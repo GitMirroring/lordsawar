@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 #include "ai_fast.h"
 #include "ImageCache.h"
 #include "game-options-dialog.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &PreferencesDialog::x)
 
@@ -59,7 +60,9 @@ PreferencesDialog::PreferencesDialog(Gtk::Window &parent, bool readonly)
 	  continue;
 	Gtk::Box *player_hbox = new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
 	Gtk::Image *image = new Gtk::Image();
-	image->property_pixbuf() = gc->getShieldPic(2, p)->to_pixbuf();
+	image->property_pixbuf() =
+          gc->getShieldPic(2, p, false,
+                           FontSize::getInstance ()->get_height ())->to_pixbuf();
 	Gtk::ComboBoxText *type = new Gtk::ComboBoxText();
 	type->signal_changed().connect (sigc::bind(method(on_type_changed), type));
 	Gtk::CheckButton *observe = new Gtk::CheckButton(_("Observe"));

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "ImageCache.h"
 #include "playerlist.h"
 #include "player.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &DiplomacyDialog::x)
 
@@ -56,7 +57,9 @@ DiplomacyDialog::DiplomacyDialog(Gtk::Window &parent, Player *player)
 	continue;
       if (p == d_player)
 	continue;
-      Glib::RefPtr<Gdk::Pixbuf> pixbuf= gc->getShieldPic(2, p)->to_pixbuf();
+      Glib::RefPtr<Gdk::Pixbuf> pixbuf =
+        gc->getShieldPic(2, p, false,
+                         FontSize::getInstance ()->get_height ())->to_pixbuf();
       Gtk::Image *im = new Gtk::Image();
       im->property_pixbuf() = pixbuf;
       d_proposals_table->attach(*manage(im), i, 0, 1, 1);
@@ -64,7 +67,9 @@ DiplomacyDialog::DiplomacyDialog(Gtk::Window &parent, Player *player)
     }
   d_proposals_table->set_column_spacing (16);
     
-  d_player_shield_image->property_pixbuf() = gc->getShieldPic(2, d_player)->to_pixbuf();
+  d_player_shield_image->property_pixbuf() =
+    gc->getShieldPic(2, d_player, false,
+                     FontSize::getInstance ()->get_height ())->to_pixbuf();
 
   d_player_label->set_text(d_player->getName());
 
@@ -87,7 +92,9 @@ DiplomacyDialog::DiplomacyDialog(Gtk::Window &parent, Player *player)
 	}
       j = 0;
       Player::DiplomaticState state = d_player->getDiplomaticState (p);
-      Glib::RefPtr<Gdk::Pixbuf> pixbuf= gc->getDiplomacyPic(1, state)->to_pixbuf();
+      Glib::RefPtr<Gdk::Pixbuf> pixbuf=
+        gc->getDiplomacyPic(1, state,
+                            FontSize::getInstance ()->get_height ())->to_pixbuf();
       Gtk::Image *im = new Gtk::Image();
       im->property_pixbuf() = pixbuf;
       d_proposals_table->attach(*manage(im), i, j + 1, 1, 1);
@@ -99,13 +106,22 @@ DiplomacyDialog::DiplomacyDialog(Gtk::Window &parent, Player *player)
 	  switch (proposal)
 	    {
 	    case Player::PROPOSE_PEACE:
-	      pixbuf2 = gc->getDiplomacyPic(1, Player::AT_PEACE)->to_pixbuf();
+	      pixbuf2 =
+                gc->getDiplomacyPic
+                (1, Player::AT_PEACE,
+                 FontSize::getInstance ()->get_height ())->to_pixbuf();
 	      break;
 	    case Player::PROPOSE_WAR_IN_FIELD:
-	      pixbuf2 = gc->getDiplomacyPic(1, Player::AT_WAR_IN_FIELD)->to_pixbuf();
+	      pixbuf2 =
+                gc->getDiplomacyPic
+                (1, Player::AT_WAR_IN_FIELD,
+                 FontSize::getInstance ()->get_height ())->to_pixbuf();
 	      break;
 	    case Player::PROPOSE_WAR:
-	      pixbuf2 = gc->getDiplomacyPic(1, Player::AT_WAR)->to_pixbuf();
+	      pixbuf2 =
+                gc->getDiplomacyPic
+                (1, Player::AT_WAR,
+                 FontSize::getInstance ()->get_height ())->to_pixbuf();
 	      break;
 	    default:
 	      continue;
@@ -137,7 +153,8 @@ DiplomacyDialog::DiplomacyDialog(Gtk::Window &parent, Player *player)
       Gtk::RadioButton *radio1= manage(new Gtk::RadioButton);
       Gtk::Image *im3 = new Gtk::Image();
       im3->property_pixbuf() = 
-	gc->getDiplomacyPic(1, Player::AT_PEACE)->to_pixbuf();
+	gc->getDiplomacyPic(1, Player::AT_PEACE,
+                            FontSize::getInstance ()->get_height ())->to_pixbuf();
       radio1->set_tooltip_text(_("Propose peace"));
       radio1->add(*manage(im3));
       radio1->set_mode(false);
@@ -155,7 +172,8 @@ DiplomacyDialog::DiplomacyDialog(Gtk::Window &parent, Player *player)
       Gtk::RadioButton *radio2= manage(new Gtk::RadioButton);
       Gtk::Image *im4 = new Gtk::Image();
       im4->property_pixbuf() = 
-	gc->getDiplomacyPic(1, Player::AT_WAR_IN_FIELD)->to_pixbuf();
+	gc->getDiplomacyPic(1, Player::AT_WAR_IN_FIELD,
+                            FontSize::getInstance ()->get_height ())->to_pixbuf();
       radio2->set_tooltip_text(_("Propose war on armies not in cities"));
       radio2->add(*manage(im4));
       radio2->set_mode(false);
@@ -174,7 +192,8 @@ DiplomacyDialog::DiplomacyDialog(Gtk::Window &parent, Player *player)
       Gtk::RadioButton *radio3= manage(new Gtk::RadioButton);
       Gtk::Image *im5 = new Gtk::Image();
       im5->property_pixbuf() = 
-	gc->getDiplomacyPic(1, Player::AT_WAR)->to_pixbuf();
+	gc->getDiplomacyPic(1, Player::AT_WAR,
+                            FontSize::getInstance ()->get_height ())->to_pixbuf();
       radio3->set_tooltip_text(_("Propose war"));
       radio3->add(*manage(im5));
       radio3->set_mode(false);

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 #include "NextTurnNetworked.h"
 #include "recently-played-game-list.h"
 #include "game-parameters.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &GameLobbyDialog::x)
 namespace
@@ -429,7 +430,9 @@ void GameLobbyDialog::add_player(guint32 order, const Glib::ustring &type,
   ImageCache *gc = ImageCache::getInstance();
   Gtk::TreeIter i = player_list->append();
   (*i)[player_columns.order] = order;
-  (*i)[player_columns.shield] = gc->getShieldPic(1, player)->to_pixbuf();
+  (*i)[player_columns.shield] =
+    gc->getShieldPic(1, player, false,
+                     FontSize::getInstance ()->get_height ())->to_pixbuf();
   (*i)[player_columns.type] = type;
   (*i)[player_columns.name] = name;
   (*i)[player_columns.player_id] = player->getId();
@@ -599,7 +602,10 @@ void GameLobbyDialog::update_turn_indicator()
       if (active)
         {
           if (row[player_columns.player_id] == active->getId())
-            (*i)[player_columns.turn] = gc->getCursorPic(ImageCache::SWORD)->to_pixbuf();
+            (*i)[player_columns.turn] =
+              gc->getCursorPic
+              (ImageCache::SWORD,
+               FontSize::getInstance ()->get_height ())->to_pixbuf();
           else
             {
               Glib::RefPtr<Gdk::Pixbuf> empty_pic

@@ -1,4 +1,4 @@
-//  Copyright (C) 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,53 +35,23 @@
 #include "GameMap.h"
 #include "army.h"
 #include "shield.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &StackTileBox::x)
 
-Glib::ustring StackTileBox::get_file(Configuration::UiFormFactor factor)
+StackTileBox * StackTileBox::create()
 {
-  Glib::ustring file = "";
-  switch (factor)
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-      file = "stack-tile-box-desktop.ui";
-      break;
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      file = "stack-tile-box-netbook.ui";
-      break;
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      file = "stack-tile-box-large-screen.ui";
-      break;
-    }
-  return file;
-}
-
-StackTileBox * StackTileBox::create(guint32 factor)
-{
-  Glib::ustring file = get_file(Configuration::UiFormFactor(factor));
+  Glib::ustring file = "stack-tile-box-large-screen.ui";
   Glib::RefPtr<Gtk::Builder> xml = BuilderCache::get(file);
 
   StackTileBox *box;
   xml->get_widget_derived("box", box);
-  box->d_factor = factor;
   return box;
 }
 
 void StackTileBox::pad_image(Gtk::Image *image)
 {
-  int padding = 0;
-  switch (Configuration::UiFormFactor(d_factor))
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-      padding = 0;
-      break;
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      padding = 0;
-      break;
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      padding = 3;
-      break;
-    }
+  int padding = 3;
   image->property_xpad() = padding;
   image->property_ypad() = padding;
 }
@@ -103,7 +73,7 @@ StackTileBox::StackTileBox(BaseObjectType* baseObject, const Glib::RefPtr<Gtk::B
   for (unsigned int i = 0; i < MAX_ARMIES_ON_A_SINGLE_TILE; i++)
     {
       //we put them in a vbox so that the buttons don't expand horizontally.
-      StackArmyButton *button = StackArmyButton::create(Configuration::s_ui_form_factor);
+      StackArmyButton *button = StackArmyButton::create();
       button->get_parent()->remove(*button);
       Gtk::Box *box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
       box->pack_start(*Gtk::manage(button), Gtk::PACK_SHRINK);
@@ -253,7 +223,9 @@ void StackTileBox::fill_in_group_info (StackTile *stile, Stack *s)
 {
   guint32 bonus = s->calculateMoveBonus();
   ImageCache *gc = ImageCache::getInstance();
-  terrain_image->property_pixbuf() = gc->getMoveBonusPic(bonus, s->hasShip())->to_pixbuf();
+  terrain_image->property_pixbuf() =
+    gc->getMoveBonusPic(bonus, s->hasShip(),
+                        FontSize::getInstance ()->get_height ())->to_pixbuf();
   group_moves_label->set_markup(String::ucompose("<b>%1</b>", s->getMoves()));
   group_ungroup_toggle->set_sensitive(false);
   d_inhibit_group_toggle = true;

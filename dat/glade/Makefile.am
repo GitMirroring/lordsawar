@@ -73,17 +73,9 @@ new-random-map-dialog.ui \
 use-item-dialog.ui \
 use-item-on-player-dialog.ui \
 use-item-on-city-dialog.ui \
-game-button-box-desktop.ui \
-game-button-box-netbook.ui \
 game-button-box-large-screen.ui \
-status-box-desktop.ui \
-status-box-netbook.ui \
 status-box-large-screen.ui \
-stack-tile-box-desktop.ui \
-stack-tile-box-netbook.ui \
 stack-tile-box-large-screen.ui \
-stack-army-button-desktop.ui \
-stack-army-button-netbook.ui \
 stack-army-button-large-screen.ui
 
 EXTRA_DIST = $(glade_DATA) \

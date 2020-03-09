@@ -1,5 +1,5 @@
 //  Copyright (C) 2007, 2008 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2010, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 #include "tilesetlist.h"
 #include "Tile.h"
 #include "SmallTile.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &FightWindow::x)
 
@@ -88,12 +89,16 @@ FightWindow::FightWindow(Gtk::Window &parent, Fight &fight)
   Gtk::Image *defender_shield_image;
   Player *p = defenders.front()->getOwner();
   xml->get_widget("defender_shield_image", defender_shield_image);
-  defender_shield_image->property_pixbuf()=gc->getShieldPic(2, p)->to_pixbuf();
+  defender_shield_image->property_pixbuf()=
+    gc->getShieldPic(2, p, false,
+                     FontSize::getInstance ()->get_height ())->to_pixbuf();
 
   Gtk::Image *attacker_shield_image;
   p = attackers.front()->getOwner();
   xml->get_widget("attacker_shield_image", attacker_shield_image);
-  attacker_shield_image->property_pixbuf()=gc->getShieldPic(2, p)->to_pixbuf();
+  attacker_shield_image->property_pixbuf()=
+    gc->getShieldPic(2, p, false,
+                     FontSize::getInstance ()->get_height ())->to_pixbuf();
 
   actions = fight.getCourseOfEvents();
   d_quick = false;

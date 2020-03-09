@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "vectoredunit.h"
 #include "shield.h"
 #include "playerlist.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &DestinationDialog::x)
 
@@ -231,10 +232,12 @@ void DestinationDialog::fill_in_vectoring_info()
   int slot = city->getActiveProductionSlot();
   Glib::RefPtr<Gdk::Pixbuf> s = 
     gc->getCircledArmyPic(as, 0, player, NULL, false, Shield::NEUTRAL, 
-                          true)->to_pixbuf();
+                          true,
+                          FontSize::getInstance ()->get_height ())->to_pixbuf();
   Glib::RefPtr<Gdk::Pixbuf> empty_pic =
     gc->getCircledArmyPic(as, 0, player, NULL, false, Shield::NEUTRAL, 
-                          false)->to_pixbuf();
+                          false,
+                          FontSize::getInstance ()->get_height ())->to_pixbuf();
 
   vector_toggle->set_sensitive(slot != -1 ? true : false);
 
@@ -267,7 +270,8 @@ void DestinationDialog::fill_in_vectoring_info()
     {
       const ArmyProdBase* a = city->getProductionBase(slot);
       pic = gc->getCircledArmyPic(as, a->getTypeId(), player, NULL, false,
-                                  Shield::NEUTRAL, true)->to_pixbuf();
+                                  Shield::NEUTRAL, true,
+                                  FontSize::getInstance ()->get_height ())->to_pixbuf();
       s1 = String::ucompose(_("%1t"), city->getDuration());
       turns_label->set_markup("<i>" + s1 + "</i>");
       update_description (vectored);
@@ -283,13 +287,15 @@ void DestinationDialog::fill_in_vectoring_info()
       if ((*it)->getDuration() == 2)
         {
           pic = gc->getCircledArmyPic(as, armytype, player, NULL, false,
-                                      Shield::NEUTRAL, true)->to_pixbuf();
+                                      Shield::NEUTRAL, true,
+                                      FontSize::getInstance ()->get_height ())->to_pixbuf();
           one_turn_away_image->property_pixbuf() = pic;
         }
       else if ((*it)->getDuration() == 1)
         {
           pic = gc->getCircledArmyPic(as, armytype, player, NULL, false, 
-                                      Shield::NEUTRAL, true)->to_pixbuf();
+                                      Shield::NEUTRAL, true,
+                                      FontSize::getInstance ()->get_height ())->to_pixbuf();
           two_turns_away_image->property_pixbuf() = pic;
         }
     }
@@ -313,7 +319,8 @@ void DestinationDialog::fill_in_vectoring_info()
         }
       pic = 
         gc->getCircledArmyPic(as, (*it)->getArmy()->getTypeId(), player, NULL, 
-                              false, Shield::NEUTRAL, true)->to_pixbuf();
+                              false, Shield::NEUTRAL, true,
+                              FontSize::getInstance ()->get_height ())->to_pixbuf();
       image->property_pixbuf() = pic;
       count++;
     }
@@ -331,7 +338,8 @@ void DestinationDialog::fill_in_vectoring_info()
         }
       pic = 
         gc->getCircledArmyPic(as, (*it)->getArmy()->getTypeId(), player, NULL,
-                              false, Shield::NEUTRAL, true)->to_pixbuf();
+                              false, Shield::NEUTRAL, true,
+                              FontSize::getInstance ()->get_height ())->to_pixbuf();
       image->property_pixbuf() = pic;
       count++;
     }

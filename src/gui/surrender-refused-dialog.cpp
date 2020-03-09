@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "defs.h"
 #include "File.h"
 #include "ImageCache.h"
+#include "font-size.h"
 
 SurrenderRefusedDialog::SurrenderRefusedDialog(Gtk::Window &parent)
  : LwDialog(parent, "surrender-refused-dialog.ui")
@@ -34,5 +35,7 @@ SurrenderRefusedDialog::SurrenderRefusedDialog(Gtk::Window &parent)
 
   label->set_text(_("Off with their heads!  I want it ALL!"));
   image->property_pixbuf() =
-    ImageCache::getInstance()->getParleyRefusedPic()->to_pixbuf();
+    ImageCache::getInstance()->getDialogPic
+    (ImageCache::DIALOG_PARLEY_REFUSED,
+     FontSize::getInstance ()->get_height ())->to_pixbuf();
 }

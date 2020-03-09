@@ -1,4 +1,4 @@
-// Copyright (C) 2010, 2014, 2017 Ben Asselstine
+// Copyright (C) 2010, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "cityset.h"
 #include "RoadPathCalculator.h"
 #include "path.h"
+#include "font-size.h"
 
 #include "editablesmallmap.h"
 
@@ -164,39 +165,51 @@ Glib::RefPtr<Gdk::Pixbuf> EditableSmallMap::get_cursor(Vector<int> & hotspot) co
   switch (pointer)
     {
     case POINTER:
-      cursor = ImageCache::getInstance()->getCursorPic(ImageCache::POINTER)->to_pixbuf();
+      cursor = ImageCache::getInstance()->getCursorPic
+        (ImageCache::POINTER,
+         FontSize::getInstance ()->get_height ())->to_pixbuf();
       hotspot = Vector<int>(cursor->get_width() / 2, cursor->get_height() / 2);
       break;
     case PICK_NEW_ROAD_START: 
     case PICK_NEW_ROAD_FINISH: 
-      cursor = ImageCache::getInstance()->getCursorPic(ImageCache::TARGET)->to_pixbuf();
+      cursor = ImageCache::getInstance()->getCursorPic
+        (ImageCache::TARGET,
+         FontSize::getInstance ()->get_height ())->to_pixbuf();
       hotspot = Vector<int>(cursor->get_width() / 2, cursor->get_height() / 2);
       break;
     case ERASE: 
-      cursor = ImageCache::getInstance()->getCursorPic(ImageCache::TARGET)->to_pixbuf();
+      cursor = ImageCache::getInstance()->getCursorPic
+        (ImageCache::TARGET,
+         FontSize::getInstance ()->get_height ())->to_pixbuf();
       hotspot = Vector<int>(cursor->get_width() / 2, cursor->get_height() / 2);
       break;
     case TERRAIN:
         {
-          cursor = ImageCache::getInstance()->getCursorPic(ImageCache::TARGET)->to_pixbuf();
+          cursor = ImageCache::getInstance()->getCursorPic
+            (ImageCache::TARGET,
+             FontSize::getInstance ()->get_height ())->to_pixbuf();
           hotspot = 
             Vector<int>(cursor->get_width() / 2, cursor->get_height() / 2);
         }
       break;
     case CITY:
-      cursor = ImageCache::getInstance()->getShieldPic(0, Playerlist::getInstance()->getNeutral())->to_pixbuf();
+      cursor = ImageCache::getInstance()->getShieldPic(0, Playerlist::getInstance()->getNeutral(), true, 0)->to_pixbuf();
       hotspot = Vector<int>(cursor->get_width() / 2, cursor->get_height() / 2);
       break;
     case RUIN:
         {
-          cursor = ImageCache::getInstance()->getCursorPic(ImageCache::TARGET)->to_pixbuf();
+          cursor = ImageCache::getInstance()->getCursorPic
+            (ImageCache::TARGET,
+             FontSize::getInstance ()->get_height ())->to_pixbuf();
           hotspot = 
             Vector<int>(cursor->get_width() / 2, cursor->get_height() / 2);
         }
       break;
     case TEMPLE: 
         {
-          cursor = ImageCache::getInstance()->getCursorPic(ImageCache::TARGET)->to_pixbuf();
+          cursor = ImageCache::getInstance()->getCursorPic
+            (ImageCache::TARGET,
+             FontSize::getInstance ()->get_height ())->to_pixbuf();
           hotspot = 
             Vector<int>(cursor->get_width() / 2, cursor->get_height() / 2);
         }

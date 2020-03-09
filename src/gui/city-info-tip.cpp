@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2011, 2012, 2014, 2015, 2016 Ben Asselstine
+//  Copyright (C) 2009, 2011, 2012, 2014, 2015, 2016, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "playerlist.h"
 #include "city.h"
 #include "File.h"
+#include "font-size.h"
 
 
 CityInfoTip::CityInfoTip(Gtk::Widget *target, MapTipPosition mpos, const City *city)
@@ -70,13 +71,19 @@ CityInfoTip::CityInfoTip(Gtk::Widget *target, MapTipPosition mpos, const City *c
       
     name_label->set_markup("<b>" + city->getName() + "</b>");
     left_shield_image->property_pixbuf() = 
-      gc->getShieldPic(1, city->getOwner())->to_pixbuf();
+      gc->getShieldPic(1, city->getOwner(), false,
+                       FontSize::getInstance ()->get_height ())->to_pixbuf();
     right_shield_image->property_pixbuf() = 
-      gc->getShieldPic(1, city->getOwner())->to_pixbuf();
-    income_image->property_file() = 
-      File::getVariousFile("smallincome.png");
-    defense_image->property_file() = 
-      File::getVariousFile("smalldefense.png");
+      gc->getShieldPic(1, city->getOwner(), false,
+                       FontSize::getInstance ()->get_height ())->to_pixbuf();
+    income_image->property_pixbuf () =
+      ImageCache::getInstance ()->getStatusPic
+      (ImageCache::STATUS_INCOME,
+       FontSize::getInstance ()->get_height ())->to_pixbuf ();
+    defense_image->property_pixbuf () =
+      ImageCache::getInstance ()->getStatusPic
+      (ImageCache::STATUS_DEFENSE,
+       FontSize::getInstance ()->get_height ())->to_pixbuf ();
     income_label->set_markup(String::ucompose("<b>%1</b>",
 					      city->getGold()));
     defense_label->set_markup(String::ucompose("<b>%1</b>",
@@ -88,7 +95,8 @@ CityInfoTip::CityInfoTip(Gtk::Widget *target, MapTipPosition mpos, const City *c
 	s += city->getCapitalOwner()->getName();
 	capital_label->set_text (s);
 	capital_image->property_pixbuf() = 
-	  gc->getShieldPic(1, city->getCapitalOwner())->to_pixbuf();
+	  gc->getShieldPic(1, city->getCapitalOwner(), false,
+                           FontSize::getInstance ()->get_height ())->to_pixbuf();
       }
     else
       {

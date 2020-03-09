@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "playerlist.h"
 #include "player.h"
 #include "shield.h"
+#include "font-size.h"
 
 TriumphsDialog::TriumphsDialog(Gtk::Window &parent, Player *player)
  : LwDialog(parent, "triumphs-dialog.ui")
@@ -99,7 +100,8 @@ void TriumphsDialog::fill_in_page(Player *p)
   Gtk::Image *hero_image = new Gtk::Image();
   hero_image->property_pixbuf() = 
     gc->getCircledArmyPic(p->getArmyset(), hero->getId(), p, NULL, false,
-                          Shield::NEUTRAL, true)->to_pixbuf();
+                          Shield::NEUTRAL, true,
+                          FontSize::getInstance()->get_height ())->to_pixbuf();
   Gtk::Box *hero_hbox = new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
   hero_hbox->pack_start(*manage(hero_image), Gtk::PACK_SHRINK, 10);
   hero_hbox->pack_start(*manage(hero_label), Gtk::PACK_SHRINK, 10);
@@ -135,7 +137,8 @@ void TriumphsDialog::fill_in_page(Player *p)
   Gtk::Image *normal_image = new Gtk::Image();
   normal_image->property_pixbuf() = 
     gc->getCircledArmyPic(p->getArmyset(), 0, p, NULL, false, Shield::NEUTRAL, 
-                          true)->to_pixbuf();
+                          true,
+                          FontSize::getInstance()->get_height ())->to_pixbuf();
   Gtk::Box *normal_hbox = new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
   normal_hbox->pack_start(*manage(normal_image), Gtk::PACK_SHRINK, 10);
   normal_hbox->pack_start(*manage(normal_label), Gtk::PACK_SHRINK, 10);
@@ -165,7 +168,8 @@ void TriumphsDialog::fill_in_page(Player *p)
   Gtk::Image *special_image = new Gtk::Image();
   special_image->property_pixbuf() = 
     gc->getCircledArmyPic(p->getArmyset(), special->getId(), p, NULL, false,
-                          Shield::NEUTRAL, true)->to_pixbuf();
+                          Shield::NEUTRAL, true,
+                          FontSize::getInstance()->get_height ())->to_pixbuf();
   Gtk::Box *special_hbox = new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
   special_hbox->pack_start(*manage(special_image), Gtk::PACK_SHRINK, 10);
   special_hbox->pack_start(*manage(special_label), Gtk::PACK_SHRINK, 10);
@@ -196,7 +200,9 @@ void TriumphsDialog::fill_in_page(Player *p)
   contents->add(*manage(ship_hbox));
   contents->add(*manage(flag_hbox));
   Gtk::Image *shield_image = new Gtk::Image();
-  shield_image->property_pixbuf() = gc->getShieldPic(2, p)->to_pixbuf();
+  shield_image->property_pixbuf() =
+    gc->getShieldPic(2, p, false,
+                     FontSize::getInstance ()->get_height ())->to_pixbuf();
   notebook->append_page (*manage(contents), *manage(shield_image));
 }
 

@@ -1,4 +1,4 @@
-//  Copyright (C) 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class StatusBox: public Gtk::Box
     //!Destructor.
     ~StatusBox();
 
-    static StatusBox * create(guint32 factor);
+    static StatusBox * create();
 
     void show_stats();
     void enforce_height();
@@ -63,9 +63,7 @@ class StatusBox: public Gtk::Box
 
  private:
     StackTileBox *stack_tile_box;
-    guint32 d_factor;
     guint32 d_height_fudge_factor;
-    static Glib::ustring get_file(Configuration::UiFormFactor factor);
     Gtk::Notebook *notebook;
     Gtk::Image *cities_stats_image;
     Gtk::Label *cities_stats_label;

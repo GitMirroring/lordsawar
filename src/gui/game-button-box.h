@@ -1,4 +1,4 @@
-//  Copyright (C) 2011 Ben Asselstine
+//  Copyright (C) 2011, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,20 +38,18 @@ class GameButtonBox: public Gtk::Box
 
     void give_some_cheese();
     bool get_end_turn_button_sensitive();
-    void setup_signals(Game *game, guint32 factor);
+    void setup_signals(Game *game);
 
     //Signals
     sigc::signal<void> diplomacy_clicked;
 
     // Statics
-    static int get_icon_size(guint32 factor);
-    static GameButtonBox * create(guint32 factor);
+    static GameButtonBox * create();
 
  protected:
 
  private:
     std::list<sigc::connection> connections;
-    guint32 d_factor;
     Gtk::Button *next_movable_button;
     Gtk::Button *center_button;
     Gtk::Button *diplomacy_button;
@@ -62,7 +60,6 @@ class GameButtonBox: public Gtk::Box
     Gtk::Button *move_button;
     Gtk::Button *move_all_button;
     Gtk::Button *end_turn_button;
-    static Glib::ustring get_file(Configuration::UiFormFactor factor);
 
     void setup_button(Gtk::Button *button, sigc::slot<void> slot,
                       sigc::signal<void, bool> &game_signal);
@@ -70,7 +67,7 @@ class GameButtonBox: public Gtk::Box
     void change_diplomacy_button_image (bool proposals_present);
     void update_diplomacy_button (bool sensitive);
 
-    void add_pictures_to_buttons(guint32 factor);
+    void add_pictures_to_buttons();
     void drop_connections();
     void pad_image(Gtk::Image *image);
     void add_picture_to_button (guint32 icontype, Gtk::Button *button);

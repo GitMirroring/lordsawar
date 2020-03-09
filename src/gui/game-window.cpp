@@ -1,5 +1,5 @@
 //  Copyright (C) 2007, 2008, Ole Laursen
-//  Copyright (C) 2007-2012, 2014-2017 Ben Asselstine
+//  Copyright (C) 2007-2012, 2014-2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -120,6 +120,7 @@
 #include "builder-cache.h"
 #include "new-network-game-dialog.h"
 #include "rnd.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &GameWindow::x)
 
@@ -165,7 +166,7 @@ GameWindow::GameWindow()
 
   xml->get_widget("status_box_container", status_box_container);
 
-  status_box = StatusBox::create(Configuration::s_ui_form_factor);
+  status_box = StatusBox::create();
   status_box->reparent(*status_box_container);
   status_box->property_hexpand() = true;
 
@@ -184,7 +185,7 @@ GameWindow::GameWindow()
   map_eventbox->signal_enter_notify_event().connect
     (sigc::hide(method(on_mouse_entered_smallmap)));
   xml->get_widget("control_panel_viewport", control_panel_viewport);
-  game_button_box = GameButtonBox::create(Configuration::s_ui_form_factor);
+  game_button_box = GameButtonBox::create();
   game_button_box->reparent(*control_panel_viewport);
   game_button_box->property_halign() = Gtk::ALIGN_CENTER;
 
@@ -623,7 +624,7 @@ bool GameWindow::setup_game(GameScenario *game_scenario, NextTurn *nextTurn)
     delete game;
   game = new Game(game_scenario, nextTurn);
 
-  game_button_box->setup_signals(game, Configuration::s_ui_form_factor);
+  game_button_box->setup_signals(game);
     
   status_box->stack_composition_modified.connect
       (sigc::mem_fun(game, &Game::recalculate_moves_for_stack));
@@ -680,7 +681,9 @@ void GameWindow::on_bigmap_cursor_changed(ImageCache::CursorType cursor)
   bigmap_image->get_window()->set_cursor
     (Gdk::Cursor::create
      (Gdk::Display::get_default(),
-      ImageCache::getInstance()->getCursorPic (cursor)->to_pixbuf(), 4, 4));
+      ImageCache::getInstance()->getCursorPic
+      (cursor,
+       FontSize::getInstance ()->get_height ())->to_pixbuf(), 4, 4));
 }
 
 bool GameWindow::on_bigmap_key_event(GdkEventKey *e)
@@ -723,17 +726,16 @@ bool GameWindow::on_smallmap_mouse_motion_event(GdkEventMotion *e)
 
 void GameWindow::get_default_magnifying_glass_hotspot (int *hotspot_x, int *hotspot_y)
 {
-  guint s =
-    Gdk::Display::get_default()->get_default_cursor_size ();
-
   PixMask *p =
-    ImageCache::getInstance()->getCursorPic(ImageCache::MAGNIFYING_GLASS);
+    ImageCache::getInstance()->getCursorPic
+    (ImageCache::MAGNIFYING_GLASS,
+     FontSize::getInstance ()->get_height ());
 
-  double x = 8.0 / (double)p->get_width ();
-  double y = 5.0 / (double)p->get_height ();
+  double x = p->get_width () * (8.0/11.0);
+  double y = p->get_height () * (5.0/11.0);
 
-  *hotspot_x = int((double)s * (double)x);
-  *hotspot_y = int((double)s * (double)y);
+  *hotspot_x = int(x);
+  *hotspot_y = int(y);
 }
 
 bool GameWindow::on_mouse_entered_smallmap()
@@ -744,7 +746,8 @@ bool GameWindow::on_mouse_entered_smallmap()
   map_eventbox->get_window()->set_cursor
     (Gdk::Cursor::create (Gdk::Display::get_default(),
                           ImageCache::getInstance()->getCursorPic
-                          (ImageCache::MAGNIFYING_GLASS)->to_pixbuf(),
+                          (ImageCache::MAGNIFYING_GLASS,
+                           FontSize::getInstance ()->get_height ())->to_pixbuf(),
                           hotspot_x, hotspot_y));
   return true;
 }
@@ -1391,7 +1394,9 @@ void GameWindow::on_game_over(Player *winner)
   xml->get_widget("image", image);
 
   image->property_pixbuf() =
-    ImageCache::getInstance()->getWinningPic()->to_pixbuf();
+    ImageCache::getInstance()->getDialogPic
+    (ImageCache::DIALOG_WINNING,
+     FontSize::getInstance ()->get_height ())->to_pixbuf();
 
   Gtk::Label *label;
   xml->get_widget("label", label);
@@ -1716,10 +1721,14 @@ void GameWindow::on_ruinfight_finished(Fight::Result result)
   xml->get_widget("image", image);
   if (result == Fight::ATTACKER_WON)
     image->property_pixbuf() =
-      ImageCache::getInstance()->getRuinSuccessPic()->to_pixbuf();
+      ImageCache::getInstance()->getDialogPic
+      (ImageCache::DIALOG_RUIN_SUCCESS,
+       FontSize::getInstance ()->get_height ())->to_pixbuf();
   else
     image->property_pixbuf() =
-      ImageCache::getInstance()->getRuinDefeatPic()->to_pixbuf();
+      ImageCache::getInstance()->getDialogPic
+      (ImageCache::DIALOG_RUIN_DEFEAT,
+       FontSize::getInstance ()->get_height ())->to_pixbuf();
   image->show();
 
   dialog.run_and_hide();
@@ -1970,7 +1979,9 @@ CityDefeatedAction GameWindow::on_city_defeated(City *city, int gold)
   Gtk::Image *image;
   xml->get_widget("city_image", image);
   image->property_pixbuf() =
-    ImageCache::getInstance()->getCityDefeatedPic()->to_pixbuf();
+    ImageCache::getInstance()->getDialogPic
+    (ImageCache::DIALOG_CONQUERED_CITY,
+     FontSize::getInstance ()->get_height ())->to_pixbuf();
   image->show();
 
   Gtk::Label *label;
@@ -2153,7 +2164,8 @@ void GameWindow::on_city_pillaged(City *city, int gold, int pillaged_army_type)
     {
       Glib::RefPtr<Gdk::Pixbuf> empty_pic = 
         gc->getCircledArmyPic(as, 0, player, NULL, false, Shield::NEUTRAL, 
-                              false)->to_pixbuf();
+                              false,
+                              FontSize::getInstance()->get_height ())->to_pixbuf();
       pillaged_army_type_image->set(empty_pic);
       pillaged_army_type_cost_label->set_text("");
     }
@@ -2161,7 +2173,8 @@ void GameWindow::on_city_pillaged(City *city, int gold, int pillaged_army_type)
     {
       Glib::RefPtr<Gdk::Pixbuf> pic;
       pic = gc->getCircledArmyPic(as, pillaged_army_type, player, NULL, false,
-                                  Shield::NEUTRAL, true)->to_pixbuf();
+                                  Shield::NEUTRAL, true,
+                                  FontSize::getInstance()->get_height ())->to_pixbuf();
       pillaged_army_type_image->property_pixbuf() = pic;
       pillaged_army_type_cost_label->set_text(String::ucompose("%1 gp", gold));
     }
@@ -2215,7 +2228,8 @@ void GameWindow::on_city_sacked(City *city, int gold, std::list<guint32> sacked_
   Glib::RefPtr<Gdk::Pixbuf> pic;
   Glib::RefPtr<Gdk::Pixbuf> empty_pic =
     gc->getCircledArmyPic(as, 0, player, NULL, false, Shield::NEUTRAL, 
-                          false)->to_pixbuf();
+                          false,
+                          FontSize::getInstance()->get_height ())->to_pixbuf();
   int i = 0;
   Gtk::Label *sack_label = NULL;
   Gtk::Image *sack_image = NULL;
@@ -2237,7 +2251,8 @@ void GameWindow::on_city_sacked(City *city, int gold, std::list<guint32> sacked_
 	  break;
 	}
       pic = gc->getCircledArmyPic(as, *it, player, NULL, false, 
-                                  Shield::NEUTRAL, true)->to_pixbuf();
+                                  Shield::NEUTRAL, true,
+                                  FontSize::getInstance()->get_height ())->to_pixbuf();
       sack_image->property_pixbuf() = pic;
       const ArmyProto *a = 
 	Armysetlist::getInstance()->getArmy (player->getArmyset(), *it);
@@ -2316,13 +2331,17 @@ void GameWindow::show_shield_turn() //show turn indicator
 	}
       if (*i == pl->getActiveplayer())
         {
-          PixMask *s = gc->getShieldPic (1, (*i));
+          PixMask *s =
+            gc->getShieldPic (1, (*i), false,
+                              FontSize::getInstance ()->get_height ());
           PixMask *p = ImageCache::add_border (s, s->get_dim(), 3.0);
           shield_image[c]->property_pixbuf() = p->to_pixbuf();
           delete p;
         }
       else
-        shield_image[c]->property_pixbuf() = gc->getShieldPic(1,(*i))->to_pixbuf();
+        shield_image[c]->property_pixbuf() =
+          gc->getShieldPic(1, (*i), false,
+                           FontSize::getInstance()->get_height ())->to_pixbuf();
       if (*i == pl->getActiveplayer())
         shield_image[c]->property_margin_top() = 0;
       else
@@ -2363,7 +2382,9 @@ void GameWindow::on_next_player_turn(Player *player, unsigned int turn_number)
   Gtk::Image *image;
   xml->get_widget("image", image);
   image->property_pixbuf() =
-    ImageCache::getInstance()->getNextTurnPic()->to_pixbuf();
+    ImageCache::getInstance()->getDialogPic
+    (ImageCache::DIALOG_NEXT_TURN,
+     FontSize::getInstance ()->get_height ())->to_pixbuf();
 
   Gtk::Label *label;
   xml->get_widget("label", label);
@@ -2386,11 +2407,13 @@ void GameWindow::on_medal_awarded_to_army(Army *army, int medaltype)
   image->property_pixbuf() = 
     gc->getCircledArmyPic(active->getArmyset(), army->getTypeId(), active, 
 		   army->getMedalBonuses(), false, Shield::NEUTRAL, 
-                   true)->to_pixbuf();
+                   true,
+                   FontSize::getInstance ()->get_height ())->to_pixbuf();
   Gtk::Image *medal_image;
   xml->get_widget("medal_image", medal_image);
   medal_image->property_pixbuf() = 
-    gc->getMedalImage(true, medaltype)->to_pixbuf();
+    gc->getMedalPic(true, medaltype,
+                    FontSize::getInstance ()->get_height ())->to_pixbuf();
 
   Gtk::Label *label;
   xml->get_widget("label", label);
@@ -2769,8 +2792,10 @@ void GameWindow::on_commentator_comments(Glib::ustring comment)
   dialog.set_title(_("The Warlord Says..."));
     
   PixMask *img = 
-    gc->getGameButtonImage(ImageCache::DIPLOMACY_NO_PROPOSALS, 1)->copy();
-  PixMask::scale(img, 60, 60);
+    gc->getGameButtonPic(ImageCache::DIPLOMACY_NO_PROPOSALS,
+                         FontSize::getInstance ()->get_height ())->copy();
+  int size = img->get_height () * 3;
+  PixMask::scale(img, size, size);
   dialog.set_image(img->to_pixbuf());
   dialog.run_and_hide();
 }

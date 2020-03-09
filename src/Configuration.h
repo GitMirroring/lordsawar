@@ -2,7 +2,7 @@
 //  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 //  Copyright (C) 2004, 2005 Andrea Paternesi
 //  Copyright (C) 2005 Josef Spillner
-//  Copyright (C) 2006, 2010, 2011, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2006, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
 //  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -129,7 +129,7 @@ class Configuration : public sigc::trackable
         static bool s_remember_recent_games;
         static bool s_remember_recently_edited_files;
 	static guint32 s_double_click_threshold;
-	static guint32 s_ui_form_factor; //See UiFormFactor enumeration
+        static guint32 s_font_size_override;
 
 	static GameParameters::NeutralCities neutralCitiesFromString(const Glib::ustring str);
 	static Glib::ustring neutralCitiesToString(const GameParameters::NeutralCities neutrals);
@@ -142,13 +142,6 @@ class Configuration : public sigc::trackable
 	};
 	static Configuration::SavingPolicy savingPolicyFromString(const Glib::ustring str);
 	static Glib::ustring savingPolicyToString(const Configuration::SavingPolicy policy);
-        enum UiFormFactor {
-	  UI_FORM_FACTOR_NETBOOK = 0,
-	  UI_FORM_FACTOR_DESKTOP = 1,
-	  UI_FORM_FACTOR_LARGE_SCREEN = 2
-	};
-	static Configuration::UiFormFactor uiFormFactorFromString(const Glib::ustring str);
-	static Glib::ustring uiFormFactorToString(const Configuration::UiFormFactor factor);
 	static GameParameters::QuickStartPolicy quickStartPolicyFromString(const Glib::ustring str);
         static Glib::ustring quickStartPolicyToString(const GameParameters::QuickStartPolicy policy);
         static GameParameters::QuestPolicy questPolicyFromString(Glib::ustring str);

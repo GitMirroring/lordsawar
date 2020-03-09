@@ -85,8 +85,6 @@ Main::Main(int &argc, char **&argv)
 
 	g_set_application_name("LordsAWar!");
 
-        Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme() = true;
-
 	Timing::instance().timer_registered.connect(
 	    sigc::mem_fun(*impl, &Main::Impl::on_timer_registered));
     }
@@ -170,6 +168,9 @@ void Main::initialize ()
   Vector<int>::setMaximumWidth(1000);
   RecentlyPlayedGameList::getInstance()->load();
 
+  Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme() = true;
+  if (Configuration::s_font_size_override > 0)
+    override_font_size ();
 
   // Check if armysets are in the path (otherwise exit)
   Armysetlist::scan(Armyset::file_extension);
@@ -178,4 +179,22 @@ void Main::initialize ()
   Citysetlist::scan(Cityset::file_extension);
   BuilderCache::getInstance();
 
+}
+
+void Main::override_font_size ()
+{
+  Glib::ustring fname = Gtk::Settings::get_default()->property_gtk_font_name ();
+  //printf ("'%s'\n", fname.c_str());
+  char *f = strdup (fname.c_str ());
+  char *space = strrchr (f, ' ');
+  if (space)
+    {
+      *space = 0;
+      Glib::ustring newfname =
+        Glib::ustring::compose ("%1 %2", Glib::ustring (f),
+                                Configuration::s_font_size_override);
+      Gtk::Settings::get_default()->property_gtk_font_name () = newfname;
+    }
+  free (f);
+  return;
 }

@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007-2010, 2012, 2014, 2015, 2016, 2017 Ben Asselstine
+//  Copyright (C) 2007-2010, 2012, 2014, 2015, 2016, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -99,6 +99,7 @@
 #include "stacktile.h"
 #include "media-dialog.h"
 #include "validation-dialog.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &MainWindow::x)
 
@@ -1862,7 +1863,8 @@ void MainWindow::fill_players()
 
       Gtk::Image *image = new Gtk::Image();
       image->property_pixbuf() = 
-	ImageCache::getInstance()->getShieldPic(1, *it)->to_pixbuf();
+	ImageCache::getInstance()->getShieldPic
+        (1, *it, false, FontSize::getInstance ()->get_height ())->to_pixbuf();
       toggle->add(*manage(image));
       toggle->show_all();
       if (*it == pl->getActiveplayer())

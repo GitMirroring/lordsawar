@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2009, 2011, 2012, 2014-2017 Ben Asselstine
+//  Copyright (C) 2007-2009, 2011, 2012, 2014-2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include "armysetlist.h"
 #include "shield.h"
 #include "armyprodbase.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &ReportDialog::x)
 
@@ -399,7 +400,8 @@ void ReportDialog::addProduction(const Action *action)
   (*i)[armies_columns.city_id] = city_id;
   (*i)[armies_columns.image] = 
     gc->getCircledArmyPic(p->getArmyset(), army_type, p, NULL, false,
-                          Shield::NEUTRAL, true)->to_pixbuf();
+                          Shield::NEUTRAL, true,
+                          FontSize::getInstance ()->get_height ())->to_pixbuf();
   (*i)[armies_columns.desc] = s;
 }
 

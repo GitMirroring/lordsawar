@@ -1,4 +1,4 @@
-//  Copyright (C) 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,51 +32,21 @@
 #include "player.h"
 #include "armysetlist.h"
 #include "GameMap.h"
+#include "font-size.h"
 
-Glib::ustring StatusBox::get_file(Configuration::UiFormFactor factor)
+StatusBox * StatusBox::create()
 {
-  Glib::ustring file = "";
-  switch (factor)
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-      file = "status-box-desktop.ui";
-      break;
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      file = "status-box-netbook.ui";
-      break;
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      file = "status-box-large-screen.ui";
-      break;
-    }
-  return file;
-}
-
-StatusBox * StatusBox::create(guint32 factor)
-{
-  Glib::ustring file = get_file(Configuration::UiFormFactor(factor));
+  Glib::ustring file = "status-box-large-screen.ui";
   Glib::RefPtr<Gtk::Builder> xml = BuilderCache::get(file);
 
   StatusBox *box;
   xml->get_widget_derived("box", box);
-  box->d_factor = factor;
   return box;
 }
 
 void StatusBox::pad_image(Gtk::Image *image)
 {
-  int padding = 0;
-  switch (Configuration::UiFormFactor(d_factor))
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-      padding = 0;
-      break;
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      padding = 0;
-      break;
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      padding = 3;
-      break;
-    }
+  int padding = 3;
   image->property_xpad() = padding;
   image->property_ypad() = padding;
 }
@@ -91,25 +61,35 @@ StatusBox::StatusBox(BaseObjectType* baseObject, const Glib::RefPtr<Gtk::Builder
   xml->get_widget("stack_info_container", stack_info_container);
   xml->get_widget("progress_status_label", progress_status_label);
   xml->get_widget("cities_stats_image", cities_stats_image);
-  cities_stats_image->property_pixbuf() = 
-    Gdk::Pixbuf::create_from_file(File::getVariousFile("smallcity.png"));
+  cities_stats_image->property_pixbuf() =
+    ImageCache::getInstance ()->getStatusPic
+    (ImageCache::STATUS_CITY,
+     FontSize::getInstance ()->get_height ())->to_pixbuf ();
 
   xml->get_widget("gold_stats_image", gold_stats_image);
-  gold_stats_image->property_pixbuf() = 
-    Gdk::Pixbuf::create_from_file(File::getVariousFile("smalltreasury.png"));
+  gold_stats_image->property_pixbuf() =
+    ImageCache::getInstance ()->getStatusPic
+    (ImageCache::STATUS_TREASURY,
+     FontSize::getInstance ()->get_height ())->to_pixbuf ();
+
   xml->get_widget("income_stats_image", income_stats_image);
-  income_stats_image->property_pixbuf() = 
-    Gdk::Pixbuf::create_from_file(File::getVariousFile("smallincome.png"));
+  income_stats_image->property_pixbuf() =
+    ImageCache::getInstance ()->getStatusPic
+    (ImageCache::STATUS_INCOME,
+     FontSize::getInstance ()->get_height ())->to_pixbuf ();
+
   xml->get_widget("upkeep_stats_image", upkeep_stats_image);
   upkeep_stats_image->property_pixbuf() =
-    Gdk::Pixbuf::create_from_file(File::getVariousFile("smallupkeep.png"));
+    ImageCache::getInstance ()->getStatusPic
+    (ImageCache::STATUS_UPKEEP,
+     FontSize::getInstance ()->get_height ())->to_pixbuf ();
 
   xml->get_widget("cities_stats_label", cities_stats_label);
   xml->get_widget("gold_stats_label", gold_stats_label);
   xml->get_widget("income_stats_label", income_stats_label);
   xml->get_widget("upkeep_stats_label", upkeep_stats_label);
   xml->get_widget("stack_tile_box_container", stack_tile_box_container);
-  stack_tile_box = Gtk::manage(StackTileBox::create(Configuration::s_ui_form_factor));
+  stack_tile_box = Gtk::manage(StackTileBox::create());
   stack_tile_box->reparent(*stack_tile_box_container);
   stack_tile_box->stack_composition_modified.connect
     (sigc::mem_fun(stack_composition_modified, 
@@ -234,10 +214,7 @@ void StatusBox::enforce_height()
   height += d_height_fudge_factor;
   height += 30; //button border pixels + radio button height.
 
-  if (d_factor == Configuration::UI_FORM_FACTOR_LARGE_SCREEN)
-    height += 50;
-  else if (d_factor == Configuration::UI_FORM_FACTOR_NETBOOK)
-    height -= 5;
+  height += 50;
 
   stats_box->get_parent()->property_height_request() = height;
 }

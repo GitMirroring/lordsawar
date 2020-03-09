@@ -1,4 +1,4 @@
-//  Copyright (C) 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,68 +26,39 @@
 #include "playerlist.h"
 #include "player.h"
 #include "ImageCache.h"
+#include "font-size.h"
 
-Glib::ustring GameButtonBox::get_file(Configuration::UiFormFactor factor)
+GameButtonBox * GameButtonBox::create()
 {
-  Glib::ustring file = "";
-  switch (factor)
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-      file = "game-button-box-desktop.ui";
-      break;
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      file = "game-button-box-netbook.ui";
-      break;
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      file = "game-button-box-large-screen.ui";
-      break;
-    }
-  return file;
-}
-
-GameButtonBox * GameButtonBox::create(guint32 factor)
-{
-  Glib::ustring file = get_file(Configuration::UiFormFactor(factor));
+  Glib::ustring file = "game-button-box-large-screen.ui";
   Glib::RefPtr<Gtk::Builder> xml = BuilderCache::get(file);
 
   GameButtonBox *box;
   xml->get_widget_derived("box", box);
-  box->add_pictures_to_buttons(factor);
+  box->add_pictures_to_buttons();
   return box;
 }
 
 void GameButtonBox::pad_image(Gtk::Image *image)
 {
-  int padding = 0;
-  switch (Configuration::UiFormFactor(d_factor))
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-      padding = 0;
-      break;
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      padding = 0;
-      break;
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      padding = 3;
-      break;
-    }
+  int padding = 3;
   image->property_xpad() = padding;
   image->property_ypad() = padding;
 }
 
 void GameButtonBox::add_picture_to_button (guint32 icontype, Gtk::Button *button)
 {
-  int s = get_icon_size(d_factor);
   Gtk::Image *image = new Gtk::Image();
-  PixMask *pixmask = ImageCache::getInstance()->getGameButtonImage(icontype, s);
+  PixMask *pixmask =
+    ImageCache::getInstance()->getGameButtonPic
+    (icontype, FontSize::getInstance ()->get_height ());
   image->property_pixbuf() = pixmask->to_pixbuf();
   pad_image(image);
   button->add(*manage(image));
 }
 
-void GameButtonBox::add_pictures_to_buttons(guint32 factor)
+void GameButtonBox::add_pictures_to_buttons()
 {
-  d_factor = factor;
   add_picture_to_button (ImageCache::NEXT_MOVABLE_STACK, next_movable_button);
   add_picture_to_button (ImageCache::CENTER_ON_STACK, center_button);
   add_picture_to_button (ImageCache::DIPLOMACY_NO_PROPOSALS, diplomacy_button);
@@ -123,27 +94,8 @@ void GameButtonBox::drop_connections()
   connections.clear();
 }
 
-int GameButtonBox::get_icon_size(guint32 factor)
+void GameButtonBox::setup_signals(Game *game)
 {
-  int s = 0;
-  switch (Configuration::UiFormFactor(factor))
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-      s = 1;
-      break;
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      s = 0;
-      break;
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      s = 2;
-      break;
-    }
-  return s;
-}
-
-void GameButtonBox::setup_signals(Game *game, guint32 factor)
-{
-  d_factor = factor;
   drop_connections();
   setup_button(next_movable_button,
                sigc::mem_fun(game, &Game::select_next_movable_stack),
@@ -210,12 +162,12 @@ void GameButtonBox::change_diplomacy_button_image (bool proposals_present)
 {
   ImageCache *gc = ImageCache::getInstance();
   /* switch up the image. */
-  int s = GameButtonBox::get_icon_size(Configuration::s_ui_form_factor);
   if (proposals_present)
     {
       Gtk::Image *proposals_present_image = new Gtk::Image();
       proposals_present_image->property_pixbuf() = 
-        gc->getGameButtonImage(ImageCache::DIPLOMACY_NEW_PROPOSALS, s)->to_pixbuf();
+        gc->getGameButtonPic (ImageCache::DIPLOMACY_NEW_PROPOSALS,
+                              FontSize::getInstance()->get_height())->to_pixbuf();
       pad_image(proposals_present_image);
       diplomacy_button->property_image() = proposals_present_image;
     }
@@ -223,7 +175,8 @@ void GameButtonBox::change_diplomacy_button_image (bool proposals_present)
     {
       Gtk::Image *proposals_not_present_image = new Gtk::Image();
       proposals_not_present_image->property_pixbuf() = 
-        gc->getGameButtonImage(ImageCache::DIPLOMACY_NO_PROPOSALS, s)->to_pixbuf();
+        gc->getGameButtonPic (ImageCache::DIPLOMACY_NO_PROPOSALS,
+                              FontSize::getInstance()->get_height())->to_pixbuf();
       pad_image(proposals_not_present_image);
       diplomacy_button->property_image() = proposals_not_present_image;
     }

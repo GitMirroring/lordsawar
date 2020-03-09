@@ -1,4 +1,5 @@
-//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2016, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2016, 2017,
+//  2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,6 +38,7 @@
 #include "ImageCache.h"
 #include "boxcompose.h"
 #include "ItemProto.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &HistoryReportDialog::x)
 
@@ -508,7 +510,9 @@ void HistoryReportDialog::addHistoryEvent(NetworkHistory *event)
   Gtk::Box *box = NULL;
 
                               
-  Glib::RefPtr<Gdk::Pixbuf> shield = gc->getShieldPic(1, p)->to_pixbuf();
+  Glib::RefPtr<Gdk::Pixbuf> shield =
+    gc->getShieldPic(1, p, false,
+                     FontSize::getInstance ()->get_height ())->to_pixbuf();
   switch (history->getType())
     {
     case History::FOUND_SAGE: 
@@ -585,10 +589,12 @@ void HistoryReportDialog::addHistoryEvent(NetworkHistory *event)
 	  History_DiplomacyPeace *ev = 
             static_cast<History_DiplomacyPeace*>(history);
 	  Player *opponent = pl->getPlayer(ev->getOpponentId());
-          box = Box::ucompose(_("%1 %2 at peace with %3 %4!"), shield,
-                              p->getName(), 
-                              gc->getShieldPic(1, opponent)->to_pixbuf(), 
-                              opponent->getName());
+          box =
+            Box::ucompose (_("%1 %2 at peace with %3 %4!"), shield,
+                           p->getName(), gc->getShieldPic
+                           (1, opponent, false,
+                            FontSize::getInstance ()->get_height ())->to_pixbuf(),
+                           opponent->getName());
 	  break;
 	}
     case History::DIPLOMATIC_WAR:
@@ -596,10 +602,12 @@ void HistoryReportDialog::addHistoryEvent(NetworkHistory *event)
 	  History_DiplomacyWar *ev = 
             static_cast<History_DiplomacyWar*>(history);
 	  Player *opponent = pl->getPlayer(ev->getOpponentId());
-          box = Box::ucompose(_("%1 %2 at war with %3 %4!"), shield,
-                              p->getName(), 
-                              gc->getShieldPic(1, opponent)->to_pixbuf(), 
-                              opponent->getName());
+          box =
+            Box::ucompose (_("%1 %2 at war with %3 %4!"), shield,
+                           p->getName(), gc->getShieldPic
+                           (1, opponent, false,
+                            FontSize::getInstance ()->get_height ())->to_pixbuf(),
+                           opponent->getName());
 	  break;
 	}
     case History::DIPLOMATIC_TREACHERY:
@@ -607,16 +615,19 @@ void HistoryReportDialog::addHistoryEvent(NetworkHistory *event)
 	  History_DiplomacyTreachery *ev = 
             static_cast<History_DiplomacyTreachery*>(history);
 	  Player *opponent = pl->getPlayer(ev->getOpponentId());
-          box = Box::ucompose(_("%1 Treachery on %2 %3!"), shield,
-                              gc->getShieldPic(1, opponent)->to_pixbuf(), 
-                              opponent->getName());
+          box =
+            Box::ucompose(_("%1 Treachery on %2 %3!"), shield,
+                          gc->getShieldPic
+                          (1, opponent, false,
+                           FontSize::getInstance ()->get_height ())->to_pixbuf(),
+                          opponent->getName());
 	  break;
 	}
     case History::HERO_FINDS_ALLIES:
 	{
 	  History_HeroFindsAllies *ev = 
             static_cast<History_HeroFindsAllies*>(history);
-          box = Box::ucompose(_("%1 %2 finds allies!"), shield, 
+          box = Box::ucompose(_("%1 %2 finds allies!"), shield,
                               ev->getHeroName());
 	  break;
 	}
@@ -625,7 +636,7 @@ void HistoryReportDialog::addHistoryEvent(NetworkHistory *event)
 	  History_HeroRuinExplored *ev = 
             static_cast<History_HeroRuinExplored *>(history);
           Ruinlist *rl = Ruinlist::getInstance();
-          box = Box::ucompose(_("%1 %2 explores %3!"), shield, 
+          box = Box::ucompose(_("%1 %2 explores %3!"), shield,
                               ev->getHeroName(),
                               rl->getById(ev->getRuinId())->getName());
 	  break;
@@ -636,12 +647,15 @@ void HistoryReportDialog::addHistoryEvent(NetworkHistory *event)
             static_cast<History_HeroUseItem*>(history);
 	  Player *opponent = pl->getPlayer(ev->getOpponentId());
           if (ev->getItemBonus() & ItemProto::USABLE)
-            box = Box::ucompose(_("%1 %2 uses the %3 against %4 %5!"), shield, 
-                                ev->getHeroName(), ev->getItemName(),
-                                gc->getShieldPic(1, opponent)->to_pixbuf(), 
-                                opponent->getName());
+            box =
+              Box::ucompose(_("%1 %2 uses the %3 against %4 %5!"), shield,
+                            ev->getHeroName(), ev->getItemName(),
+                            gc->getShieldPic
+                            (1, opponent, false,
+                             FontSize::getInstance ()->get_height ())->to_pixbuf(),
+                            opponent->getName());
           else
-            box = Box::ucompose(_("%1 %2 uses the %3!"), shield, 
+            box = Box::ucompose(_("%1 %2 uses the %3!"), shield,
                                 ev->getHeroName(), ev->getItemName());
 	  break;
 	}

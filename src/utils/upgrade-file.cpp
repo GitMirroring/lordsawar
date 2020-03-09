@@ -18,7 +18,6 @@
 #include <config.h>
 
 #include <iostream>
-#include "Configuration.h"
 #include "xmlhelper.h"
 #include "tarhelper.h"
 #include "File.h"
@@ -37,15 +36,7 @@ int main(int argc, char* argv[])
   Glib::ustring filename;
   Glib::ustring rewrite;
   bool identify_file = false;
-  initialize_configuration();
   Vector<int>::setMaximumWidth(1000);
-
-  #if ENABLE_NLS
-  setlocale(LC_ALL, Configuration::s_lang.c_str());
-  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
-  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
-  textdomain (GETTEXT_PACKAGE);
-  #endif
 
   Gtk::Main kit(argc, argv);
   if (argc > 1)

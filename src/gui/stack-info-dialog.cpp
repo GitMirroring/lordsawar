@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include <assert.h>
 #include "stacktile.h"
 #include "GameMap.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &StackInfoDialog::x)
 
@@ -97,7 +98,8 @@ void StackInfoDialog::addArmy (bool first, Stack *s, Army *h, guint32 modified_s
   Glib::RefPtr<Gdk::Pixbuf> pixbuf= 
     gc->getCircledArmyPic(player->getArmyset(), h->getTypeId(), player, NULL,
                           greyed_out, !greyed_out ? player->getId() : colour_id,
-                          true)->to_pixbuf();
+                          true,
+                          FontSize::getInstance()->get_height ())->to_pixbuf();
   
   Gtk::Image *image = NULL;
   guint32 move_bonus = h->getStat(Army::MOVE_BONUS);
@@ -106,7 +108,9 @@ void StackInfoDialog::addArmy (bool first, Stack *s, Army *h, guint32 modified_s
 			     Tile::HILLS | Tile::SWAMP | Tile::MOUNTAIN))
     {
       image = new Gtk::Image();
-      image->property_pixbuf() = gc->getMoveBonusPic(move_bonus, ship)->to_pixbuf();
+      image->property_pixbuf() =
+        gc->getMoveBonusPic(move_bonus, ship,
+                            FontSize::getInstance ()->get_height ())->to_pixbuf();
     }
 
   armies.push_back(h);

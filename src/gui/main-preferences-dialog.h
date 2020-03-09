@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,12 +38,10 @@ class MainPreferencesDialog: public LwDialog
  private:
     Gtk::Switch *commentator_switch;
     Gtk::Switch *play_music_switch;
-    Gtk::ComboBox *ui_combobox;
     Gtk::Scale *music_volume_scale;
     void on_play_music_toggled();
     void on_show_commentator_toggled();
     void on_music_volume_changed();
-    void on_ui_form_factor_changed();
 };
 
 #endif

@@ -1,4 +1,4 @@
-//  Copyright (C) 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,34 +32,15 @@
 #include "playerlist.h"
 #include "player.h"
 #include "shield.h"
+#include "font-size.h"
 
-Glib::ustring StackArmyButton::get_file(Configuration::UiFormFactor factor)
+StackArmyButton * StackArmyButton::create()
 {
-  Glib::ustring file = "";
-  switch (factor)
-    {
-    case Configuration::UI_FORM_FACTOR_DESKTOP:
-      file = "stack-army-button-desktop.ui";
-      break;
-    case Configuration::UI_FORM_FACTOR_NETBOOK:
-      file = "stack-army-button-netbook.ui";
-      break;
-    case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-      file = "stack-army-button-large-screen.ui";
-      break;
-    }
-  return file;
-}
-
-StackArmyButton * StackArmyButton::create(guint32 factor)
-{
-  Glib::ustring file = 
-    StackArmyButton::get_file (Configuration::UiFormFactor(factor));
+  Glib::ustring file = "stack-army-button-large-screen.ui";
   Glib::RefPtr<Gtk::Builder> xml = BuilderCache::get(file);
 
   StackArmyButton *box;
   xml->get_widget_derived("box", box);
-  box->d_factor = factor;
   box->d_stack = NULL;
   box->d_army = NULL;
   box->d_circle_colour_id = 0;
@@ -150,22 +131,11 @@ void StackArmyButton::fill_army_button()
         gc->getCircledArmyPic(p->getArmyset(), d_army->getTypeId(),
                               p, d_army->getMedalBonuses(), greyed_out, 
                               !greyed_out ? p->getId() : d_circle_colour_id, 
-                              true)->to_pixbuf();
+                              true,
+                              FontSize::getInstance ()->get_height ())->to_pixbuf();
 
       Pango::AttrList attrs;
-      Pango::Attribute scale;
-      switch (d_factor)
-        {
-        case Configuration::UI_FORM_FACTOR_DESKTOP:
-          scale = Pango::Attribute::create_attr_scale(1.0);
-          break;
-        case Configuration::UI_FORM_FACTOR_NETBOOK:
-          scale = Pango::Attribute::create_attr_scale(0.8);
-          break;
-        case Configuration::UI_FORM_FACTOR_LARGE_SCREEN:
-          scale = Pango::Attribute::create_attr_scale(1.2);
-          break;
-        }
+      Pango::Attribute scale = Pango::Attribute::create_attr_scale(1.2);
       attrs.insert(scale);
       army_label->set_attributes(attrs);
       army_label->set_label(String::ucompose("%1", d_army->getMoves()));
@@ -174,7 +144,8 @@ void StackArmyButton::fill_army_button()
     {
       army_image->property_pixbuf() = 
         gc->getCircledArmyPic(p->getArmyset(), 0, p, NULL, false, 
-                              Shield::NEUTRAL, false)->to_pixbuf();
+                              Shield::NEUTRAL, false,
+                              FontSize::getInstance ()->get_height ())->to_pixbuf();
       
       stack_image->clear();
       army_label->set_text("  ");

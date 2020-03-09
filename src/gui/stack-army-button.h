@@ -1,4 +1,4 @@
-//  Copyright (C) 2011, 2015 Ben Asselstine
+//  Copyright (C) 2011, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -48,13 +48,11 @@ class StackArmyButton: public Gtk::Box
     sigc::signal<void> army_toggled;
     
     //Statics
-    static StackArmyButton * create(guint32 factor);
-    static Glib::ustring get_file(Configuration::UiFormFactor factor);
+    static StackArmyButton * create();
 
  protected:
 
  private:
-    guint32 d_factor;
     Stack *d_stack;
     Army *d_army;
     guint32 d_circle_colour_id;
