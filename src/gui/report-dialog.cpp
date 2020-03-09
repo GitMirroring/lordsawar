@@ -105,6 +105,7 @@ ReportDialog::~ReportDialog()
   delete vectormap;
   delete armymap;
   delete citymap;
+  report_notebook->property_show_tabs () = false;
 }
 
 void ReportDialog::run()

@@ -218,3 +218,8 @@ void TriumphsDialog::fill_in_info()
       fill_in_page(p);
     }
 }
+
+TriumphsDialog::~TriumphsDialog()
+{
+  notebook->property_show_tabs () = false;
+}

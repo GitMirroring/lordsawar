@@ -169,6 +169,7 @@ NetworkGameSelectorDialog::~NetworkGameSelectorDialog()
 {
   GamelistClient::getInstance()->disconnect();
   //GamelistClient::deleteInstance();
+  notebook->property_show_tabs () = false;
 }
 
 void NetworkGameSelectorDialog::addGame(Glib::RefPtr<Gtk::ListStore> list, const GamesColumns &columns, RecentlyPlayedNetworkedGame*g)

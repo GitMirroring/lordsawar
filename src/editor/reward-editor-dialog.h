@@ -34,7 +34,7 @@ class RewardEditorDialog: public LwEditorDialog
  public:
     RewardEditorDialog(Gtk::Window &parent, Player *player, bool hidden_ruins, 
                        Reward *r);
-    ~RewardEditorDialog() {};
+    ~RewardEditorDialog();
 
     int run();
 

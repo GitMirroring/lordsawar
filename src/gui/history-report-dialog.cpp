@@ -126,6 +126,7 @@ HistoryReportDialog::~HistoryReportDialog()
       for (; hit != hist.end(); hit++)
 	delete (*hit);
     }
+  history_notebook->property_show_tabs () = false;
   delete historymap;
 }
 
