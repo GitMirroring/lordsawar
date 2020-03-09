@@ -168,9 +168,13 @@ NewRandomMapDialog::NewRandomMapDialog(Gtk::Window &parent)
   map_size_combobox->set_active(MAP_SIZE_NORMAL);
   map_size_combobox->signal_changed().connect(method(on_map_size_changed));
 
-
   xml->get_widget("cities_can_produce_allies_checkbutton", 
                   cities_can_produce_allies_checkbutton);
+
+  xml->get_widget("notebook", notebook);
+  notebook->child_property_tab_expand (*notebook->get_nth_page (0)) = true;
+  notebook->child_property_tab_expand (*notebook->get_nth_page (1)) = true;
+
   grass_scale->set_value(78);
   water_scale->set_value(7);
   swamp_scale->set_value(2);
@@ -847,4 +851,9 @@ void NewRandomMapDialog::on_value_changed (ActiveTerrainType type)
     default:
       break;
     }
+}
+
+NewRandomMapDialog::~NewRandomMapDialog()
+{
+  notebook->property_show_tabs () = false;
 }

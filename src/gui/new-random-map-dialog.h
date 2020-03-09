@@ -31,7 +31,7 @@ class NewRandomMapDialog: public LwDialog
 {
  public:
     NewRandomMapDialog(Gtk::Window &parent);
-    ~NewRandomMapDialog() {};
+    ~NewRandomMapDialog();
 
     int run();
 
@@ -84,8 +84,8 @@ class NewRandomMapDialog: public LwDialog
     Gtk::CheckButton *hills_random_checkbutton;
     Gtk::CheckButton *mountains_random_checkbutton;
     Gtk::CheckButton *cities_random_checkbutton;
-
     Gtk::CheckButton *cities_can_produce_allies_checkbutton;
+    Gtk::Notebook *notebook;
 
     enum { MAP_SIZE_NORMAL = 0, MAP_SIZE_SMALL, MAP_SIZE_TINY };
 
