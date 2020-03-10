@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -112,7 +112,10 @@ void Main::start_main_loop()
   if (random_number_seed)
     Rnd::set_seed(random_number_seed);
   else
-    Rnd::set_seed(time(NULL));
+    {
+      random_number_seed = time (NULL);
+      Rnd::set_seed(random_number_seed);
+    }
 
   try
     {
