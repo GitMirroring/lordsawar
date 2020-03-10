@@ -61,6 +61,9 @@ HistoryReportDialog::HistoryReportDialog(Gtk::Window &parent, Player *p, History
   turn_scale->signal_value_changed().connect (method(on_turn_changed));
 
   xml->get_widget("history_notebook", history_notebook);
+  for (int i = 0; i < 5; i++)
+    history_notebook->child_property_tab_expand
+      (*history_notebook->get_nth_page (i)) = true;
   history_notebook->set_current_page(type);
   history_notebook->signal_switch_page().connect
     (sigc::hide(sigc::hide(method(on_switch_page))));
