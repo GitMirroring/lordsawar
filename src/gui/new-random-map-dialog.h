@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -87,15 +87,15 @@ class NewRandomMapDialog: public LwDialog
     Gtk::Notebook *notebook;
     Gtk::TreeView *progress_treeview;
 
-    class ModelColumns : public Gtk::TreeModel::ColumnRecord
+    class ProgressModelColumns : public Gtk::TreeModel::ColumnRecord
       {
     public:
-        ModelColumns ()
-          { add (m_col_percentage);}
-        Gtk::TreeModelColumn<int> m_col_percentage;
+        ProgressModelColumns ()
+          { add (perc);}
+        Gtk::TreeModelColumn<int> perc;
       };
-    ModelColumns m_Columns;
-    Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
+    ProgressModelColumns progress_columns;
+    Glib::RefPtr<Gtk::ListStore> progress_liststore;
     Gtk::TreeModel::Row row;
 
     enum { MAP_SIZE_NORMAL = 0, MAP_SIZE_SMALL, MAP_SIZE_TINY };

@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -188,16 +188,15 @@ NewRandomMapDialog::NewRandomMapDialog(Gtk::Window &parent)
 
   //progressbar, what a pain
   progress_treeview->property_headers_visible () = false;
-  m_refTreeModel = Gtk::ListStore::create(m_Columns);
-  progress_treeview->set_model (m_refTreeModel);
-  row = *(m_refTreeModel->append());
-  row[m_Columns.m_col_percentage] = 0;
+  progress_liststore = Gtk::ListStore::create(progress_columns);
+  progress_treeview->set_model (progress_liststore);
+  row = *(progress_liststore->append());
   auto cell = Gtk::make_managed<Gtk::CellRendererProgress>();
   cell->property_text () = "";
   int cols_count = progress_treeview->append_column ("progress", *cell);
   auto pColumn = progress_treeview->get_column(cols_count -1);
   if (pColumn)
-    pColumn->add_attribute(cell->property_value (), m_Columns.m_col_percentage);
+    pColumn->add_attribute(cell->property_value (), progress_columns.perc);
 
 }
 
@@ -630,24 +629,22 @@ void NewRandomMapDialog::on_accept_clicked()
 {
   dialog_vbox->set_sensitive(false);
   progress_treeview->show_all();
-  while (g_main_context_iteration(NULL, FALSE)); //doEvents
 
-  GameParameters g = getParams();
   while (g_main_context_iteration(NULL, FALSE)); //doEvents
+  GameParameters g = getParams();
 
   sigc::slot<void> progress = method(pulse);
   g.difficulty = GameScenarioOptions::calculate_difficulty_rating(g);
   d_filename = create_and_dump_scenario("random.map", g, &progress);
 
   //finish off the progressbar
-  while (row[m_Columns.m_col_percentage] < 100)
+  while (row[progress_columns.perc] < 100)
     {
-      row[m_Columns.m_col_percentage] = row[m_Columns.m_col_percentage] + 1;
-      Glib::usleep (10000);
+      row[progress_columns.perc] = row[progress_columns.perc] + 1;
       while (g_main_context_iteration(NULL, FALSE)); //doEvents
+      Glib::usleep (10000);
     }
-  row[m_Columns.m_col_percentage] = 100;
-  while (g_main_context_iteration(NULL, FALSE)); //doEvents
+  row[progress_columns.perc] = 100;
 
   dialog_response = Gtk::RESPONSE_ACCEPT;
   dialog->hide();
@@ -660,9 +657,11 @@ void NewRandomMapDialog::on_cancel_clicked()
 }
 void NewRandomMapDialog::pulse()
 {
-  if (row[m_Columns.m_col_percentage] < 98)
-    row[m_Columns.m_col_percentage] = row[m_Columns.m_col_percentage] + 3;
-  while (g_main_context_iteration(NULL, FALSE)); //doEvents
+  if (row[progress_columns.perc] < 98)
+    {
+      row[progress_columns.perc] = row[progress_columns.perc] + 3;
+      while (g_main_context_iteration(NULL, FALSE)); //doEvents
+    }
 }
 
 void NewRandomMapDialog::take_percentages ()
