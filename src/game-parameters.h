@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -20,15 +20,19 @@
 #ifndef GAME_PARAMETERS_H
 #define GAME_PARAMETERS_H
 
+#include <iostream>
+#include <sstream>
 #include <vector>
 #include <glibmm.h>
 #include "defs.h"
+#include "ucompose.hpp"
+#include "gui/main.h"
 
 //! Scenario information that can be used to instantiate a new GameScenario.
 class GameParameters
 {
 public:
-    struct Player 
+    struct Player
     {
 	enum Type { HUMAN, EASY, HARD, OFF, NETWORKED };
 
@@ -157,6 +161,156 @@ public:
         case GameParameters::Player::NETWORKED: return NETWORKED_PLAYER_TYPE;
         default: return NO_PLAYER_TYPE;
         }
+    }
+  std::string dump ()
+    {
+      std::stringstream out;
+
+      out << "This map was made with the following parameters:" << std::endl;
+      out << String::ucompose ("random seed: %1",
+                               Main::instance().random_number_seed) << std::endl;
+      out << String::ucompose ("%1 players", players.size ()) << std::endl;
+      for (guint32 i = 0; i < players.size (); i++)
+        {
+          out << String::ucompose ("  player %1: type='", i);
+
+          switch (players[i].type)
+            {
+            case GameParameters::Player::HUMAN:
+              out << "HUMAN"; break;
+            case GameParameters::Player::EASY:
+              out << "EASY"; break;
+            case GameParameters::Player::HARD:
+              out << "HARD"; break;
+            case GameParameters::Player::OFF:
+              out << "OFF"; break;
+            case GameParameters::Player::NETWORKED:
+              out << "NETWORKED"; break;
+            }
+          out << String::ucompose ("', name='%1', id=%2",
+                                   players[i].name, players[i].id) << std::endl;
+        }
+      out << String::ucompose ("map size: width=%1, height=%2",
+                               map.width, map.height) << std::endl;
+      out << "map terrain:" << std::endl;
+      out << String::ucompose
+        ("  grass=%1, water=%2, swamp=%3, forest=%4, hills=%5, mountains=%6",
+         map.grass, map.water, map.swamp, map.forest, map.hills,
+         map.mountains) << std::endl;
+      out << String::ucompose
+        ("map features: cities=%1, ruins=%2, temples=%3, signposts=%4",
+         map.cities, map.ruins, map.temples, map.signposts) << std::endl;
+      out << String::ucompose ("map path: '%1'", map_path) << std::endl;
+      out << String::ucompose ("tile theme: '%1'", tile_theme) << std::endl;
+      out << String::ucompose ("army theme: '%1'", army_theme) << std::endl;
+      out <<
+        String::ucompose ("shield theme: '%1'", shield_theme) << std::endl;
+      out << String::ucompose ("city theme: '%1'", city_theme) << std::endl;
+      out <<String::ucompose ("see opponents stacks: %1",
+                              see_opponents_stacks) << std::endl;
+      out << String::ucompose ("see opponents production: %1",
+                               see_opponents_stacks) << std::endl;
+      out << "quest policy: ";
+      switch (play_with_quests)
+        {
+        case GameParameters::QuestPolicy::NO_QUESTING:
+          out << "NO_QUESTING"; break;
+        case GameParameters::QuestPolicy::ONE_QUEST_PER_PLAYER:
+          out << "ONE_QUEST_PER_PLAYER"; break;
+        case GameParameters::QuestPolicy::ONE_QUEST_PER_HERO:
+          out << "ONE_QUEST_PER_HERO"; break;
+        }
+      out << std::endl;
+
+      out << "quick start: ";
+      switch (quick_start)
+        {
+        case GameParameters::QuickStartPolicy::NO_QUICK_START:
+          out << "NO_QUICK_START"; break;
+        case GameParameters::QuickStartPolicy::EVENLY_DIVIDED:
+          out << "EVENLY_DIVIDED"; break;
+        case GameParameters::QuickStartPolicy::AI_HEAD_START:
+          out << "AI_HEAD_START"; break;
+        }
+      out << std::endl;
+
+      out << String::ucompose ("hidden map: %1", hidden_map) << std::endl;
+      out << String::ucompose ("diplomacy: %1", diplomacy) << std::endl;
+
+      out << "neutral cities: ";
+      switch (neutral_cities)
+        {
+        case GameParameters::NeutralCities::AVERAGE:
+          out << "AVERAGE"; break;
+        case GameParameters::NeutralCities::STRONG:
+          out << "STRONG"; break;
+        case GameParameters::NeutralCities::ACTIVE:
+          out << "ACTIVE"; break;
+        case GameParameters::NeutralCities::DEFENSIVE:
+          out << "DEFENSIVE"; break;
+        }
+      out << std::endl;
+
+      out << "razing cities: ";
+      switch (razing_cities)
+        {
+        case GameParameters::RazingCities::NEVER:
+          out << "NEVER"; break;
+        case GameParameters::RazingCities::ON_CAPTURE:
+          out << "ON_CAPTURE"; break;
+        case GameParameters::RazingCities::ALWAYS:
+          out << "ALWAYS"; break;
+        }
+      out << std::endl;
+
+      out << "vectoring mode: ";
+      switch (vectoring_mode)
+        {
+        case GameParameters::VectoringMode::VECTORING_ALWAYS_TWO_TURNS:
+          out << "VECTORING_ALWAYS_TWO_TURNS"; break;
+        case GameParameters::VectoringMode::VECTORING_VARIABLE_TURNS:
+          out << "VECTORING_VARIABLE_TURNS"; break;
+        }
+      out << std::endl;
+
+      out << "build production mode: ";
+      switch (build_production_mode)
+        {
+        case GameParameters::BuildProductionMode::BUILD_PRODUCTION_ALWAYS:
+          out << "BUILD_PRODUCTION_ALWAYS"; break;
+        case GameParameters::BuildProductionMode::BUILD_PRODUCTION_USUALLY:
+          out << "BUILD_PRODUCTION_USUALLY"; break;
+        case GameParameters::BuildProductionMode::BUILD_PRODUCTION_SELDOM:
+          out << "BUILD_PRODUCTION_SELDOM"; break;
+        case GameParameters::BuildProductionMode::BUILD_PRODUCTION_NEVER:
+          out << "BUILD_PRODUCTION_NEVER"; break;
+        }
+      out << std::endl;
+
+      out << "sacking mode: ";
+      switch (sacking_mode)
+        {
+        case GameParameters::SackingMode::SACKING_ALWAYS:
+          out << "SACKING_ALWAYS"; break;
+        case GameParameters::SackingMode::SACKING_ON_CAPTURE:
+          out << "SACKING_ON_CAPTURE"; break;
+        case GameParameters::SackingMode::SACKING_ON_QUEST:
+          out << "SACKING_ON_QUEST"; break;
+        case GameParameters::SackingMode::SACKING_NEVER:
+          out << "SACKING_NEVER"; break;
+        }
+      out << std::endl;
+
+      out << String::ucompose ("cusp of war: %1", cusp_of_war) << std::endl;
+      out << String::ucompose ("intense combat: %1", intense_combat) << std::endl;
+      out << String::ucompose ("military advisor: %1",
+                               military_advisor) << std::endl;
+      out << String::ucompose ("random turns: %1", random_turns) << std::endl;
+      out << String::ucompose ("cities can produce allies: %1",
+                                     cities_can_produce_allies) << std::endl;
+      out << String::ucompose ("difficulty : %1", difficulty) << std::endl;
+      out << String::ucompose ("name: '%1'", name) << std::endl;
+      return out.str ();
     }
 };
 
