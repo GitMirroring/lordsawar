@@ -301,62 +301,79 @@ bool Configuration::parseConfiguration(XML_Helper* helper)
     return true;
 }
 
+
 void initialize_configuration()
 {
-    Configuration conf;
-
-    bool foundconf = conf.loadConfigurationFile();
-    if (!foundconf)
+  bool try_upgrade = true;
+  if (try_upgrade)
     {
-	bool saveconf = conf.saveConfigurationFile();
-	if (!saveconf)
-	{
+      std::string cfgfile = File::getConfigFile (DEFAULT_CONFIG_FILENAME);
+      FileCompat::support_backward_compatibility_for_common_files();
+      Glib::ustring tmpfile = File::get_tmp_file(".tmp");
+      File::copy(cfgfile, tmpfile);
+      bool same_version = false;
+      bool upgraded = FileCompat::getInstance()->upgrade(tmpfile, 
+                                                         same_version);
+      if (upgraded)
+        {
+          File::copy(tmpfile, cfgfile);
+          File::erase(tmpfile);
+        }
+    }
+  Configuration conf;
+
+  bool foundconf = conf.loadConfigurationFile();
+  if (!foundconf)
+    {
+      bool saveconf = conf.saveConfigurationFile();
+      if (!saveconf)
+        {
           std::cerr << String::ucompose(_("Error!  couldn't save configuration file `%1'.  Exiting."), Configuration::s_configuration_file_path) << std::endl;
           exit(-1);
-	}
-	else
-          std::cerr << String::ucompose(_("Created default configuration file `%1'."), Configuration::s_configuration_file_path) << std::endl;
+        }
+      else
+        std::cerr << String::ucompose(_("Created default configuration file `%1'."), Configuration::s_configuration_file_path) << std::endl;
     }
-    
-    //Check if the save game directory exists. If not, try to create it.
 
-    if (File::create_dir(Configuration::s_savePath) == false)
+  //Check if the save game directory exists. If not, try to create it.
+
+  if (File::create_dir(Configuration::s_savePath) == false)
     {
       std::cerr << String::ucompose("Error!  Couldn't create saved game directory `%1'.  Exiting.", Configuration::s_savePath) << std::endl;
-        exit(-1);
+      exit(-1);
     }
-    //Check if the personal armyset directory exists. If not, try to create it.
-    if (File::create_dir(File::getSetDir(ARMYSET_EXT, false)) == false)
+  //Check if the personal armyset directory exists. If not, try to create it.
+  if (File::create_dir(File::getSetDir(ARMYSET_EXT, false)) == false)
     {
       std::cerr << String::ucompose(_("Error!  Couldn't create armyset directory `%1'.  Exiting."), File::getSetDir(ARMYSET_EXT, false)) << std::endl;
-        exit(-1);
+      exit(-1);
     }
-    //Check if the personal tileset directory exists. If not, try to create it.
-    if (File::create_dir(File::getSetDir(TILESET_EXT, false)) == false)
+  //Check if the personal tileset directory exists. If not, try to create it.
+  if (File::create_dir(File::getSetDir(TILESET_EXT, false)) == false)
     {
       std::cerr << String::ucompose(_("Error!  Couldn't create tileset directory `%1'.  Exiting."), File::getSetDir(TILESET_EXT, false)) << std::endl;
-        exit(-1);
+      exit(-1);
     }
 
-    //Check if the personal maps directory exists. If not, try to create it.
-    if (File::create_dir(File::getUserMapDir()) == false)
+  //Check if the personal maps directory exists. If not, try to create it.
+  if (File::create_dir(File::getUserMapDir()) == false)
     {
       std::cerr << String::ucompose(_("Error!  Couldn't create map directory `%1'.  Exiting."), File::getUserMapDir()) << std::endl;
-        exit(-1);
+      exit(-1);
     }
 
-    //Check if the personal shieldset directory exists. If not, try to make it.
-    if (File::create_dir(File::getSetDir(SHIELDSET_EXT, false)) == false)
+  //Check if the personal shieldset directory exists. If not, try to make it.
+  if (File::create_dir(File::getSetDir(SHIELDSET_EXT, false)) == false)
     {
       std::cerr << String::ucompose(_("Error!  Couldn't create shieldset directory `%1'.  Exiting."), File::getSetDir(SHIELDSET_EXT, false)) << std::endl;
-        exit(-1);
+      exit(-1);
     }
 
-    //Check if the personal cityset directory exists. If not, try to make it.
-    if (File::create_dir(File::getSetDir(CITYSET_EXT, false)) == false)
+  //Check if the personal cityset directory exists. If not, try to make it.
+  if (File::create_dir(File::getSetDir(CITYSET_EXT, false)) == false)
     {
       std::cerr << String::ucompose(_("Error!  Couldn't create cityset directory `%1'.  Exiting."), File::getSetDir(CITYSET_EXT, false)) << std::endl;
-        exit(-1);
+      exit(-1);
     }
 }
 
