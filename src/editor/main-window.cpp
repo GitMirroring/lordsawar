@@ -408,6 +408,9 @@ void MainWindow::show()
   bigmap_image->show_all();
   window->show();
   on_bigmap_surface_changed(bigmap_image->get_allocation());
+  Gdk::EventMask event_mask = window->get_window()->get_events ();
+  event_mask |= Gdk::STRUCTURE_MASK;
+  window->get_window()->set_events (event_mask);
 }
 
 void MainWindow::on_bigmap_surface_changed(Gtk::Allocation box)
