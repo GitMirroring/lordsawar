@@ -177,6 +177,7 @@ void GameBigMap::mouse_button_event(MouseButtonEvent e)
 	    }
 	  else if (d_cursor == ImageCache::RUIN)
 	    {
+              // we're holding shift down here
 	      if (Ruin *r = GameMap::getRuin(tile))
 		{
 		  if ((r->isHidden() == true && 
@@ -184,11 +185,13 @@ void GameBigMap::mouse_button_event(MouseButtonEvent e)
 		      r->isHidden() == false)
 		    {
 		      set_shift_key_down (false);
+                      cursor_changed.emit(ImageCache::POINTER);
 		      ruin_queried (r, false);
 		    }
 		}
 	      else if (Temple *t = GameMap::getTemple(tile))
 		{
+                  cursor_changed.emit(ImageCache::POINTER);
 		  temple_queried (t, false);
 		  set_shift_key_down (false);
 		}
@@ -204,6 +207,7 @@ void GameBigMap::mouse_button_event(MouseButtonEvent e)
 		      set_control_key_down (false);
 		      if (d_see_opponents_production == true)
 			{
+                          cursor_changed.emit(ImageCache::POINTER);
 			  city_visited.emit (c);
 			  set_shift_key_down (false);
 			  return;
@@ -212,6 +216,7 @@ void GameBigMap::mouse_button_event(MouseButtonEvent e)
 			{
 			  if (c->getOwner() == Playerlist::getActiveplayer())
 			    {
+                              cursor_changed.emit(ImageCache::POINTER);
 			      city_visited.emit(c);
 			      set_shift_key_down (false);
 			      return;
@@ -385,6 +390,7 @@ void GameBigMap::mouse_button_event(MouseButtonEvent e)
 		      set_control_key_down (false);
 		      if (d_see_opponents_production == true)
 			{
+                          cursor_changed.emit(ImageCache::POINTER);
 			  city_visited.emit (c);
 			  set_shift_key_down (false);
 			}
@@ -392,6 +398,7 @@ void GameBigMap::mouse_button_event(MouseButtonEvent e)
 			{
 			  if (c->getOwner() == Playerlist::getActiveplayer())
 			    {
+                              cursor_changed.emit(ImageCache::POINTER);
 			      city_visited.emit (c);
 			      set_shift_key_down (false);
 			    }
@@ -402,10 +409,14 @@ void GameBigMap::mouse_button_event(MouseButtonEvent e)
 		{
 		  if ((r->isHidden() == true && r->getOwner() == viewing) ||
 		      r->isHidden() == false)
-		    ruin_queried (r, false);
+                    {
+                      cursor_changed.emit(ImageCache::POINTER);
+                      ruin_queried (r, false);
+                    }
 		}
 	      else if (Temple *t = GameMap::getTemple(tile))
 		{
+                  cursor_changed.emit(ImageCache::POINTER);
 		  temple_queried (t, false);
 		}
 	    }

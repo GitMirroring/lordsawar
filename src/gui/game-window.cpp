@@ -678,12 +678,17 @@ bool GameWindow::on_bigmap_mouse_motion_event(GdkEventMotion *e)
     
 void GameWindow::on_bigmap_cursor_changed(ImageCache::CursorType cursor)
 {
-  bigmap_image->get_window()->set_cursor
-    (Gdk::Cursor::create
-     (Gdk::Display::get_default(),
-      ImageCache::getInstance()->getCursorPic
-      (cursor,
-       FontSize::getInstance ()->get_height ())->to_pixbuf(), 4, 4));
+  if (cursor == ImageCache::POINTER)
+      bigmap_image->get_window()->set_cursor ();
+  else
+    {
+      bigmap_image->get_window()->set_cursor
+        (Gdk::Cursor::create
+         (Gdk::Display::get_default(),
+          ImageCache::getInstance()->getCursorPic
+          (cursor,
+           FontSize::getInstance ()->get_height ())->to_pixbuf(), 4, 4));
+    }
 }
 
 bool GameWindow::on_bigmap_key_event(GdkEventKey *e)
