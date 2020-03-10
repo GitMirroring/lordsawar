@@ -870,6 +870,8 @@ void GameWindow::on_new_game_activated()
 
 void GameWindow::on_quit_activated()
 {
+  if (window->is_maximized ())
+    window->unmaximize ();
   LwDialog dialog(*window, "game-quit-dialog.ui");
   int response = dialog.run_and_hide();
   if (response == Gtk::RESPONSE_ACCEPT) //end the game
