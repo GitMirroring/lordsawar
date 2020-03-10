@@ -35,7 +35,6 @@
 #include "main-preferences-dialog.h"
 #include "timed-message-dialog.h"
 #include "new-random-map-dialog.h"
-#include "ImageCache.h"
 #include "new-network-game-dialog.h"
 #include "profile.h"
 
