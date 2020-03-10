@@ -30,7 +30,7 @@ class GameOptionsDialog: public LwDialog
 {
  public:
     GameOptionsDialog(Gtk::Window &parent, bool readonly);
-    ~GameOptionsDialog() {};
+    ~GameOptionsDialog();
 
     bool run();
     void hide() {dialog->hide();};
@@ -55,6 +55,7 @@ class GameOptionsDialog: public LwDialog
     Gtk::ComboBox *vectoring_combobox;
     Gtk::ComboBox *build_production_combobox;
     Gtk::ComboBox *sack_combobox;
+    Gtk::Notebook *notebook;
     void fill_in_options();
     void on_view_enemies_switch_clicked();
     void on_view_production_switch_clicked();

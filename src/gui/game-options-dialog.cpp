@@ -49,6 +49,9 @@ GameOptionsDialog::GameOptionsDialog(Gtk::Window &parent, bool readonly)
     xml->get_widget("cusp_of_war_switch", cusp_of_war_switch);
     xml->get_widget("intense_combat_switch", intense_combat_switch);
     xml->get_widget("random_turns_switch", random_turns_switch);
+    xml->get_widget("notebook", notebook);
+    notebook->child_property_tab_expand (*notebook->get_nth_page (0)) = true;
+    notebook->child_property_tab_expand (*notebook->get_nth_page (1)) = true;
 }
 
 void GameOptionsDialog::fill_in_options()
@@ -278,4 +281,9 @@ void GameOptionsDialog::on_intense_combat_switch_clicked()
 void GameOptionsDialog::on_military_advisor_switch_clicked()
 {
   GameScenarioOptions::s_military_advisor = military_advisor_switch->get_active();
+}
+
+GameOptionsDialog::~GameOptionsDialog()
+{
+  notebook->property_show_tabs () = false;
 }
