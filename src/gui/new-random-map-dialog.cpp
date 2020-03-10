@@ -75,7 +75,6 @@ NewRandomMapDialog::NewRandomMapDialog(Gtk::Window &parent)
   mountains_scale->signal_value_changed().connect
     (sigc::bind(sigc::mem_fun (this, &NewRandomMapDialog::on_value_changed), terrain));
   xml->get_widget("cities_scale", cities_scale);
-  xml->get_widget("progressbar", progressbar);
   xml->get_widget("accept2_button", accept_button);
   accept_button->signal_clicked().connect (method(on_accept_clicked));
   xml->get_widget("cancel2_button", cancel_button);
@@ -101,6 +100,7 @@ NewRandomMapDialog::NewRandomMapDialog(Gtk::Window &parent)
   xml->get_widget("cities_random_checkbutton", cities_random_checkbutton);
   cities_random_checkbutton->signal_toggled().connect
     (method(on_cities_random_toggled));
+  xml->get_widget("progress_treeview", progress_treeview);
 
   // fill in tile themes combobox
 
@@ -185,13 +185,27 @@ NewRandomMapDialog::NewRandomMapDialog(Gtk::Window &parent)
   dialog_response = Gtk::RESPONSE_CANCEL;
   d_active_terrain = NONE;
   d_inhibit_scales = false;
+
+  //progressbar, what a pain
+  progress_treeview->property_headers_visible () = false;
+  m_refTreeModel = Gtk::ListStore::create(m_Columns);
+  progress_treeview->set_model (m_refTreeModel);
+  row = *(m_refTreeModel->append());
+  row[m_Columns.m_col_percentage] = 0;
+  auto cell = Gtk::make_managed<Gtk::CellRendererProgress>();
+  cell->property_text () = "";
+  int cols_count = progress_treeview->append_column ("progress", *cell);
+  auto pColumn = progress_treeview->get_column(cols_count -1);
+  if (pColumn)
+    pColumn->add_attribute(cell->property_value (), m_Columns.m_col_percentage);
+
 }
 
 int NewRandomMapDialog::run()
 {
   dialog->show_all();
   dialog_action_area->hide();
-  progressbar->hide();
+  progress_treeview->hide();
   //we're not using the buttons from the action area.
   //we have our own buttons so that we can show a progress bar after the
   //button is clicked.
@@ -615,17 +629,25 @@ Glib::ustring NewRandomMapDialog::create_and_dump_scenario(const Glib::ustring &
 void NewRandomMapDialog::on_accept_clicked()
 {
   dialog_vbox->set_sensitive(false);
-  progressbar->show_all();
-  progressbar->pulse();
+  progress_treeview->show_all();
   while (g_main_context_iteration(NULL, FALSE)); //doEvents
 
   GameParameters g = getParams();
-  progressbar->pulse();
   while (g_main_context_iteration(NULL, FALSE)); //doEvents
 
   sigc::slot<void> progress = method(pulse);
   g.difficulty = GameScenarioOptions::calculate_difficulty_rating(g);
   d_filename = create_and_dump_scenario("random.map", g, &progress);
+
+  //finish off the progressbar
+  while (row[m_Columns.m_col_percentage] < 100)
+    {
+      row[m_Columns.m_col_percentage] = row[m_Columns.m_col_percentage] + 1;
+      Glib::usleep (10000);
+      while (g_main_context_iteration(NULL, FALSE)); //doEvents
+    }
+  row[m_Columns.m_col_percentage] = 100;
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
 
   dialog_response = Gtk::RESPONSE_ACCEPT;
   dialog->hide();
@@ -638,7 +660,8 @@ void NewRandomMapDialog::on_cancel_clicked()
 }
 void NewRandomMapDialog::pulse()
 {
-  progressbar->pulse();
+  if (row[m_Columns.m_col_percentage] < 98)
+    row[m_Columns.m_col_percentage] = row[m_Columns.m_col_percentage] + 3;
   while (g_main_context_iteration(NULL, FALSE)); //doEvents
 }
 

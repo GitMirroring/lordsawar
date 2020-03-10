@@ -62,7 +62,6 @@ class NewRandomMapDialog: public LwDialog
     Gtk::Box *dialog_vbox;
     Gtk::ButtonBox *dialog_action_area;
     Gtk::ComboBox *map_size_combobox;
-    Gtk::ProgressBar *progressbar;
     Gtk::ComboBoxText *tile_size_combobox;
     Gtk::ComboBoxText *tile_theme_combobox;
     Gtk::ComboBoxText *city_theme_combobox;
@@ -86,6 +85,18 @@ class NewRandomMapDialog: public LwDialog
     Gtk::CheckButton *cities_random_checkbutton;
     Gtk::CheckButton *cities_can_produce_allies_checkbutton;
     Gtk::Notebook *notebook;
+    Gtk::TreeView *progress_treeview;
+
+    class ModelColumns : public Gtk::TreeModel::ColumnRecord
+      {
+    public:
+        ModelColumns ()
+          { add (m_col_percentage);}
+        Gtk::TreeModelColumn<int> m_col_percentage;
+      };
+    ModelColumns m_Columns;
+    Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
+    Gtk::TreeModel::Row row;
 
     enum { MAP_SIZE_NORMAL = 0, MAP_SIZE_SMALL, MAP_SIZE_TINY };
 
