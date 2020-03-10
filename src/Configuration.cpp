@@ -315,10 +315,8 @@ void initialize_configuration()
       bool upgraded = FileCompat::getInstance()->upgrade(tmpfile, 
                                                          same_version);
       if (upgraded)
-        {
-          File::copy(tmpfile, cfgfile);
-          File::erase(tmpfile);
-        }
+        File::copy(tmpfile, cfgfile);
+      File::erase(tmpfile);
     }
   Configuration conf;
 
