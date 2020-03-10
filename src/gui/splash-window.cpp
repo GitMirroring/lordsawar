@@ -225,7 +225,7 @@ void SplashWindow::on_load_scenario_clicked()
 	    return;
 	}
       GamePreferencesDialog gp(*window, filename, GameScenario::HOTSEAT);
-      gp.game_started.connect(method(on_game_started));
+      gp.game_started.connect(sigc::bind(sigc::mem_fun (this, &SplashWindow::on_game_started), &gp));
 
       gp.run();
     } 
@@ -242,9 +242,9 @@ void SplashWindow::on_network_game_selected(Glib::ustring ip, unsigned short por
   new_remote_network_game_requested.emit(ip, port, profile);
 }
 
-void SplashWindow::on_game_started(GameParameters g)
+void SplashWindow::on_game_started(GameParameters g, GamePreferencesDialog *gpd)
 {
-  new_game_requested.emit(g);
+  new_game_requested.emit(g, gpd);
 }
 
 void SplashWindow::on_network_game_created(GameParameters g, Profile *profile,

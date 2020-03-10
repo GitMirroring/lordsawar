@@ -345,6 +345,21 @@ void GamePreferencesDialog::update_difficulty_rating()
 
 void GamePreferencesDialog::on_start_game_clicked()
 {
+  progress_treeview = Gtk::manage (new Gtk::TreeView ());
+  progress_treeview->property_headers_visible () = false;
+  progress_liststore = Gtk::ListStore::create(progress_columns);
+  progress_treeview->set_model (progress_liststore);
+  row = *(progress_liststore->append());
+  auto cell = Gtk::make_managed<Gtk::CellRendererProgress>();
+  cell->property_text () = "";
+  int cols_count = progress_treeview->append_column ("progress", *cell);
+  auto pColumn = progress_treeview->get_column(cols_count -1);
+  if (pColumn)
+    pColumn->add_attribute(cell->property_value (), progress_columns.perc);
+
+  dialog_vbox->pack_end (*progress_treeview, true, true);
+  dialog_vbox->show_all ();
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
   dialog_vbox->set_sensitive(false);
   // read out the values in the widgets
   GameParameters g;
@@ -387,8 +402,8 @@ void GamePreferencesDialog::on_start_game_clicked()
     g.name = String::utrim(game_name_entry->get_text());
 
   // and call callback
-  dialog->hide();
   game_started.emit(g);
+  dialog->hide();
 }
 
 void GamePreferencesDialog::on_difficulty_changed()
@@ -549,4 +564,29 @@ void GamePreferencesDialog::on_num_players_changed()
       else
         (*c)->set_active(GameParameters::Player::OFF);
     }
+}
+
+void GamePreferencesDialog::tick_progress ()
+{
+  if (!progress_treeview)
+    return;
+  if (row[progress_columns.perc] < 98)
+    {
+      row[progress_columns.perc] = row[progress_columns.perc] + 3;
+      while (g_main_context_iteration(NULL, FALSE)); //doEvents
+    }
+}
+
+void GamePreferencesDialog::finish_progress ()
+{
+  if (!progress_treeview)
+    return;
+  //finish off the progressbar
+  while (row[progress_columns.perc] < 100)
+    {
+      row[progress_columns.perc] = row[progress_columns.perc] + 1;
+      while (g_main_context_iteration(NULL, FALSE)); //doEvents
+      Glib::usleep (10000);
+    }
+  row[progress_columns.perc] = 100;
 }

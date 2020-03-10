@@ -1,5 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2016, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2016, 2017,
+//  2020  Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,6 +30,7 @@
 #include "new-network-game-download-window.h"
 #include "game-parameters.h"
 #include "../editor/main-window.h"
+class GamePreferencesDialog;
 
 class Profile;
 // takes care of setting up the splash window and the game window, the
@@ -58,8 +60,10 @@ class Driver: public sigc::trackable
     Glib::ustring game_scenario_downloaded;
     sigc::signal<void, Glib::ustring> game_scenario_received;
     sigc::signal<void, Player*> player_replaced;
+    sigc::signal<void> start_game_progress_tick;
+    sigc::signal<void> start_game_progress_finish;
 
-    void on_new_game_requested(GameParameters g);
+    void on_new_game_requested(GameParameters g, GamePreferencesDialog *gpd);
     void on_new_remote_network_game_requested(Glib::ustring host, unsigned short port, Profile *p);
     void on_new_hosted_network_game_requested(GameParameters g, int port, Profile *p, bool advertised, bool remotely_hosted);
     void on_load_hosted_network_game_requested(GameScenario *game_scenario, int port, Profile *p, bool advertised, bool remotely_hosted);

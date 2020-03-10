@@ -29,6 +29,7 @@
 #include "PixMask.h"
 
 class Profile;
+class GamePreferencesDialog;
 /** The opening window of the game
   * 
   * This is the first window to pop up, where the user selects whether to start
@@ -51,7 +52,7 @@ class SplashWindow: public sigc::trackable
 
     sigc::signal<void, Glib::ustring, unsigned short, Profile*> new_remote_network_game_requested;
     sigc::signal<void, GameParameters, int, Profile*, bool, bool > new_hosted_network_game_requested;
-    sigc::signal<void, GameParameters> new_game_requested;
+    sigc::signal<void, GameParameters, GamePreferencesDialog*> new_game_requested;
     sigc::signal<void, Glib::ustring> load_requested;
     sigc::signal<void> quit_requested;
     sigc::signal<void, Glib::ustring> editor_requested;
@@ -81,7 +82,7 @@ class SplashWindow: public sigc::trackable
     void on_quit_clicked();
     void on_rescue_crashed_game_clicked();
 	
-    void on_game_started(GameParameters g);
+    void on_game_started(GameParameters g, GamePreferencesDialog *gpd);
     void on_network_game_created(GameParameters g, Profile *profile, bool advertised, bool remotely_hosted);
     void on_network_game_selected(Glib::ustring ip, unsigned short port, Profile  *profile);
     bool on_draw(const ::Cairo::RefPtr< ::Cairo::Context >& cr);

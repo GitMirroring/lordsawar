@@ -1,5 +1,6 @@
 //  Copyright (C) 2007, 2008, Ole Laursen
-//  Copyright (C) 2007-2012, 2014-2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016,
+//  2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -358,7 +359,7 @@ void Driver::run()
       g.name = "";
 
       g.difficulty = GameScenario::calculate_difficulty_rating(g);
-      on_new_game_requested(g);
+      on_new_game_requested(g, NULL);
     }
   else if (Main::instance().start_net_test_scenario)
     {
@@ -432,8 +433,8 @@ void Driver::run()
 	  if (found != Glib::ustring::npos)
 	    {
 	      GamePreferencesDialog d(*splash_window->get_window(), d_load_filename, GameScenario::HOTSEAT);
-	      d.game_started.connect(sigc::mem_fun
-				     (*this, &Driver::on_new_game_requested));
+	      d.game_started.connect(sigc::bind(sigc::mem_fun
+				     (*this, &Driver::on_new_game_requested), &d));
 	      d.run();
 	    }
 	  else
@@ -442,7 +443,7 @@ void Driver::run()
 	      if (found != Glib::ustring::npos)
 		on_load_requested(d_load_filename);
 	      else
-		on_new_game_requested(g);
+		on_new_game_requested(g, NULL);
 	    }
 	}
     }
@@ -540,6 +541,7 @@ GameScenario *Driver::create_new_scenario(GameParameters &g, GameScenario::PlayM
       Glib::ustring path = 
         NewRandomMapDialog::create_and_dump_scenario("random.map", g, NULL);
       g.map_path = path;
+      start_game_progress_tick.emit ();
     }
   else
     update_uuid = true;
@@ -550,6 +552,7 @@ GameScenario *Driver::create_new_scenario(GameParameters &g, GameScenario::PlayM
   if (broken)
     return NULL;
 
+  start_game_progress_tick.emit ();
   GameScenarioOptions::s_see_opponents_stacks = g.see_opponents_stacks;
   GameScenarioOptions::s_see_opponents_production = g.see_opponents_production;
   GameScenarioOptions::s_play_with_quests = g.play_with_quests;
@@ -575,6 +578,7 @@ GameScenario *Driver::create_new_scenario(GameParameters &g, GameScenario::PlayM
       Playerlist::getInstance()->syncPlayers(g.players);
       game_scenario->initialize(g);
     }
+  start_game_progress_tick.emit ();
   return game_scenario;
 }
 
@@ -918,8 +922,15 @@ void Driver::on_game_scenario_downloaded(Glib::ustring path)
   //...without stopping the game client from getting more messages
 }
 
-void Driver::on_new_game_requested(GameParameters g)
+void Driver::on_new_game_requested(GameParameters g, GamePreferencesDialog *gpd)
 {
+  if (gpd)
+    {
+      start_game_progress_tick.connect (sigc::mem_fun (gpd, &GamePreferencesDialog::tick_progress));
+      start_game_progress_finish.connect (sigc::mem_fun (gpd, &GamePreferencesDialog::finish_progress));
+    }
+
+    start_game_progress_tick.emit ();
     GameScenario *game_scenario = create_new_scenario(g, GameScenario::HOTSEAT);
 
     if (game_scenario == NULL)
@@ -947,7 +958,9 @@ void Driver::on_new_game_requested(GameParameters g)
 	splash_window->show();
 	return;
       }
+    start_game_progress_tick.emit ();
 
+    start_game_progress_finish.emit ();
     if (splash_window)
 	splash_window->hide();
 

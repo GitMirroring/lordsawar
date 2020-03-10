@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@ class GamePreferencesDialog: public LwDialog
     bool run(Glib::ustring nickname = "guest");
     void hide() {dialog->hide();};
     
+    void tick_progress ();
+    void finish_progress ();
  private:
     void init(Glib::ustring filename);
     GameScenario::PlayMode mode;
@@ -90,6 +92,19 @@ class GamePreferencesDialog: public LwDialog
     guint32 d_shieldset;
     guint32 d_max_players;
     bool d_inhibit_change;
+
+    Gtk::TreeView *progress_treeview;
+
+    class ProgressModelColumns : public Gtk::TreeModel::ColumnRecord
+      {
+    public:
+        ProgressModelColumns ()
+          { add (perc);}
+        Gtk::TreeModelColumn<int> perc;
+      };
+    ProgressModelColumns progress_columns;
+    Glib::RefPtr<Gtk::ListStore> progress_liststore;
+    Gtk::TreeModel::Row row;
 };
 
 #endif
