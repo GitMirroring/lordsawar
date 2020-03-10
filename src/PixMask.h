@@ -53,7 +53,7 @@ class PixMask
      void draw_pixbuf(Glib::RefPtr<Gdk::Pixbuf> pixbuf, int src_x, int src_y, int dest_x, int dest_y, int width, int height);
 
      //! scale a pixmask in place (alters pixmask)
-     static void scale(PixMask*& pixmask, int xsize, int ysize, Gdk::InterpType intper = Gdk::INTERP_NEAREST);
+     static void scale(PixMask*& pixmask, int xsize, int ysize, Gdk::InterpType intper = Gdk::INTERP_BILINEAR);
 
      //! draw this pixmask onto a pixmap.
      void blit(Cairo::RefPtr<Cairo::Surface> pixmap, int dest_x, int dest_y);
