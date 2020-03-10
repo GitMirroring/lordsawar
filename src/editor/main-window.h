@@ -269,6 +269,8 @@ class MainWindow: public sigc::trackable
     void update_buttons();
     void update_terrain_buttons();
 
+    bool on_window_state_event (GdkEventWindowState *e);
+    bool on_configure_event (GdkEventConfigure *e);
 
     int d_width;
     int d_height;
@@ -277,6 +279,7 @@ class MainWindow: public sigc::trackable
     StoneEditorTip *stone_editor_tip;
     std::list<Army*> battle_calculator_attackers;
     std::list<Army*> battle_calculator_defenders;
+    Gtk::Allocation unmaximized_box;
     
 };
 

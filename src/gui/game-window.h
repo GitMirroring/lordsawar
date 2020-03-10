@@ -336,6 +336,8 @@ class GameWindow: public sigc::trackable
     Player *game_winner;
     void give_some_cheese(Player *game_winner);
 
+    bool on_window_state_event (GdkEventWindowState *e);
+    bool on_configure_event (GdkEventConfigure *e);
 public:
     bool d_quick_fights; //do we speed up fights for this player's turn?
     Glib::ustring stop_action; //hackhackhack
@@ -345,6 +347,7 @@ public:
     Glib::ustring d_player_name;
     Glib::ustring d_load_filename;
     Gtk::Allocation last_box;
+    Gtk::Allocation unmaximized_box;
     sigc::connection map_tip_timer;
 };
 

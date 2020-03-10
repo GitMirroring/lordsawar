@@ -113,13 +113,16 @@ MainWindow::MainWindow(Glib::ustring load_filename)
   needs_saving = false;
   road_editor_tip = NULL;
   stone_editor_tip = NULL;
+  unmaximized_box = Gtk::Allocation(0,0,1,1);
   Glib::RefPtr<Gtk::Builder> xml = 
     BuilderCache::editor_get("main-window.ui");
 
     xml->get_widget("window", window);
     window->set_icon_from_file(File::getVariousFile("tileset_icon.png"));
 
-    window->signal_delete_event().connect(sigc::hide(method(on_delete_event)));
+    window->signal_window_state_event().connect (method(on_window_state_event));
+    window->signal_delete_event().connect (sigc::hide(method(on_delete_event)));
+    window->signal_configure_event().connect(method(on_configure_event));
 
     // the map image
     xml->get_widget("bigmap_image", bigmap_image);
@@ -2214,4 +2217,30 @@ void MainWindow::update_terrain_buttons()
       i.button->show_all();
       delete px;
     }
+}
+
+bool MainWindow::on_window_state_event (GdkEventWindowState *e)
+{
+  if (e->window == window->get_window ()->gobj ())
+    {
+      if (e->changed_mask & GDK_WINDOW_STATE_MAXIMIZED)
+        {
+          if (e->new_window_state & GDK_WINDOW_STATE_MAXIMIZED)
+            ; //maximized
+          else
+            window->resize (unmaximized_box.get_width (),
+                            unmaximized_box.get_height ());
+        }
+    }
+  return false;
+}
+
+bool MainWindow::on_configure_event (GdkEventConfigure *e)
+{
+  if (unmaximized_box.get_width () == 0)
+    {
+      unmaximized_box.set_width (e->width);
+      unmaximized_box.set_height (e->height);
+    }
+  return false;
 }

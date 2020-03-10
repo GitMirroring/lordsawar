@@ -134,6 +134,7 @@ GameWindow::GameWindow()
   game = NULL;
   game_button_box = NULL;
   last_box = Gtk::Allocation(0,0,1,1);
+  unmaximized_box = Gtk::Allocation(0,0,1,1);
 
   Glib::RefPtr<Gtk::Builder> xml = BuilderCache::get("game-window.ui");
 
@@ -142,7 +143,9 @@ GameWindow::GameWindow()
   window = w;
   w->set_icon_from_file(File::getVariousFile("castle_icon.png"));
 
+  w->signal_window_state_event().connect (method(on_window_state_event));
   w->signal_delete_event().connect (sigc::hide(method(on_delete_event)));
+  w->signal_configure_event().connect(method(on_configure_event));
 
   xml->get_widget("menubar", menubar);
   xml->get_widget("bigmap_image", bigmap_image);
@@ -358,6 +361,9 @@ void GameWindow::show()
         window->set_position(Gtk::WIN_POS_NONE);
         window->move(0, 0);
       }
+  Gdk::EventMask event_mask = window->get_window()->get_events ();
+  event_mask |= Gdk::STRUCTURE_MASK;
+  window->get_window()->set_events (event_mask);
 }
 
 void GameWindow::init(int width, int height)
@@ -3048,4 +3054,30 @@ void GameWindow::on_popup_stack_menu (Stack *stack)
 void GameWindow::on_pointing_at_new_tile(Vector<int> tile)
 {
   pos_label->set_text(String::ucompose("(%1, %2)", tile.x, tile.y));
+}
+
+bool GameWindow::on_window_state_event (GdkEventWindowState *e)
+{
+  if (e->window == window->get_window ()->gobj ())
+    {
+      if (e->changed_mask & GDK_WINDOW_STATE_MAXIMIZED)
+        {
+          if (e->new_window_state & GDK_WINDOW_STATE_MAXIMIZED)
+            ; //maximized
+          else
+            window->resize (unmaximized_box.get_width (),
+                            unmaximized_box.get_height ());
+        }
+    }
+  return false;
+}
+
+bool GameWindow::on_configure_event (GdkEventConfigure *e)
+{
+  if (unmaximized_box.get_width () == 0)
+    {
+      unmaximized_box.set_width (e->width);
+      unmaximized_box.set_height (e->height);
+    }
+  return false;
 }
