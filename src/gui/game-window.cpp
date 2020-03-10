@@ -870,6 +870,12 @@ void GameWindow::on_new_game_activated()
 
 void GameWindow::on_quit_activated()
 {
+  if (fullscreen_menuitem->get_active())
+    {
+      window->unfullscreen ();
+      window->resize (unmaximized_box.get_width (),
+                      unmaximized_box.get_height ());
+    }
   if (window->is_maximized ())
     window->unmaximize ();
   LwDialog dialog(*window, "game-quit-dialog.ui");
@@ -984,7 +990,11 @@ void GameWindow::on_fullscreen_activated()
   if (fullscreen_menuitem->get_active())
     window->fullscreen();
   else
-    window->unfullscreen();
+    {
+      window->unfullscreen();
+      window->resize (unmaximized_box.get_width (),
+                      unmaximized_box.get_height ());
+    }
 }
 
 void GameWindow::on_signpost_activated()
