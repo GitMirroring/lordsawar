@@ -74,6 +74,7 @@
 #include "../editor/main-window.h"
 #include "../editor/editor-splash-window.h"
 #include "smallmap.h"
+#include "ScenarioMedia.h"
 
 #define method(x) sigc::mem_fun(*this, &Driver::x)
 
@@ -1088,6 +1089,7 @@ void Driver::on_game_ended()
   Tilesetlist::deleteInstance();
   Citysetlist::deleteInstance();
   HeroTemplates::deleteInstance();
+  ScenarioMedia::deleteInstance();
 
   splash_window->show();
 }
