@@ -123,7 +123,7 @@
         <col id="0" translatable="yes">Only On Capture</col>
       </row>
       <row>
-        <col id="0" translatable="yes">Always Allowed</col>
+        <col id="0" translatable="yes">Anytime</col>
       </row>
     </data>
   </object>
