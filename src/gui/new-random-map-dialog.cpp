@@ -363,31 +363,39 @@ void NewRandomMapDialog::assign_random_terrain (GameParameters &g)
   double excess = 100 - sum;
   if (excess <= 0)
     return;
-  for (int i = 0; i < int(excess); i++)
+  if (excess == 1)
     {
-      ActiveTerrainType type = ter[Rnd::rand() % ter.size()];
-      switch (type)
+      g.map.grass++;
+      return;
+    }
+  if (ter.empty () == false)
+    {
+      for (int i = 0; i < int(excess); i++)
         {
-        case GRASS:
-          g.map.grass++;
-          break;
-        case WATER:
-          g.map.water++;
-          break;
-        case FOREST:
-          g.map.forest++;
-          break;
-        case HILLS:
-          g.map.hills++;
-          break;
-        case SWAMP:
-          g.map.swamp++;
-          break;
-        case MOUNTAINS:
-          g.map.mountains++;
-          break;
-        default:
-          break;
+          ActiveTerrainType type = ter[Rnd::rand() % ter.size()];
+          switch (type)
+            {
+            case GRASS:
+              g.map.grass++;
+              break;
+            case WATER:
+              g.map.water++;
+              break;
+            case FOREST:
+              g.map.forest++;
+              break;
+            case HILLS:
+              g.map.hills++;
+              break;
+            case SWAMP:
+              g.map.swamp++;
+              break;
+            case MOUNTAINS:
+              g.map.mountains++;
+              break;
+            default:
+              break;
+            }
         }
     }
 }
