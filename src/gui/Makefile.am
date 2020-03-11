@@ -65,6 +65,7 @@ liblwgui_la_SOURCES = \
     input-helpers.h \
     timed-message-dialog.cpp timed-message-dialog.h \
     game-lobby-dialog.cpp game-lobby-dialog.h \
+    quick-help-window.cpp quick-help-window.h \
     network-game-selector-dialog.cpp network-game-selector-dialog.h \
     new-network-game-dialog.cpp new-network-game-dialog.h \
     new-profile-dialog.cpp new-profile-dialog.h \

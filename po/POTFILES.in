@@ -64,11 +64,7 @@
 [type: gettext/glade]dat/glade/splash-window.ui
 [type: gettext/glade]dat/glade/stack-info-dialog.ui
 [type: gettext/glade]dat/glade/stack-info-window.ui
-[type: gettext/glade]dat/glade/status-box-desktop.ui
-[type: gettext/glade]dat/glade/status-box-netbook.ui
 [type: gettext/glade]dat/glade/status-box-large-screen.ui
-[type: gettext/glade]dat/glade/stack-tile-box-desktop.ui
-[type: gettext/glade]dat/glade/stack-tile-box-netbook.ui
 [type: gettext/glade]dat/glade/stack-tile-box-large-screen.ui
 [type: gettext/glade]dat/glade/surrender-dialog.ui
 [type: gettext/glade]dat/glade/surrender-refused-dialog.ui
@@ -79,6 +75,7 @@
 [type: gettext/glade]dat/glade/use-item-on-player-dialog.ui
 [type: gettext/glade]dat/glade/use-item-on-city-dialog.ui
 [type: gettext/glade]dat/glade/new-random-map-dialog.ui
+[type: gettext/glade]dat/glade/quick-help-window.ui
 [type: gettext/glade]dat/glade/editor/armyset-info-dialog.ui
 [type: gettext/glade]dat/glade/editor/armyset-window.ui
 [type: gettext/glade]dat/glade/editor/city-editor-dialog.ui
@@ -124,9 +121,7 @@
 [type: gettext/glade]dat/glade/editor/media-dialog.ui
 [type: gettext/glade]dat/glade/editor/validation-dialog.ui
 [type: gettext/glade]dat/glade/editor/stone-editor-tip.ui
-[type: gettext/glade]dat/glade/game-button-box-desktop.ui
 [type: gettext/glade]dat/glade/game-button-box-large-screen.ui
-[type: gettext/glade]dat/glade/game-button-box-netbook.ui
 [type: gettext/glade]dat/glade/fighter.ui
 [type: gettext/xml]dat/shield/default/default.lws.in
 [type: gettext/xml]dat/shield/dol/dol.lws.in
@@ -266,6 +261,7 @@ src/gui/fight-window.cpp
 src/gui/new-random-map-dialog.cpp
 src/gui/use-item-on-city-dialog.cpp
 src/gui/tartan-progress-bar.cpp
+src/gui/quick-help-window.cpp
 src/CreateScenarioRandomize.cpp
 src/vectoredunitlist.cpp
 src/editor/itemlist-dialog.cpp

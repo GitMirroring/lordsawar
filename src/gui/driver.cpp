@@ -82,6 +82,7 @@ Driver::Driver(bool start_editor, Glib::ustring load_filename)
 {
     game_window = NULL;
     game_lobby_dialog = NULL;
+    quick_help_window = NULL;
     splash_window = NULL;
     download_window = NULL;
     editor_window = NULL;
@@ -457,6 +458,8 @@ Driver::~Driver()
     delete game_window;
   if (game_lobby_dialog)
     delete game_lobby_dialog;
+  if (quick_help_window)
+    delete quick_help_window;
   if (splash_window)
     delete splash_window;
   if (download_window)
@@ -1058,6 +1061,12 @@ void Driver::on_game_ended()
       delete game_lobby_dialog;
       game_lobby_dialog = NULL;
     }
+  if (quick_help_window)
+    {
+      quick_help_window->hide ();
+      delete quick_help_window;
+      quick_help_window = NULL;
+    }
 
   if (game_window)
     {
@@ -1109,6 +1118,7 @@ void Driver::init_game_window()
   game_window->game_ended.connect (method(on_game_ended));
   game_window->game_ended_start_new.connect (method(on_game_ended_and_start_new));
   game_window->show_lobby.connect (method(on_show_lobby_requested));
+  game_window->show_quick_help.connect (method(on_quick_help_requested));
   game_window->quit_requested.connect (method(on_quit_requested));
   game_window->load_hosted_network_game.connect
     (method(on_game_ended_and_load_network_game));
@@ -1332,6 +1342,13 @@ void Driver::on_show_lobby_requested()
 {
   if (game_lobby_dialog)
     game_lobby_dialog->show();
+}
+    
+void Driver::on_quick_help_requested()
+{
+  if (!quick_help_window)
+    quick_help_window = new QuickHelpWindow ();
+  quick_help_window->show();
 }
     
 void Driver::start_network_game_requested(GameScenario *game_scenario, NextTurnNetworked *next_turn)

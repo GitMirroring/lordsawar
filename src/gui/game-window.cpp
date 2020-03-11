@@ -298,6 +298,8 @@ GameWindow::GameWindow()
   xml->get_widget("online_help_menuitem", online_help_menuitem);
   online_help_menuitem->signal_activate().connect
     (method(on_online_help_activated));
+  xml->get_widget("quick_help_menuitem", quick_help_menuitem);
+  quick_help_menuitem->signal_activate().connect (method(on_quick_help_activated));
   xml->get_widget("pos_label", pos_label);
   d_quick_fights = false;
 }
@@ -3092,4 +3094,9 @@ bool GameWindow::on_configure_event (GdkEventConfigure *e)
       unmaximized_box.set_height (e->height);
     }
   return false;
+}
+    
+void GameWindow::on_quick_help_activated()
+{
+  show_quick_help.emit();
 }

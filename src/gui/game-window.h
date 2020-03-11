@@ -97,6 +97,7 @@ class GameWindow: public sigc::trackable
     sigc::signal<void> game_ended_start_new;
     
     sigc::signal<void> show_lobby;
+    sigc::signal<void> show_quick_help;
 
     sigc::signal<void> quit_requested;
 
@@ -161,6 +162,7 @@ class GameWindow: public sigc::trackable
     Gtk::MenuItem *preferences_menuitem;
     Gtk::MenuItem *zoom_in_menuitem;
     Gtk::MenuItem *zoom_out_menuitem;
+    Gtk::MenuItem *quick_help_menuitem;
     Gtk::Image *smallmap_image;
     Gtk::Image *bigmap_image;
 
@@ -245,6 +247,7 @@ class GameWindow: public sigc::trackable
     void on_triumphs_activated();
     void on_help_about_activated();
     void on_online_help_activated();
+    void on_quick_help_activated();
 
     void on_message_requested(Glib::ustring msg);
     

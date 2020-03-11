@@ -27,6 +27,7 @@
 #include "splash-window.h"
 #include "game-window.h"
 #include "game-lobby-dialog.h"
+#include "quick-help-window.h"
 #include "new-network-game-download-window.h"
 #include "game-parameters.h"
 #include "../editor/main-window.h"
@@ -47,6 +48,7 @@ class Driver: public sigc::trackable
  private:
     GameWindow* game_window;
     GameLobbyDialog* game_lobby_dialog;
+    QuickHelpWindow* quick_help_window;
     SplashWindow* splash_window;
     NewNetworkGameDownloadWindow* download_window;
     MainWindow *editor_window;
@@ -112,6 +114,7 @@ class Driver: public sigc::trackable
     void on_hosted_player_says_game_may_begin();
 
     void on_show_lobby_requested();
+    void on_quick_help_requested();
 
     void start_network_game_requested(GameScenario *game_scenario,
 				      NextTurnNetworked *next_turn);
