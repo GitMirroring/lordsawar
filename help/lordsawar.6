@@ -1,4 +1,4 @@
-.TH LORDSAWAR "6" "April 2017" "lordsawar 0.3.2" "Games"
+.TH LORDSAWAR "6" "March 2020" "lordsawar 0.3.2" "Games"
 .SH NAME
 lordsawar \- A Warlords II clone
 .SH SYNOPSIS
@@ -6,6 +6,8 @@ lordsawar \- A Warlords II clone
 [\fIOPTION\fR...] [\fIFILE\fR]
 .SH DESCRIPTION
 LordsAWar! is a  2d turn-based strategy game where up to 8 players strive for control of as many cities as possible.  Produce new armies in cities to conquer  nearby  cities.  Using the income from those cities, make more armies to take more cities.  Send a hero to a temple to get a quest, or maybe search a nearby ruin instead.  Play against the computer or against a friend.
+
+Specify \fIFILE\fR to load a saved-game (.sav) or start a new game from a .map file.  The latter is a scenario file saved from the scenario builder.
 .TP
 \fB\-c\fR, \fB\-\-cache\-size\fR \fISIZE\fR
 Don't use more than \fISIZE\fR bytes to cache rendered graphics.
@@ -63,6 +65,9 @@ Saved shieldset directory.
 .TP
 .I ~/.locale/share/lordsawar/citysets/
 Saved cityset directory.
+.TP
+.I ~/.cache/lordsawar/
+Cache directory.
 .SH "REPORTING BUGS"
 Report bugs to <lordsawar-discuss@nongnu.org>.
 .SH "SEE ALSO"
