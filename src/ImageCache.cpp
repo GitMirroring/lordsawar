@@ -1222,13 +1222,14 @@ PixMask* ImageCache::getDefaultTileStylePic(guint32 type, guint32 size)
   return s;
 }
 
-PixMask* ImageCache::getTartanPic(const Player *p, guint32 width, Shieldset *shieldset)
+PixMask* ImageCache::getTartanPic(const Player *p, guint32 width, Shieldset *shieldset, guint32 font_size)
 {
   guint added = 0;
   TartanPixMaskCacheItem i;
   i.player_id = p->getId();
   i.width = width;
   i.shieldset = shieldset->getId();
+  i.font_size = font_size;
   PixMask *s = tartancache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1236,13 +1237,14 @@ PixMask* ImageCache::getTartanPic(const Player *p, guint32 width, Shieldset *shi
   return s;
 }
 
-PixMask* ImageCache::getEmptyTartanPic(const Player *p, guint32 width, Shieldset *shieldset)
+PixMask* ImageCache::getEmptyTartanPic(const Player *p, guint32 width, Shieldset *shieldset, guint32 font_size)
 {
   guint added = 0;
   EmptyTartanPixMaskCacheItem i;
   i.player_id = p->getId();
   i.width = width;
   i.shieldset = shieldset->getId();
+  i.font_size = font_size;
   PixMask *s = emptytartancache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -2570,16 +2572,19 @@ PixMask *TartanPixMaskCacheItem::generate(TartanPixMaskCacheItem i)
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::LEFT, &image, &mask);
   PixMask *left = ImageCache::applyMask(image, mask, colour);
+  //XXX XXX XXX scale it
   image = NULL;
   mask = NULL;
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::CENTER, &image, &mask);
   PixMask *center = ImageCache::applyMask(image, mask, colour);
+  //XXX XXX XXX scale it
   image = NULL;
   mask = NULL;
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::RIGHT, &image, &mask);
   PixMask *right = ImageCache::applyMask(image, mask, colour);
+  //XXX XXX XXX scale it
   //okay, so we have our left, right and center images, now we need to
   //concatenate them together
 
@@ -2625,6 +2630,8 @@ int TartanPixMaskCacheItem::comp(const TartanPixMaskCacheItem item) const
     (width > item.width) ?  1 :
     (shieldset < item.shieldset) ? -1 :
     (shieldset > item.shieldset) ?  1 :
+    (font_size < item.font_size) ? -1 :
+    (font_size > item.font_size) ?  1 :
     0;
 }
 
@@ -2640,16 +2647,19 @@ PixMask *EmptyTartanPixMaskCacheItem::generate(EmptyTartanPixMaskCacheItem i)
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::LEFT, &image, &mask);
   PixMask *left = image->copy();
+  //XXX XXX XXX scale it
   image = NULL;
   mask = NULL;
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::CENTER, &image, &mask);
   PixMask *center = image->copy();
+  //XXX XXX XXX scale it
   image = NULL;
   mask = NULL;
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::RIGHT, &image, &mask);
   PixMask *right = image->copy();
+  //XXX XXX XXX scale it
   //okay, so we have our left, right and center images, now we need to
   //concatenate them together
 
@@ -2694,7 +2704,9 @@ int EmptyTartanPixMaskCacheItem::comp(const EmptyTartanPixMaskCacheItem item) co
     (width < item.width) ? -1 :
     (width > item.width) ?  1 :
     (shieldset < item.shieldset) ? -1 :
-    (shieldset > item.shieldset) ?  1 :
+    (shieldset < item.shieldset) ? -1 :
+    (font_size > item.font_size) ?  1 :
+    (font_size > item.font_size) ?  1 :
     0;
 }
 

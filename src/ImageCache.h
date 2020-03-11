@@ -346,13 +346,13 @@ class ImageCache
          * The image will not be any wider than width, but can be less wide.
          */
         PixMask* getTartanPic (const Player *p, guint32 width,
-                               Shieldset *s);
+                               Shieldset *s, guint32 font_size);
 
         /** Method for getting a picture of the empty tartan progess bar.
          * The image will not be any wider than width, but can be less wide.
          */
         PixMask* getEmptyTartanPic (const Player *p, guint32 width,
-                                    Shieldset *s);
+                                    Shieldset *s, guint32 font_size);
 
         /** Method for getting a city picture
           * 
@@ -1012,6 +1012,7 @@ public:
     guint32 width;
     guint32 player_id;
     guint32 shieldset;
+    guint32 font_size;
 };
 
 //! Helper class for empty tartan progress bar images in the ImageCache.
@@ -1029,6 +1030,7 @@ public:
     guint32 width;
     guint32 player_id;
     guint32 shieldset;
+    guint32 font_size;
 };
 
 //! Helper class for status images in the ImageCache.

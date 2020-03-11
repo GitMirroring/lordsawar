@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "shieldset.h"
 #include "PixMask.h"
 #include "playerlist.h"
+#include "font-size.h"
 
 TartanProgressBar::TartanProgressBar(Player *p)
 {
@@ -70,7 +71,8 @@ bool TartanProgressBar::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
       PixMask *p = 
         ImageCache::getInstance()->getTartanPic (player, get_width() *
                                                  TARTAN_PERCENT_WIDTH,
-                                                 GameMap::getShieldset());
+                                                 GameMap::getShieldset(),
+                                                 FontSize::getInstance()->get_height ());
 
       set_size_request(-1, p->get_height());
       cr->set_source(p->get_pixmap(), 0, 0);
@@ -82,7 +84,8 @@ bool TartanProgressBar::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
       p = 
         ImageCache::getInstance()->getEmptyTartanPic (player, get_width() *
                                                       TARTAN_PERCENT_WIDTH,
-                                                      GameMap::getShieldset());
+                                                      GameMap::getShieldset(),
+                                                      FontSize::getInstance()->get_height ());
       cr->set_source(p->get_pixmap(), 0, 0);
       cr->rectangle(limit, 0, p->get_width() - limit, p->get_height());
       cr->fill();
