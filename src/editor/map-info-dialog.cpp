@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -42,6 +42,9 @@ MapInfoDialog::MapInfoDialog(Gtk::Window &parent, GameScenario *g)
     copyright_textview->get_buffer()->set_text(game_scenario->getCopyright());
     xml->get_widget("license_textview", license_textview);
     license_textview->get_buffer()->set_text(game_scenario->getLicense());
+    xml->get_widget ("notebook", notebook);
+    for (guint32 i = 0; i < notebook->get_children().size(); i++)
+      notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 }
 
 int MapInfoDialog::run()
@@ -57,4 +60,9 @@ int MapInfoDialog::run()
         game_scenario->setLicense(license_textview->get_buffer()->get_text());
     }
     return response;
+}
+
+MapInfoDialog::~MapInfoDialog()
+{
+  notebook->property_show_tabs () = false;
 }

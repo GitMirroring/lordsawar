@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -91,6 +91,9 @@ MediaDialog::MediaDialog(Gtk::Window &parent, TarFile *tarfile)
     (method(on_victory_button_activated));
   xml->get_widget("back_button", d_back_button);
   d_back_button->signal_clicked().connect(method(on_back_button_activated));
+  xml->get_widget ("notebook", notebook);
+  for (guint32 i = 0; i < notebook->get_children().size(); i++)
+    notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 
   fill_in_buttons();
 }
@@ -420,4 +423,9 @@ void MediaDialog::on_back_button_activated()
     (sigc::mem_fun(sm, &ScenarioMedia::getBackSoundName),
      sigc::ptr_fun (&ScenarioMedia::getDefaultBackSoundFilename),
      sigc::mem_fun (sm, &ScenarioMedia::setBackSoundName));
+}
+
+MediaDialog::~MediaDialog()
+{
+  notebook->property_show_tabs () = false;
 }

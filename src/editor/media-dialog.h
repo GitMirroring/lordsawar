@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ class MediaDialog: public LwEditorDialog
 {
 public:
     MediaDialog(Gtk::Window &parent, TarFile *tarfile);
-    ~MediaDialog() {};
+    ~MediaDialog();
 
     int run();
     void hide() {dialog->hide();};
@@ -58,6 +58,7 @@ private:
     Gtk::Button *d_defeat_button;
     Gtk::Button *d_victory_button;
     Gtk::Button *d_back_button;
+    Gtk::Notebook *notebook;
 
     //callbacks
     void on_next_turn_button_activated();

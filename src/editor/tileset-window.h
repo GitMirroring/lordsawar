@@ -1,4 +1,4 @@
-//  Copyright (C) 2008-2010, 2012, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2008-2010, 2012, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class TileSetWindow: public sigc::trackable
 {
  public:
     TileSetWindow(Glib::ustring load_filename = "");
-    ~TileSetWindow() {delete window;};
+    ~TileSetWindow();
 
     void show() {window->show();};
     void hide() {window->hide();};
@@ -90,6 +90,7 @@ class TileSetWindow: public sigc::trackable
     Gtk::Button *image_button;
     Gtk::Alignment *tilestyle_alignment;
     Gtk::Alignment *tilestyleset_alignment;
+    Gtk::Notebook *notebook;
 
     std::vector<PixMask* > tilestyle_images;
     Gtk::Image *tilestyle_standard_image;

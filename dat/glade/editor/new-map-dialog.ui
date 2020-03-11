@@ -158,7 +158,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkNotebook">
+          <object class="GtkNotebook" id="notebook">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="margin_bottom">12</property>

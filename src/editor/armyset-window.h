@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class ArmySetWindow: public sigc::trackable
 {
  public:
     ArmySetWindow(Glib::ustring load_filename = "");
-    ~ArmySetWindow() {delete window;};
+    ~ArmySetWindow();
     
     void show() {window->show();};
     void hide() {window->hide();};
@@ -121,6 +121,7 @@ class ArmySetWindow: public sigc::trackable
     Gtk::MenuItem *quit_menuitem;
     Gtk::MenuItem *help_about_menuitem;
     Gtk::Button *make_same_button;
+    Gtk::Notebook *notebook;
 
     class ArmiesColumns: public Gtk::TreeModelColumnRecord {
     public:

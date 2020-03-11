@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -71,6 +71,9 @@ CitySetInfoDialog::CitySetInfoDialog(Gtk::Window &parent, Set *cityset, Glib::us
     license_textview->get_buffer()->set_text(d_cityset->getLicense());
     xml->get_widget("description_textview", description_textview);
     description_textview->get_buffer()->set_text(cityset->getInfo());
+    xml->get_widget ("notebook", notebook);
+    for (guint32 i = 0; i < notebook->get_children().size(); i++)
+      notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 
     dir_label->set_text (dir);
     if (readonly)
@@ -139,4 +142,9 @@ void CitySetInfoDialog::update_buttons()
       status_label->set_text("");
       accept_button->set_sensitive(true);
     }
+}
+
+CitySetInfoDialog::~CitySetInfoDialog()
+{
+  notebook->property_show_tabs () = false;
 }

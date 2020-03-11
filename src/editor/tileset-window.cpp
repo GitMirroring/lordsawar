@@ -1,4 +1,4 @@
-//  Copyright (C) 2008-2012, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2008-2012, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -224,6 +224,9 @@ TileSetWindow::TileSetWindow(Glib::ustring load_filename)
     image_button->signal_clicked().connect (method(on_image_chosen));
 
     xml->get_widget("tilestyle_standard_image", tilestyle_standard_image);
+    xml->get_widget("notebook", notebook);
+    for (guint32 i = 0; i < notebook->get_children().size(); i++)
+      notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 
     if (load_filename != "")
       current_save_filename = load_filename;
@@ -1531,4 +1534,10 @@ void TileSetWindow::show_add_file_error(Tileset *t, Gtk::Dialog &d, Glib::ustrin
   Gtk::MessageDialog td(d, m);
   td.run();
   td.hide();
+}
+
+TileSetWindow::~TileSetWindow()
+{
+  notebook->property_show_tabs () = false;
+  delete window;
 }

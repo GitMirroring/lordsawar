@@ -1,5 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007-2010, 2012, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2017,
+//  2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -58,6 +59,9 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
     xml->get_widget("random_roads_switch", random_roads_switch);
     xml->get_widget("random_names_switch", random_names_switch);
     xml->get_widget("num_players_spinbutton", num_players_spinbutton);
+    xml->get_widget ("notebook", notebook);
+    for (guint32 i = 0; i < notebook->get_children().size(); i++)
+      notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 
     // fill in tile themes combobox
     
@@ -348,3 +352,7 @@ void NewMapDialog::on_tile_size_changed()
     accept_button->set_sensitive(false);
 }
 
+NewMapDialog::~NewMapDialog()
+{
+  notebook->property_show_tabs () = false;
+}

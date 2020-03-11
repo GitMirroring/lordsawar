@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -117,6 +117,9 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
     xml->get_widget("change_towerpics_button", change_towerpics_button);
     change_towerpics_button->signal_clicked().connect
       (method(on_change_towerpics_clicked));
+    xml->get_widget ("notebook", notebook);
+    for (guint32 i = 0; i < notebook->get_children().size(); i++)
+      notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 
     if (load_filename != "")
       current_save_filename = load_filename;
@@ -796,4 +799,10 @@ void CitySetWindow::show_add_file_error(Gtk::Dialog &d, Glib::ustring file)
   Gtk::MessageDialog td(d, m);
   td.run();
   td.hide();
+}
+
+CitySetWindow::~CitySetWindow()
+{
+  notebook->property_show_tabs () = false;
+  delete window;
 }

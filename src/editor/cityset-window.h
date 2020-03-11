@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class CitySetWindow: public sigc::trackable
 {
  public:
     CitySetWindow(Glib::ustring load_filename = "");
-    ~CitySetWindow() {delete window;};
+    ~CitySetWindow();
 
     Gtk::Window &get_window() { return *window; }
     void show() {window->show();};
@@ -64,6 +64,7 @@ class CitySetWindow: public sigc::trackable
     Gtk::SpinButton *ruin_tile_width_spinbutton;
     Gtk::SpinButton *temple_tile_width_spinbutton;
     Gtk::Alignment *cityset_alignment;
+    Gtk::Notebook *notebook;
 
     bool on_delete_event();
 

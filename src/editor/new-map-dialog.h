@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class NewMapDialog: public LwEditorDialog
 {
  public:
     NewMapDialog(Gtk::Window &parent);
-    ~NewMapDialog() {};
+    ~NewMapDialog();
 
     void run();
 
@@ -81,6 +81,7 @@ class NewMapDialog: public LwEditorDialog
     Gtk::Switch *random_roads_switch;
     Gtk::Switch *random_names_switch;
     Gtk::SpinButton *num_players_spinbutton;
+    Gtk::Notebook *notebook;
 
     enum { MAP_SIZE_NORMAL = 0, MAP_SIZE_SMALL, MAP_SIZE_TINY, 
       MAP_SIZE_CUSTOM };

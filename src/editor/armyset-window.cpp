@@ -1,4 +1,5 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015,
+//  2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -291,6 +292,9 @@ ArmySetWindow::ArmySetWindow(Glib::ustring load_filename)
     (method(on_edit_ship_picture_activated));
   xml->get_widget ("help_about_menuitem", help_about_menuitem);
   help_about_menuitem->signal_activate().connect (method(on_help_about_activated));
+  xml->get_widget("notebook", notebook);
+  for (guint32 i = 0; i < notebook->get_children().size(); i++)
+    notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 
   window->signal_delete_event().connect (sigc::hide(method(on_delete_event)));
 
@@ -1592,4 +1596,10 @@ void ArmySetWindow::refresh_armies()
   for (Gtk::TreeNodeChildren::iterator i = armies_list->children().begin();
        i != armies_list->children().end(); i++, j++)
     (*i)[armies_columns.army] = *j;
+}
+
+ArmySetWindow::~ArmySetWindow()
+{
+  notebook->property_show_tabs () = false;
+  delete window;
 }
