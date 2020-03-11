@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) Ben Asselstine 2017
+# Copyright (C) Ben Asselstine 2017, 2020
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -56,6 +56,6 @@ ids=`$xdotool search 'LordsAWar!' 2>/dev/null`
 for f in $ids; do
   $xdotool windowactivate $f 2>/dev/null
 done
-usleep 500000
+sleep 0.5
 $screenshot -window root -border -frame $tmpfile -crop 882x646+0+33 2>/dev/null
 echo $tmpfile

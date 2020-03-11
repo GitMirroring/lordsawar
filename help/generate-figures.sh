@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) Ben Asselstine 2017
+# Copyright (C) Ben Asselstine 2017, 2020
 #
 # The idea here is that we're going to replay an Xnee file to generate
 # the correct screenshots for the manual.
@@ -42,29 +42,29 @@ if [ "x$grab" == "x1" ]; then
   sleep 1
   echo "image-05"
   image05=`./create-manual-screenshot.sh`
-  usleep 500000
+  sleep 0.5
   echo "image-06"
   image06=`./create-manual-screenshot.sh`
-  usleep 500000
+  sleep 0.5
   echo "image-07"
   image07=`./create-manual-screenshot.sh`
-  usleep 500000
+  sleep 0.5
   echo "image-08"
   image08=`./create-manual-screenshot.sh`
   sleep 9
   echo "image-09"
   image09=`./create-manual-screenshot.sh`
-  usleep 500000
+  sleep 0.5
   echo "image-10"
   image10=`./create-manual-screenshot.sh`
-  #usleep 250000
+  #sleep 0.25
   echo "image-11"
   image11=`./create-manual-screenshot.sh`
   echo "image-12"
   image12=`./create-manual-screenshot.sh`
   sleep 1
-  usleep 250000
-  usleep 500000
+  sleep 0.25
+  sleep 0.5
   echo "image-13"
   image13=`./create-manual-screenshot.sh`
   sleep 7 
@@ -106,18 +106,18 @@ if [ "x$grab" == "x1" ]; then
   sleep 12
   echo "image-26"
   image26=`./create-manual-screenshot.sh`
-  usleep 3000000
+  sleep 3
   echo "image-27"
   image27=`./create-manual-screenshot.sh`
   sleep 3
-  usleep 400000
+  sleep 0.4
   echo "image-28"
   image28=`./create-manual-screenshot.sh`
-  usleep 150000
+  sleep 0.15
   sleep 3
   echo "image-29"
   image29=`./create-manual-screenshot.sh`
-  usleep 6500000
+  sleep 6.5
   echo "image-29b"
   image29b=`./create-manual-screenshot.sh`
   sleep 10
@@ -132,7 +132,7 @@ if [ "x$grab" == "x1" ]; then
   sleep 14
   echo "image-33"
   image33=`./create-manual-screenshot.sh`
-  usleep 3000000
+  sleep 3
   echo "image-34"
   image34=`./create-manual-screenshot.sh`
   echo "image-35"
@@ -140,7 +140,7 @@ if [ "x$grab" == "x1" ]; then
   echo "image-36"
   image36=`./create-manual-screenshot.sh`
   sleep 12
-  usleep 700000
+  sleep 7
   echo "image-37"
   image37=`./create-manual-screenshot.sh`
   sleep 4
