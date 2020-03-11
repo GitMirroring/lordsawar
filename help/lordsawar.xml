@@ -39,12 +39,6 @@
                         To report a bug or make a suggestion regarding the game, the editors, or this documentation, see the <ulink type="help" url="http://sv.gnu.org/p/lordsawar">LordsAWar! Project Page</ulink> or send it in a mail to <ulink type="help" url="mailto:lordsawar-discuss@nongnu.org">lordsawar-discuss@nongnu.org</ulink>.  Go ahead and tell us how we're doing.  We like that.
 		</para>
 	</legalnotice>
-	<legalnotice id="translations"> 
-		<title>Translate this Manual</title> 
-                <para>
-                        If you choose to translate this manual into your language, please note that there are scripts to automatically generate the images found herein.  We know the images are a hassle to translators, so we hope this makes it a little easier.
-                </para>
-	</legalnotice>
 	<legalnotice id="alternatives"> 
 		<title>Alternative to Reading</title> 
 		<para>
