@@ -2572,19 +2572,28 @@ PixMask *TartanPixMaskCacheItem::generate(TartanPixMaskCacheItem i)
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::LEFT, &image, &mask);
   PixMask *left = ImageCache::applyMask(image, mask, colour);
-  //XXX XXX XXX scale it
+  double ratio = 3.73;
+  double new_height = i.font_size * ratio;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height (left, new_height);
+  PixMask::scale (left, new_width, new_height);
+
   image = NULL;
   mask = NULL;
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::CENTER, &image, &mask);
   PixMask *center = ImageCache::applyMask(image, mask, colour);
-  //XXX XXX XXX scale it
+  new_width =
+    ImageCache::calculate_width_from_adjusted_height (center, new_height);
+  PixMask::scale (center, new_width, new_height);
   image = NULL;
   mask = NULL;
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::RIGHT, &image, &mask);
   PixMask *right = ImageCache::applyMask(image, mask, colour);
-  //XXX XXX XXX scale it
+  new_width =
+    ImageCache::calculate_width_from_adjusted_height (right, new_height);
+  PixMask::scale (right, new_width, new_height);
   //okay, so we have our left, right and center images, now we need to
   //concatenate them together
 
@@ -2647,19 +2656,30 @@ PixMask *EmptyTartanPixMaskCacheItem::generate(EmptyTartanPixMaskCacheItem i)
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::LEFT, &image, &mask);
   PixMask *left = image->copy();
-  //XXX XXX XXX scale it
+  double ratio = 3.73;
+  double new_height = i.font_size * ratio;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height (left, new_height);
+  PixMask::scale (left, new_width, new_height);
+
   image = NULL;
   mask = NULL;
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::CENTER, &image, &mask);
   PixMask *center = image->copy();
-  //XXX XXX XXX scale it
+  new_width =
+    ImageCache::calculate_width_from_adjusted_height (center, new_height);
+  PixMask::scale (center, new_width, new_height);
+
   image = NULL;
   mask = NULL;
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::RIGHT, &image, &mask);
   PixMask *right = image->copy();
-  //XXX XXX XXX scale it
+  new_width =
+    ImageCache::calculate_width_from_adjusted_height (right, new_height);
+  PixMask::scale (right, new_width, new_height);
+
   //okay, so we have our left, right and center images, now we need to
   //concatenate them together
 
