@@ -3,7 +3,7 @@
   <!ENTITY legal SYSTEM "legal.xml">
 <!ENTITY app "<application>LordsAWar!</application>">
 <!ENTITY appversion "0.3.2">
-<!ENTITY date "May 2014">
+<!ENTITY date "March 2020">
 <!ENTITY manrevision "0.3.2">
 ]>
 
@@ -12,7 +12,7 @@
 <articleinfo> 
 	<title>LordsAWar! User's Manual &manrevision;</title> 
 	<copyright> 
-		<year>2008, 2009, 2010, 2011, 2014, 2016, 2017</year>
+		<year>2008, 2009, 2010, 2011, 2014, 2016, 2017, 2020</year>
 		<holder>Ben Asselstine</holder> 
  	</copyright>
 	<publisher> 
