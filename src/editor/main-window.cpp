@@ -105,6 +105,7 @@
 
 MainWindow::MainWindow(Glib::ustring load_filename)
 {
+  Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme() = false;
   d_load_filename = load_filename;
   bigmap = NULL;
   smallmap = NULL;
@@ -322,6 +323,7 @@ MainWindow::MainWindow(Glib::ustring load_filename)
 
 MainWindow::~MainWindow()
 {
+  Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme() = true;
   for (auto a : battle_calculator_attackers)
     delete a;
   for (auto d : battle_calculator_defenders)
