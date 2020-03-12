@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007-2009, 2012, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007-2009, 2012, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 #include "stacktile.h"
 #include "hero-editor-dialog.h"
 #include "GameMap.h"
+#include "font-size.h"
 
 #include "select-army-dialog.h"
 
@@ -280,9 +281,10 @@ void StackEditorDialog::add_army(Army *a)
     ImageCache *gc = ImageCache::getInstance();
     Gtk::TreeIter i = army_list->append();
     (*i)[army_columns.army] = a;
+    guint32 fs = FontSize::getInstance ()->get_height ();
     (*i)[army_columns.image] = gc->getArmyPic(a->getOwner()->getArmyset(),
 					      a->getTypeId(), a->getOwner(),
-					      NULL)->to_pixbuf();
+					      NULL, false, fs)->to_pixbuf();
     (*i)[army_columns.strength] = a->getStat(Army::STRENGTH, false);
     (*i)[army_columns.moves] = a->getStat(Army::MOVES, false);
     (*i)[army_columns.upkeep] = a->getUpkeep();
@@ -336,13 +338,15 @@ void StackEditorDialog::on_player_changed()
     fortified_switch->set_active(false);
   set_button_sensitivity();
 
+  guint32 fs = FontSize::getInstance ()->get_height ();
   for (Gtk::TreeIter j = army_list->children().begin(),
        jend = army_list->children().end(); j != jend; ++j)
     {
       Army *a = (*j)[army_columns.army];
       (*j)[army_columns.image] = gc->getArmyPic(player->getArmyset(),
 						a->getTypeId(), 
-						player, NULL)->to_pixbuf();
+						player, NULL, false,
+                                                fs)->to_pixbuf();
     }
 }
 

@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 #include "GameMap.h"
 #include "tileset.h"
 #include "fight.h"
+#include "font-size.h"
 
 #include "select-army-dialog.h"
 
@@ -235,9 +236,10 @@ void BattleCalculatorDialog::add_attacker_army(Army *a, bool add)
   ImageCache *gc = ImageCache::getInstance();
   Gtk::TreeIter i = attackers_list->append();
   (*i)[combatant_columns.army] = a;
+  guint32 fs = FontSize::getInstance ()->get_height ();
   (*i)[combatant_columns.image] =
     gc->getArmyPic(a->getOwner()->getArmyset(), a->getTypeId(), a->getOwner(),
-                   NULL)->to_pixbuf();
+                   NULL, false, fs)->to_pixbuf();
   (*i)[combatant_columns.strength] = a->getStat(Army::STRENGTH, false);
   (*i)[combatant_columns.hp] = a->getStat(Army::HP, false);
 
@@ -257,13 +259,14 @@ void BattleCalculatorDialog::on_attacker_player_changed()
   Player *player = get_attacker_player();
   set_button_sensitivity();
 
+  guint32 fs = FontSize::getInstance ()->get_height ();
   for (Gtk::TreeIter j = attackers_list->children().begin(),
        jend = attackers_list->children().end(); j != jend; ++j)
     {
       Army *a = (*j)[combatant_columns.army];
       (*j)[combatant_columns.image] =
         gc->getArmyPic(player->getArmyset(), a->getTypeId(), player,
-                       NULL)->to_pixbuf();
+                       NULL, false, fs)->to_pixbuf();
     }
 }
 
@@ -418,9 +421,10 @@ void BattleCalculatorDialog::add_defender_army(Army *a, bool add)
   ImageCache *gc = ImageCache::getInstance();
   Gtk::TreeIter i = defenders_list->append();
   (*i)[combatant_columns.army] = a;
+  guint32 fs = FontSize::getInstance ()->get_height ();
   (*i)[combatant_columns.image] =
     gc->getArmyPic(a->getOwner()->getArmyset(), a->getTypeId(), a->getOwner(),
-                   NULL)->to_pixbuf();
+                   NULL, false, fs)->to_pixbuf();
   (*i)[combatant_columns.strength] = a->getStat(Army::STRENGTH, false);
   //(*i)[combatant_columns.augmented_strength] =
     //a->getStat(Army::STRENGTH, false);
@@ -442,13 +446,14 @@ void BattleCalculatorDialog::on_defender_player_changed()
   Player *player = get_defender_player();
   set_button_sensitivity();
 
+  guint32 fs = FontSize::getInstance ()->get_height ();
   for (Gtk::TreeIter j = defenders_list->children().begin(),
        jend = defenders_list->children().end(); j != jend; ++j)
     {
       Army *a = (*j)[combatant_columns.army];
       (*j)[combatant_columns.image] =
         gc->getArmyPic(player->getArmyset(), a->getTypeId(), player,
-                       NULL)->to_pixbuf();
+                       NULL, false, fs)->to_pixbuf();
     }
 }
 

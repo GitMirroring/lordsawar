@@ -152,7 +152,8 @@ void FightWindow::add_army(Army *army, int initial_hp,
   xml->get_widget("water_image", water_image);
 
   // image
-  PixMask *armypic = ImageCache::getInstance()->getArmyPic(army);
+  guint32 fs = FontSize::getInstance()->get_height ();
+  PixMask *armypic = ImageCache::getInstance()->getDialogArmyPic(army, fs);
   army_image->property_pixbuf() = armypic->to_pixbuf();
   int height = 3;
   SmallTile *water =

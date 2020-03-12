@@ -193,6 +193,48 @@ const unsigned int ROAD_STONE_CHANCE = 150;
 //1 in x chance of standing stone being on a grass tile for random map.
 const unsigned int GRASS_STONE_CHANCE = 1500;
 
+//how tall an army icon appears on a dialog relative to default font height
+const double DIALOG_ARMY_PIC_FONTSIZE_MULTIPLE = 3.636363634;
+//scale for the small shield pictures that appear on dialogs
+const double DIALOG_SMALL_SHIELD_PIC_FONTSIZE_MULTIPLE = 0.727272727;
+//scale for the medium shield pictures that appear on dialogs
+const double DIALOG_MEDIUM_SHIELD_PIC_FONTSIZE_MULTIPLE = 1.272727273;
+//scale for the large shield pictures
+const double DIALOG_LARGE_SHIELD_PIC_FONTSIZE_MULTIPLE = 3.272727273;
+//scale for the smaller diplomacy pictures
+const double DIALOG_DIPLOMACY_TYPE_0_PIC_FONTSIZE_MULTIPLE = 3.0;
+//scale for the larger diplomacy pictures
+const double DIALOG_DIPLOMACY_TYPE_1_PIC_FONTSIZE_MULTIPLE = 5.0;
+//scale for the mouse cursor graphics
+const double DIALOG_CURSOR_PIC_FONTSIZE_MULTIPLE = 2.25;
+//scale for the new hero level picture
+const double DIALOG_NEW_LEVEL_PIC_FONTSIZE_MULTIPLE = 23;
+//scale for the tartan progress images
+const double DIALOG_TARTAN_PIC_FONTSIZE_MULTIPLE = 3.73;
+//scale for the movement bonus pictures
+const double DIALOG_MOVE_BONUS_PIC_FONTSIZE_MULTIPLE = 2;
+//scale for the large medal awarded picture
+const double DIALOG_MEDAL_PIC_FONTSIZE_MULTIPLE = 19;
+//scale for the cities/treasury/income/upkeep pictures on the main game screen
+const double DIALOG_STATUS_PIC_FONTSIZE_MULTIPLE = 2.333;
+//scale for the tiny defense icon that appears on a city info tip
+const double DIALOG_DEFENSE_PIC_FONTSIZE_MULTIPLE = 1.333;
+//scale for the images in the buttons on the main game screen
+const double DIALOG_GAME_BUTTON_PIC_FONTSIZE_MULTIPLE = 3;
+//scale for the new turn (ship) picture
+const double DIALOG_NEXT_TURN_PIC_FONT_SIZE_MULTIPLE = 23;
+//scale for the male/female hero picture
+const double DIALOG_NEW_HERO_PIC_FONT_SIZE_MULTIPLE = 23;
+//scale for city defeated picture
+const double DIALOG_CONQUERED_CITY_PIC_FONT_SIZE_MULTIPLE = 23;
+//scale for the game winning cheese picture
+const double DIALOG_WINNING_PIC_FONT_SIZE_MULTIPLE = 41;
+//scale for the ruin success/defeated picture
+const double DIALOG_RUIN_PIC_FONT_SIZE_MULTIPLE = 23;
+//scale for the parley accepted/refuse picture
+const double DIALOG_PARLEY_PIC_FONT_SIZE_MULTIPLE = 41;
+
+//do dialog pics too
 
 //for mingw:
 #ifndef M_PI

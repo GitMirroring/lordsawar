@@ -753,7 +753,7 @@ void EditorBigMap::after_draw()
                         Playerlist *plist = Playerlist::getInstance();
                         pic = ImageCache::getInstance()->getArmyPic
                           (plist->getActiveplayer()->getArmyset(), 0,
-                           plist->getActiveplayer(), NULL);
+                           plist->getActiveplayer(), NULL, true, 0);
                         pic->blit(buffer, pos);
                         pic = ImageCache::getInstance()->getFlagPic
                           (gm->countArmyUnits(s->getPos()),
@@ -795,7 +795,7 @@ void EditorBigMap::after_draw()
 	  case STACK:
             pic = ImageCache::getInstance()->getArmyPic
 	       (Playerlist::getInstance()->getActiveplayer()->getArmyset(), 0,
-                Playerlist::getInstance()->getActiveplayer(), NULL);
+                Playerlist::getInstance()->getActiveplayer(), NULL, true, 0);
 	    pic->blit(buffer, pos);
 	    break;
 

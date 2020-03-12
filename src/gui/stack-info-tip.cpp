@@ -1,5 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2015, 2016 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2015, 2016,
+//  2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,13 +33,13 @@
 #include "GameScenarioOptions.h"
 #include "playerlist.h"
 #include "GameMap.h"
+#include "font-size.h"
 
 StackInfoTip::StackInfoTip(Gtk::Widget *target, MapTipPosition mpos, StackTile *stile)
 {
     ImageCache *gc = ImageCache::getInstance();
     Glib::RefPtr<Gtk::Builder> xml = BuilderCache::get("stack-info-window.ui");
 
-    guint32 ts = GameMap::getInstance()->getTileSize();
     xml->get_widget("window", window);
     Gtk::Widget *w = target->get_ancestor (GTK_TYPE_WINDOW);
     if (w)
@@ -63,12 +64,12 @@ StackInfoTip::StackInfoTip(Gtk::Widget *target, MapTipPosition mpos, StackTile *
         else
           return;
       }
+    guint32 fs = FontSize::getInstance ()->get_height ();
     for (std::vector<Stack *>::iterator i = stks.begin(); i != stks.end(); i++)
       for (Stack::iterator it = (*i)->begin(); it != (*i)->end(); it++)
 	{
 	  Gtk::Image *image = new Gtk::Image();
-          PixMask *armypic = gc->getArmyPic(*it)->copy();
-          armypic->scale (armypic, ts, ts);
+          PixMask *armypic = gc->getDialogArmyPic(*it, fs)->copy();
 	  image->property_pixbuf() = armypic->to_pixbuf();
           delete armypic;
 	  image_hbox->add(*manage(image));

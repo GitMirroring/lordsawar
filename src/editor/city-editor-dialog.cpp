@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "CreateScenarioRandomize.h"
 #include "ImageCache.h"
 #include "GameMap.h"
+#include "font-size.h"
 
 #include "select-army-dialog.h"
 
@@ -298,9 +299,10 @@ void CityEditorDialog::add_army(const ArmyProdBase *a)
   ImageCache *gc = ImageCache::getInstance();
   Gtk::TreeIter i = army_list->append();
   (*i)[army_columns.army] = a;
+  guint32 fs = FontSize::getInstance ()->get_height ();
   (*i)[army_columns.image] = gc->getArmyPic(player->getArmyset(),
 					    a->getTypeId(), player,
-					    NULL)->to_pixbuf();
+					    NULL, false, fs)->to_pixbuf();
   (*i)[army_columns.strength] = a->getStrength();
   (*i)[army_columns.moves] = a->getMaxMoves();
   (*i)[army_columns.upkeep] = a->getUpkeep();
@@ -426,13 +428,15 @@ void CityEditorDialog::on_player_changed()
   ImageCache *gc = ImageCache::getInstance();
   // set allegiance
   Player *player = get_selected_player();
+  guint32 fs = FontSize::getInstance ()->get_height ();
   for (Gtk::TreeIter j = army_list->children().begin(),
        jend = army_list->children().end(); j != jend; ++j)
     {
       const ArmyProdBase *a = (*j)[army_columns.army];
       (*j)[army_columns.image] = gc->getArmyPic(player->getArmyset(),
 						a->getTypeId(), 
-						player, NULL)->to_pixbuf();
+						player, NULL, false,
+                                                fs)->to_pixbuf();
     }
   if (capital_switch->get_active())
     capital_switch->set_active(false);

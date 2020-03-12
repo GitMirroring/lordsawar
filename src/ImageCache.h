@@ -178,12 +178,17 @@ class ImageCache
           * @param armyset      the armyset to be used
           * @param army         the index of the army to be used
           * @param player       the player owning the army
+          * @param medals       an array of medal types
+          * @param map          whether or not this army appears on a map
+          * @param font_size    the height of the default font, if not on map
 	  * @param greyed       the image is greyed out; deselected/inactive.
           * @return the image of the unit
           */
         PixMask* getArmyPic(guint32 armyset, guint32 army, const Player* p,
-                                const bool* medals, bool greyed = false);
+                                const bool* medals, bool map, guint32 font_size,
+                                bool greyed = false);
 	PixMask* getArmyPic(Army *a, bool greyed = false);
+        PixMask* getDialogArmyPic(Army *a, guint32 font_size, bool greyed = false);
         PixMask* getCircledArmyPic(guint32 armyset, guint32 army, 
                                    const Player* p, const bool* medals, 
                                    bool greyed, guint32 circle_colour_id,
@@ -612,6 +617,8 @@ public:
     guint32 army_id;
     guint32 player_id;
     bool medals[3];
+    bool map;
+    guint32 font_size;
     bool greyed;
 };
 
