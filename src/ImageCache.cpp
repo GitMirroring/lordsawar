@@ -177,8 +177,6 @@ bool ImageCache::loadProdShieldImages()
 {
   bool broken = false;
   //load the production shieldset
-  int xsize = SMALL_PRODUCTION_SHIELD_WIDTH;
-  int ysize = SMALL_PRODUCTION_SHIELD_HEIGHT;
   std::vector<PixMask*> prodshield;
   prodshield = disassemble_row
     (File::getVariousFile("prodshieldset.png"), PRODUCTION_SHIELD_TYPES,
@@ -186,11 +184,7 @@ bool ImageCache::loadProdShieldImages()
   if (broken)
     return false;
   for (unsigned int i = 0; i < PRODUCTION_SHIELD_TYPES; i++)
-    {
-      if (prodshield[i]->get_width() != xsize)
-	PixMask::scale(prodshield[i], xsize, ysize);
-      d_prodshield[i] = prodshield[i];
-    }
+    d_prodshield[i] = prodshield[i];
   prodshield.clear();
   return true;
 }
@@ -199,19 +193,13 @@ bool ImageCache::loadMoveBonusImages()
 {
   bool broken = false;
   //load the movement bonus icons
-  int xsize = MOVE_BONUS_WIDTH;
-  int ysize = MOVE_BONUS_HEIGHT;
   std::vector<PixMask*> movebonus;
   movebonus = disassemble_row(File::getVariousFile("movebonus.png"),
                               MOVE_BONUS_TYPES, broken);
   if (broken)
     return false;
   for (unsigned int i = 0; i < MOVE_BONUS_TYPES; i++)
-    {
-      if (movebonus[i]->get_width() != xsize)
-	PixMask::scale(movebonus[i], xsize, ysize);
-      d_movebonus[i] = movebonus[i];
-    }
+    d_movebonus[i] = movebonus[i];
   return true;
 }
 

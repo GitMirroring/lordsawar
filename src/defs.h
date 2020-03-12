@@ -83,13 +83,7 @@ const unsigned int MAP_SIZE_SMALL_HEIGHT = 105;
 const unsigned int MAP_SIZE_NORMAL_WIDTH = 112;
 const unsigned int MAP_SIZE_NORMAL_HEIGHT = 156;
 
-const unsigned int SMALL_PRODUCTION_SHIELD_WIDTH = 10;
-const unsigned int SMALL_PRODUCTION_SHIELD_HEIGHT = 10;
-const unsigned int MEDIUM_PRODUCTION_SHIELD_WIDTH = 11;
-const unsigned int MEDIUM_PRODUCTION_SHIELD_HEIGHT = 14;
 const unsigned int PRODUCTION_SHIELD_TYPES = 8;
-const unsigned int MOVE_BONUS_WIDTH = 32;
-const unsigned int MOVE_BONUS_HEIGHT = 20;
 const unsigned int MOVE_BONUS_TYPES = 6;
 const unsigned int MEDAL_TYPES = 3;
 const unsigned int NUM_WAYPOINTS = 2;
