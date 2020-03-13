@@ -43,8 +43,6 @@ MapInfoDialog::MapInfoDialog(Gtk::Window &parent, GameScenario *g)
     xml->get_widget("license_textview", license_textview);
     license_textview->get_buffer()->set_text(game_scenario->getLicense());
     xml->get_widget ("notebook", notebook);
-    for (guint32 i = 0; i < notebook->get_children().size(); i++)
-      notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 }
 
 int MapInfoDialog::run()

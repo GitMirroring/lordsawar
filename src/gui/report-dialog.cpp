@@ -58,9 +58,6 @@ ReportDialog::ReportDialog(Gtk::Window &parent, Player *player, ReportType type)
 
 
   xml->get_widget("report_notebook", report_notebook);
-  for (int i = 0; i < 5; i++)
-    report_notebook->child_property_tab_expand
-      (*report_notebook->get_nth_page (i)) = true;
   report_notebook->set_current_page(type);
   switch_conn = report_notebook->signal_switch_page().connect
     (sigc::hide<0>(method(on_switch_page)));

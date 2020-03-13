@@ -293,8 +293,6 @@ ArmySetWindow::ArmySetWindow(Glib::ustring load_filename)
   xml->get_widget ("help_about_menuitem", help_about_menuitem);
   help_about_menuitem->signal_activate().connect (method(on_help_about_activated));
   xml->get_widget("notebook", notebook);
-  for (guint32 i = 0; i < notebook->get_children().size(); i++)
-    notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 
   window->signal_delete_event().connect (sigc::hide(method(on_delete_event)));
 

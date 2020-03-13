@@ -92,8 +92,6 @@ MediaDialog::MediaDialog(Gtk::Window &parent, TarFile *tarfile)
   xml->get_widget("back_button", d_back_button);
   d_back_button->signal_clicked().connect(method(on_back_button_activated));
   xml->get_widget ("notebook", notebook);
-  for (guint32 i = 0; i < notebook->get_children().size(); i++)
-    notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 
   fill_in_buttons();
 }

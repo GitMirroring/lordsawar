@@ -72,8 +72,6 @@ CitySetInfoDialog::CitySetInfoDialog(Gtk::Window &parent, Set *cityset, Glib::us
     xml->get_widget("description_textview", description_textview);
     description_textview->get_buffer()->set_text(cityset->getInfo());
     xml->get_widget ("notebook", notebook);
-    for (guint32 i = 0; i < notebook->get_children().size(); i++)
-      notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 
     dir_label->set_text (dir);
     if (readonly)

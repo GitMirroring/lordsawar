@@ -118,8 +118,6 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
     change_towerpics_button->signal_clicked().connect
       (method(on_change_towerpics_clicked));
     xml->get_widget ("notebook", notebook);
-    for (guint32 i = 0; i < notebook->get_children().size(); i++)
-      notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 
     if (load_filename != "")
       current_save_filename = load_filename;

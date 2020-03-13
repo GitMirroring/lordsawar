@@ -60,8 +60,6 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
     xml->get_widget("random_names_switch", random_names_switch);
     xml->get_widget("num_players_spinbutton", num_players_spinbutton);
     xml->get_widget ("notebook", notebook);
-    for (guint32 i = 0; i < notebook->get_children().size(); i++)
-      notebook->child_property_tab_expand (*notebook->get_nth_page(i)) = true;
 
     // fill in tile themes combobox
     

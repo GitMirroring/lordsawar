@@ -145,6 +145,9 @@
                           </packing>
                         </child>
                       </object>
+                      <packing>
+                        <property name="tab_expand">True</property>
+                      </packing>
                     </child>
                     <child type="tab">
                       <object class="GtkLabel" id="label1">
@@ -205,6 +208,7 @@
                       </object>
                       <packing>
                         <property name="position">1</property>
+                        <property name="tab_expand">True</property>
                       </packing>
                     </child>
                     <child type="tab">
@@ -267,6 +271,7 @@
                       </object>
                       <packing>
                         <property name="position">2</property>
+                        <property name="tab_expand">True</property>
                       </packing>
                     </child>
                     <child type="tab">
@@ -334,6 +339,7 @@
                       </object>
                       <packing>
                         <property name="position">3</property>
+                        <property name="tab_expand">True</property>
                       </packing>
                     </child>
                     <child type="tab">
@@ -396,6 +402,7 @@
                       </object>
                       <packing>
                         <property name="position">4</property>
+                        <property name="tab_expand">True</property>
                       </packing>
                     </child>
                     <child type="tab">

@@ -50,8 +50,6 @@ GameOptionsDialog::GameOptionsDialog(Gtk::Window &parent, bool readonly)
     xml->get_widget("intense_combat_switch", intense_combat_switch);
     xml->get_widget("random_turns_switch", random_turns_switch);
     xml->get_widget("notebook", notebook);
-    notebook->child_property_tab_expand (*notebook->get_nth_page (0)) = true;
-    notebook->child_property_tab_expand (*notebook->get_nth_page (1)) = true;
 }
 
 void GameOptionsDialog::fill_in_options()

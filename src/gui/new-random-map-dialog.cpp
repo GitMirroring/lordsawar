@@ -172,8 +172,6 @@ NewRandomMapDialog::NewRandomMapDialog(Gtk::Window &parent)
                   cities_can_produce_allies_checkbutton);
 
   xml->get_widget("notebook", notebook);
-  notebook->child_property_tab_expand (*notebook->get_nth_page (0)) = true;
-  notebook->child_property_tab_expand (*notebook->get_nth_page (1)) = true;
 
   grass_scale->set_value(78);
   water_scale->set_value(7);

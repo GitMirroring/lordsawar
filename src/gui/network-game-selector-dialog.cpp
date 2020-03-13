@@ -67,8 +67,6 @@ NetworkGameSelectorDialog::NetworkGameSelectorDialog(Gtk::Window &parent, Profil
 
     xml->get_widget("games_treeview", games_treeview);
     xml->get_widget("notebook1", notebook);
-    for (int i = 0; i < 2; i++)
-      notebook->child_property_tab_expand (*notebook->get_nth_page (i)) = true;
     games_list = Gtk::ListStore::create(games_columns);
     games_treeview->set_model(games_list);
     games_treeview->append_column(_("Name"), games_columns.name);
