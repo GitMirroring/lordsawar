@@ -237,9 +237,7 @@ void BattleCalculatorDialog::add_attacker_army(Army *a, bool add)
   Gtk::TreeIter i = attackers_list->append();
   (*i)[combatant_columns.army] = a;
   guint32 fs = FontSize::getInstance ()->get_height ();
-  (*i)[combatant_columns.image] =
-    gc->getArmyPic(a->getOwner()->getArmyset(), a->getTypeId(), a->getOwner(),
-                   NULL, false, fs)->to_pixbuf();
+  (*i)[combatant_columns.image] = gc->getDialogArmyPic (a, fs)->to_pixbuf ();
   (*i)[combatant_columns.strength] = a->getStat(Army::STRENGTH, false);
   (*i)[combatant_columns.hp] = a->getStat(Army::HP, false);
 
@@ -264,9 +262,9 @@ void BattleCalculatorDialog::on_attacker_player_changed()
        jend = attackers_list->children().end(); j != jend; ++j)
     {
       Army *a = (*j)[combatant_columns.army];
+      a->setOwner (player);
       (*j)[combatant_columns.image] =
-        gc->getArmyPic(player->getArmyset(), a->getTypeId(), player,
-                       NULL, false, fs)->to_pixbuf();
+        gc->getDialogArmyPic(a, fs)->to_pixbuf ();
     }
 }
 
@@ -422,9 +420,7 @@ void BattleCalculatorDialog::add_defender_army(Army *a, bool add)
   Gtk::TreeIter i = defenders_list->append();
   (*i)[combatant_columns.army] = a;
   guint32 fs = FontSize::getInstance ()->get_height ();
-  (*i)[combatant_columns.image] =
-    gc->getArmyPic(a->getOwner()->getArmyset(), a->getTypeId(), a->getOwner(),
-                   NULL, false, fs)->to_pixbuf();
+  (*i)[combatant_columns.image] = gc->getDialogArmyPic (a, fs)->to_pixbuf ();
   (*i)[combatant_columns.strength] = a->getStat(Army::STRENGTH, false);
   //(*i)[combatant_columns.augmented_strength] =
     //a->getStat(Army::STRENGTH, false);
@@ -451,9 +447,9 @@ void BattleCalculatorDialog::on_defender_player_changed()
        jend = defenders_list->children().end(); j != jend; ++j)
     {
       Army *a = (*j)[combatant_columns.army];
+      a->setOwner (player);
       (*j)[combatant_columns.image] =
-        gc->getArmyPic(player->getArmyset(), a->getTypeId(), player,
-                       NULL, false, fs)->to_pixbuf();
+        gc->getDialogArmyPic(a, fs)->to_pixbuf ();
     }
 }
 
@@ -602,6 +598,7 @@ void BattleCalculatorDialog::on_fight100_clicked()
       d->property_transient_for() = dialog;
       d->add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_ACCEPT);
       Gtk::Box *box = d->get_content_area ();
+      d->set_title (_("Battle Outcome"));
       Glib::ustring s = 
         String::ucompose(ngettext("The attacker won %1 battle and lost %2.",
                                   "The attacker won %1 battles and lost %2.",
