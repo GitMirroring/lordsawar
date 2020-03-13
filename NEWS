@@ -8,5 +8,6 @@ LordsAWar! version 0.3.2, a clone of the turn-based strategy game Warlords II, h
  * added a popup context menu for stacks.
  * now showing the army bonus in the city window.
  * added a new french translation.  Thanks James!
+ * added a 'battle calculator' to the scenario builder.
 
-Please donate to the LordsAWar project so that we can get better artwork! Click on the donate button here: http://lordsawar.nongnu.org
+Please consider donating to the LordsAWar! project: http://lordsawar.nongnu.org

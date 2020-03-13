@@ -3,14 +3,8 @@ no blue bar when fighting on a boat? or was that because of the editor.
 maybe the move bonuses should be displayed in a dialog
   the move bonuses are a bit strange in that they're not all handled graphically.
 where are the defeat and victory sounds being played?
-is there a way i can know the size of the screen in cm?
-  if so, then i could always display the tiles at the same size, and auto-pick a tile-size and zoom things accordingly.
-    ah, that's what dpi is all about.
-      i guess we need a more general scale to cm type of method in PixMask too
-  but the problem is that we have small screens.
-    sometimes we want to scale to cm, and sometimes we want to scale to fit.
 
- scp lordsawar-0.1.8.tar.gz benasselstine@dl.sv.nongnu.org:/releases/lordsawar/
+ scp lordsawar-0.3.2.tar.gz benasselstine@dl.sv.nongnu.org:/releases/lordsawar/
 
 
 when next to an enemy city, just attack it
@@ -29,3 +23,5 @@ favour cheaper army units for production when we don't have much money
 upload to dl.sv.gnu.org.  cd /releases/lordsawar
 
 ---
+
+gtk 4, use Gtk::Overlay with Gtk::Image to make our tiles.
