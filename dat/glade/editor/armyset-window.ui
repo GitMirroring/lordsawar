@@ -497,6 +497,7 @@
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -558,6 +559,7 @@
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -619,6 +621,7 @@
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -678,6 +681,7 @@
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -741,6 +745,7 @@
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -804,6 +809,7 @@
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -867,6 +873,7 @@
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -931,6 +938,7 @@ Non-Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -995,6 +1003,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1058,6 +1067,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1121,6 +1131,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1184,6 +1195,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1247,6 +1259,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1310,6 +1323,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1373,6 +1387,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1436,6 +1451,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1499,6 +1515,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1562,6 +1579,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1625,6 +1643,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1688,6 +1707,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1751,6 +1771,7 @@ Hero Bonuses</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1815,6 +1836,7 @@ In Mountains</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1879,6 +1901,7 @@ In Hills</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -1943,6 +1966,7 @@ In Marshland</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -2007,6 +2031,7 @@ In Forests</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -2067,6 +2092,7 @@ In Forests</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -2117,6 +2143,7 @@ In Forests</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -2167,6 +2194,7 @@ In Forests</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -2188,6 +2216,7 @@ In Forests</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="orientation">vertical</property>
+                                                <property name="spacing">6</property>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
@@ -2238,6 +2267,7 @@ In Forests</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -2297,6 +2327,7 @@ In Forests</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -2356,6 +2387,7 @@ In Forests</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -2415,6 +2447,7 @@ In Forests</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -2475,6 +2508,7 @@ In Forests</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
+                                            <property name="spacing">6</property>
                                             <child>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
@@ -2714,6 +2748,7 @@ In Forests</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
+                                    <property name="spacing">6</property>
                                     <child>
                                       <object class="GtkLabel" id="label5">
                                         <property name="visible">True</property>
@@ -2766,6 +2801,7 @@ In Forests</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
+                                    <property name="spacing">6</property>
                                     <child>
                                       <object class="GtkLabel" id="label12">
                                         <property name="visible">True</property>
@@ -2818,6 +2854,7 @@ In Forests</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
+                                    <property name="spacing">6</property>
                                     <child>
                                       <object class="GtkBox">
                                         <property name="visible">True</property>
@@ -2882,6 +2919,7 @@ In Forests</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
+                                    <property name="spacing">6</property>
                                     <child>
                                       <object class="GtkLabel" id="label28">
                                         <property name="visible">True</property>
@@ -2934,6 +2972,7 @@ In Forests</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
+                                    <property name="spacing">6</property>
                                     <child>
                                       <object class="GtkLabel" id="label29">
                                         <property name="visible">True</property>
@@ -2986,6 +3025,7 @@ In Forests</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
+                                    <property name="spacing">6</property>
                                     <child>
                                       <object class="GtkLabel" id="label30">
                                         <property name="visible">True</property>
@@ -3038,6 +3078,7 @@ In Forests</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
+                                    <property name="spacing">6</property>
                                     <child>
                                       <object class="GtkLabel" id="label15">
                                         <property name="visible">True</property>
@@ -3090,6 +3131,7 @@ In Forests</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
+                                    <property name="spacing">6</property>
                                     <child>
                                       <object class="GtkLabel" id="label26">
                                         <property name="visible">True</property>
@@ -3142,6 +3184,7 @@ In Forests</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
+                                    <property name="spacing">6</property>
                                     <child>
                                       <object class="GtkLabel" id="label27">
                                         <property name="visible">True</property>
