@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2012, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2012, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 #include "line-chart.h"
 #include "ucompose.hpp"
 #include <cairomm/context.h>
+#include "font-size.h"
 
 LineChart::LineChart(std::list<std::list<unsigned int> > lines, 
 		     std::list<Gdk::RGBA> colours, 
@@ -84,7 +85,8 @@ bool LineChart::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
 
     // ensure the border is big enough for the label.
     Glib::RefPtr<Pango::Layout> layout = Glib::wrap (pango_cairo_create_layout (cr->cobj ()));
-    Glib::ustring text_font = "Sans 8";
+    Glib::ustring text_font =
+      String::ucompose ("Sans %1", FontSize::getInstance()->get_height ());
     Pango::FontDescription font_desc (text_font);
     layout->set_font_description (font_desc);
 
