@@ -36,6 +36,7 @@
                         <attributes>
                           <attribute name="weight" value="bold"/>
                           <attribute name="underline" value="True"/>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
                         </attributes>
                       </object>
                       <packing>
@@ -49,6 +50,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Move the main map: left-click + drag</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -61,6 +65,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Select a stack: left-click on a stack</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -73,6 +80,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">City production: left-click on a city</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -100,6 +110,7 @@
                         <attributes>
                           <attribute name="weight" value="bold"/>
                           <attribute name="underline" value="True"/>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
                         </attributes>
                       </object>
                       <packing>
@@ -113,6 +124,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Deselect a stack: right-click anywhere else on map</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -125,6 +139,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Move a stack: left click on map, or left-click + drag</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -137,6 +154,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">See stack actions: right-click on stack</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -164,6 +184,7 @@
                         <attributes>
                           <attribute name="weight" value="bold"/>
                           <attribute name="underline" value="True"/>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
                         </attributes>
                       </object>
                       <packing>
@@ -177,6 +198,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Move the mini map: left-click</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -189,6 +213,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">See opponents stack: right-click on stack</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -201,6 +228,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Read sign: right-click on sign</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -213,6 +243,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Ruin information: right-click on ruin</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -225,6 +258,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Temple information: right-click on temple</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -237,6 +273,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">City information: right-click on city</property>
+                        <attributes>
+                          <attribute name="foreground" value="#eeeeeeeeecec"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -272,6 +311,8 @@
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="margin_left">12</property>
+                <property name="margin_right">12</property>
                 <child>
                   <object class="GtkGrid">
                     <property name="visible">True</property>
@@ -295,7 +336,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Group/Upgroup stack</property>
-                                <property name="use_markup">True</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -317,6 +360,7 @@
                             <property name="label" translatable="yes">Space</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -344,6 +388,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Deselect stack</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -365,6 +412,7 @@
                             <property name="label" translatable="yes">Escape</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -392,6 +440,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Select next stack</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -413,6 +464,7 @@
                             <property name="label" translatable="yes">Enter</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -440,6 +492,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Pick up/drop items</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -461,6 +516,7 @@
                             <property name="label" translatable="yes">Comma</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -488,6 +544,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Search</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -509,6 +568,7 @@
                             <property name="label" translatable="yes">Z</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -536,6 +596,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Move all stacks</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -557,6 +620,7 @@
                             <property name="label" translatable="yes">M</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -584,6 +648,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Disband stack</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -605,6 +672,7 @@
                             <property name="label" translatable="yes">Q</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -632,6 +700,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">View fight order</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -653,6 +724,7 @@
                             <property name="label" translatable="yes">I (as in igloo)</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -680,6 +752,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Show stack bonuses</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -701,6 +776,7 @@
                             <property name="label" translatable="yes">S</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -728,6 +804,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Army report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -749,6 +828,7 @@
                             <property name="label" translatable="yes">A</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -776,6 +856,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">City report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -797,6 +880,7 @@
                             <property name="label" translatable="yes">K</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -824,6 +908,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Gold report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -845,6 +932,7 @@
                             <property name="label" translatable="yes">G</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -872,6 +960,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Production report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -893,6 +984,7 @@
                             <property name="label" translatable="yes">N</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -920,6 +1012,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Winning report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -941,6 +1036,7 @@
                             <property name="label" translatable="yes">W</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -968,6 +1064,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Diplomacy report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -989,6 +1088,7 @@
                             <property name="label" translatable="yes">D</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1016,6 +1116,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Quest report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1037,6 +1140,7 @@
                             <property name="label" translatable="yes">=</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1064,6 +1168,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Hero report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1085,6 +1192,7 @@
                             <property name="label" translatable="yes">U</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1112,6 +1220,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Ruin report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1133,6 +1244,7 @@
                             <property name="label" translatable="yes">Period</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1160,6 +1272,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Make battles go quicker</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1181,6 +1296,7 @@
                             <property name="label" translatable="yes">Space</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1208,6 +1324,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Load game</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1226,9 +1345,10 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Alr+L</property>
+                            <property name="label" translatable="yes">Alt+L</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1256,6 +1376,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Save game</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1277,6 +1400,7 @@
                             <property name="label" translatable="yes">Alt+S</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1304,6 +1428,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Game Lobby (networked play)</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1325,6 +1452,7 @@
                             <property name="label" translatable="yes">Ctrl+L</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1352,6 +1480,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Toggle fullscreen</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1373,6 +1504,7 @@
                             <property name="label" translatable="yes">F11</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1400,6 +1532,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Preferences</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1421,6 +1556,7 @@
                             <property name="label" translatable="yes">Ctrl+P</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1448,6 +1584,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Toggle grid</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1469,6 +1608,7 @@
                             <property name="label" translatable="yes">Shift+G</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1496,6 +1636,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">End turn</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1517,6 +1660,7 @@
                             <property name="label" translatable="yes">Alt+E</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1544,6 +1688,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Resign</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1565,6 +1712,7 @@
                             <property name="label" translatable="yes">R</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1592,6 +1740,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Army Abilities report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1613,6 +1764,7 @@
                             <property name="label" translatable="yes">O (Oh)</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1640,6 +1792,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Item Abilities report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1661,6 +1816,7 @@
                             <property name="label" translatable="yes">T</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1688,6 +1844,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">City History report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1709,6 +1868,7 @@
                             <property name="label" translatable="yes">H</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1736,6 +1896,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Event History report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1757,6 +1920,7 @@
                             <property name="label" translatable="yes">E</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1784,6 +1948,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Gold History report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1805,6 +1972,7 @@
                             <property name="label" translatable="yes">J</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1832,6 +2000,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Winning History report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1853,6 +2024,7 @@
                             <property name="label" translatable="yes">Y</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1880,6 +2052,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Triumphs report</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1901,6 +2076,7 @@
                             <property name="label" translatable="yes">T</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1928,6 +2104,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">City Production</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1949,6 +2128,7 @@
                             <property name="label" translatable="yes">C</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -1976,6 +2156,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Production Vectoring</property>
+                                <attributes>
+                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1997,6 +2180,7 @@
                             <property name="label" translatable="yes">V</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
+                              <attribute name="foreground" value="#eeeeeeeeecec"/>
                             </attributes>
                           </object>
                           <packing>
@@ -2069,8 +2253,9 @@
               <object class="GtkButtonBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="margin_right">2</property>
                 <property name="margin_top">6</property>
-                <property name="margin_bottom">6</property>
+                <property name="margin_bottom">8</property>
                 <property name="spacing">1</property>
                 <property name="layout_style">end</property>
                 <child>
