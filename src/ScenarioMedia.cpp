@@ -166,8 +166,11 @@ ScenarioMedia::~ScenarioMedia()
   for (auto i: d_musicMap)
     {
       MusicItem *m = dynamic_cast<MusicItem*>(i.second);
-      File::erase (m->file);
-      delete m;
+      if (m)
+        {
+          File::erase (m->file);
+          delete m;
+        }
     }
 }
 
