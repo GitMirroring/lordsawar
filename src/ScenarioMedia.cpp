@@ -271,7 +271,7 @@ void ScenarioMedia::instantiateImage(Tar_Helper &t, Glib::ustring name, PixMask 
 void ScenarioMedia::copySound(Tar_Helper &t, Glib::ustring name, Glib::ustring piece, bool &broken)
 {
   Glib::ustring n = t.getFile (name + ".ogg", broken);
-  if (!broken)
+  if (!broken && n != "")
     {
       Glib::ustring tmpfile = File::get_tmp_file(".ogg");
       File::copy (n, tmpfile);
@@ -296,8 +296,13 @@ void ScenarioMedia::copySounds(Tar_Helper &t, bool &broken)
   copySound(t, d_victory_name, "victory", broken);
 
   copySound(t, d_back_name, "back", broken);
-  getSoundEffect("back")->background = true;
-  d_bgMap.push_back("back");
+
+  MusicItem *back = getSoundEffect("back");
+  if (back)
+    {
+      back->background = true;
+      d_bgMap.push_back("back");
+    }
 }
 
 void ScenarioMedia::instantiateImages(Tar_Helper &t, bool &broken)
