@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include "ImageCache.h"
 
 TilePreviewScene::TilePreviewScene (Tile *tile, Tile *secondary_tile,
-				    guint32 height, guint32 width, 
+				    guint32 height, guint32 width,
 				    Glib::ustring scene, guint32 tilesize)
 {
   struct tile_model model;
@@ -60,19 +60,14 @@ TilePreviewScene::TilePreviewScene (Tile *tile, Tile *secondary_tile,
 
 Glib::RefPtr<Gdk::Pixbuf> TilePreviewScene::getTileStylePixbuf(int x, int y)
 {
-  return d_view[x * d_width + y];
+  return d_view[y * d_width + x];
 }
-  
-TileStyle* TilePreviewScene::getTileStyle(int x, int y)
-{
-  return d_tilestyles[x * d_width + y];
-}
-  
+
 void TilePreviewScene::regenerate()
 {
   //populate d_view
   d_view.clear();
-  for (std::list<struct tile_model>::iterator it = d_model.begin(); 
+  for (std::list<struct tile_model>::iterator it = d_model.begin();
        it != d_model.end(); it++)
     {
       struct tile_model model = *it;
@@ -92,19 +87,18 @@ void TilePreviewScene::regenerate()
         }
     }
 }
-  
+
 Glib::RefPtr<Gdk::Pixbuf> TilePreviewScene::renderScene(guint32 tilesize)
 {
   Glib::RefPtr<Gdk::Pixbuf> dest;
-  dest = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB,true, 8, (int)(d_height * tilesize), (int)(d_width * tilesize));
+  dest = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, (int)(d_width * tilesize), (int)(d_height * tilesize));
   for (unsigned int i = 0; i < d_width; i++)
     for (unsigned int j = 0; j < d_height; j++)
-      {
-	getTileStylePixbuf(i,j)->copy_area (0, 0, tilesize, tilesize, dest, j * tilesize, i *tilesize);
-      }
+      getTileStylePixbuf(i,j)->copy_area (0, 0, tilesize, tilesize, dest,
+                                          i * tilesize, j *tilesize);
   return dest;
 }
-    
+
 Vector<int> TilePreviewScene::mouse_pos_to_tile(Vector<int> pos)
 {
   return pos / d_tilesize;
@@ -123,7 +117,7 @@ void TilePreviewScene::mouse_button_event(MouseButtonEvent e)
     {
       Vector<int> pos = mouse_pos_to_tile(e.pos);
       current_tile = pos;
-      TileStyle *tilestyle =  get_tilestyle(pos);
+      TileStyle *tilestyle = get_tilestyle(pos);
       selected_tilestyle_id.emit(tilestyle->getId());
     }
   return;
@@ -133,7 +127,7 @@ void TilePreviewScene::mouse_motion_event(MouseMotionEvent e)
 {
   Vector<int> pos = mouse_pos_to_tile(e.pos);
   current_tile = pos;
-  TileStyle *tilestyle =  get_tilestyle(pos);
+  TileStyle *tilestyle = get_tilestyle(pos);
   hovered_tilestyle_id.emit(tilestyle->getId());
   return;
 }
