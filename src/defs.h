@@ -228,6 +228,8 @@ const double DIALOG_WINNING_PIC_FONT_SIZE_MULTIPLE = 41;
 const double DIALOG_RUIN_PIC_FONT_SIZE_MULTIPLE = 23;
 //scale for the parley accepted/refuse picture
 const double DIALOG_PARLEY_PIC_FONT_SIZE_MULTIPLE = 41;
+//scale for the underline beneath the shields in the turn indicator
+const double  TURN_INDICATOR_FONT_SIZE_MULTIPLE = 0.3;
 
 //do dialog pics too
 

@@ -2358,8 +2358,11 @@ void GameWindow::show_shield_turn() //show turn indicator
         {
           PixMask *s =
             gc->getShieldPic (1, (*i), false,
-                              FontSize::getInstance ()->get_height ());
+                              FontSize::getInstance ()->get_height ())->copy ();
+          ImageCache::add_underline (&s, pl->getActiveplayer()->getColor (),
+                                     FontSize::getInstance ()->get_height ());
           shield_image[c]->property_pixbuf() = s->to_pixbuf();
+          delete s;
         }
       else
         shield_image[c]->property_pixbuf() =

@@ -494,6 +494,7 @@ class ImageCache
         static PixMask* loadMiscImage(Glib::ustring pngfile);
 
         static int calculate_width_from_adjusted_height (PixMask *p, double new_height);
+        static void add_underline (PixMask **p, Gdk::RGBA color, guint32 font_size);
     private:
         ImageCache();
         ~ImageCache();

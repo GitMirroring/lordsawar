@@ -1725,6 +1725,27 @@ PixMask* ImageCache::getParleyRefusedPic ()
   return d_parleyrefused;
 }
 
+void ImageCache::add_underline (PixMask **p, Gdk::RGBA color, guint32 font_size)
+{
+  int height = (*p)->get_height () +
+    (font_size * TURN_INDICATOR_FONT_SIZE_MULTIPLE);
+  int width = (*p)->get_width ();
+    Glib::RefPtr<Gdk::Pixbuf> pixbuf
+    = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, width, height);
+  pixbuf->fill(0x00000000);
+  PixMask *box = PixMask::create (pixbuf);
+  (*p)->blit (box->get_pixmap(), 0, 0);
+  Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(box->get_pixmap());
+  cr->set_line_width(1.0);
+  cr->set_source_rgba(color.get_red (), color.get_green(), color.get_blue (),
+                      color.get_alpha ());
+  cr->rectangle(0, (*p)->get_height (), width, height - (*p)->get_height ());
+  cr->fill ();
+  //cr->stroke();
+  delete *p;
+  *p = box;
+}
+
 int ImageCache::calculate_width_from_adjusted_height (PixMask *p, double new_height)
 {
   return p->get_width () * (new_height / p->get_height ());
