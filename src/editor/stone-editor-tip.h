@@ -50,7 +50,7 @@ class StoneEditorTip: public sigc::trackable
     void connect_signals();
     void on_stone_selected(int type);
 
-    void fill_pixbuf (int i, bool selected);
+    void fill_pixbuf (int i);
     PixMask *get_grass_image();
 };
 

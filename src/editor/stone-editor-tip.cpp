@@ -111,7 +111,7 @@ PixMask *StoneEditorTip::get_grass_image()
 }
 
 void
-StoneEditorTip::fill_pixbuf (int i, bool selected)
+StoneEditorTip::fill_pixbuf (int i)
 {
   Tileset *ts = GameMap::getTileset();
   int siz = GameMap::getTileset()->getTileSize();
@@ -156,7 +156,7 @@ void StoneEditorTip::fill_stone_buttons()
       buttons[i]->set_group(group);
       buttons[i]->property_active() = false;
       buttons[i]->property_draw_indicator() = false;
-      fill_pixbuf (i, types[i] == stone->getType());
+      fill_pixbuf (i);
       buttons[i]->show_all();
     }
 }
