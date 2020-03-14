@@ -2182,9 +2182,13 @@ void MainWindow::update_buttons()
     {
       if (i.button->get_active())
         {
-          PixMask *p =
-            ImageCache::add_border (File::getEditorFile(i.image_file),
-                                    Vector<int>(40, 40), 3.0);
+          bool br = false;
+          PixMask *p = PixMask::create (File::getEditorFile(i.image_file), br);
+          double ratio = 2.3;
+          double new_height = FontSize::getInstance()->get_height () * ratio;
+          int new_width =
+            ImageCache::calculate_width_from_adjusted_height (p, new_height);
+          PixMask::scale (p, new_width, new_height);
           Gtk::Image *image = new Gtk::Image(p->to_pixbuf());
           i.button->set_icon_widget(*image);
           delete p;
@@ -2208,11 +2212,8 @@ void MainWindow::update_terrain_buttons()
       PixMask::scale(px, 20, 20);
       if (i.button->get_active())
         {
-          PixMask *p =
-            ImageCache::add_border (px, Vector<int>(20, 20), 3.0);
-          Gtk::Image *image = new Gtk::Image(p->to_pixbuf());
+          Gtk::Image *image = new Gtk::Image(px->to_pixbuf());
           i.button->set_image(*image);
-          delete p;
         }
       else
         {

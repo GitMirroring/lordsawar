@@ -141,12 +141,6 @@ StoneEditorTip::fill_pixbuf (int i, bool selected)
   if (s)
     s->blit (p->get_pixmap(), Vector<int>(0, 0));
 
-  if (selected)
-    {
-      PixMask *np = ImageCache::add_border (p, Vector<int>(siz, siz), 3.0);
-      delete p;
-      p = np;
-    }
   buttons[i]->add(*manage(new Gtk::Image(p->to_pixbuf())));
   button_box->pack_start(*buttons[i], Gtk::PACK_SHRINK);
   //Gtk::Image *image = dynamic_cast<Gtk::Image*>(buttons[i]->get_child());

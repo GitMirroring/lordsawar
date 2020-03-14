@@ -2359,9 +2359,7 @@ void GameWindow::show_shield_turn() //show turn indicator
           PixMask *s =
             gc->getShieldPic (1, (*i), false,
                               FontSize::getInstance ()->get_height ());
-          PixMask *p = ImageCache::add_border (s, s->get_dim(), 3.0);
-          shield_image[c]->property_pixbuf() = p->to_pixbuf();
-          delete p;
+          shield_image[c]->property_pixbuf() = s->to_pixbuf();
         }
       else
         shield_image[c]->property_pixbuf() =
@@ -2370,7 +2368,8 @@ void GameWindow::show_shield_turn() //show turn indicator
       if (*i == pl->getActiveplayer())
         shield_image[c]->property_margin_top() = 0;
       else
-        shield_image[c]->property_margin_top() = 3;
+        shield_image[c]->property_margin_top() =
+          FontSize::getInstance ()->get_height () / 3;
       shield_image[c]->property_tooltip_text() = (*i)->getName();
       c++;
     }
