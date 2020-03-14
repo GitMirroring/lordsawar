@@ -783,7 +783,7 @@ void GameWindow::on_load_game_activated()
 {
   Gtk::FileChooserDialog chooser(*window, _("Choose Game to Load"));
   Glib::RefPtr<Gtk::FileFilter> sav_filter = Gtk::FileFilter::create();
-  sav_filter->set_name(_("Army Saved Games (*.sav)"));
+  sav_filter->set_name(_("LordsAWar Saved Games (*.sav)"));
   sav_filter->add_pattern("*" + SAVE_EXT);
   chooser.add_filter(sav_filter);
   chooser.set_current_folder(Configuration::s_savePath);
@@ -831,7 +831,7 @@ void GameWindow::on_save_game_as_activated()
   Gtk::FileChooserDialog chooser(*window, _("Choose a Name"),
 				 Gtk::FILE_CHOOSER_ACTION_SAVE);
   Glib::RefPtr<Gtk::FileFilter> sav_filter = Gtk::FileFilter::create();
-  sav_filter->set_name(_("Army Saved Games (*.sav)"));
+  sav_filter->set_name(_("LordsAWar Saved Games (*.sav)"));
   sav_filter->add_pattern("*" + SAVE_EXT);
   chooser.add_filter(sav_filter);
   chooser.set_current_folder(Configuration::s_savePath);
