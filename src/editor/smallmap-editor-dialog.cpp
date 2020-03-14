@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2010, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "ImageCache.h"
 #include "playerlist.h"
 #include "tilesetlist.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &SmallmapEditorDialog::x)
 
@@ -165,15 +166,13 @@ void SmallmapEditorDialog::setup_terrain_radiobuttons()
           group_set = true;
         }
       item.button->property_draw_indicator() = false;
+      item.button->property_tooltip_text () = tile->getName();
 
       int row = i / no_columns, column = i % no_columns;
 
       terrain_type_table->attach(*item.button, column, row, 1, 1);
       item.button->signal_toggled().connect(method(on_terrain_radiobutton_toggled));
-
-      Glib::RefPtr<Gdk::Pixbuf> pic;
       PixMask *pix = (*(*(*tile).begin())->begin())->getImage()->copy();
-      PixMask::scale(pix, 40, 40);
       item.button->add(*manage(new Gtk::Image(pix->to_pixbuf())));
       delete pix;
 
@@ -227,8 +226,16 @@ void SmallmapEditorDialog::setup_pointer_radiobutton(Glib::RefPtr<Gtk::Builder> 
 
     Gtk::Image *image;
     b->get_widget(prefix + "_image", image);
-    image->property_file() = File::getEditorFile(image_file);
+    image->property_file () = File::getEditorFile(image_file);
     item.button->property_draw_indicator() = false;
+    if (prefix == "draw_ruin")
+      item.button->property_tooltip_text () = "Ruin";
+    else if (prefix == "draw_temple")
+      item.button->property_tooltip_text () = "Temple";
+    else if (prefix == "draw_city")
+      item.button->property_tooltip_text () = "City";
+    else if (prefix == "erase")
+      item.button->property_tooltip_text () = "Erase";
 }
 
 void SmallmapEditorDialog::setup_pointer_radiobuttons(Glib::RefPtr<Gtk::Builder> b)
@@ -350,9 +357,14 @@ void SmallmapEditorDialog::update_buttons()
     {
       if (i.button->get_active())
         {
-          PixMask *p =
-            ImageCache::add_border (File::getEditorFile(i.image_file),
-                                    Vector<int>(40, 40), 3.0);
+          bool br = false;
+          PixMask *p = PixMask::create (File::getEditorFile(i.image_file), br);
+          double ratio = 2.3;
+          double new_height = FontSize::getInstance()->get_height () * ratio;
+          int new_width =
+            ImageCache::calculate_width_from_adjusted_height (p, new_height);
+          PixMask::scale (p, new_width, new_height);
+
           Gtk::Image *image = new Gtk::Image(p->to_pixbuf());
           i.button->set_image(*image);
           delete p;
@@ -376,11 +388,8 @@ void SmallmapEditorDialog::update_terrain_buttons()
       PixMask::scale(px, 40, 40);
       if (i.button->get_active())
         {
-          PixMask *p =
-            ImageCache::add_border (px, Vector<int>(40, 40), 3.0);
-          Gtk::Image *image = new Gtk::Image(p->to_pixbuf());
+          Gtk::Image *image = new Gtk::Image(px->to_pixbuf());
           i.button->set_image(*image);
-          delete p;
         }
       else
         {
