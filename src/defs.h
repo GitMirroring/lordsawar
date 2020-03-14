@@ -164,6 +164,7 @@ const Gdk::RGBA SELECTED_CITY_BOX_COLOUR(WHITE_COLOUR);
 const Gdk::RGBA BEVELED_CIRCLE_DARK(DARK_GREY_COLOUR);
 const Gdk::RGBA BEVELED_CIRCLE_LIGHT(LIGHT_GREY_COLOUR);
 const Gdk::RGBA ACTIVE_RUIN_BOX(YELLOW_COLOUR);
+
 #ifdef GDK_WINDOWING_WIN32
 const int SPEED_DELAY = 0;
 const double ZOOM_STEP = 0.1;
@@ -192,7 +193,7 @@ const double DIALOG_ARMY_PIC_FONTSIZE_MULTIPLE = 3.636363634;
 //scale for the small shield pictures that appear on dialogs
 const double DIALOG_SMALL_SHIELD_PIC_FONTSIZE_MULTIPLE = 0.727272727;
 //scale for the medium shield pictures that appear on dialogs
-const double DIALOG_MEDIUM_SHIELD_PIC_FONTSIZE_MULTIPLE = 1.272727273;
+const double DIALOG_MEDIUM_SHIELD_PIC_FONTSIZE_MULTIPLE = 1.872727273; //was 1.2
 //scale for the large shield pictures
 const double DIALOG_LARGE_SHIELD_PIC_FONTSIZE_MULTIPLE = 3.272727273;
 //scale for the smaller diplomacy pictures
