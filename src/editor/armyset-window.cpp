@@ -1519,7 +1519,7 @@ void ArmySetWindow::update_window_title()
     title += "*";
   title += File::get_basename(current_save_filename, true);
   title += " - ";
-  title += _("LordsAWar! Armyset Editor");
+  title += _("Armyset Editor");
   window->set_title(title);
 }
     

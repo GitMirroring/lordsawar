@@ -1447,7 +1447,7 @@ void TileSetWindow::update_window_title()
     title += "*";
   title += File::get_basename(current_save_filename, true);
   title += " - ";
-  title += _("LordsAWar! Tileset Editor");
+  title += _("Tileset Editor");
   window->set_title(title);
 }
 

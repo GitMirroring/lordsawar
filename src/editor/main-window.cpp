@@ -1901,7 +1901,7 @@ void MainWindow::update_window_title()
       title += File::get_basename(current_save_filename, true);
       title += " - ";
     }
-  title += _("LordsAWar! Scenario Editor");
+  title += _("Scenario Builder");
   window->set_title(title);
 }
     
