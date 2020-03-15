@@ -214,6 +214,14 @@
                   <object class="GtkMenu" id="help_menuitem_menu">
                     <property name="can_focus">False</property>
                     <child>
+                      <object class="GtkMenuItem" id="tutorial_menuitem">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Tutorial Video</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkImageMenuItem" id="help_about_menuitem">
                         <property name="label">gtk-about</property>
                         <property name="visible">True</property>

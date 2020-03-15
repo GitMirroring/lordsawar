@@ -85,6 +85,7 @@ class TileSetWindow: public sigc::trackable
     Gtk::MenuItem *smallmap_building_colors_menuitem;
     Gtk::MenuItem *quit_menuitem;
     Gtk::MenuItem *help_about_menuitem;
+    Gtk::MenuItem *tutorial_menuitem;
     Gtk::ComboBoxText *tilestyle_combobox;
     Gtk::Image *tilestyle_image;
     Gtk::Button *image_button;
@@ -163,6 +164,7 @@ class TileSetWindow: public sigc::trackable
     void on_organize_tilestyles_activated();
     void on_smallmap_building_colors_activated();
     void on_help_about_activated();
+    void on_tutorial_video_activated ();
     void on_tile_selected();
     void on_tilestyleset_selected();
     void on_tilestyle_selected();
@@ -202,7 +204,7 @@ class TileSetWindow: public sigc::trackable
     void select_tilestyle(TileStyle *style);
 
     void refresh_tiles();
-    
+  
 };
 
 #endif

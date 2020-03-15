@@ -77,6 +77,9 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
     xml->get_widget ("help_about_menuitem", help_about_menuitem);
     help_about_menuitem->signal_activate().connect
        (method(on_help_about_activated));
+    xml->get_widget ("tutorial_menuitem", tutorial_menuitem);
+    tutorial_menuitem->signal_activate().connect
+      (method(on_tutorial_video_activated));
     xml->get_widget("city_tile_width_spinbutton", city_tile_width_spinbutton);
     city_tile_width_spinbutton->set_range (1, 4);
     city_tile_width_spinbutton->signal_changed().connect
@@ -803,4 +806,11 @@ CitySetWindow::~CitySetWindow()
 {
   notebook->property_show_tabs () = false;
   delete window;
+}
+
+void CitySetWindow::on_tutorial_video_activated()
+{
+  GError *errs = NULL;
+  gtk_show_uri(window->get_screen()->gobj(), 
+               "http://vimeo.com/97837645", 0, &errs);
 }

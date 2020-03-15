@@ -120,6 +120,7 @@ class ArmySetWindow: public sigc::trackable
     Gtk::MenuItem *edit_bag_picture_menuitem;
     Gtk::MenuItem *quit_menuitem;
     Gtk::MenuItem *help_about_menuitem;
+    Gtk::MenuItem *tutorial_menuitem;
     Gtk::Button *make_same_button;
     Gtk::Notebook *notebook;
 
@@ -155,6 +156,7 @@ class ArmySetWindow: public sigc::trackable
     void on_edit_bag_picture_activated();
     void on_edit_ship_picture_activated();
     void on_help_about_activated();
+    void on_tutorial_video_activated();
     void on_army_selected();
     void fill_army_image(Gtk::Button *button, Gtk::Image *image, Shield::Colour c, ArmyProto *army);
     void fill_army_info(ArmyProto *army);

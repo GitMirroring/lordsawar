@@ -53,6 +53,7 @@ class CitySetWindow: public sigc::trackable
     Gtk::MenuItem *edit_cityset_info_menuitem;
     Gtk::MenuItem *quit_menuitem;
     Gtk::MenuItem *help_about_menuitem;
+    Gtk::MenuItem *tutorial_menuitem;
     Gtk::Button *change_citypics_button;
     Gtk::Button *change_razedcitypics_button;
     Gtk::Button *change_portpic_button;
@@ -85,6 +86,7 @@ class CitySetWindow: public sigc::trackable
     bool quit();
     void on_edit_cityset_info_activated();
     void on_help_about_activated();
+    void on_tutorial_video_activated();
     void on_city_tile_width_changed();
     void on_city_tile_width_text_changed();
     void on_ruin_tile_width_changed();
