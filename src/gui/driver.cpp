@@ -1039,7 +1039,10 @@ void Driver::on_editor_quit ()
   if (editor_window)
     delete editor_window;
   editor_window = NULL;
-  splash_window->show();
+  if (Main::instance().start_editor == false)
+    splash_window->show();
+  else
+    Main::instance().stop_main_loop();
 }
 
 void Driver::on_quit_requested()
