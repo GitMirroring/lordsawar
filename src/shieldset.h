@@ -139,6 +139,7 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 	 *         parameters, NULL is returned.
 	 */
 	ShieldStyle* lookupShieldByTypeAndColour(guint32 type, guint32 colour) const;
+        Shield* lookupShieldByColour(guint32 colour) const;
 
         //! Get the image and mask associated with the shield of a given colour.
         /**
@@ -154,8 +155,11 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 	//! Check to see if the number of shields is sufficient.
 	bool validateNumberOfShields() const;
 
-	//! Check to see if the images for the shieldset are supplied.
+	//! Check to see if the images for the shields are supplied.
 	bool validateShieldImages(Shield::Colour c) const;
+
+	//! Check to see if the images for the tartans are supplied.
+	bool validateTartanImages(Shield::Colour c) const;
 
         guint32 countEmptyImageNames() const;
 

@@ -140,7 +140,8 @@ class File
 
         static Glib::ustring add_ext_if_necessary(Glib::ustring file, Glib::ustring ext);
 
-        static char *sanify(const char *string);
+        static char *_sanify(const char *string);
+        static Glib::ustring sanify (Glib::ustring s);
 
         static Glib::ustring get_tmp_file(Glib::ustring ext = "");
 

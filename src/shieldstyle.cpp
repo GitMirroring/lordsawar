@@ -131,6 +131,11 @@ void ShieldStyle::instantiateImages(Glib::ustring filename, Shieldset *s, bool &
     case ShieldStyle::LARGE:
       xsize = s->getLargeWidth(); ysize = s->getLargeHeight(); break;
     }
+  if (xsize == 0 || ysize == 0)
+    {
+      xsize = half[0]->get_unscaled_width();
+      ysize = half[0]->get_unscaled_height();
+    }
   if (xsize > 0 && ysize > 0)
     {
       PixMask::scale(half[0], xsize, ysize);

@@ -38,15 +38,29 @@ void TarFile::created(Glib::ustring filename)
   setDirectory(File::get_dirname(filename));
   setBaseName(File::get_basename(filename, false));
   setExtension(File::get_extension(filename));
+  if (isTemporaryFile ())
+    {
+      File::erase (d_tmp_filename);
+      d_tmp_filename = "";
+    }
 }
 
 Glib::ustring TarFile::getConfigurationFile() const
 {
+  if (getBaseName () == "")
+    {
+      if (d_tmp_filename != "")
+        return d_tmp_filename;
+      else
+        return "";
+    }
   return getDirectory() + getBaseName() + d_extension;
 }
 
 Glib::ustring TarFile::getFileFromConfigurationFile(Glib::ustring file)
 {
+  if (getConfigurationFile () == "")
+    return "";
   bool broken = false;
   Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
   if (broken == false)
@@ -68,7 +82,10 @@ bool TarFile::removeFileInConfigurationFile(Glib::ustring file)
 bool TarFile::replaceFileInConfigurationFile(Glib::ustring file, Glib::ustring new_file)
 {
   bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  Glib::ustring infile = d_tmp_filename;
+  if (infile == "")
+    infile = getConfigurationFile();
+  Tar_Helper t(infile, std::ios::in, broken);
   if (broken == false)
     {
       broken = !t.replaceFile(file, new_file);
@@ -82,8 +99,13 @@ bool TarFile::addFileInConfigurationFile(Glib::ustring new_file)
   return replaceFileInConfigurationFile("", new_file);
 }
 
-void TarFile::clean_tmp_dir() const
+void TarFile::clean_tmp_dir()
 {
+  if (d_tmp_filename != "" && File::exists (d_tmp_filename))
+    {
+      File::erase (d_tmp_filename);
+      d_tmp_filename = "";
+    }
   return Tar_Helper::clean_tmp_dir(getConfigurationFile());
 }
 
@@ -95,56 +117,86 @@ bool TarFile::saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring
     return false;
   t.saveFile(tmpfile, File::get_basename(dest, true));
   //now the images, go get 'em from the tarball we were made from.
-  std::list<Glib::ustring> delfiles;
-  Tar_Helper orig(getConfigurationFile(), std::ios::in, broken);
-  if (broken == false)
+  Glib::ustring infile = d_tmp_filename;
+  if (infile == "")
+    infile = getConfigurationFile ();
+  if (infile != "")
     {
-      std::list<Glib::ustring> extensions;
-      extensions.push_back (".png");
-      extensions.push_back (".ogg");
-      if (add_sets)
+      std::list<Glib::ustring> delfiles;
+      Tar_Helper orig(infile, std::ios::in, broken);
+      if (broken == false)
         {
-          extensions.push_back (ARMYSET_EXT);
-          extensions.push_back (TILESET_EXT);
-          extensions.push_back (SHIELDSET_EXT);
-          extensions.push_back (CITYSET_EXT);
-        }
-      for (auto ext : extensions)
-        {
-          std::list<Glib::ustring> files = orig.getFilenamesWithExtension(ext);
-          for (std::list<Glib::ustring>::iterator it = files.begin(); 
-               it != files.end(); it++)
+          std::list<Glib::ustring> extensions;
+          extensions.push_back (".png");
+          extensions.push_back (".ogg");
+          if (add_sets)
             {
-              Glib::ustring file = orig.getFile(*it, broken);
-              if (broken == false)
+              extensions.push_back (ARMYSET_EXT);
+              extensions.push_back (TILESET_EXT);
+              extensions.push_back (SHIELDSET_EXT);
+              extensions.push_back (CITYSET_EXT);
+            }
+          for (auto ext : extensions)
+            {
+              std::list<Glib::ustring> files = orig.getFilenamesWithExtension(ext);
+              for (std::list<Glib::ustring>::iterator it = files.begin(); 
+                   it != files.end(); it++)
                 {
-                  t.saveFile(file);
-                  delfiles.push_back(file);
+                  Glib::ustring file = orig.getFile(*it, broken);
+                  if (broken == false)
+                    {
+                      t.saveFile(file);
+                      delfiles.push_back(file);
+                    }
+                  else
+                    break;
                 }
-              else
+              if (broken)
                 break;
             }
-          if (broken)
-            break;
+          orig.Close();
+          for (std::list<Glib::ustring>::iterator it = delfiles.begin();
+               it != delfiles.end(); it++)
+            File::erase(*it);
         }
-      orig.Close();
-    }
-  else
-    {
-      FILE *fileptr = fopen (getConfigurationFile().c_str(), "r");
-      if (fileptr)
-        fclose (fileptr);
       else
-        broken = false;
+        {
+          FILE *fileptr = fopen (infile.c_str(), "r");
+          if (fileptr)
+            fclose (fileptr);
+          else
+            broken = false;
+        }
     }
   t.Close();
-  for (std::list<Glib::ustring>::iterator it = delfiles.begin(); it != delfiles.end(); it++)
-    File::erase(*it);
   File::erase(tmpfile);
   if (broken == false)
     {
       if (File::copy(tmptar, dest) == true)
         File::erase(tmptar);
+      else
+        {
+          int save_errno = errno;
+          //all that work for nothing
+          File::erase(tmptar);
+          errno = save_errno;
+          broken = true;
+        }
     }
   return broken == false;
+}
+    
+void TarFile::setNewTemporaryFile ()
+{
+  d_tmp_filename = File::get_tmp_file ();
+  bool broken = false;
+  Tar_Helper t(d_tmp_filename, std::ios::out, broken);
+  if (broken == true)
+    return;
+  t.Close ();
+}
+
+bool TarFile::isTemporaryFile () const
+{
+  return d_tmp_filename != "";
 }

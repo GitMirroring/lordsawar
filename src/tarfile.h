@@ -47,7 +47,7 @@ public:
     bool addFileInConfigurationFile(Glib::ustring new_file);
     bool removeFileInConfigurationFile(Glib::ustring file);
 
-    void clean_tmp_dir() const;
+    void clean_tmp_dir();
 
     bool saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring dest, bool add_sets = false) const;
     Glib::ustring getBaseName() const {return d_basename;}
@@ -58,11 +58,15 @@ public:
     void moved(Glib::ustring filename);
     void created(Glib::ustring filename);
 
+    //! when we don't have a configuration file yet, we use this
+    void setNewTemporaryFile ();
+    bool isTemporaryFile() const;
 private:
 
     Glib::ustring d_dir;
     Glib::ustring d_basename;
     Glib::ustring d_extension;
+    Glib::ustring d_tmp_filename;
 
 };
 

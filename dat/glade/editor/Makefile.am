@@ -46,7 +46,8 @@ road-editor-tip.ui \
 battle-calculator-dialog.ui \
 media-dialog.ui \
 validation-dialog.ui \
-stone-editor-tip.ui
+stone-editor-tip.ui \
+editor-save-changes-dialog.ui
 
 EXTRA_DIST = $(glade_DATA) \
 README

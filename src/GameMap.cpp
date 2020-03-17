@@ -2428,7 +2428,7 @@ Cityset* GameMap::getCityset()
 Shieldset* GameMap::getShieldset()
 {
   if (s_shieldset == 0)
-    s_shieldset = Shieldsetlist::getInstance()->get(GameMap::getInstance()->getShieldsetBaseName());
+    s_shieldset = Shieldsetlist::getInstance()->get(GameMap::getInstance()->getShieldsetId());
     
   return s_shieldset;
 }

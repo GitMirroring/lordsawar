@@ -23,35 +23,34 @@
 #include "shieldset.h"
 #include "lw-editor-dialog.h"
 
-//! Shieldset Editor.  Edit the description of the Shieldset.
+//! Shieldset Info Editor.  Change the name/description/etc of the Shieldset.
 class ShieldSetInfoDialog: public LwEditorDialog
 {
  public:
-    ShieldSetInfoDialog(Gtk::Window &parent, Set *shieldset, 
-                        Glib::ustring dir, Glib::ustring file,
-                        bool readonly = false, Glib::ustring title = "");
+    ShieldSetInfoDialog(Gtk::Window &parent, Shieldset *shieldset);
     ~ShieldSetInfoDialog();
 
-    int run();
+    //returns true if we changed anything
+    bool run();
     
  private:
-    Set *d_shieldset;
+    Shieldset *d_shieldset;
+    bool d_changed;
     Gtk::Entry *name_entry;
     Gtk::TextView *copyright_textview;
     Gtk::TextView *license_textview;
     Gtk::Entry *filename_entry;
     Gtk::SpinButton *id_spinbutton;
-    Gtk::Button *accept_button;
+    Gtk::Button *close_button;
     Gtk::Label *status_label;
     Gtk::TextView *description_textview;
-    Gtk::Label *dir_label;
+    Gtk::Label *location_label;
     Gtk::Notebook *notebook;
 
     void on_name_changed();
-    void on_filename_changed();
-    void update_buttons();
-
-    bool d_readonly;
+    void on_copyright_changed ();
+    void on_license_changed ();
+    void on_description_changed ();
 };
 
 #endif

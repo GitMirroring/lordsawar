@@ -92,6 +92,16 @@ ShieldStyle * Shieldset::lookupShieldByTypeAndColour(guint32 type, guint32 colou
   return NULL;
 }
 
+Shield * Shieldset::lookupShieldByColour (guint32 colour) const
+{
+  for (const_iterator it = begin(); it != end(); it++)
+    {
+      if ((*it)->getOwner() == colour)
+        return *it;
+    }
+  return NULL;
+}
+
 Gdk::RGBA Shieldset::getColor(guint32 owner) const
 {
   for (const_iterator it = begin(); it != end(); it++)
@@ -205,8 +215,7 @@ bool Shieldset::save(Glib::ustring filename, Glib::ustring ext) const
   helper.close();
   if (broken == true)
     return false;
-  broken = saveTar(tmpfile, tmpfile + ".tar", goodfilename);
-  return !broken;
+  return saveTar(tmpfile, tmpfile + ".tar", goodfilename);
 }
 
 bool Shieldset::save(XML_Helper *helper) const
@@ -243,11 +252,18 @@ void Shieldset::uninstantiateImages()
 bool Shieldset::validate() const
 {
   bool valid = true;
+  if (File::sanify (getName ()) == "")
+    return false;
   if (validateNumberOfShields() == false)
     return false;
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
       if (validateShieldImages(Shield::Colour(i)) == false)
+	return false;
+    }
+  for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
+    {
+      if (validateTartanImages(Shield::Colour(i)) == false)
 	return false;
     }
   if (d_small_width == 0 || d_small_height == 0)
@@ -312,6 +328,28 @@ bool Shieldset::validateShieldImages(Shield::Colour c) const
 	  if ((*i)->getImageName().empty() == false)
 	    player[idx]++;
 	}
+    }
+  int count = player[0] + player[1] + player[2];
+  if (count <= 2)
+    return false;
+  return true;
+}
+
+bool Shieldset::validateTartanImages(Shield::Colour c) const
+{
+  //if we have a shield, it should have all 3 portions of a tartan.
+  int player[3];
+  memset(player, 0, sizeof(player));
+  for (const_iterator it = begin(); it != end(); it++)
+    {
+      if ((*it)->getOwner() != guint32(c))
+        continue;
+      if ((*it)->getTartanImageName (Tartan::LEFT).empty () == false)
+        player[0]++;
+      if ((*it)->getTartanImageName (Tartan::CENTER).empty () == false)
+        player[1]++;
+      if ((*it)->getTartanImageName (Tartan::RIGHT).empty () == false)
+        player[2]++;
     }
   int count = player[0] + player[1] + player[2];
   if (count <= 2)

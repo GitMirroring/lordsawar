@@ -35,7 +35,7 @@
                       <object class="GtkMenuItem" id="new_shieldset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">New Shieldset</property>
+                        <property name="label" translatable="yes">New</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -43,7 +43,7 @@
                       <object class="GtkMenuItem" id="load_shieldset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Load Shieldset</property>
+                        <property name="label" translatable="yes">Open...</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -51,7 +51,7 @@
                       <object class="GtkMenuItem" id="save_shieldset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Save Shieldset</property>
+                        <property name="label" translatable="yes">Save</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -59,7 +59,7 @@
                       <object class="GtkMenuItem" id="save_as_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Save A Copy</property>
+                        <property name="label" translatable="yes">Save As...</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -67,7 +67,7 @@
                       <object class="GtkMenuItem" id="validate_shieldset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Validate Shieldset</property>
+                        <property name="label" translatable="yes">Validate</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -103,7 +103,7 @@
                       <object class="GtkMenuItem" id="edit_shieldset_info_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Edit Shieldset Information</property>
+                        <property name="label" translatable="yes">Shieldset Properties</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -111,7 +111,7 @@
                       <object class="GtkMenuItem" id="edit_copy_shields_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Copy White Shields Down</property>
+                        <property name="label" translatable="yes">Copy White Images Down</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -129,6 +129,14 @@
                   <object class="GtkMenu" id="menu3">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkMenuItem" id="tutorial_menuitem">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Tutorial Video</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
                     <child>
                       <object class="GtkMenuItem" id="help_about_menuitem">
                         <property name="visible">True</property>
@@ -206,7 +214,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="valign">end</property>
-                                <property name="label" translatable="yes">Small Shield Image</property>
+                                <property name="label" translatable="yes">Small Shield</property>
                                 <attributes>
                                   <attribute name="underline" value="True"/>
                                 </attributes>
@@ -270,7 +278,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="valign">end</property>
-                                <property name="label" translatable="yes">Medium Shield Image</property>
+                                <property name="label" translatable="yes">Medium Shield</property>
                                 <attributes>
                                   <attribute name="underline" value="True"/>
                                 </attributes>
@@ -334,7 +342,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="valign">end</property>
-                                <property name="label" translatable="yes">Large Shield Image</property>
+                                <property name="label" translatable="yes">Large Shield</property>
                                 <attributes>
                                   <attribute name="underline" value="True"/>
                                 </attributes>
@@ -450,7 +458,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="valign">end</property>
-                                <property name="label" translatable="yes">Left Tartan Image</property>
+                                <property name="label" translatable="yes">Left Tartan</property>
                                 <attributes>
                                   <attribute name="underline" value="True"/>
                                 </attributes>
@@ -514,7 +522,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="valign">end</property>
-                                <property name="label" translatable="yes">Right Tartan Image</property>
+                                <property name="label" translatable="yes">Right Tartan</property>
                                 <attributes>
                                   <attribute name="underline" value="True"/>
                                 </attributes>
@@ -578,7 +586,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="valign">end</property>
-                                <property name="label" translatable="yes">Center Tartan Image</property>
+                                <property name="label" translatable="yes">Center Tartan</property>
                                 <attributes>
                                   <attribute name="underline" value="True"/>
                                 </attributes>

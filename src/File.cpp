@@ -434,7 +434,7 @@ Glib::ustring File::getSetConfigurationFilename(Glib::ustring dir, Glib::ustring
                                subdir, subdir + ext);
 }
 
-char *File::sanify(const char *string)
+char *File::_sanify(const char *string)
 {
   char *result = NULL;
   size_t resultlen = 1;
@@ -456,6 +456,14 @@ char *File::sanify(const char *string)
 	}
     }
   return result;
+}
+
+Glib::ustring File::sanify (Glib::ustring s)
+{
+  char *s1 = _sanify (s.c_str ());
+  Glib::ustring ret(s1);
+  free (s1);
+  return ret;
 }
   
 Glib::ustring File::get_tmp_file(Glib::ustring ext)

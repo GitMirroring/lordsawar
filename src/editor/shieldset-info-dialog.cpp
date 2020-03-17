@@ -27,124 +27,84 @@
 #include "defs.h"
 #include "File.h"
 
+#define method(x) sigc::mem_fun(*this, &ShieldSetInfoDialog::x)
 
-ShieldSetInfoDialog::ShieldSetInfoDialog(Gtk::Window &parent, Set *shieldset, Glib::ustring dir, Glib::ustring file, bool readonly, Glib::ustring title)
+ShieldSetInfoDialog::ShieldSetInfoDialog(Gtk::Window &parent, Shieldset *s)
  : LwEditorDialog(parent, "shieldset-info-dialog.ui")
 {
-  d_shieldset = shieldset;
-  d_readonly = readonly;
-    
-    if (title != "")
-      dialog->set_title(title);
+  d_shieldset = s;
+  dialog->set_title(_("Shieldset Properties"));
 
-    xml->get_widget("accept_button", accept_button);
-    xml->get_widget("status_label", status_label);
-    xml->get_widget("dir_label", dir_label);
+  xml->get_widget("close_button", close_button);
+  xml->get_widget("status_label", status_label);
+  xml->get_widget("location_label", location_label);
+  xml->get_widget("name_entry", name_entry);
 
-    xml->get_widget("name_entry", name_entry);
-    name_entry->set_text(shieldset->getName());
-    if (readonly == false)
-      name_entry->signal_changed().connect
-	(sigc::mem_fun(this, &ShieldSetInfoDialog::on_name_changed));
-    
-    xml->get_widget("filename_entry", filename_entry);
-    if (file != "")
-      filename_entry->set_text(file);
-    else
-      {
-        guint32 num = 0;
-        Glib::ustring basename = Shieldsetlist::getInstance()->findFreeBaseName(_("untitled"), 100, num);
-        filename_entry->set_text(basename);
+  name_entry->set_text (d_shieldset->getName ());
+  location_label->property_label () = 
+    d_shieldset->isTemporaryFile () ? "" : d_shieldset->getConfigurationFile ();
 
-        Glib::ustring name = String::ucompose("%1 %2", _("Untitled"), num);
-        name_entry->set_text(name);
-      }
-    if (readonly == false)
-      filename_entry->signal_changed().connect
-	(sigc::mem_fun(this, &ShieldSetInfoDialog::on_filename_changed));
+  name_entry->signal_changed().connect (method(on_name_changed));
 
-    xml->get_widget("id_spinbutton", id_spinbutton);
-    id_spinbutton->set_value(shieldset->getId());
-    id_spinbutton->set_sensitive(false);
-
-    xml->get_widget("copyright_textview", copyright_textview);
-    copyright_textview->get_buffer()->set_text(d_shieldset->getCopyright());
-    xml->get_widget("license_textview", license_textview);
-    license_textview->get_buffer()->set_text(d_shieldset->getLicense());
-    xml->get_widget("description_textview", description_textview);
-    description_textview->get_buffer()->set_text(shieldset->getInfo());
-    xml->get_widget("notebook", notebook);
-
-    dir_label->set_text (dir);
-    if (readonly)
-      filename_entry->set_sensitive(false);
-
-    update_buttons();
-}
-
-void ShieldSetInfoDialog::on_filename_changed()
-{
-  update_buttons();
+  xml->get_widget("copyright_textview", copyright_textview);
+  copyright_textview->get_buffer()->set_text(d_shieldset->getCopyright());
+  copyright_textview->get_buffer()->signal_changed().connect
+    (method(on_copyright_changed));
+  xml->get_widget("license_textview", license_textview);
+  license_textview->get_buffer()->set_text(d_shieldset->getLicense());
+  license_textview->get_buffer()->signal_changed().connect
+    (method(on_license_changed));
+  xml->get_widget("description_textview", description_textview);
+  description_textview->get_buffer()->set_text(d_shieldset->getInfo());
+  description_textview->get_buffer()->signal_changed().connect
+    (method(on_description_changed));
+  xml->get_widget("notebook", notebook);
+  on_name_changed ();
+  d_changed = false;
 }
 
 void ShieldSetInfoDialog::on_name_changed()
 {
-  char *s = File::sanify(name_entry->get_text().c_str());
-  filename_entry->set_text(s);
-  free (s);
-  update_buttons();
+  d_changed = true;
+  d_shieldset->setName (name_entry->get_text ());
+  close_button->set_sensitive (File::sanify (d_shieldset->getName ()) != "");
+
+  Glib::ustring file =
+    Shieldsetlist::getInstance()->lookupConfigurationFileByName(d_shieldset);
+  if (file != "" && file != d_shieldset->getConfigurationFile ())
+    status_label->set_text (_("That name is already in use."));
+  else
+    status_label->set_text ("");
 }
 
-int ShieldSetInfoDialog::run()
+bool ShieldSetInfoDialog::run()
 {
     dialog->show_all();
-    int response = dialog->run();
-
-    if (response == Gtk::RESPONSE_ACCEPT)	// accepted
-    {
-      d_shieldset->setName(name_entry->get_text());
-      d_shieldset->setId(int(id_spinbutton->get_value()));
-      if (d_readonly == false)
-	d_shieldset->setBaseName(filename_entry->get_text());
-      d_shieldset->setCopyright(copyright_textview->get_buffer()->get_text());
-      d_shieldset->setLicense(license_textview->get_buffer()->get_text());
-      d_shieldset->setInfo(description_textview->get_buffer()->get_text());
-      return response;
-    }
-    return response;
+    dialog->run();
+    dialog->hide ();
+    return d_changed;
 }
 
-void ShieldSetInfoDialog::update_buttons()
+void ShieldSetInfoDialog::on_copyright_changed ()
 {
-  if (d_readonly)
-    {
-      accept_button->set_sensitive(true);
-      return;
-    }
+  d_changed = true;
+  d_shieldset->setCopyright(copyright_textview->get_buffer()->get_text());
+}
 
-  if (Shieldsetlist::getInstance()->get(filename_entry->get_text()))
-    {
-      accept_button->set_sensitive(false);
-      status_label->set_markup(String::ucompose("<b>%1</b>", 
-						_("That filename is already used.")));
-    }
-  else if (filename_entry->get_text() == "" || name_entry->get_text() == "")
-    accept_button->set_sensitive(false);
-  else if (Shieldsetlist::getInstance()->contains(name_entry->get_text()) && 
-           name_entry->get_text() != "")
-    {
-      status_label->set_markup(String::ucompose("<b>%1</b>", 
-						_("That name is already in use.")));
-      accept_button->set_sensitive(true);
-    }
-  else
-    {
-      status_label->set_text("");
-      accept_button->set_sensitive(true);
-    }
+void ShieldSetInfoDialog::on_license_changed ()
+{
+  d_changed = true;
+  d_shieldset->setLicense(license_textview->get_buffer()->get_text());
+}
+
+void ShieldSetInfoDialog::on_description_changed ()
+{
+  d_changed = true;
+  d_shieldset->setInfo(description_textview->get_buffer()->get_text());
 }
 
 ShieldSetInfoDialog::~ShieldSetInfoDialog()
 {
   notebook->property_show_tabs () = false;
 }
+

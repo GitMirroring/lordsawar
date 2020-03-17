@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2010, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007-2010, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -65,6 +65,7 @@ class ShieldSetWindow: public sigc::trackable
     Gtk::MenuItem *edit_copy_shields_menuitem;
     Gtk::MenuItem *quit_menuitem;
     Gtk::MenuItem *help_about_menuitem;
+    Gtk::MenuItem *tutorial_menuitem;
     Gtk::Button *change_smallpic_button;
     Gtk::Button *change_mediumpic_button;
     Gtk::Button *change_largepic_button;
@@ -96,29 +97,42 @@ class ShieldSetWindow: public sigc::trackable
     void on_edit_shieldset_info_activated();
     void on_edit_copy_shields_activated();
     void on_help_about_activated();
+    void on_tutorial_video_activated ();
     void on_shield_selected();
     void on_shieldpic_changed(ShieldStyle::Type type);
+    void on_tartanpic_changed (Tartan::Type type);
     void on_player_color_changed();
 
-    void fill_shield_info(Shield *shield);
+    bool make_new_shieldset ();
+    bool load_shieldset ();
     bool load_shieldset(Glib::ustring filename);
-    bool save_current_shieldset();
-    void update_shield_panel();
-    void update_shieldset_menuitems();
+    void add_shield_to_treeview (Shield *shield);
+    bool save_current_shieldset_file(Glib::ustring filename = "");
+    bool save_current_shieldset_file_as();
     bool quit();
     
-    void addNewShield(Shield::Colour owner, Gdk::RGBA colour);
-    void loadShield(Shield *shield);
-    void update_window_title();
+    bool check_save_valid (bool existing);
+    bool check_name_valid (bool existing);
+    bool check_discard ();
+
+    void fill_shield_info(Shield *shield);
     void show_shield(ShieldStyle *ss, Shield *s, Gtk::Image *image);
     void show_tartan(Shield *s, Glib::ustring f, Gtk::Image *image);
-    void refresh_shields();
-    void process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialog *d);
-    Gtk::FileChooserDialog* shield_filechooser (Shield *s, ShieldStyle::Type t);
 
-    void on_left_tartan_changed();
-    void on_center_tartan_changed();
-    void on_right_tartan_changed();
+    void process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialog *d);
+    void process_tartanpic (Tartan::Type t, Shield *s, Gtk::FileChooserDialog *d);
+
+    Gtk::FileChooserDialog* shield_filechooser (Shield *s, ShieldStyle::Type t,
+                                                bool clear);
+    Gtk::FileChooserDialog* tartan_filechooser(Shield *s, Tartan::Type type,
+                                               bool clear);
+    Gtk::FileChooserDialog* image_filechooser (Glib::ustring title, bool clear);
+
+    void update_shield_panel();
+    void refresh_shields();
+    void update_window_title();
+
+    bool isValidName ();
 };
 
 #endif

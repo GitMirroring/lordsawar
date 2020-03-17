@@ -107,9 +107,17 @@ class Tartan
 	//! Load the images associated with this tartan.
 	void instantiateTartanImages(Glib::ustring l, Glib::ustring c, Glib::ustring r, bool &broken);
 
+        void instantiateTartanImage(Tartan::Type type, Glib::ustring file, bool &broken);
+
 	//! Destroy the images associated with this tartan.
 	void uninstantiateTartanImages();
+        void uninstantiateTartanImage(Tartan::Type type);
 
+        //! Convert the enum to a nice readable string
+        static Glib::ustring tartanTypeToFriendlyName(const Tartan::Type type);
+
+        Glib::ustring getTartanImageName (Tartan::Type type) const;
+        void setTartanImageName (Tartan::Type type, Glib::ustring name);
     protected:
 
         Glib::ustring d_left_tartan_name;

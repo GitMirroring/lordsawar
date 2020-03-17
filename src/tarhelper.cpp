@@ -397,9 +397,12 @@ bool Tar_Helper::replaceFile(Glib::ustring filename, Glib::ustring newfilename)
     }
   archive_write_free(t);
   t = NULL;
-  File::copy(tmp, pathname);
-  File::erase(tmp);
-  return true;
+  bool ret = File::copy(tmp, pathname);
+  int save_errno = errno;
+  if (ret)
+    File::erase(tmp);
+  errno = save_errno;
+  return ret;
 }
 
 void Tar_Helper::clean_tmp_dir(Glib::ustring filename)

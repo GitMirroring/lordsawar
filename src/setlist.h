@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014, 2015 Ben Asselstine
+// Copyright (C) 2009, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -121,6 +121,15 @@ public:
         return (*it).second;
       }
 
+    T *get(Glib::ustring name, guint32 size) const
+      { 
+        Glib::ustring n = String::ucompose ("%1 %2", name, size);
+        typename SetNameMap::const_iterator it = d_namesets.find(n);
+        if (it == d_namesets.end())
+          return NULL;
+        return (*it).second;
+      }
+
     void add(T *set, Glib::ustring file)
       {
         Glib::ustring basename = File::get_basename(file);
@@ -129,7 +138,17 @@ public:
         d_setdirs[String::ucompose("%1 %2", set->getName(), set->getTileSize())] = basename;
         d_sets[basename] = set;
         d_setids[set->getId()] = set;
+        d_namesets[String::ucompose("%1 %2", set->getName(), set->getTileSize())] = set;
         add_signal.emit(set);
+      }
+
+    Glib::ustring lookupConfigurationFileByName(T *set)
+      {
+        T* f = get (set->getName (), set->getTileSize ());
+        if (!f)
+          return "";
+        else
+          return f->getConfigurationFile ();
       }
 
     T* loadSet(Glib::ustring name)
@@ -143,6 +162,7 @@ public:
             return NULL;
           }
 
+        /*
         if (d_sets.find(set->getBaseName()) != d_sets.end())
           {
             T *s = (*d_sets.find(set->getBaseName())).second;
@@ -150,6 +170,7 @@ public:
             delete set;
             return NULL;
           }
+          */
 
         if (d_setdirs.find(set->getName()) != d_setdirs.end())
           {
@@ -174,6 +195,22 @@ public:
         return set;
       }
 
+    Glib::ustring findFreeName(Glib::ustring n, guint32 max, guint32 &num) const
+      {
+        Glib::ustring new_name;
+        for (unsigned int count = 1; count < max; count++)
+          {
+            new_name = String::ucompose("%1 %2", n, count);
+            if (get(File::sanify(new_name)) == NULL)
+              {
+                num = count;
+                break;
+              }
+            else
+              new_name = "";
+          }
+        return new_name;
+      }
     Glib::ustring findFreeBaseName(Glib::ustring basename, guint32 max, guint32 &num) const
       {
         Glib::ustring new_basename;
@@ -315,12 +352,14 @@ public:
 
     typedef std::map<guint32, T*> SetIdMap;
     typedef std::map<Glib::ustring, T*> SetMap;
+    typedef std::map<Glib::ustring, T*> SetNameMap;
     typedef std::map<Glib::ustring, Glib::ustring> SetDirMap;
 private: 
     Glib::ustring extension;
     SetMap d_sets;
     SetIdMap d_setids;
     SetDirMap d_setdirs;
+    SetNameMap d_namesets;
     sigc::signal<void, T*> add_signal;
     sigc::signal<void, T*> reload_signal;
 };

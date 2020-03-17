@@ -2649,6 +2649,9 @@ PixMask *EmptyTartanPixMaskCacheItem::generate(EmptyTartanPixMaskCacheItem i)
   //and then finally we cap it off with the rightmost tartan image
   //the images are all masked in the player's colour.
 
+  //the empty tartan pictures are the same as the regular tartan pictures
+  //except they're not coloured in the player's colour.
+
   PixMask *image = NULL, *mask = NULL;
   Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                           Tartan::LEFT, &image, &mask);

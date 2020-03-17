@@ -89,7 +89,7 @@ void ArmySetInfoDialog::on_filename_changed()
 
 void ArmySetInfoDialog::on_name_changed()
 {
-  char *s = File::sanify(name_entry->get_text().c_str());
+  char *s = File::_sanify(name_entry->get_text().c_str());
   filename_entry->set_text(s);
   free (s);
   update_buttons();

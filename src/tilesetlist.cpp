@@ -97,7 +97,10 @@ void Tilesetlist::instantiateImages(bool &broken)
   for (iterator it = begin(); it != end(); it++)
     {
       if (!broken)
-        (*it)->instantiateImages(broken);
+        {
+          if ((*it)->validate () == true)
+            (*it)->instantiateImages(broken);
+        }
     }
 }
 
