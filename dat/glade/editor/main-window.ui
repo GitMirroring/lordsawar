@@ -48,7 +48,7 @@
                           <object class="GtkMenuItem" id="new_map_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">New Map</property>
+                            <property name="label" translatable="yes">New...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -56,7 +56,7 @@
                           <object class="GtkMenuItem" id="load_map_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Load Map</property>
+                            <property name="label" translatable="yes">Open...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -64,7 +64,7 @@
                           <object class="GtkMenuItem" id="save_map_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Save Map</property>
+                            <property name="label" translatable="yes">Save</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -72,7 +72,7 @@
                           <object class="GtkMenuItem" id="save_map_as_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Save Map As</property>
+                            <property name="label" translatable="yes">Save As...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -80,7 +80,7 @@
                           <object class="GtkMenuItem" id="import_map_from_sav_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Import Map from Saved Game</property>
+                            <property name="label" translatable="yes">Import from Saved Game</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -89,7 +89,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="tooltip_text" translatable="yes">Save a picture of the map.</property>
-                            <property name="label" translatable="yes">Export Map As Image</property>
+                            <property name="label" translatable="yes">Export As Image</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -140,7 +140,7 @@
                           <object class="GtkMenuItem" id="edit_map_info_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Map Info</property>
+                            <property name="label" translatable="yes">Map Properties</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
