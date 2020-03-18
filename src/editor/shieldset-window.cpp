@@ -117,8 +117,6 @@ ShieldSetWindow::ShieldSetWindow(Glib::ustring load_filename)
     xml->get_widget ("center_tartan_image", center_tartan_image);
     xml->get_widget ("right_tartan_image", right_tartan_image);
 
-    window->signal_delete_event().connect(sigc::hide(method(on_delete_event)));
-
     shields_list = Gtk::ListStore::create(shields_columns);
     shields_treeview->set_model(shields_list);
     shields_treeview->append_column("", shields_columns.name);
@@ -171,15 +169,10 @@ ShieldSetWindow::update_shield_panel()
     fill_shield_info((*iterrow)[shields_columns.shield]);
 }
 
-bool ShieldSetWindow::on_delete_event()
-{
-  hide();
-  return true;
-}
-
 bool ShieldSetWindow::make_new_shieldset ()
 {
-  if (check_discard () == false)
+  Glib::ustring msg = _("Save these changes before making a new shieldset?");
+  if (check_discard (msg) == false)
     return false;
   save_shieldset_menuitem->set_sensitive (false);
   current_save_filename = "";
@@ -223,12 +216,11 @@ void ShieldSetWindow::on_new_shieldset_activated()
   make_new_shieldset ();
 }
 
-bool ShieldSetWindow::check_discard ()
+bool ShieldSetWindow::check_discard (Glib::ustring msg)
 {
   if (needs_saving)
     {
-      EditorSaveChangesDialog d
-        (*window, _("Save these changes before making a new shieldset?"));
+      EditorSaveChangesDialog d (*window, msg);
       int response = d.run_and_hide();
 
       if (response == Gtk::RESPONSE_CANCEL) // we don't want to new
@@ -259,7 +251,8 @@ bool ShieldSetWindow::check_discard ()
 bool ShieldSetWindow::load_shieldset ()
 {
   bool ret = false;
-  if (check_discard () == false)
+  Glib::ustring msg = _("Save these changes before opening a new shieldset?");
+  if (check_discard (msg) == false)
     return ret;
   Gtk::FileChooserDialog chooser(*window,
 				 _("Choose a Shieldset to Open"));

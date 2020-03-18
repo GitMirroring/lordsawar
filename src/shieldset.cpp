@@ -252,7 +252,7 @@ void Shieldset::uninstantiateImages()
 bool Shieldset::validate() const
 {
   bool valid = true;
-  if (File::sanify (getName ()) == "")
+  if (String::utrim (getName ()) == "")
     return false;
   if (validateNumberOfShields() == false)
     return false;

@@ -92,7 +92,6 @@ class ShieldSetWindow: public sigc::trackable
     void on_save_as_activated();
     void on_validate_shieldset_activated();
     void on_quit_activated();
-    bool on_delete_event();
     bool on_window_closed(GdkEventAny*);
     void on_edit_shieldset_info_activated();
     void on_edit_copy_shields_activated();
@@ -113,7 +112,7 @@ class ShieldSetWindow: public sigc::trackable
     
     bool check_save_valid (bool existing);
     bool check_name_valid (bool existing);
-    bool check_discard ();
+    bool check_discard (Glib::ustring msg);
 
     void fill_shield_info(Shield *shield);
     void show_shield(ShieldStyle *ss, Shield *s, Gtk::Image *image);
