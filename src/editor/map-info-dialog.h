@@ -32,15 +32,21 @@ class MapInfoDialog: public LwEditorDialog
     MapInfoDialog(Gtk::Window &parent, GameScenario *game_scenario);
     ~MapInfoDialog();
 
-    int run();
+    bool run();
     
  private:
+    bool d_changed;
     Gtk::Entry *name_entry;
     Gtk::TextView *description_textview;
     Gtk::TextView *copyright_textview;
     Gtk::TextView *license_textview;
     Gtk::Notebook *notebook;
     GameScenario *game_scenario;
+
+    void on_name_changed();
+    void on_copyright_changed ();
+    void on_license_changed ();
+    void on_description_changed ();
 };
 
 #endif

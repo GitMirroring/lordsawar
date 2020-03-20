@@ -27,40 +27,66 @@
 #include "signpost.h"
 #include "GameScenario.h"
 
+#define method(x) sigc::mem_fun(*this, &MapInfoDialog::x)
 
 MapInfoDialog::MapInfoDialog(Gtk::Window &parent, GameScenario *g)
  : LwEditorDialog(parent, "map-info-dialog.ui")
 {
-    game_scenario = g;
-    
-    xml->get_widget("name_entry", name_entry);
-    name_entry->set_text(game_scenario->getName());
-    
-    xml->get_widget("description_textview", description_textview);
-    description_textview->get_buffer()->set_text(game_scenario->getComment());
-    xml->get_widget("copyright_textview", copyright_textview);
-    copyright_textview->get_buffer()->set_text(game_scenario->getCopyright());
-    xml->get_widget("license_textview", license_textview);
-    license_textview->get_buffer()->set_text(game_scenario->getLicense());
-    xml->get_widget ("notebook", notebook);
+  d_changed = false;
+  game_scenario = g;
+
+  xml->get_widget("name_entry", name_entry);
+  name_entry->set_text(game_scenario->getName());
+  name_entry->signal_changed().connect (method(on_name_changed));
+  xml->get_widget("description_textview", description_textview);
+  description_textview->get_buffer()->set_text(game_scenario->getComment());
+  description_textview->get_buffer()->signal_changed().connect
+    (method(on_description_changed));
+  xml->get_widget("copyright_textview", copyright_textview);
+  copyright_textview->get_buffer()->set_text(game_scenario->getCopyright());
+  copyright_textview->get_buffer()->signal_changed().connect
+    (method(on_copyright_changed));
+  xml->get_widget("license_textview", license_textview);
+  license_textview->get_buffer()->set_text(game_scenario->getLicense());
+  license_textview->get_buffer()->signal_changed().connect
+    (method(on_license_changed));
+  xml->get_widget ("notebook", notebook);
 }
 
-int MapInfoDialog::run()
+bool MapInfoDialog::run()
 {
-    dialog->show_all();
-    int response = dialog->run();
+  dialog->show_all();
+  dialog->run();
+  dialog->hide ();
+  return d_changed;
+}
 
-    if (response == Gtk::RESPONSE_ACCEPT)	// accepted
-    {
-        game_scenario->setName(name_entry->get_text());
-        game_scenario->setComment(description_textview->get_buffer()->get_text());
-        game_scenario->setCopyright(copyright_textview->get_buffer()->get_text());
-        game_scenario->setLicense(license_textview->get_buffer()->get_text());
-    }
-    return response;
+void MapInfoDialog::on_name_changed()
+{
+  d_changed = true;
+  game_scenario->setName (name_entry->get_text ());
+}
+
+void MapInfoDialog::on_copyright_changed ()
+{
+  d_changed = true;
+  game_scenario->setCopyright(copyright_textview->get_buffer()->get_text());
+}
+
+void MapInfoDialog::on_license_changed ()
+{
+  d_changed = true;
+  game_scenario->setLicense(license_textview->get_buffer()->get_text());
+}
+
+void MapInfoDialog::on_description_changed ()
+{
+  d_changed = true;
+  game_scenario->setComment(description_textview->get_buffer()->get_text());
 }
 
 MapInfoDialog::~MapInfoDialog()
 {
   notebook->property_show_tabs () = false;
 }
+

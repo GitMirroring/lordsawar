@@ -1004,8 +1004,7 @@ void MainWindow::on_edit_players_activated()
 void MainWindow::on_edit_map_info_activated()
 {
     MapInfoDialog d(*window, game_scenario);
-    int response = d.run();
-    if (response == Gtk::RESPONSE_ACCEPT)
+    if (d.run())
       {
         needs_saving = true;
         update_window_title();
