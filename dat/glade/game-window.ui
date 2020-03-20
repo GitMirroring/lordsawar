@@ -36,7 +36,7 @@
                           <object class="GtkMenuItem" id="new_game_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">New Game</property>
+                            <property name="label" translatable="yes">New</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -44,7 +44,7 @@
                           <object class="GtkMenuItem" id="load_game_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Load Game</property>
+                            <property name="label" translatable="yes">Open...</property>
                             <property name="use_underline">True</property>
                             <accelerator key="L" signal="activate" modifiers="GDK_MOD1_MASK"/>
                           </object>
@@ -53,7 +53,7 @@
                           <object class="GtkMenuItem" id="save_game_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Save Game</property>
+                            <property name="label" translatable="yes">Save</property>
                             <property name="use_underline">True</property>
                             <accelerator key="S" signal="activate" modifiers="GDK_MOD1_MASK"/>
                           </object>
@@ -62,7 +62,7 @@
                           <object class="GtkMenuItem" id="save_game_as_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Save Game As...</property>
+                            <property name="label" translatable="yes">Save As...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
