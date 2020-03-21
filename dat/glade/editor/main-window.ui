@@ -129,18 +129,18 @@
                       <object class="GtkMenu" id="edit_menuitem_menu">
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkMenuItem" id="edit_players_menuitem">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Players</property>
-                            <property name="use_underline">True</property>
-                          </object>
-                        </child>
-                        <child>
                           <object class="GtkMenuItem" id="edit_map_info_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Map Properties</property>
+                            <property name="use_underline">True</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkMenuItem" id="edit_players_menuitem">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Players</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
