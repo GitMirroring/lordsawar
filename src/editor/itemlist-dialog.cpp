@@ -40,127 +40,130 @@ ItemlistDialog::ItemlistDialog(Gtk::Window &parent)
  : LwEditorDialog(parent, "itemlist-dialog.ui")
 {
   d_itemlist = Itemlist::getInstance();
+  selected_summon_army = NULL;
+  selected_banish_army = NULL;
+  selected_defender_army = NULL;
 
-    xml->get_widget("name_entry", name_entry);
-    name_entry->signal_changed().connect (method(on_name_changed));
-    name_entry->set_max_length (MAX_LENGTH_FOR_ITEM_NAME);
-    xml->get_widget("items_treeview", items_treeview);
-    xml->get_widget("add_item_button", add_item_button);
-    add_item_button->signal_clicked().connect (method(on_add_item_clicked));
-    xml->get_widget("remove_item_button", remove_item_button);
-    remove_item_button->signal_clicked().connect (method(on_remove_item_clicked));
-    xml->get_widget("item_vbox", item_vbox);
-    xml->get_widget("kill_army_type_button", kill_army_type_button);
-    kill_army_type_button->signal_clicked().connect(method(on_kill_army_type_clicked));
-    xml->get_widget("summon_army_type_button", summon_army_type_button);
-    summon_army_type_button->signal_clicked().connect(method(on_summon_army_type_clicked));
-    xml->get_widget("building_type_to_summon_on_combobox", 
-                    building_type_to_summon_on_combobox);
-    xml->get_widget("disease_city_switch", disease_city_switch);
-    disease_city_switch->property_active().signal_changed().connect(method(on_disease_city_toggled));
-    xml->get_widget("disease_armies_percent_spinbutton", 
-                    disease_armies_percent_spinbutton);
-    disease_armies_percent_spinbutton->signal_changed().connect(method(on_disease_armies_percent_changed));
-    disease_armies_percent_spinbutton->signal_insert_text().connect
-      (sigc::hide(sigc::hide(method(on_disease_armies_percent_text_changed))));
+  xml->get_widget("name_entry", name_entry);
+  name_entry->signal_changed().connect (method(on_name_changed));
+  name_entry->set_max_length (MAX_LENGTH_FOR_ITEM_NAME);
+  xml->get_widget("items_treeview", items_treeview);
+  xml->get_widget("add_item_button", add_item_button);
+  add_item_button->signal_clicked().connect (method(on_add_item_clicked));
+  xml->get_widget("remove_item_button", remove_item_button);
+  remove_item_button->signal_clicked().connect (method(on_remove_item_clicked));
+  xml->get_widget("item_vbox", item_vbox);
+  xml->get_widget("kill_army_type_button", kill_army_type_button);
+  kill_army_type_button->signal_clicked().connect(method(on_kill_army_type_clicked));
+  xml->get_widget("summon_army_type_button", summon_army_type_button);
+  summon_army_type_button->signal_clicked().connect(method(on_summon_army_type_clicked));
+  xml->get_widget("building_type_to_summon_on_combobox", 
+                  building_type_to_summon_on_combobox);
+  xml->get_widget("disease_city_switch", disease_city_switch);
+  disease_city_switch->property_active().signal_changed().connect(method(on_disease_city_toggled));
+  xml->get_widget("disease_armies_percent_spinbutton", 
+                  disease_armies_percent_spinbutton);
+  disease_armies_percent_spinbutton->signal_changed().connect(method(on_disease_armies_percent_changed));
+  disease_armies_percent_spinbutton->signal_insert_text().connect
+    (sigc::hide(sigc::hide(method(on_disease_armies_percent_text_changed))));
 
-    xml->get_widget("raise_defenders_switch", raise_defenders_switch);
-    raise_defenders_switch->property_active().signal_changed().connect
-      (method(on_raise_defenders_toggled));
-    xml->get_widget("defender_army_type_button", defender_army_type_button);
-    defender_army_type_button->signal_clicked().connect (method(on_defender_type_clicked));
-    xml->get_widget("num_defenders_spinbutton", num_defenders_spinbutton);
-    num_defenders_spinbutton->signal_changed().connect (method(on_num_defenders_changed));
-    num_defenders_spinbutton->signal_insert_text().connect
-      (sigc::hide(sigc::hide(method(on_num_defenders_text_changed))));
-    xml->get_widget("persuade_neutral_city_switch", 
-                    persuade_neutral_city_switch);
-    persuade_neutral_city_switch->property_active().signal_changed().connect
-      (method(on_persuade_neutral_city_toggled));
-    xml->get_widget("teleport_to_city_switch", 
-                    teleport_to_city_switch);
-    teleport_to_city_switch->property_active().signal_changed().connect
-      (method(on_teleport_to_city_toggled));
+  xml->get_widget("raise_defenders_switch", raise_defenders_switch);
+  raise_defenders_switch->property_active().signal_changed().connect
+    (method(on_raise_defenders_toggled));
+  xml->get_widget("defender_army_type_button", defender_army_type_button);
+  defender_army_type_button->signal_clicked().connect (method(on_defender_type_clicked));
+  xml->get_widget("num_defenders_spinbutton", num_defenders_spinbutton);
+  num_defenders_spinbutton->signal_changed().connect (method(on_num_defenders_changed));
+  num_defenders_spinbutton->signal_insert_text().connect
+    (sigc::hide(sigc::hide(method(on_num_defenders_text_changed))));
+  xml->get_widget("persuade_neutral_city_switch", 
+                  persuade_neutral_city_switch);
+  persuade_neutral_city_switch->property_active().signal_changed().connect
+    (method(on_persuade_neutral_city_toggled));
+  xml->get_widget("teleport_to_city_switch", 
+                  teleport_to_city_switch);
+  teleport_to_city_switch->property_active().signal_changed().connect
+    (method(on_teleport_to_city_toggled));
 
-    items_list = Gtk::ListStore::create(items_columns);
-    items_treeview->set_model(items_list);
-    items_treeview->append_column("", items_columns.name);
-    items_treeview->set_headers_visible(false);
+  items_list = Gtk::ListStore::create(items_columns);
+  items_treeview->set_model(items_list);
+  items_treeview->append_column("", items_columns.name);
+  items_treeview->set_headers_visible(false);
 
-    Itemlist::iterator iter = d_itemlist->begin();
-    for (;iter != d_itemlist->end(); iter++)
-      addItemProto((*iter).second);
-      
+  Itemlist::iterator iter = d_itemlist->begin();
+  for (;iter != d_itemlist->end(); iter++)
+    addItemProto((*iter).second);
 
-    xml->get_widget("add1str_switch", add1str_switch);
-    add1str_switch->property_active().signal_changed().connect(method(on_add1str_toggled));
-    xml->get_widget("add2str_switch", add2str_switch);
-    add2str_switch->property_active().signal_changed().connect(method(on_add2str_toggled));
-    xml->get_widget("add3str_switch", add3str_switch);
-    add3str_switch->property_active().signal_changed().connect(method(on_add3str_toggled));
-    xml->get_widget("add1stack_switch", add1stack_switch);
-    add1stack_switch->property_active().signal_changed().connect(method(on_add1stack_toggled));
-    xml->get_widget("add2stack_switch", add2stack_switch);
-    add2stack_switch->property_active().signal_changed().connect(method(on_add2stack_toggled));
-    xml->get_widget("add3stack_switch", add3stack_switch);
-    add3stack_switch->property_active().signal_changed().connect(method(on_add3stack_toggled));
-    xml->get_widget("flystack_switch", flystack_switch);
-    flystack_switch->property_active().signal_changed().connect(method(on_flystack_toggled));
-    xml->get_widget("doublemovestack_switch", doublemovestack_switch);
-    doublemovestack_switch->property_active().signal_changed().connect(method(on_doublemovestack_toggled));
-    xml->get_widget("add2goldpercity_switch", add2goldpercity_switch);
-    add2goldpercity_switch->property_active().signal_changed().connect
-      (method(on_add2goldpercity_toggled));
-    xml->get_widget("add3goldpercity_switch", add3goldpercity_switch);
-    add3goldpercity_switch->property_active().signal_changed().connect
-      (method(on_add3goldpercity_toggled));
-    xml->get_widget("add4goldpercity_switch", add4goldpercity_switch);
-    add4goldpercity_switch->property_active().signal_changed().connect
-      (method(on_add4goldpercity_toggled));
-    xml->get_widget("add5goldpercity_switch", add5goldpercity_switch);
-    add5goldpercity_switch->property_active().signal_changed().connect
-      (method(on_add5goldpercity_toggled));
-    xml->get_widget("steals_gold_switch", steals_gold_switch);
-    steals_gold_switch->property_active().signal_changed().connect (method(on_steals_gold_toggled));
-    xml->get_widget("pickup_bags_switch", pickup_bags_switch);
-    pickup_bags_switch->property_active().signal_changed().connect(method(on_pickup_bags_toggled));
-    xml->get_widget("add_mp_switch", add_mp_switch);
-    add_mp_switch->property_active().signal_changed().connect(method(on_add_mp_toggled));
-    xml->get_widget("sinks_ships_switch", sinks_ships_switch);
-    sinks_ships_switch->property_active().signal_changed().connect(method(on_sinks_ships_toggled));
-    xml->get_widget("banish_worms_switch", banish_worms_switch);
-    banish_worms_switch->property_active().signal_changed().connect(method(on_banish_worms_toggled));
-    xml->get_widget("burn_bridge_switch", burn_bridge_switch);
-    burn_bridge_switch->property_active().signal_changed().connect(method(on_burn_bridge_toggled));
-    xml->get_widget("capture_keeper_switch", capture_keeper_switch);
-    capture_keeper_switch->property_active().signal_changed().connect(method(on_capture_keeper_toggled));
-    xml->get_widget("summon_monster_switch", summon_monster_switch);
-    summon_monster_switch->property_active().signal_changed().connect
-      (method(on_summon_monster_toggled));
-    xml->get_widget("uses_spinbutton", uses_spinbutton);
-    uses_spinbutton->signal_changed().connect(method(on_uses_changed));
-    xml->get_widget("steal_percent_spinbutton", steal_percent_spinbutton);
-    steal_percent_spinbutton->signal_changed().connect
-      (method(on_steal_percent_changed));
-    steal_percent_spinbutton->signal_insert_text().connect
-      (sigc::hide(sigc::hide(method(on_steal_percent_text_changed))));
-    xml->get_widget("add_mp_spinbutton", add_mp_spinbutton);
-    add_mp_spinbutton->signal_changed().connect (method(on_add_mp_changed));
-    add_mp_spinbutton->signal_insert_text().connect
-      (sigc::hide(sigc::hide(method(on_add_mp_text_changed))));
 
-    items_treeview->get_selection()->signal_changed().connect (method(on_item_selected));
-    d_item = NULL;
-    guint32 max = d_itemlist->size();
-    if (max)
-      {
-	Gtk::TreeModel::Row row;
-	row = items_treeview->get_model()->children()[0];
-	if(row)
-	  items_treeview->get_selection()->select(row);
-      }
-    update_item_panel();
-    update_itemlist_buttons();
+  xml->get_widget("add1str_switch", add1str_switch);
+  add1str_switch->property_active().signal_changed().connect(method(on_add1str_toggled));
+  xml->get_widget("add2str_switch", add2str_switch);
+  add2str_switch->property_active().signal_changed().connect(method(on_add2str_toggled));
+  xml->get_widget("add3str_switch", add3str_switch);
+  add3str_switch->property_active().signal_changed().connect(method(on_add3str_toggled));
+  xml->get_widget("add1stack_switch", add1stack_switch);
+  add1stack_switch->property_active().signal_changed().connect(method(on_add1stack_toggled));
+  xml->get_widget("add2stack_switch", add2stack_switch);
+  add2stack_switch->property_active().signal_changed().connect(method(on_add2stack_toggled));
+  xml->get_widget("add3stack_switch", add3stack_switch);
+  add3stack_switch->property_active().signal_changed().connect(method(on_add3stack_toggled));
+  xml->get_widget("flystack_switch", flystack_switch);
+  flystack_switch->property_active().signal_changed().connect(method(on_flystack_toggled));
+  xml->get_widget("doublemovestack_switch", doublemovestack_switch);
+  doublemovestack_switch->property_active().signal_changed().connect(method(on_doublemovestack_toggled));
+  xml->get_widget("add2goldpercity_switch", add2goldpercity_switch);
+  add2goldpercity_switch->property_active().signal_changed().connect
+    (method(on_add2goldpercity_toggled));
+  xml->get_widget("add3goldpercity_switch", add3goldpercity_switch);
+  add3goldpercity_switch->property_active().signal_changed().connect
+    (method(on_add3goldpercity_toggled));
+  xml->get_widget("add4goldpercity_switch", add4goldpercity_switch);
+  add4goldpercity_switch->property_active().signal_changed().connect
+    (method(on_add4goldpercity_toggled));
+  xml->get_widget("add5goldpercity_switch", add5goldpercity_switch);
+  add5goldpercity_switch->property_active().signal_changed().connect
+    (method(on_add5goldpercity_toggled));
+  xml->get_widget("steals_gold_switch", steals_gold_switch);
+  steals_gold_switch->property_active().signal_changed().connect (method(on_steals_gold_toggled));
+  xml->get_widget("pickup_bags_switch", pickup_bags_switch);
+  pickup_bags_switch->property_active().signal_changed().connect(method(on_pickup_bags_toggled));
+  xml->get_widget("add_mp_switch", add_mp_switch);
+  add_mp_switch->property_active().signal_changed().connect(method(on_add_mp_toggled));
+  xml->get_widget("sinks_ships_switch", sinks_ships_switch);
+  sinks_ships_switch->property_active().signal_changed().connect(method(on_sinks_ships_toggled));
+  xml->get_widget("banish_worms_switch", banish_worms_switch);
+  banish_worms_switch->property_active().signal_changed().connect(method(on_banish_worms_toggled));
+  xml->get_widget("burn_bridge_switch", burn_bridge_switch);
+  burn_bridge_switch->property_active().signal_changed().connect(method(on_burn_bridge_toggled));
+  xml->get_widget("capture_keeper_switch", capture_keeper_switch);
+  capture_keeper_switch->property_active().signal_changed().connect(method(on_capture_keeper_toggled));
+  xml->get_widget("summon_monster_switch", summon_monster_switch);
+  summon_monster_switch->property_active().signal_changed().connect
+    (method(on_summon_monster_toggled));
+  xml->get_widget("uses_spinbutton", uses_spinbutton);
+  uses_spinbutton->signal_changed().connect(method(on_uses_changed));
+  xml->get_widget("steal_percent_spinbutton", steal_percent_spinbutton);
+  steal_percent_spinbutton->signal_changed().connect
+    (method(on_steal_percent_changed));
+  steal_percent_spinbutton->signal_insert_text().connect
+    (sigc::hide(sigc::hide(method(on_steal_percent_text_changed))));
+  xml->get_widget("add_mp_spinbutton", add_mp_spinbutton);
+  add_mp_spinbutton->signal_changed().connect (method(on_add_mp_changed));
+  add_mp_spinbutton->signal_insert_text().connect
+    (sigc::hide(sigc::hide(method(on_add_mp_text_changed))));
+
+  items_treeview->get_selection()->signal_changed().connect (method(on_item_selected));
+  d_item = NULL;
+  guint32 max = d_itemlist->size();
+  if (max)
+    {
+      Gtk::TreeModel::Row row;
+      row = items_treeview->get_model()->children()[0];
+      if(row)
+        items_treeview->get_selection()->select(row);
+    }
+  update_item_panel();
+  update_itemlist_buttons();
 }
 
 void
@@ -428,6 +431,11 @@ void ItemlistDialog::on_banish_worms_toggled()
 {
   on_switch_toggled(banish_worms_switch, ItemProto::BANISH_WORMS);
   kill_army_type_button->set_sensitive(banish_worms_switch->get_active());
+  if (banish_worms_switch->get_active() == false)
+    {
+      selected_banish_army =  NULL;
+      update_kill_army_type_name();
+    }
 }
 
 void ItemlistDialog::on_burn_bridge_toggled()
@@ -460,11 +468,11 @@ void ItemlistDialog::on_kill_army_type_clicked()
     SelectArmyDialog d(*dialog, neutral, false, true);
     d.run();
 
-    const ArmyProto *army = d.get_selected_army();
-    if (army)
-      d_item->setArmyTypeToKill(army->getId());
+    selected_banish_army = d.get_selected_army();
+    if (selected_banish_army)
+      d_item->setArmyTypeToKill(selected_banish_army->getId());
     else
-      d_item->setArmyTypeToKill(0);
+      banish_worms_switch->property_active () = false;
 
     update_kill_army_type_name();
 }
@@ -473,7 +481,8 @@ void ItemlistDialog::update_kill_army_type_name()
 {
     Player *neutral = Playerlist::getInstance()->getNeutral();
     Glib::ustring name;
-    if (banish_worms_switch->get_active() == true)
+    if (banish_worms_switch->get_active() == true &&
+        selected_banish_army != NULL)
       {
         kill_army_type_button->property_sensitive() = true;
         Armysetlist *asl = Armysetlist::getInstance();
@@ -501,29 +510,33 @@ void ItemlistDialog::on_summon_monster_toggled()
     (summon_monster_switch->get_active());
   building_type_to_summon_on_combobox->set_sensitive
     (summon_monster_switch->get_active());
+  if (summon_monster_switch->get_active() == false)
+    {
+      selected_summon_army =  NULL;
+      update_summon_army_type_name();
+    }
 }
     
 void ItemlistDialog::on_summon_army_type_clicked()
 {
-    Player *neutral = Playerlist::getInstance()->getNeutral();
-    Glib::ustring name;
-    if (summon_monster_switch->get_active() == true)
-      {
-        Armysetlist *asl = Armysetlist::getInstance();
-	name = asl->getArmy(neutral->getArmyset(), 
-                            d_item->getArmyTypeToSummon())->getName();
-      }
-    else
-	name = _("No army type selected");
-    
-    summon_army_type_button->set_label(name);
+  Player *neutral = Playerlist::getInstance()->getNeutral();
+  SelectArmyDialog d(*dialog, neutral);
+  d.run();
+  selected_summon_army = d.get_selected_army();
+  if (selected_summon_army)
+    d_item->setArmyTypeToSummon(selected_summon_army->getId());
+  else
+    summon_monster_switch->property_active () = false;
+
+  update_summon_army_type_name();
 }
 
 void ItemlistDialog::update_summon_army_type_name()
 {
     Player *neutral = Playerlist::getInstance()->getNeutral();
     Glib::ustring name;
-    if (summon_monster_switch->get_active() == true)
+    if (summon_monster_switch->get_active() == true &&
+        selected_summon_army != NULL)
       {
         summon_army_type_button->set_sensitive(true);
         Armysetlist *asl = Armysetlist::getInstance();
@@ -565,6 +578,11 @@ void ItemlistDialog::on_raise_defenders_toggled()
     (raise_defenders_switch->get_active());
   defender_army_type_button->set_sensitive
     (raise_defenders_switch->get_active());
+  if (raise_defenders_switch->get_active() == false)
+    {
+      selected_defender_army =  NULL;
+      update_raise_defender_army_type_name();
+    }
 }
 
 void ItemlistDialog::on_steal_percent_changed()
@@ -627,24 +645,24 @@ void ItemlistDialog::on_num_defenders_text_changed()
 void ItemlistDialog::on_defender_type_clicked()
 {
     Player *neutral = Playerlist::getInstance()->getNeutral();
-    Glib::ustring name;
-    if (raise_defenders_switch->get_active() == true)
-      {
-        Armysetlist *asl = Armysetlist::getInstance();
-	name = asl->getArmy(neutral->getArmyset(), 
-                            d_item->getArmyTypeToRaise())->getName();
-      }
+    SelectArmyDialog d(*dialog, neutral);
+    d.run();
+
+    selected_defender_army = d.get_selected_army();
+    if (selected_defender_army)
+      d_item->setArmyTypeToRaise(selected_defender_army->getId());
     else
-	name = _("No army type selected");
-    
-    defender_army_type_button->set_label(name);
+      raise_defenders_switch->property_active () = false;
+
+    update_raise_defender_army_type_name();
 }
 
 void ItemlistDialog::update_raise_defender_army_type_name()
 {
     Player *neutral = Playerlist::getInstance()->getNeutral();
     Glib::ustring name;
-    if (raise_defenders_switch->get_active() == true)
+    if (raise_defenders_switch->get_active() == true &&
+        selected_defender_army != NULL)
       {
         defender_army_type_button->set_sensitive(true);
         Armysetlist *asl = Armysetlist::getInstance();

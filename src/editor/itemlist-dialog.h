@@ -24,6 +24,8 @@
 #include "Itemlist.h"
 #include "lw-editor-dialog.h"
 
+class ArmyProto;
+
 //! Scenario editor.  Edits the global list of Item objects in the scenario.
 class ItemlistDialog: public LwEditorDialog
 {
@@ -33,6 +35,9 @@ class ItemlistDialog: public LwEditorDialog
 
  private:
     Glib::ustring current_save_filename;
+    const ArmyProto *selected_summon_army;
+    const ArmyProto *selected_banish_army;
+    const ArmyProto *selected_defender_army;
     Itemlist *d_itemlist; //current itemlist
     ItemProto *d_item; //current item
     Gtk::Entry *name_entry;

@@ -352,6 +352,8 @@
                                           <object class="GtkGrid">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
+                                            <property name="margin_top">12</property>
+                                            <property name="margin_bottom">12</property>
                                             <property name="row_spacing">48</property>
                                             <property name="column_spacing">24</property>
                                             <child>
@@ -1200,7 +1202,9 @@
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="valign">end</property>
-                                                    <property name="label" translatable="yes">Disease City</property>
+                                                    <property name="label" translatable="yes">Disease City
+(Number of Army Units)</property>
+                                                    <property name="justify">center</property>
                                                     <attributes>
                                                       <attribute name="underline" value="True"/>
                                                     </attributes>
@@ -1269,7 +1273,9 @@
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="valign">end</property>
-                                                    <property name="label" translatable="yes">Pick Up Bags</property>
+                                                    <property name="label" translatable="yes">Pick Up
+Bags</property>
+                                                    <property name="justify">center</property>
                                                     <attributes>
                                                       <attribute name="underline" value="True"/>
                                                     </attributes>
@@ -1320,7 +1326,9 @@
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="valign">end</property>
-                                                    <property name="label" translatable="yes">Add Movement Points</property>
+                                                    <property name="label" translatable="yes">Add Movement
+Points</property>
+                                                    <property name="justify">center</property>
                                                     <attributes>
                                                       <attribute name="underline" value="True"/>
                                                     </attributes>
@@ -1653,6 +1661,7 @@
                                                     <property name="valign">end</property>
                                                     <property name="label" translatable="yes">Kills All Units Of
 Giant Worms</property>
+                                                    <property name="justify">center</property>
                                                     <attributes>
                                                       <attribute name="underline" value="True"/>
                                                     </attributes>
