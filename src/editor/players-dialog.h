@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include <vector>
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
+#include "game-parameters.h"
 
 class Player;
 class CreateScenarioRandomize;
@@ -31,14 +32,15 @@ class CreateScenarioRandomize;
 class PlayersDialog: public LwEditorDialog
 {
  public:
-    PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *randomizer, int width, int height);
+    PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *randomizer);
     ~PlayersDialog() {}
 
-    int run();
-    
+    bool run();
+
  private:
+    bool d_changed;
     Gtk::TreeView *player_treeview;
-    
+
     class PlayerColumns: public Gtk::TreeModelColumnRecord {
     public:
 	PlayerColumns()
@@ -50,7 +52,7 @@ class PlayersDialog: public LwEditorDialog
     };
     const PlayerColumns player_columns;
     Glib::RefPtr<Gtk::ListStore> player_list;
-    
+
     Gtk::CellRendererCombo type_renderer;
     Gtk::TreeViewColumn type_column;
     Gtk::CellRendererSpin gold_renderer;
@@ -59,7 +61,7 @@ class PlayersDialog: public LwEditorDialog
     Gtk::TreeViewColumn name_column;
     Gtk::Button *randomize_gold_button;
     Gtk::Button *all_players_on_button;
-    
+
     class PlayerTypeColumns: public Gtk::TreeModelColumnRecord {
     public:
 	PlayerTypeColumns()
@@ -72,7 +74,7 @@ class PlayersDialog: public LwEditorDialog
 
     typedef std::vector<Glib::ustring> player_name_seq;
     player_name_seq default_player_names;
-    
+
     void cell_data_type(Gtk::CellRenderer *renderer, const Gtk::TreeIter &i);
     void on_type_edited(const Glib::ustring &path,
 			const Glib::ustring &new_text);
@@ -80,14 +82,15 @@ class PlayersDialog: public LwEditorDialog
     void on_gold_edited(const Glib::ustring &path, const Glib::ustring &new_text);
     void cell_data_name(Gtk::CellRenderer *renderer, const Gtk::TreeIter& i);
     void on_name_edited(const Glib::ustring &path, const Glib::ustring &new_text);
-    
+
     void add_player(const Glib::ustring &type, const Glib::ustring &name,
 		    int gold, Player *player);
     void on_randomize_gold_pressed();
     void on_all_players_on_pressed();
-    int d_width;
-    int d_height;
     CreateScenarioRandomize *d_random;
+
+    void update_player ();
+    GameParameters::Player to_player (Gtk::TreeModel::iterator i);
 };
 
 #endif

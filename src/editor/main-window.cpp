@@ -989,10 +989,10 @@ void MainWindow::on_quit_activated()
 
 void MainWindow::on_edit_players_activated()
 {
-    PlayersDialog d(*window, d_create_scenario_names, d_width, d_height);
+    PlayersDialog d(*window, d_create_scenario_names);
     Player *active = Playerlist::getActiveplayer();
-    int response = d.run();
-    if (response == Gtk::RESPONSE_ACCEPT)
+    bool changed = d.run();
+    if (changed)
       {
 	if (Playerlist::getInstance()->getPlayer(active->getId()))
 	  Playerlist::getInstance()->setActiveplayer(active);

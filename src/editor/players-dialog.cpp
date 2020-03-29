@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -51,15 +51,14 @@ namespace
     }
 }
 
-PlayersDialog::PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *random, int width, int height)
+PlayersDialog::PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *random)
   : LwEditorDialog(parent, "players-dialog.ui"),
     type_column(_("Type"), type_renderer),
     gold_column(_("Gold"), gold_renderer),
     name_column(_("Name"), name_renderer)
 {
   d_random = random;
-  d_width = width;
-  d_height = height;
+  d_changed = false;
 
   // setup the player settings
   player_list = Gtk::ListStore::create(player_columns);
@@ -144,44 +143,43 @@ PlayersDialog::PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *rando
   player_treeview->set_cursor (Gtk::TreePath ("0"));
 }
 
-int PlayersDialog::run()
+GameParameters::Player PlayersDialog::to_player (Gtk::TreeModel::iterator i)
+{
+  GameParameters::Player player;
+  Glib::ustring type = (*i)[player_columns.type];
+  player.name = (*i)[player_columns.name];
+  if (type == HUMAN_PLAYER_TYPE)
+    player.type = GameParameters::Player::HUMAN;
+  else if (type == EASY_PLAYER_TYPE)
+    player.type = GameParameters::Player::EASY;
+  else if (type == HARD_PLAYER_TYPE)
+    player.type = GameParameters::Player::HARD;
+  else if (type == NO_PLAYER_TYPE)
+    player.type = GameParameters::Player::OFF;
+  Gtk::TreeModel::Path path = player_treeview->get_model()->get_path (i);
+  player.id = atoi (path.to_string ().c_str ());
+  return player;
+}
+
+void PlayersDialog::update_player ()
+{
+  Gtk::TreeModel::Path path;
+  Gtk::TreeViewColumn* focus_column;
+  player_treeview->get_cursor (path, focus_column);
+  Gtk::TreeModel::iterator i = player_treeview->get_model()->get_iter(path);
+  GameParameters::Player player = to_player (i);
+  Playerlist::getInstance ()->syncPlayer(player);
+  Player *p = Playerlist::getInstance ()->getPlayer(player.id);
+  (*i)[player_columns.player] = p;
+  if (p)
+    p->setGold((*i)[player_columns.gold]);
+}
+
+bool PlayersDialog::run()
 {
   dialog->show_all();
-  int response = dialog->run();
-  Playerlist *pl = Playerlist::getInstance();
-
-  if (response == Gtk::RESPONSE_ACCEPT)	// accepted
-    {
-
-      // update the player list
-      int c = 0;
-      for (Gtk::TreeIter i = player_list->children().begin(),
-	   end = player_list->children().end(); i != end; ++i, ++c)
-	{
-	  Glib::ustring type = (*i)[player_columns.type];
-	  Glib::ustring name = (*i)[player_columns.name];
-	  int gold = (*i)[player_columns.gold];
-
-	  GameParameters::Player player;
-	  player.name = name;
-	  if (type == HUMAN_PLAYER_TYPE)
-	    player.type = GameParameters::Player::HUMAN;
-	  else if (type == EASY_PLAYER_TYPE)
-	    player.type = GameParameters::Player::EASY;
-	  else if (type == HARD_PLAYER_TYPE)
-	    player.type = GameParameters::Player::HARD;
-	  else if (type == NO_PLAYER_TYPE)
-	    player.type = GameParameters::Player::OFF;
-	  player.id = c;
-	  pl->syncPlayer(player);
-	  Player *p = pl->getPlayer(player.id);
-	  (*i)[player_columns.player] = p;
-	  if (p)
-	    p->setGold(gold);
-	}
-    }
-
-  return response;
+  dialog->run();
+  return d_changed;
 }
 
 void PlayersDialog::cell_data_type(Gtk::CellRenderer *renderer,
@@ -195,9 +193,11 @@ void PlayersDialog::on_type_edited(const Glib::ustring &path,
                                    const Glib::ustring &new_text)
 {
   (*player_list->get_iter(Gtk::TreePath(path)))[player_columns.type] = new_text;
+  d_changed = true;
+  update_player ();
 }
 
-void PlayersDialog::add_player(const Glib::ustring &type, 
+void PlayersDialog::add_player(const Glib::ustring &type,
                                const Glib::ustring &name, int gold, Player *player)
 {
   Gtk::TreeIter i = player_list->append();
@@ -212,10 +212,10 @@ void PlayersDialog::add_player(const Glib::ustring &type,
 void PlayersDialog::cell_data_gold(Gtk::CellRenderer *renderer,
 				  const Gtk::TreeIter& i)
 {
-    dynamic_cast<Gtk::CellRendererSpin*>(renderer)->property_adjustment()
-          = Gtk::Adjustment::create((*i)[player_columns.gold], 0, 10000, 1);
-    dynamic_cast<Gtk::CellRendererSpin*>(renderer)->property_text() = 
-      String::ucompose("%1", (*i)[player_columns.gold]);
+  dynamic_cast<Gtk::CellRendererSpin*>(renderer)->property_adjustment()
+    = Gtk::Adjustment::create((*i)[player_columns.gold], 0, 10000, 1);
+  dynamic_cast<Gtk::CellRendererSpin*>(renderer)->property_text() =
+    String::ucompose("%1", (*i)[player_columns.gold]);
 }
 
 void PlayersDialog::on_gold_edited(const Glib::ustring &path,
@@ -223,19 +223,23 @@ void PlayersDialog::on_gold_edited(const Glib::ustring &path,
 {
   int gold = atoi(new_text.c_str());
   (*player_list->get_iter(Gtk::TreePath(path)))[player_columns.gold] = gold;
+  d_changed = true;
+  update_player ();
 }
 
 void PlayersDialog::cell_data_name(Gtk::CellRenderer *renderer,
 				  const Gtk::TreeIter& i)
 {
-    dynamic_cast<Gtk::CellRendererText*>(renderer)->property_text() = 
-      String::ucompose("%1", (*i)[player_columns.name]);
+  dynamic_cast<Gtk::CellRendererText*>(renderer)->property_text() =
+    String::ucompose("%1", (*i)[player_columns.name]);
 }
 
 void PlayersDialog::on_name_edited(const Glib::ustring &path,
 				   const Glib::ustring &new_text)
 {
   (*player_list->get_iter(Gtk::TreePath(path)))[player_columns.name] = new_text;
+  d_changed = true;
+  update_player ();
 }
 
 void PlayersDialog::on_randomize_gold_pressed()
@@ -247,12 +251,22 @@ void PlayersDialog::on_randomize_gold_pressed()
       d_random->getBaseGold(100, &gold);
       gold = d_random->adjustBaseGold(gold);
       (*i)[player_columns.gold] = gold;
+      Player *p = (*i)[player_columns.player];
+      p->setGold (gold);
     }
+  d_changed = true;
 }
 
 void PlayersDialog::on_all_players_on_pressed()
 {
   for (Gtk::TreeIter i = player_list->children().begin(),
        end = player_list->children().end(); i != end; ++i)
-    (*i)[player_type_columns.type] = HUMAN_PLAYER_TYPE;
+    {
+      (*i)[player_type_columns.type] = HUMAN_PLAYER_TYPE;
+      GameParameters::Player player = to_player (i);
+      Playerlist::getInstance ()->syncPlayer(player);
+      Player *p = Playerlist::getInstance ()->getPlayer(player.id);
+      (*i)[player_columns.player] = p;
+    }
+  d_changed = true;
 }
