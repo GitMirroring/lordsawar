@@ -29,7 +29,7 @@ public:
     PastChooser();
 
     //! Destructor.
-    ~PastChooser() {};
+    ~PastChooser() {}
 
     //! Store a folder for the file pattern and dir in the given filechooser.
     /**

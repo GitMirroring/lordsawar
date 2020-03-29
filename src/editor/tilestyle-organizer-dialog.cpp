@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2010, 2012, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "Tile.h"
 #include "ImageCache.h"
 #include "timing.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &TileStyleOrganizerDialog::x)
 
@@ -185,8 +186,16 @@ void TileStyleOrganizerDialog::add_category(guint32 type)
 {
   ImageCache *gc = ImageCache::getInstance();
   Gtk::TreeModel::Row row = *(categories_list->append());
-  row[categories_columns.image] = 
-    gc->getDefaultTileStylePic(type, 80)->to_pixbuf();
+  double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
+  PixMask *p = gc->getDefaultTileStylePic(type, 80)->copy ();
+  int font_size = FontSize::getInstance()->get_height ();
+  double new_height = font_size * ratio;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height
+    (p, new_height);
+  PixMask::scale (p, new_width, new_height);
+  row[categories_columns.image] = p->to_pixbuf ();
+  delete p;
   row[categories_columns.name] = TileStyle::getTypeName(TileStyle::Type(type));
   row[categories_columns.type] = type;
 }
@@ -199,7 +208,17 @@ void TileStyleOrganizerDialog::empty_category()
 void TileStyleOrganizerDialog::add_tilestyle(Glib::RefPtr<Gtk::ListStore> list, TileStyle *tilestyle)
 {
   Gtk::TreeModel::Row row = *(list->append());
-  row[tilestyle_columns.image] = tilestyle->getImage()->to_pixbuf();
+  double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
+
+  PixMask *p = tilestyle->getImage ()->copy ();
+  int font_size = FontSize::getInstance()->get_height ();
+  double new_height = font_size * ratio;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height
+    (p, new_height);
+  PixMask::scale (p, new_width, new_height);
+  row[tilestyle_columns.image] = p->to_pixbuf();
+  delete p;
   row[tilestyle_columns.name] = "0x" + 
     TileStyle::idToString(tilestyle->getId());
   row[tilestyle_columns.style] = tilestyle;

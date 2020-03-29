@@ -32,7 +32,7 @@ class ShieldSetInfoDialog: public LwEditorDialog
 
     //returns true if we changed anything
     bool run();
-    
+
  private:
     Shieldset *d_shieldset;
     bool d_changed;
@@ -40,17 +40,30 @@ class ShieldSetInfoDialog: public LwEditorDialog
     Gtk::TextView *copyright_textview;
     Gtk::TextView *license_textview;
     Gtk::Entry *filename_entry;
-    Gtk::SpinButton *id_spinbutton;
     Gtk::Button *close_button;
     Gtk::Label *status_label;
     Gtk::TextView *description_textview;
     Gtk::Label *location_label;
     Gtk::Notebook *notebook;
+    Gtk::SpinButton *small_width_spinbutton;
+    Gtk::SpinButton *small_height_spinbutton;
+    Gtk::SpinButton *medium_width_spinbutton;
+    Gtk::SpinButton *medium_height_spinbutton;
+    Gtk::SpinButton *large_width_spinbutton;
+    Gtk::SpinButton *large_height_spinbutton;
+    Gtk::Button *fit_button;
 
     void on_name_changed();
     void on_copyright_changed ();
     void on_license_changed ();
     void on_description_changed ();
+    void on_small_width_changed ();
+    void on_small_height_changed ();
+    void on_medium_width_changed ();
+    void on_medium_height_changed ();
+    void on_large_width_changed ();
+    void on_large_height_changed ();
+    void on_fit_pressed ();
 };
 
 #endif

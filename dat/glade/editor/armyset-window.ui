@@ -104,7 +104,7 @@
                       <object class="GtkMenuItem" id="new_armyset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">New Armyset</property>
+                        <property name="label" translatable="yes">New</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -112,7 +112,7 @@
                       <object class="GtkMenuItem" id="load_armyset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Load Armyset</property>
+                        <property name="label" translatable="yes">Open...</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -120,7 +120,7 @@
                       <object class="GtkMenuItem" id="save_armyset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Save Armyset</property>
+                        <property name="label" translatable="yes">Save</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -128,7 +128,7 @@
                       <object class="GtkMenuItem" id="save_as_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Save A Copy</property>
+                        <property name="label" translatable="yes">Save As...</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -136,7 +136,7 @@
                       <object class="GtkMenuItem" id="validate_armyset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Validate Armyset</property>
+                        <property name="label" translatable="yes">Validate</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -172,7 +172,7 @@
                       <object class="GtkMenuItem" id="edit_armyset_info_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Armyset Information</property>
+                        <property name="label" translatable="yes">Armyset Properties</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -180,7 +180,7 @@
                       <object class="GtkMenuItem" id="edit_ship_picture_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Edit Ship Picture</property>
+                        <property name="label" translatable="yes">Ship Picture</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -188,7 +188,7 @@
                       <object class="GtkMenuItem" id="edit_standard_picture_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Edit Hero Flag Picture</property>
+                        <property name="label" translatable="yes">Hero Flag Picture</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -196,7 +196,7 @@
                       <object class="GtkMenuItem" id="edit_bag_picture_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Edit Bag of Items Picture</property>
+                        <property name="label" translatable="yes">Bag of Items Picture</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -572,6 +572,7 @@
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
+                                                <property name="tooltip_text" translatable="yes">The price to make one of these armies.</property>
                                                 <property name="valign">end</property>
                                                 <property name="label" translatable="yes">Cost</property>
                                                 <attributes>
@@ -883,15 +884,27 @@
                                             <property name="orientation">vertical</property>
                                             <property name="spacing">6</property>
                                             <child>
-                                              <object class="GtkLabel">
+                                              <object class="GtkBox">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="valign">end</property>
-                                                <property name="label" translatable="yes">Subtract All
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="valign">end</property>
+                                                    <property name="label" translatable="yes">Subtract All
 Non-Hero Bonuses</property>
-                                                <attributes>
-                                                  <attribute name="underline" value="True"/>
-                                                </attributes>
+                                                    <property name="justify">center</property>
+                                                    <attributes>
+                                                      <attribute name="underline" value="True"/>
+                                                    </attributes>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">True</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
                                               </object>
                                               <packing>
                                                 <property name="expand">False</property>
@@ -948,15 +961,27 @@ Non-Hero Bonuses</property>
                                             <property name="orientation">vertical</property>
                                             <property name="spacing">6</property>
                                             <child>
-                                              <object class="GtkLabel">
+                                              <object class="GtkBox">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="valign">end</property>
-                                                <property name="label" translatable="yes">Subtract All
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="valign">end</property>
+                                                    <property name="label" translatable="yes">Subtract All
 Hero Bonuses</property>
-                                                <attributes>
-                                                  <attribute name="underline" value="True"/>
-                                                </attributes>
+                                                    <property name="justify">center</property>
+                                                    <attributes>
+                                                      <attribute name="underline" value="True"/>
+                                                    </attributes>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">True</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
                                               </object>
                                               <packing>
                                                 <property name="expand">False</property>
@@ -1781,15 +1806,27 @@ Hero Bonuses</property>
                                             <property name="orientation">vertical</property>
                                             <property name="spacing">6</property>
                                             <child>
-                                              <object class="GtkLabel">
+                                              <object class="GtkBox">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="valign">end</property>
-                                                <property name="label" translatable="yes">Travels Faster
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="valign">end</property>
+                                                    <property name="label" translatable="yes">Travels Faster
 In Mountains</property>
-                                                <attributes>
-                                                  <attribute name="underline" value="True"/>
-                                                </attributes>
+                                                    <property name="justify">center</property>
+                                                    <attributes>
+                                                      <attribute name="underline" value="True"/>
+                                                    </attributes>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">True</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
                                               </object>
                                               <packing>
                                                 <property name="expand">False</property>
@@ -1846,15 +1883,27 @@ In Mountains</property>
                                             <property name="orientation">vertical</property>
                                             <property name="spacing">6</property>
                                             <child>
-                                              <object class="GtkLabel">
+                                              <object class="GtkBox">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="valign">end</property>
-                                                <property name="label" translatable="yes">Travels Faster
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="valign">end</property>
+                                                    <property name="label" translatable="yes">Travels Faster
 In Hills</property>
-                                                <attributes>
-                                                  <attribute name="underline" value="True"/>
-                                                </attributes>
+                                                    <property name="justify">center</property>
+                                                    <attributes>
+                                                      <attribute name="underline" value="True"/>
+                                                    </attributes>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">True</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
                                               </object>
                                               <packing>
                                                 <property name="expand">False</property>
@@ -1911,15 +1960,27 @@ In Hills</property>
                                             <property name="orientation">vertical</property>
                                             <property name="spacing">6</property>
                                             <child>
-                                              <object class="GtkLabel">
+                                              <object class="GtkBox">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="valign">end</property>
-                                                <property name="label" translatable="yes">Travels Faster
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="valign">end</property>
+                                                    <property name="label" translatable="yes">Travels Faster
 In Marshland</property>
-                                                <attributes>
-                                                  <attribute name="underline" value="True"/>
-                                                </attributes>
+                                                    <property name="justify">center</property>
+                                                    <attributes>
+                                                      <attribute name="underline" value="True"/>
+                                                    </attributes>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">True</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
                                               </object>
                                               <packing>
                                                 <property name="expand">False</property>
@@ -1976,15 +2037,27 @@ In Marshland</property>
                                             <property name="orientation">vertical</property>
                                             <property name="spacing">6</property>
                                             <child>
-                                              <object class="GtkLabel">
+                                              <object class="GtkBox">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="valign">end</property>
-                                                <property name="label" translatable="yes">Travels Faster
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="valign">end</property>
+                                                    <property name="label" translatable="yes">Travels Faster
 In Forests</property>
-                                                <attributes>
-                                                  <attribute name="underline" value="True"/>
-                                                </attributes>
+                                                    <property name="justify">center</property>
+                                                    <attributes>
+                                                      <attribute name="underline" value="True"/>
+                                                    </attributes>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">True</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
                                               </object>
                                               <packing>
                                                 <property name="expand">False</property>
@@ -2460,6 +2533,7 @@ In Forests</property>
                                               <object class="GtkLabel">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
+                                                <property name="tooltip_text" translatable="yes">The one time price to make a city be able to produce one of these army types.</property>
                                                 <property name="valign">end</property>
                                                 <property name="label" translatable="yes">New Cost</property>
                                                 <attributes>
@@ -2762,7 +2836,7 @@ In Forests</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
-                                        <property name="label" translatable="yes">White Picture</property>
+                                        <property name="label" translatable="yes">White</property>
                                         <attributes>
                                           <attribute name="underline" value="True"/>
                                         </attributes>
@@ -2815,7 +2889,7 @@ In Forests</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
-                                        <property name="label" translatable="yes">Green Picture</property>
+                                        <property name="label" translatable="yes">Green</property>
                                         <attributes>
                                           <attribute name="underline" value="True"/>
                                         </attributes>
@@ -2873,7 +2947,7 @@ In Forests</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="valign">end</property>
-                                            <property name="label" translatable="yes">Yellow Picture</property>
+                                            <property name="label" translatable="yes">Yellow</property>
                                             <attributes>
                                               <attribute name="underline" value="True"/>
                                             </attributes>
@@ -2933,7 +3007,7 @@ In Forests</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
-                                        <property name="label" translatable="yes">Orange Picture</property>
+                                        <property name="label" translatable="yes">Orange</property>
                                         <attributes>
                                           <attribute name="underline" value="True"/>
                                         </attributes>
@@ -2986,7 +3060,7 @@ In Forests</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
-                                        <property name="label" translatable="yes">Black Picture</property>
+                                        <property name="label" translatable="yes">Black</property>
                                         <attributes>
                                           <attribute name="underline" value="True"/>
                                         </attributes>
@@ -3039,7 +3113,7 @@ In Forests</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
-                                        <property name="label" translatable="yes">Neutral Picture</property>
+                                        <property name="label" translatable="yes">Neutral</property>
                                         <attributes>
                                           <attribute name="underline" value="True"/>
                                         </attributes>
@@ -3092,7 +3166,7 @@ In Forests</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
-                                        <property name="label" translatable="yes">Light Blue Picture</property>
+                                        <property name="label" translatable="yes">Light Blue</property>
                                         <attributes>
                                           <attribute name="underline" value="True"/>
                                         </attributes>
@@ -3145,7 +3219,7 @@ In Forests</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
-                                        <property name="label" translatable="yes">Red Picture</property>
+                                        <property name="label" translatable="yes">Red</property>
                                         <attributes>
                                           <attribute name="underline" value="True"/>
                                         </attributes>
@@ -3198,7 +3272,7 @@ In Forests</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
-                                        <property name="label" translatable="yes">Dark Blue Picture</property>
+                                        <property name="label" translatable="yes">Dark Blue</property>
                                         <attributes>
                                           <attribute name="underline" value="True"/>
                                         </attributes>
@@ -3245,16 +3319,29 @@ In Forests</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
+                                    <property name="spacing">6</property>
                                     <child>
-                                      <object class="GtkLabel">
+                                      <object class="GtkBox">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="valign">end</property>
-                                        <property name="label" translatable="yes">Make All Pics
+                                        <child>
+                                          <object class="GtkLabel">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="valign">end</property>
+                                            <property name="label" translatable="yes">Make All Images
 Same As White</property>
-                                        <attributes>
-                                          <attribute name="underline" value="True"/>
-                                        </attributes>
+                                            <property name="justify">center</property>
+                                            <attributes>
+                                              <attribute name="underline" value="True"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">True</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>

@@ -231,6 +231,8 @@ const double DIALOG_RUIN_PIC_FONT_SIZE_MULTIPLE = 23;
 const double DIALOG_PARLEY_PIC_FONT_SIZE_MULTIPLE = 41;
 //scale for the underline beneath the shields in the turn indicator
 const double  TURN_INDICATOR_FONT_SIZE_MULTIPLE = 0.3;
+//scale for tile graphics appearing on dialogs in the scenario builder
+const double EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE = 5.3;
 
 //do dialog pics too
 

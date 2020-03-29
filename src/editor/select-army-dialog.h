@@ -37,7 +37,7 @@ class SelectArmyDialog: public LwEditorDialog
     SelectArmyDialog(Gtk::Window &parent, Player *p, bool hero_too = false,
 		     bool defends_ruins = false,
 		     bool rewardable = false);
-    ~SelectArmyDialog() {};
+    ~SelectArmyDialog() {}
 
     void run();
 

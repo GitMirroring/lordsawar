@@ -26,7 +26,7 @@ class EditorSaveChangesDialog: public LwEditorDialog
 {
  public:
     EditorSaveChangesDialog(Gtk::Window &parent, Glib::ustring text);
-    ~EditorSaveChangesDialog() {};
+    ~EditorSaveChangesDialog() {}
 
  private:
     Gtk::Label *label;

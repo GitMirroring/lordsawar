@@ -30,7 +30,7 @@ class TileStyleOrganizerDialog: public LwEditorDialog
 {
  public:
     TileStyleOrganizerDialog(Gtk::Window &parent, Tile *tile);
-    ~TileStyleOrganizerDialog() {};
+    ~TileStyleOrganizerDialog() {}
 
     sigc::signal<void, guint32> tilestyle_selected;
 

@@ -129,9 +129,12 @@ bool Shieldset::loadShield(Glib::ustring tag, XML_Helper* helper)
   if (tag == Tartan::d_tag)
     {
       Tartan * t = new Tartan(helper);
-      back()->setName(Tartan::LEFT, t->getName(Tartan::LEFT));
-      back()->setName(Tartan::CENTER, t->getName(Tartan::CENTER));
-      back()->setName(Tartan::RIGHT, t->getName(Tartan::RIGHT));
+      back()->setTartanImageName(Tartan::LEFT,
+                                 t->getTartanImageName(Tartan::LEFT));
+      back()->setTartanImageName(Tartan::CENTER,
+                                 t->getTartanImageName(Tartan::CENTER));
+      back()->setTartanImageName(Tartan::RIGHT,
+                                 t->getTartanImageName(Tartan::RIGHT));
       delete t;
       return true;
     }
@@ -236,11 +239,15 @@ bool Shieldset::save(XML_Helper *helper) const
   return retval;
 }
 
-void Shieldset::instantiateImages(bool &broken)
+void Shieldset::instantiateImages(bool scale, bool &broken)
 {
   uninstantiateImages();
   for (iterator it = begin(); it != end(); it++)
-    (*it)->instantiateImages(this, broken);
+    {
+      (*it)->instantiateImages(this, scale, broken);
+      if (broken)
+        break;
+    }
 }
 
 void Shieldset::uninstantiateImages()
@@ -370,7 +377,7 @@ void Shieldset::reload(bool &broken)
         delete *it;
       Glib::ustring basename = getBaseName();
       *this = *d.shieldset;
-      instantiateImages(broken);
+      instantiateImages(true, broken);
       setBaseName(basename);
     }
 }
@@ -413,46 +420,122 @@ Shieldset* Shieldset::copy(const Shieldset *shieldset)
 
 void Shieldset::setHeightsAndWidthsFromImages()
 {
+  setSmallHeightsAndWidthsFromImages();
+  setMediumHeightsAndWidthsFromImages();
+  setLargeHeightsAndWidthsFromImages();
+}
+
+void Shieldset::setHeightsAndWidthsFromImages(ShieldStyle *ss)
+{
+  ShieldStyle::Type t = ShieldStyle::Type(ss->getType ());
+  switch (t)
+    {
+    case ShieldStyle::SMALL:
+      return setSmallHeightsAndWidthsFromImages();
+    case ShieldStyle::MEDIUM:
+      return setMediumHeightsAndWidthsFromImages();
+    case ShieldStyle::LARGE:
+      return setLargeHeightsAndWidthsFromImages();
+    }
+}
+
+void Shieldset::setSmallHeightsAndWidthsFromImages()
+{
   d_small_width = 0;
   d_small_height = 0;
-  d_medium_width = 0;
-  d_medium_height = 0;
-  d_large_width = 0;
-  d_large_height = 0;
+  std::map<Vector<int>, guint32> small_sizecounts;
+
   for (iterator it = begin(); it != end(); it++)
     for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); i++)
       {
         PixMask *image = (*i)->getImage();
         if (image == NULL)
           continue;
-        guint32 height = 0;
-        if (image->get_height() > 0)
-          height = image->get_unscaled_height();
-        guint32 width = 0;
-        if (image->get_unscaled_width() > 0)
-          width = image->get_width();
-        if ((*i)->getType() == ShieldStyle::SMALL)
+        switch ((*i)->getType ())
           {
-            if (width > d_small_width)
-              d_small_width = width;
-            if (height > d_small_height)
-              d_small_height = height;
-          }
-        else if ((*i)->getType() == ShieldStyle::MEDIUM)
-          {
-            if (width > d_medium_width)
-              d_medium_width = width;
-            if (height > d_medium_height)
-              d_medium_height = height;
-          }
-        else if ((*i)->getType() == ShieldStyle::LARGE)
-          {
-            if (width > d_large_width)
-              d_large_width = width;
-            if (height > d_large_height)
-              d_large_height = height;
+          case ShieldStyle::SMALL:
+            small_sizecounts[image->get_unscaled_dim ()]++;
+            break;
           }
       }
+
+  guint32 maxcount = 0;
+  for (auto i : small_sizecounts)
+    {
+      if (i.second > maxcount)
+        {
+          maxcount = i.second;
+          d_small_width = i.first.x;
+          d_small_height = i.first.y;
+        }
+    }
+  return;
+}
+
+void Shieldset::setMediumHeightsAndWidthsFromImages()
+{
+  d_medium_width = 0;
+  d_medium_height = 0;
+  std::map<Vector<int>, guint32> medium_sizecounts;
+
+  for (iterator it = begin(); it != end(); it++)
+    for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); i++)
+      {
+        PixMask *image = (*i)->getImage();
+        if (image == NULL)
+          continue;
+        switch ((*i)->getType ())
+          {
+          case ShieldStyle::MEDIUM:
+            medium_sizecounts[image->get_unscaled_dim ()]++;
+            break;
+          }
+      }
+
+  guint32 maxcount = 0;
+  for (auto i : medium_sizecounts)
+    {
+      if (i.second > maxcount)
+        {
+          maxcount = i.second;
+          d_medium_width = i.first.x;
+          d_medium_height = i.first.y;
+        }
+    }
+  return;
+}
+
+void Shieldset::setLargeHeightsAndWidthsFromImages()
+{
+  d_large_width = 0;
+  d_large_height = 0;
+  std::map<Vector<int>, guint32> large_sizecounts;
+
+  for (iterator it = begin(); it != end(); it++)
+    for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); i++)
+      {
+        PixMask *image = (*i)->getImage();
+        if (image == NULL)
+          continue;
+        switch ((*i)->getType ())
+          {
+          case ShieldStyle::LARGE:
+            large_sizecounts[image->get_unscaled_dim ()]++;
+            break;
+          }
+      }
+
+  guint32 maxcount = 0;
+  for (auto i : large_sizecounts)
+    {
+      if (i.second > maxcount)
+        {
+          maxcount = i.second;
+          d_large_width = i.first.x;
+          d_large_height = i.first.y;
+        }
+    }
+  return;
 }
 
 void Shieldset::lookupTartanImage(guint32 colour, Tartan::Type type,
@@ -486,4 +569,54 @@ void Shieldset::lookupTartanImage(guint32 colour, Tartan::Type type,
   return;
 }
 
+void Shieldset ::uninstantiateSameNamedImages (Glib::ustring name)
+{
+  for (auto s : *this)
+    {
+      for (auto ss : *s)
+        if (ss->getImageName () == name)
+          {
+            ss->uninstantiateImages ();
+            ss->setImageName ("");
+          }
+      if (s->getTartanImageName (Tartan::LEFT) == name)
+        {
+          s->uninstantiateTartanImage (Tartan::LEFT);
+          s->setTartanImageName (Tartan::LEFT, "");
+        }
+      if (s->getTartanImageName (Tartan::CENTER) == name)
+        {
+          s->uninstantiateTartanImage (Tartan::CENTER);
+          s->setTartanImageName (Tartan::CENTER, "");
+        }
+      if (s->getTartanImageName (Tartan::RIGHT) == name)
+        {
+          s->uninstantiateTartanImage (Tartan::RIGHT);
+          s->setTartanImageName (Tartan::RIGHT, "");
+        }
+    }
+}
+        
+bool Shieldset::isAnyHeightAndWidthSet()
+{
+  return
+    isSmallHeightAndWidthSet () ||
+    isMediumHeightAndWidthSet () ||
+    isLargeHeightAndWidthSet ();
+}
+
+bool Shieldset::isSmallHeightAndWidthSet()
+{
+  return d_small_width && d_small_height;
+}
+
+bool Shieldset::isMediumHeightAndWidthSet()
+{
+  return d_medium_width && d_medium_height;
+}
+
+bool Shieldset::isLargeHeightAndWidthSet()
+{
+  return d_large_width && d_large_height;
+}
 //End of file

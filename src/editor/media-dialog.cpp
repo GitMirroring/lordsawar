@@ -31,6 +31,7 @@
 #include "shieldsetlist.h"
 #include "shieldset.h"
 #include "playerlist.h"
+#include "past-chooser.h"
 
 #define method(x) sigc::mem_fun(*this, &MediaDialog::x)
 
@@ -101,7 +102,7 @@ void MediaDialog::fill_image_button(Gtk::Button *button, Glib::ustring name)
   if (name == "")
     button->set_label (_("override default"));
   else
-    button->set_label (name + ".png");
+    button->set_label (name);
 }
 
 void MediaDialog::fill_sound_button(Gtk::Button *button, Glib::ustring name)
@@ -146,171 +147,326 @@ int MediaDialog::run()
   return response;
 }
 
-void MediaDialog::on_image_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<Glib::ustring> getDefaultFilename, sigc::slot<void,Glib::ustring> setName, int num_frames)
+void MediaDialog::on_image_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<void,Glib::ustring> setName, int num_frames, std::vector<PixMask *> frames)
 {
   TarFile *t = d_tarfile;
-  Glib::ustring oldfile = getName() == "" ?
-    getDefaultFilename() : t->getFileFromConfigurationFile(getName());
-
-  ImageEditorDialog d (*dialog, oldfile, num_frames);
+  Glib::ustring imgname = getName ();
+  ImageEditorDialog d (*dialog, imgname, num_frames, frames, 0);
   int response = d.run();
+
   if (response == Gtk::RESPONSE_ACCEPT)
     {
-      Glib::ustring newfile = d.get_selected_filename();
-      d.hide();
-      if (File::exists (newfile) == false)
-        return;
-      Glib::ustring bname = File::get_basename(newfile, true);
-      if (getName() == "")
-        t->addFileInConfigurationFile(newfile);
-      else
-        t->replaceFileInConfigurationFile(bname, newfile);
-      setName(File::get_basename (bname, false));
-      if (newfile == getDefaultFilename())
+      if (d.get_filename () != "")
         {
-          t->removeFileInConfigurationFile(bname);
-          setName("");
+          Glib::ustring newname = "";
+          bool success = false;
+          if (getName() == "")
+            success = t->addFileInCfgFile(d.get_filename (), newname);
+          else
+            success = t->replaceFileInCfgFile(imgname, d.get_filename (),
+                                              newname);
+          if (success)
+            {
+              setName(newname);
+              d_needs_saving = true;
+              fill_in_buttons();
+            }
+          else
+            {
+              Glib::ustring errmsg = Glib::strerror(errno);
+              Gtk::MessageDialog
+                td(*d.get_dialog (),
+                   String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
+                                    d.get_filename (),
+                                    t->getConfigurationFile(), errmsg));
+              td.run();
+              td.hide();
+            }
         }
-      d_needs_saving = true;
-      fill_in_buttons();
     }
+  else if (response == Gtk::RESPONSE_REJECT)
+    {
+      if (imgname.empty () == false)
+        {
+          if (t->removeFileInCfgFile(imgname))
+            {
+              setName ("");
+              d_needs_saving = true;
+              fill_in_buttons();
+            }
+          else
+            {
+              Glib::ustring errmsg = Glib::strerror(errno);
+              Gtk::MessageDialog
+                td(*d.get_dialog (),
+                   String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
+                                    imgname,
+                                    t->getConfigurationFile(),
+                                    errmsg));
+              td.run();
+              td.hide();
+            }
+        }
+    }
+  d.hide();
 }
 
-void MediaDialog::on_masked_image_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<Glib::ustring> getDefaultFilename, sigc::slot<void,Glib::ustring> setName, Shieldset *ss)
+void MediaDialog::on_masked_image_button_activated(sigc::slot<Glib::ustring> getName, PixMask *image, PixMask *mask, sigc::slot<void,Glib::ustring> setName, Shieldset *ss)
 {
   TarFile *t = d_tarfile;
-  Glib::ustring oldfile = getName() == "" ?
-    getDefaultFilename() : t->getFileFromConfigurationFile(getName());
+  Glib::ustring imgname = getName ();
 
-  MaskedImageEditorDialog d (*dialog, oldfile, ss);
+  MaskedImageEditorDialog d (*dialog, imgname, image, mask, 0, ss);
   int response = d.run();
-  if (response == Gtk::RESPONSE_ACCEPT)
+
+  if (response == Gtk::RESPONSE_ACCEPT && d.get_filename () != "")
     {
-      Glib::ustring newfile = d.get_selected_filename();
-      d.hide();
-      if (File::exists (newfile) == false)
-        return;
-      Glib::ustring bname = File::get_basename(newfile, true);
+      Glib::ustring newname = "";
+      bool success = false;
       if (getName() == "")
-        t->addFileInConfigurationFile(newfile);
+        success = t->addFileInCfgFile(d.get_filename (), newname);
       else
-        t->replaceFileInConfigurationFile(bname, newfile);
-      setName(File::get_basename (bname, false));
-      if (newfile == getDefaultFilename())
+        success = t->replaceFileInCfgFile(imgname, d.get_filename (), newname);
+      if (success)
         {
-          t->removeFileInConfigurationFile(bname);
-          setName("");
+          setName(newname);
+          d_needs_saving = true;
+          fill_in_buttons();
         }
-      d_needs_saving = true;
-      fill_in_buttons();
+      else
+        {
+          Glib::ustring errmsg = Glib::strerror(errno);
+          Gtk::MessageDialog
+            td(*d.get_dialog (),
+               String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
+                                d.get_filename (),
+                                t->getConfigurationFile(),
+                                errmsg));
+          td.run();
+          td.hide();
+        }
     }
+  else if (response == Gtk::RESPONSE_REJECT)
+    {
+      if (imgname.empty () == false)
+        {
+          if (t->removeFileInCfgFile(imgname))
+            {
+              setName ("");
+              d_needs_saving = true;
+              fill_in_buttons();
+            }
+          else
+            {
+              Glib::ustring errmsg = Glib::strerror(errno);
+              Gtk::MessageDialog
+                td(*d.get_dialog (),
+                   String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
+                                    imgname, t->getConfigurationFile(),
+                                    errmsg));
+              td.run();
+              td.hide();
+            }
+        }
+    }
+  d.hide();
 }
 
 void MediaDialog::on_sound_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<Glib::ustring> getDefaultFilename, sigc::slot<void, Glib::ustring> setName)
 {
   TarFile *t = d_tarfile;
-  Gtk::FileChooserDialog chooser(*dialog, _("Choose Sound File"));
-  Glib::RefPtr<Gtk::FileFilter> map_filter = Gtk::FileFilter::create();
-  map_filter->set_name(_("Sound Files (*.ogg)"));
-  map_filter->add_pattern("*.ogg");
-  chooser.add_filter(map_filter);
+  Glib::ustring sndname = getName ();
+  Glib::ustring oldfile = getDefaultFilename ();
+  if (sndname.empty () == false)
+    oldfile = t->getFileFromConfigurationFile(sndname + ".ogg");
 
-  Glib::ustring oldfile = getDefaultFilename();
-  if (getName() != "")
-    oldfile = t->getFileFromConfigurationFile(getName());
-  chooser.set_current_folder(File::get_dirname (oldfile));
-  chooser.set_filename(oldfile);
+  Gtk::FileChooserDialog d(*dialog, _("Choose Sound File"));
+  Glib::RefPtr<Gtk::FileFilter> ogg_filter = Gtk::FileFilter::create();
+  ogg_filter->set_name(_("Sound Files (*.ogg)"));
+  ogg_filter->add_pattern("*.ogg");
+  d.add_filter(ogg_filter);
 
-  chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-  chooser.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
-  chooser.set_default_response(Gtk::RESPONSE_ACCEPT);
+  d.set_current_folder(PastChooser::getInstance()->get_dir(&d));
 
-  chooser.show_all();
-  int res = chooser.run();
+  if (sndname.empty () == false)
+    d.add_button(Gtk::Stock::CLEAR, Gtk::RESPONSE_REJECT);
+  d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  d.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
+  d.set_default_response(Gtk::RESPONSE_ACCEPT);
+
+  d.show_all();
+  int res = d.run();
+  if (sndname.empty () == false)
+    File::erase (oldfile);
 
   if (res == Gtk::RESPONSE_ACCEPT)
     {
-      Glib::ustring newfile = chooser.get_filename();
-      chooser.hide();
-      if (File::exists (newfile) == false)
-        return;
-      Glib::ustring bname = File::get_basename(newfile, true);
-      if (getName() == "")
-        t->addFileInConfigurationFile(newfile);
-      else
-        t->replaceFileInConfigurationFile(bname, newfile);
-      setName(File::get_basename (bname, false));
-      if (newfile == getDefaultFilename())
+      if (File::nameEndsWith(d.get_filename (), ".ogg") != true)
         {
-          t->removeFileInConfigurationFile(bname);
-          setName("");
+          Gtk::MessageDialog td(d,
+                                _("Only OGG files can be used for sound."));
+          td.run();
+          td.hide();
         }
-      fill_in_buttons();
-      d_needs_saving = true;
+
+      if (d.get_filename () != getDefaultFilename ())
+        {
+          Glib::ustring newname = "";
+          bool success = false;
+          if (getName() == "")
+            success = t->addFileInCfgFile(d.get_filename (), newname);
+          else
+            success = t->replaceFileInCfgFile(sndname, d.get_filename (),
+                                              newname);
+          if (success)
+            {
+              setName(newname);
+              d_needs_saving = true;
+              fill_in_buttons();
+            }
+          else
+            {
+              Glib::ustring errmsg = Glib::strerror(errno);
+              Gtk::MessageDialog
+                td(d,
+                   String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
+                                    d.get_filename (),
+                                    t->getConfigurationFile(), errmsg));
+              td.run();
+              td.hide();
+            }
+        }
     }
+  else if (res == Gtk::RESPONSE_REJECT)
+    {
+      if (sndname.empty () == false)
+        {
+          if (t->removeFileInCfgFile(sndname + ".ogg"))
+            {
+              setName ("");
+              d_needs_saving = true;
+              fill_in_buttons();
+            }
+          else
+            {
+              Glib::ustring errmsg = Glib::strerror(errno);
+              Gtk::MessageDialog
+                td(d,
+                   String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
+                                    sndname + ".ogg",
+                                    t->getConfigurationFile(),
+                                    errmsg));
+              td.run();
+              td.hide();
+            }
+        }
+    }
+  d.hide ();
 }
 
 void MediaDialog::on_next_turn_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  if (sm->getNextTurnImage ())
+    frames.push_back (sm->getNextTurnImage ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getNextTurnImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultNextTurnImageFilename),
-     sigc::mem_fun (sm, &ScenarioMedia::setNextTurnImageName), 1);
+     sigc::mem_fun (sm, &ScenarioMedia::setNextTurnImageName), 1, frames);
+  if (sm->getNextTurnImageName ().empty () == false)
+    sm->instantiateNextTurnImage (d_tarfile);
+  else
+    sm->clearNextTurnImage ();
 }
 
 void MediaDialog::on_city_defeated_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  if (sm->getCityDefeatedImage ())
+    frames.push_back (sm->getCityDefeatedImage ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getCityDefeatedImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultCityDefeatedImageFilename),
-     sigc::mem_fun (sm, &ScenarioMedia::setCityDefeatedImageName), 1);
+     sigc::mem_fun (sm, &ScenarioMedia::setCityDefeatedImageName), 1, frames);
+  if (sm->getCityDefeatedImageName ().empty () == false)
+    sm->instantiateCityDefeatedImage (d_tarfile);
+  else
+    sm->clearCityDefeatedImage ();
 }
 
 void MediaDialog::on_winning_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  if (sm->getWinningImage ())
+    frames.push_back (sm->getWinningImage ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getWinningImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultWinningImageFilename),
-     sigc::mem_fun (sm, &ScenarioMedia::setWinningImageName), 1);
+     sigc::mem_fun (sm, &ScenarioMedia::setWinningImageName), 1, frames);
+  if (sm->getWinningImageName ().empty () == false)
+    sm->instantiateWinningImage (d_tarfile);
+  else
+    sm->clearWinningImage ();
 }
 
 void MediaDialog::on_hero_male_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  if (sm->getMaleHeroImage ())
+    frames.push_back (sm->getMaleHeroImage ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getMaleHeroImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultMaleHeroImageFilename),
-     sigc::mem_fun (sm, &ScenarioMedia::setMaleHeroImageName), 1);
+     sigc::mem_fun (sm, &ScenarioMedia::setMaleHeroImageName), 1, frames);
+  if (sm->getMaleHeroImageName ().empty () == false)
+    sm->instantiateMaleHeroImage (d_tarfile);
+  else
+    sm->clearMaleHeroImage ();
 }
 
 void MediaDialog::on_hero_female_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  if (sm->getFemaleHeroImage ())
+    frames.push_back (sm->getFemaleHeroImage ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getFemaleHeroImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultFemaleHeroImageFilename),
-     sigc::mem_fun (sm, &ScenarioMedia::setFemaleHeroImageName), 1);
+     sigc::mem_fun (sm, &ScenarioMedia::setFemaleHeroImageName), 1, frames);
+  if (sm->getFemaleHeroImageName ().empty () == false)
+    sm->instantiateFemaleHeroImage (d_tarfile);
+  else
+    sm->clearFemaleHeroImage ();
 }
 
 void MediaDialog::on_ruin_success_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  if (sm->getRuinSuccessImage ())
+    frames.push_back (sm->getRuinSuccessImage ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getRuinSuccessImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultRuinSuccessImageFilename),
-     sigc::mem_fun (sm, &ScenarioMedia::setRuinSuccessImageName), 1);
+     sigc::mem_fun (sm, &ScenarioMedia::setRuinSuccessImageName), 1, frames);
+  if (sm->getRuinSuccessImageName ().empty () == false)
+    sm->instantiateRuinSuccessImage (d_tarfile);
+  else
+    sm->clearRuinSuccessImage ();
 }
 
 void MediaDialog::on_ruin_defeat_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  if (sm->getRuinDefeatImage ())
+    frames.push_back (sm->getRuinDefeatImage ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getRuinDefeatImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultRuinDefeatImageFilename),
-     sigc::mem_fun (sm, &ScenarioMedia::setRuinDefeatImageName), 1);
+     sigc::mem_fun (sm, &ScenarioMedia::setRuinDefeatImageName), 1, frames);
+  if (sm->getRuinDefeatImageName ().empty () == false)
+    sm->instantiateRuinDefeatImage (d_tarfile);
+  else
+    sm->clearRuinDefeatImage ();
 }
 
 void MediaDialog::on_hero_newlevel_male_button_activated()
@@ -318,9 +474,14 @@ void MediaDialog::on_hero_newlevel_male_button_activated()
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   on_masked_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getHeroNewLevelMaleImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultHeroNewLevelMaleImageFilename),
+     sm->getHeroNewLevelMaleImage(),
+     sm->getHeroNewLevelMaleMask(),
      sigc::mem_fun (sm, &ScenarioMedia::setHeroNewLevelMaleImageName),
      Shieldsetlist::getInstance()->get(Playerlist::getActiveplayer()->getId()));
+  if (sm->getHeroNewLevelMaleImageName ().empty () == false)
+    sm->instantiateHeroNewLevelMaleImage (d_tarfile);
+  else
+    sm->clearHeroNewLevelMaleImage ();
 }
 
 void MediaDialog::on_hero_newlevel_female_button_activated()
@@ -328,45 +489,78 @@ void MediaDialog::on_hero_newlevel_female_button_activated()
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   on_masked_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getHeroNewLevelFemaleImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultHeroNewLevelFemaleImageFilename),
+     sm->getHeroNewLevelFemaleImage(),
+     sm->getHeroNewLevelFemaleMask(),
      sigc::mem_fun (sm, &ScenarioMedia::setHeroNewLevelFemaleImageName),
      Shieldsetlist::getInstance()->get(Playerlist::getActiveplayer()->getId()));
+  if (sm->getHeroNewLevelFemaleImageName ().empty () == false)
+    sm->instantiateHeroNewLevelFemaleImage (d_tarfile);
+  else
+    sm->clearHeroNewLevelFemaleImage ();
 }
 
 void MediaDialog::on_parley_offered_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  if (sm->getParleyOfferedImage ())
+    frames.push_back (sm->getParleyOfferedImage ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getParleyOfferedImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultParleyOfferedImageFilename),
-     sigc::mem_fun (sm, &ScenarioMedia::setParleyOfferedImageName), 1);
+     sigc::mem_fun (sm, &ScenarioMedia::setParleyOfferedImageName), 1, frames);
+  if (sm->getParleyOfferedImageName ().empty () == false)
+    sm->instantiateParleyOfferedImage (d_tarfile);
+  else
+    sm->clearParleyOfferedImage ();
 }
 
 void MediaDialog::on_parley_refused_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  if (sm->getParleyRefusedImage ())
+    frames.push_back (sm->getParleyRefusedImage ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getParleyRefusedImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultParleyRefusedImageFilename),
-     sigc::mem_fun (sm, &ScenarioMedia::setParleyRefusedImageName), 1);
+     sigc::mem_fun (sm, &ScenarioMedia::setParleyRefusedImageName), 1, frames);
+  if (sm->getParleyRefusedImageName ().empty () == false)
+    sm->instantiateParleyRefusedImage (d_tarfile);
+  else
+    sm->clearParleyRefusedImage ();
 }
 
 void MediaDialog::on_small_medals_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  for (guint32 i = 0; i < MEDAL_TYPES; i++)
+    if (sm->getSmallMedalImage (i))
+      frames.push_back (sm->getSmallMedalImage (i));
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getSmallMedalsImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultSmallMedalsImageFilename),
-     sigc::mem_fun (sm, &ScenarioMedia::setSmallMedalsImageName), MEDAL_TYPES);
+     sigc::mem_fun (sm, &ScenarioMedia::setSmallMedalsImageName), MEDAL_TYPES,
+     frames);
+  if (sm->getSmallMedalsImageName ().empty () == false)
+    sm->instantiateSmallMedalImage (d_tarfile);
+  else
+    sm->clearSmallMedalImage ();
 }
 
 void MediaDialog::on_big_medals_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  for (guint32 i = 0; i < MEDAL_TYPES; i++)
+    if (sm->getBigMedalImage (i))
+      frames.push_back (sm->getBigMedalImage (i));
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getBigMedalsImageName),
-     sigc::ptr_fun (&ScenarioMedia::getDefaultBigMedalsImageFilename),
-     sigc::mem_fun (sm, &ScenarioMedia::setBigMedalsImageName), MEDAL_TYPES);
+     sigc::mem_fun (sm, &ScenarioMedia::setBigMedalsImageName), MEDAL_TYPES,
+     frames);
+  if (sm->getBigMedalsImageName ().empty () == false)
+    sm->instantiateBigMedalImage (d_tarfile);
+  else
+    sm->clearBigMedalImage ();
 }
 
 void MediaDialog::on_bless_button_activated()

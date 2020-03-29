@@ -79,23 +79,39 @@ void TilePreviewScene::regenerate()
 	}
 
       if (tilestyle)
-	d_view.push_back(tilestyle->getImage()->to_pixbuf());
+        {
+          PixMask *p = tilestyle->getImage()->copy ();
+          double new_height = d_tilesize;
+          int new_width =
+            ImageCache::calculate_width_from_adjusted_height (p, new_height);
+          PixMask::scale (p, new_width, new_height);
+          d_view.push_back(p->to_pixbuf());
+          delete p;
+        }
       else
         {
-          PixMask *img = ImageCache::getInstance()->getDefaultTileStylePic(model.type, d_tilesize)->copy();
-          d_view.push_back(img->to_pixbuf());
+          PixMask *p =
+            ImageCache::getInstance()->getDefaultTileStylePic
+            (model.type, d_tilesize)->copy();
+          double new_height = d_tilesize;
+          int new_width =
+            ImageCache::calculate_width_from_adjusted_height (p, new_height);
+          PixMask::scale (p, new_width, new_height);
+          d_view.push_back(p->to_pixbuf());
+          delete p;
         }
     }
 }
 
-Glib::RefPtr<Gdk::Pixbuf> TilePreviewScene::renderScene(guint32 tilesize)
+Glib::RefPtr<Gdk::Pixbuf> TilePreviewScene::renderScene()
 {
+  guint32 ts = d_tilesize;
   Glib::RefPtr<Gdk::Pixbuf> dest;
-  dest = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, (int)(d_width * tilesize), (int)(d_height * tilesize));
+  dest = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, (int)(d_width * ts),
+                             (int)(d_height * ts));
   for (unsigned int i = 0; i < d_width; i++)
     for (unsigned int j = 0; j < d_height; j++)
-      getTileStylePixbuf(i,j)->copy_area (0, 0, tilesize, tilesize, dest,
-                                          i * tilesize, j *tilesize);
+      getTileStylePixbuf(i, j)->copy_area (0, 0, ts, ts, dest, i * ts, j * ts);
   return dest;
 }
 
@@ -128,6 +144,7 @@ void TilePreviewScene::mouse_motion_event(MouseMotionEvent e)
   Vector<int> pos = mouse_pos_to_tile(e.pos);
   current_tile = pos;
   TileStyle *tilestyle = get_tilestyle(pos);
-  hovered_tilestyle_id.emit(tilestyle->getId());
+  if (tilestyle)
+    hovered_tilestyle_id.emit(tilestyle->getId());
   return;
 }

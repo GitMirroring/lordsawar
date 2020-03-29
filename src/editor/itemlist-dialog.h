@@ -29,7 +29,7 @@ class ItemlistDialog: public LwEditorDialog
 {
  public:
     ItemlistDialog(Gtk::Window &parent);
-    ~ItemlistDialog() {};
+    ~ItemlistDialog() {}
 
  private:
     Glib::ustring current_save_filename;

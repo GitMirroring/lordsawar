@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -111,11 +111,23 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 	//! Set the mask portion of the image of the stack in a ship.
 	void setShipMask(PixMask* shipmask) {d_shipmask = shipmask;};
 
+        //! Clear the ship name, pic, and mask
+        void clearShipImage (bool clear_name = true);
+
+        //! Instantiate the ship image by loading it from the lwa file.
+        bool instantiateShipImage ();
+
 	//! Get the image of the bag.
 	PixMask* getBagPic() const {return d_bag;}
 
 	//! Set the image of the bag.
 	void setBagPic(PixMask* s) {d_bag = s;};
+
+        //! Clear the bag name and pic 
+        void clearBagImage (bool clear_name = true);
+
+        //! Instantiate the bag image by loading it from the lwa file.
+        bool instantiateBagImage ();
 
 	//! Get the image of the planted standard (minus the mask).
 	PixMask* getStandardPic() const {return d_standard;}
@@ -128,6 +140,12 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 
 	//! Set the mask portion of the image of the planted standard.
 	void setStandardMask(PixMask* s) {d_standard_mask = s;};
+
+        //! Clear the standard (hero's flag) name, pic and mask
+        void clearStandardImage (bool clear_name = true);
+        
+        //! Instantiate the standard image by loading it from the lwa file.
+        bool instantiateStandardImage ();
 
 	//! Set the name of the file holding the image of the stack in a boat.
 	void setShipImageName(Glib::ustring n) {d_stackship_name = n;};
@@ -190,10 +208,20 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 	bool validateArmyUnitName(ArmyProto *a);
 	bool validateArmyTypeIds();
 
-	void instantiateImages(bool &broken);
+        //! Load the images associated with this armyset.
+        /**
+         * Go get the image files from the armyset file and create the
+         * various pixmask objects.
+         *
+         * @param scale   The images are clamped to the tile size or not.
+         * @param broken  True when things went wrong reading the armyset file.
+         */
+	void instantiateImages(bool scale, bool &broken);
 	void uninstantiateImages();
-	void loadStandardPic(Glib::ustring image_filename, bool &broken);
-	void loadShipPic(Glib::ustring image_filename, bool &broken);
+        void uninstantiateSameNamedImages (Glib::ustring name);
+
+	void loadStandardPic(Glib::ustring image_filename, bool scale, bool &broken);
+	void loadShipPic(Glib::ustring image_filename, bool scale, bool &broken);
 	void loadBagPic(Glib::ustring image_filename, bool &broken);
 
 	static void switchArmyset(Army *army, const Armyset *armyset);
@@ -204,12 +232,13 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 
         //! Load the armyset again.
         void reload(bool &broken);
-        guint32 calculate_preferred_tile_size() const;
+        bool calculate_preferred_tile_size(guint32 &ts) const;
 
         //! callback to upgrade old files.
         static bool upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version);
         static void support_backward_compatibility();
 
+        static guint32 get_default_tile_size ();
     private:
 
         //! Callback function for the army tag (see XML_Helper)

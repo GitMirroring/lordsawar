@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,49 +25,47 @@
 #include "tileset.h"
 #include "lw-editor-dialog.h"
 
-//! Tileset selector editor.  
+//! Tileset selector editor.
 //! Shows and manages the large and small army unit selector animation.
 class TilesetSelectorEditorDialog: public LwEditorDialog
 {
  public:
-    TilesetSelectorEditorDialog(Gtk::Window &parent, Tileset * tileset);
-    ~TilesetSelectorEditorDialog() {};
+    TilesetSelectorEditorDialog(Gtk::Window &parent, Tileset *tileset);
+    ~TilesetSelectorEditorDialog();
 
-    Glib::ustring get_small_selector_filename() {return small_filename;};
-    Glib::ustring get_large_selector_filename() {return large_filename;};
-    int run();
-    
+    bool run();
+
  private:
+    bool d_changed;
     Gtk::RadioButton *large_selector_radiobutton;
     Gtk::RadioButton *small_selector_radiobutton;
-    Gtk::FileChooserButton *selector_filechooserbutton;
+    Gtk::Button *selector_imagebutton;
     Gtk::ComboBoxText *shield_theme_combobox;
     Gtk::Grid *preview_table;
     Tileset *d_tileset;
-    std::list<Glib::ustring> delfiles;
-
-    void setup_shield_theme_combobox(Gtk::Box *box);
-    void shieldset_changed();
-    void on_image_chosen();
-    void on_large_toggled();
-    void on_small_toggled();
-    void update_selector_panel();
-    void show_preview_selectors(Glib::ustring filename);
-
-    bool loadSelector(Glib::ustring filename);
-    void clearSelector();
+    PixMask *small_selector;
+    PixMask *large_selector;
     std::map< guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >* > selectors;
     sigc::connection heartbeat;
     std::map<guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator> frame;
 
+    void on_shieldset_changed();
+    bool on_image_chosen(Gtk::FileChooserDialog *d);
+    void on_button_toggle ();
+    void on_selector_imagebutton_clicked ();
     void on_heartbeat();
-    Glib::ustring small_filename;
-    Glib::ustring large_filename;
 
-    void reset_filechooser();
-    void on_add(Gtk::Widget *widget);
-    void on_button_pressed();
-
+    void setup_shield_theme_combobox(Gtk::Box *box);
+    void update_selector_panel();
+    void show_preview_selectors();
+    bool loadSelector();
+    void clearSelector();
+    void fill_imagebutton ();
+    Glib::ustring get_selector_filename ();
+    void set_selector_filename (Glib::ustring f);
+    bool load_selector_image (Glib::ustring filename);
+    void clear_selector_image ();
+    Gtk::FileChooserDialog* image_filechooser(bool clear);
 };
 
 #endif

@@ -63,6 +63,7 @@ ShieldStyle::ShieldStyle(XML_Helper* helper)
   helper->getData(type_str, "type");
   d_type = shieldStyleTypeFromString(type_str);
   helper->getData(d_image_name, "image");
+  File::add_png_if_no_ext (d_image_name);
 }
 
 Glib::ustring ShieldStyle::shieldStyleTypeToString(const ShieldStyle::Type type)
@@ -109,7 +110,7 @@ bool ShieldStyle::save(XML_Helper *helper) const
   return retval;
 }
 
-void ShieldStyle::instantiateImages(Glib::ustring filename, Shieldset *s, bool &broken)
+void ShieldStyle::instantiateImages(Glib::ustring filename, Shieldset *s, bool scale, bool &broken)
 {
   if (filename.empty() == true)
     return;
@@ -138,8 +139,11 @@ void ShieldStyle::instantiateImages(Glib::ustring filename, Shieldset *s, bool &
     }
   if (xsize > 0 && ysize > 0)
     {
-      PixMask::scale(half[0], xsize, ysize);
-      PixMask::scale(half[1], xsize, ysize);
+      if (scale)
+        {
+          PixMask::scale(half[0], xsize, ysize);
+          PixMask::scale(half[1], xsize, ysize);
+        }
       setImage(half[0]);
       setMask(half[1]);
     }

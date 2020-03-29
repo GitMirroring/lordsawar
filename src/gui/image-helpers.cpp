@@ -68,24 +68,8 @@ disassemble_row(const Glib::ustring &file, int no, bool &broken)
 }
 
 std::vector<PixMask*>
-disassemble_row(const Glib::ustring &file, int no, bool first_half_height, bool &broken)
+disassemble_row(Glib::RefPtr<Gdk::Pixbuf> row, int no, bool first_half_height)
 {
-    Glib::RefPtr<Gdk::Pixbuf> row;
-    try
-      {
-        row = Gdk::Pixbuf::create_from_file(file);
-      }
-  catch (const Glib::Exception &ex)
-    {
-      broken = true;
-    }
-
-  if (broken || !row)
-    {
-      std::vector<PixMask*> empty;
-      return  empty;
-    }
-
     std::vector<Glib::RefPtr<Gdk::Pixbuf> > images;
     images.reserve(no);
   
@@ -113,6 +97,27 @@ disassemble_row(const Glib::ustring &file, int no, bool first_half_height, bool 
     for (unsigned int i = 0; i < images.size(); i++)
       pixmasks.push_back(PixMask::create(images[i]));
     return pixmasks;
+}
+
+std::vector<PixMask*>
+disassemble_row(const Glib::ustring &file, int no, bool first_half_height, bool &broken)
+{
+    Glib::RefPtr<Gdk::Pixbuf> row;
+    try
+      {
+        row = Gdk::Pixbuf::create_from_file(file);
+      }
+  catch (const Glib::Exception &ex)
+    {
+      broken = true;
+    }
+
+  if (broken || !row)
+    {
+      std::vector<PixMask*> empty;
+      return  empty;
+    }
+  return disassemble_row(row, no, first_half_height);
 }
 
 bool image_width_is_multiple_of_image_height(const Glib::ustring file)

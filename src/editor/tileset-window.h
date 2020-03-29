@@ -44,14 +44,13 @@ class TileSetWindow: public sigc::trackable
     sigc::signal<void, guint32> tileset_saved;
 
     static void show_add_file_error(Tileset *t, Gtk::Dialog &d, Glib::ustring file);
+    static void show_remove_file_error(Tileset *t, Gtk::Window &d, Glib::ustring file);
  private:
     Gtk::Window* window;
     Glib::ustring current_save_filename;
     Tileset *d_tileset; //current tileset
     Tile *d_tile; //current tile
     bool needs_saving;
-    bool inhibit_needs_saving;
-    bool inhibit_updates;
     Gtk::Entry *name_entry;
     Gtk::TreeView *tiles_treeview;
     Gtk::Button *add_tile_button;
@@ -98,7 +97,7 @@ class TileSetWindow: public sigc::trackable
 
     class TilesColumns: public Gtk::TreeModelColumnRecord {
     public:
-	TilesColumns() 
+	TilesColumns()
         { add(name); add(tile);}
 	
 	Gtk::TreeModelColumn<Glib::ustring> name;
@@ -110,7 +109,7 @@ class TileSetWindow: public sigc::trackable
     Gtk::TreeView *tilestylesets_treeview;
     class TileStyleSetsColumns: public Gtk::TreeModelColumnRecord {
     public:
-	TileStyleSetsColumns() 
+	TileStyleSetsColumns()
         { add(name); add(tilestyleset);}
 	
 	Gtk::TreeModelColumn<Glib::ustring> name;
@@ -121,7 +120,7 @@ class TileSetWindow: public sigc::trackable
     Gtk::TreeView *tilestyles_treeview;
     class TileStylesColumns: public Gtk::TreeModelColumnRecord {
     public:
-	TileStylesColumns() 
+	TileStylesColumns()
         { add(name); add(tilestyle);}
 	
 	Gtk::TreeModelColumn<Glib::ustring> name;
@@ -134,14 +133,11 @@ class TileSetWindow: public sigc::trackable
     TileStyleSet * get_selected_tilestyleset ();
     TileStyle * get_selected_tilestyle ();
 
-    bool on_delete_event();
-
     void update_tile_panel();
     void update_tilestyleset_panel();
     void update_tilestyle_panel();
     void update_tileset_buttons();
     void update_tilestyleset_buttons();
-    void update_tileset_menuitems();
     void update_tile_preview_menuitem();
 
     void on_new_tileset_activated();
@@ -192,7 +188,6 @@ class TileSetWindow: public sigc::trackable
     void on_remove_tilestyleset_clicked();
 
     bool load_tileset(Glib::ustring filename);
-    bool save_current_tileset();
     void update_window_title();
 
     void choose_and_add_or_replace_tilestyleset(Glib::ustring replace_filename);
@@ -204,7 +199,29 @@ class TileSetWindow: public sigc::trackable
     void select_tilestyle(TileStyle *style);
 
     void refresh_tiles();
-  
+
+    bool make_new_tileset ();
+    bool load_tileset ();
+    bool save_current_tileset_file (Glib::ustring filename = "");
+    bool save_current_tileset_file_as ();
+
+    bool check_discard (Glib::ustring msg);
+    bool check_save_valid (bool existing);
+    bool check_name_valid (bool existing);
+    bool isValidName ();
+    bool remove_selected_tilestyleset (Gtk::Window *);
+    void dirty ();
+    bool remove_tilestyleset_files (Tile *a);
+    
+    sigc::connection tile_selected_connection;
+    sigc::connection tilestyle_selected_connection;
+    sigc::connection tilestyleset_selected_connection;
+    void connect_tile_treeview ();
+    void disconnect_tile_treeview ();
+    void connect_tilestyle_treeview ();
+    void disconnect_tilestyle_treeview ();
+    void connect_tilestyleset_treeview ();
+    void disconnect_tilestyleset_treeview ();
 };
 
 #endif

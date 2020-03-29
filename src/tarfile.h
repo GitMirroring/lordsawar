@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Ben Asselstine
+// Copyright (C) 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,12 +40,12 @@ public:
     Glib::ustring getDirectory() const {return d_dir;}
     void setDirectory(Glib::ustring d) {d_dir = File::add_slash_if_necessary(d);}
 
-    Glib::ustring getConfigurationFile() const;
+    Glib::ustring getConfigurationFile(bool master = false) const;
 
     Glib::ustring getFileFromConfigurationFile(Glib::ustring file);
-    bool replaceFileInConfigurationFile(Glib::ustring file, Glib::ustring new_file);
-    bool addFileInConfigurationFile(Glib::ustring new_file);
-    bool removeFileInConfigurationFile(Glib::ustring file);
+    bool replaceFileInCfgFile(Glib::ustring file, Glib::ustring new_file, Glib::ustring &out);
+    bool addFileInCfgFile(Glib::ustring new_file, Glib::ustring &out);
+    bool removeFileInCfgFile(Glib::ustring file);
 
     void clean_tmp_dir();
 
@@ -60,6 +60,8 @@ public:
 
     //! when we don't have a configuration file yet, we use this
     void setNewTemporaryFile ();
+    //! when we open a file, we work on a copy of it
+    void setLoadTemporaryFile ();
     bool isTemporaryFile() const;
 private:
 

@@ -27,31 +27,31 @@
 class TileSetInfoDialog: public LwEditorDialog
 {
  public:
-    TileSetInfoDialog(Gtk::Window &parent, Set *tileset, Glib::ustring dir, 
-                      Glib::ustring file, bool readonly = false, 
-                      Glib::ustring title = "");
+    TileSetInfoDialog(Gtk::Window &parent, Tileset *tileset);
     ~TileSetInfoDialog();
 
-    int run();
-    
+    bool run();
+
  private:
-    Set *d_tileset;
+    Tileset *d_tileset;
+    bool d_changed;
     Gtk::Entry *name_entry;
     Gtk::TextView *copyright_textview;
     Gtk::TextView *license_textview;
-    Gtk::Entry *filename_entry;
-    Gtk::SpinButton *id_spinbutton;
-    Gtk::Button *accept_button;
+    Gtk::Button *close_button;
     Gtk::Label *status_label;
     Gtk::TextView *description_textview;
-    Gtk::Label *dir_label;
+    Gtk::Label *location_label;
     Gtk::Notebook *notebook;
+    Gtk::Button *fit_button;
+    Gtk::SpinButton *size_spinbutton;
 
     void on_name_changed();
-    void on_filename_changed();
-    void update_buttons();
-
-    bool d_readonly;
+    void on_copyright_changed ();
+    void on_license_changed ();
+    void on_description_changed ();
+    void on_size_changed();
+    void on_fit_pressed();
 };
 
 #endif

@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2012, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,54 +29,44 @@
 #include "shieldsetlist.h"
 #include "ImageCache.h"
 #include "past-chooser.h"
+#include "font-size.h"
+#include "image-file-filter.h"
 
 #define method(x) sigc::mem_fun(*this, &TilesetFlagEditorDialog::x)
 
 TilesetFlagEditorDialog::TilesetFlagEditorDialog(Gtk::Window &parent, Tileset *tileset)
  : LwEditorDialog(parent, "tileset-flag-editor-dialog.ui")
 {
-  selected_filename = "";
-    d_tileset = tileset;
+  d_changed = false;
+  d_tileset = tileset;
 
-    Gtk::Box *box;
-    xml->get_widget("shieldset_box", box);
-    setup_shield_theme_combobox(box);
-    xml->get_widget("preview_table", preview_table);
-    
-    xml->get_widget("flag_filechooserbutton", flag_filechooserbutton);
-    flag_filechooserbutton->signal_selection_changed().connect
-       (method(on_image_chosen));
+  Gtk::Box *box;
+  xml->get_widget("shieldset_box", box);
+  setup_shield_theme_combobox(box);
+  xml->get_widget("preview_table", preview_table);
 
-    update_flag_panel();
+  xml->get_widget("flag_imagebutton", flag_imagebutton);
+  flag_imagebutton->signal_clicked().connect
+    (method(on_flag_imagebutton_clicked));
+
+  Glib::ustring imgname = d_tileset->getFlagsFilename();
+  if (imgname.empty() == false)
+    {
+      bool broken = false;
+      Glib::ustring f = d_tileset->getFileFromConfigurationFile(imgname);
+      d_flags = PixMask::create (f, broken);
+    }
+  else
+    d_flags = NULL;
+  update_flag_panel();
 }
 
-int TilesetFlagEditorDialog::run()
+bool TilesetFlagEditorDialog::run()
 {
-    dialog->show_all();
-    int response = dialog->run();
-
-    if (response == Gtk::RESPONSE_ACCEPT)
-      PastChooser::getInstance()->set_dir(flag_filechooserbutton);
-
-
-    if (std::find(delfiles.begin(), delfiles.end(), selected_filename)
-        == delfiles.end() && response == Gtk::RESPONSE_ACCEPT)
-      {
-        Glib::ustring file = File::get_basename(selected_filename);
-        if (d_tileset->replaceFileInConfigurationFile(d_tileset->getFlagsFilename()+".png", selected_filename))
-          d_tileset->setFlagsFilename(file);
-        else
-          {
-            TileSetWindow::show_add_file_error (d_tileset, *dialog, file);
-            response = Gtk::RESPONSE_CANCEL;
-          }
-      }
-    else if (response == Gtk::RESPONSE_ACCEPT)
-      response = Gtk::RESPONSE_CANCEL;
-    for (std::list<Glib::ustring>::iterator it = delfiles.begin(); 
-         it != delfiles.end(); it++)
-      File::erase(*it);
-    return response;
+  dialog->show_all();
+  dialog->run();
+  dialog->hide ();
+  return d_changed;
 }
 
 void TilesetFlagEditorDialog::setup_shield_theme_combobox(Gtk::Box *box)
@@ -98,43 +88,86 @@ void TilesetFlagEditorDialog::setup_shield_theme_combobox(Gtk::Box *box)
     }
 
   shield_theme_combobox->set_active(default_id);
-  shield_theme_combobox->signal_changed().connect (method(shieldset_changed));
+  shield_theme_combobox->signal_changed().connect (method(on_shieldset_changed));
 
-  box->pack_start(*shield_theme_combobox, Gtk::PACK_SHRINK);
+  box->set_center_widget (*shield_theme_combobox);
 }
-    
-void TilesetFlagEditorDialog::shieldset_changed()
+
+void TilesetFlagEditorDialog::on_shieldset_changed()
 {
+  show_preview_flags();
 }
-void TilesetFlagEditorDialog::on_image_chosen()
+
+bool TilesetFlagEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
 {
-  selected_filename = flag_filechooserbutton->get_filename();
-  if (selected_filename.empty())
-    return;
-
-  show_preview_flags(selected_filename);
+  bool broken = false;
+  d_flags = PixMask::create (d->get_filename (), broken);
+  if (!broken)
+    {
+      Glib::ustring imgname = d_tileset->getFlagsFilename();
+      Glib::ustring newname = "";
+      bool success = false;
+      if (imgname.empty() == true)
+        success =
+          d_tileset->addFileInCfgFile(d->get_filename(), newname);
+      else
+        success =
+          d_tileset->replaceFileInCfgFile(imgname, d->get_filename(), newname);
+      if (success)
+        {
+          d_tileset->setFlagsFilename (newname);
+          d_tileset->instantiateFlagImages();
+          d_changed = true;
+          update_flag_panel();
+        }
+      else
+        {
+          Glib::ustring errmsg = Glib::strerror(errno);
+          Gtk::MessageDialog
+            td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
+                                    d->get_filename (),
+                                    d_tileset->getConfigurationFile(),
+                                    errmsg));
+          td.run();
+          td.hide();
+          broken = true;
+        }
+    }
+  else
+    {
+      Gtk::MessageDialog
+        td(*d, String::ucompose(_("Couldn't make sense of the image:\n%1"),
+                                d->get_filename ()));
+      td.run();
+      td.hide();
+      broken = true;
+    }
+  return broken;
 }
 
-void TilesetFlagEditorDialog::show_preview_flags(Glib::ustring filename)
+void TilesetFlagEditorDialog::show_preview_flags()
 {
   //load it up and show in the colours of the selected shield theme
   if (heartbeat.connected())
     heartbeat.disconnect();
 
   clearFlag();
-  if (loadFlag(filename) == true)
+  if (loadFlag() == true)
     {
+      on_heartbeat ();
       heartbeat = Glib::signal_timeout().connect
-	(sigc::bind_return (method (on_heartbeat), true), 250);
+	(sigc::bind_return (method (on_heartbeat), true),
+         TIMER_BIGMAP_SELECTOR);
     }
 }
 
 void TilesetFlagEditorDialog::clearFlag()
 {
-  for (std::map< guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >* >::iterator it = flags.begin();
-       it != flags.end(); it++)
+  for (std::map< guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >* >::iterator it =
+       flags.begin(); it != flags.end(); it++)
     {
-      for (std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator lit = (*it).second->begin(); lit != (*it).second->end(); lit++)
+      for (std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator lit =
+           (*it).second->begin(); lit != (*it).second->end(); lit++)
 	{
 	  (*lit).clear();
 	}
@@ -142,41 +175,57 @@ void TilesetFlagEditorDialog::clearFlag()
       delete ((*it).second);
     }
   flags.clear();
+  preview_table->foreach(sigc::mem_fun(preview_table, &Gtk::Container::remove));
 }
 
-bool TilesetFlagEditorDialog::loadFlag(Glib::ustring filename)
+bool TilesetFlagEditorDialog::loadFlag()
 {
   std::vector<PixMask *> images;
   std::vector<PixMask *> masks;
-  bool success = FlagPixMaskCacheItem::loadFlagImages(filename, d_tileset->getTileSize(), images, masks);
+  if (!d_flags)
+    return false;
+  bool success =
+    FlagPixMaskCacheItem::loadFlagImages(d_flags, d_tileset->getTileSize(),
+                                         images, masks, false);
   if (success)
     {
-      Glib::ustring subdir = Shieldsetlist::getInstance()->getSetDir 
-	(Glib::filename_from_utf8(shield_theme_combobox->get_active_text()));
-      Shieldset *shieldset = Shieldsetlist::getInstance()->get(subdir);
+      Glib::ustring n = shield_theme_combobox->get_active_text();
+      Shieldset *shieldset = Shieldsetlist::getInstance()->get(n, 0);
 
       for (unsigned int i = 0; i < MAX_PLAYERS; i++)
 	{
-	  std::list<Glib::RefPtr<Gdk::Pixbuf> > *mylist = new std::list<Glib::RefPtr<Gdk::Pixbuf> >();
+	  std::list<Glib::RefPtr<Gdk::Pixbuf> > *mylist =
+            new std::list<Glib::RefPtr<Gdk::Pixbuf> >();
 	  flags[i] = mylist;
 	}
 
-      for (std::vector<PixMask*>::iterator it = images.begin(), mit = masks.begin(); it != images.end(); it++, mit++)
+      for (std::vector<PixMask*>::iterator it = images.begin(),
+           mit = masks.begin(); it != images.end(); it++, mit++)
 	{
-	  for (Shieldset::iterator sit = shieldset->begin(); sit != shieldset->end(); sit++)
+	  for (Shieldset::iterator sit = shieldset->begin();
+               sit != shieldset->end(); sit++)
 	    {
 	      if ((*sit)->getOwner() == 8) //ignore neutral
 		continue;
-              flags[(*sit)->getOwner()]->push_back
-                (ImageCache::applyMask(*it, *mit, (*sit)->getColor())->to_pixbuf());
-		
+              PixMask *q =
+                ImageCache::applyMask(*it, *mit, (*sit)->getColor());
+              double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
+              int font_size = FontSize::getInstance()->get_height ();
+              double new_height = font_size * ratio;
+              int new_width =
+                ImageCache::calculate_width_from_adjusted_height
+                (q, new_height);
+              PixMask::scale (q, new_width, new_height);
+              flags[(*sit)->getOwner()]->push_back (q->to_pixbuf ());
               frame[(*sit)->getOwner()] = flags[(*sit)->getOwner()]->begin();
 	    }
 	}
 
-      for (std::vector<PixMask*>::iterator it = images.begin(); it != images.end(); it++)
+      for (std::vector<PixMask*>::iterator it = images.begin();
+           it != images.end(); it++)
 	delete *it;
-      for (std::vector<PixMask*>::iterator it = masks.begin(); it != masks.end(); it++)
+      for (std::vector<PixMask*>::iterator it = masks.begin();
+           it != masks.end(); it++)
 	delete *it;
 
     }
@@ -186,11 +235,18 @@ bool TilesetFlagEditorDialog::loadFlag(Glib::ustring filename)
 
 void TilesetFlagEditorDialog::update_flag_panel()
 {
-  if (d_tileset->getFlagsFilename() != "")
+  Glib::ustring imgname = d_tileset->getFlagsFilename();
+  if (imgname.empty() == false)
     {
-      Glib::ustring filename = d_tileset->getFileFromConfigurationFile(d_tileset->getFlagsFilename() + ".png");
-      delfiles.push_back(filename);
-      flag_filechooserbutton->set_filename (filename);
+      flag_imagebutton->set_label (imgname);
+      show_preview_flags ();
+    }
+  else
+    {
+      flag_imagebutton->set_label (_("no image set"));
+      if (heartbeat.connected ())
+        heartbeat.disconnect ();
+      clearFlag();
     }
 }
 
@@ -221,7 +277,7 @@ void TilesetFlagEditorDialog::on_heartbeat()
 	case 7: x = 1; y = 3; break;
 	}
       preview_table->attach(*manage(new Gtk::Image(*frame[count])), y, x, 1,1);
-  
+
       frame[count]++;
       if (frame[count] == flags[count]->end())
 	frame[count] = flags[count]->begin();
@@ -231,18 +287,76 @@ void TilesetFlagEditorDialog::on_heartbeat()
 
 }
 
-void TilesetFlagEditorDialog::on_add(Gtk::Widget *widget)
+Gtk::FileChooserDialog* TilesetFlagEditorDialog::image_filechooser(bool clear)
 {
-  if (widget)
-    {
-      Gtk::Button *button = dynamic_cast<Gtk::Button*>(widget);
-      button->signal_clicked().connect (method(on_button_pressed));
-    }
+  Glib::ustring filename = "";
+  Glib::ustring title = _("Choose a flag image");
+  Gtk::FileChooserDialog *d = new Gtk::FileChooserDialog(*dialog, title);
+  ImageFileFilter::getInstance ()->add (d);
+  d->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  d->add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
+  if (clear)
+    d->add_button(Gtk::Stock::CLEAR, Gtk::RESPONSE_REJECT);
+  d->set_default_response(Gtk::RESPONSE_ACCEPT);
+  d->set_current_folder(PastChooser::getInstance()->get_dir(d));
+  return d;
 }
 
-void TilesetFlagEditorDialog::on_button_pressed()
+void TilesetFlagEditorDialog::on_flag_imagebutton_clicked ()
 {
-  Glib::ustring d = PastChooser::getInstance()->get_dir(flag_filechooserbutton);
-  if (d.empty() == false)
-    flag_filechooserbutton->set_current_folder(d);
+  Glib::ustring f = d_tileset->getFlagsFilename ();
+  Glib::ustring filename = "";
+  Gtk::FileChooserDialog *d = image_filechooser(f != "");
+  if (f != "")
+    filename = d_tileset->getFileFromConfigurationFile(f);
+  int response = d->run();
+  if (filename != "")
+    File::erase(filename);
+  if (response == Gtk::RESPONSE_ACCEPT && d->get_filename() != "")
+    {
+      if (ImageFileFilter::getInstance()->hasInvalidExt(d->get_filename ()))
+        ImageFileFilter::getInstance()->showErrorDialog (d);
+      else
+        {
+          if (d->get_filename() != filename)
+            {
+              PastChooser::getInstance()->set_dir(d);
+              on_image_chosen (d);
+            }
+        }
+    }
+  else if (response == Gtk::RESPONSE_REJECT && f != "")
+    {
+      if (d_tileset->removeFileInCfgFile(f))
+        {
+          d_changed = true;
+          d_tileset->uninstantiateSameNamedImages (f);
+          if (d_flags)
+            {
+              delete d_flags;
+              d_flags = NULL;
+            }
+          clearFlag ();
+          update_flag_panel();
+        }
+      else
+        {
+          Glib::ustring errmsg = Glib::strerror(errno);
+          Gtk::MessageDialog
+            td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
+                                    f, d_tileset->getConfigurationFile(),
+                                    errmsg));
+          td.run();
+          td.hide();
+        }
+    }
+  d->hide();
+  delete d;
+
+}
+
+TilesetFlagEditorDialog::~TilesetFlagEditorDialog ()
+{
+  if (d_flags)
+    delete d_flags;
 }

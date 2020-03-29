@@ -31,11 +31,11 @@ class FightOrderEditorDialog: public LwEditorDialog
 {
  public:
     FightOrderEditorDialog(Gtk::Window &parent);
-    ~FightOrderEditorDialog() {};
+    ~FightOrderEditorDialog() {}
 
     void hide();
     int run();
-    bool get_modified() {return modified;};
+    bool get_modified() {return modified;}
 
  private:
     Gtk::TreeView *armies_treeview;

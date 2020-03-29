@@ -46,7 +46,7 @@ public:
   int getWidth() {return d_width;}
   int getHeight() {return d_height;}
   Tile *getTile() {return d_tile;}
-  Glib::RefPtr<Gdk::Pixbuf> renderScene(guint32 tilesize);
+  Glib::RefPtr<Gdk::Pixbuf> renderScene();
   void mouse_motion_event(MouseMotionEvent e);
   void mouse_button_event(MouseButtonEvent e);
 
@@ -64,6 +64,7 @@ private:
     Tile *d_tile;
     Tile *d_secondary_tile;
     guint32 d_tilesize;
+    guint32 d_ts;
     Vector<int> current_tile;
 
     TileStyle * get_tilestyle(Vector<int> tile);

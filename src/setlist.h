@@ -135,10 +135,12 @@ public:
         Glib::ustring basename = File::get_basename(file);
         this->push_back(set);
         set->setBaseName(basename);
-        d_setdirs[String::ucompose("%1 %2", set->getName(), set->getTileSize())] = basename;
+        d_setdirs[String::ucompose("%1 %2", set->getName(),
+                                   set->getTileSize())] = basename;
         d_sets[basename] = set;
         d_setids[set->getId()] = set;
-        d_namesets[String::ucompose("%1 %2", set->getName(), set->getTileSize())] = set;
+        d_namesets[String::ucompose ("%1 %2", set->getName(),
+                                     set->getTileSize ())] = set;
         add_signal.emit(set);
       }
 
@@ -148,7 +150,7 @@ public:
         if (!f)
           return "";
         else
-          return f->getConfigurationFile ();
+          return f->getConfigurationFile (true);
       }
 
     T* loadSet(Glib::ustring name)
@@ -161,16 +163,6 @@ public:
             std::cerr << String::ucompose(_("Error!  `%1' is malformed.  Skipping."), File::get_basename(name, true)) << std::endl;
             return NULL;
           }
-
-        /*
-        if (d_sets.find(set->getBaseName()) != d_sets.end())
-          {
-            T *s = (*d_sets.find(set->getBaseName())).second;
-            std::cerr << String::ucompose(_("Error!  `%1' shares a duplicate basename `%2' with `%3'.  Skipping."), set->getConfigurationFile(), s->getBaseName(), s->getConfigurationFile()) << std::endl;
-            delete set;
-            return NULL;
-          }
-          */
 
         if (d_setdirs.find(set->getName()) != d_setdirs.end())
           {
@@ -195,22 +187,23 @@ public:
         return set;
       }
 
-    Glib::ustring findFreeName(Glib::ustring n, guint32 max, guint32 &num) const
+    Glib::ustring findFreeName(Glib::ustring n, guint32 max, guint32 &num, guint32 ts = 0) const
       {
         Glib::ustring new_name;
         for (unsigned int count = 1; count < max; count++)
           {
             new_name = String::ucompose("%1 %2", n, count);
-            if (get(File::sanify(new_name)) == NULL)
+            if (get(new_name, ts) == NULL)
               {
                 num = count;
-                break;
+                return new_name;
               }
             else
               new_name = "";
           }
-        return new_name;
+        return "";
       }
+
     Glib::ustring findFreeBaseName(Glib::ustring basename, guint32 max, guint32 &num) const
       {
         Glib::ustring new_basename;
@@ -329,8 +322,13 @@ public:
         set->reload(broken);
         if (broken)
           return false;
+        remove_mapping_setid_with_id (id);
+        remove_mapping_set_with_id (id);
+        remove_mapping_nameset_with_id (id);
         d_setids[set->getId()] = set;
         d_sets[set->getBaseName()] = set;
+        d_namesets[String::ucompose ("%1 %2", set->getName(),
+                                     set->getTileSize ())] = set;
         reload_signal.emit(set);
         return true;
       }
@@ -362,6 +360,48 @@ private:
     SetNameMap d_namesets;
     sigc::signal<void, T*> add_signal;
     sigc::signal<void, T*> reload_signal;
+
+    void remove_mapping_setid_with_id (guint32 id)
+      {
+        for (typename SetIdMap::iterator i = d_setids.begin ();
+             i != d_setids.end (); i++)
+          {
+            T *s = (*i).second;
+            if (s && s->getId () == id)
+              {
+                d_setids.erase (i);
+                break;
+              }
+          }
+      }
+
+    void remove_mapping_set_with_id (guint32 id)
+      {
+        for (typename SetMap::iterator i = d_sets.begin ();
+             i != d_sets.end (); i++)
+          {
+            T *s = (*i).second;
+            if (s && s->getId () == id)
+              {
+                d_sets.erase (i);
+                break;
+              }
+          }
+      }
+
+    void remove_mapping_nameset_with_id (guint32 id)
+      {
+        for (typename SetNameMap::iterator i = d_namesets.begin ();
+             i != d_namesets.end (); i++)
+          {
+            T *s = (*i).second;
+            if (s && s->getId () == id)
+              {
+                d_namesets.erase (i);
+                break;
+              }
+          }
+      }
 };
 
 #endif

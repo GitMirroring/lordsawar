@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ bool Shield::save(XML_Helper *helper) const
   return retval;
 }
 	
-void Shield::instantiateImages(Shieldset *s, bool &broken)
+void Shield::instantiateImages(Shieldset *s, bool scale, bool &broken)
 {
   broken = false;
   Tar_Helper t(s->getConfigurationFile(), std::ios::in, broken);
@@ -140,13 +140,14 @@ void Shield::instantiateImages(Shieldset *s, bool &broken)
   int count = 0;
   for (iterator it = begin(); it != end(); it++)
     {
-      if ((*it)->getImageName().empty() == false)
+      Glib::ustring imgname = (*it)->getImageName();
+      if (imgname.empty() == false)
         {
-          Glib::ustring pngfile = t.getFile((*it)->getImageName() + ".png", 
-                                          broken);
+          Tar_Helper::reopen (&t);
+          Glib::ustring pngfile = t.getFile(imgname, broken);
           if (broken == false)
             {
-              (*it)->instantiateImages(pngfile, s, broken);
+              (*it)->instantiateImages(pngfile, s, scale, broken);
               File::erase(pngfile);
             }
           else
@@ -157,23 +158,39 @@ void Shield::instantiateImages(Shieldset *s, bool &broken)
         }
       count++;
     }
-  Glib::ustring l = t.getFile(getName(Tartan::LEFT) + ".png", broken);
-  if (broken)
+  Glib::ustring l = "", c = "", r = "",
+    imgname = getTartanImageName(Tartan::LEFT);
+  if (imgname.empty () == false)
     {
-      t.Close();
-      return;
+      Tar_Helper::reopen (&t);
+      l = t.getFile(imgname, broken);
+      if (broken)
+        {
+          t.Close();
+          return;
+        }
     }
-  Glib::ustring c = t.getFile(getName(Tartan::CENTER) + ".png", broken);
-  if (broken)
+  imgname = getTartanImageName(Tartan::CENTER);
+  if (imgname.empty () == false)
     {
-      t.Close();
-      return;
+      Tar_Helper::reopen (&t);
+      c = t.getFile(imgname, broken);
+      if (broken)
+        {
+          t.Close();
+          return;
+        }
     }
-  Glib::ustring r = t.getFile(getName(Tartan::RIGHT) + ".png", broken);
-  if (broken)
+  imgname = getTartanImageName(Tartan::RIGHT);
+  if (imgname.empty () == false)
     {
-      t.Close();
-      return;
+      Tar_Helper::reopen (&t);
+      r = t.getFile(imgname, broken);
+      if (broken)
+        {
+          t.Close();
+          return;
+        }
     }
   instantiateTartanImages (l, c, r, broken);
   t.Close();

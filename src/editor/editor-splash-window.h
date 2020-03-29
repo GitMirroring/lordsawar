@@ -27,7 +27,7 @@ class EditorSplashWindow: public sigc::trackable
 {
  public:
     EditorSplashWindow();
-    ~EditorSplashWindow() {delete window;};
+    ~EditorSplashWindow() {delete window;}
 
     int run();
 

@@ -75,7 +75,7 @@ class Tartan
 	// Get Methods
 
         //! Get the filename of the tartan image, minus the path and suffix.
-        Glib::ustring getName(Type t) const;
+        Glib::ustring getTartanImageName (Tartan::Type type) const;
 
         //! Get the image of the tartan (the left half)
         PixMask *getImage(Type t) const;
@@ -87,7 +87,7 @@ class Tartan
 	// Set Methods
 
         //! Set the filenmame of the tartan image, minus the path and suffix.
-        void setName(Type t, Glib::ustring n);
+        void setTartanImageName (Tartan::Type type, Glib::ustring name);
 
         //! Set the image of the tartan (the left half)
         void setImage(Type t, PixMask *i);
@@ -116,8 +116,6 @@ class Tartan
         //! Convert the enum to a nice readable string
         static Glib::ustring tartanTypeToFriendlyName(const Tartan::Type type);
 
-        Glib::ustring getTartanImageName (Tartan::Type type) const;
-        void setTartanImageName (Tartan::Type type, Glib::ustring name);
     protected:
 
         Glib::ustring d_left_tartan_name;

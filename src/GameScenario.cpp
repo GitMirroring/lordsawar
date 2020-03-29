@@ -135,14 +135,13 @@ GameScenario::GameScenario(Glib::ustring savegame, bool& broken)
 bool GameScenario::loadArmysets(Tar_Helper *t)
 {
   bool broken = false;
-  std::list<Glib::ustring> armysets;
-  armysets = t->getFilenamesWithExtension(Armyset::file_extension);
+  std::list<Glib::ustring> armysets = t->getFilenames(Armyset::file_extension);
   for (std::list<Glib::ustring>::iterator it = armysets.begin();
        it != armysets.end(); it++)
     {
       guint32 id = Armysetlist::getInstance()->import(t, *it, broken);
       if (!broken)
-        Armysetlist::getInstance()->get(id)->instantiateImages(broken);
+        Armysetlist::getInstance()->get(id)->instantiateImages(true, broken);
     }
   return !broken;
 }
@@ -150,13 +149,12 @@ bool GameScenario::loadArmysets(Tar_Helper *t)
 bool GameScenario::loadTilesets(Tar_Helper *t)
 {
   bool broken = false;
-  std::list<Glib::ustring> tilesets = 
-    t->getFilenamesWithExtension(Tileset::file_extension);
+  std::list<Glib::ustring> tilesets = t->getFilenames(Tileset::file_extension);
   for (auto it: tilesets)
     {
       guint32 id = Tilesetlist::getInstance()->import(t, it, broken);
       if (!broken)
-        Tilesetlist::getInstance()->get(id)->instantiateImages(broken);
+        Tilesetlist::getInstance()->get(id)->instantiateImages(true, broken);
     }
   return !broken;
 }
@@ -164,13 +162,12 @@ bool GameScenario::loadTilesets(Tar_Helper *t)
 bool GameScenario::loadCitysets(Tar_Helper *t)
 {
   bool broken = false;
-  std::list<Glib::ustring> citysets =
-    t->getFilenamesWithExtension(Cityset::file_extension);
+  std::list<Glib::ustring> citysets = t->getFilenames(Cityset::file_extension);
   for (auto it: citysets)
     {
       guint32 id = Citysetlist::getInstance()->import(t, it, broken);
       if (!broken)
-        Citysetlist::getInstance()->get(id)->instantiateImages(broken);
+        Citysetlist::getInstance()->get(id)->instantiateImages(true, broken);
     }
   return !broken;
 }
@@ -178,13 +175,13 @@ bool GameScenario::loadCitysets(Tar_Helper *t)
 bool GameScenario::loadShieldsets(Tar_Helper *t)
 {
   bool broken = false;
-  std::list<Glib::ustring> shieldsets = 
-    t->getFilenamesWithExtension(Shieldset::file_extension);
+  std::list<Glib::ustring> shieldsets =
+    t->getFilenames(Shieldset::file_extension);
   for (auto it: shieldsets)
     {
       guint32 id = Shieldsetlist::getInstance()->import(t, it, broken);
       if (!broken)
-        Shieldsetlist::getInstance()->get(id)->instantiateImages(broken);
+        Shieldsetlist::getInstance()->get(id)->instantiateImages(true, broken);
     }
   return !broken;
 }

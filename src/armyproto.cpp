@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@
 #include "gui/image-helpers.h"
 #include "Tile.h"
 #include "tarhelper.h"
+#include "File.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -68,14 +69,23 @@ ArmyProto::ArmyProto(XML_Helper* helper)
 {
   helper->getData(d_id, "id");
   helper->getData(d_image_name[Shield::WHITE], "image_white");
+  File::add_png_if_no_ext (d_image_name[Shield::WHITE]);
   helper->getData(d_image_name[Shield::GREEN], "image_green");
+  File::add_png_if_no_ext (d_image_name[Shield::GREEN]);
   helper->getData(d_image_name[Shield::YELLOW], "image_yellow");
+  File::add_png_if_no_ext (d_image_name[Shield::YELLOW]);
   helper->getData(d_image_name[Shield::LIGHT_BLUE], "image_light_blue");
+  File::add_png_if_no_ext (d_image_name[Shield::LIGHT_BLUE]);
   helper->getData(d_image_name[Shield::RED], "image_red");
+  File::add_png_if_no_ext (d_image_name[Shield::RED]);
   helper->getData(d_image_name[Shield::DARK_BLUE], "image_dark_blue");
+  File::add_png_if_no_ext (d_image_name[Shield::DARK_BLUE]);
   helper->getData(d_image_name[Shield::ORANGE], "image_orange");
+  File::add_png_if_no_ext (d_image_name[Shield::ORANGE]);
   helper->getData(d_image_name[Shield::BLACK], "image_black");
+  File::add_png_if_no_ext (d_image_name[Shield::BLACK]);
   helper->getData(d_image_name[Shield::NEUTRAL], "image_neutral");
+  File::add_png_if_no_ext (d_image_name[Shield::NEUTRAL]);
   helper->getData(d_defends_ruins,"defends_ruins");
   helper->getData(d_awardable,"awardable");
   Glib::ustring gender_str;
@@ -132,7 +142,7 @@ bool ArmyProto::saveData(XML_Helper* helper) const
   return retval;
 }
 
-void ArmyProto::instantiateImages(int tilesize, Shield::Colour c, Glib::ustring image_filename, bool &broken)
+void ArmyProto::loadImage(int tilesize, Shield::Colour c, Glib::ustring image_filename, bool scale, bool &broken)
 {
   Glib::ustring s;
 
@@ -150,8 +160,11 @@ void ArmyProto::instantiateImages(int tilesize, Shield::Colour c, Glib::ustring 
   half = disassemble_row(image_filename, 2, broken);
   if (!broken)
     {
-      PixMask::scale(half[0], tilesize, tilesize);
-      PixMask::scale(half[1], tilesize, tilesize);
+      if (scale)
+        {
+          PixMask::scale(half[0], tilesize, tilesize);
+          PixMask::scale(half[1], tilesize, tilesize);
+        }
 
       setImage(c, half[0]);
       setMask(c, half[1]);
@@ -160,16 +173,17 @@ void ArmyProto::instantiateImages(int tilesize, Shield::Colour c, Glib::ustring 
   return;
 }
 
-void ArmyProto::instantiateImages(guint32 tilesize, Tar_Helper *t, bool &broken)
+void ArmyProto::instantiateImages(guint32 tilesize, Tar_Helper *t, bool scale,
+                                  bool &broken)
 {
   broken = false;
   for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
     {
       Glib::ustring file = "";
       if (getImageName(Shield::Colour(c)).empty() == false)
-	file = t->getFile(getImageName(Shield::Colour(c)) + ".png", broken);
+	file = t->getFile(getImageName(Shield::Colour(c)), broken);
       if (!broken && file.empty() == false)
-        instantiateImages(tilesize, Shield::Colour(c), file, broken);
+        loadImage(tilesize, Shield::Colour(c), file, scale, broken);
       if (file.empty() == false)
         File::erase(file);
     }
@@ -204,4 +218,38 @@ ArmyProto * ArmyProto::createBat()
 			 Tile::WATER | Tile::MOUNTAIN);
   basearmy->setMaxMoves(50);
   return basearmy;
+}
+
+void ArmyProto::clearImage (Shield::Colour col, bool clear_name)
+{
+  if (clear_name)
+    setImageName (col, "");
+
+  PixMask *p = getImage (col);
+  delete p;
+  setImage (col, NULL);
+
+  p = getMask (col);
+  delete p;
+  setMask (col, NULL);
+}
+
+bool ArmyProto::instantiateImage (Glib::ustring cfgfile, guint32 ts, 
+                                  Shield::Colour col)
+{
+  bool broken = false;
+  Tar_Helper t(cfgfile, std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getImageName(col);
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          clearImage (col, false);
+          loadImage (ts, col, filename, false, broken);
+        }
+    }
+  return broken;
 }

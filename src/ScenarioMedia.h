@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Ben Asselstine
+// Copyright (C) 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 #include "snd.h"
 
 class XML_Helper;
+class TarFile;
+
 //! Scenario Media provides images/sounds/music for the scenario
 /**
  *
@@ -87,8 +89,38 @@ class ScenarioMedia
         PixMask *getHeroNewLevelMaleMask() {return d_hero_newlevel_male_mask;}
         PixMask *getHeroNewLevelFemaleImage() {return d_hero_newlevel_female_image;}
         PixMask *getHeroNewLevelFemaleMask() {return d_hero_newlevel_female_mask;}
-        PixMask *getSmallMedalImage(int i) {return d_small_medal_images[i];}
-        PixMask *getBigMedalImage(int i) {return d_big_medal_images[i];}
+        PixMask *getSmallMedalImage(guint32 i)
+          {return d_small_medal_images.size () > i ? d_small_medal_images[i] : NULL;}
+        PixMask *getBigMedalImage(guint32 i)
+          {return d_big_medal_images.size () > i ? d_big_medal_images[i] : NULL;}
+
+        void clearNextTurnImage(bool clear_name = true);
+        void clearCityDefeatedImage(bool clear_name = true);
+        void clearWinningImage(bool clear_name = true);
+        void clearMaleHeroImage(bool clear_name = true);
+        void clearFemaleHeroImage(bool clear_name = true);
+        void clearRuinSuccessImage(bool clear_name = true);
+        void clearRuinDefeatImage(bool clear_name = true);
+        void clearParleyOfferedImage(bool clear_name = true);
+        void clearParleyRefusedImage(bool clear_name = true);
+        void clearSmallMedalImage(bool clear_name = true);
+        void clearBigMedalImage(bool clear_name = true);
+        void clearHeroNewLevelMaleImage (bool clear_name = true);
+        void clearHeroNewLevelFemaleImage (bool clear_name = true);
+
+        bool instantiateNextTurnImage(TarFile *t);
+        bool instantiateCityDefeatedImage(TarFile *t);
+        bool instantiateWinningImage(TarFile *t);
+        bool instantiateMaleHeroImage(TarFile *t);
+        bool instantiateFemaleHeroImage(TarFile *t);
+        bool instantiateRuinSuccessImage(TarFile *t);
+        bool instantiateRuinDefeatImage(TarFile *t);
+        bool instantiateParleyOfferedImage(TarFile *t);
+        bool instantiateParleyRefusedImage(TarFile *t);
+        bool instantiateSmallMedalImage(TarFile *t);
+        bool instantiateBigMedalImage(TarFile *t);
+        bool instantiateHeroNewLevelMaleImage (TarFile *t);
+        bool instantiateHeroNewLevelFemaleImage (TarFile *t);
 
         MusicItem* getSoundEffect(Glib::ustring n);
         std::vector<Glib::ustring> getBackgroundMusic() const {return d_bgMap;}
@@ -118,12 +150,17 @@ class ScenarioMedia
         void setRuinDefeatImage(PixMask *i) {d_ruin_defeat_image = i;}
         void setParleyOfferedImage(PixMask *i) {d_parley_offered_image = i;}
         void setParleyRefusedImage(PixMask *i) {d_parley_refused_image = i;}
-        void setHeroNewLevelMaleImage(PixMask *i) {d_hero_newlevel_male_image=i;}
+        void setHeroNewLevelMaleImage(PixMask *i)
+          {d_hero_newlevel_male_image=i;}
         void setHeroNewLevelMaleMask(PixMask *m) {d_hero_newlevel_male_mask=m;}
-        void setHeroNewLevelFemaleImage(PixMask *i) {d_hero_newlevel_female_image=i;}
-        void setHeroNewLevelFemaleMask(PixMask *m) {d_hero_newlevel_female_mask=m;}
-        void setSmallMedalsImage(int n, PixMask *i) {d_small_medal_images[n]=i;}
-        void setBigMedalsImage(int n, PixMask *i) {d_big_medal_images[n] = i;}
+        void setHeroNewLevelFemaleImage(PixMask *i)
+          {d_hero_newlevel_female_image=i;}
+        void setHeroNewLevelFemaleMask(PixMask *m)
+          {d_hero_newlevel_female_mask=m;}
+        void setSmallMedalsImage(guint32 n, PixMask *i)
+          { if (n < d_small_medal_images.size ()) d_small_medal_images[n] = i;}
+        void setBigMedalsImage(guint32 n, PixMask *i)
+          {if (n < d_big_medal_images.size ()) d_big_medal_images[n] = i;}
 
         void setBlessSoundName(Glib::ustring n) {d_bless_name = n;}
         void setHeroSoundName(Glib::ustring n) {d_hero_name = n;}

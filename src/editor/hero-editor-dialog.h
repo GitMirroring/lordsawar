@@ -29,7 +29,7 @@ class HeroEditorDialog: public LwEditorDialog
 {
  public:
     HeroEditorDialog(Gtk::Window &parent, Hero *hero);
-    ~HeroEditorDialog() {};
+    ~HeroEditorDialog() {}
 
     void run();
     

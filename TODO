@@ -25,3 +25,16 @@ upload to dl.sv.gnu.org.  cd /releases/lordsawar
 ---
 
 gtk 4, use Gtk::Overlay with Gtk::Image to make our tiles.
+
+
+in the editor, images that we supply for graphics need to have a width that is a multiple of the height.  we're only doing that for tilestylesets right now but the policy could be more widely applied to prevent garbage in garbage out.
+
+when we get a networked game and add the tilesets, etc to our personal collection, we need to ensure a unique name
+
+3x3 forests in the editor causes crazy tiles.  not being smoothed properly.
+
+it would be nice to view->zoom-in in the editor
+  the problem is the mouse hovering with a city, etc.
+  the rest we should get for free
+
+should we do anything when an armyset, etc gets removed from disk after it is loaded

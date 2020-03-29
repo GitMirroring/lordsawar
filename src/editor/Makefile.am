@@ -23,9 +23,9 @@ noinst_LTLIBRARIES = libshieldsetwindow.la libarmysetwindow.la libcitysetwindow.
 libeditutil_la_SOURCES = \
 	editor-quit-dialog.cpp editor-quit-dialog.h \
 	editor-save-changes-dialog.cpp editor-save-changes-dialog.h \
-	tile-size-editor-dialog.cpp tile-size-editor-dialog.h \
 	lw-editor-dialog.cpp lw-editor-dialog.h \
-	past-chooser.cpp past-chooser.h
+	past-chooser.cpp past-chooser.h \
+	image-file-filter.cpp image-file-filter.h
 
 libshieldsetwindow_la_SOURCES = \
 	shieldset-window.cpp shieldset-window.h \

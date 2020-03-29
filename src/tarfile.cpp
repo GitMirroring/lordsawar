@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Ben Asselstine
+// Copyright (C) 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,12 +19,13 @@
 #include "tarhelper.h"
 
 TarFile::TarFile(Glib::ustring name, Glib::ustring ext)
-  : d_dir(""), d_basename(name), d_extension(ext)
+  : d_dir(""), d_basename(name), d_extension(ext), d_tmp_filename("")
 {
 }
 
 TarFile::TarFile(const TarFile &s)
-  : d_dir(s.d_dir), d_basename(s.d_basename), d_extension(s.d_extension)
+  : d_dir(s.d_dir), d_basename(s.d_basename), d_extension(s.d_extension),
+    d_tmp_filename ("")
 {
 }
 
@@ -38,21 +39,14 @@ void TarFile::created(Glib::ustring filename)
   setDirectory(File::get_dirname(filename));
   setBaseName(File::get_basename(filename, false));
   setExtension(File::get_extension(filename));
-  if (isTemporaryFile ())
-    {
-      File::erase (d_tmp_filename);
-      d_tmp_filename = "";
-    }
 }
 
-Glib::ustring TarFile::getConfigurationFile() const
+Glib::ustring TarFile::getConfigurationFile(bool master) const
 {
-  if (getBaseName () == "")
+  if (!master)
     {
       if (d_tmp_filename != "")
         return d_tmp_filename;
-      else
-        return "";
     }
   return getDirectory() + getBaseName() + d_extension;
 }
@@ -74,12 +68,7 @@ Glib::ustring TarFile::getFileFromConfigurationFile(Glib::ustring file)
   return "";
 }
 
-bool TarFile::removeFileInConfigurationFile(Glib::ustring file)
-{
-  return replaceFileInConfigurationFile(file, "");
-}
-
-bool TarFile::replaceFileInConfigurationFile(Glib::ustring file, Glib::ustring new_file)
+bool TarFile::removeFileInCfgFile(Glib::ustring file)
 {
   bool broken = false;
   Glib::ustring infile = d_tmp_filename;
@@ -88,25 +77,62 @@ bool TarFile::replaceFileInConfigurationFile(Glib::ustring file, Glib::ustring n
   Tar_Helper t(infile, std::ios::in, broken);
   if (broken == false)
     {
-      broken = !t.replaceFile(file, new_file);
+      broken = !t.replaceFile(file, "", "");
       t.Close();
     }
   return !broken;
 }
 
-bool TarFile::addFileInConfigurationFile(Glib::ustring new_file)
+bool TarFile::replaceFileInCfgFile(Glib::ustring file, Glib::ustring new_file, Glib::ustring &out)
 {
-  return replaceFileInConfigurationFile("", new_file);
+  bool broken = false;
+  Glib::ustring infile = d_tmp_filename;
+  if (infile == "")
+    infile = getConfigurationFile();
+  Tar_Helper t(infile, std::ios::in, broken);
+  if (broken == false)
+    {
+      Glib::ustring bname = File::get_basename (new_file, true);
+      Glib::ustring outfile = t.makeNameUnique (bname);
+      Tar_Helper::reopen (&t);
+      if (bname != outfile && bname == file)
+        outfile = file;
+      broken = !t.replaceFile(file, new_file, outfile);
+      t.Close();
+      if (!broken)
+        out = outfile;
+    }
+  return !broken;
+}
+
+bool TarFile::addFileInCfgFile(Glib::ustring new_file, Glib::ustring &out)
+{
+  bool broken = false;
+  Glib::ustring infile = d_tmp_filename;
+  if (infile == "")
+    infile = getConfigurationFile();
+  Tar_Helper t(infile, std::ios::in, broken);
+  if (broken == false)
+    {
+      Glib::ustring bname = File::get_basename (new_file, true);
+      Glib::ustring outfile = t.makeNameUnique (bname);
+      Tar_Helper::reopen (&t);
+      broken = !t.replaceFile("", new_file, outfile);
+      t.Close();
+      if (!broken)
+        out = outfile;
+    }
+  return !broken;
 }
 
 void TarFile::clean_tmp_dir()
 {
+  Tar_Helper::clean_tmp_dir(getConfigurationFile());
   if (d_tmp_filename != "" && File::exists (d_tmp_filename))
     {
       File::erase (d_tmp_filename);
       d_tmp_filename = "";
     }
-  return Tar_Helper::clean_tmp_dir(getConfigurationFile());
 }
 
 bool TarFile::saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring dest, bool add_sets) const
@@ -138,7 +164,7 @@ bool TarFile::saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring
             }
           for (auto ext : extensions)
             {
-              std::list<Glib::ustring> files = orig.getFilenamesWithExtension(ext);
+              std::list<Glib::ustring> files = orig.getFilenames(ext);
               for (std::list<Glib::ustring>::iterator it = files.begin(); 
                    it != files.end(); it++)
                 {
@@ -194,6 +220,13 @@ void TarFile::setNewTemporaryFile ()
   if (broken == true)
     return;
   t.Close ();
+}
+
+void TarFile::setLoadTemporaryFile ()
+{
+  Glib::ustring f = File::get_tmp_file ();
+  File::copy (getConfigurationFile (), f);
+  d_tmp_filename = f;
 }
 
 bool TarFile::isTemporaryFile () const

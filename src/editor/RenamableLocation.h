@@ -31,10 +31,10 @@ class RenamableLocation: public Location, public Renamable
      //! Default constructor.
      RenamableLocation(Vector<int> pos);
      //! Destructor.
-    ~RenamableLocation() {};
+    ~RenamableLocation() {}
 
-    Glib::ustring getDescription() const {return d_description;};
-    void setDescription(Glib::ustring desc) {d_description = desc;};
+    Glib::ustring getDescription() const {return d_description;}
+    void setDescription(Glib::ustring desc) {d_description = desc;}
 
  private:
     Glib::ustring d_description;

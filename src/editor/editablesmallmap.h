@@ -48,7 +48,7 @@ public:
     EditableSmallMap();
 
     //! Destructor.
-    ~EditableSmallMap() {};
+    ~EditableSmallMap() {}
 
 
     // Get Methods

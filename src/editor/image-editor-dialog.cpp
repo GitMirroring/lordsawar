@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,38 +27,96 @@
 #include "File.h"
 #include "shieldsetlist.h"
 #include "past-chooser.h"
+#include "font-size.h"
+#include "ImageCache.h"
+#include "image-file-filter.h"
 
 #define method(x) sigc::mem_fun(*this, &ImageEditorDialog::x)
 
-ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, Glib::ustring filename, int no_frames)
+ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, Glib::ustring bname, int no_frames, std::vector<PixMask *> f, double ratio)
  : LwEditorDialog(parent, "image-editor-dialog.ui")
 {
-  num_frames = no_frames;
+  d_ratio = ratio;
+  d_active_frame = 0;
+  d_num_frames = no_frames;
+  d_target_filename = "";
 
-  xml->get_widget("filechooserbutton", filechooserbutton);
+  xml->get_widget("imagebutton", imagebutton);
+  imagebutton->signal_clicked().connect (method(on_imagebutton_clicked));
+
   xml->get_widget("image", image);
-  show_image(filename);
-  target_filename = filename;
-  update_panel();
-  filechooserbutton->signal_file_set().connect (method(on_image_chosen));
-  filechooserbutton->signal_set_focus_child().connect (method(on_add));
-  Glib::RefPtr<Gtk::FileFilter> png_filter = Gtk::FileFilter::create();
-  png_filter->set_name(_("PNG files (*.png)"));
-  png_filter->add_pattern("*.png");
-  filechooserbutton->add_filter(png_filter);
+  xml->get_widget("clear_button", clear_button);
+  update_imagebutton_label (bname);
+
+  if (f.empty () == false)
+    clear_button->set_visible (true);
+
+  for (guint32 i = 0; i < f.size (); i++)
+    {
+      if (d_ratio > 0)
+        {
+          int font_size = FontSize::getInstance ()->get_height ();
+          double new_height = font_size * d_ratio;
+          int new_width =
+            ImageCache::calculate_width_from_adjusted_height (f[i],
+                                                              new_height);
+          PixMask *ff = f[i]->copy ();
+          PixMask::scale (ff, new_width, new_height);
+          frames.push_back(ff);
+        }
+      else
+        frames.push_back(f[i]->copy ());
+    }
+}
+
+ImageEditorDialog::~ImageEditorDialog()
+{
+  for (auto f : frames)
+    delete f;
+}
+
+void ImageEditorDialog::update_imagebutton_label (Glib::ustring filename)
+{
+  Glib::ustring f = File::get_basename (filename, true);
+  if (f.empty () == false)
+    imagebutton->set_label (f);
+  else
+    imagebutton->set_label (_("no image set"));
+}
+
+bool ImageEditorDialog::load_frames (Glib::ustring filename)
+{
+  bool broken = false;
+  for (auto f : frames)
+    delete f;
+  frames = disassemble_row(filename, d_num_frames, broken);
+  if (!broken)
+    {
+      clear_button->set_visible (true);
+      if (d_ratio > 0)
+        {
+          for (int i = 0; i < d_num_frames; i++)
+            {
+              int font_size = FontSize::getInstance ()->get_height ();
+              double new_height = font_size * d_ratio;
+              int new_width =
+                ImageCache::calculate_width_from_adjusted_height
+                (frames[i], new_height);
+              PixMask::scale (frames[i], new_width, new_height);
+            }
+        }
+    }
+  return broken;
 }
 
 int ImageEditorDialog::run()
 {
-    filechooserbutton->set_title(dialog->get_title());
-    dialog->show_all();
-    int response = dialog->run();
-    if (response != Gtk::RESPONSE_ACCEPT)
-      target_filename = "";
-    else
-      PastChooser::getInstance()->set_dir(filechooserbutton);
+  show_image();
+  int response = dialog->run();
+  if (response != Gtk::RESPONSE_ACCEPT)
+    d_target_filename = "";
 
-    return response;
+  return response;
 }
 
 void ImageEditorDialog::hide ()
@@ -66,68 +124,95 @@ void ImageEditorDialog::hide ()
   dialog->hide();
 }
 
-void ImageEditorDialog::on_image_chosen()
+void ImageEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
 {
-  Glib::ustring selected_filename = filechooserbutton->get_filename();
-  if (selected_filename.empty())
+  Glib::ustring filename = d->get_filename();
+  if (filename.empty())
     return;
 
-  target_filename = selected_filename;
-  show_image(selected_filename);
+  d_target_filename = filename;
+
+  update_imagebutton_label (d_target_filename);
+  load_frames (d_target_filename);
+
+  show_image ();
 }
 
-
-void ImageEditorDialog::update_panel()
+void ImageEditorDialog::show_image()
 {
-  if (target_filename != "")
-    filechooserbutton->set_filename (target_filename);
-}
-
-void ImageEditorDialog::show_image(Glib::ustring filename)
-{
-  if (filename == "")
-    {
-      image->clear();
-      return;
-    }
-
   if (heartbeat.connected())
     heartbeat.disconnect();
 
-  bool broken = false;
-  frames = disassemble_row(filename, num_frames, broken);
-  if (!broken)
+  image->clear();
+  if (frames.empty () == false)
     {
-      active_frame = 0;
-      image->clear();
-      if (num_frames > 0)
-        heartbeat = Glib::signal_timeout().connect
-          (sigc::bind_return (method (on_heartbeat), true), 500);
+      on_heartbeat (false);
+      heartbeat = Glib::signal_timeout().connect
+        (sigc::bind_return (sigc::bind (method (on_heartbeat), true),
+                            true), 500);
+    }
+}
+
+void ImageEditorDialog::on_heartbeat(bool incr)
+{
+  image->property_pixbuf() = frames[d_active_frame]->to_pixbuf();
+  if (incr)
+    {
+      d_active_frame++;
+      if (d_active_frame >= d_num_frames)
+        d_active_frame = 0;
+    }
+}
+
+Gtk::FileChooserDialog* ImageEditorDialog::image_filechooser(bool clear)
+{
+  Gtk::FileChooserDialog *d =
+    new Gtk::FileChooserDialog(*dialog, dialog->get_title ());
+  ImageFileFilter::getInstance ()->add (d);
+  d->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  d->add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
+  if (clear)
+    d->add_button(Gtk::Stock::CLEAR, Gtk::RESPONSE_REJECT);
+  d->set_default_response(Gtk::RESPONSE_ACCEPT);
+  d->set_current_folder(PastChooser::getInstance()->get_dir(d));
+  return d;
+}
+
+void ImageEditorDialog::on_imagebutton_clicked ()
+{
+  Gtk::FileChooserDialog *d =
+    image_filechooser (frames.empty () == false);
+  int response = d->run();
+  if (response == Gtk::RESPONSE_ACCEPT && d->get_filename() != "")
+    {
+      if (ImageFileFilter::getInstance()->hasInvalidExt (d->get_filename ()))
+        ImageFileFilter::getInstance ()->showErrorDialog (d);
       else
-        on_heartbeat();
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (d->get_filename (), broken);
+          if (p)
+            delete p;
+          if (broken)
+            {
+              Gtk::MessageDialog
+                td(*d,
+                   String::ucompose(_("Couldn't make sense of the image:\n%1"),
+                                    d->get_filename ()));
+              td.run();
+              td.hide();
+            }
+          else
+            {
+              PastChooser::getInstance()->set_dir(d);
+              on_image_chosen (d);
+            }
+        }
     }
-}
-
-void ImageEditorDialog::on_heartbeat()
-{
-  image->property_pixbuf() = frames[active_frame]->to_pixbuf();
-  active_frame++;
-  if (active_frame >= num_frames)
-    active_frame = 0;
-}
-
-void ImageEditorDialog::on_add(Gtk::Widget *widget)
-{
-  if (widget)
+  else if (response == Gtk::RESPONSE_REJECT)
     {
-      Gtk::Button *button = dynamic_cast<Gtk::Button*>(widget);
-      button->signal_clicked().connect (method(on_button_pressed));
+      clear_button->activate ();
     }
-}
-
-void ImageEditorDialog::on_button_pressed()
-{
-  Glib::ustring d = PastChooser::getInstance()->get_dir(filechooserbutton);
-  if (d.empty() == false)
-    filechooserbutton->set_current_folder(d);
+  d->hide();
+  delete d;
 }

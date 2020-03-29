@@ -310,6 +310,7 @@ src/editor/battle-calculator-dialog.cpp
 src/editor/media-dialog.cpp
 src/editor/validation-dialog.cpp
 src/editor/stone-editor-tip.cpp
+src/editor/image-file-filter.cpp
 src/utils/import.cpp
 src/gui/city-info-tip.cpp
 src/gui/game-lobby-dialog.cpp

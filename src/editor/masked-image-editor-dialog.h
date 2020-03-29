@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #include "lw-editor-dialog.h"
 
 
-//! general masked picture editor.  
+//! general masked picture editor.
 /**
  * This class doesn't actually edit the image, instead it shows the image
  * being edited in each player colour.  The user can pick a new file to be
@@ -40,18 +40,22 @@ class MaskedImageEditorDialog: public LwEditorDialog
 {
  public:
     static const int MAX_IMAGES_WIDTH;
-    MaskedImageEditorDialog(Gtk::Window &parent, Glib::ustring filename, Shieldset *shieldset = NULL);
-    ~MaskedImageEditorDialog() {};
+    //MaskedImageEditorDialog(Gtk::Window &parent, Glib::ustring filename, double ratio, Shieldset *shieldset = NULL);
+    MaskedImageEditorDialog(Gtk::Window &parent, Glib::ustring filename, PixMask *image, PixMask *mask, double ratio, Shieldset *shieldset = NULL);
+    ~MaskedImageEditorDialog();
 
-    void set_title(Glib::ustring t) {dialog->set_title(t);};
+    void set_title(Glib::ustring t) {dialog->set_title(t);}
 
-    Glib::ustring get_selected_filename() {return target_filename;};
+    Glib::ustring get_filename() {return d_target_filename;}
     int run();
     void hide();
-    
+
  private:
-    Glib::ustring target_filename;
-    Gtk::FileChooserButton *filechooserbutton;
+    double d_ratio;
+    Glib::ustring d_target_filename;
+    PixMask *d_image;
+    PixMask *d_mask;
+    Gtk::Button *imagebutton;
     Gtk::Image *image_white;
     Gtk::Image *image_green;
     Gtk::Image *image_yellow;
@@ -62,12 +66,16 @@ class MaskedImageEditorDialog: public LwEditorDialog
     Gtk::Image *image_black;
     Gtk::Image *image_neutral;
     Shieldset * d_shieldset;
-    void on_image_chosen();
-    void show_image(Glib::ustring filename);
+    Gtk::ComboBoxText *shield_theme_combobox;
+    Gtk::Button *clear_button;
+    void on_shieldset_changed();
+    void on_image_chosen(Gtk::FileChooserDialog *d);
+    void show_image();
     void update_panel();
-    void on_add(Gtk::Widget *widget);
-    void on_button_pressed();
-
+    void on_imagebutton_clicked ();
+    Gtk::FileChooserDialog* image_filechooser(bool clear);
+    void setup_shield_theme_combobox(Gtk::Box *box);
+    bool load_image ();
 };
 
 #endif

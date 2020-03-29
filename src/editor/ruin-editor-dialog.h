@@ -34,7 +34,7 @@ class RuinEditorDialog: public LwEditorDialog
  public:
     RuinEditorDialog(Gtk::Window &parent, Ruin *ruin, 
                      CreateScenarioRandomize *randomize);
-    ~RuinEditorDialog() {};
+    ~RuinEditorDialog() {}
 
     int run();
     

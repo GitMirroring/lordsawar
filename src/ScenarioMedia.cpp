@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Ben Asselstine
+// Copyright (C) 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "xmlhelper.h"
 #include "File.h"
 #include "snd.h"
+#include "tarfile.h"
 
 ScenarioMedia* ScenarioMedia::d_instance = 0;
 
@@ -66,6 +67,11 @@ ScenarioMedia::ScenarioMedia()
     d_hero_newlevel_male_mask(0), d_hero_newlevel_female_image(0),
     d_hero_newlevel_female_mask(0)
 {
+  for (guint32 i = 0; i < MEDAL_TYPES; i++)
+    {
+      d_big_medal_images.push_back (NULL);
+      d_small_medal_images.push_back (NULL);
+    }
 }
 
 ScenarioMedia::ScenarioMedia(XML_Helper *helper)
@@ -84,18 +90,31 @@ ScenarioMedia::ScenarioMedia(XML_Helper *helper)
     d_hero_newlevel_female_mask(0)
 {
   helper->getData(d_next_turn_name, "next_turn_image");
+  File::add_png_if_no_ext (d_next_turn_name);
   helper->getData(d_city_defeated_name, "city_defeated_image");
+  File::add_png_if_no_ext (d_city_defeated_name);
   helper->getData(d_winning_name, "winning_image");
+  File::add_png_if_no_ext (d_winning_name);
   helper->getData(d_male_hero_name, "male_hero_image");
+  File::add_png_if_no_ext (d_male_hero_name);
   helper->getData(d_female_hero_name, "female_hero_image");
+  File::add_png_if_no_ext (d_female_hero_name);
   helper->getData(d_ruin_success_name, "ruin_success_image");
+  File::add_png_if_no_ext (d_ruin_success_name);
   helper->getData(d_ruin_defeat_name, "ruin_defeat_image");
+  File::add_png_if_no_ext (d_ruin_defeat_name);
   helper->getData(d_parley_offered_name, "parley_offered_image");
+  File::add_png_if_no_ext (d_parley_offered_name);
   helper->getData(d_parley_refused_name, "parley_refused_image");
+  File::add_png_if_no_ext (d_parley_refused_name);
   helper->getData(d_hero_newlevel_male_name, "hero_newlevel_male_image");
+  File::add_png_if_no_ext (d_hero_newlevel_male_name);
   helper->getData(d_hero_newlevel_female_name,"hero_newlevel_female_image");
+  File::add_png_if_no_ext (d_hero_newlevel_female_name);
   helper->getData(d_small_medals_name, "small_medals_image");
+  File::add_png_if_no_ext (d_small_medals_name);
   helper->getData(d_big_medals_name, "big_medals_image");
+  File::add_png_if_no_ext (d_big_medals_name);
   helper->getData(d_bless_name, "bless_sound");
   helper->getData(d_hero_name,"d_hero_name");
   helper->getData(d_battle_name,"d_battle_name");
@@ -216,10 +235,12 @@ void ScenarioMedia::uninstantiateImages()
     delete d_hero_newlevel_female_mask;
   d_hero_newlevel_female_mask = NULL;
   for (auto i : d_small_medal_images)
-    delete i;
+    if (i)
+      delete i;
   d_small_medal_images.clear();
   for (auto i : d_big_medal_images)
-    delete i;
+    if (i)
+      delete i;
   d_big_medal_images.clear();
 }
 
@@ -227,7 +248,7 @@ void ScenarioMedia::instantiateImageRow(Tar_Helper &t, Glib::ustring name, int n
 {
   if (name != "")
     {
-      Glib::ustring n = t.getFile (name + ".png", broken);
+      Glib::ustring n = t.getFile (name, broken);
       if (!broken)
         images = disassemble_row(n, num, broken);
     }
@@ -237,7 +258,7 @@ void ScenarioMedia::instantiateMaskedImage(Tar_Helper &t, Glib::ustring name, Pi
 {
   if (name != "")
     {
-      Glib::ustring n = t.getFile (name + ".png", broken);
+      Glib::ustring n = t.getFile (name, broken);
       if (!broken)
         {
           std::vector<PixMask* > half = disassemble_row(n, 2, broken);
@@ -256,7 +277,7 @@ void ScenarioMedia::instantiateImage(Tar_Helper &t, Glib::ustring name, PixMask 
 {
   if (name != "")
     {
-      Glib::ustring n = t.getFile (name + ".png", broken);
+      Glib::ustring n = t.getFile (name, broken);
       if (!broken)
         {
           PixMask *i = PixMask::create (n, broken);
@@ -335,7 +356,7 @@ void ScenarioMedia::instantiateImages(Tar_Helper &t, bool &broken)
   if (!broken)
     instantiateImageRow (t, d_big_medals_name, MEDAL_TYPES, d_big_medal_images, broken);
 }
-        
+
 MusicItem* ScenarioMedia::getSoundEffect(Glib::ustring n)
 {
   return d_musicMap[n];
@@ -344,31 +365,31 @@ MusicItem* ScenarioMedia::getSoundEffect(Glib::ustring n)
 void ScenarioMedia::getFilenames(std::list<Glib::ustring> &files)
 {
   if (getNextTurnImageName() != "")
-    files.push_back (getNextTurnImageName() + ".png");
+    files.push_back (getNextTurnImageName());
   if (getCityDefeatedImageName() != "")
-    files.push_back (getCityDefeatedImageName() + ".png");
+    files.push_back (getCityDefeatedImageName());
   if (getWinningImageName() != "")
-    files.push_back (getWinningImageName() + ".png");
+    files.push_back (getWinningImageName());
   if (getMaleHeroImageName() != "")
-    files.push_back (getMaleHeroImageName() + ".png");
+    files.push_back (getMaleHeroImageName());
   if (getFemaleHeroImageName() != "")
-    files.push_back (getFemaleHeroImageName() + ".png");
+    files.push_back (getFemaleHeroImageName());
   if (getRuinSuccessImageName() != "")
-    files.push_back (getRuinSuccessImageName() + ".png");
+    files.push_back (getRuinSuccessImageName());
   if (getRuinDefeatImageName() != "")
-    files.push_back (getRuinDefeatImageName() + ".png");
+    files.push_back (getRuinDefeatImageName());
   if (getParleyOfferedImageName() != "")
-    files.push_back (getParleyOfferedImageName() + ".png");
+    files.push_back (getParleyOfferedImageName());
   if (getParleyRefusedImageName() != "")
-    files.push_back (getParleyRefusedImageName() + ".png");
+    files.push_back (getParleyRefusedImageName());
   if (getHeroNewLevelMaleImageName() != "")
-    files.push_back (getHeroNewLevelMaleImageName() + ".png");
+    files.push_back (getHeroNewLevelMaleImageName());
   if (getHeroNewLevelFemaleImageName() != "")
-    files.push_back (getHeroNewLevelFemaleImageName() + ".png");
+    files.push_back (getHeroNewLevelFemaleImageName());
   if (getSmallMedalsImageName() != "")
-    files.push_back (getSmallMedalsImageName() + ".png");
+    files.push_back (getSmallMedalsImageName());
   if (getBigMedalsImageName() != "")
-    files.push_back (getBigMedalsImageName() + ".png");
+    files.push_back (getBigMedalsImageName());
   if (getBlessSoundName() != "")
     files.push_back (getBlessSoundName() + ".ogg");
   if (getHeroSoundName() != "")
@@ -476,4 +497,471 @@ Glib::ustring ScenarioMedia::getDefaultVictorySoundFilename()
 Glib::ustring ScenarioMedia::getDefaultBackSoundFilename()
 {
   return Snd::getInstance()->getFile("back");
+}
+
+void ScenarioMedia::clearNextTurnImage(bool clear_name)
+{
+  if (clear_name)
+    setNextTurnImageName ("");
+  PixMask *p = getNextTurnImage ();
+  if (p)
+    delete p;
+  setNextTurnImage (NULL);
+}
+
+void ScenarioMedia::clearCityDefeatedImage(bool clear_name)
+{
+  if (clear_name)
+    setCityDefeatedImageName ("");
+  PixMask *p = getCityDefeatedImage ();
+  if (p)
+    delete p;
+  setCityDefeatedImage (NULL);
+}
+
+void ScenarioMedia::clearWinningImage(bool clear_name)
+{
+  if (clear_name)
+    setWinningImageName ("");
+  PixMask *p = getWinningImage ();
+  if (p)
+    delete p;
+  setWinningImage (NULL);
+}
+
+void ScenarioMedia::clearMaleHeroImage(bool clear_name)
+{
+  if (clear_name)
+    setMaleHeroImageName ("");
+  PixMask *p = getMaleHeroImage ();
+  if (p)
+    delete p;
+  setMaleHeroImage (NULL);
+}
+
+void ScenarioMedia::clearFemaleHeroImage(bool clear_name)
+{
+  if (clear_name)
+    setFemaleHeroImageName ("");
+  PixMask *p = getFemaleHeroImage ();
+  if (p)
+    delete p;
+  setFemaleHeroImage (NULL);
+}
+
+void ScenarioMedia::clearRuinSuccessImage(bool clear_name)
+{
+  if (clear_name)
+    setRuinSuccessImageName ("");
+  PixMask *p = getRuinSuccessImage ();
+  if (p)
+    delete p;
+  setRuinSuccessImage (NULL);
+}
+
+void ScenarioMedia::clearRuinDefeatImage(bool clear_name)
+{
+  if (clear_name)
+    setRuinDefeatImageName ("");
+  PixMask *p = getRuinDefeatImage ();
+  if (p)
+    delete p;
+  setRuinDefeatImage (NULL);
+}
+
+void ScenarioMedia::clearParleyOfferedImage(bool clear_name)
+{
+  if (clear_name)
+    setParleyOfferedImageName ("");
+  PixMask *p = getParleyOfferedImage ();
+  if (p)
+    delete p;
+  setParleyOfferedImage (NULL);
+}
+
+void ScenarioMedia::clearParleyRefusedImage(bool clear_name)
+{
+  if (clear_name)
+    setParleyRefusedImageName ("");
+  PixMask *p = getParleyRefusedImage ();
+  if (p)
+    delete p;
+  setParleyRefusedImage (NULL);
+}
+
+void ScenarioMedia::clearHeroNewLevelMaleImage (bool clear_name)
+{
+  if (clear_name)
+    setHeroNewLevelMaleImageName ("");
+  PixMask *p = getHeroNewLevelMaleImage ();
+  if (p)
+    delete p;
+  setHeroNewLevelMaleImage (NULL);
+  
+  p = getHeroNewLevelMaleMask ();
+  if (p)
+    delete p;
+  setHeroNewLevelMaleMask (NULL);
+}
+
+void ScenarioMedia::clearHeroNewLevelFemaleImage (bool clear_name)
+{
+  if (clear_name)
+    setHeroNewLevelFemaleImageName ("");
+  PixMask *p = getHeroNewLevelFemaleImage ();
+  if (p)
+    delete p;
+  setHeroNewLevelFemaleImage (NULL);
+  
+  p = getHeroNewLevelFemaleMask ();
+  if (p)
+    delete p;
+  setHeroNewLevelFemaleMask (NULL);
+}
+
+void ScenarioMedia::clearSmallMedalImage(bool clear_name)
+{
+  if (clear_name)
+    setSmallMedalsImageName ("");
+  for (guint32 i = 0; i < MEDAL_TYPES; i++)
+    {
+      PixMask *p = getSmallMedalImage (i);
+      if (p)
+        delete p;
+      setSmallMedalsImage (i, NULL);
+    }
+}
+
+void ScenarioMedia::clearBigMedalImage(bool clear_name)
+{
+  if (clear_name)
+    setBigMedalsImageName ("");
+  for (guint32 i = 0; i < MEDAL_TYPES; i++)
+    {
+      PixMask *p = getBigMedalImage (i);
+      if (p)
+        delete p;
+      setBigMedalsImage (i, NULL);
+    }
+}
+
+bool ScenarioMedia::instantiateNextTurnImage(TarFile *t)
+{
+  Glib::ustring imgname = getNextTurnImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearNextTurnImage (false);
+              setNextTurnImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool ScenarioMedia::instantiateCityDefeatedImage(TarFile *t)
+{
+  Glib::ustring imgname = getCityDefeatedImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearCityDefeatedImage (false);
+              setCityDefeatedImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool ScenarioMedia::instantiateWinningImage(TarFile *t)
+{
+  Glib::ustring imgname = getWinningImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearWinningImage (false);
+              setWinningImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool ScenarioMedia::instantiateMaleHeroImage(TarFile *t)
+{
+  Glib::ustring imgname = getMaleHeroImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearMaleHeroImage (false);
+              setMaleHeroImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool ScenarioMedia::instantiateFemaleHeroImage(TarFile *t)
+{
+  Glib::ustring imgname = getFemaleHeroImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearFemaleHeroImage (false);
+              setFemaleHeroImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool ScenarioMedia::instantiateRuinSuccessImage(TarFile *t)
+{
+  Glib::ustring imgname = getRuinSuccessImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearRuinSuccessImage (false);
+              setRuinSuccessImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool ScenarioMedia::instantiateRuinDefeatImage(TarFile *t)
+{
+  Glib::ustring imgname = getRuinDefeatImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearRuinDefeatImage (false);
+              setRuinDefeatImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool ScenarioMedia::instantiateParleyOfferedImage(TarFile *t)
+{
+  Glib::ustring imgname = getParleyOfferedImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearParleyOfferedImage (false);
+              setParleyOfferedImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool ScenarioMedia::instantiateParleyRefusedImage(TarFile *t)
+{
+  Glib::ustring imgname = getParleyRefusedImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearParleyRefusedImage (false);
+              setParleyRefusedImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool ScenarioMedia::instantiateSmallMedalImage(TarFile *t)
+{
+  Glib::ustring imgname = getSmallMedalsImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          std::vector<PixMask *> images =
+            disassemble_row(filename, MEDAL_TYPES, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearSmallMedalImage (false);
+              for (guint32  i = 0; i < MEDAL_TYPES; i++)
+                setSmallMedalsImage (i, images[i]);
+            }
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool ScenarioMedia::instantiateBigMedalImage(TarFile *t)
+{
+  Glib::ustring imgname = getBigMedalsImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          std::vector<PixMask *> images =
+            disassemble_row(filename, MEDAL_TYPES, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearBigMedalImage (false);
+              for (guint32 i = 0; i < MEDAL_TYPES; i++)
+                setBigMedalsImage (i, images[i]);
+            }
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool ScenarioMedia::instantiateHeroNewLevelMaleImage (TarFile *t)
+{
+  bool broken = false;
+  Glib::ustring imgname = getHeroNewLevelMaleImageName ();
+
+  if (imgname.empty () == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          std::vector<PixMask* > half = disassemble_row(filename, 2, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearHeroNewLevelMaleImage (false);
+              setHeroNewLevelMaleImage(half[0]);
+              setHeroNewLevelMaleMask (half[1]);
+            }
+        }
+    }
+  return broken;
+}
+
+bool ScenarioMedia::instantiateHeroNewLevelFemaleImage (TarFile *t)
+{
+  bool broken = false;
+  Glib::ustring imgname = getHeroNewLevelFemaleImageName ();
+
+  if (imgname.empty () == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          std::vector<PixMask* > half = disassemble_row(filename, 2, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearHeroNewLevelFemaleImage (false);
+              setHeroNewLevelFemaleImage(half[0]);
+              setHeroNewLevelFemaleMask (half[1]);
+            }
+        }
+    }
+  return broken;
 }

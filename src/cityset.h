@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009, 2010, 2011, 2014 Ben Asselstine
+// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -99,6 +99,14 @@ class Cityset : public sigc::trackable, public Set
 	void setTowersFilename(Glib::ustring s) {d_towers_filename = s;};
 	Glib::ustring getTowersFilename() {return d_towers_filename;};
 
+        void clearCitiesImage(bool clear_name = true);
+        void clearRazedCitiesImage(bool clear_name = true);
+        void clearPortImage(bool clear_name = true);
+        void clearSignpostImage(bool clear_name = true);
+        void clearRuinsImage(bool clear_name = true);
+        void clearTemplesImage(bool clear_name = true);
+        void clearTowersImage(bool clear_name = true);
+
 	void setCityImage(guint32 i, PixMask *p) {citypics[i] = p;};
 	PixMask *getCityImage(guint32 i) {return citypics[i];};
 	void setRazedCityImage(guint32 i, PixMask *p) {razedcitypics[i] = p;};
@@ -114,7 +122,15 @@ class Cityset : public sigc::trackable, public Set
 	void setTowerImage(guint32 i, PixMask *p) {towerpics[i] = p;};
 	PixMask *getTowerImage(guint32 i) {return towerpics[i];};
 
-	void instantiateImages(bool &broken);
+        //! Load the images associated with this cityset.
+        /**
+         * Go get the image files from the cityset file and create the
+         * various pixmask objects.
+         *
+         * @param scale   The images are clamped to the tile size or not.
+         * @param broken  True when things went wrong reading the cityset file.
+         */
+	void instantiateImages(bool scale, bool &broken);
 	void instantiateImages(Glib::ustring port_filename,
 			       Glib::ustring signpost_filename,
 			       Glib::ustring cities_filename,
@@ -122,7 +138,15 @@ class Cityset : public sigc::trackable, public Set
 			       Glib::ustring towers_filename,
 			       Glib::ustring ruins_filename,
 			       Glib::ustring temples_filename,
-                               bool &broken);
+                               bool scale, bool &broken);
+
+        bool instantiateCityImages ();
+        bool instantiateRazedCityImages ();
+        bool instantiatePortImage ();
+        bool instantiateSignpostImage ();
+        bool instantiateRuinImages ();
+        bool instantiateTempleImages ();
+        bool instantiateTowerImages ();
 	void uninstantiateImages();
 
         guint32 countEmptyImageNames() const;
@@ -145,13 +169,16 @@ class Cityset : public sigc::trackable, public Set
 	bool validateTempleTileWidth();
 	bool tileWidthsEqual(Cityset *cityset);
 
+        void uninstantiateSameNamedImages (Glib::ustring name);
+
         //! Callback to convert old files to new ones.
         static bool upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version);
         static void support_backward_compatibility();
 
+        static guint32 get_default_tile_size ();
         //! Load the cityset again.
         void reload(bool &broken);
-        guint32 calculate_preferred_tile_size() const;
+        bool calculate_preferred_tile_size(guint32 &ts) const;
     private:
 
         // DATA

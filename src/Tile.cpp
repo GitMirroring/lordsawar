@@ -1,6 +1,6 @@
 // Copyright (C) 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -244,7 +244,8 @@ void Tile::uninstantiateImages()
     (*it)->uninstantiateImages();
 }
 
-void Tile::instantiateImages(int tilesize, Tar_Helper *t, bool &broken)
+void Tile::instantiateImages(int tilesize, Tar_Helper *t, bool scale,
+                             bool &broken)
 {
   broken = false;
   for (iterator it = begin(); it != end(); it++)
@@ -252,9 +253,9 @@ void Tile::instantiateImages(int tilesize, Tar_Helper *t, bool &broken)
       Glib::ustring file = "";
       if ((*it)->getName().empty() == false && !broken)
         {
-          file = t->getFile((*it)->getName() + ".png", broken);
+          file = t->getFile((*it)->getName(), broken);
           if (!broken)
-            (*it)->instantiateImages(tilesize, file, broken);
+            (*it)->loadImages(tilesize, file, scale, broken);
           if (file.empty() == false)
             File::erase(file);
         }

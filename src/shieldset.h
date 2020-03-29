@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "defs.h"
 
 class XML_Helper;
+class ShieldStyle;
 
 //! A list of Shield graphic objects in a shield theme.
 /**
@@ -111,14 +112,40 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 	//! Return the total number of shields in this shieldset.
         guint32 getSize() const {return size();}
 
+        bool isAnyHeightAndWidthSet();
+        bool isSmallHeightAndWidthSet();
+        bool isMediumHeightAndWidthSet();
+        bool isLargeHeightAndWidthSet();
 
 	// Set Methods
+
+	//! Return the number of pixels high the small shields are.
+	void setSmallHeight(guint32 n) {d_small_height = n;}
+
+	//! Set how wide in pixels small shields are scaled to.
+	void setSmallWidth(guint32 n) {d_small_width = n;}
+
+	//! Set how high in pixels medium shields are scaled to.
+	void setMediumHeight(guint32 n) {d_medium_height = n;}
+
+	//! Set how wide in pixels medium shields are scaled to.
+	void setMediumWidth(guint32 n) {d_medium_width = n;}
+
+	//! Set how high in pixels large shields are scaled to.
+	void setLargeHeight(guint32 n) {d_large_height = n;}
+
+	//! Set how wide in pixels large shields are scaled to.
+	void setLargeWidth(guint32 n) {d_large_width = n;}
 
         //! Load the shieldset again.
         void reload(bool &broken);
 
         //! Set the dimensions based on the largest image of that shieldstyle.
+        void setHeightsAndWidthsFromImages(ShieldStyle *s);
         void setHeightsAndWidthsFromImages();
+        void setSmallHeightsAndWidthsFromImages();
+        void setMediumHeightsAndWidthsFromImages();
+        void setLargeHeightsAndWidthsFromImages();
 
 	// Methods that operate on the class data but do not modify the class.
 
@@ -165,11 +192,23 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 
 	// Methods that operate on the class data and also modify the class.
 
-	//! Load images associated with this shieldset.
-	void instantiateImages(bool &broken);
+        //! Load the images associated with this shieldset.
+        /**
+         * Go get the image files from the shieldset file and create the
+         * various pixmask objects.
+         *
+         * @param scale   The images are clamped to the sizes held in
+         *                d_small_width, d_small_height (for the small
+         *                shields) and so on.
+         * @param broken  True when couldn't read the shieldset file.
+         */
+	void instantiateImages(bool scale, bool &broken);
 
 	//! Destroy images associated with this shieldset.
 	void uninstantiateImages();
+
+        //! destroy any image that has this name
+        void uninstantiateSameNamedImages (Glib::ustring imgname);
 
 	// Static Methods
 
@@ -189,42 +228,42 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 
 	// DATA
 
-	//! The number of pixels high the small shield occupies onscreen.
+	//! The number of pixels high the small shield images are scaled to.
 	/**
 	 * Equates to the shieldset.d_small_height XML entity in the shieldset 
 	 * configuration file.
 	 */
 	guint32 d_small_height;
 
-	//! The number of pixels wide the small shield occupies onscreen.
+	//! The number of pixels wide the small shield images are scaled to.
 	/**
 	 * Equates to the shieldset.d_small_width XML entity in the shieldset 
 	 * configuration file.
 	 */
 	guint32 d_small_width;
 
-	//! The number of pixels high the medium shield occupies onscreen.
+	//! The number of pixels high the medium shield images are scaled to.
 	/**
 	 * Equates to the shieldset.d_medium_height XML entity in the shieldset 
 	 * configuration file.
 	 */
 	guint32 d_medium_height;
 
-	//! The number of pixels wide the medium shield occupies onscreen.
+	//! The number of pixels wide the medium shield images are scaled to.
 	/**
 	 * Equates to the shieldset.d_medium_width XML entity in the shieldset 
 	 * configuration file.
 	 */
 	guint32 d_medium_width;
 
-	//! The number of pixels high the large shield occupies onscreen.
+	//! The number of pixels high the large shield images are scaled to.
 	/**
 	 * Equates to the shieldset.d_large_height XML entity in the shieldset 
 	 * configuration file.
 	 */
 	guint32 d_large_height;
 
-	//! The number of pixels wide the large shield occupies onscreen.
+	//! The number of pixels wide the large shield images are scaled to.
 	/**
 	 * Equates to the shieldset.d_large_width XML entity in the shieldset 
 	 * configuration file.

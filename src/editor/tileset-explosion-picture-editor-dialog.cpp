@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,69 +30,94 @@
 #include "tile-preview-scene.h"
 #include "tileset-window.h"
 #include "past-chooser.h"
+#include "font-size.h"
+#include "image-file-filter.h"
 
 #define method(x) sigc::mem_fun(*this, &TilesetExplosionPictureEditorDialog::x)
 
 TilesetExplosionPictureEditorDialog::TilesetExplosionPictureEditorDialog(Gtk::Window &parent, Tileset *tileset)
  : LwEditorDialog(parent, "tileset-explosion-picture-editor-dialog.ui")
 {
-  selected_filename = "";
-    d_tileset = tileset;
+  d_changed = false;
+  d_tileset = tileset;
 
-    xml->get_widget("explosion_filechooserbutton", explosion_filechooserbutton);
-    explosion_filechooserbutton->signal_file_set().connect (method(on_image_chosen));
-    explosion_filechooserbutton->set_current_folder(Glib::get_home_dir());
+  xml->get_widget("explosion_imagebutton", explosion_imagebutton);
+  explosion_imagebutton->signal_clicked().connect
+    (method(on_explosion_imagebutton_clicked));
 
-    xml->get_widget("large_explosion_radiobutton", large_explosion_radiobutton);
-    large_explosion_radiobutton->signal_toggled().connect (method(on_large_toggled));
-    xml->get_widget("small_explosion_radiobutton", small_explosion_radiobutton);
-    small_explosion_radiobutton->signal_toggled().connect (method(on_small_toggled));
+  xml->get_widget("large_explosion_radiobutton", large_explosion_radiobutton);
+  large_explosion_radiobutton->signal_toggled().connect (method(on_large_toggled));
+  xml->get_widget("small_explosion_radiobutton", small_explosion_radiobutton);
+  small_explosion_radiobutton->signal_toggled().connect (method(on_small_toggled));
 
-    xml->get_widget("scene_image", scene_image);
-    
-    if (d_tileset->getExplosionFilename().empty() == false)
-      {
-        selected_filename = d_tileset->getFileFromConfigurationFile(d_tileset->getExplosionFilename() +".png");
-        delfiles.push_back(selected_filename);
-      }
-    on_large_toggled();
+  xml->get_widget("scene_image", scene_image);
+
+  Glib::ustring imgname = d_tileset->getExplosionFilename();
+  if (imgname.empty() == false)
+    {
+      bool broken = false;
+      Glib::ustring f =
+        d_tileset->getFileFromConfigurationFile(imgname);
+      d_explosion = PixMask::create (f, broken);
+    }
+  else
+    d_explosion = NULL;
+  on_large_toggled();
 }
 
-int TilesetExplosionPictureEditorDialog::run()
+bool TilesetExplosionPictureEditorDialog::run()
 {
-    dialog->show_all();
-    int response = dialog->run();
-
-    if (response == Gtk::RESPONSE_ACCEPT)
-      PastChooser::getInstance()->set_dir(explosion_filechooserbutton);
-
-    if (std::find(delfiles.begin(), delfiles.end(), selected_filename)
-        == delfiles.end() && response == Gtk::RESPONSE_ACCEPT)
-      {
-        Glib::ustring file = File::get_basename(selected_filename);
-        if (d_tileset->replaceFileInConfigurationFile(d_tileset->getExplosionFilename()+".png", selected_filename))
-          d_tileset->setExplosionFilename(file);
-        else
-          {
-            TileSetWindow::show_add_file_error (d_tileset, *dialog, file);
-            response =Gtk::RESPONSE_CANCEL;
-          }
-      }
-    else if (response == Gtk::RESPONSE_ACCEPT)
-      response = Gtk::RESPONSE_CANCEL;
-    for (std::list<Glib::ustring>::iterator it = delfiles.begin(); 
-         it != delfiles.end(); it++)
-      File::erase(*it);
-    return response;
+  dialog->show_all();
+  dialog->run();
+  dialog->hide ();
+  return d_changed;
 }
 
-void TilesetExplosionPictureEditorDialog::on_image_chosen()
+bool TilesetExplosionPictureEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
 {
-  selected_filename = explosion_filechooserbutton->get_filename();
-  if (selected_filename.empty())
-    return;
-
-  show_explosion_image(selected_filename);
+  bool broken = false;
+  d_explosion = PixMask::create (d->get_filename (), broken);
+  if (!broken)
+    {
+      Glib::ustring imgname = d_tileset->getExplosionFilename();
+      Glib::ustring newname = "";
+      bool success = false;
+      if (imgname.empty() == true)
+        success =
+          d_tileset->addFileInCfgFile(d->get_filename(), newname);
+      else
+        success =
+          d_tileset->replaceFileInCfgFile(imgname, d->get_filename(), newname);
+      if (success)
+        {
+          d_tileset->setExplosionFilename (newname);
+          d_tileset->instantiateExplosionImage();
+          d_changed = true;
+          update_panel ();
+        }
+      else
+        {
+          Glib::ustring errmsg = Glib::strerror(errno);
+          Gtk::MessageDialog
+            td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
+                                    d->get_filename (),
+                                    d_tileset->getConfigurationFile(),
+                                    errmsg));
+          td.run();
+          td.hide();
+          broken = true;
+        }
+    }
+  else
+    {
+      Gtk::MessageDialog
+        td(*d, String::ucompose(_("Couldn't make sense of the image:\n%1"),
+                                d->get_filename ()));
+      td.run();
+      td.hide();
+      broken = true;
+    }
+  return broken;
 }
 
 void TilesetExplosionPictureEditorDialog::on_large_toggled()
@@ -105,19 +130,25 @@ void TilesetExplosionPictureEditorDialog::on_small_toggled()
   update_panel();
 }
 
-
 void TilesetExplosionPictureEditorDialog::update_panel()
 {
-  if (selected_filename.empty() == false)
+  Glib::ustring imgname = d_tileset->getExplosionFilename();
+  if (imgname.empty() == false)
     {
-    explosion_filechooserbutton->set_filename (selected_filename);
-    show_explosion_image(selected_filename);
+      explosion_imagebutton->set_label (imgname);
+      show_explosion_image();
+    }
+  else
+    {
+      explosion_imagebutton->set_label (_("no image set"));
+      scene_image->clear();
     }
 }
 
-void TilesetExplosionPictureEditorDialog::show_explosion_image(Glib::ustring filename)
+void TilesetExplosionPictureEditorDialog::show_explosion_image()
 {
-  guint32 size = d_tileset->getTileSize();
+  guint32 size = FontSize::getInstance ()->get_height () *
+    EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
   TilePreviewScene *s;
   Glib::ustring scene;
   guint32 idx = d_tileset->getIndex(Tile::GRASS);
@@ -134,7 +165,7 @@ void TilesetExplosionPictureEditorDialog::show_explosion_image(Glib::ustring fil
       scene += "aaaaaa";
       scene += "aaaaaa";
       s = new TilePreviewScene(grass, NULL, 6, 6, scene, size);
-      update_scene(s, filename);
+      update_scene(s);
     }
   else if (small_explosion_radiobutton->get_active() == true)
     {
@@ -146,54 +177,49 @@ void TilesetExplosionPictureEditorDialog::show_explosion_image(Glib::ustring fil
       scene += "aaaaaaa";
       scene += "aaaaaaa";
       s = new TilePreviewScene(grass, NULL, 7, 7, scene, size);
-      update_scene(s, filename);
+      update_scene(s);
     }
 }
 
-void TilesetExplosionPictureEditorDialog::update_scene(TilePreviewScene *scene,
-						       Glib::ustring filename)
+void TilesetExplosionPictureEditorDialog::update_scene(TilePreviewScene *scene)
 {
-  if (!scene)
+  if (!d_explosion)
     return;
-  if (filename == "")
+  if (!scene)
     return;
 
   Glib::RefPtr<Gdk::Pixbuf> scene_pixbuf;
-  scene_pixbuf = scene->renderScene(d_tileset->getTileSize());
+  scene_pixbuf = scene->renderScene ();
   //center the explosion image on the pixbuf
   //but the large explosion is scaled first
 
   Glib::RefPtr<Gdk::Pixbuf> explosion;
   if (small_explosion_radiobutton->get_active())
     {
-      try
-        {
-          explosion = Gdk::Pixbuf::create_from_file(filename, 
-                                                    d_tileset->getTileSize(), 
-                                                    d_tileset->getTileSize(), 
-                                                    false);
-        }
-      catch (const Glib::Exception &ex)
-        {
-          return;
-        }
+      //explosion = d_explosion->to_pixbuf ();
+      PixMask *p = d_explosion->copy ();
+      double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
+      double new_height = FontSize::getInstance()->get_height () * ratio;
+      int new_width =
+        ImageCache::calculate_width_from_adjusted_height (p, new_height);
+      PixMask::scale (p, new_width, new_height);
+      explosion = p->to_pixbuf ();
+      delete p;
     }
   else if (large_explosion_radiobutton->get_active())
     {
-      try
-        {
-          explosion = 
-            Gdk::Pixbuf::create_from_file(filename, 
-                                          d_tileset->getTileSize() * 2, 
-                                          d_tileset->getTileSize() * 2, false);
-        }
-      catch (const Glib::Exception &ex)
-        {
-          return;
-        }
+      PixMask *p = d_explosion->copy ();
+      double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
+      double new_height = FontSize::getInstance()->get_height () * ratio * 2.0;
+      int new_width =
+        ImageCache::calculate_width_from_adjusted_height (p, new_height);
+      PixMask::scale (p, new_width, new_height);
+      explosion = p->to_pixbuf ();
+      //guint32 ts = d_tileset->getTileSize ();
+      //PixMask::scale (p, ts * 2, ts * 2);
+      //explosion = p->to_pixbuf ();
+      delete p;
     }
-  if (!explosion)
-    return;
 
   int i = (scene_pixbuf->get_width() - explosion->get_width()) / 2;
   int j = (scene_pixbuf->get_height() - explosion->get_height()) / 2;
@@ -202,19 +228,74 @@ void TilesetExplosionPictureEditorDialog::update_scene(TilePreviewScene *scene,
   scene_image->queue_draw();
 }
 
-void TilesetExplosionPictureEditorDialog::on_add(Gtk::Widget *widget)
+Gtk::FileChooserDialog* TilesetExplosionPictureEditorDialog::image_filechooser(bool clear)
 {
-  if (widget)
-    {
-      Gtk::Button *button = dynamic_cast<Gtk::Button*>(widget);
-      button->signal_clicked().connect (method(on_button_pressed));
-    }
+  Glib::ustring filename = "";
+  Glib::ustring title = _("Choose an explosion image");
+  Gtk::FileChooserDialog *d = new Gtk::FileChooserDialog(*dialog, title);
+  ImageFileFilter::getInstance ()->add (d);
+  d->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  d->add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
+  if (clear)
+    d->add_button(Gtk::Stock::CLEAR, Gtk::RESPONSE_REJECT);
+  d->set_default_response(Gtk::RESPONSE_ACCEPT);
+  d->set_current_folder(PastChooser::getInstance()->get_dir(d));
+  return d;
 }
 
-void TilesetExplosionPictureEditorDialog::on_button_pressed()
+void TilesetExplosionPictureEditorDialog::on_explosion_imagebutton_clicked ()
 {
-  Glib::ustring d = 
-    PastChooser::getInstance()->get_dir(explosion_filechooserbutton);
-  if (d.empty() == false)
-    explosion_filechooserbutton->set_current_folder(d);
+  Glib::ustring f = d_tileset->getExplosionFilename ();
+  Glib::ustring filename = "";
+  Gtk::FileChooserDialog *d = image_filechooser(f != "");
+  if (f != "")
+    filename = d_tileset->getFileFromConfigurationFile(f);
+  int response = d->run();
+  if (filename != "")
+    File::erase(filename);
+  if (response == Gtk::RESPONSE_ACCEPT && d->get_filename() != "")
+    {
+      if (ImageFileFilter::getInstance ()->hasInvalidExt (d->get_filename ()))
+        ImageFileFilter::getInstance()->showErrorDialog (d);
+      else
+        {
+          if (d->get_filename() != filename)
+            {
+              PastChooser::getInstance()->set_dir(d);
+              on_image_chosen (d);
+            }
+        }
+    }
+  else if (response == Gtk::RESPONSE_REJECT && f != "")
+    {
+      if (d_tileset->removeFileInCfgFile(f))
+        {
+          d_changed = true;
+          d_tileset->uninstantiateSameNamedImages (f);
+          if (d_explosion)
+            {
+              delete d_explosion;
+              d_explosion = NULL;
+            }
+          update_panel ();
+        }
+      else
+        {
+          Glib::ustring errmsg = Glib::strerror(errno);
+          Gtk::MessageDialog
+            td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
+                                    f, d_tileset->getConfigurationFile(),
+                                    errmsg));
+          td.run();
+          td.hide();
+        }
+    }
+  d->hide();
+  delete d;
+}
+
+TilesetExplosionPictureEditorDialog::~TilesetExplosionPictureEditorDialog ()
+{
+  if (d_explosion)
+    delete d_explosion;
 }

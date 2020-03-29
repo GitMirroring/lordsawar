@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,13 +29,13 @@
 class TilePreviewDialog: public LwEditorDialog
 {
  public:
-    TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *secondary, guint32 tileSize);
-    ~TilePreviewDialog() {};
+    TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *secondary);
+    ~TilePreviewDialog() {}
 
     void run();
 
     sigc::signal<void, guint32> tilestyle_selected;
-    
+
  private:
     Tile *d_tile;
     Gtk::Button *next_button;

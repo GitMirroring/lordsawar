@@ -323,6 +323,20 @@ namespace String
     out += str.substr (1);
     return out;
   }
+
+  inline Glib::ustring strip_trailing_numbers (Glib::ustring name)
+    {
+      int digits = 0;
+      Glib::ustring::reverse_iterator i;
+      for (i = name.rbegin (); i != name.rend(); i++)
+        {
+          if (g_unichar_isdigit (*i))
+            digits++;
+          else
+            break;
+        }
+      return name.substr (0, name.length () - digits);
+    }
 }
 
 

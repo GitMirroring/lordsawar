@@ -90,7 +90,7 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 	// Methods that operate on class data and modify the class.
 
 	//! Load the images associated with this shield.
-	void instantiateImages(Shieldset *s, bool &broken);
+	void instantiateImages(Shieldset *s, bool scale, bool &broken);
 
 	//! Destroy the images associated with this shield.
 	void uninstantiateImages();

@@ -26,7 +26,7 @@ class EditorQuitDialog: public LwEditorDialog
 {
  public:
     EditorQuitDialog(Gtk::Window &parent);
-    ~EditorQuitDialog() {};
+    ~EditorQuitDialog() {}
 
  private:
 };

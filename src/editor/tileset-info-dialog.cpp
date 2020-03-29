@@ -29,121 +29,104 @@
 
 #define method(x) sigc::mem_fun(*this, &TileSetInfoDialog::x)
 
-TileSetInfoDialog::TileSetInfoDialog(Gtk::Window &parent, Set *tileset, Glib::ustring dir, Glib::ustring file, bool readonly, Glib::ustring title)
+TileSetInfoDialog::TileSetInfoDialog(Gtk::Window &parent, Tileset *s)
  : LwEditorDialog(parent, "tileset-info-dialog.ui")
 {
-  d_tileset = tileset;
-  d_readonly = readonly;
-    
-    if (title != "")
-      dialog->set_title(title);
+  d_tileset = s;
+  dialog->set_title(_("Tileset Properties"));
 
-    xml->get_widget("accept_button", accept_button);
-    xml->get_widget("status_label", status_label);
-    xml->get_widget("dir_label", dir_label);
+  xml->get_widget("close_button", close_button);
+  xml->get_widget("status_label", status_label);
+  xml->get_widget("location_label", location_label);
+  xml->get_widget("name_entry", name_entry);
+  xml->get_widget("size_spinbutton", size_spinbutton);
+  xml->get_widget("fit_button", fit_button);
 
-    xml->get_widget("name_entry", name_entry);
-    name_entry->set_text(tileset->getName());
-    if (readonly == false)
-      name_entry->signal_changed().connect (method(on_name_changed));
-    
-    xml->get_widget("filename_entry", filename_entry);
-    if (file != "")
-      filename_entry->set_text(file);
-    else
-      {
-        guint32 num = 0;
-        Glib::ustring basename = Tilesetlist::getInstance()->findFreeBaseName(_("untitled"), 100, num);
-        filename_entry->set_text(basename);
+  size_spinbutton->set_value ((double)s->getTileSize ());
+  size_spinbutton->signal_changed().connect (method(on_size_changed));
+  fit_button->signal_clicked().connect (method(on_fit_pressed));
 
-        Glib::ustring name = String::ucompose("%1 %2", _("Untitled"), num);
-        name_entry->set_text(name);
-      }
-    if (readonly == false)
-      filename_entry->signal_changed().connect (method(on_filename_changed));
+  name_entry->set_text (d_tileset->getName ());
+  location_label->property_label () =
+    d_tileset->getDirectory ().empty () ? "" :
+    d_tileset->getConfigurationFile (true);
 
-    xml->get_widget("id_spinbutton", id_spinbutton);
-    id_spinbutton->set_value(tileset->getId());
-    id_spinbutton->set_sensitive(false);
+  name_entry->signal_changed().connect (method(on_name_changed));
 
-    xml->get_widget("copyright_textview", copyright_textview);
-    copyright_textview->get_buffer()->set_text(d_tileset->getCopyright());
-    xml->get_widget("license_textview", license_textview);
-    license_textview->get_buffer()->set_text(d_tileset->getLicense());
-    xml->get_widget("description_textview", description_textview);
-    description_textview->get_buffer()->set_text(tileset->getInfo());
-    xml->get_widget("notebook", notebook);
-
-    dir_label->set_text (dir);
-    if (readonly)
-      filename_entry->set_sensitive(false);
-
-    update_buttons();
-}
-
-void TileSetInfoDialog::on_filename_changed()
-{
-  update_buttons();
+  xml->get_widget("copyright_textview", copyright_textview);
+  copyright_textview->get_buffer()->set_text(d_tileset->getCopyright());
+  copyright_textview->get_buffer()->signal_changed().connect
+    (method(on_copyright_changed));
+  xml->get_widget("license_textview", license_textview);
+  license_textview->get_buffer()->set_text(d_tileset->getLicense());
+  license_textview->get_buffer()->signal_changed().connect
+    (method(on_license_changed));
+  xml->get_widget("description_textview", description_textview);
+  description_textview->get_buffer()->set_text(d_tileset->getInfo());
+  description_textview->get_buffer()->signal_changed().connect
+    (method(on_description_changed));
+  xml->get_widget("notebook", notebook);
+  on_name_changed ();
+  d_changed = false;
 }
 
 void TileSetInfoDialog::on_name_changed()
 {
-  char *s = File::_sanify(name_entry->get_text().c_str());
-  filename_entry->set_text(s);
-  free (s);
-  update_buttons();
-}
+  d_changed = true;
+  d_tileset->setName (String::utrim (name_entry->get_text ()));
+  close_button->set_sensitive (File::sanify (d_tileset->getName ()) != "");
 
-int TileSetInfoDialog::run()
-{
-    dialog->show_all();
-    int response = dialog->run();
-
-    if (response == Gtk::RESPONSE_ACCEPT)	// accepted
-    {
-      d_tileset->setName(name_entry->get_text());
-      d_tileset->setId(int(id_spinbutton->get_value()));
-      if (d_readonly == false)
-	d_tileset->setBaseName(filename_entry->get_text());
-      d_tileset->setCopyright(copyright_textview->get_buffer()->get_text());
-      d_tileset->setLicense(license_textview->get_buffer()->get_text());
-      d_tileset->setInfo(description_textview->get_buffer()->get_text());
-      return response;
-    }
-    return response;
-}
-
-void TileSetInfoDialog::update_buttons()
-{
-  if (d_readonly)
-    {
-      accept_button->set_sensitive(true);
-      return;
-    }
-
-  if (Tilesetlist::getInstance()->get(filename_entry->get_text()))
-    {
-      accept_button->set_sensitive(false);
-      status_label->set_markup(String::ucompose("<b>%1</b>", 
-						_("That filename is already used.")));
-    }
-  else if (filename_entry->get_text() == "" || name_entry->get_text() == "")
-    accept_button->set_sensitive(false);
-  else if (Tilesetlist::getInstance()->contains(name_entry->get_text()) && 
-           name_entry->get_text() != "")
-    {
-      status_label->set_markup(String::ucompose("<b>%1</b>", 
-						_("That name is already in use.")));
-      accept_button->set_sensitive(true);
-    }
+  Glib::ustring file =
+    Tilesetlist::getInstance()->lookupConfigurationFileByName(d_tileset);
+  if (file != "" && file != d_tileset->getConfigurationFile (true))
+    status_label->set_text (_("That name is already in use."));
   else
-    {
-      status_label->set_text("");
-      accept_button->set_sensitive(true);
-    }
+    status_label->set_text ("");
+}
+
+bool TileSetInfoDialog::run()
+{
+  dialog->show_all();
+  dialog->run();
+  dialog->hide ();
+  return d_changed;
+}
+
+void TileSetInfoDialog::on_copyright_changed ()
+{
+  d_changed = true;
+  d_tileset->setCopyright(copyright_textview->get_buffer()->get_text());
+}
+
+void TileSetInfoDialog::on_license_changed ()
+{
+  d_changed = true;
+  d_tileset->setLicense(license_textview->get_buffer()->get_text());
+}
+
+void TileSetInfoDialog::on_description_changed ()
+{
+  d_changed = true;
+  d_tileset->setInfo(description_textview->get_buffer()->get_text());
 }
 
 TileSetInfoDialog::~TileSetInfoDialog()
 {
   notebook->property_show_tabs () = false;
+}
+
+void TileSetInfoDialog::on_size_changed()
+{
+  d_changed = true;
+  d_tileset->setTileSize (size_spinbutton->get_value ());
+  on_name_changed ();
+}
+
+void TileSetInfoDialog::on_fit_pressed()
+{
+  d_changed = true;
+  guint32 ts = 0;
+  d_tileset->calculate_preferred_tile_size (ts);
+  size_spinbutton->set_value (ts);
+  on_name_changed ();
 }

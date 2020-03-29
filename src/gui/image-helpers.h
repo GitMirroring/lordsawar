@@ -30,6 +30,8 @@ std::vector<PixMask*>
 disassemble_row(const Glib::ustring &file, int no, bool &broken);
 std::vector<PixMask*>
 disassemble_row(const Glib::ustring &file, int no, bool first_half_height, bool &broken);
+std::vector<PixMask*>
+disassemble_row(Glib::RefPtr<Gdk::Pixbuf> p, int no, bool first_half_height);
 
 //Cairo::RefPtr<Cairo::Surface> scale (Cairo::RefPtr<Cairo::Surface> pixmap, int w, int h);
 bool image_width_is_multiple_of_image_height(const Glib::ustring file);

@@ -34,7 +34,7 @@ class StoneEditorTip: public sigc::trackable
  public:
     // the tip is shown above target, simply delete the object to hide it again
     StoneEditorTip(Gtk::Widget *target, MapTipPosition mpos, Stone *s, Road *r);
-    ~StoneEditorTip() {delete window;};
+    ~StoneEditorTip() {delete window;}
     sigc::signal<void,Vector<int>,int> stone_picked;
 
  private:

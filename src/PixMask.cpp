@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -265,4 +265,9 @@ int PixMask::get_depth()
 Vector<int> PixMask::get_dim() const
 {
   return Vector<int>(width, height);
+}
+
+Vector<int> PixMask::get_unscaled_dim() const
+{
+  return Vector<int>(unscaled_width, unscaled_height);
 }

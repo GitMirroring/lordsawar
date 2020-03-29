@@ -8,12 +8,9 @@
     <property name="border_width">5</property>
     <property name="window_position">center-on-parent</property>
     <property name="type_hint">dialog</property>
-    <property name="copyright" translatable="yes">Copyright © 2006-2017 Ben Asselstine
+    <property name="copyright" translatable="yes">Copyright © 2006-2020 Ben Asselstine
 (and many other copyright holders)</property>
-    <property name="comments" translatable="yes">Please consider donating to the project
-so we can have new artwork created.  
-Our fundraising goal is $2000 USD.
-</property>
+    <property name="comments" translatable="yes">If you enjoy playing LordsAWar! please consider donating to keep the project alive.</property>
     <property name="website">lordsawar.nongnu.org</property>
     <property name="website_label" translatable="yes">lordsawar.nongnu.org</property>
     <property name="license" translatable="yes">LordsAWar! is licensed under the GNU General Public License version 3,

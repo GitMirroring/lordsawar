@@ -105,7 +105,8 @@ class ShieldStyle : public sigc::trackable
 	// Methods that operate on class data and modify the class.
 
 	//! Load the images for this shieldstyle from the given file.
-	void instantiateImages(Glib::ustring filename, Shieldset *s, bool &broke);
+	void instantiateImages(Glib::ustring filename, Shieldset *s,
+                               bool scale, bool &broke);
 
 	//! Destroy the images associated with this shieldstyle.
 	void uninstantiateImages();

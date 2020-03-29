@@ -19,8 +19,10 @@
 #ifndef MEDIA_DIALOG_H
 #define MEDIA_DIALOG_H
 
+#include <vector>
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
+#include "PixMask.h"
 
 class TarFile;
 class Shieldset;
@@ -31,7 +33,7 @@ public:
     ~MediaDialog();
 
     int run();
-    void hide() {dialog->hide();};
+    void hide() {dialog->hide();}
 
     bool get_needs_saving() const {return d_needs_saving;}
 
@@ -85,8 +87,8 @@ private:
     void fill_in_buttons();
     void fill_image_button(Gtk::Button *button, Glib::ustring name);
     void fill_sound_button(Gtk::Button *button, Glib::ustring name);
-    void on_image_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<Glib::ustring> getDefaultFilename, sigc::slot<void,Glib::ustring> setName, int num_frames);
-    void on_masked_image_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<Glib::ustring> getDefaultFilename, sigc::slot<void,Glib::ustring> setName, Shieldset *ss);
+    void on_image_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<void,Glib::ustring> setName, int num_frames, std::vector<PixMask *> frames);
+    void on_masked_image_button_activated(sigc::slot<Glib::ustring> getName, PixMask *image, PixMask *mask, sigc::slot<void,Glib::ustring> setName, Shieldset *ss);
     void on_sound_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<Glib::ustring> getDefaultFilename, sigc::slot<void, Glib::ustring> setName);
 };
 

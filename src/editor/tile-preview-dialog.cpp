@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,10 +27,11 @@
 #include "defs.h"
 #include "File.h"
 #include "tilestyle.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &TilePreviewDialog::x)
 
-TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec, guint32 tileSize)
+TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec)
  : LwEditorDialog(parent, "tile-preview-dialog.ui")
 {
     xml->get_widget("next_button", next_button);
@@ -42,13 +43,14 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
     xml->get_widget("preview_image", preview_image);
     xml->get_widget("selected_tilestyle_label", selected_tilestyle_label);
     xml->get_widget("eventbox", eventbox);
-    eventbox->add_events(Gdk::BUTTON_PRESS_MASK | 
+    eventbox->add_events(Gdk::BUTTON_PRESS_MASK |
                          Gdk::BUTTON_RELEASE_MASK | Gdk::POINTER_MOTION_MASK);
     eventbox->signal_button_press_event().connect (method(on_mouse_button_event));
     eventbox->signal_button_release_event().connect (method(on_mouse_button_event));
     eventbox->signal_motion_notify_event().connect (method(on_mouse_motion_event));
 
-    d_tileSize = tileSize;
+    d_tileSize = FontSize::getInstance ()->get_height () *
+      EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
 
     Glib::ustring scene;
     TilePreviewScene *s;
@@ -64,7 +66,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "aaaaa";
 	scene += "aaaaa";
 	scene += "aaaaa";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
         add_scene(s);
 	break;
       case Tile::WATER:
@@ -72,7 +74,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "bcd";
 	scene += "hij";
 	scene += "efg";
-	s = new TilePreviewScene(tile, sec, 3, 3, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 3, 3, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene += "iiiii";
@@ -80,7 +82,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "iiiii";
 	scene += "iiiii";
 	scene += "iiiii";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene += "iiii";
@@ -88,7 +90,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "ijhi";
 	scene += "imni";
 	scene += "iiii";
-	s = new TilePreviewScene(tile, sec, 5, 4, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 4, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene += "ahiii";
@@ -96,14 +98,14 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "ijhja";
 	scene += "ijeoc";
 	scene += "ijahi";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
 	break;
       case Tile::FOREST:
 	scene.clear();
 	scene += "bcd";
 	scene += "hij";
 	scene += "efg";
-	s = new TilePreviewScene(tile, sec, 3, 3, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 3, 3, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene += "iiiii";
@@ -111,7 +113,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "iiiii";
 	scene += "iiiii";
 	scene += "iiiii";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene += "ahiii";
@@ -119,7 +121,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "ijhja";
 	scene += "ijeoc";
 	scene += "ijahi";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
         add_scene(s);
 	break;
       case Tile::HILLS:
@@ -127,7 +129,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "bcd";
 	scene += "hij";
 	scene += "efg";
-	s = new TilePreviewScene(tile, sec, 3, 3, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 3, 3, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene += "iiiii";
@@ -135,7 +137,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "iiiii";
 	scene += "iiiii";
 	scene += "iiiii";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene += "ahiii";
@@ -143,7 +145,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "ijhja";
 	scene += "ijeoc";
 	scene += "ijahi";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
         add_scene(s);
 	break;
       case Tile::MOUNTAIN:
@@ -151,7 +153,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "bcd";
 	scene += "hij";
 	scene += "efg";
-	s = new TilePreviewScene(tile, sec, 3, 3, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 3, 3, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene += "iiiii";
@@ -159,13 +161,13 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "iiiii";
 	scene += "iiiii";
 	scene += "iiiii";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene += "III";
 	scene += "IaI";
 	scene += "III";
-	s = new TilePreviewScene(tile, sec, 3, 3, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 3, 3, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene += "ahiii";
@@ -173,7 +175,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "ijhja";
 	scene += "ijeoc";
 	scene += "ijahi";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
         add_scene(s);
 	break;
       case Tile::SWAMP:
@@ -182,7 +184,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "aaaaa";
 	scene += "aaaaa";
 	scene += "aaaaa";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene += "ahiii";
@@ -190,7 +192,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "ijhja";
 	scene += "ijeoc";
 	scene += "ijahi";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
         add_scene(s);
 	scene.clear();
 	scene = "iiiii";
@@ -198,7 +200,7 @@ TilePreviewDialog::TilePreviewDialog(Gtk::Window &parent, Tile *tile, Tile *sec,
 	scene += "iiiii";
 	scene += "iiiii";
 	scene += "iiiii";
-	s = new TilePreviewScene(tile, sec, 5, 5, scene, tileSize);
+	s = new TilePreviewScene(tile, sec, 5, 5, scene, d_tileSize);
         add_scene(s);
 	break;
       }
@@ -276,7 +278,8 @@ void TilePreviewDialog::update_scene(TilePreviewScene *scene)
 {
   if (!scene)
     return;
-  preview_image->property_pixbuf() = scene->renderScene(d_tileSize);
+  preview_image->property_pixbuf() =
+    scene->renderScene();
   guint32 width = scene->getWidth();
   guint32 height = scene->getHeight();
   eventbox->set_size_request(width * d_tileSize, height * d_tileSize);
@@ -289,7 +292,7 @@ void TilePreviewDialog::update_buttons()
   next_button->set_sensitive(++it != scenes.end());
   previous_button->set_sensitive(current_scene != scenes.begin());
 }
-    
+
 bool TilePreviewDialog::on_mouse_button_event(GdkEventButton *e)
 {
   (*current_scene)->mouse_button_event(to_input_event(e));

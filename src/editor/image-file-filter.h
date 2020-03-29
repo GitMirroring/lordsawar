@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2014 Ben Asselstine
+//  Copyright (C) 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,27 +16,26 @@
 //  02110-1301, USA.
 
 #pragma once
-#ifndef TILE_SIZE_EDITOR_DIALOG_H
-#define TILE_SIZE_EDITOR_DIALOG_H
+#ifndef IMAGE_FILE_FILTER_H
+#define IMAGE_FILE_FILTER_H
 
 #include <gtkmm.h>
-#include "lw-editor-dialog.h"
 
-class TileSizeEditorDialog: public LwEditorDialog
+class ImageFileFilter
 {
- public:
-    TileSizeEditorDialog(Gtk::Window &parent, guint32 current, guint32 suggested);
-    ~TileSizeEditorDialog() {};
+public:
 
-    guint32 get_selected_tilesize() const {return d_tilesize;}
+    bool hasInvalidExt (Glib::ustring filename);
+    void add (Gtk::FileChooserDialog *d);
+    void showErrorDialog(Gtk::Dialog *d);
+    static ImageFileFilter* getInstance();
+    static void deleteInstance();
 
-    int run();
-    void hide() {dialog->hide();};
-    
- private:
-    Gtk::Label *label;
-    Gtk::SpinButton *tilesize_spinbutton;
-    guint32 d_tilesize;
+protected:
+    ImageFileFilter() {}
+    ~ImageFileFilter() {}
+private:
+    static ImageFileFilter * s_instance;
 };
 
 #endif

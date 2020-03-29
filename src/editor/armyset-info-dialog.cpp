@@ -28,123 +28,105 @@
 #include "File.h"
 
 
-ArmySetInfoDialog::ArmySetInfoDialog(Gtk::Window &parent, Set *armyset, Glib::ustring dir, Glib::ustring file, bool readonly, Glib::ustring title)
+#define method(x) sigc::mem_fun(*this, &ArmySetInfoDialog::x)
+
+ArmySetInfoDialog::ArmySetInfoDialog(Gtk::Window &parent, Armyset *armyset)
  : LwEditorDialog(parent, "armyset-info-dialog.ui")
 {
   d_armyset = armyset;
-  d_readonly = readonly;
-    
-    if (title != "")
-      dialog->set_title(title);
+  dialog->set_title(_("Armyset Properties"));
 
-    xml->get_widget("accept_button", accept_button);
-    xml->get_widget("status_label", status_label);
-    xml->get_widget("dir_label", dir_label);
+  xml->get_widget("close_button", close_button);
+  xml->get_widget("status_label", status_label);
+  xml->get_widget("location_label", location_label);
+  location_label->property_label () =
+    d_armyset->getDirectory ().empty () ? "" :
+    d_armyset->getConfigurationFile (true);
 
-    xml->get_widget("name_entry", name_entry);
-    name_entry->set_text(armyset->getName());
-    if (readonly == false)
-      name_entry->signal_changed().connect
-	(sigc::mem_fun(this, &ArmySetInfoDialog::on_name_changed));
-    
-    xml->get_widget("filename_entry", filename_entry);
-    if (file != "")
-      filename_entry->set_text(file);
-    else
-      {
-        guint32 num = 0;
-        Glib::ustring basename = Armysetlist::getInstance()->findFreeBaseName(_("untitled"), 100, num);
-        filename_entry->set_text(basename);
+  xml->get_widget("name_entry", name_entry);
+  name_entry->set_text(armyset->getName());
+  name_entry->signal_changed().connect (method (on_name_changed));
 
-        Glib::ustring name = String::ucompose("%1 %2", _("Untitled"), num);
-        name_entry->set_text(name);
-      }
-    if (readonly == false)
-      filename_entry->signal_changed().connect
-	(sigc::mem_fun(this, &ArmySetInfoDialog::on_filename_changed));
+  xml->get_widget("copyright_textview", copyright_textview);
+  copyright_textview->get_buffer()->set_text(d_armyset->getCopyright());
+  copyright_textview->get_buffer()->signal_changed().connect
+    (method(on_copyright_changed));
+  xml->get_widget("license_textview", license_textview);
+  license_textview->get_buffer()->set_text(d_armyset->getLicense());
+  license_textview->get_buffer()->signal_changed().connect
+    (method(on_license_changed));
+  xml->get_widget("description_textview", description_textview);
+  description_textview->get_buffer()->set_text(d_armyset->getInfo());
+  description_textview->get_buffer()->signal_changed().connect
+    (method(on_description_changed));
+  xml->get_widget("notebook", notebook);
+  xml->get_widget("size_spinbutton", size_spinbutton);
+  xml->get_widget("fit_button", fit_button);
 
-    xml->get_widget("id_spinbutton", id_spinbutton);
-    id_spinbutton->set_value(armyset->getId());
-    id_spinbutton->set_sensitive(false);
-
-    xml->get_widget("copyright_textview", copyright_textview);
-    copyright_textview->get_buffer()->set_text(d_armyset->getCopyright());
-    xml->get_widget("license_textview", license_textview);
-    license_textview->get_buffer()->set_text(d_armyset->getLicense());
-    xml->get_widget("description_textview", description_textview);
-    description_textview->get_buffer()->set_text(armyset->getInfo());
-    xml->get_widget("notebook", notebook);
-
-    dir_label->set_text (dir);
-    if (readonly)
-      filename_entry->set_sensitive(false);
-
-    update_buttons();
-}
-
-void ArmySetInfoDialog::on_filename_changed()
-{
-  update_buttons();
+  size_spinbutton->set_value ((double)armyset->getTileSize ());
+  size_spinbutton->signal_changed().connect (method(on_size_changed));
+  fit_button->signal_clicked().connect (method(on_fit_pressed));
+  on_name_changed ();
+  d_changed = false;
 }
 
 void ArmySetInfoDialog::on_name_changed()
 {
-  char *s = File::_sanify(name_entry->get_text().c_str());
-  filename_entry->set_text(s);
-  free (s);
-  update_buttons();
-}
+  d_changed = true;
+  d_armyset->setName (String::utrim (name_entry->get_text ()));
+  close_button->set_sensitive (File::sanify (d_armyset->getName ()) != "");
 
-int ArmySetInfoDialog::run()
-{
-    dialog->show_all();
-    int response = dialog->run();
-
-    if (response == Gtk::RESPONSE_ACCEPT)	// accepted
-    {
-      d_armyset->setName(name_entry->get_text());
-      d_armyset->setId(int(id_spinbutton->get_value()));
-      if (d_readonly == false)
-	d_armyset->setBaseName(filename_entry->get_text());
-      d_armyset->setCopyright(copyright_textview->get_buffer()->get_text());
-      d_armyset->setLicense(license_textview->get_buffer()->get_text());
-      d_armyset->setInfo(description_textview->get_buffer()->get_text());
-      return response;
-    }
-    return response;
-}
-
-void ArmySetInfoDialog::update_buttons()
-{
-  if (d_readonly)
-    {
-      accept_button->set_sensitive(true);
-      return;
-    }
-
-  if (Armysetlist::getInstance()->get(filename_entry->get_text()))
-    {
-      accept_button->set_sensitive(false);
-      status_label->set_markup(String::ucompose("<b>%1</b>", 
-						_("That filename is already used.")));
-    }
-  else if (filename_entry->get_text() == "" || name_entry->get_text() == "")
-    accept_button->set_sensitive(false);
-  else if (Armysetlist::getInstance()->contains(name_entry->get_text()) && 
-           name_entry->get_text() != "")
-    {
-      status_label->set_markup(String::ucompose("<b>%1</b>", 
-						_("That name is already in use.")));
-      accept_button->set_sensitive(true);
-    }
+  Glib::ustring file =
+    Armysetlist::getInstance()->lookupConfigurationFileByName(d_armyset);
+  if (file != "" && file != d_armyset->getConfigurationFile (true))
+    status_label->set_text (_("That name is already in use."));
   else
-    {
-      status_label->set_text("");
-      accept_button->set_sensitive(true);
-    }
+    status_label->set_text ("");
+}
+
+bool ArmySetInfoDialog::run()
+{
+  dialog->show_all();
+  dialog->run();
+  dialog->hide ();
+  return d_changed;
+}
+
+void ArmySetInfoDialog::on_copyright_changed ()
+{
+  d_changed = true;
+  d_armyset->setCopyright(copyright_textview->get_buffer()->get_text());
+}
+
+void ArmySetInfoDialog::on_license_changed ()
+{
+  d_changed = true;
+  d_armyset->setLicense(license_textview->get_buffer()->get_text());
+}
+
+void ArmySetInfoDialog::on_description_changed ()
+{
+  d_changed = true;
+  d_armyset->setInfo(description_textview->get_buffer()->get_text());
 }
 
 ArmySetInfoDialog::~ArmySetInfoDialog()
 {
   notebook->property_show_tabs () = false;
+}
+
+void ArmySetInfoDialog::on_size_changed()
+{
+  d_changed = true;
+  d_armyset->setTileSize (size_spinbutton->get_value ());
+  on_name_changed ();
+}
+
+void ArmySetInfoDialog::on_fit_pressed()
+{
+  d_changed = true;
+  guint32 ts = 0;
+  d_armyset->calculate_preferred_tile_size (ts);
+  size_spinbutton->set_value (ts);
+  on_name_changed ();
 }

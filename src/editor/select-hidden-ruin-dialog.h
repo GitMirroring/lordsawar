@@ -29,7 +29,7 @@ class SelectHiddenRuinDialog: public LwEditorDialog
 {
  public:
     SelectHiddenRuinDialog(Gtk::Window &parent);
-    ~SelectHiddenRuinDialog() {};
+    ~SelectHiddenRuinDialog() {}
 
     void run();
     const Ruin *get_selected_hidden_ruin() 

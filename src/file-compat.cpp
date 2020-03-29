@@ -312,7 +312,10 @@ bool FileCompat::rewrite_with_updated_version(Glib::ustring filename, FileCompat
           if (broken == false && version != "")
             upgraded = XML_Helper::rewrite_version(tmpfile, tag, version);
           if (upgraded)
-            t.replaceFile (t.getFirstFilenameWithExtension(ext), tmpfile);
+            {
+              Glib::ustring n = t.getFirstFilename(ext);
+              t.replaceFile (n, tmpfile, n);
+            }
           t.Close();
           if (tmpfile != "")
             File::erase(tmpfile);
@@ -363,10 +366,10 @@ bool FileCompat::upgradeGameScenario(Glib::ustring filename, Glib::ustring versi
       if (upgraded)
         {
           bool same;
-          t.replaceFile (t.getFirstFilenameWithExtension(ext), tmpfile);
+          Glib::ustring n = t.getFirstFilename(ext);
+          t.replaceFile (n, tmpfile, n);
           //now we need to upgrade the other files.
-          Glib::ustring f = t.getFirstFilenameWithExtension
-            (getFileExtension(ARMYSET));
+          Glib::ustring f = t.getFirstFilename (getFileExtension(ARMYSET));
           tmpfile = t.getFile(f, broken);
           if (tmpfile != "")
             {
@@ -376,7 +379,7 @@ bool FileCompat::upgradeGameScenario(Glib::ustring filename, Glib::ustring versi
                   if (!same)
                     {
                       upgraded_armyset = true;
-                      t.replaceFile (f, tmpfile);
+                      t.replaceFile (f, tmpfile, f);
                     }
                 }
               delfiles.push_back(tmpfile);
@@ -390,8 +393,8 @@ bool FileCompat::upgradeGameScenario(Glib::ustring filename, Glib::ustring versi
                   if (!same)
                     {
                       upgraded_tileset = true;
-                      t.replaceFile (t.getFirstFilenameWithExtension
-                                     (getFileExtension(TILESET)), tmpfile);
+                      n = t.getFirstFilename (getFileExtension(TILESET));
+                      t.replaceFile (n, tmpfile, n);
                     }
                 }
               delfiles.push_back(tmpfile);
@@ -405,8 +408,8 @@ bool FileCompat::upgradeGameScenario(Glib::ustring filename, Glib::ustring versi
                   if (!same)
                     {
                       upgraded_cityset = true;
-                      t.replaceFile (t.getFirstFilenameWithExtension
-                                     (getFileExtension(CITYSET)), tmpfile);
+                      n = t.getFirstFilename (getFileExtension(CITYSET));
+                      t.replaceFile (n, tmpfile, n);
                     }
                 }
               delfiles.push_back(tmpfile);
@@ -420,8 +423,8 @@ bool FileCompat::upgradeGameScenario(Glib::ustring filename, Glib::ustring versi
                   if (!same)
                     {
                       upgraded_shieldset = true;
-                      t.replaceFile (t.getFirstFilenameWithExtension
-                                     (getFileExtension(SHIELDSET)), tmpfile);
+                      n = t.getFirstFilename (getFileExtension(SHIELDSET));
+                      t.replaceFile (n, tmpfile, n);
                     }
                 }
               delfiles.push_back(tmpfile);
@@ -502,10 +505,11 @@ bool FileCompat::rewrite_with_xslt(Glib::ustring filename, FileCompat::Type type
       if (broken == false)
         {
           Glib::ustring tmpfile = t.getFirstFile(ext, broken);
+          Glib::ustring n = t.getFirstFilename(ext);
           if (broken == false)
             upgraded = xsl_transform(tmpfile, xsl_file);
           if (upgraded)
-            t.replaceFile (t.getFirstFilenameWithExtension(ext), tmpfile);
+            t.replaceFile (n, tmpfile, n);
           t.Close();
           if (tmpfile != "")
             File::erase(tmpfile);
@@ -547,10 +551,10 @@ bool FileCompat::upgradeGameScenarioWithXslt(Glib::ustring filename, Glib::ustri
       if (upgraded)
         {
           bool same;
-          t.replaceFile (t.getFirstFilenameWithExtension(ext), tmpfile);
+          Glib::ustring n = t.getFirstFilename(ext);
+          t.replaceFile (n, tmpfile, n);
           //now we need to upgrade the other files.
-          Glib::ustring f = t.getFirstFilenameWithExtension
-            (getFileExtension(ARMYSET));
+          Glib::ustring f = t.getFirstFilename (getFileExtension(ARMYSET));
           tmpfile = t.getFile(f, broken);
           if (tmpfile != "")
             {
@@ -560,7 +564,7 @@ bool FileCompat::upgradeGameScenarioWithXslt(Glib::ustring filename, Glib::ustri
                   if (!same)
                     {
                       armyset_upgraded = true;
-                      t.replaceFile (f, tmpfile);
+                      t.replaceFile (f, tmpfile, f);
                     }
                 }
               delfiles.push_back(tmpfile);
@@ -574,8 +578,8 @@ bool FileCompat::upgradeGameScenarioWithXslt(Glib::ustring filename, Glib::ustri
                   if (!same)
                     {
                       tileset_upgraded = true;
-                      t.replaceFile (t.getFirstFilenameWithExtension
-                                     (getFileExtension(TILESET)), tmpfile);
+                      n = t.getFirstFilename (getFileExtension(TILESET));
+                      t.replaceFile (n, tmpfile, n);
                     }
                 }
               delfiles.push_back(tmpfile);
@@ -589,8 +593,8 @@ bool FileCompat::upgradeGameScenarioWithXslt(Glib::ustring filename, Glib::ustri
                   if (!same)
                     {
                       cityset_upgraded = true;
-                      t.replaceFile (t.getFirstFilenameWithExtension
-                                     (getFileExtension(CITYSET)), tmpfile);
+                      n = t.getFirstFilename (getFileExtension(CITYSET));
+                      t.replaceFile (n, tmpfile, n);
                     }
                 }
               delfiles.push_back(tmpfile);
@@ -604,8 +608,8 @@ bool FileCompat::upgradeGameScenarioWithXslt(Glib::ustring filename, Glib::ustri
                   if (!same)
                     {
                       shieldset_upgraded = true;
-                      t.replaceFile (t.getFirstFilenameWithExtension
-                                     (getFileExtension(SHIELDSET)), tmpfile);
+                      n = t.getFirstFilename (getFileExtension(SHIELDSET));
+                      t.replaceFile (n, tmpfile, n);
                     }
                 }
               delfiles.push_back(tmpfile);

@@ -1,4 +1,4 @@
-// Copyright (C) 2010, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -44,20 +44,34 @@ public:
     Glib::ustring getFirstFile(Glib::ustring extension, bool &broken);
     Glib::ustring getFirstFile(std::list<Glib::ustring> exts, bool &broken);
 
-    std::list<Glib::ustring> getFilenamesWithExtension(Glib::ustring ext);
-    Glib::ustring getFirstFilenameWithExtension(Glib::ustring ext);
+    std::list<Glib::ustring> getFilenames(Glib::ustring ext);
+    Glib::ustring getFirstFilename(Glib::ustring ext);
 
     std::list<Glib::ustring> getFilenames();
 
+    //munge name if necessary to make it unique
+    Glib::ustring makeNameUnique (Glib::ustring name);
 
-    bool removeFile(Glib::ustring filename);
     //! Replaces old_filename with new_filename, or adds it if not present.
     /**
-     * delete old_filename from the archive if present.
-     * add new_filename to the archive.
+     * archive name is the name of the member in the archive.
+     * new_filename is the place on disk of the file we want to add or replace.
+     * old_filename is the name of the member in the archive that we want to
+     * replace.
+     *
+     * we use this method to remove a member from the archive by passing
+     * new_filename as "".
+     *
+     * we use htis method to add a member to the archive by passing
+     * old_filename as "".
+     *
+     * usually archive_name ends up as the basename of new_filename,
+     * but sometimes we need to change the name so it doesn't collide
+     * with another member.
      * @return returns True if successful.
      */
-    bool replaceFile(Glib::ustring old_filename, Glib::ustring new_filename);
+    bool replaceFile(Glib::ustring old_filename, Glib::ustring new_filename,
+                     Glib::ustring archive_name);
 
     bool Open(Glib::ustring file, std::ios::openmode mode);
     void Close(bool clean = true);
@@ -78,6 +92,5 @@ private:
     std::ios::openmode openmode;
     Glib::ustring tmpoutdir;
     Glib::ustring pathname;
-
 };
 #endif

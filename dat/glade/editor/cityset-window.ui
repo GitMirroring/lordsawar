@@ -49,7 +49,7 @@
                       <object class="GtkMenuItem" id="new_cityset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">New Cityset</property>
+                        <property name="label" translatable="yes">New</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -57,7 +57,7 @@
                       <object class="GtkMenuItem" id="load_cityset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Load Cityset</property>
+                        <property name="label" translatable="yes">Open...</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -65,7 +65,7 @@
                       <object class="GtkMenuItem" id="save_cityset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Save Cityset</property>
+                        <property name="label" translatable="yes">Save</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -73,7 +73,7 @@
                       <object class="GtkMenuItem" id="save_as_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Save A Copy</property>
+                        <property name="label" translatable="yes">Save As...</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -81,7 +81,7 @@
                       <object class="GtkMenuItem" id="validate_cityset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Validate Cityset</property>
+                        <property name="label" translatable="yes">Validate</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -117,7 +117,7 @@
                       <object class="GtkMenuItem" id="edit_cityset_info_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Edit Cityset Information</property>
+                        <property name="label" translatable="yes">Cityset Properties</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -201,7 +201,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">end</property>
-                                    <property name="label" translatable="yes">Razed Cities Picture</property>
+                                    <property name="label" translatable="yes">Razed Cities</property>
                                     <attributes>
                                       <attribute name="underline" value="True"/>
                                     </attributes>
@@ -268,7 +268,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">end</property>
-                                    <property name="label" translatable="yes">Port Picture</property>
+                                    <property name="label" translatable="yes">Port</property>
                                     <attributes>
                                       <attribute name="underline" value="True"/>
                                     </attributes>
@@ -335,7 +335,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">end</property>
-                                    <property name="label" translatable="yes">Signpost Picture</property>
+                                    <property name="label" translatable="yes">Signpost</property>
                                     <attributes>
                                       <attribute name="underline" value="True"/>
                                     </attributes>
@@ -402,7 +402,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">end</property>
-                                    <property name="label" translatable="yes">Ruins Picture</property>
+                                    <property name="label" translatable="yes">Ruins</property>
                                     <attributes>
                                       <attribute name="underline" value="True"/>
                                     </attributes>
@@ -469,7 +469,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">end</property>
-                                    <property name="label" translatable="yes">Temple Picture</property>
+                                    <property name="label" translatable="yes">Temple</property>
                                     <attributes>
                                       <attribute name="underline" value="True"/>
                                     </attributes>
@@ -536,7 +536,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">end</property>
-                                    <property name="label" translatable="yes">Towers Picture</property>
+                                    <property name="label" translatable="yes">Towers</property>
                                     <attributes>
                                       <attribute name="underline" value="True"/>
                                     </attributes>
@@ -623,7 +623,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">end</property>
-                                    <property name="label" translatable="yes">Cities Picture</property>
+                                    <property name="label" translatable="yes">Cities</property>
                                     <attributes>
                                       <attribute name="underline" value="True"/>
                                     </attributes>

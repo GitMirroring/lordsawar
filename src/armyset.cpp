@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -62,8 +62,11 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
   helper->getData(ts, "tilesize");
   setTileSize(ts);
   helper->getData(d_stackship_name, "stackship");
+  File::add_png_if_no_ext (d_stackship_name);
   helper->getData(d_standard_name, "plantedstandard");
+  File::add_png_if_no_ext (d_standard_name);
   helper->getData(d_bag_name, "bag");
+  File::add_png_if_no_ext (d_bag_name);
   helper->registerTag(ArmyProto::d_tag, 
 		      sigc::mem_fun((*this), &Armyset::loadArmyProto));
 }
@@ -128,8 +131,7 @@ bool Armyset::save(Glib::ustring filename, Glib::ustring ext) const
   helper.close();
   if (broken == true)
     return false;
-  broken = saveTar(tmpfile, tmpfile + ".tar", goodfilename);
-  return !broken;
+  return saveTar(tmpfile, tmpfile + ".tar", goodfilename);
 }
 
 bool Armyset::save(XML_Helper* helper) const
@@ -246,15 +248,16 @@ bool Armyset::validateHero()
   for (iterator it = begin(); it != end(); it++)
     {
       if ((*it)->isHero() == true)
-	{
-	  found = true;
-	  break;
-	}
+        {
+          found = true;
+          break;
+        }
     }
   if (!found)
     return false;
   return true;
 }
+
 bool Armyset::validatePurchasables()
 {
   bool found = false;
@@ -373,6 +376,9 @@ bool Armyset::validateArmyTypeIds()
 }
 bool Armyset::validate()
 {
+  if (String::utrim (getName ()) == "")
+    return false;
+
   bool valid = true;
   valid = validateHero();
   if (!valid)
@@ -482,7 +488,7 @@ Armyset *Armyset::create(Glib::ustring filename, bool &unsupported_version)
   return d.armyset;
 }
 
-void Armyset::instantiateImages(bool &broken)
+void Armyset::instantiateImages(bool scale, bool &broken)
 {
   uninstantiateImages();
   broken = false;
@@ -491,24 +497,24 @@ void Armyset::instantiateImages(bool &broken)
     return;
 
   for (iterator it = begin(); it != end(); ++it)
-    (*it)->instantiateImages(getTileSize(), &t, broken);
+    (*it)->instantiateImages(getTileSize(), &t, scale, broken);
 
   Glib::ustring ship_filename = "";
   Glib::ustring flag_filename = "";
   Glib::ustring bag_filename = "";
   if (getShipImageName().empty() == false && !broken)
-    ship_filename = t.getFile(getShipImageName() + ".png", broken);
+    ship_filename = t.getFile(getShipImageName(), broken);
   if (getStandardImageName().empty() == false && !broken)
-    flag_filename = t.getFile(getStandardImageName() + ".png", broken);
+    flag_filename = t.getFile(getStandardImageName(), broken);
   if (getBagImageName().empty() == false && !broken)
-    bag_filename = t.getFile(getBagImageName() + ".png", broken);
+    bag_filename = t.getFile(getBagImageName(), broken);
 
   if (!broken)
     {
       if (ship_filename.empty() == false)
-        loadShipPic(ship_filename, broken);
+        loadShipPic(ship_filename, scale, broken);
       if (flag_filename.empty() == false)
-        loadStandardPic(flag_filename, broken);
+        loadStandardPic(flag_filename, scale, broken);
       if (bag_filename.empty() == false)
         loadBagPic(bag_filename, broken);
     }
@@ -549,7 +555,8 @@ void Armyset::uninstantiateImages()
   d_bag = NULL;
 }
 
-void Armyset::loadShipPic(Glib::ustring image_filename, bool &broken)
+void Armyset::loadShipPic(Glib::ustring image_filename, bool scale,
+                          bool &broken)
 {
   if (image_filename.empty() == true)
     {
@@ -560,9 +567,12 @@ void Armyset::loadShipPic(Glib::ustring image_filename, bool &broken)
   half = disassemble_row(image_filename, 2, broken);
   if (!broken)
     {
-      int s = getTileSize();
-      PixMask::scale(half[0], s, s);
-      PixMask::scale(half[1], s, s);
+      if (scale)
+        {
+          int s = getTileSize();
+          PixMask::scale(half[0], s, s);
+          PixMask::scale(half[1], s, s);
+        }
       setShipImage(half[0]);
       setShipMask(half[1]);
     }
@@ -579,7 +589,8 @@ void Armyset::loadBagPic(Glib::ustring image_filename, bool &broken)
     setBagPic(PixMask::create(image_filename, broken));
 }
 
-void Armyset::loadStandardPic(Glib::ustring image_filename, bool &broken)
+void Armyset::loadStandardPic(Glib::ustring image_filename, bool scale,
+                              bool &broken)
 {
   if (image_filename.empty() == true)
     {
@@ -589,9 +600,12 @@ void Armyset::loadStandardPic(Glib::ustring image_filename, bool &broken)
   std::vector<PixMask*> half = disassemble_row(image_filename, 2, broken);
   if (!broken)
     {
-      int s = getTileSize();
-      PixMask::scale(half[0], s, s);
-      PixMask::scale(half[1], s, s);
+      if (scale)
+        {
+          int s = getTileSize();
+          PixMask::scale(half[0], s, s);
+          PixMask::scale(half[1], s, s);
+        }
       setStandardPic(half[0]);
       setStandardMask(half[1]);
     }
@@ -842,11 +856,11 @@ void Armyset::reload(bool &broken)
       for (iterator it = d.armyset->begin(); it != d.armyset->end(); it++)
         push_back(new ArmyProto(*(*it)));
       *this = *d.armyset;
-      instantiateImages(broken);
+      instantiateImages(true, broken);
     }
 }
 
-guint32 Armyset::calculate_preferred_tile_size() const
+bool Armyset::calculate_preferred_tile_size(guint32 &ts) const
 {
   guint32 tilesize = 0;
   std::map<guint32, guint32> sizecounts;
@@ -874,9 +888,15 @@ guint32 Armyset::calculate_preferred_tile_size() const
           tilesize = (*it).first;
         }
     }
+  bool ret = true;
   if (tilesize == 0)
-    tilesize = DEFAULT_ARMY_TILE_SIZE;
-  return tilesize;
+    {
+      ts = DEFAULT_ARMY_TILE_SIZE;
+      ret = false;
+    }
+  else
+    ts = tilesize;
+  return ret;
 }
 
 bool Armyset::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version)
@@ -929,4 +949,131 @@ ArmyProto *Armyset::lookupWeakestQuickestArmy() const
   ArmyProto *p = Armysetlist::getInstance()->getArmy(getId(), type_id);
   delete a;
   return p;
+}
+
+void Armyset::clearStandardImage (bool clear_name)
+{
+  if (clear_name)
+    setStandardImageName ("");
+
+  PixMask *p = getStandardPic ();
+  if (p)
+    delete p;
+  setStandardPic (NULL);
+
+  p = getStandardMask ();
+  if (p)
+    delete p;
+  setStandardMask (NULL);
+}
+
+void Armyset::clearBagImage (bool clear_name)
+{
+  if (clear_name)
+    setBagImageName ("");
+
+  PixMask *p = getBagPic ();
+  if (p)
+    delete p;
+  setBagPic (NULL);
+}
+
+void Armyset::clearShipImage (bool clear_name)
+{
+  if (clear_name)
+    setShipImageName ("");
+
+  PixMask *p = getShipPic ();
+  if (p)
+    delete p;
+  setShipImage (NULL);
+
+  p = getShipMask ();
+  if (p)
+    delete p;
+  setShipMask (NULL);
+}
+
+bool Armyset::instantiateBagImage ()
+{
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getBagImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          clearBagImage (false);
+          loadBagPic(filename, broken);
+        }
+    }
+  return broken;
+}
+
+bool Armyset::instantiateStandardImage ()
+{
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getStandardImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          clearStandardImage (false);
+          loadStandardPic(filename, false, broken);
+        }
+    }
+  return broken;
+}
+
+bool Armyset::instantiateShipImage ()
+{
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getShipImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          clearShipImage (false);
+          loadShipPic(filename, false, broken);
+        }
+    }
+  return broken;
+}
+
+guint32 Armyset::get_default_tile_size ()
+{
+  Armyset *a = new Armyset (1, "");
+  guint32 ts = a->getTileSize ();
+  delete a;
+  return ts;
+}
+
+void Armyset::uninstantiateSameNamedImages (Glib::ustring name)
+{
+  if (getBagImageName() == name)
+    clearBagImage ();
+  if (getStandardImageName() == name)
+    clearStandardImage ();
+  if (getShipImageName() == name)
+    clearShipImage ();
+  for (iterator i = begin (); i != end (); i++)
+    {
+      for (guint32 cc = Shield::WHITE; cc <= Shield::NEUTRAL; cc++)
+        {
+          Shield::Colour c = Shield::Colour (cc);
+          if ((*i)->getImageName (c) == name)
+            (*i)->clearImage (c);
+        }
+    }
 }

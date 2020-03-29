@@ -67,10 +67,7 @@ class CitySetWindow: public sigc::trackable
     Gtk::Alignment *cityset_alignment;
     Gtk::Notebook *notebook;
 
-    bool on_delete_event();
-
     void update_cityset_panel();
-    void update_cityset_menuitems();
 
     bool load_cityset(Glib::ustring filename);
     bool save_current_cityset();
@@ -100,8 +97,20 @@ class CitySetWindow: public sigc::trackable
     void on_change_ruinpics_clicked();
     void on_change_templepic_clicked();
     void on_change_towerpics_clicked();
+    Glib::ustring change_image (Glib::ustring m, Glib::ustring i, int num, std::vector<PixMask *> frames, bool &cleared, int tile_width);
     void update_window_title();
     void show_add_file_error(Gtk::Dialog &d, Glib::ustring file);
+    void show_remove_file_error(Gtk::Dialog &d, Glib::ustring file);
+
+    bool make_new_cityset ();
+    bool load_cityset ();
+    bool save_current_cityset_file (Glib::ustring filename = "");
+    bool save_current_cityset_file_as ();
+
+    bool check_discard (Glib::ustring msg);
+    bool check_save_valid (bool existing);
+    bool check_name_valid (bool existing);
+    bool isValidName ();
 };
 
 #endif

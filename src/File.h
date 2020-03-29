@@ -148,6 +148,8 @@ class File
         static Glib::ustring get_extension(Glib::ustring filename);
 
         static bool rename(Glib::ustring src, Glib::ustring dest);
+
+        static bool add_png_if_no_ext (Glib::ustring &filename);
 };
 
 bool case_insensitive (const Glib::ustring& first, const Glib::ustring& second);

@@ -37,7 +37,7 @@ class BattleCalculatorDialog: public LwEditorDialog
 {
  public:
     BattleCalculatorDialog(Gtk::Window &parent, std::list<Army*> &attackers, std::list<Army *> &defenders);
-    ~BattleCalculatorDialog() {};
+    ~BattleCalculatorDialog() {}
 
     int run();
     

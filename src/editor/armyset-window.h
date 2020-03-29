@@ -35,9 +35,9 @@ class ArmySetWindow: public sigc::trackable
  public:
     ArmySetWindow(Glib::ustring load_filename = "");
     ~ArmySetWindow();
-    
-    void show() {window->show();};
-    void hide() {window->hide();};
+
+    void show() {window->show();}
+    void hide() {window->hide();}
 
     Gtk::Window &get_window() { return *window; }
 
@@ -126,7 +126,7 @@ class ArmySetWindow: public sigc::trackable
 
     class ArmiesColumns: public Gtk::TreeModelColumnRecord {
     public:
-	ArmiesColumns() 
+	ArmiesColumns()
         { add(name); add(army);}
 	
 	Gtk::TreeModelColumn<Glib::ustring> name;
@@ -136,12 +136,9 @@ class ArmySetWindow: public sigc::trackable
     Glib::RefPtr<Gtk::ListStore> armies_list;
     bool inhibit_scrolldown;
 
-    bool on_delete_event();
-
     void addArmyType(guint32 army_type);
     void update_army_panel();
     void update_armyset_buttons();
-    void update_armyset_menuitems();
 
     void on_new_armyset_activated();
     void on_load_armyset_activated();
@@ -164,7 +161,7 @@ class ArmySetWindow: public sigc::trackable
     //callbacks
     void on_name_changed();
     void on_description_changed();
-    void on_image_changed(Gtk::Button *button, Gtk::Image *image, Shield::Colour c);
+    void on_image_changed(Shield::Colour c);
     void on_production_changed();
     void on_production_text_changed();
     void on_cost_changed();
@@ -194,12 +191,27 @@ class ArmySetWindow: public sigc::trackable
     void on_white_all_checked();
 
     bool load_armyset(Glib::ustring filename);
-    bool save_current_armyset();
     void update_window_title();
     void on_make_same_clicked();
 
     void show_add_file_error(Armyset *a, Gtk::Window &d, Glib::ustring file);
+    void show_remove_file_error(Armyset *a, Gtk::Window &d, Glib::ustring file);
     void refresh_armies();
+
+    bool make_new_armyset ();
+    bool load_armyset ();
+    bool save_current_armyset_file (Glib::ustring filename = "");
+    bool save_current_armyset_file_as ();
+
+    bool check_discard (Glib::ustring msg);
+    bool check_save_valid (bool existing);
+    bool check_name_valid (bool existing);
+    bool isValidName ();
+    Gtk::Button *lookup_button_by_colour (Shield::Colour s);
+    void fill_army_images (ArmyProto *army);
+    void sync_armies ();
+    void instantiateOthers (ArmyProto *a, Shield::Colour c, Glib::ustring f);
+    void on_army_moved ();
 };
 
 #endif

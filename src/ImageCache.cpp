@@ -1777,31 +1777,46 @@ int SelectorPixMaskCacheItem::comp(const SelectorPixMaskCacheItem item) const
     0;
 }
 
-bool SelectorPixMaskCacheItem::loadSelectorImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks)
+bool SelectorPixMaskCacheItem::loadSelectorImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale)
+{
+  bool broken = false;
+  PixMask *p = PixMask::create (filename, broken);
+  if (!broken)
+    {
+      broken = loadSelectors(p, size, images, masks, scale);
+      delete p;
+    }
+  return broken;
+}
+
+bool SelectorPixMaskCacheItem::loadSelectors(PixMask *p, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale)
 {
   bool broken = false;
   int num_frames;
-  guint32 width, height;
-  get_image_width_and_height(filename, width, height, broken);
-  if (broken)
-    return false;
+  guint32 width = p->get_unscaled_width ();
   num_frames = width / size;
-  images = disassemble_row(filename, num_frames, true, broken);
+  images = disassemble_row(p->to_pixbuf (), num_frames, true);
   if (broken)
     return false;
-  for (int i = 0; i < num_frames; i++)
+  if (scale)
     {
-      if (images[i]->get_width() != (int)size)
-        PixMask::scale(images[i], size, size);
+      for (int i = 0; i < num_frames; i++)
+        {
+          if (images[i]->get_width() != (int)size)
+            PixMask::scale(images[i], size, size);
+        }
     }
 
-  masks = disassemble_row(filename, num_frames, false, broken);
+  masks = disassemble_row(p->to_pixbuf (), num_frames, false);
   if (broken)
     return false;
-  for (int i = 0; i < num_frames; i++)
+  if (scale)
     {
-      if (masks[i]->get_width() != (int)size)
-        PixMask::scale(masks[i], size, size);
+      for (int i = 0; i < num_frames; i++)
+        {
+          if (masks[i]->get_width() != (int)size)
+            PixMask::scale(masks[i], size, size);
+        }
     }
 
   return true;
@@ -1828,24 +1843,41 @@ int FlagPixMaskCacheItem::comp(const FlagPixMaskCacheItem item) const
     0;
 }
 
-bool FlagPixMaskCacheItem::loadFlagImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks)
+bool FlagPixMaskCacheItem::loadFlagImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale)
 {
   bool broken = false;
-  images = disassemble_row(filename, FLAG_TYPES, true, broken);
-  if (broken)
-    return false;
-  for (unsigned int i = 0; i < FLAG_TYPES; i++)
+  PixMask *p = PixMask::create (filename, broken);
+  if (!broken)
     {
-      if (images[i]->get_width() != (int)size)
-        PixMask::scale(images[i], size, size);
+      broken = loadFlagImages (p, size, images, masks, scale);
+      delete p;
     }
-  masks = disassemble_row(filename, FLAG_TYPES, false, broken);
-  if (broken)
-    return false;
-  for (unsigned int i = 0; i < FLAG_TYPES; i++)
+  return broken;
+}
+
+bool FlagPixMaskCacheItem::loadFlagImages(PixMask *p, guint32 size,
+                                          std::vector<PixMask* > &images,
+                                          std::vector<PixMask* > &masks,
+                                          bool scale)
+{
+  images = disassemble_row(p->to_pixbuf (), FLAG_TYPES, true);
+  if (scale)
     {
-      if (masks[i]->get_width() !=(int) size)
-        PixMask::scale(masks[i], size, size);
+      for (unsigned int i = 0; i < FLAG_TYPES; i++)
+        {
+          if (images[i]->get_width() != (int)size)
+            PixMask::scale(images[i], size, size);
+        }
+    }
+
+  masks = disassemble_row(p->to_pixbuf (), FLAG_TYPES, false);
+  if (scale)
+    {
+      for (unsigned int i = 0; i < FLAG_TYPES; i++)
+        {
+          if (masks[i]->get_width() !=(int) size)
+            PixMask::scale(masks[i], size, size);
+        }
     }
   return true;
 }
@@ -2514,7 +2546,9 @@ int NewLevelPixMaskCacheItem::comp(const NewLevelPixMaskCacheItem item) const
 
 PixMask *DefaultTileStylePixMaskCacheItem::generate(DefaultTileStylePixMaskCacheItem i)
 {
-  PixMask *s = ImageCache::getInstance()->getDefaultTileStyleImage(i.tilestyle_type)->copy();
+  PixMask *t =
+    ImageCache::getInstance()->getDefaultTileStyleImage(i.tilestyle_type);
+  PixMask *s = t->copy();
   PixMask::scale(s, i.tilesize, i.tilesize);
   return s;
 }

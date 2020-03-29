@@ -29,7 +29,7 @@ class SelectRewardDialog: public LwEditorDialog
 {
  public:
     SelectRewardDialog(Gtk::Window &parent);
-    ~SelectRewardDialog() {};
+    ~SelectRewardDialog() {}
 
     void run();
     const Reward *get_selected_reward() { return selected_reward; }

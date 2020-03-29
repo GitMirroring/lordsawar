@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2010, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2010, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "tilestyle.h"
 
 class XML_Helper;
+class Tileset;
 
 /** 
  * TileStyleSet is an array of tilestyles (the look of terrain tile objects).
@@ -105,13 +106,15 @@ class TileStyleSet : public sigc::trackable, public std::vector<TileStyle*>
 	//Methods that operate on the class data and modify the class.
 
 	//! Instantiate the tilestyleset's images from the given file.
-	void instantiateImages(int tilesize, Glib::ustring image_filename,
-                               bool &broken);
+	void loadImages(int tilesize, Glib::ustring image_filename,
+                        bool scale, bool &broken);
 
 	//! Destroy the images associated with this tilestyleset.
 	void uninstantiateImages();
 
         static bool validate_image(Glib::ustring filename);
+
+        bool instantiateImages (Tileset *set);
 
     private:
 

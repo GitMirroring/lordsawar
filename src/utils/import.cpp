@@ -64,7 +64,8 @@ setup_new_map (Glib::ustring name)
   GameMap::getInstance("default", "default", "default");
   Itemlist::createStandardInstance();
 
-  GameScenario *g = new GameScenario(name, String::ucompose(_("a scenario called %1 converted by lordsawar-import version %2"), name, VERSION));
+  GameScenario *g =
+    new GameScenario (name, String::ucompose(_("a scenario called %1 converted by lordsawar-import version %2"), name, VERSION));
   for (unsigned int i = 0; i < MAX_PLAYERS + 1; i++)
     fl_counter->getNextId();
 
@@ -988,11 +989,11 @@ copy_armyset_images (Armyset *armyset, Armyset *default_armyset, ArmyProto *army
 {
   for (int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
-      army->setImageName(Shield::Colour(i),
-                         default_army->getImageName(Shield::Colour(i)));
       Glib::ustring f =
-        default_armyset->getFileFromConfigurationFile(default_army->getImageName(Shield::Colour(i)) + ".png");
-      armyset->addFileInConfigurationFile(f);
+        default_armyset->getFileFromConfigurationFile(default_army->getImageName(Shield::Colour(i)));
+      Glib::ustring outfile = "";
+      armyset->addFileInCfgFile(f, outfile);
+      army->setImageName(Shield::Colour(i), outfile);
     }
 }
 
@@ -1038,15 +1039,20 @@ static void
 copy_other_armyset_images (Armyset *default_armyset, Armyset *armyset)
 {
   Glib::ustring f =
-    default_armyset->getFileFromConfigurationFile(default_armyset->getBagImageName() + ".png");
-  armyset->setBagImageName(default_armyset->getBagImageName());
-  armyset->addFileInConfigurationFile(f);
-  f = default_armyset->getFileFromConfigurationFile(default_armyset->getShipImageName() + ".png");
-  armyset->addFileInConfigurationFile(f);
-  armyset->setShipImageName(default_armyset->getShipImageName());
-  f = default_armyset->getFileFromConfigurationFile(default_armyset->getStandardImageName() + ".png");
-  armyset->setStandardImageName(default_armyset->getStandardImageName());
-  armyset->addFileInConfigurationFile(f);
+    default_armyset->getFileFromConfigurationFile(default_armyset->getBagImageName());
+  Glib::ustring outfile = "";
+  armyset->addFileInCfgFile(f, outfile);
+  armyset->setBagImageName(outfile);
+
+  f = default_armyset->getFileFromConfigurationFile(default_armyset->getShipImageName());
+  outfile = "";
+  armyset->addFileInCfgFile(f, outfile);
+  armyset->setShipImageName(outfile);
+
+  f = default_armyset->getFileFromConfigurationFile(default_armyset->getStandardImageName());
+  outfile = "";
+  armyset->addFileInCfgFile(f, outfile);
+  armyset->setStandardImageName(outfile);
 }
 
 static Armyset* 

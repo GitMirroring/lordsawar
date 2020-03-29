@@ -1,7 +1,8 @@
 // Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015
+// 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -290,6 +291,8 @@ Glib::ustring File::get_dirname(Glib::ustring path)
 
 Glib::ustring File::get_basename(Glib::ustring path, bool keep_ext)
 {
+  if (path.empty ())
+    return path;
   Glib::ustring file;
   file = Glib::path_get_basename(path);
   if (keep_ext)
@@ -327,6 +330,7 @@ bool File::copy (Glib::ustring from, Glib::ustring to)
 
   return true;
 }
+
 bool File::create_dir(Glib::ustring dir)
 {
   if (Glib::file_test(dir, Glib::FILE_TEST_IS_DIR) == true)
@@ -518,4 +522,22 @@ bool File::rename(Glib::ustring src, Glib::ustring dest)
         }
     }
   return result;
+}
+
+bool File::add_png_if_no_ext (Glib::ustring &filename)
+{
+  Glib::ustring f = filename;
+  //in the old days we had filenames without the extensions in our
+  //army/city/shield/tilesets.
+  //now we keep the extensions, but to maintain backwards compatibility
+  //we rejig the filenames as we load them in just in case we have an old
+  //file.
+  //the altenative to this approach is to increment the version numbers on
+  //those files and make xslt templates to give them an upgrade path.
+  if (f != "" && File::get_extension (f) == "")
+    {
+      filename = f + ".png";
+      return true;
+    }
+  return false;
 }

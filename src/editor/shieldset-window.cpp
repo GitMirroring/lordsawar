@@ -43,6 +43,7 @@
 #include "GameMap.h"
 #include "past-chooser.h"
 #include "font-size.h"
+#include "image-file-filter.h"
 
 Glib::ustring no_shield_msg = N_("no image set");
 
@@ -121,7 +122,7 @@ ShieldSetWindow::ShieldSetWindow(Glib::ustring load_filename)
     shields_treeview->set_model(shields_list);
     shields_treeview->append_column("", shields_columns.name);
     shields_treeview->set_headers_visible(false);
-    shields_treeview->get_selection()->signal_changed().connect (method(on_shield_selected));
+    connect_shield_treeview();
 
     update_shield_panel();
 
@@ -296,7 +297,7 @@ bool ShieldSetWindow::isValidName ()
     Shieldsetlist::getInstance()->lookupConfigurationFileByName(d_shieldset);
   if (file == "")
     return true;
-  if (file == d_shieldset->getConfigurationFile ())
+  if (file == d_shieldset->getConfigurationFile (true))
     return true;
   return false;
 }
@@ -379,16 +380,47 @@ void ShieldSetWindow::on_validate_shieldset_activated()
 
 bool ShieldSetWindow::check_name_valid (bool existing)
 {
-  Glib::ustring name = String::utrim (d_shieldset->getName ());
+  Glib::ustring name = d_shieldset->getName ();
+  Glib::ustring newname = "";
+  if (existing)
+    {
+      Shieldset *oldshieldset =
+        Shieldsetlist::getInstance ()->get(d_shieldset->getId());
+      if (oldshieldset && oldshieldset->getName () != name)
+          newname = oldshieldset->getName ();
+    }
+  guint32 num = 0;
+  Glib::ustring n = String::utrim (String::strip_trailing_numbers (name));
+  if (n == "")
+    n = _("Untitled");
+  if (newname.empty () == true)
+    newname =
+      Shieldsetlist::getInstance()->findFreeName(n, 100, num,
+                                                 d_shieldset->getTileSize ());
   if (name == "")
     {
-      Gtk::MessageDialog
-        dialog(*window,
-               _("The shieldset has an invalid name.\nChange it and save again."));
-      dialog.run();
-      dialog.hide();
-      on_edit_shieldset_info_activated ();
-      return false;
+      if (newname.empty() == true)
+        {
+          Glib::ustring msg =
+            _("The shieldset has an invalid name.\nChange it and save again.");
+          Gtk::MessageDialog d(*window, msg);
+          d.run();
+          d.hide();
+          on_edit_shieldset_info_activated ();
+          return false;
+        }
+      else
+        {
+          Glib::ustring msg =
+            String::ucompose (_("The shieldset has an invalid name.\nChange it to '%1'?"), newname);
+          Gtk::MessageDialog d(*window, msg);
+          d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+          int response = d.run();
+          d.hide();
+          if (response == Gtk::RESPONSE_CANCEL)
+            return false;
+          d_shieldset->setName (newname);
+        }
     }
 
   //okay the question is whether or not the name is already used.
@@ -398,7 +430,7 @@ bool ShieldSetWindow::check_name_valid (bool existing)
   if (file == "")
     return true;
 
-  Glib::ustring cfgfile = d_shieldset->getConfigurationFile();
+  Glib::ustring cfgfile = d_shieldset->getConfigurationFile(true);
 
   if (existing) // this means we're doing File->Save
     {
@@ -411,13 +443,29 @@ bool ShieldSetWindow::check_name_valid (bool existing)
 
   if (same_name)
     {
-      Gtk::MessageDialog
-        dialog(*window,
-               _("The shieldset has the same name as another shieldset.\nChange the name and save again."));
-      dialog.run();
-      dialog.hide();
-      on_edit_shieldset_info_activated ();
-      return false;
+      if (newname.empty() == true)
+        {
+          Glib::ustring msg =
+            _("The shieldset has the same name as another shieldset.\nChange it and save again.");
+          Gtk::MessageDialog d(*window, msg);
+          d.run();
+          d.hide();
+          on_edit_shieldset_info_activated ();
+          return false;
+        }
+      else
+        {
+          Glib::ustring msg =
+            String::ucompose (_("The shieldset has the same name as another shieldset.\nChange it to '%1' instead?."), newname);
+
+          Gtk::MessageDialog d(*window, msg);
+          d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+          int response = d.run();
+          d.hide();
+          if (response == Gtk::RESPONSE_CANCEL)
+            return false;
+          d_shieldset->setName (newname);
+        }
     }
 
   return true;
@@ -425,7 +473,6 @@ bool ShieldSetWindow::check_name_valid (bool existing)
 
 bool ShieldSetWindow::check_save_valid (bool existing)
 {
- 
   if (check_name_valid (existing) == false)
     return false;
 
@@ -460,7 +507,7 @@ bool ShieldSetWindow::check_save_valid (bool existing)
 
 void ShieldSetWindow::on_save_as_activated()
 {
-  if (ShieldSetWindow::check_save_valid (false))
+  if (check_save_valid (false))
     save_current_shieldset_file_as ();
 }
 
@@ -511,7 +558,8 @@ bool ShieldSetWindow::save_current_shieldset_file_as ()
                   dir == File::getSetDir(SHIELDSET_EXT, true))
                 {
                   //if we saved it to a standard place, update the list
-                  Shieldsetlist::getInstance()->add (Shieldset::copy (d_shieldset), filename);
+                  Shieldset *newshieldset = Shieldset::copy (d_shieldset);
+                  Shieldsetlist::getInstance()->add (newshieldset, filename);
                   shieldset_saved.emit(d_shieldset->getId());
                 }
               refresh_shields();
@@ -531,7 +579,14 @@ bool ShieldSetWindow::save_current_shieldset_file (Glib::ustring filename)
 {
   current_save_filename = filename;
   if (current_save_filename.empty())
-    current_save_filename = d_shieldset->getConfigurationFile();
+    current_save_filename = d_shieldset->getConfigurationFile(true);
+
+  if (!d_shieldset->isSmallHeightAndWidthSet ())
+    d_shieldset->setSmallHeightsAndWidthsFromImages();
+  if (!d_shieldset->isMediumHeightAndWidthSet ())
+    d_shieldset->setMediumHeightsAndWidthsFromImages();
+  if (!d_shieldset->isLargeHeightAndWidthSet ())
+    d_shieldset->setLargeHeightsAndWidthsFromImages();
 
   bool ok = d_shieldset->save(current_save_filename, Shieldset::file_extension);
   if (ok)
@@ -558,7 +613,7 @@ bool ShieldSetWindow::save_current_shieldset_file (Glib::ustring filename)
 
 void ShieldSetWindow::on_save_shieldset_activated()
 {
-  if (ShieldSetWindow::check_save_valid (true))
+  if (check_save_valid (true))
     save_current_shieldset_file();
 }
 
@@ -597,34 +652,25 @@ void ShieldSetWindow::on_shield_selected()
   update_shield_panel();
 }
 
-void ShieldSetWindow::show_tartan(Shield *s, Glib::ustring f, Gtk::Image *image)
+void ShieldSetWindow::show_tartan (Shield *s, Tartan::Type t, Gtk::Image *image)
 {
-  bool broken = false;
-  if (!s)
+  if (!s || s->getTartanImageName (t).empty () || s->getImage (t) == NULL ||
+      s->getMask (t) == NULL)
     {
       image->clear();
       return;
     }
-  std::vector<PixMask*> h = disassemble_row
-    (d_shieldset->getFileFromConfigurationFile(f + ".png"), 2,
-     broken);
-  if (!broken)
+  PixMask *i =
+    ImageCache::applyMask(s->getImage (t), s->getMask (t), s->getColor());
+  double ratio = DIALOG_TARTAN_PIC_FONTSIZE_MULTIPLE;
+  double new_height = FontSize::getInstance()->get_height () * ratio;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height (i, new_height);
+  PixMask::scale (i, new_width, new_height);
+  if (i)
     {
-      PixMask *i = ImageCache::applyMask(h[0], h[1], s->getColor());
-      double ratio = DIALOG_TARTAN_PIC_FONTSIZE_MULTIPLE;
-      double new_height = FontSize::getInstance()->get_height () * ratio;
-      int new_width =
-        ImageCache::calculate_width_from_adjusted_height (i, new_height);
-      PixMask::scale (i, new_width, new_height);
-      if (i)
-        {
-          image->property_pixbuf() = i->to_pixbuf();
-          delete i;
-        }
-      else
-        image->clear();
-      delete h[0];
-      delete h[1];
+      image->property_pixbuf() = i->to_pixbuf();
+      delete i;
     }
   else
     image->clear();
@@ -632,44 +678,35 @@ void ShieldSetWindow::show_tartan(Shield *s, Glib::ustring f, Gtk::Image *image)
 
 void ShieldSetWindow::show_shield(ShieldStyle *ss, Shield *s, Gtk::Image *image)
 {
-  bool broken = false;
-  if (!ss || !s)
+  if (!ss || !s || ss->getImageName().empty () || ss->getImage () == NULL ||
+      ss->getMask () == NULL)
     {
       image->clear();
       return;
     }
-  std::vector<PixMask*> h = disassemble_row
-    (d_shieldset->getFileFromConfigurationFile(ss->getImageName() + ".png"), 2,
-     broken);
-  if (!broken)
+  PixMask *i =
+    ImageCache::applyMask(ss->getImage(), ss->getMask(), s->getColor());
+  double ratio = 1.0;
+  switch (ss->getType ())
     {
-      PixMask *i = ImageCache::applyMask(h[0], h[1], s->getColor());
-      double ratio = 1.0;
-      switch (ss->getType ())
-        {
-        case ShieldStyle::SMALL:
-          ratio = DIALOG_SMALL_SHIELD_PIC_FONTSIZE_MULTIPLE;
-          break;
-        case ShieldStyle::MEDIUM:
-          ratio = DIALOG_MEDIUM_SHIELD_PIC_FONTSIZE_MULTIPLE;
-          break;
-        case ShieldStyle::LARGE:
-          ratio = DIALOG_LARGE_SHIELD_PIC_FONTSIZE_MULTIPLE;
-          break;
-        }
-      double new_height = FontSize::getInstance()->get_height () * ratio;
-      int new_width =
-        ImageCache::calculate_width_from_adjusted_height (i, new_height);
-      PixMask::scale (i, new_width, new_height);
-      if (i)
-        {
-          image->property_pixbuf() = i->to_pixbuf();
-          delete i;
-        }
-      else
-        image->clear();
-      delete h[0];
-      delete h[1];
+    case ShieldStyle::SMALL:
+      ratio = DIALOG_SMALL_SHIELD_PIC_FONTSIZE_MULTIPLE;
+      break;
+    case ShieldStyle::MEDIUM:
+      ratio = DIALOG_MEDIUM_SHIELD_PIC_FONTSIZE_MULTIPLE;
+      break;
+    case ShieldStyle::LARGE:
+      ratio = DIALOG_LARGE_SHIELD_PIC_FONTSIZE_MULTIPLE;
+      break;
+    }
+  double new_height = FontSize::getInstance()->get_height () * ratio;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height (i, new_height);
+  PixMask::scale (i, new_width, new_height);
+  if (i)
+    {
+      image->property_pixbuf() = i->to_pixbuf();
+      delete i;
     }
   else
     image->clear();
@@ -683,7 +720,7 @@ void ShieldSetWindow::fill_shield_info(Shield*shield)
       Glib::ustring s;
       ShieldStyle* ss = shield->getFirstShieldstyle(ShieldStyle::SMALL);
       if (ss && ss->getImageName().empty() == false)
-	s = ss->getImageName() + ".png";
+	s = ss->getImageName();
       else
 	s = no_shield_msg;
       show_shield(ss, shield, small_image);
@@ -691,7 +728,7 @@ void ShieldSetWindow::fill_shield_info(Shield*shield)
 
       ss = shield->getFirstShieldstyle(ShieldStyle::MEDIUM);
       if (ss && ss->getImageName().empty() == false)
-	s = ss->getImageName() + ".png";
+	s = ss->getImageName();
       else
 	s = no_shield_msg;
       change_mediumpic_button->set_label(s);
@@ -699,31 +736,31 @@ void ShieldSetWindow::fill_shield_info(Shield*shield)
 
       ss = shield->getFirstShieldstyle(ShieldStyle::LARGE);
       if (ss && ss->getImageName().empty() == false)
-	s = ss->getImageName() + ".png";
+	s = ss->getImageName();
       else
 	s = no_shield_msg;
       change_largepic_button->set_label(s);
       show_shield(ss, shield, large_image);
 
-      if (shield->getName(Tartan::LEFT).empty() == false)
-        s = shield->getName(Tartan::LEFT) + ".png";
+      if (shield->getTartanImageName(Tartan::LEFT).empty() == false)
+        s = shield->getTartanImageName(Tartan::LEFT);
       else
         s = no_tartan_msg;
-      show_tartan (shield, shield->getName(Tartan::LEFT), left_tartan_image);
+      show_tartan (shield, Tartan::LEFT, left_tartan_image);
       change_left_tartan_button->set_label(s);
 
-      if (shield->getName(Tartan::CENTER).empty() == false)
-        s = shield->getName(Tartan::CENTER) + ".png";
+      if (shield->getTartanImageName(Tartan::CENTER).empty() == false)
+        s = shield->getTartanImageName(Tartan::CENTER);
       else
         s = no_tartan_msg;
-      show_tartan (shield, shield->getName(Tartan::CENTER), center_tartan_image);
+      show_tartan (shield, Tartan::CENTER, center_tartan_image);
       change_center_tartan_button->set_label(s);
 
-      if (shield->getName(Tartan::RIGHT).empty() == false)
-        s = shield->getName(Tartan::RIGHT) + ".png";
+      if (shield->getTartanImageName(Tartan::RIGHT).empty() == false)
+        s = shield->getTartanImageName(Tartan::RIGHT);
       else
         s = no_tartan_msg;
-      show_tartan (shield, shield->getName(Tartan::RIGHT), right_tartan_image);
+      show_tartan (shield, Tartan::RIGHT, right_tartan_image);
       change_right_tartan_button->set_label(s);
     }
 }
@@ -732,8 +769,6 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
 {
   Glib::ustring old_current_save_filename = current_save_filename;
   current_save_filename = filename;
-
-  Glib::ustring name = File::get_basename(filename);
 
   bool unsupported_version = false;
   Shieldset *shieldset = Shieldset::create(filename, unsupported_version);
@@ -750,18 +785,34 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
       dialog.hide();
       return false;
     }
+  disconnect_shield_treeview ();
   shields_list->clear();
+  connect_shield_treeview ();
   if (d_shieldset)
     delete d_shieldset;
   d_shieldset = shieldset;
+  d_shieldset->setLoadTemporaryFile ();
 
   bool broken = false;
-  d_shieldset->instantiateImages(broken);
+  d_shieldset->instantiateImages(false, broken);
+
+  if (broken)
+    {
+      delete d_shieldset;
+      d_shieldset = NULL;
+      Gtk::MessageDialog td(*window, _("Couldn't load shieldset images."));
+      td.run();
+      td.hide();
+      return false;
+    }
+      
   for (Shieldset::iterator i = d_shieldset->begin(); i != d_shieldset->end();
        ++i)
     add_shield_to_treeview (*i);
-  if (d_shieldset->size())
+      
+  if (d_shieldset->empty () == false)
     shields_treeview->set_cursor (Gtk::TreePath ("0"));
+  save_shieldset_menuitem->set_sensitive (true);
   update_shield_panel();
   update_window_title();
   return true;
@@ -780,20 +831,21 @@ bool ShieldSetWindow::quit()
       else if (response == Gtk::RESPONSE_ACCEPT) // save it
         {
           bool saved = false;
-          if (d_shieldset->isTemporaryFile () == true)
+          bool existing = d_shieldset->getDirectory ().empty () == false;
+          if (existing)
             {
-              if (ShieldSetWindow::check_save_valid (false))
-                saved = save_current_shieldset_file_as ();
+              if (check_save_valid (true))
+                {
+                  if (save_current_shieldset_file ())
+                    saved = true;
+                }
               else
                 return false;
             }
           else
             {
-              if (ShieldSetWindow::check_save_valid (true))
-                {
-                  if (save_current_shieldset_file ())
-                    saved = true;
-                }
+              if (check_save_valid (false))
+                saved = save_current_shieldset_file_as ();
               else
                 return false;
             }
@@ -826,40 +878,46 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
     {
       Gtk::TreeModel::Row row = *iterrow;
       Shield *shield = row[shields_columns.shield];
-      Glib::ustring filename = "";
       ShieldStyle *ss = shield->getFirstShieldstyle(type);
       Glib::ustring f = ss->getImageName ();
-      if (f != "")
-	filename = d_shieldset->getFileFromConfigurationFile(f + ".png");
       Gtk::FileChooserDialog *d = shield_filechooser (shield, type, f != "");
       int response = d->run();
-      if (filename != "")
-        File::erase(filename);
       if (response == Gtk::RESPONSE_ACCEPT && d->get_filename() != "")
 	{
-          if (File::nameEndsWith(d->get_filename (), ".png") != true)
-            {
-              Gtk::MessageDialog td(*d,
-                                    _("Only PNG files can be used as images."));
-              td.run();
-              td.hide();
-            }
+          if (ImageFileFilter::getInstance()->hasInvalidExt(d->get_filename()))
+            ImageFileFilter::getInstance()->showErrorDialog (d);
           else
             {
-              if (d->get_filename() != filename)
+              bool broken = false;
+              PixMask *p = PixMask::create (d->get_filename (), broken);
+              if (p)
+                delete p;
+              if (broken)
+                {
+                  Gtk::MessageDialog
+                    td (*d,
+                        String::ucompose
+                        (_("Couldn't make sense of the image:\n%1"),
+                         d->get_filename ()));
+                  td.run();
+                  td.hide();
+                }
+              else
                 {
                   PastChooser::getInstance()->set_dir(d);
                   process_shieldstyle(ss, d);
+                  d_shieldset->setHeightsAndWidthsFromImages(ss);
                 }
               update_shield_panel();
             }
 	}
       else if (response == Gtk::RESPONSE_REJECT && f != "")
         {
-          if (d_shieldset->removeFileInConfigurationFile(f))
+          if (d_shieldset->removeFileInCfgFile(f))
             {
-              ss->setImageName("");
-              d_shieldset->setHeightsAndWidthsFromImages();
+              d_shieldset->uninstantiateSameNamedImages
+                (ss->getImageName ());
+              d_shieldset->setHeightsAndWidthsFromImages(ss);
               needs_saving = true;
             }
           else
@@ -938,9 +996,7 @@ void ShieldSetWindow::on_edit_copy_shields_activated()
     }
   needs_saving = true;
   bool broken = false;
-  d_shieldset->instantiateImages(broken);
-  d_shieldset->setHeightsAndWidthsFromImages();
-  d_shieldset->instantiateImages(broken);
+  d_shieldset->instantiateImages(false, broken);
   update_shield_panel();
   update_window_title();
 }
@@ -961,10 +1017,7 @@ void ShieldSetWindow::refresh_shields()
 Gtk::FileChooserDialog* ShieldSetWindow::image_filechooser (Glib::ustring title, bool clear)
 {
   Gtk::FileChooserDialog *d = new Gtk::FileChooserDialog(*window, title);
-  Glib::RefPtr<Gtk::FileFilter> png_filter = Gtk::FileFilter::create();
-  png_filter->set_name(_("PNG files (*.png)"));
-  png_filter->add_pattern("*.png");
-  d->add_filter(png_filter);
+  ImageFileFilter::getInstance ()->add (d);
   d->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   d->add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
   if (clear)
@@ -996,19 +1049,19 @@ Gtk::FileChooserDialog* ShieldSetWindow::shield_filechooser(Shield *s, ShieldSty
 
 void ShieldSetWindow::process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialog *d)
 {
-  Glib::ustring file = File::get_basename(d->get_filename());
+  Glib::ustring newname = "";
   bool ret = false;
   if (ss->getImageName() == "")
-    ret = d_shieldset->addFileInConfigurationFile(d->get_filename ());
+    ret = d_shieldset->addFileInCfgFile(d->get_filename (), newname);
   else
-    ret = d_shieldset->replaceFileInConfigurationFile(ss->getImageName()+".png",
-                                                      d->get_filename());
+    ret = d_shieldset->replaceFileInCfgFile(ss->getImageName(),
+                                            d->get_filename(), newname);
   if (ret == true)
     {
       bool broken = false;
-      ss->setImageName(file);
-      ss->instantiateImages(d->get_filename(), d_shieldset, broken);
-      d_shieldset->setHeightsAndWidthsFromImages();
+      ss->setImageName(newname);
+      ss->uninstantiateImages();
+      ss->instantiateImages(d->get_filename(), d_shieldset, false, broken);
       needs_saving = true;
       update_window_title();
     }
@@ -1016,9 +1069,9 @@ void ShieldSetWindow::process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialo
     {
       Glib::ustring errmsg = Glib::strerror(errno);
       Gtk::MessageDialog
-        td(*d, String::ucompose(_("Couldn't add %1.png to:\n%2\n%3"),
-                               file, d_shieldset->getConfigurationFile(),
-                               errmsg));
+        td(*d, String::ucompose(_("Couldn't add %1 to:\n%2\n%3"),
+                               d->get_filename (),
+                               d_shieldset->getConfigurationFile(), errmsg));
       td.run();
       td.hide();
     }
@@ -1033,27 +1086,31 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
     {
       Gtk::TreeModel::Row row = *iterrow;
       Shield *shield = row[shields_columns.shield];
-      Glib::ustring filename = "";
 
       Glib::ustring f = shield->getTartanImageName(type);
-      if (f != "")
-        filename = d_shieldset->getFileFromConfigurationFile(f +".png");
       Gtk::FileChooserDialog *d = tartan_filechooser (shield, type, f != "");
       int response = d->run();
-      if (filename != "")
-        File::erase(filename);
       if (response == Gtk::RESPONSE_ACCEPT && d->get_filename() != "")
         {
-          if (File::nameEndsWith(d->get_filename (), ".png") != true)
-            {
-              Gtk::MessageDialog td(*d,
-                                    _("Only PNG files can be used as images."));
-              td.run();
-              td.hide();
-            }
+          if (ImageFileFilter::getInstance()->hasInvalidExt(d->get_filename()))
+            ImageFileFilter::getInstance ()->showErrorDialog (d);
           else
             {
-              if (d->get_filename() != filename)
+              bool broken = false;
+              PixMask *p = PixMask::create (d->get_filename (), broken);
+              if (p)
+                delete p;
+              if (broken)
+                {
+                  Gtk::MessageDialog
+                    td (*d,
+                        String::ucompose
+                        (_("Couldn't make sense of the image:\n%1"),
+                         d->get_filename ()));
+                  td.run();
+                  td.hide();
+                }
+              else
                 {
                   PastChooser::getInstance()->set_dir(d);
                   process_tartanpic (type, shield, d);
@@ -1063,10 +1120,11 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
         }
       else if (response == Gtk::RESPONSE_REJECT)
         {
-          Glib::ustring file = shield->getTartanImageName(type) + ".png";
-          if (d_shieldset->removeFileInConfigurationFile(file))
+          Glib::ustring file = shield->getTartanImageName(type);
+          if (d_shieldset->removeFileInCfgFile(file))
             {
-              shield->setTartanImageName(type, "");
+              d_shieldset->uninstantiateSameNamedImages
+                (shield->getTartanImageName (type));
               needs_saving = true;
             }
           else
@@ -1088,18 +1146,18 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
 
 void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk::FileChooserDialog *d)
 {
-  Glib::ustring file = File::get_basename(d->get_filename());
+  Glib::ustring newname = "";
   Glib::ustring f = shield->getTartanImageName(type);
   bool ret = false;
   if (f == "")
-    ret = d_shieldset->addFileInConfigurationFile(d->get_filename());
+    ret = d_shieldset->addFileInCfgFile(d->get_filename(), newname);
   else
-    ret = d_shieldset->replaceFileInConfigurationFile(f + ".png",
-                                                      d->get_filename());
+    ret = d_shieldset->replaceFileInCfgFile(f, d->get_filename(), newname);
   if (ret == true)
     {
       bool broken = false;
-      shield->setTartanImageName (type, file);
+      shield->setTartanImageName (type, newname);
+      shield->uninstantiateTartanImage (type);
       shield->instantiateTartanImage (type, d->get_filename (), broken);
       needs_saving = true;
       update_window_title();
@@ -1108,9 +1166,9 @@ void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk:
     {
       Glib::ustring errmsg = Glib::strerror(errno);
       Gtk::MessageDialog
-        td(*d, String::ucompose(_("Couldn't add %1.png to:\n%2\n%3"),
-                               file, d_shieldset->getConfigurationFile(),
-                               errmsg));
+        td(*d, String::ucompose(_("Couldn't add %1 to:\n%2\n%3"),
+                               d->get_filename (),
+                               d_shieldset->getConfigurationFile(), errmsg));
       td.run();
       td.hide();
     }
@@ -1124,25 +1182,38 @@ void ShieldSetWindow::on_tutorial_video_activated()
   return;
 }
 
+void ShieldSetWindow::connect_shield_treeview()
+{
+  shield_selected_connection =
+    shields_treeview->get_selection()->signal_changed().connect (method(on_shield_selected));
+}
+
+void ShieldSetWindow::disconnect_shield_treeview()
+{
+  if (shield_selected_connection.connected ())
+    shield_selected_connection.disconnect ();
+}
+
 /*
  some test cases
-  1. create a new  shieldset from scratch, save invalid set, close, load it
+  1. create a new shieldset from scratch, save invalid set, close, load it
   2. create a new shieldset from scratch, save valid set, then switch sets
   3. save a copy of the default shieldset, and switch sets
   4. modify the working shieldset so we can see it change in scenario builder
-  5. modify the working shieldset so that it's invalid
+  5. modify the working shieldset so that it's invalid, try to save
   6. try adding an image file that isn't a .png
-  7. try saving a new shieldset that has a same name
-  8. try modifying an existing shieldset that has a same name
-  9. validate a shieldset without: one of the shields
- 10. validate a shieldset without: one of the tartans
- 11. try saving a new shieldset that has an empty name
- 12. validate a shieldset with a same name
- 13. validate a shieldset with an empty name
- 14. try clearing an image on a file we don't have permission to change
- 15. make a new invalid shieldset and quit save it
- 16. load a writable shieldset, modify and quit save it
- 17. load a writable shieldset, make it invalid, and then quit save it
- 18. try saving a shieldset we don't have permission to save
- 19. try quit-saving a shieldset we don't have permission to save
-*/
+  7. try adding an image file that says it's a .png but is actually a .jpg
+  8. try adding an image file that says it's a .png but is actually random data
+  9. try saving a new shieldset that has a same name
+ 10. try modifying an existing shieldset that has a same name
+ 11. validate a shieldset without: one of the shields
+ 12. validate a shieldset without: one of the tartans
+ 13. try saving a new shieldset that has an empty name
+ 14. validate a shieldset with a same name
+ 15. validate a shieldset with an empty name
+ 16. make a new invalid shieldset and quit save it
+ 17. load a writable shieldset, modify and quit save it
+ 18. load a writable shieldset, make it invalid, and then quit save it
+ 19. try saving a shieldset we don't have permission to save
+ 20. try quit-saving a shieldset we don't have permission to save
+ */

@@ -1,6 +1,6 @@
 // Copyright (C) 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -157,7 +157,8 @@ class Tile : public std::list<TileStyleSet*>
 	void uninstantiateImages();
 
 	//! Load the images associated with this tile.
-	void instantiateImages(int tilesize, Tar_Helper *t, bool &broken);
+	void instantiateImages(int tilesize, Tar_Helper *t, bool scale,
+                               bool &broken);
 
 
 	// Static Methods

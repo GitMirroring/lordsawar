@@ -29,7 +29,7 @@ class SelectItemDialog: public LwEditorDialog
 {
  public:
     SelectItemDialog(Gtk::Window &parent);
-    ~SelectItemDialog() {};
+    ~SelectItemDialog() {}
 
     void run();
     const ItemProto *get_selected_item(guint32 &id) { id = selected_item_type_id; return selected_item; }

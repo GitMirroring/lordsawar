@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 #include "xmlhelper.h"
 #include "gui/image-helpers.h"
 #include "File.h"
+#include "tileset.h"
+#include "tarhelper.h"
 
 Glib::ustring TileStyleSet::d_tag = "tilestyleset";
 
@@ -56,11 +58,11 @@ TileStyleSet::TileStyleSet(Glib::ustring file, guint32 tilesize, bool &success, 
   get_image_width_and_height (file, width, height, broken);
   if (!broken)
     {
-      d_name = File::get_basename(file);
+      d_name = File::get_basename(file, true);
       guint32 num_tilestyles = width / height;
       for (guint32 i = 0; i < num_tilestyles; i++)
         push_back(new TileStyle(0, type));
-      instantiateImages(tilesize, file, broken);
+      loadImages(tilesize, file, true, broken);
       if (!broken)
         success = true;
       else
@@ -73,6 +75,7 @@ TileStyleSet::TileStyleSet(Glib::ustring file, guint32 tilesize, bool &success, 
 TileStyleSet::TileStyleSet(XML_Helper *helper)
 {
   helper->getData(d_name, "name"); 
+  File::add_png_if_no_ext (d_name);
 }
 
 TileStyleSet::~TileStyleSet()
@@ -115,7 +118,8 @@ void TileStyleSet::uninstantiateImages()
     (*this)[i]->uninstantiateImage();
 }
 
-void TileStyleSet::instantiateImages(int tilesize, Glib::ustring filename, bool &broken)
+void TileStyleSet::loadImages(int tilesize, Glib::ustring filename,
+                              bool scale, bool &broken)
 {
   if (filename.empty() == false && !broken)
     {
@@ -124,10 +128,36 @@ void TileStyleSet::instantiateImages(int tilesize, Glib::ustring filename, bool 
         {
           for (unsigned int i = 0; i < size(); i++)
             {
-              PixMask::scale(styles[i], tilesize, tilesize);
+              if (scale)
+                PixMask::scale(styles[i], tilesize, tilesize);
               (*this)[i]->setImage(styles[i]);
             }
         }
     }
+}
+
+bool TileStyleSet::instantiateImages (Tileset *set)
+{
+  uninstantiateImages ();
+  bool broken = false;
+  Tar_Helper t(set->getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          std::vector<PixMask *> styles =
+            disassemble_row(filename, size(), broken);
+          if (!broken)
+            {
+              for (unsigned int i = 0; i < size(); i++)
+                (*this)[i]->setImage(styles[i]);
+            }
+        }
+    }
+  return broken;
 }
 // End of file

@@ -830,6 +830,7 @@ void MainWindow::on_new_map_activated()
             {
               Playerlist *pl = Playerlist::getInstance();
               GameParameters::Player player;
+              player.type = GameParameters::Player::HUMAN;
               player.name =
                 d_create_scenario_names->getPlayerName(Shield::Colour(i));
               player.id = i;

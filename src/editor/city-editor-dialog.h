@@ -33,7 +33,7 @@ class CityEditorDialog: public LwEditorDialog
 {
  public:
     CityEditorDialog(Gtk::Window &parent, City *city, CreateScenarioRandomize *randomizer);
-    ~CityEditorDialog() {};
+    ~CityEditorDialog() {}
 
     int run();
     

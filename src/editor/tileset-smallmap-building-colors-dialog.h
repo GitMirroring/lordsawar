@@ -27,7 +27,7 @@ class TilesetSmallmapBuildingColorsDialog: public LwEditorDialog
 {
  public:
     TilesetSmallmapBuildingColorsDialog(Gtk::Window &parent, Tileset *tileset);
-    ~TilesetSmallmapBuildingColorsDialog() {};
+    ~TilesetSmallmapBuildingColorsDialog() {}
 
  private:
     Tileset *d_tileset;

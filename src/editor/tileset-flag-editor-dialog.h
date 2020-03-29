@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,41 +25,39 @@
 #include "tileset.h"
 #include "lw-editor-dialog.h"
 
-//! Tileset flag editor.  
+//! Tileset flag editor.
 //! Shows and manages the flags that appear on stacks
 class TilesetFlagEditorDialog: public LwEditorDialog
 {
  public:
     TilesetFlagEditorDialog(Gtk::Window &parent, Tileset * tileset);
-    ~TilesetFlagEditorDialog() {};
+    ~TilesetFlagEditorDialog();
 
-    Glib::ustring get_selected_filename() {return selected_filename;};
-    int run();
-    
+    bool run();
+
  private:
-    Gtk::FileChooserButton *flag_filechooserbutton;
+    bool d_changed;
+    PixMask *d_flags;
+    Gtk::Button *flag_imagebutton;
     Gtk::ComboBoxText *shield_theme_combobox;
     Gtk::Grid *preview_table;
     Tileset *d_tileset;
-    Glib::ustring selected_filename;
-    std::list<Glib::ustring> delfiles;
-
-    void setup_shield_theme_combobox(Gtk::Box *box);
-    void shieldset_changed();
-    void on_image_chosen();
-    void update_flag_panel();
-    void show_preview_flags(Glib::ustring filename);
-
-    bool loadFlag(Glib::ustring filename);
-    void clearFlag();
     std::map< guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >* > flags;
     sigc::connection heartbeat;
     std::map<guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator> frame;
 
-    void on_heartbeat();
-    void on_add(Gtk::Widget *widget);
-    void on_button_pressed();
+    void setup_shield_theme_combobox(Gtk::Box *box);
+    void on_shieldset_changed();
+    bool on_image_chosen(Gtk::FileChooserDialog *d);
+    void update_flag_panel();
+    void show_preview_flags();
 
+    bool loadFlag();
+    void clearFlag();
+
+    void on_heartbeat();
+    Gtk::FileChooserDialog* image_filechooser(bool clear);
+    void on_flag_imagebutton_clicked ();
 };
 
 #endif

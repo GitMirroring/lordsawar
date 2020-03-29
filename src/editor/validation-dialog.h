@@ -28,7 +28,7 @@ class ValidationDialog: public LwEditorDialog
  public:
     ValidationDialog(Gtk::Window &parent, std::list<Glib::ustring> errors,
                      std::list<Glib::ustring> warnings);
-    ~ValidationDialog() {};
+    ~ValidationDialog() {}
 
  private:
     Gtk::Label *label;

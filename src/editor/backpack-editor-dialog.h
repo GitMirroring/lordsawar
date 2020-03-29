@@ -30,7 +30,7 @@ class BackpackEditorDialog: public LwEditorDialog
 {
  public:
     BackpackEditorDialog(Gtk::Window &parent, Backpack *backpack);
-    ~BackpackEditorDialog() {delete working;};
+    ~BackpackEditorDialog() {delete working;}
 
     int run();
     void hide();

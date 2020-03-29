@@ -34,12 +34,12 @@ class ShieldSetWindow: public sigc::trackable
 {
  public:
     ShieldSetWindow(Glib::ustring load_filename = "");
-    ~ShieldSetWindow() {delete window;};
+    ~ShieldSetWindow() {delete window;}
 
-    void show() {window->show();};
-    void hide() {window->hide();};
+    void show() {window->show();}
+    void hide() {window->hide();}
 
-    Gtk::Window &get_window() { return *window; };
+    Gtk::Window &get_window() { return *window; }
 
     sigc::signal<void, guint32> shieldset_saved;
 
@@ -74,6 +74,7 @@ class ShieldSetWindow: public sigc::trackable
     Gtk::Button *change_right_tartan_button;
     Gtk::ColorButton *player_colorbutton;
     Gtk::Alignment *shield_alignment;
+    sigc::connection shield_selected_connection;
 
     class ShieldsColumns: public Gtk::TreeModelColumnRecord {
     public:
@@ -116,7 +117,7 @@ class ShieldSetWindow: public sigc::trackable
 
     void fill_shield_info(Shield *shield);
     void show_shield(ShieldStyle *ss, Shield *s, Gtk::Image *image);
-    void show_tartan(Shield *s, Glib::ustring f, Gtk::Image *image);
+    void show_tartan(Shield *s, Tartan::Type t, Gtk::Image *image);
 
     void process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialog *d);
     void process_tartanpic (Tartan::Type t, Shield *s, Gtk::FileChooserDialog *d);
@@ -132,6 +133,9 @@ class ShieldSetWindow: public sigc::trackable
     void update_window_title();
 
     bool isValidName ();
+
+    void connect_shield_treeview();
+    void disconnect_shield_treeview();
 };
 
 #endif

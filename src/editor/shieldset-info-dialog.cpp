@@ -39,10 +39,38 @@ ShieldSetInfoDialog::ShieldSetInfoDialog(Gtk::Window &parent, Shieldset *s)
   xml->get_widget("status_label", status_label);
   xml->get_widget("location_label", location_label);
   xml->get_widget("name_entry", name_entry);
+  xml->get_widget("small_width_spinbutton", small_width_spinbutton);
+  xml->get_widget("small_height_spinbutton", small_height_spinbutton);
+  xml->get_widget("medium_width_spinbutton", medium_width_spinbutton);
+  xml->get_widget("medium_height_spinbutton", medium_height_spinbutton);
+  xml->get_widget("large_width_spinbutton", large_width_spinbutton);
+  xml->get_widget("large_height_spinbutton", large_height_spinbutton);
+  xml->get_widget("fit_button", fit_button);
+  fit_button->signal_clicked().connect (method(on_fit_pressed));
+
+  small_width_spinbutton->set_value (s->getSmallWidth ());
+  small_width_spinbutton->signal_changed().connect
+    (method(on_small_width_changed));
+  small_height_spinbutton->set_value (s->getSmallHeight ());
+  small_height_spinbutton->signal_changed().connect
+    (method(on_small_height_changed));
+  medium_width_spinbutton->set_value (s->getMediumWidth ());
+  medium_width_spinbutton->signal_changed().connect
+    (method(on_medium_width_changed));
+  medium_height_spinbutton->set_value (s->getMediumHeight ());
+  medium_height_spinbutton->signal_changed().connect
+    (method(on_medium_height_changed));
+  large_width_spinbutton->set_value (s->getLargeWidth ());
+  large_width_spinbutton->signal_changed().connect
+    (method(on_large_width_changed));
+  large_height_spinbutton->set_value (s->getLargeHeight ());
+  large_height_spinbutton->signal_changed().connect
+    (method(on_large_height_changed));
 
   name_entry->set_text (d_shieldset->getName ());
-  location_label->property_label () = 
-    d_shieldset->isTemporaryFile () ? "" : d_shieldset->getConfigurationFile ();
+  location_label->property_label () =
+    d_shieldset->getDirectory ().empty () ? "" :
+    d_shieldset->getConfigurationFile (true);
 
   name_entry->signal_changed().connect (method(on_name_changed));
 
@@ -66,12 +94,12 @@ ShieldSetInfoDialog::ShieldSetInfoDialog(Gtk::Window &parent, Shieldset *s)
 void ShieldSetInfoDialog::on_name_changed()
 {
   d_changed = true;
-  d_shieldset->setName (name_entry->get_text ());
+  d_shieldset->setName (String::utrim (name_entry->get_text ()));
   close_button->set_sensitive (File::sanify (d_shieldset->getName ()) != "");
 
   Glib::ustring file =
     Shieldsetlist::getInstance()->lookupConfigurationFileByName(d_shieldset);
-  if (file != "" && file != d_shieldset->getConfigurationFile ())
+  if (file != "" && file != d_shieldset->getConfigurationFile (true))
     status_label->set_text (_("That name is already in use."));
   else
     status_label->set_text ("");
@@ -108,3 +136,50 @@ ShieldSetInfoDialog::~ShieldSetInfoDialog()
   notebook->property_show_tabs () = false;
 }
 
+void ShieldSetInfoDialog::on_small_width_changed ()
+{
+  d_changed = true;
+  d_shieldset->setSmallWidth (small_width_spinbutton->get_value ());
+}
+
+void ShieldSetInfoDialog::on_small_height_changed ()
+{
+  d_changed = true;
+  d_shieldset->setSmallHeight (small_height_spinbutton->get_value ());
+}
+
+void ShieldSetInfoDialog::on_medium_width_changed ()
+{
+  d_changed = true;
+  d_shieldset->setMediumWidth (medium_width_spinbutton->get_value ());
+}
+
+void ShieldSetInfoDialog::on_medium_height_changed ()
+{
+  d_changed = true;
+  d_shieldset->setMediumHeight (medium_height_spinbutton->get_value ());
+}
+
+void ShieldSetInfoDialog::on_large_width_changed ()
+{
+  d_changed = true;
+  d_shieldset->setLargeWidth (large_width_spinbutton->get_value ());
+}
+
+void ShieldSetInfoDialog::on_large_height_changed ()
+{
+  d_changed = true;
+  d_shieldset->setLargeHeight (large_height_spinbutton->get_value ());
+}
+
+void ShieldSetInfoDialog::on_fit_pressed ()
+{
+  d_changed = true;
+  d_shieldset->setHeightsAndWidthsFromImages();
+  small_width_spinbutton->set_value ((double)d_shieldset->getSmallWidth());
+  small_height_spinbutton->set_value ((double)d_shieldset->getSmallHeight());
+  medium_width_spinbutton->set_value ((double)d_shieldset->getMediumWidth());
+  medium_height_spinbutton->set_value ((double)d_shieldset->getMediumHeight());
+  large_width_spinbutton->set_value ((double)d_shieldset->getLargeWidth());
+  large_height_spinbutton->set_value ((double)d_shieldset->getLargeHeight());
+}

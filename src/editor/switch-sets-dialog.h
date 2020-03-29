@@ -35,19 +35,19 @@ class SwitchSetsDialog: public LwEditorDialog
 {
  public:
     SwitchSetsDialog(Gtk::Window &parent);
-    ~SwitchSetsDialog() {};
+    ~SwitchSetsDialog() {}
 
     int run();
 
-    Tileset* get_selected_tileset() {return selected_tileset;};
-    Armyset* get_selected_armyset() {return selected_armyset;};
-    Cityset* get_selected_cityset() {return selected_cityset;};
-    Shieldset* get_selected_shieldset() {return selected_shieldset;};
+    Tileset* get_selected_tileset() {return selected_tileset;}
+    Armyset* get_selected_armyset() {return selected_armyset;}
+    Cityset* get_selected_cityset() {return selected_cityset;}
+    Shieldset* get_selected_shieldset() {return selected_shieldset;}
 
-    bool get_armyset_changed() const {return armyset_changed;};
-    bool get_tileset_changed() const {return tileset_changed;};
-    bool get_cityset_changed() const {return cityset_changed;};
-    bool get_shieldset_changed() const {return shieldset_changed;};
+    bool get_armyset_changed() const {return armyset_changed;}
+    bool get_tileset_changed() const {return tileset_changed;}
+    bool get_cityset_changed() const {return cityset_changed;}
+    bool get_shieldset_changed() const {return shieldset_changed;}
     
  private:
     Gtk::ComboBoxText *tile_size_combobox;

@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2010, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2008, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ void Citysetlist::instantiateImages(bool &broken)
       if (!broken)
         {
           if ((*it)->validate () == true)
-            (*it)->instantiateImages(broken);
+            (*it)->instantiateImages(true, broken);
         }
     }
 }

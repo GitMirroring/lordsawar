@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,34 +27,34 @@
 
 class TilePreviewScene;
 
-//! Tileset explosion picture editor.  
+//! Tileset explosion picture editor.
 class TilesetExplosionPictureEditorDialog: public LwEditorDialog
 {
  public:
     TilesetExplosionPictureEditorDialog(Gtk::Window &parent, Tileset * tileset);
-    ~TilesetExplosionPictureEditorDialog() {};
+    ~TilesetExplosionPictureEditorDialog();
 
-    Glib::ustring get_selected_filename() {return selected_filename;};
-    int run();
-    
+    bool run();
+
  private:
+    bool d_changed;
     Gtk::RadioButton *large_explosion_radiobutton;
     Gtk::RadioButton *small_explosion_radiobutton;
-    Gtk::FileChooserButton *explosion_filechooserbutton;
+    Gtk::Button *explosion_imagebutton;
     Gtk::Image *scene_image;
     Tileset *d_tileset;
-    Glib::ustring selected_filename;
-    std::list<Glib::ustring> delfiles;
+    PixMask *d_explosion;
 
-    void on_image_chosen();
+    bool on_image_chosen(Gtk::FileChooserDialog *d);
     void on_large_toggled();
     void on_small_toggled();
-    void show_explosion_image(Glib::ustring filename);
+    void show_explosion_image();
     void update_panel();
 
-    void update_scene(TilePreviewScene *scene, Glib::ustring filename);
-    void on_add(Gtk::Widget *widget);
-    void on_button_pressed();
+    void update_scene(TilePreviewScene *scene);
+
+    Gtk::FileChooserDialog* image_filechooser(bool clear);
+    void on_explosion_imagebutton_clicked ();
 
 };
 

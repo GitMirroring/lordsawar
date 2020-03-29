@@ -30,7 +30,6 @@
 #include "cityset-window.h"
 #include "builder-cache.h"
 #include "cityset-info-dialog.h"
-#include "masked-image-editor-dialog.h"
 
 #include "defs.h"
 #include "File.h"
@@ -40,9 +39,9 @@
 #include "image-editor-dialog.h"
 #include "ImageCache.h"
 #include "citysetlist.h"
-#include "tile-size-editor-dialog.h"
 #include "editor-quit-dialog.h"
 #include "GameMap.h"
+#include "editor-save-changes-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &CitySetWindow::x)
 
@@ -50,7 +49,7 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
 {
   needs_saving = false;
   d_cityset = NULL;
-    Glib::RefPtr<Gtk::Builder> xml = 
+    Glib::RefPtr<Gtk::Builder> xml =
       BuilderCache::editor_get("cityset-window.ui");
 
     xml->get_widget("window", window);
@@ -92,7 +91,7 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
       (method(on_ruin_tile_width_changed));
     ruin_tile_width_spinbutton->signal_insert_text().connect
       (sigc::hide(sigc::hide(method(on_ruin_tile_width_text_changed))));
-    xml->get_widget("temple_tile_width_spinbutton", 
+    xml->get_widget("temple_tile_width_spinbutton",
 		    temple_tile_width_spinbutton);
     temple_tile_width_spinbutton->set_range (1, 4);
     temple_tile_width_spinbutton->signal_changed().connect
@@ -100,7 +99,6 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
     temple_tile_width_spinbutton->signal_insert_text().connect
       (sigc::hide(sigc::hide(method(on_temple_tile_width_text_changed))));
 
-    window->signal_delete_event().connect (sigc::hide(method(on_delete_event)));
     xml->get_widget("change_citypics_button", change_citypics_button);
     change_citypics_button->signal_clicked().connect
       (method(on_change_citypics_clicked));
@@ -132,26 +130,6 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
 	update_cityset_panel();
         update_window_title();
       }
-    update_cityset_menuitems();
-}
-
-void
-CitySetWindow::update_cityset_menuitems()
-{
-  if (d_cityset == NULL)
-    {
-      save_cityset_menuitem->set_sensitive(false);
-      save_as_menuitem->set_sensitive(false);
-      validate_cityset_menuitem->set_sensitive(false);
-      edit_cityset_info_menuitem->set_sensitive(false);
-    }
-  else
-    {
-      save_cityset_menuitem->set_sensitive(true);
-      save_as_menuitem->set_sensitive(true);
-      edit_cityset_info_menuitem->set_sensitive(true);
-      validate_cityset_menuitem->set_sensitive(true);
-    }
 }
 
 void
@@ -161,37 +139,37 @@ CitySetWindow::update_cityset_panel()
   Glib::ustring no_image = _("no image set");
   Glib::ustring s;
   if (d_cityset && d_cityset->getCitiesFilename().empty() == false)
-    s = d_cityset->getCitiesFilename() + ".png";
+    s = d_cityset->getCitiesFilename();
   else
     s = no_image;
   change_citypics_button->set_label(s);
   if (d_cityset && d_cityset->getRazedCitiesFilename().empty() == false)
-    s = d_cityset->getRazedCitiesFilename() + ".png";
+    s = d_cityset->getRazedCitiesFilename();
   else
     s = no_image;
   change_razedcitypics_button->set_label(s);
   if (d_cityset && d_cityset->getPortFilename().empty() == false)
-    s = d_cityset->getPortFilename() + ".png";
+    s = d_cityset->getPortFilename();
   else
     s = no_image;
   change_portpic_button->set_label(s);
   if (d_cityset && d_cityset->getSignpostFilename().empty() == false)
-    s = d_cityset->getSignpostFilename() + ".png";
+    s = d_cityset->getSignpostFilename();
   else
     s = no_image;
   change_signpostpic_button->set_label(s);
   if (d_cityset && d_cityset->getRuinsFilename().empty() == false)
-    s = d_cityset->getRuinsFilename() + ".png";
+    s = d_cityset->getRuinsFilename();
   else
     s = no_image;
   change_ruinpics_button->set_label(s);
   if (d_cityset && d_cityset->getTemplesFilename().empty() == false)
-    s = d_cityset->getTemplesFilename() + ".png";
+    s = d_cityset->getTemplesFilename();
   else
     s = no_image;
   change_templepic_button->set_label(s);
   if (d_cityset && d_cityset->getTowersFilename().empty() == false)
-    s = d_cityset->getTowersFilename() + ".png";
+    s = d_cityset->getTowersFilename();
   else
     s = no_image;
   change_towerpics_button->set_label(s);
@@ -209,73 +187,38 @@ CitySetWindow::update_cityset_panel()
     temple_tile_width_spinbutton->set_value(1);
 }
 
-bool CitySetWindow::on_delete_event()
+bool CitySetWindow::make_new_cityset ()
 {
-  hide();
+  Glib::ustring msg = _("Save these changes before making a new cityset?");
+  if (check_discard (msg) == false)
+    return false;
+  save_cityset_menuitem->set_sensitive (false);
+  current_save_filename = "";
+  if (d_cityset)
+    delete d_cityset;
+
+  guint32 num = 0;
+  Glib::ustring name =
+    Citysetlist::getInstance()->findFreeName(_("Untitled"), 100, num,
+                                             Cityset::get_default_tile_size ());
+
+  d_cityset = new Cityset (Citysetlist::getNextAvailableId (1), name);
+  d_cityset->setNewTemporaryFile ();
+
+  update_cityset_panel();
+  needs_saving = true;
+  update_window_title();
   return true;
 }
 
 void CitySetWindow::on_new_cityset_activated()
 {
-  Glib::ustring name = "";
-  int id = Citysetlist::getNextAvailableId(0);
-  Cityset *cityset = new Cityset(id, name);
-  CitySetInfoDialog d(*window, cityset, 
-                      File::getSetDir(Cityset::file_extension, false), "", 
-                      false, _("Make a New Cityset"));
-  int response = d.run();
-  if (response != Gtk::RESPONSE_ACCEPT)
-    {
-      delete cityset;
-      return;
-    }
-  if (d_cityset)
-    delete d_cityset;
-  d_cityset = cityset;
-  Glib::ustring dir = File::getSetDir(Cityset::file_extension, false);
-  d_cityset->setDirectory(dir);
-  current_save_filename = d_cityset->getConfigurationFile();
-
-  //here we put a copy into the citysetlist, and keep d_cityset as our
-  //current working cityset.
-  Cityset *copy = Cityset::copy (d_cityset);
-  Glib::ustring new_basename = copy->getBaseName();
-  guint32 new_id = copy->getId();
-  if (!Citysetlist::getInstance()->addToPersonalCollection(copy, new_basename, new_id))
-    delete copy;
-  update_cityset_panel();
-  update_cityset_menuitems();
-  needs_saving = true;
-  update_window_title();
+  make_new_cityset ();
 }
 
 void CitySetWindow::on_load_cityset_activated()
 {
-  Gtk::FileChooserDialog chooser(*window, 
-				 _("Choose a Cityset to Load"));
-  Glib::RefPtr<Gtk::FileFilter> lwc_filter = Gtk::FileFilter::create();
-  lwc_filter->set_name(_("LordsAWar Citysets (*.lwc)"));
-  lwc_filter->add_pattern("*" + CITYSET_EXT);
-  chooser.add_filter(lwc_filter);
-  chooser.set_current_folder(File::getSetDir(Cityset::file_extension, false));
-
-  chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-  chooser.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
-  chooser.set_default_response(Gtk::RESPONSE_ACCEPT);
-
-  chooser.show_all();
-  int res = chooser.run();
-
-  if (res == Gtk::RESPONSE_ACCEPT)
-    {
-      load_cityset(chooser.get_filename());
-      chooser.hide();
-      needs_saving = false;
-      update_window_title();
-    }
-
-  update_cityset_menuitems();
-  update_cityset_panel();
+  load_cityset ();
 }
 
 void CitySetWindow::on_validate_cityset_activated()
@@ -283,6 +226,15 @@ void CitySetWindow::on_validate_cityset_activated()
   std::list<Glib::ustring> msgs;
   if (d_cityset == NULL)
     return;
+  if (msgs.empty () == true)
+    {
+      bool valid = String::utrim (d_cityset->getName ()) != "";
+      if (!valid)
+        {
+          Glib::ustring s = _("The name of the cityset is invalid.");
+          msgs.push_back(s);
+        }
+    }
   if (d_cityset->validateCitiesFilename() == false)
     msgs.push_back(_("The cities picture is not set."));
   if (d_cityset->validateRazedCitiesFilename() == false)
@@ -303,15 +255,20 @@ void CitySetWindow::on_validate_cityset_activated()
     msgs.push_back(_("The tile width for ruins must be over zero."));
   if (d_cityset->validateTempleTileWidth() == false)
     msgs.push_back(_("The tile width for temples must be over zero."));
+  if (msgs.empty() == true && isValidName () == false)
+    msgs.push_back(_("The name of the cityset is not unique."));
 
   Glib::ustring msg = "";
   for (std::list<Glib::ustring>::iterator it = msgs.begin(); it != msgs.end();
        it++)
-    msg += (*it) + "\n";
+    {
+      msg += (*it) + "\n";
+      break;
+    }
 
   if (msg == "")
     msg = _("The cityset is valid.");
-      
+
   Gtk::MessageDialog dialog(*window, msg);
   dialog.run();
   dialog.hide();
@@ -321,104 +278,86 @@ void CitySetWindow::on_validate_cityset_activated()
 
 void CitySetWindow::on_save_as_activated()
 {
-  guint32 suggested_tile_size = d_cityset->calculate_preferred_tile_size();
-  if (suggested_tile_size != d_cityset->getTileSize())
-    {
-      TileSizeEditorDialog d(*window, d_cityset->getTileSize(), suggested_tile_size);
-      int response = d.run();
-      if (response == Gtk::RESPONSE_ACCEPT)
-        d_cityset->setTileSize(d.get_selected_tilesize());
-    }
-  Cityset *copy = Cityset::copy (d_cityset);
-  copy->setId(Citysetlist::getNextAvailableId(d_cityset->getId()));
-  CitySetInfoDialog d(*window, copy, 
-                      File::getSetDir(Cityset::file_extension, false), "", 
-                      false, _("Save a Copy of a Cityset"));
-  int response = d.run();
-  if (response == Gtk::RESPONSE_ACCEPT)
-    {
-      Glib::ustring new_basename = copy->getBaseName();
-      guint32 new_id = copy->getId();
-      copy->setDirectory(File::getSetDir(Cityset::file_extension, false));
-      guint32 oldid = d_cityset->getId();
-      Glib::ustring oldname = d_cityset->getName();
-      Glib::ustring oldbasename = d_cityset->getBaseName();
-      Glib::ustring olddir = d_cityset->getDirectory();
-
-      Glib::ustring tmpdir = File::get_tmp_file();
-      File::erase(tmpdir);
-      tmpdir += Cityset::file_extension;
-      File::create_dir(tmpdir);
-      d_cityset->setName(copy->getName());
-      File::copy(d_cityset->getConfigurationFile(), 
-                 File::getTempFile (tmpdir, copy->getBaseName() + Cityset::file_extension));
-      d_cityset->setBaseName(copy->getBaseName());
-      d_cityset->setDirectory(tmpdir);
-      d_cityset->setId(copy->getId());
-          
-      current_save_filename = copy->getConfigurationFile();
-      bool ok = Citysetlist::getInstance()->addToPersonalCollection(d_cityset, new_basename, new_id);
-      File::erase(File::getTempFile (tmpdir, copy->getBaseName() + Cityset::file_extension));
-      File::erase_dir(tmpdir);
-      if (ok)
-        {
-          save_cityset_menuitem->set_sensitive(true);
-          d_cityset = copy;
-          needs_saving = false;
-          update_window_title();
-          cityset_saved.emit(d_cityset->getId());
-        }
-      else
-        {
-          d_cityset->setName(oldname);
-          d_cityset->setBaseName(oldbasename);
-          d_cityset->setId(oldid);
-          d_cityset->setDirectory(olddir);
-          Glib::ustring errmsg = Glib::strerror(errno);
-          Glib::ustring msg;
-          msg = _("Error!  Cityset could not be saved.");
-          msg += "\n" + current_save_filename + "\n" + errmsg;
-          Gtk::MessageDialog dialog(*window, msg);
-          dialog.run();
-          dialog.hide();
-          delete copy;
-        }
-    }
-  else
-    delete copy;
+  if (check_save_valid (false))
+    save_current_cityset_file_as ();
 }
 
-bool CitySetWindow::save_current_cityset()
+bool CitySetWindow::save_current_cityset_file_as ()
 {
-  if (GameMap::getInstance()->getCitysetId() == d_cityset->getId() &&
-      d_cityset->validate() == false)
+  bool ret = false;
+  while (1)
     {
-      Glib::ustring errmsg = _("Cityset is invalid, and is also the current working cityset.");
-      Glib::ustring msg;
-      msg = _("Error!  Cityset could not be saved.");
-      msg += "\n" + current_save_filename + "\n" +
-        errmsg;
-      Gtk::MessageDialog dialog(*window, msg);
-      dialog.run();
-      dialog.hide();
-      return false;
-    }
-  if (current_save_filename.empty())
-    current_save_filename = d_cityset->getConfigurationFile();
-  
-  guint32 suggested_tile_size = d_cityset->calculate_preferred_tile_size();
-  if (suggested_tile_size != d_cityset->getTileSize())
-    {
-      TileSizeEditorDialog d(*window, d_cityset->getTileSize(), suggested_tile_size);
-      int response = d.run();
-      if (response == Gtk::RESPONSE_ACCEPT)
-        d_cityset->setTileSize(d.get_selected_tilesize());
-    }
+      Gtk::FileChooserDialog chooser(*window, _("Choose a Name"),
+                                     Gtk::FILE_CHOOSER_ACTION_SAVE);
+      Glib::RefPtr<Gtk::FileFilter> lwc_filter = Gtk::FileFilter::create();
+      lwc_filter->set_name(_("LordsAWar Citysets (*.lwc)"));
+      lwc_filter->add_pattern("*" + CITYSET_EXT);
+      chooser.add_filter(lwc_filter);
+      chooser.set_current_folder(File::getSetDir(CITYSET_EXT, false));
 
-  bool success = d_cityset->save(current_save_filename, Cityset::file_extension);
-  if (success)
+      chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+      chooser.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_ACCEPT);
+      chooser.set_default_response(Gtk::RESPONSE_ACCEPT);
+      chooser.set_do_overwrite_confirmation();
+      chooser.set_current_name (File::sanify(d_cityset->getName ()) +
+                                CITYSET_EXT);
+
+      chooser.show_all();
+      int res = chooser.run();
+
+      if (res == Gtk::RESPONSE_ACCEPT)
+        {
+          Glib::ustring filename = chooser.get_filename();
+          Glib::ustring old_filename = current_save_filename;
+          guint32 old_id = d_cityset->getId ();
+          d_cityset->setId(Citysetlist::getNextAvailableId(old_id));
+
+          ret = save_current_cityset_file(filename);
+          if (ret == false)
+            {
+              current_save_filename = old_filename;
+              d_cityset->setId(old_id);
+            }
+          else
+            {
+              save_cityset_menuitem->set_sensitive (true);
+              needs_saving = false;
+              d_cityset->created (filename);
+              Glib::ustring dir =
+                File::add_slash_if_necessary (File::get_dirname (filename));
+              if (dir == File::getSetDir(CITYSET_EXT, false) ||
+                  dir == File::getSetDir(CITYSET_EXT, true))
+                {
+                  //if we saved it to a standard place, update the list
+                  Citysetlist::getInstance()->add (Cityset::copy (d_cityset),
+                                                   filename);
+                  cityset_saved.emit(d_cityset->getId());
+                }
+              update_cityset_panel();
+              update_window_title();
+            }
+        }
+      chooser.hide ();
+      if (res == Gtk::RESPONSE_CANCEL)
+        break;
+      if (ret == true)
+        break;
+    }
+  return ret;
+}
+
+bool CitySetWindow::save_current_cityset_file (Glib::ustring filename)
+{
+
+  current_save_filename = filename;
+  if (current_save_filename.empty())
+    current_save_filename = d_cityset->getConfigurationFile(true);
+
+  bool ok = d_cityset->save(current_save_filename, Cityset::file_extension);
+  if (ok)
     {
-      Citysetlist::getInstance()->reload(d_cityset->getId());
+      if (Citysetlist::getInstance()->reload(d_cityset->getId()))
+        update_cityset_panel();
       needs_saving = false;
       update_window_title();
       cityset_saved.emit(d_cityset->getId());
@@ -426,28 +365,26 @@ bool CitySetWindow::save_current_cityset()
   else
     {
       Glib::ustring errmsg = Glib::strerror(errno);
-      Glib::ustring msg;
-      msg = _("Error!  Cityset could not be saved.");
+      Glib::ustring msg = _("Error!  Cityset could not be saved.");
       msg += "\n" + current_save_filename + "\n" + errmsg;
       Gtk::MessageDialog dialog(*window, msg);
       dialog.run();
       dialog.hide();
     }
-  return success;
+  return ok;
 }
 
 void CitySetWindow::on_save_cityset_activated()
 {
-  save_current_cityset();
+  if (check_save_valid (true))
+    save_current_cityset_file();
 }
 
 void CitySetWindow::on_edit_cityset_info_activated()
 {
-  CitySetInfoDialog d(*window, d_cityset, File::get_dirname(current_save_filename), 
-                      File::get_basename(current_save_filename), true, 
-                      _("Edit Cityset Information"));
-  int response = d.run();
-  if (response == Gtk::RESPONSE_ACCEPT)
+  CitySetInfoDialog d(*window, d_cityset);
+  bool changed = d.run();
+  if (changed)
     {
       needs_saving = true;
       update_window_title();
@@ -474,11 +411,47 @@ void CitySetWindow::on_help_about_activated()
   return;
 }
 
+bool CitySetWindow::load_cityset ()
+{
+  bool ret = false;
+  Glib::ustring msg = _("Save these changes before opening a new cityset?");
+  if (check_discard (msg) == false)
+    return ret;
+  Gtk::FileChooserDialog chooser(*window,
+				 _("Choose a Cityset to Open"));
+  Glib::RefPtr<Gtk::FileFilter> lwc_filter = Gtk::FileFilter::create();
+  lwc_filter->set_name(_("LordsAWar Citysets (*.lwc)"));
+  lwc_filter->add_pattern("*" + CITYSET_EXT);
+  chooser.add_filter(lwc_filter);
+  chooser.set_current_folder(File::getSetDir(Cityset::file_extension, false));
+
+  chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  chooser.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
+  chooser.set_default_response(Gtk::RESPONSE_ACCEPT);
+
+  chooser.show_all();
+  int res = chooser.run();
+
+  if (res == Gtk::RESPONSE_ACCEPT)
+    {
+      bool ok = load_cityset(chooser.get_filename());
+      chooser.hide();
+      if (ok)
+        {
+          needs_saving = false;
+          update_window_title();
+          ret = true;
+        }
+    }
+
+  update_cityset_panel();
+  return ret;
+}
+
 bool CitySetWindow::load_cityset(Glib::ustring filename)
 {
   Glib::ustring old_current_save_filename = current_save_filename;
   current_save_filename = filename;
-  Glib::ustring name = File::get_basename(filename);
 
   bool unsupported_version = false;
   Cityset *cityset = Cityset::create(filename, unsupported_version);
@@ -498,33 +471,60 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
   if (d_cityset)
     delete d_cityset;
   d_cityset = cityset;
+  d_cityset->setLoadTemporaryFile ();
 
   bool broken = false;
-  d_cityset->instantiateImages(broken);
+  d_cityset->instantiateImages(false, broken);
+  if (broken)
+    {
+      delete d_cityset;
+      d_cityset = NULL;
+      Gtk::MessageDialog td(*window, _("Couldn't load cityset images."));
+      td.run();
+      td.hide();
+      return false;
+    }
+  save_cityset_menuitem->set_sensitive (true);
   update_window_title();
   return true;
 }
 
 bool CitySetWindow::quit()
 {
-  if (needs_saving == true)
+  if (needs_saving)
     {
-      EditorQuitDialog d(*window);
+      EditorQuitDialog d (*window);
       int response = d.run_and_hide();
 
-      if (response == Gtk::RESPONSE_CANCEL) //we don't want to quit
-	return false;
+      if (response == Gtk::RESPONSE_CANCEL) // we don't want to new
+        return false;
 
-      else if (response == Gtk::RESPONSE_ACCEPT) // save and quit
+      else if (response == Gtk::RESPONSE_ACCEPT) // save it
         {
-          if (save_current_cityset() == false)
+          bool saved = false;
+          bool existing = d_cityset->getDirectory().empty () == false;
+          if (existing)
+            {
+              if (check_save_valid (true))
+                {
+                  if (save_current_cityset_file ())
+                    saved = true;
+                }
+              else
+                return false;
+            }
+          else
+            {
+              if (check_save_valid (false))
+                saved = save_current_cityset_file_as ();
+              else
+                return false;
+            }
+          if (!saved)
             return false;
         }
-      //else if (Response == Gtk::CLOSE) // don't save just quit
-      window->hide();
     }
-  else
-    window->hide();
+  window->hide ();
   if (d_cityset)
     delete d_cityset;
   return true;
@@ -587,198 +587,207 @@ void CitySetWindow::on_temple_tile_width_changed()
 
 void CitySetWindow::on_change_citypics_clicked()
 {
-  Glib::ustring filename = "";
-  if (d_cityset->getCitiesFilename().empty() == false)
-    filename = d_cityset->getFileFromConfigurationFile(d_cityset->getCitiesFilename() +".png");
-  ImageEditorDialog d(*window, filename, MAX_PLAYERS + 1);
-  d.set_title(_("Select a Cities image"));
-  int response = d.run();
-  if (filename != "")
-    File::erase(filename);
-  if (response == Gtk::RESPONSE_ACCEPT)
+  bool cleared = false;
+  std::vector<PixMask *> frames;
+  for (guint32 i = 0; i < MAX_PLAYERS + 1; i++)
+    if (d_cityset->getCityImage (i))
+      frames.push_back (d_cityset->getCityImage (i));
+  Glib::ustring imgname = d_cityset->getCitiesFilename();
+  Glib::ustring f =
+    change_image(_("Select a Cities image"), imgname, MAX_PLAYERS + 1,
+                 frames, cleared, d_cityset->getCityTileWidth ());
+  if (cleared)
+    d_cityset->uninstantiateSameNamedImages (imgname);
+  else
     {
-      if (d.get_selected_filename() != filename)
+      if (f != "")
         {
-          Glib::ustring file = File::get_basename(d.get_selected_filename());
-          if (d_cityset->replaceFileInConfigurationFile(d_cityset->getCitiesFilename()+".png", d.get_selected_filename()))
-            {
-              d_cityset->setCitiesFilename (file);
-              needs_saving = true;
-              update_window_title();
-            }
-          else
-            show_add_file_error(*d.get_dialog(), file);
+          d_cityset->setCitiesFilename (f);
+          d_cityset->instantiateCityImages();
         }
-      update_cityset_panel();
     }
+  update_cityset_panel();
 }
 
 void CitySetWindow::on_change_razedcitypics_clicked()
 {
-  Glib::ustring filename = "";
-  if (d_cityset->getRazedCitiesFilename().empty() == false)
-    filename = d_cityset->getFileFromConfigurationFile(d_cityset->getRazedCitiesFilename() +".png");
-  ImageEditorDialog d(*window, filename, MAX_PLAYERS);
-  d.set_title(_("Select a Razed Cities image"));
-  int response = d.run();
-  if (filename != "")
-    File::erase(filename);
-  if (response == Gtk::RESPONSE_ACCEPT)
+  bool cleared = false;
+  std::vector<PixMask *> frames;
+  for (guint32 i = 0; i < MAX_PLAYERS; i++)
+    if (d_cityset->getRazedCityImage (i))
+      frames.push_back (d_cityset->getRazedCityImage (i));
+  Glib::ustring imgname = d_cityset->getRazedCitiesFilename();
+  Glib::ustring f = 
+    change_image(_("Select a Razed Cities image"), imgname, MAX_PLAYERS,
+                 frames, cleared, d_cityset->getCityTileWidth ());
+  if (cleared)
+    d_cityset->uninstantiateSameNamedImages (imgname);
+  else
     {
-      if (d.get_selected_filename() != filename)
+      if (f != "")
         {
-          Glib::ustring file = File::get_basename(d.get_selected_filename());
-          if (d_cityset->replaceFileInConfigurationFile(d_cityset->getRazedCitiesFilename()+".png", d.get_selected_filename()))
-            {
-              d_cityset->setRazedCitiesFilename (file);
-              needs_saving = true;
-              update_window_title();
-            }
-          else
-            show_add_file_error(*d.get_dialog(), file);
+          d_cityset->setRazedCitiesFilename (f);
+          d_cityset->instantiateRazedCityImages();
         }
-      update_cityset_panel();
     }
+  update_cityset_panel();
 }
 
 void CitySetWindow::on_change_portpic_clicked()
 {
-  Glib::ustring filename = "";
-  if (d_cityset->getPortFilename().empty() == false)
-    filename = d_cityset->getFileFromConfigurationFile(d_cityset->getPortFilename() +".png");
-  ImageEditorDialog d(*window, filename, 1);
-  d.set_title(_("Select a Port image"));
-  int response = d.run();
-  if (filename != "")
-    File::erase(filename);
-  if (response == Gtk::RESPONSE_ACCEPT)
+  bool cleared = false;
+  std::vector<PixMask *> frames;
+  if (d_cityset->getPortImage ())
+    frames.push_back (d_cityset->getPortImage ());
+  Glib::ustring imgname = d_cityset->getPortFilename();
+  Glib::ustring f = change_image(_("Select a Port image"), imgname, 1, frames,
+                                 cleared, 1);
+  if (cleared)
+    d_cityset->uninstantiateSameNamedImages (imgname);
+  else
     {
-      if (d.get_selected_filename() != filename)
+      if (f != "")
         {
-          Glib::ustring file = File::get_basename(d.get_selected_filename());
-          if (d_cityset->replaceFileInConfigurationFile(d_cityset->getPortFilename()+".png", d.get_selected_filename()))
-            {
-              d_cityset->setPortFilename(file);
-              needs_saving = true;
-              update_window_title();
-            }
-          else
-            show_add_file_error(*d.get_dialog(), file);
+          d_cityset->setPortFilename (f);
+          d_cityset->instantiatePortImage();
         }
-      update_cityset_panel();
     }
+  update_cityset_panel();
 }
 
 void CitySetWindow::on_change_signpostpic_clicked()
 {
-  Glib::ustring filename = "";
-  if (d_cityset->getSignpostFilename().empty() == false)
-    filename = d_cityset->getFileFromConfigurationFile(d_cityset->getSignpostFilename() +".png");
-  ImageEditorDialog d(*window, filename, 1);
-  d.set_title(_("Select a Signpost image"));
-  int response = d.run();
-  if (filename != "")
-    File::erase(filename);
-  if (response == Gtk::RESPONSE_ACCEPT)
+  bool cleared = false;
+  std::vector<PixMask *> frames;
+  if (d_cityset->getSignpostImage ())
+    frames.push_back (d_cityset->getSignpostImage ());
+  Glib::ustring imgname = d_cityset->getSignpostFilename();
+  Glib::ustring f =
+    change_image(_("Select a Signpost image"), imgname, 1, frames, cleared, 1);
+  if (cleared)
+    d_cityset->uninstantiateSameNamedImages (imgname);
+  else
     {
-      if (d.get_selected_filename() != filename)
+      if (f != "")
         {
-          Glib::ustring file = File::get_basename(d.get_selected_filename());
-          if (d_cityset->replaceFileInConfigurationFile(d_cityset->getSignpostFilename()+".png", d.get_selected_filename()))
-            {
-              d_cityset->setSignpostFilename (file);
-              needs_saving = true;
-              update_window_title();
-            }
-          else
-            show_add_file_error(*d.get_dialog(), file);
+          d_cityset->setSignpostFilename (f);
+          d_cityset->instantiateSignpostImage();
         }
-      update_cityset_panel();
     }
+  update_cityset_panel();
 }
 
 void CitySetWindow::on_change_ruinpics_clicked()
 {
-  Glib::ustring filename = "";
-  if (d_cityset->getRuinsFilename().empty() == false)
-    filename = d_cityset->getFileFromConfigurationFile(d_cityset->getRuinsFilename() +".png");
-  ImageEditorDialog d(*window, filename, RUIN_TYPES);
-  d.set_title(_("Select a Ruins image"));
-  int response = d.run();
-  if (filename != "")
-    File::erase(filename);
-  if (response == Gtk::RESPONSE_ACCEPT)
+  bool cleared = false;
+  std::vector<PixMask *> frames;
+  for (guint32 i = 0; i < RUIN_TYPES; i++)
+    if (d_cityset->getRuinImage (i))
+      frames.push_back (d_cityset->getRuinImage (i));
+  Glib::ustring imgname = d_cityset->getRuinsFilename();
+  Glib::ustring f =
+    change_image(_("Select a Ruins image"), imgname, RUIN_TYPES, frames,
+                 cleared, d_cityset->getRuinTileWidth ());
+  if (cleared)
+    d_cityset->uninstantiateSameNamedImages (imgname);
+  else
     {
-      if (d.get_selected_filename() != filename)
+      if (f != "")
         {
-          Glib::ustring file = File::get_basename(d.get_selected_filename());
-          if (d_cityset->replaceFileInConfigurationFile(d_cityset->getRuinsFilename()+".png", d.get_selected_filename()))
-            {
-              d_cityset->setRuinsFilename (file);
-              needs_saving = true;
-              update_window_title();
-            }
-          else
-            show_add_file_error(*d.get_dialog(), file);
+          d_cityset->setRuinsFilename (f);
+          d_cityset->instantiateRuinImages();
         }
-      update_cityset_panel();
     }
+  update_cityset_panel();
 }
 
 void CitySetWindow::on_change_templepic_clicked()
 {
-  Glib::ustring filename = "";
-  if (d_cityset->getTemplesFilename().empty() == false)
-    filename = d_cityset->getFileFromConfigurationFile(d_cityset->getTemplesFilename() +".png");
-  ImageEditorDialog d(*window, filename, TEMPLE_TYPES);
-  d.set_title(_("Select a Temples image"));
-  int response = d.run();
-  if (filename != "")
-    File::erase(filename);
-  if (response == Gtk::RESPONSE_ACCEPT)
+  bool cleared = false;
+  std::vector<PixMask *> frames;
+  for (guint32 i = 0; i < TEMPLE_TYPES; i++)
+    if (d_cityset->getTempleImage (i))
+      frames.push_back (d_cityset->getTempleImage (i));
+  Glib::ustring imgname = d_cityset->getTemplesFilename();
+  Glib::ustring f =
+    change_image(_("Select a Temples image"), imgname, TEMPLE_TYPES, frames,
+                 cleared, d_cityset->getTempleTileWidth ());
+  if (cleared)
+    d_cityset->uninstantiateSameNamedImages (imgname);
+  else
     {
-      if (d.get_selected_filename() != filename)
+      if (f != "")
         {
-          Glib::ustring file = File::get_basename(d.get_selected_filename());
-          if (d_cityset->replaceFileInConfigurationFile(d_cityset->getTemplesFilename()+".png", d.get_selected_filename()))
-            {
-              d_cityset->setTemplesFilename (file);
-              needs_saving = true;
-              update_window_title();
-            }
-          else
-            show_add_file_error(*d.get_dialog(), file);
+          d_cityset->setTemplesFilename (f);
+          d_cityset->instantiateTempleImages();
         }
-      update_cityset_panel();
     }
+  update_cityset_panel();
 }
 
 void CitySetWindow::on_change_towerpics_clicked()
 {
-  Glib::ustring filename = "";
-  if (d_cityset->getTowersFilename().empty() == false)
-    filename = d_cityset->getFileFromConfigurationFile(d_cityset->getTowersFilename() +".png");
-  ImageEditorDialog d(*window, filename, MAX_PLAYERS);
-  d.set_title(_("Select a Towers image"));
-  int response = d.run();
-  if (filename != "")
-    File::erase(filename);
-  if (response == Gtk::RESPONSE_ACCEPT)
+  bool cleared = false;
+  std::vector<PixMask *> frames;
+  for (guint32 i = 0; i < MAX_PLAYERS; i++)
+    if (d_cityset->getTowerImage (i))
+      frames.push_back (d_cityset->getTowerImage (i));
+  Glib::ustring imgname = d_cityset->getTowersFilename();
+  Glib::ustring f =
+    change_image(_("Select a Towers image"), imgname, MAX_PLAYERS, frames,
+                 cleared, 1);
+  if (cleared)
+    d_cityset->uninstantiateSameNamedImages (imgname);
+  else
     {
-      if (d.get_selected_filename() != filename)
+      if (f != "")
         {
-          Glib::ustring file = File::get_basename(d.get_selected_filename());
-          if (d_cityset->replaceFileInConfigurationFile(d_cityset->getTowersFilename()+".png", d.get_selected_filename()))
-            {
-              d_cityset->setTowersFilename (file);
-              needs_saving = true;
-              update_window_title();
-            }
-          else
-            show_add_file_error(*d.get_dialog(), file);
+          d_cityset->setTowersFilename (f);
+          d_cityset->instantiateTowerImages();
         }
-      update_cityset_panel();
     }
+  update_cityset_panel();
+}
+
+Glib::ustring CitySetWindow::change_image(Glib::ustring msg, Glib::ustring imgname, int num, std::vector<PixMask *> frames, bool &cleared, int tw)
+{
+  Glib::ustring newfile = "";
+
+  ImageEditorDialog d(*window, imgname, num, frames,
+                      EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE * (double)tw);
+  d.set_title(msg);
+  int response = d.run();
+  if (response == Gtk::RESPONSE_ACCEPT && d.get_filename() != "")
+    {
+      Glib::ustring newname = "";
+      bool success = false;
+      if (imgname.empty () == true)
+        success = d_cityset->addFileInCfgFile(d.get_filename(), newname);
+      else
+        success =
+          d_cityset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
+      if (success)
+        {
+          newfile = newname;
+          needs_saving = true;
+          update_window_title();
+        }
+      else
+        show_add_file_error(*d.get_dialog(), d.get_filename ());
+    }
+  else if (response == Gtk::RESPONSE_REJECT)
+    {
+      if (d_cityset->removeFileInCfgFile(imgname))
+        {
+          needs_saving = true;
+          update_window_title();
+          cleared = true;
+          newfile = "";
+        }
+      else
+        show_remove_file_error(*d.get_dialog(), imgname);
+    }
+  return newfile;
 }
 
 void CitySetWindow::update_window_title()
@@ -786,7 +795,7 @@ void CitySetWindow::update_window_title()
   Glib::ustring title = "";
   if (needs_saving)
     title += "*";
-  title += File::get_basename(current_save_filename, true);
+  title += d_cityset->getName();
   title += " - ";
   title += _("Cityset Editor");
   window->set_title(title);
@@ -794,9 +803,21 @@ void CitySetWindow::update_window_title()
 
 void CitySetWindow::show_add_file_error(Gtk::Dialog &d, Glib::ustring file)
 {
-  Glib::ustring m = 
-    String::ucompose(_("Couldn't add %1.png to:\n%2"),
-                     file, d_cityset->getConfigurationFile());
+  Glib::ustring errmsg = Glib::strerror(errno);
+  Glib::ustring m =
+    String::ucompose(_("Couldn't add %1 to:\n%2\n%3"),
+                     file, d_cityset->getConfigurationFile(), errmsg);
+  Gtk::MessageDialog td(d, m);
+  td.run();
+  td.hide();
+}
+
+void CitySetWindow::show_remove_file_error(Gtk::Dialog &d, Glib::ustring file)
+{
+  Glib::ustring errmsg = Glib::strerror(errno);
+  Glib::ustring m =
+    String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
+                     file, d_cityset->getConfigurationFile(), errmsg);
   Gtk::MessageDialog td(d, m);
   td.run();
   td.hide();
@@ -811,6 +832,202 @@ CitySetWindow::~CitySetWindow()
 void CitySetWindow::on_tutorial_video_activated()
 {
   GError *errs = NULL;
-  gtk_show_uri(window->get_screen()->gobj(), 
+  gtk_show_uri(window->get_screen()->gobj(),
                "http://vimeo.com/97837645", 0, &errs);
 }
+
+bool CitySetWindow::check_discard (Glib::ustring msg)
+{
+  if (needs_saving)
+    {
+      EditorSaveChangesDialog d (*window, msg);
+      int response = d.run_and_hide();
+
+      if (response == Gtk::RESPONSE_CANCEL) // we don't want to new
+        return false;
+
+      else if (response == Gtk::RESPONSE_ACCEPT) // save it
+        {
+          if (check_save_valid (true))
+            {
+              bool saved = false;
+              if (d_cityset->getDirectory ().empty () == false)
+                  saved = save_current_cityset_file_as ();
+              else
+                {
+                  if (save_current_cityset_file ())
+                    saved = true;
+                }
+              if (!saved)
+                return false;
+            }
+          else
+            return false;
+        }
+    }
+  return true;
+}
+
+bool CitySetWindow::check_save_valid (bool existing)
+{
+  if (check_name_valid (existing) == false)
+    return false;
+
+  if (d_cityset->validate () == false)
+    {
+      if (existing &&
+          GameMap::getInstance()->getCitysetId() == d_cityset->getId())
+        {
+          Glib::ustring errmsg =
+            _("Cityset is invalid, and is also the current working cityset.");
+          Glib::ustring msg = _("Error!  Cityset could not be saved.");
+          msg += "\n" + current_save_filename + "\n" + errmsg;
+          Gtk::MessageDialog dialog(*window, msg);
+          dialog.run();
+          dialog.hide();
+          return false;
+        }
+      else
+        {
+          Gtk::MessageDialog
+            dialog(*window,
+                   _("The cityset is invalid.  Do you want to proceed?"));
+          dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+          int response = dialog.run();
+          dialog.hide();
+          if (response == Gtk::RESPONSE_CANCEL)
+            return false;
+        }
+    }
+  return true;
+}
+
+bool CitySetWindow::check_name_valid (bool existing)
+{
+  Glib::ustring name = d_cityset->getName ();
+  Glib::ustring newname = "";
+  if (existing)
+    {
+      Cityset *oldcityset =
+        Citysetlist::getInstance ()->get(d_cityset->getId());
+      if (oldcityset && oldcityset->getName () != name)
+          newname = oldcityset->getName ();
+    }
+  guint32 num = 0;
+  Glib::ustring n = String::utrim (String::strip_trailing_numbers (name));
+  if (n == "")
+    n = _("Untitled");
+  if (newname.empty () == true)
+    newname =
+      Citysetlist::getInstance()->findFreeName(n, 100, num,
+                                               d_cityset->getTileSize ());
+  if (name == "")
+    {
+      if (newname.empty() == true)
+        {
+          Glib::ustring msg =
+            _("The cityset has an invalid name.\nChange it and save again.");
+          Gtk::MessageDialog d(*window, msg);
+          d.run();
+          d.hide();
+          on_edit_cityset_info_activated ();
+          return false;
+        }
+      else
+        {
+          Glib::ustring msg =
+            String::ucompose (_("The cityset has an invalid name.\nChange it to '%1'?"), newname);
+          Gtk::MessageDialog d(*window, msg);
+          d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+          int response = d.run();
+          d.hide();
+          if (response == Gtk::RESPONSE_CANCEL)
+            return false;
+          d_cityset->setName (newname);
+        }
+    }
+
+  //okay the question is whether or not the name is already used.
+  bool same_name = false;
+  Glib::ustring file =
+    Citysetlist::getInstance()->lookupConfigurationFileByName(d_cityset);
+  if (file == "")
+    return true;
+
+  Glib::ustring cfgfile = d_cityset->getConfigurationFile(true);
+
+  if (existing) // this means we're doing File->Save
+    {
+      if (file == cfgfile)
+        return true;
+      same_name = true;
+    }
+  else // this means we're doing File->Save As
+    same_name = true;
+
+  if (same_name)
+    {
+      if (newname.empty() == true)
+        {
+          Glib::ustring msg =
+            _("The cityset has the same name as another cityset.\nChange it and save again.");
+          Gtk::MessageDialog d(*window, msg);
+          d.run();
+          d.hide();
+          on_edit_cityset_info_activated ();
+          return false;
+        }
+      else
+        {
+          Glib::ustring msg =
+            String::ucompose (_("The cityset has the same name as another cityset.\nChange it to '%1' instead?."), newname);
+
+          Gtk::MessageDialog d(*window, msg);
+          d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+          int response = d.run();
+          d.hide();
+          if (response == Gtk::RESPONSE_CANCEL)
+            return false;
+          d_cityset->setName (newname);
+        }
+    }
+
+  return true;
+}
+
+bool CitySetWindow::isValidName ()
+{
+  Glib::ustring file =
+    Citysetlist::getInstance()->lookupConfigurationFileByName(d_cityset);
+  if (file == "")
+    return true;
+  if (file == d_cityset->getConfigurationFile (true))
+    return true;
+  return false;
+}
+
+/*
+ some test cases
+  1. create a new cityset from scratch, save invalid set, close, load it
+  2. create a new cityset from scratch, save valid set, then switch sets
+  3. save a copy of the default cityset, and switch sets
+  4. modify the working cityset so we can see it change in scenario builder
+  5. modify the working cityset so that it's invalid, try to save
+  6. try adding an image file that isn't a .png
+  7. try adding an image file that says it's a .png but is actually a .jpg
+  8. try adding an image file that says it's a .png but is actually random data
+  9. try saving a new cityset that has a same name
+ 10. try saving an existing cityset that has a same name
+ 11. validate a cityset without: the port picture
+ 12. validate a cityset without: the towers picture
+ 13. try saving a new cityset that has an empty name
+ 14. validate a cityset with a same name
+ 15. validate a cityset with an empty name
+ 16. make a new invalid cityset and quit save it
+ 17. load a writable cityset, modify and quit save it
+ 18. load a writable cityset, make it invalid, and then quit save it
+ 19. try saving a cityset we don't have permission to save
+ 20. try quit-saving a cityset we don't have permission to save
+*/
+
+

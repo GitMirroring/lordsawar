@@ -589,7 +589,8 @@ class SelectorPixMaskCacheItem
 {
 public:
     static PixMask *generate(SelectorPixMaskCacheItem item);
-    static bool loadSelectorImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks);
+    static bool loadSelectorImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale);
+    static bool loadSelectors(PixMask *p, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale);
     int comp(const SelectorPixMaskCacheItem item) const;
     bool operator == (const SelectorPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const SelectorPixMaskCacheItem &c) const {return comp(c)<0;};
@@ -627,7 +628,8 @@ class FlagPixMaskCacheItem
 {
 public:
     static PixMask *generate(FlagPixMaskCacheItem item);
-    static bool loadFlagImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks);
+    static bool loadFlagImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale);
+    static bool loadFlagImages(PixMask *p, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale);
     int comp(const FlagPixMaskCacheItem item) const;
     bool operator == (const FlagPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const FlagPixMaskCacheItem &c) const {return comp(c)<0;};

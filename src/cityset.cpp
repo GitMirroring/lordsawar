@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2010, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2008, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -132,12 +132,19 @@ Cityset::Cityset(XML_Helper *helper, Glib::ustring directory)
   helper->getData(ts, "tilesize");
   setTileSize(ts);
   helper->getData(d_cities_filename, "cities");
+  File::add_png_if_no_ext (d_cities_filename);
   helper->getData(d_razedcities_filename, "razed_cities");
+  File::add_png_if_no_ext (d_razedcities_filename);
   helper->getData(d_port_filename, "port");
+  File::add_png_if_no_ext (d_port_filename);
   helper->getData(d_signpost_filename, "signpost");
+  File::add_png_if_no_ext (d_signpost_filename);
   helper->getData(d_ruins_filename, "ruins");
+  File::add_png_if_no_ext (d_ruins_filename);
   helper->getData(d_temples_filename, "temples");
+  File::add_png_if_no_ext (d_temples_filename);
   helper->getData(d_towers_filename, "towers");
+  File::add_png_if_no_ext (d_towers_filename);
   helper->getData(d_city_tile_width, "city_tile_width");
   helper->getData(d_temple_tile_width, "temple_tile_width");
   helper->getData(d_ruin_tile_width, "ruin_tile_width");
@@ -238,8 +245,7 @@ bool Cityset::save(Glib::ustring filename, Glib::ustring ext) const
   helper.close();
   if (broken == true)
     return false;
-  broken = saveTar(tmpfile, tmpfile + ".tar", goodfilename);
-  return !broken;
+  return saveTar(tmpfile, tmpfile + ".tar", goodfilename);
 }
 
 bool Cityset::save(XML_Helper *helper) const
@@ -324,14 +330,13 @@ void Cityset::instantiateImages(Glib::ustring port_filename,
 				Glib::ustring towers_filename,
 				Glib::ustring ruins_filename,
 				Glib::ustring temples_filename,
-                                bool &broken)
+                                bool scale, bool &broken)
 {
   if (port_filename.empty() == false && !broken)
     setPortImage (PixMask::create(port_filename, broken));
   if (signpost_filename.empty() == false && !broken)
     setSignpostImage (PixMask::create(signpost_filename, broken));
 
-      
   int citysize = getTileSize() * d_city_tile_width;
   if (cities_filename.empty() == false && !broken)
     {
@@ -341,8 +346,11 @@ void Cityset::instantiateImages(Glib::ustring port_filename,
         {
           for (unsigned int i = 0; i < MAX_PLAYERS + 1; i++)
             {
-              if (pics[i]->get_width() != citysize)
-                PixMask::scale(pics[i], citysize, citysize);
+              if (scale)
+                {
+                  if (pics[i]->get_width() != citysize)
+                    PixMask::scale(pics[i], citysize, citysize);
+                }
               setCityImage(i, pics[i]);
             }
         }
@@ -356,8 +364,11 @@ void Cityset::instantiateImages(Glib::ustring port_filename,
         {
           for (unsigned int i = 0; i < MAX_PLAYERS; i++)
             {
-              if (pics[i]->get_width() != citysize)
-                PixMask::scale(pics[i], citysize, citysize);
+              if (scale)
+                {
+                  if (pics[i]->get_width() != citysize)
+                    PixMask::scale(pics[i], citysize, citysize);
+                }
               setRazedCityImage(i, pics[i]);
             }
         }
@@ -371,8 +382,11 @@ void Cityset::instantiateImages(Glib::ustring port_filename,
         {
           for (unsigned int i = 0; i < MAX_PLAYERS; i++)
             {
-              if (pics[i]->get_width() != (int)getTileSize())
-                PixMask::scale(pics[i], getTileSize(), getTileSize());
+              if (scale)
+                {
+                  if (pics[i]->get_width() != (int)getTileSize())
+                    PixMask::scale(pics[i], getTileSize(), getTileSize());
+                }
               setTowerImage(i, pics[i]);
             }
         }
@@ -387,8 +401,11 @@ void Cityset::instantiateImages(Glib::ustring port_filename,
           int ruinsize = getTileSize() * d_ruin_tile_width;
           for (unsigned int i = 0; i < RUIN_TYPES ; i++)
             {
-              if (pics[i]->get_width() != ruinsize)
-                PixMask::scale(pics[i], ruinsize, ruinsize);
+              if (scale)
+                {
+                  if (pics[i]->get_width() != ruinsize)
+                    PixMask::scale(pics[i], ruinsize, ruinsize);
+                }
               setRuinImage(i, pics[i]);
             }
         }
@@ -403,15 +420,18 @@ void Cityset::instantiateImages(Glib::ustring port_filename,
           int templesize = getTileSize() * d_temple_tile_width;
           for (unsigned int i = 0; i < TEMPLE_TYPES ; i++)
             {
-              if (pics[i]->get_width() != templesize)
-                PixMask::scale(pics[i], templesize, templesize);
+              if (scale)
+                {
+                  if (pics[i]->get_width() != templesize)
+                    PixMask::scale(pics[i], templesize, templesize);
+                }
               setTempleImage(i, pics[i]);
             }
         }
     }
 }
 
-void Cityset::instantiateImages(bool &broken)
+void Cityset::instantiateImages(bool scale, bool &broken)
 {
   debug("Loading images for cityset " << getName());
   uninstantiateImages();
@@ -428,23 +448,23 @@ void Cityset::instantiateImages(bool &broken)
   Glib::ustring temples_filename = "";
 
   if (getPortFilename().empty() == false && !broken)
-    port_filename = t.getFile(getPortFilename() + ".png", broken);
+    port_filename = t.getFile(getPortFilename(), broken);
   if (getSignpostFilename().empty() == false && !broken)
-    signpost_filename = t.getFile(getSignpostFilename() + ".png", broken);
+    signpost_filename = t.getFile(getSignpostFilename(), broken);
   if (getCitiesFilename().empty() == false && !broken)
-    cities_filename = t.getFile(getCitiesFilename() + ".png", broken);
+    cities_filename = t.getFile(getCitiesFilename(), broken);
   if (getRazedCitiesFilename().empty() == false && !broken)
-    razed_cities_filename = t.getFile(getRazedCitiesFilename() + ".png", broken);
+    razed_cities_filename = t.getFile(getRazedCitiesFilename(), broken);
   if (getTowersFilename().empty() == false && !broken)
-    towers_filename = t.getFile(getTowersFilename() + ".png", broken);
+    towers_filename = t.getFile(getTowersFilename(), broken);
   if (getRuinsFilename().empty() == false && !broken)
-    ruins_filename = t.getFile(getRuinsFilename() + ".png", broken);
+    ruins_filename = t.getFile(getRuinsFilename(), broken);
   if (getTemplesFilename().empty() == false && !broken)
-    temples_filename = t.getFile(getTemplesFilename() + ".png", broken);
+    temples_filename = t.getFile(getTemplesFilename(), broken);
   if (!broken)
     instantiateImages(port_filename, signpost_filename, cities_filename,
                       razed_cities_filename, towers_filename, ruins_filename,
-                      temples_filename, broken);
+                      temples_filename, scale, broken);
   if (port_filename != "")
     File::erase(port_filename);
   if (signpost_filename != "")
@@ -465,6 +485,8 @@ void Cityset::instantiateImages(bool &broken)
 bool Cityset::validate()
 {
   bool valid = true;
+  if (String::utrim (getName ()) == "")
+    return false;
   if (validateCitiesFilename() == false)
     return false;
   if (validateRazedCitiesFilename() == false)
@@ -578,12 +600,12 @@ void Cityset::reload(bool &broken)
       uninstantiateImages();
       Glib::ustring basename = getBaseName();
       *this = *d.cityset;
-      instantiateImages(broken);
+      instantiateImages(true, broken);
       setBaseName(basename);
     }
 }
 
-guint32 Cityset::calculate_preferred_tile_size() const
+bool Cityset::calculate_preferred_tile_size(guint32 &ts) const
 {
   guint32 tilesize = 0;
   std::map<guint32, guint32> sizecounts;
@@ -613,9 +635,15 @@ guint32 Cityset::calculate_preferred_tile_size() const
           tilesize = (*it).first;
         }
     }
+  bool ret = true;
   if (tilesize == 0)
-    tilesize = DEFAULT_CITY_TILE_SIZE;
-  return tilesize;
+    {
+      ts = DEFAULT_CITY_TILE_SIZE;
+      ret = false;
+    }
+  else
+    ts = tilesize;
+  return ret;
 }
 
 guint32 Cityset::countEmptyImageNames() const
@@ -658,5 +686,277 @@ Cityset* Cityset::copy(const Cityset *cityset)
   if (!cityset)
     return NULL;
   return new Cityset(*cityset);
+}
+
+void Cityset::clearCitiesImage (bool clear_name)
+{
+  if (clear_name)
+    setCitiesFilename ("");
+
+  for (unsigned int i = 0; i < MAX_PLAYERS + 1; i++)
+    {
+      PixMask *p = getCityImage (i);
+      delete p;
+      setCityImage (i, NULL);
+    }
+}
+
+bool Cityset::instantiateCityImages ()
+{
+  clearCitiesImage (false);
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getCitiesFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          std::vector<PixMask* > pics;
+          pics = disassemble_row(filename, MAX_PLAYERS + 1, broken);
+          if (!broken)
+            {
+              for (unsigned int i = 0; i < MAX_PLAYERS + 1; i++)
+                setCityImage(i, pics[i]);
+            }
+        }
+    }
+  return broken;
+}
+
+void Cityset::clearRazedCitiesImage (bool clear_name)
+{
+  if (clear_name)
+    setRazedCitiesFilename ("");
+
+  for (unsigned int i = 0; i < MAX_PLAYERS; i++)
+    {
+      PixMask *p = getRazedCityImage (i);
+      delete p;
+      setRazedCityImage (i, NULL);
+    }
+}
+
+bool Cityset::instantiateRazedCityImages ()
+{
+  clearRazedCitiesImage (false);
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getRazedCitiesFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          std::vector<PixMask* > pics;
+          pics = disassemble_row(filename, MAX_PLAYERS, broken);
+          if (!broken)
+            {
+              for (unsigned int i = 0; i < MAX_PLAYERS; i++)
+                setRazedCityImage(i, pics[i]);
+            }
+        }
+    }
+  return broken;
+}
+
+void Cityset::clearPortImage (bool clear_name)
+{
+  if (clear_name)
+    setPortFilename ("");
+
+  PixMask *p = getPortImage ();
+  if (p)
+    delete p;
+  setPortImage (NULL);
+}
+
+bool Cityset::instantiatePortImage ()
+{
+  clearPortImage (false);
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getPortFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        setPortImage (PixMask::create(filename, broken));
+    }
+  return broken;
+}
+
+void Cityset::clearSignpostImage (bool clear_name)
+{
+  if (clear_name)
+    setSignpostFilename ("");
+
+  PixMask *p = getSignpostImage ();
+  if (p)
+    delete p;
+  setSignpostImage (NULL);
+}
+
+bool Cityset::instantiateSignpostImage ()
+{
+  clearSignpostImage (false);
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getSignpostFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        setSignpostImage (PixMask::create(filename, broken));
+    }
+  return broken;
+}
+
+void Cityset::clearRuinsImage (bool clear_name)
+{
+  if (clear_name)
+    setRuinsFilename ("");
+
+  for (unsigned int i = 0; i < RUIN_TYPES; i++)
+    {
+      PixMask *p = getRuinImage (i);
+      delete p;
+      setRuinImage (i, NULL);
+    }
+}
+
+bool Cityset::instantiateRuinImages ()
+{
+  clearRuinsImage (false);
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getRuinsFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          std::vector<PixMask* > pics =
+            disassemble_row(filename, RUIN_TYPES, broken);
+          if (!broken)
+            {
+              for (unsigned int i = 0; i < RUIN_TYPES ; i++)
+                setRuinImage(i, pics[i]);
+            }
+        }
+    }
+  return broken;
+}
+
+void Cityset::clearTemplesImage (bool clear_name)
+{
+  if (clear_name)
+    setTemplesFilename ("");
+
+  for (unsigned int i = 0; i < TEMPLE_TYPES; i++)
+    {
+      PixMask *p = getTempleImage (i);
+      delete p;
+      setTempleImage (i, NULL);
+    }
+}
+
+bool Cityset::instantiateTempleImages ()
+{
+  clearTemplesImage (false);
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getTemplesFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          std::vector<PixMask* > pics;
+          pics = disassemble_row(filename, TEMPLE_TYPES, broken);
+          if (!broken)
+            {
+              for (unsigned int i = 0; i < TEMPLE_TYPES ; i++)
+                setTempleImage(i, pics[i]);
+            }
+        }
+    }
+  return broken;
+}
+
+void Cityset::clearTowersImage (bool clear_name)
+{
+  if (clear_name)
+    setTowersFilename ("");
+
+  for (unsigned int i = 0; i < MAX_PLAYERS; i++)
+    {
+      PixMask *p = getTowerImage (i);
+      delete p;
+      setTowerImage (i, NULL);
+    }
+}
+
+bool Cityset::instantiateTowerImages ()
+{
+  clearTowersImage (false);
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getTowersFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          std::vector<PixMask* > pics =
+            disassemble_row(filename, MAX_PLAYERS, broken);
+          if (!broken)
+            {
+              for (unsigned int i = 0; i < MAX_PLAYERS; i++)
+                setTowerImage(i, pics[i]);
+            }
+        }
+    }
+  return broken;
+}
+
+guint32 Cityset::get_default_tile_size ()
+{
+  Cityset *c = new Cityset (1, "");
+  guint32 ts = c->getTileSize ();
+  delete c;
+  return ts;
+}
+
+void Cityset::uninstantiateSameNamedImages (Glib::ustring name)
+{
+  if (getCitiesFilename() == name)
+    clearCitiesImage ();
+  if (getRazedCitiesFilename() == name)
+    clearRazedCitiesImage ();
+  if (getPortFilename() == name)
+    clearPortImage ();
+  if (getSignpostFilename() == name)
+    clearSignpostImage ();
+  if (getRuinsFilename() == name)
+    clearRuinsImage ();
+  if (getTemplesFilename() == name)
+    clearTemplesImage ();
+  if (getTowersFilename() == name)
+    clearTowersImage ();
 }
 // End of file

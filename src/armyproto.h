@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -66,6 +66,9 @@ class ArmyProto : public ArmyProtoBase
         //! Set the image mask of the unit type (for player colours).
         void setMask(Shield::Colour c, PixMask* mask) {d_mask[c] = mask;};
 
+        //! Clear the names, images and masks of the army.
+        void clearImage (Shield::Colour c, bool clear_name = true);
+
 	//! Sets whether or not this Army prototype can found in a ruin.
 	void setDefendsRuins(bool defends) {d_defends_ruins = defends; }
 
@@ -120,10 +123,15 @@ class ArmyProto : public ArmyProtoBase
 	// Methods that operate on class data and modify the class.
 
 	//! Load the pictures associated with this ArmyProto object.
-	void instantiateImages(guint32 tilesize, Tar_Helper *t, bool &broken);
+	void instantiateImages(guint32 tilesize, Tar_Helper *t, bool scale,
+                               bool &broken);
 
 	//! Load the ArmyProto image in the given filename.
-	void instantiateImages(int tilesize, Shield::Colour c, Glib::ustring image_filename, bool &broken);
+	void loadImage(int tilesize, Shield::Colour c, Glib::ustring image_filename, bool scale, bool &broken);
+
+        //! Instantiate the image for the given colour from the lwa file.
+        bool instantiateImage (Glib::ustring cfgfile, guint32 ts, 
+                               Shield::Colour col);
 
 	//! Destroy the images associated with this ArmyProto object.
 	void uninstantiateImages();

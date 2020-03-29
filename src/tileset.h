@@ -1,6 +1,6 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007-2011, 2014, 2017 Ben Asselstine
+// Copyright (C) 2007-2011, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -92,76 +92,78 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	// Get Methods
 
 	//! Returns the basename of the file containing big selector images.
-	Glib::ustring getLargeSelectorFilename() {return d_large_selector;};
+	Glib::ustring getLargeSelectorFilename() const
+          {return d_large_selector;}
 
 	//! Returns the basename of the file containing small selector images.
-	Glib::ustring getSmallSelectorFilename() {return d_small_selector;};
+	Glib::ustring getSmallSelectorFilename() const
+          {return d_small_selector;}
 
 	//! Returns the basename of the file containing the explosion image.
-	Glib::ustring getExplosionFilename() {return d_explosion;};
+	Glib::ustring getExplosionFilename() const {return d_explosion;}
 
 	//! Returns the basename of the file containing the road images.
-	Glib::ustring getRoadsFilename() {return d_roads;};
+	Glib::ustring getRoadsFilename() const {return d_roads;}
 
 	//! Returns the basename of the file containing the stone images.
-	Glib::ustring getStonesFilename() {return d_standing_stones;};
+	Glib::ustring getStonesFilename() const {return d_standing_stones;}
 
 	//! Returns the basename of the file containing the bridge images.
-	Glib::ustring getBridgesFilename() {return d_bridges;};
+	Glib::ustring getBridgesFilename() const {return d_bridges;}
 
 	//! Returns the basename of the file containing the fog images.
-	Glib::ustring getFogFilename() {return d_fog;};
+	Glib::ustring getFogFilename() const {return d_fog;}
 
 	//! Returns the basename of the file containing the flag images.
-	Glib::ustring getFlagsFilename() {return d_flags;};
+	Glib::ustring getFlagsFilename() const {return d_flags;}
 
         //! Get the colour associated with the road on the smallmap.
-	Gdk::RGBA getRoadColor() const {return d_road_color;};
+	Gdk::RGBA getRoadColor() const {return d_road_color;}
 
         //! Get the colour associated with temples on the smallmap.
-	Gdk::RGBA getTempleColor() const {return d_temple_color;};
+	Gdk::RGBA getTempleColor() const {return d_temple_color;}
 
         //! Get the colour associated with ruins on the smallmap.
-	Gdk::RGBA getRuinColor() const {return d_ruin_color;};
+	Gdk::RGBA getRuinColor() const {return d_ruin_color;}
 
 	//! Get the explosion image.
-	PixMask *getExplosionImage() {return explosion;};
+	PixMask *getExplosionImage() {return explosion;}
 
 	//! Get a road image.  Pass in the index.
-	PixMask *getRoadImage(guint32 i) {return roadpic[i];};
+	PixMask *getRoadImage(guint32 i) {return roadpic[i];}
 
 	//! Get a standing stone image.  Pass in the index.
-	PixMask *getStoneImage(guint32 i) {return stonepic[i];};
+	PixMask *getStoneImage(guint32 i) {return stonepic[i];}
 
 	//! Get a bridge image.  Pass in the index.
-	PixMask *getBridgeImage(guint32 i) {return bridgepic[i];};
+	PixMask *getBridgeImage(guint32 i) {return bridgepic[i];}
 
 	//! Get a flag image.  Pass in the index.
-	PixMask *getFlagImage(guint32 i) {return flagpic[i];};
+	PixMask *getFlagImage(guint32 i) {return flagpic[i];}
 
 	//! Get the flag mask.  Pass in the index.
-	PixMask *getFlagMask(guint32 i) {return flagmask[i];};
+	PixMask *getFlagMask(guint32 i) {return flagmask[i];}
 
 	//! Get the fog image.  Passin the index.
-	PixMask *getFogImage(guint32 i) {return fogpic[i];};
+	PixMask *getFogImage(guint32 i) {return fogpic[i];}
 
 	//! Get the big selector image.  Pass in the index.
-	PixMask *getSelectorImage(guint32 i) {return selector[i];};
+	PixMask *getSelectorImage(guint32 i) {return selector[i];}
 
 	//! Get the big selector mask.  Pass in the index.
-	PixMask *getSelectorMask(guint32 i) {return selectormask[i];};
+	PixMask *getSelectorMask(guint32 i) {return selectormask[i];}
 
 	//! Get the small selector image.  Pass in the index.
-	PixMask *getSmallSelectorImage(guint32 i) {return smallselector[i];};
+	PixMask *getSmallSelectorImage(guint32 i) {return smallselector[i];}
 
 	//! Get the small selector mask.  Pass in the index.
-	PixMask *getSmallSelectorMask(guint32 i) {return smallselectormask[i];};
+	PixMask *getSmallSelectorMask(guint32 i) {return smallselectormask[i];}
 
 	//! Get the number of animation frames in the big selector image.
-	guint32 getNumberOfSelectorFrames() {return number_of_selector_frames;};
+	guint32 getNumberOfSelectorFrames() {return number_of_selector_frames;}
 
 	//! Get the number of animation frames in the small selector image.
-	guint32 getNumberOfSmallSelectorFrames() {return number_of_small_selector_frames;};
+	guint32 getNumberOfSmallSelectorFrames() {return number_of_small_selector_frames;}
 
         //! Get the first tile that has a certain pattern on the small map.
         Tile *getFirstTile(SmallTile::Pattern pattern) const;
@@ -171,86 +173,113 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	// Set Methods
 
 	//! Sets the basename of the file containing the big selector images.
-	void setLargeSelectorFilename(Glib::ustring p){d_large_selector = p;};
+	void setLargeSelectorFilename(Glib::ustring p){d_large_selector = p;}
 
 	//! Sets the basename of the file containing the small selector images.
-	void setSmallSelectorFilename(Glib::ustring p){d_small_selector = p;};
+	void setSmallSelectorFilename(Glib::ustring p){d_small_selector = p;}
 
 	//! Sets the basename of the file containing the explosion image.
-	void setExplosionFilename(Glib::ustring p){d_explosion = p;};
+	void setExplosionFilename(Glib::ustring p){d_explosion = p;}
 
 	//! Sets the basename of the file containing the road images.
-	void setRoadsFilename(Glib::ustring p){d_roads = p;};
+	void setRoadsFilename(Glib::ustring p){d_roads = p;}
 
 	//! Sets the basename of the file containing the standing stone images.
-	void setStonesFilename(Glib::ustring p){d_standing_stones = p;};
+	void setStonesFilename(Glib::ustring p){d_standing_stones = p;}
 
 	//! Sets the basename of the file containing the bridge images.
-	void setBridgesFilename(Glib::ustring p){d_bridges = p;};
+	void setBridgesFilename(Glib::ustring p){d_bridges = p;}
 
 	//! Sets the basename of the file containing the fog images.
-	void setFogFilename(Glib::ustring p){d_fog = p;};
+	void setFogFilename(Glib::ustring p){d_fog = p;}
 
 	//! Sets the basename of the file containing the flag images.
-	void setFlagsFilename(Glib::ustring p){d_flags = p;};
+	void setFlagsFilename(Glib::ustring p){d_flags = p;}
 
 	//! Sets the colour of the road on the smallmap.
-	void setRoadColor(Gdk::RGBA color) {d_road_color = color;};
+	void setRoadColor(Gdk::RGBA color) {d_road_color = color;}
 
 	//! Sets the colour of the ruins on the smallmap.
-	void setRuinColor(Gdk::RGBA color) {d_ruin_color = color;};
+	void setRuinColor(Gdk::RGBA color) {d_ruin_color = color;}
 
 	//! Sets the colour of the temples on the smallmap.
-	void setTempleColor(Gdk::RGBA color) {d_temple_color = color;};
+	void setTempleColor(Gdk::RGBA color) {d_temple_color = color;}
 
 	//! Sets the explosion image.
-	void setExplosionImage(PixMask *p) {explosion = p;};
+	void setExplosionImage(PixMask *p) {explosion = p;}
 
 	//! Sets a road image.
-	void setRoadImage(guint32 i, PixMask *p) {roadpic[i] = p;};
+	void setRoadImage(guint32 i, PixMask *p) {roadpic[i] = p;}
 
 	//! Sets a stpone image.
-	void setStoneImage(guint32 i, PixMask *p) {stonepic[i] = p;};
+	void setStoneImage(guint32 i, PixMask *p) {stonepic[i] = p;}
 
 	//! Sets a bridge image.
-	void setBridgeImage(guint32 i, PixMask *p) {bridgepic[i] = p;};
+	void setBridgeImage(guint32 i, PixMask *p) {bridgepic[i] = p;}
 
 	//! Sets a flag image.
-	void setFlagImage(guint32 i, PixMask *p) {flagpic[i] = p;};
+	void setFlagImage(guint32 i, PixMask *p) {flagpic[i] = p;}
 
 	//! Sets a flag mask.
-	void setFlagMask(guint32 i, PixMask *p) {flagmask[i] = p;};
+	void setFlagMask(guint32 i, PixMask *p) {flagmask[i] = p;}
 
 	//! Sets a fog image.
-	void setFogImage(guint32 i, PixMask *p) {fogpic[i] = p;};
+	void setFogImage(guint32 i, PixMask *p) {fogpic[i] = p;}
 
 	//! Sets a big selector image.
-	void setSelectorImage(guint32 i, PixMask *p) {selector[i] = p;};
+	void setSelectorImage(guint32 i, PixMask *p) {selector[i] = p;}
 
 	//! Sets a big selector mask.
-	void setSelectorMask(guint32 i, PixMask *p) {selectormask[i] = p;};
+	void setSelectorMask(guint32 i, PixMask *p) {selectormask[i] = p;}
 
 	//! Sets a small selector image.
-	void setSmallSelectorImage(guint32 i, PixMask *p) {smallselector[i] = p;};
+	void setSmallSelectorImage(guint32 i, PixMask *p) {smallselector[i] = p;}
 	//! Sets a small selector mask.
-	void setSmallSelectorMask(guint32 i, PixMask *p) {smallselectormask[i] = p;};
+	void setSmallSelectorMask(guint32 i, PixMask *p) {smallselectormask[i] = p;}
 
 	//! Sets the number of animation frames in the big selector.
-	void setNumberOfSelectorFrames(guint32 s) {selector.reserve(s); selectormask.reserve(s); number_of_selector_frames = s;};
+	void setNumberOfSelectorFrames(guint32 s) {selector.reserve(s); selectormask.reserve(s); number_of_selector_frames = s;}
 
 	//! Sets the number of animation frames in the small selector.
-	void setNumberOfSmallSelectorFrames(guint32 s) {smallselector.reserve(s);smallselectormask.reserve(s); number_of_small_selector_frames = s;};
+	void setNumberOfSmallSelectorFrames(guint32 s) {smallselector.reserve(s);smallselectormask.reserve(s); number_of_small_selector_frames = s;}
+
+        void clearRoadsImage (bool clear_name = true);
+        void clearStonesImage (bool clear_name = true);
+        void clearBridgesImage (bool clear_name = true);
+        void clearFlagsImage (bool clear_name = true);
+        void clearSmallSelectorImage (bool clear_name = true);
+        void clearLargeSelectorImage (bool clear_name = true);
+        void clearExplosionImage (bool clear_name = true);
+        void clearFogImages (bool clear_name = true);
+        bool instantiateRoadImages();
+        bool instantiateStoneImages();
+        bool instantiateFlagImages();
+        bool instantiateBridgeImages();
+        bool instantiateSmallSelectorImages();
+        bool instantiateLargeSelectorImages();
+        bool instantiateExplosionImage();
+        bool instantiateFogImages();
 
         //! clear the tileset and add the normal tiles to it.
         void populateWithDefaultTiles();
 
 	//Methods that operate on class data and modify the class data.
 
-	//! Destroy the images assoicated with this tileset.
+	//! Destroy the images associated with this tileset.
 	void uninstantiateImages();
+        
+        //! Destroy all images with this name.
+        void uninstantiateSameNamedImages (Glib::ustring name);
 
-	//! Load the images assoicated with this tileset.
-	void instantiateImages(bool &broken);
+        //! Load the images associated with this tileset.
+        /**
+         * Go get the image files from the tileset file and create the
+         * various pixmask objects.
+         *
+         * @param scale   The images are clamped to the tile size or not.
+         * @param broken  True when things went wrong reading the tileset file.
+         */
+	void instantiateImages(bool scale, bool &broken);
 
         //! Load the tileset again.
         void reload(bool &broken);
@@ -300,7 +329,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	bool validate() const;
 
         //! Determine the most common tile size in the graphic files.
-        guint32 calculate_preferred_tile_size() const;
+        bool calculate_preferred_tile_size(guint32 &ts) const;
 
         //! Where does the given tile style live?
         bool getTileStyle(guint32 id, Tile **tile, TileStyleSet **set, TileStyle ** style) const;
@@ -319,6 +348,9 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         static bool upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version);
         static void support_backward_compatibility();
 	
+        static guint32 get_default_tile_size ();
+
+
     private:
         //! Callback to load Tile objects into the Tileset.
         bool loadTile(Glib::ustring, XML_Helper* helper);
@@ -332,7 +364,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 			       Glib::ustring flags_filename,
 			       Glib::ustring selector_filename,
 			       Glib::ustring small_selector_filename,
-                               bool &broken);
+                               bool scale, bool &broken);
         // DATA
 
 	//! The basename of the small selector image.

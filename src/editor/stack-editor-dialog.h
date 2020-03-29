@@ -32,7 +32,7 @@ class StackEditorDialog: public LwEditorDialog
 {
  public:
     StackEditorDialog(Gtk::Window &parent, Stack *stack, int min_size = 1);
-    ~StackEditorDialog() {};
+    ~StackEditorDialog() {}
 
     int run();
     
