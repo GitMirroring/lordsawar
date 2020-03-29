@@ -107,7 +107,6 @@
 [type: gettext/glade]dat/glade/editor/hero-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/backpack-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/editor-quit-dialog.ui
-[type: gettext/glade]dat/glade/editor/tile-size-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/tileset-smallmap-building-colors-dialog.ui
 [type: gettext/glade]dat/glade/editor/cityset-window.ui
 [type: gettext/glade]dat/glade/editor/shieldset-window.ui
