@@ -300,7 +300,6 @@ src/editor/shieldset-window.cpp
 src/editor/tileset-flag-editor-dialog.cpp
 src/editor/tileset-selector-editor-dialog.cpp
 src/editor/editor-quit-dialog.cpp
-src/editor/tile-size-editor-dialog.cpp
 src/editor/editor-splash-window.cpp
 src/editor/image-editor-dialog.cpp
 src/editor/masked-image-editor-dialog.cpp
