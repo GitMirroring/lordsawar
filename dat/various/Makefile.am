@@ -49,7 +49,6 @@ EXTRA_DIST = \
     README \
     waypoints.png \
     buttons.png \
-    buttons-medium.png \
     city_occupied.png \
     medals_mask.png \
     bigmedals.png \
@@ -58,14 +57,13 @@ EXTRA_DIST = \
     recruit_male.png \
     ruin_1.png \
     ruin_2.png \
-    splash_screen.jpg \
+    splash_screen.png \
     win.png \
     lordsawar_logo.png \
     hero.png \
     bag.png \
     hero-inactive.png \
     prodshieldset.png \
-    prodshieldset-medium.png \
     smallruinedcity.png \
     movebonus.png \
     smallunexploredruin.png \
