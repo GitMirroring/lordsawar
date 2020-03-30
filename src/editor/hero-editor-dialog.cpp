@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,31 +34,21 @@ HeroEditorDialog::HeroEditorDialog(Gtk::Window &parent, Hero *hero)
  : LwEditorDialog(parent, "hero-editor-dialog.ui")
 {
   d_hero = hero;
-    
-    xml->get_widget("edit_backpack_button", edit_backpack_button);
-    edit_backpack_button->signal_clicked().connect (method(on_edit_backpack_clicked));
-    xml->get_widget("gender_combobox", gender_combobox);
-    xml->get_widget("name_entry", name_entry);
-    name_entry->set_text(d_hero->getName());
-    gender_combobox->set_active(d_hero->getGender()-1);
+
+  xml->get_widget("edit_backpack_button", edit_backpack_button);
+  edit_backpack_button->signal_clicked().connect (method(on_edit_backpack_clicked));
+  xml->get_widget("gender_combobox", gender_combobox);
+  xml->get_widget("name_entry", name_entry);
+  name_entry->set_text(d_hero->getName());
+  gender_combobox->set_active(d_hero->getGender()-1);
+  gender_combobox->signal_changed ().connect (method (on_gender_changed));
+  name_entry->signal_changed ().connect (method (on_name_changed));
 }
 
-void HeroEditorDialog::run()
+int HeroEditorDialog::run()
 {
   dialog->show_all();
-  Backpack *original_backpack = new Backpack(*d_hero->getBackpack());
-  int response = dialog->run();
-
-  if (response == Gtk::RESPONSE_ACCEPT)	// accepted
-    {
-      d_hero->setName(name_entry->get_text());
-      d_hero->setGender(Hero::Gender(gender_combobox->get_active_row_number()+1));
-    }
-  else
-    {
-      d_hero->getBackpack()->removeAllFromBackpack();
-      d_hero->getBackpack()->add(original_backpack);
-    }
+  return dialog->run ();
 }
 
 void HeroEditorDialog::on_edit_backpack_clicked()
@@ -66,4 +56,14 @@ void HeroEditorDialog::on_edit_backpack_clicked()
   BackpackEditorDialog d(*dialog, d_hero->getBackpack());
   d.run();
   return;
+}
+
+void HeroEditorDialog::on_name_changed ()
+{
+  d_hero->setName (String::utrim (name_entry->get_text ()));
+}
+
+void HeroEditorDialog::on_gender_changed ()
+{
+  d_hero->setGender(Hero::Gender(gender_combobox->get_active_row_number()+1));
 }

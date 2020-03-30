@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -31,15 +31,17 @@ class HeroEditorDialog: public LwEditorDialog
     HeroEditorDialog(Gtk::Window &parent, Hero *hero);
     ~HeroEditorDialog() {}
 
-    void run();
+    int run();
     
  private:
-    Hero*d_hero;
+    Hero *d_hero;
     Gtk::Entry *name_entry;
     Gtk::ComboBox *gender_combobox;
     Gtk::Button *edit_backpack_button;
 	
-    void on_edit_backpack_clicked();
+    void on_edit_backpack_clicked ();
+    void on_name_changed ();
+    void on_gender_changed ();
 };
 
 #endif
