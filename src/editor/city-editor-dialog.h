@@ -36,7 +36,7 @@ class CityEditorDialog: public LwEditorDialog
     ~CityEditorDialog() {}
 
     int run();
-    
+
  private:
     City *city;
     CreateScenarioRandomize *d_randomizer;
@@ -48,7 +48,7 @@ class CityEditorDialog: public LwEditorDialog
     Gtk::Switch *build_production_switch;
 
     Gtk::TreeView *army_treeview;
-    
+
     class ArmyColumns: public Gtk::TreeModelColumnRecord {
     public:
 	ArmyColumns()
@@ -98,6 +98,14 @@ class CityEditorDialog: public LwEditorDialog
     void cell_data_upkeep(Gtk::CellRenderer *renderer, const Gtk::TreeIter& i);
     void on_upkeep_edited(const Glib::ustring &path, const Glib::ustring &new_text);
     void update_buttons();
+    void on_burned_changed ();
+    void on_capital_changed ();
+    void on_name_changed ();
+    void on_income_changed ();
+    void on_income_text_changed ();
+    void on_build_production_changed ();
+
+    void update_armies ();
 
 };
 
