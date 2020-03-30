@@ -52,7 +52,6 @@ class RewardEditorDialog: public LwEditorDialog
     Gtk::SpinButton *gold_spinbutton;
     Gtk::Button *randomize_gold_button;
     Gtk::Button *item_button;
-    Gtk::Button *clear_item_button;
     Gtk::Button *randomize_item_button;
     Gtk::Button *ally_button;
     Gtk::Button *clear_ally_button;

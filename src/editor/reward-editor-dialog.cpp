@@ -56,8 +56,6 @@ RewardEditorDialog::RewardEditorDialog(Gtk::Window &parent, Player *player, bool
   randomize_gold_button->signal_clicked().connect (method(on_randomize_gold_clicked));
   xml->get_widget("item_button", item_button);
   item_button->signal_clicked().connect (method(on_item_clicked));
-  xml->get_widget("clear_item_button", clear_item_button);
-  clear_item_button->signal_clicked().connect (method(on_clear_item_clicked));
   xml->get_widget("randomize_item_button", randomize_item_button);
   randomize_item_button->signal_clicked().connect (method(on_randomize_item_clicked));
   set_item_name();
@@ -224,6 +222,8 @@ void RewardEditorDialog::on_item_clicked()
       item = new Item(*itemproto, id);
       set_item_name();
     }
+  else
+    on_clear_item_clicked ();
 }
 
 void RewardEditorDialog::on_clear_item_clicked()
