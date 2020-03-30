@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,20 +36,20 @@ BackpackEditorDialog::BackpackEditorDialog(Gtk::Window &parent, Backpack *pack)
  : LwEditorDialog(parent, "backpack-editor-dialog.ui")
 {
   backpack = pack;
-  working = new Backpack(*pack);
-    
-    xml->get_widget("remove_button", remove_button);
-    xml->get_widget("add_button", add_button);
-    remove_button->signal_clicked().connect(method(on_remove_item_clicked));
-    add_button->signal_clicked().connect(method(on_add_item_clicked));
-    
-    item_list = Gtk::ListStore::create(item_columns);
-    xml->get_widget("treeview", item_treeview);
-    item_treeview->set_model(item_list);
-    item_treeview->append_column(_("Name"), item_columns.name);
-    item_treeview->append_column(_("Attributes"), item_columns.attributes);
 
-    item_treeview->get_selection()->signal_changed().connect(method(on_item_selection_changed));
+  xml->get_widget("remove_button", remove_button);
+  xml->get_widget("add_button", add_button);
+  remove_button->signal_clicked().connect(method(on_remove_item_clicked));
+  add_button->signal_clicked().connect(method(on_add_item_clicked));
+
+  item_list = Gtk::ListStore::create(item_columns);
+  xml->get_widget("treeview", item_treeview);
+  item_treeview->set_model(item_list);
+  item_treeview->append_column(_("Name"), item_columns.name);
+  item_treeview->append_column(_("Attributes"), item_columns.attributes);
+
+  item_treeview->get_selection()->signal_changed().connect(method(on_item_selection_changed));
+  fill_bag ();
 }
 
 void BackpackEditorDialog::hide()
@@ -60,35 +60,39 @@ void BackpackEditorDialog::hide()
 int BackpackEditorDialog::run()
 {
   dialog->show_all();
+  return dialog->run ();
+
+  /*
   fill_bag();
   on_item_selection_changed();
   int response = dialog->run();
-  if (response == Gtk::RESPONSE_ACCEPT)	// accepted
+  if (response == Gtk::RESPONSE_ACCEPT)
     {
       backpack->removeAllFromBackpack();
       backpack->add(working);
     }
   return response;
+  */
 }
 
 void BackpackEditorDialog::on_item_selection_changed()
 {
-    Gtk::TreeIter i = item_treeview->get_selection()->get_selected();
-    if (i)
-      remove_button->set_sensitive(true);
-    else
-      remove_button->set_sensitive(false);
+  Gtk::TreeIter i = item_treeview->get_selection()->get_selected();
+  if (i)
+    remove_button->set_sensitive(true);
+  else
+    remove_button->set_sensitive(false);
 }
 
 void BackpackEditorDialog::on_remove_item_clicked()
 {
-    Gtk::TreeIter i = item_treeview->get_selection()->get_selected();
-    if (i)
+  Gtk::TreeIter i = item_treeview->get_selection()->get_selected();
+  if (i)
     {
-	Item *item = (*i)[item_columns.item];
-	working->removeFromBackpack(item);
-	item_list->erase(item_treeview->get_selection()->get_selected());
-	on_item_selection_changed();
+      Item *item = (*i)[item_columns.item];
+      backpack->removeFromBackpack(item);
+      item_list->erase(item_treeview->get_selection()->get_selected());
+      on_item_selection_changed();
     }
 }
 
@@ -101,7 +105,7 @@ void BackpackEditorDialog::on_add_item_clicked()
   if (itemproto)
     {
       Item *item = new Item(*itemproto, id);
-      working->addToBackpack(item);
+      backpack->addToBackpack(item);
       add_item(item);
       on_item_selection_changed();
     }
@@ -109,21 +113,16 @@ void BackpackEditorDialog::on_add_item_clicked()
 
 void BackpackEditorDialog::add_item(Item *item)
 {
-    Gtk::TreeIter i = item_list->append();
-    (*i)[item_columns.name] = item->getName();
-
-    (*i)[item_columns.attributes] = item->getBonusDescription();
-    
-    (*i)[item_columns.item] = item;
+  Gtk::TreeIter i = item_list->append();
+  (*i)[item_columns.name] = item->getName();
+  (*i)[item_columns.attributes] = item->getBonusDescription();
+  (*i)[item_columns.item] = item;
 }
 
 void BackpackEditorDialog::fill_bag()
 {
-	
-    // populate the item list
-    item_list->clear();
-    for (Backpack::iterator i = working->begin(); i != working->end(); ++i)
-	add_item(*i);
-
+  item_list->clear();
+  for (Backpack::iterator i = backpack->begin(); i != backpack->end(); ++i)
+    add_item(*i);
   return;
 }

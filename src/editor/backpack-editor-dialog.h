@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,14 +30,13 @@ class BackpackEditorDialog: public LwEditorDialog
 {
  public:
     BackpackEditorDialog(Gtk::Window &parent, Backpack *backpack);
-    ~BackpackEditorDialog() {delete working;}
+    ~BackpackEditorDialog() {}
 
     int run();
     void hide();
     
  private:
-    Backpack *backpack; //destination backpack
-    Backpack *working; //the backpack we're going to work with before that
+    Backpack *backpack;
 
     Gtk::TreeView *item_treeview;
     Gtk::Button *remove_button;
@@ -55,13 +54,11 @@ class BackpackEditorDialog: public LwEditorDialog
     const ItemColumns item_columns;
     Glib::RefPtr<Gtk::ListStore> item_list;
 
-
     void on_item_selection_changed();
     void on_remove_item_clicked();
     void on_add_item_clicked();
 
     void add_item(Item *item);
-
     void fill_bag();
 };
 

@@ -24,29 +24,13 @@
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
-              <object class="GtkButton" id="cancel_button">
-                <property name="label" translatable="yes">Cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="has_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="has_default">True</property>
-                <property name="receives_default">False</property>
-                <property name="use_underline">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkButton" id="accept_button">
-                <property name="label" translatable="yes">OK</property>
+                <property name="label">gtk-close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_underline">True</property>
+                <property name="use_stock">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -123,12 +107,13 @@
                             <property name="spacing">6</property>
                             <child>
                               <object class="GtkButton" id="remove_button">
-                                <property name="label" translatable="yes">Remove item</property>
+                                <property name="label">gtk-remove</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="receives_default">False</property>
                                 <property name="tooltip_text" translatable="yes">Stop producing armies</property>
                                 <property name="use_underline">True</property>
+                                <property name="use_stock">True</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -139,12 +124,13 @@
                             </child>
                             <child>
                               <object class="GtkButton" id="add_button">
-                                <property name="label" translatable="yes">Add Item</property>
+                                <property name="label">gtk-add</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="receives_default">False</property>
                                 <property name="tooltip_text" translatable="yes">Buy a production capability</property>
                                 <property name="use_underline">True</property>
+                                <property name="use_stock">True</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -186,7 +172,6 @@
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-6">cancel_button</action-widget>
       <action-widget response="-3">accept_button</action-widget>
     </action-widgets>
   </object>
