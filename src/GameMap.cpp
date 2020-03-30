@@ -1,7 +1,8 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2003, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006-2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2017,
+// 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 // Copyright (C) 2008 Janek Kozicki
 //
@@ -1917,6 +1918,7 @@ Rectangle GameMap::putTerrain(Rectangle r, Tile::Type type, int tile_style_id, b
             else
               t->setIndex(index);
             updateShips(Vector<int>(x,y));
+            updateTowers(Vector<int>(x,y));
             replaced = true;
           }
       }
@@ -2114,6 +2116,20 @@ void GameMap::updateShips(Vector<int> pos)
 	}
     }
 }
+
+void GameMap::updateTowers (Vector<int> pos)
+{
+  std::vector<Stack*> stks = getStacks(pos)->getStacks();
+  for (std::vector<Stack *>::iterator it = stks.begin(); it != stks.end(); it++)
+    {
+      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); sit++)
+	{
+          if (((*sit)->getFortified ()) && !can_defend(*it))
+            (*sit)->setFortified (false);
+	}
+    }
+}
+
 Location *GameMap::getLocation(Vector<int> tile)
 {
   switch (getBuilding(tile))

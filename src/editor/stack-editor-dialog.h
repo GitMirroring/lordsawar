@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,16 +35,16 @@ class StackEditorDialog: public LwEditorDialog
     ~StackEditorDialog() {}
 
     int run();
-    
+
  private:
     Gtk::ComboBoxText *player_combobox;
 
     Gtk::TreeView *army_treeview;
-    
+
     class ArmyColumns: public Gtk::TreeModelColumnRecord {
     public:
 	ArmyColumns()
-	    { add(army); add(image); add(strength); add(moves); add(upkeep); 
+	    { add(army); add(image); add(strength); add(moves); add(upkeep);
 	    add(name);}
 
 	Gtk::TreeModelColumn<Army *> army;
@@ -88,6 +88,7 @@ class StackEditorDialog: public LwEditorDialog
     void on_upkeep_edited(const Glib::ustring &path, const Glib::ustring &new_text);
 
     Player *get_selected_player();
+    void update_armies ();
 };
 
 #endif

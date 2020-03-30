@@ -1,7 +1,7 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2003, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2020 Ben Asselstine
 // Copyright (C) 2008 Janek Kozicki
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -1447,6 +1447,7 @@ class GameMap: public sigc::trackable
 	void removeBuilding(LocationBox *b);
 
 	void updateShips(Vector<int> pos);
+        void updateTowers (Vector<int> pos);
 
         static void changeFootprintToSmallerCityset(Location *location, Maptile::Building building_type, guint32 old_tile_width);
 
