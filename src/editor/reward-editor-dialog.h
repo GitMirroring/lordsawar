@@ -62,7 +62,6 @@ class RewardEditorDialog: public LwEditorDialog
     Gtk::SpinButton *map_height_spinbutton;
     Gtk::Button *randomize_map_button;
     Gtk::Button *randomize_hidden_ruin_button;
-    Gtk::Button *clear_hidden_ruin_button;
     Gtk::Button *hidden_ruin_button;
 
     void on_randomize_gold_clicked();

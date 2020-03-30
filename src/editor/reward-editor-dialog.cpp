@@ -80,9 +80,6 @@ RewardEditorDialog::RewardEditorDialog(Gtk::Window &parent, Player *player, bool
 
   xml->get_widget("hidden_ruin_button", hidden_ruin_button);
   hidden_ruin_button->signal_clicked().connect (method(on_hidden_ruin_clicked));
-  xml->get_widget("clear_hidden_ruin_button", clear_hidden_ruin_button);
-  clear_hidden_ruin_button->signal_clicked().connect
-    (method(on_clear_hidden_ruin_clicked));
   xml->get_widget("randomize_hidden_ruin_button", randomize_hidden_ruin_button);
   randomize_hidden_ruin_button->signal_clicked().connect
     (method(on_randomize_hidden_ruin_clicked));
@@ -321,6 +318,11 @@ void RewardEditorDialog::on_hidden_ruin_clicked()
     {
       on_clear_hidden_ruin_clicked();
       hidden_ruin = new Ruin(*(d.get_selected_hidden_ruin()));
+      set_hidden_ruin_name();
+    }
+  else
+    {
+      on_clear_hidden_ruin_clicked();
       set_hidden_ruin_name();
     }
 }
