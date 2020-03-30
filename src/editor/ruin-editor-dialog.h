@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -41,21 +41,16 @@ class RuinEditorDialog: public LwEditorDialog
  private:
     Gtk::Entry *name_entry;
     Gtk::Entry *description_entry;
-    Gtk::SpinButton *type_entry;
+    Gtk::SpinButton *type_spinbutton;
     Gtk::Button *keeper_button;
     Gtk::Button *randomize_name_button;
-    Gtk::Button *clear_keeper_button;
     Gtk::Button *randomize_keeper_button;
     Gtk::Switch *hidden_switch;
     Gtk::ComboBoxText *player_combobox;
     Gtk::Box *new_reward_hbox;
     Gtk::Switch *random_reward_switch;
     Gtk::Button *reward_button;
-    Gtk::Button *clear_reward_button;
-    Gtk::Button *randomize_reward_button;
-    Gtk::Button *reward_list_button;
     Ruin *ruin;
-    Stack *keeper;
     Reward *reward;
     CreateScenarioRandomize *d_randomizer;
 
@@ -63,15 +58,17 @@ class RuinEditorDialog: public LwEditorDialog
     void set_reward_name();
 
     void on_keeper_clicked();
-    void on_clear_keeper_clicked();
     void on_hidden_toggled();
     void on_randomize_name_clicked();
     void on_randomize_keeper_clicked();
     void on_new_reward_toggled();
-    void on_clear_reward_clicked();
-    void on_randomize_reward_clicked();
-    void on_reward_list_clicked();
     void on_reward_clicked();
+    void on_name_changed ();
+    void on_description_changed ();
+    void on_type_changed ();
+    void on_type_text_changed ();
+    void update_hidden_status ();
+    void on_hidden_ruin_player_changed ();
 };
 
 #endif
