@@ -33,7 +33,6 @@
 #include "reward.h"
 
 #include "select-army-dialog.h"
-#include "select-reward-dialog.h"
 #include "reward-editor-dialog.h"
 #include "RenamableLocation.h"
 
