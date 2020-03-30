@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -54,7 +54,6 @@ class RewardEditorDialog: public LwEditorDialog
     Gtk::Button *item_button;
     Gtk::Button *randomize_item_button;
     Gtk::Button *ally_button;
-    Gtk::Button *clear_ally_button;
     Gtk::Button *randomize_allies_button;
     Gtk::SpinButton *num_allies_spinbutton;
     Gtk::SpinButton *map_x_spinbutton;

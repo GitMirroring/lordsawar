@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -465,7 +465,7 @@ void ItemlistDialog::on_uses_changed()
 void ItemlistDialog::on_kill_army_type_clicked()
 {
     Player *neutral = Playerlist::getInstance()->getNeutral();
-    SelectArmyDialog d(*dialog, neutral, false, true);
+    SelectArmyDialog d(*dialog, true, neutral, false, true);
     d.run();
 
     selected_banish_army = d.get_selected_army();
@@ -520,7 +520,7 @@ void ItemlistDialog::on_summon_monster_toggled()
 void ItemlistDialog::on_summon_army_type_clicked()
 {
   Player *neutral = Playerlist::getInstance()->getNeutral();
-  SelectArmyDialog d(*dialog, neutral);
+  SelectArmyDialog d(*dialog, true, neutral);
   d.run();
   selected_summon_army = d.get_selected_army();
   if (selected_summon_army)
@@ -645,7 +645,7 @@ void ItemlistDialog::on_num_defenders_text_changed()
 void ItemlistDialog::on_defender_type_clicked()
 {
     Player *neutral = Playerlist::getInstance()->getNeutral();
-    SelectArmyDialog d(*dialog, neutral);
+    SelectArmyDialog d(*dialog, true, neutral);
     d.run();
 
     selected_defender_army = d.get_selected_army();

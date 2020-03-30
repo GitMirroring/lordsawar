@@ -35,120 +35,123 @@
 
 #define method(x) sigc::mem_fun(*this, &SelectArmyDialog::x)
 
-SelectArmyDialog::SelectArmyDialog(Gtk::Window &parent, Player *p, 
-                                   bool hero_too, bool defends_ruins, 
+SelectArmyDialog::SelectArmyDialog(Gtk::Window &parent, bool clear, Player *p,
+                                   bool hero_too, bool defends_ruins,
                                    bool awardable)
  : LwEditorDialog(parent, "select-army-dialog.ui")
 {
+  d_clear = clear;
   army_info_tip = NULL;
   d_hero_too = hero_too;
-    d_defends_ruins = defends_ruins;
-    player = p;
-    d_awardable = awardable;
-    selected_army = 0;
-    
-    xml->get_widget("army_info_label1", army_info_label1);
-    xml->get_widget("army_info_label2", army_info_label2);
-    xml->get_widget("select_button", select_button);
+  d_defends_ruins = defends_ruins;
+  player = p;
+  d_awardable = awardable;
+  selected_army = 0;
 
-    xml->get_widget("army_toggles_table", toggles_table);
+  xml->get_widget("army_info_label1", army_info_label1);
+  xml->get_widget("army_info_label2", army_info_label2);
+  xml->get_widget("select_button", select_button);
+  xml->get_widget("clear_button", clear_button);
+
+  xml->get_widget("army_toggles_table", toggles_table);
 
   fill_in_army_toggles();
 }
 
 void SelectArmyDialog::run()
 {
-    dialog->show_all();
-    int response = dialog->run();
+  dialog->show_all();
+  clear_button->set_visible (d_clear);
+  int response = dialog->run();
 
-    if (response != Gtk::RESPONSE_ACCEPT)
-	selected_army = 0;
+  if (response != Gtk::RESPONSE_ACCEPT)
+    selected_army = 0;
 }
 
 void SelectArmyDialog::on_army_toggled(Gtk::ToggleButton *toggle)
 {
-    if (ignore_toggles)
-	return;
-    
-    selected_army = 0;
-    ignore_toggles = true;
-    for (unsigned int i = 0; i < army_toggles.size(); ++i) {
-	if (toggle == army_toggles[i])
-	    selected_army = selectable[i];
-	
-	army_toggles[i]->set_active(toggle == army_toggles[i]);
-    }
-    ignore_toggles = false;
+  if (ignore_toggles)
+    return;
 
-    fill_in_army_info();
-    set_select_button_state();
+  selected_army = 0;
+  ignore_toggles = true;
+  for (unsigned int i = 0; i < army_toggles.size(); ++i) {
+    if (toggle == army_toggles[i])
+      selected_army = selectable[i];
+
+    army_toggles[i]->set_active(toggle == army_toggles[i]);
+  }
+  ignore_toggles = false;
+
+  fill_in_army_info();
+  set_select_button_state();
 }
 
 void SelectArmyDialog::fill_in_army_toggles()
 {
-    const Armysetlist* al = Armysetlist::getInstance();
+  const Armysetlist* al = Armysetlist::getInstance();
 
-    if (!player)
-      player = Playerlist::getInstance()->getNeutral();
-    int armyset = player->getArmyset();
-    bool pushed_back = false;
+  if (!player)
+    player = Playerlist::getInstance()->getNeutral();
+  int armyset = player->getArmyset();
+  bool pushed_back = false;
 
-    // fill in selectable armies
-    selectable.clear();
-    Armyset *as = al->get(armyset);
-    for (Armyset::iterator j = as->begin(); j != as->end(); ++j)
+  // fill in selectable armies
+  selectable.clear();
+  Armyset *as = al->get(armyset);
+  for (Armyset::iterator j = as->begin(); j != as->end(); ++j)
     {
-	const ArmyProto *a = al->getArmy(armyset, (*j)->getId());
-	if (a->isHero() && d_hero_too == false)
-	  continue;
-	if ((d_defends_ruins && a->getDefendsRuins()) || 
-	    (!d_defends_ruins && !d_awardable))
-	  {
-	    pushed_back = true;
-	    selectable.push_back(a);
-	  }
-	if (((d_awardable && a->getAwardable()) || 
-	    (!d_defends_ruins && !d_awardable)) && !pushed_back)
-	  selectable.push_back(a);
-	pushed_back = false;
+      const ArmyProto *a = al->getArmy(armyset, (*j)->getId());
+      if (a->isHero() && d_hero_too == false)
+        continue;
+      if ((d_defends_ruins && a->getDefendsRuins()) ||
+          (!d_defends_ruins && !d_awardable))
+        {
+          pushed_back = true;
+          selectable.push_back(a);
+        }
+      if (((d_awardable && a->getAwardable()) ||
+           (!d_defends_ruins && !d_awardable)) && !pushed_back)
+        selectable.push_back(a);
+      pushed_back = false;
     }
 
-    // fill in army options
-    army_toggles.clear();
-    toggles_table->foreach(sigc::mem_fun(toggles_table, &Gtk::Container::remove));
-    toggles_table->insert_row (0);
-    toggles_table->insert_column (0);
-    const int no_columns = 6;
-    guint32 fs = FontSize::getInstance ()->get_height ();
-    for (unsigned int i = 0; i < selectable.size(); ++i)
-      {
-	Gtk::ToggleButton *toggle = manage(new Gtk::ToggleButton);
+  // fill in army options
+  army_toggles.clear();
+  toggles_table->foreach(sigc::mem_fun(toggles_table, &Gtk::Container::remove));
+  toggles_table->insert_row (0);
+  toggles_table->insert_column (0);
+  const int no_columns = 6;
+  guint32 fs = FontSize::getInstance ()->get_height ();
+  for (unsigned int i = 0; i < selectable.size(); ++i)
+    {
+      Gtk::ToggleButton *toggle = manage(new Gtk::ToggleButton);
 
-	Glib::RefPtr<Gdk::Pixbuf> pixbuf
-	  = ImageCache::getInstance()->getArmyPic(armyset,
-						     selectable[i]->getId(),
-						     player, NULL, false,
-                                                     fs)->to_pixbuf();
+      Glib::RefPtr<Gdk::Pixbuf> pixbuf
+        = ImageCache::getInstance()->getArmyPic(armyset,
+                                                selectable[i]->getId(),
+                                                player, NULL, false,
+                                                fs)->to_pixbuf();
 
-	toggle->add(*manage(new Gtk::Image(pixbuf)));
-	army_toggles.push_back(toggle);
-	int x = i % no_columns;
-	int y = i / no_columns;
-	toggles_table->attach(*toggle, x, y, 1 , 1);
-	toggle->show_all();
+      toggle->add(*manage(new Gtk::Image(pixbuf)));
+      army_toggles.push_back(toggle);
+      int x = i % no_columns;
+      int y = i / no_columns;
+      toggles_table->attach(*toggle, x, y, 1 , 1);
+      toggle->show_all();
 
-	toggle->signal_toggled().connect(sigc::bind(method(on_army_toggled), toggle));
-	toggle->add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
-	toggle->signal_button_press_event().connect
-          (sigc::bind(method(on_army_button_event), toggle), false);
+      toggle->signal_toggled().connect(sigc::bind(method(on_army_toggled), toggle));
+      toggle->add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
+      toggle->signal_button_press_event().connect
+        (sigc::bind(method(on_army_button_event), toggle), false);
 
-	toggle->signal_button_release_event().connect
-          (sigc::bind(method(on_army_button_event), toggle), false);
-      }
+      toggle->signal_button_release_event().connect
+        (sigc::bind(method(on_army_button_event), toggle), false);
+    }
 
-    ignore_toggles = false;
-    if (!army_toggles.empty())
-      army_toggles[0]->set_active(true);
+  ignore_toggles = false;
+  if (!army_toggles.empty())
+    army_toggles[0]->set_active(true);
 }
 
 void SelectArmyDialog::fill_in_army_info()

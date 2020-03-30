@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,8 +34,8 @@ class Player;
 class SelectArmyDialog: public LwEditorDialog
 {
  public:
-    SelectArmyDialog(Gtk::Window &parent, Player *p, bool hero_too = false,
-		     bool defends_ruins = false,
+    SelectArmyDialog(Gtk::Window &parent, bool clear, Player *p,
+                     bool hero_too = false, bool defends_ruins = false,
 		     bool rewardable = false);
     ~SelectArmyDialog() {}
 
@@ -44,11 +44,13 @@ class SelectArmyDialog: public LwEditorDialog
     const ArmyProto *get_selected_army() { return selected_army; }
     
  private:
+    bool d_clear;
     ArmyInfoTip* army_info_tip;
     Gtk::Label *army_info_label1;
     Gtk::Label *army_info_label2;
     Gtk::Grid *toggles_table;
     Gtk::Button *select_button;
+    Gtk::Button *clear_button;
     std::vector<guint32> armysets;
 
     const ArmyProto *selected_army;

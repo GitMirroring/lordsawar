@@ -181,7 +181,7 @@ int CityEditorDialog::run()
 
 void CityEditorDialog::on_add_clicked()
 {
-  SelectArmyDialog d(*dialog, city->getOwner());
+  SelectArmyDialog d(*dialog, false, city->getOwner());
   d.run();
 
   const ArmyProto *army = d.get_selected_army();

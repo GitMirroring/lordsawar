@@ -232,7 +232,7 @@ void RuinEditorDialog::update_hidden_status ()
 void RuinEditorDialog::on_keeper_clicked()
 {
   Player *neutral = Playerlist::getInstance()->getNeutral();
-  SelectArmyDialog d(*dialog, neutral, false, true);
+  SelectArmyDialog d(*dialog, true, neutral, false, true);
   d.run();
 
   const ArmyProto *army = d.get_selected_army();

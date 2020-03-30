@@ -231,7 +231,7 @@ void StackEditorDialog::on_copy_clicked()
 
 void StackEditorDialog::on_add_clicked()
 {
-  SelectArmyDialog d(*dialog, stack->getOwner(), true);
+  SelectArmyDialog d(*dialog, false, stack->getOwner(), true);
   d.run();
 
   Player *player = get_selected_player();

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -63,8 +63,6 @@ RewardEditorDialog::RewardEditorDialog(Gtk::Window &parent, Player *player, bool
   xml->get_widget("num_allies_spinbutton", num_allies_spinbutton);
   xml->get_widget("ally_button", ally_button);
   ally_button->signal_clicked().connect (method(on_ally_clicked));
-  xml->get_widget("clear_ally_button", clear_ally_button);
-  clear_ally_button->signal_clicked().connect (method(on_clear_ally_clicked));
   xml->get_widget("randomize_allies_button", randomize_allies_button);
   randomize_allies_button->signal_clicked().connect (method(on_randomize_allies_clicked));
   set_ally_name();
@@ -256,12 +254,17 @@ void RewardEditorDialog::set_item_name()
 
 void RewardEditorDialog::on_ally_clicked()
 {
-  SelectArmyDialog d(*dialog, d_player, false, false, true);
+  SelectArmyDialog d(*dialog, true, d_player, false, false, true);
   d.run();
   if (d.get_selected_army())
     {
       on_clear_ally_clicked();
       ally = new ArmyProto(*(d.get_selected_army()));
+      set_ally_name();
+    }
+  else
+    {
+      on_clear_ally_clicked();
       set_ally_name();
     }
 }

@@ -182,7 +182,7 @@ void BattleCalculatorDialog::on_attacker_copy_clicked()
 
 void BattleCalculatorDialog::on_attacker_add_clicked()
 {
-  SelectArmyDialog d(*dialog, get_attacker_player(), true);
+  SelectArmyDialog d(*dialog, false, get_attacker_player(), true);
   d.run();
 
   Player *player = get_attacker_player();
@@ -367,7 +367,7 @@ void BattleCalculatorDialog::on_defender_copy_clicked()
 
 void BattleCalculatorDialog::on_defender_add_clicked()
 {
-  SelectArmyDialog d(*dialog, get_defender_player(), true);
+  SelectArmyDialog d(*dialog, false, get_defender_player(), true);
   d.run();
 
   Player *player = get_defender_player();
