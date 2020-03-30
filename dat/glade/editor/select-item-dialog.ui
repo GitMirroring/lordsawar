@@ -25,7 +25,7 @@
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
-              <object class="GtkButton" id="cancel_button">
+              <object class="GtkButton" id="clear_button">
                 <property name="label">gtk-clear</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -129,7 +129,7 @@
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-6">cancel_button</action-widget>
+      <action-widget response="-6">clear_button</action-widget>
       <action-widget response="-3">select_button</action-widget>
     </action-widgets>
   </object>

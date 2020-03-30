@@ -212,7 +212,7 @@ void RewardEditorDialog::on_randomize_gold_clicked()
 
 void RewardEditorDialog::on_item_clicked()
 {
-  SelectItemDialog d(*dialog);
+  SelectItemDialog d(*dialog, true);
   d.run();
   guint32 id = 0;
   const ItemProto *itemproto = d.get_selected_item(id);

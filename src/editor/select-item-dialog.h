@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,14 +28,16 @@ class ItemProto;
 class SelectItemDialog: public LwEditorDialog
 {
  public:
-    SelectItemDialog(Gtk::Window &parent);
+    SelectItemDialog(Gtk::Window &parent, bool clear = false);
     ~SelectItemDialog() {}
 
     void run();
     const ItemProto *get_selected_item(guint32 &id) { id = selected_item_type_id; return selected_item; }
     
  private:
+    bool d_clear;
     Gtk::Button *select_button;
+    Gtk::Button *clear_button;
 
     const ItemProto *selected_item;
     guint32 selected_item_type_id;

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,33 +28,35 @@
 #include "Item.h"
 #include "Itemlist.h"
 
-SelectItemDialog::SelectItemDialog(Gtk::Window &parent)
+SelectItemDialog::SelectItemDialog(Gtk::Window &parent, bool clear)
  : LwEditorDialog(parent, "select-item-dialog.ui")
 {
-    selected_item = 0;
-    
-    xml->get_widget("select_button", select_button);
+  d_clear = clear;
+  selected_item = 0;
 
-    xml->get_widget("items_treeview", items_treeview);
-    items_list = Gtk::ListStore::create(items_columns);
-    items_treeview->set_model(items_list);
-    items_treeview->append_column("", items_columns.name);
-    items_treeview->append_column("", items_columns.attributes);
-    items_treeview->set_headers_visible(false);
+  xml->get_widget("select_button", select_button);
+  xml->get_widget("clear_button", clear_button);
 
-    Itemlist *itemlist = Itemlist::getInstance();
-    Itemlist::iterator iter = itemlist->begin();
-    for (;iter != itemlist->end(); iter++)
-      addItemProto((*iter).second);
-      
-    guint32 max = itemlist->size();
-    if (max)
-      {
-	Gtk::TreeModel::Row row;
-	row = items_treeview->get_model()->children()[0];
-	if(row)
-	  items_treeview->get_selection()->select(row);
-      }
+  xml->get_widget("items_treeview", items_treeview);
+  items_list = Gtk::ListStore::create(items_columns);
+  items_treeview->set_model(items_list);
+  items_treeview->append_column("", items_columns.name);
+  items_treeview->append_column("", items_columns.attributes);
+  items_treeview->set_headers_visible(false);
+
+  Itemlist *itemlist = Itemlist::getInstance();
+  Itemlist::iterator iter = itemlist->begin();
+  for (;iter != itemlist->end(); iter++)
+    addItemProto((*iter).second);
+
+  guint32 max = itemlist->size();
+  if (max)
+    {
+      Gtk::TreeModel::Row row;
+      row = items_treeview->get_model()->children()[0];
+      if(row)
+        items_treeview->get_selection()->select(row);
+    }
 }
 
 void SelectItemDialog::addItemProto(ItemProto *item)
@@ -67,30 +69,31 @@ void SelectItemDialog::addItemProto(ItemProto *item)
 
 void SelectItemDialog::run()
 {
-    dialog->show_all();
-    int response = dialog->run();
+  dialog->show_all();
+  clear_button->set_visible (d_clear);
+  int response = dialog->run();
 
-    if (response != Gtk::RESPONSE_ACCEPT)
-	selected_item = 0;
-    else
-      {
-	Glib::RefPtr<Gtk::TreeSelection> selection = 
-	  items_treeview->get_selection();
-	Gtk::TreeModel::iterator iterrow = selection->get_selected();
+  if (response != Gtk::RESPONSE_ACCEPT)
+    selected_item = 0;
+  else
+    {
+      Glib::RefPtr<Gtk::TreeSelection> selection = 
+        items_treeview->get_selection();
+      Gtk::TreeModel::iterator iterrow = selection->get_selected();
 
-	if (iterrow) 
-          {
-            Gtk::TreeModel::Row row = *iterrow;
-            selected_item = row[items_columns.item];
-            selected_item_type_id = 0;
-            Itemlist::iterator iter = Itemlist::getInstance()->begin();
-            for (;iter != Itemlist::getInstance()->end(); iter++)
-              {
-                if ((*iter).second == selected_item)
-                  break;
-                selected_item_type_id++;
-              }
-          }
-      }
+      if (iterrow) 
+        {
+          Gtk::TreeModel::Row row = *iterrow;
+          selected_item = row[items_columns.item];
+          selected_item_type_id = 0;
+          Itemlist::iterator iter = Itemlist::getInstance()->begin();
+          for (;iter != Itemlist::getInstance()->end(); iter++)
+            {
+              if ((*iter).second == selected_item)
+                break;
+              selected_item_type_id++;
+            }
+        }
+    }
 }
 
