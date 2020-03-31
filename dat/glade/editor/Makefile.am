@@ -31,7 +31,6 @@ hero-editor-dialog.ui \
 masked-image-editor-dialog.ui \
 image-editor-dialog.ui \
 editor-quit-dialog.ui \
-tile-size-editor-dialog.ui \
 tileset-smallmap-building-colors-dialog.ui \
 cityset-info-dialog.ui \
 cityset-window.ui \
