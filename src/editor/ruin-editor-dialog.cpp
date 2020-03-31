@@ -278,6 +278,11 @@ void RuinEditorDialog::on_new_reward_toggled()
 
 void RuinEditorDialog::on_reward_clicked()
 {
+  //this, is a dog's breakfast, right here.  wow.
+  //ruin rewards are not in the rewards list, so we have to push it on
+  //and off.
+  //but the edit in the reward list editor can make it go away,
+  //so we have to be careful about dangling pointers.
   Reward *copy = NULL;
   if (ruin->getReward ())
     {
@@ -289,6 +294,10 @@ void RuinEditorDialog::on_reward_clicked()
   if (d.get_reward())
     {
       ruin->setReward (Reward::copy (d.get_reward ()));
+      if (d.get_reward () != Rewardlist::getInstance ()->front () &&
+          copy)
+        Rewardlist::getInstance()->deleteReward
+          (Rewardlist::getInstance()->front ());
       Rewardlist::getInstance()->deleteReward (d.get_reward ());
     }
   else
@@ -296,7 +305,8 @@ void RuinEditorDialog::on_reward_clicked()
       if (copy)
         {
           ruin->setReward (NULL);
-          Rewardlist::getInstance()->deleteReward (copy);
+          Rewardlist::getInstance()->deleteReward
+            (Rewardlist::getInstance()->front ());
         }
       random_reward_switch->set_active (true);
     }
