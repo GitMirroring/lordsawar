@@ -178,6 +178,8 @@ int RewardlistDialog::run ()
   dialog->show_all ();
   if (!d_clear)
     clear_button->set_visible (false);
+  if (d_select)
+    remove_button->set_visible (false);
   int response = dialog->run ();
   if (response != Gtk::RESPONSE_ACCEPT)
     d_reward = NULL;
