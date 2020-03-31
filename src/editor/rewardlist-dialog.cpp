@@ -92,6 +92,14 @@ RewardlistDialog::update_rewardlist_buttons()
       edit_button->set_sensitive(true);
       close_button->set_sensitive (true);
     }
+  if (d_select && d_clear)
+    {
+      Glib::RefPtr<Gtk::TreeSelection> selection =
+        rewards_treeview->get_selection();
+      Gtk::TreeModel::iterator i = selection->get_selected();
+      Gtk::TreeModel::Path path = rewards_treeview->get_model()->get_path (i);
+      edit_button->set_sensitive (path.to_string () == "0");
+    }
 }
 
 void RewardlistDialog::addReward(Reward *reward)
@@ -177,7 +185,11 @@ int RewardlistDialog::run ()
 {
   dialog->show_all ();
   if (!d_clear)
-    clear_button->set_visible (false);
+    {
+      clear_button->set_visible (false);
+      if (d_select)
+        edit_button->set_visible (false);
+    }
   if (d_select)
     remove_button->set_visible (false);
   int response = dialog->run ();
