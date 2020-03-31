@@ -630,6 +630,7 @@ void EditorBigMap::smooth_view()
 void EditorBigMap::display_moving_building(Vector<int> src, Vector<int> dest)
 {
   PixMask *pic = NULL;
+  double scale = GameMap::getCityset()->get_scale ();
   switch (GameMap::getInstance()->getBuilding(src))
     {
     case Maptile::CITY:
@@ -649,6 +650,7 @@ void EditorBigMap::display_moving_building(Vector<int> src, Vector<int> dest)
       break;
     case Maptile::STONE:
       pic = GameMap::getTileset()->getStoneImage (GameMap::getStone (src)->getType());
+      scale = GameMap::getTileset()->get_scale ();
       break;
     case Maptile::PORT:
       pic = ImageCache::getInstance()->getPortPic ();
@@ -660,224 +662,256 @@ void EditorBigMap::display_moving_building(Vector<int> src, Vector<int> dest)
       break;
     }
   if (pic)
-    pic->blit(buffer, dest);
+    {
+      PixMask *p = pic->copy ();
+      double new_height = p->get_unscaled_height () * scale;
+      int new_width =
+        ImageCache::calculate_width_from_adjusted_height (p, new_height);
+      PixMask::scale (p, new_width, new_height);
+      p->blit(buffer, dest);
+      delete p;
+    }
   if (GameMap::getInstance()->getBuilding(src) == Maptile::ROAD)
     {
       if (GameMap::getStone(src))
         {
           PixMask *stone = GameMap::getTileset()->getStoneImage (GameMap::getStone (src)->getType());
           if (stone)
-            stone->blit(buffer, dest);
+            {
+              PixMask *p = stone->copy ();
+              double new_height = p->get_unscaled_height () * scale;
+              int new_width =
+                ImageCache::calculate_width_from_adjusted_height
+                (p, new_height);
+              PixMask::scale (p, new_width, new_height);
+              p->blit(buffer, dest);
+              delete p;
+            }
         }
     }
 }
 
+void EditorBigMap::blit (PixMask *src, Cairo::RefPtr<Cairo::Surface> dest, Vector<int> pos, double scale)
+{
+  PixMask *p = src->copy ();
+  double new_height = p->get_unscaled_height () * scale;
+  int new_width =
+    ImageCache::calculate_width_from_adjusted_height (p, new_height);
+  PixMask::scale (p, new_width, new_height);
+  p->blit(dest, pos);
+  delete p;
+}
+
 void EditorBigMap::after_draw()
 {
-    int tilesize = GameMap::getInstance()->getTileSize();
-    std::vector<Vector<int> > tiles;
+  guint32 army_set_id = Playerlist::getActiveplayer()->getArmyset();
+  Armyset *armyset = Armysetlist::getInstance()->get(army_set_id);
 
-    if (mouse_pos == Vector<int>(-1,-1))
-      return;
+  int tilesize = GameMap::getInstance()->getTileSize();
+  std::vector<Vector<int> > tiles;
 
-    // we need to draw a drawing cursor on the map
-    tiles = get_cursor_tiles();
-    // draw each tile
-	
-    Gdk::RGBA terrain_box_color = Gdk::RGBA();
-    terrain_box_color.set_rgba(200.0/255.0, 200.0/255.0, 200.0/255.0);
-    Gdk::RGBA erase_box_color = Gdk::RGBA();
-    erase_box_color.set_rgba(200.0/255.0, 50.0/255.0, 50.0/255.0);
-    Gdk::RGBA move_box_color = Gdk::RGBA();
-    move_box_color.set_rgba(50.0/255.0, 200.0/255.0, 50.0/255.0);
-    Gdk::RGBA moving_box_color = Gdk::RGBA();
-    moving_box_color.set_rgba(250.0/255.0, 250.0/255.0, 0.0/255.0);
-    for (std::vector<Vector<int> >::iterator i = tiles.begin(),
-	     end = tiles.end(); i != end; ++i)
-      {
-	Vector<int> pos = tile_to_buffer_pos(*i);
-
-	PixMask *pic;
-
-
-	switch (pointer)
-	  {
-	  case POINTER:
-	    break;
-
-	  case TERRAIN:
-	    buffer_gc->set_source_rgb(terrain_box_color.get_red(),
-                                       terrain_box_color.get_green(),
-                                       terrain_box_color.get_blue());
-            buffer_gc->move_to(pos.x+1, pos.y+1);
-            buffer_gc->rel_line_to(tilesize-2, 0);
-            buffer_gc->rel_line_to(0, tilesize-2);
-            buffer_gc->rel_line_to(-tilesize +2, 0);
-            buffer_gc->rel_line_to(0, -tilesize+2);
-            buffer_gc->set_line_width(1.0);
-            buffer_gc->stroke();
-	    break;
-
-	  case ERASE:
-	    buffer_gc->set_source_rgb(erase_box_color.get_red(),
-                                       erase_box_color.get_green(),
-                                       erase_box_color.get_blue());
-            buffer_gc->move_to(pos.x+1, pos.y+1);
-            buffer_gc->rel_line_to(tilesize-2, 0);
-            buffer_gc->rel_line_to(0, tilesize-2);
-            buffer_gc->rel_line_to(-tilesize +2, 0);
-            buffer_gc->rel_line_to(0, -tilesize+2);
-            buffer_gc->set_line_width(1.0);
-            buffer_gc->stroke();
-	    break;
-
-	  case MOVE:
-	    if (moving_objects_from != Vector<int>(-1,-1))
-              {
-                Vector<int> tile = *i;
-                buffer_gc->set_source_rgb(moving_box_color.get_red(),
-                                          moving_box_color.get_green(),
-                                          moving_box_color.get_blue());
-                GameMap *gm = GameMap::getInstance();
-                Vector<int> from = moving_objects_from;
-                if (gm->getStack(from) != NULL)
-                  {
-                    Stack *s = gm->getStack(from);
-                    if (!s)
-                      s = gm->getStack(from);
-                    std::vector<Stack *> enemy_stacks =
-                      gm->getEnemyStacks(tile, s->getOwner());
-                    if (gm->canPutStack(s->size(), s->getOwner(), tile) == true &&
-                        enemy_stacks.empty() == true)
-                      {
-                        Playerlist *plist = Playerlist::getInstance();
-                        pic = ImageCache::getInstance()->getArmyPic
-                          (plist->getActiveplayer()->getArmyset(), 0,
-                           plist->getActiveplayer(), NULL, true, 0);
-                        pic->blit(buffer, pos);
-                        pic = ImageCache::getInstance()->getFlagPic
-                          (gm->countArmyUnits(s->getPos()),
-                           plist->getActiveplayer());
-                        pic->blit(buffer, pos);
-                      }
-                  }
-                else if (gm->getBackpack(from)->empty() == false)
-                  {
-                    pic = ImageCache::getInstance()->getBagPic();
-                    pic->blit(buffer, pos);
-                  }
-                else if (gm->getBuilding(from) != Maptile::NONE)
-                  {
-                    guint32 s = gm->getBuildingSize(from);
-                    bool same = false;
-                    if (gm->getLocation(from)->contains(tile) ||
-                        LocationBox(tile, s).contains(from))
-                      same = true;
-                    if (gm->canPutBuilding
-                        (gm->getBuilding(from), s, tile, false) == true ||
-                        same)
-                      display_moving_building (from, pos);
-                  }
-              }
-	    else
-              buffer_gc->set_source_rgb(move_box_color.get_red(),
-                                        move_box_color.get_green(),
-                                        move_box_color.get_blue());
-            buffer_gc->move_to(pos.x+1, pos.y+1);
-            buffer_gc->rel_line_to(tilesize-2, 0);
-            buffer_gc->rel_line_to(0, tilesize-2);
-            buffer_gc->rel_line_to(-tilesize +2, 0);
-            buffer_gc->rel_line_to(0, -tilesize+2);
-            buffer_gc->set_line_width(1.0);
-            buffer_gc->stroke();
-	    break;
-
-	  case STACK:
-            pic = ImageCache::getInstance()->getArmyPic
-	       (Playerlist::getInstance()->getActiveplayer()->getArmyset(), 0,
-                Playerlist::getInstance()->getActiveplayer(), NULL, true, 0);
-	    pic->blit(buffer, pos);
-	    break;
-
-	  case CITY:
-	    pic = ImageCache::getInstance()->getCityPic(0, Playerlist::getInstance()->getActiveplayer(), GameMap::getInstance()->getCitysetId());
-	    pic->blit(buffer, pos);
-	    break;
-
-	  case RUIN:
-	    pic = ImageCache::getInstance()->getRuinPic(0, GameMap::getInstance()->getCitysetId());
-	    pic->blit(buffer, pos);
-	    break;
-
-	  case TEMPLE:
-	    pic = ImageCache::getInstance()->getTemplePic(0, GameMap::getInstance()->getCitysetId());
-	    pic->blit(buffer, pos);
-	    break;
-
-	  case SIGNPOST:
-	    pic = ImageCache::getInstance()->getSignpostPic();
-	    pic->blit(buffer, pos);
-	    break;
-
-	  case ROAD:
-              {
-                Road *r = GameMap::getRoad(*i);
-                if (r)
-                  pic = ImageCache::getInstance()->getRoadPic(r->getType());
-                else
-                  pic = ImageCache::getInstance()->getRoadPic(CreateScenario::calculateRoadType(*i));
-                pic->blit(buffer, pos);
-              }
-	    break;
-          case STONE:
-              {
-                Tileset *t = GameMap::getTileset();
-                Stone *s = GameMap::getStone(*i);
-                if (s)
-                  pic = t->getStoneImage(s->getType());
-                else
-                  {
-                    Road *r = GameMap::getRoad(*i);
-                    if (r)
-                      pic = t->getStoneImage(Stone::getRandomType
-                                             (Road::Type(r->getType())));
-                    else
-                      pic = t->getStoneImage
-                        (Stone::ROAD_ALL_DIRECTIONS_STONES_NW_NE_SW_SE);
-                  }
-                if (pic)
-                  pic->blit(buffer, pos);
-              }
-            break;
-	  case PORT:
-	    pic = ImageCache::getInstance()->getPortPic();
-	    pic->blit(buffer, pos);
-	    break;
-	  case BRIDGE:
-	    pic = ImageCache::getInstance()->getBridgePic(tile_to_bridge_type(*i));
-	    pic->blit(buffer, pos);
-	    break;
-	  case BAG:
-              {
-                pic = ImageCache::getInstance()->getBagPic();
-                Vector<int> offset = Vector<int>(tilesize,tilesize) - 
-                  Vector<int>(pic->get_width(), pic->get_height());
-                pic->blit(buffer, pos + (offset / 2));
-              }
-	    break;
-          case FIGHT:
-              {
-                pic =
-                  ImageCache::getInstance()->getCursorPic
-                  (ImageCache::SWORD, FontSize::getInstance ()->get_height ());
-                PixMask *copy = pic->copy();
-                PixMask::scale (copy, tilesize * 0.66, tilesize * 0.66);
-                copy->blit(buffer, pos +
-                           Vector<int>(tilesize * 0.165, tilesize * 0.165));
-                delete copy;
-              }
-            break;
-	  }
-      }
+  if (mouse_pos == Vector<int>(-1,-1))
     return;
+
+  // we need to draw a drawing cursor on the map
+  tiles = get_cursor_tiles();
+  // draw each tile
+
+  Gdk::RGBA terrain_box_color = Gdk::RGBA();
+  terrain_box_color.set_rgba(200.0/255.0, 200.0/255.0, 200.0/255.0);
+  Gdk::RGBA erase_box_color = Gdk::RGBA();
+  erase_box_color.set_rgba(200.0/255.0, 50.0/255.0, 50.0/255.0);
+  Gdk::RGBA move_box_color = Gdk::RGBA();
+  move_box_color.set_rgba(50.0/255.0, 200.0/255.0, 50.0/255.0);
+  Gdk::RGBA moving_box_color = Gdk::RGBA();
+  moving_box_color.set_rgba(250.0/255.0, 250.0/255.0, 0.0/255.0);
+  for (std::vector<Vector<int> >::iterator i = tiles.begin(),
+       end = tiles.end(); i != end; ++i)
+    {
+      Vector<int> pos = tile_to_buffer_pos(*i);
+
+      PixMask *pic;
+
+
+      switch (pointer)
+        {
+        case POINTER:
+          break;
+
+        case TERRAIN:
+          buffer_gc->set_source_rgb(terrain_box_color.get_red(),
+                                    terrain_box_color.get_green(),
+                                    terrain_box_color.get_blue());
+          buffer_gc->move_to(pos.x+1, pos.y+1);
+          buffer_gc->rel_line_to(tilesize-2, 0);
+          buffer_gc->rel_line_to(0, tilesize-2);
+          buffer_gc->rel_line_to(-tilesize +2, 0);
+          buffer_gc->rel_line_to(0, -tilesize+2);
+          buffer_gc->set_line_width(1.0);
+          buffer_gc->stroke();
+          break;
+
+        case ERASE:
+          buffer_gc->set_source_rgb(erase_box_color.get_red(),
+                                    erase_box_color.get_green(),
+                                    erase_box_color.get_blue());
+          buffer_gc->move_to(pos.x+1, pos.y+1);
+          buffer_gc->rel_line_to(tilesize-2, 0);
+          buffer_gc->rel_line_to(0, tilesize-2);
+          buffer_gc->rel_line_to(-tilesize +2, 0);
+          buffer_gc->rel_line_to(0, -tilesize+2);
+          buffer_gc->set_line_width(1.0);
+          buffer_gc->stroke();
+          break;
+
+        case MOVE:
+          if (moving_objects_from != Vector<int>(-1,-1))
+            {
+              Vector<int> tile = *i;
+              buffer_gc->set_source_rgb(moving_box_color.get_red(),
+                                        moving_box_color.get_green(),
+                                        moving_box_color.get_blue());
+              GameMap *gm = GameMap::getInstance();
+              Vector<int> from = moving_objects_from;
+              if (gm->getStack(from) != NULL)
+                {
+                  Stack *s = gm->getStack(from);
+                  if (!s)
+                    s = gm->getStack(from);
+                  std::vector<Stack *> enemy_stacks =
+                    gm->getEnemyStacks(tile, s->getOwner());
+                  if (gm->canPutStack(s->size(), s->getOwner(), tile) == true &&
+                      enemy_stacks.empty() == true)
+                    {
+                      Playerlist *plist = Playerlist::getInstance();
+                      pic = ImageCache::getInstance()->getArmyPic
+                        (plist->getActiveplayer()->getArmyset(), 0,
+                         plist->getActiveplayer(), NULL, true, 0);
+                      blit (pic, buffer, pos, armyset->get_scale ());
+                      pic = ImageCache::getInstance()->getFlagPic
+                        (gm->countArmyUnits(s->getPos()),
+                         plist->getActiveplayer());
+                      blit (pic, buffer, pos, gm->getTileset()->get_scale ());
+                    }
+                }
+              else if (gm->getBackpack(from)->empty() == false)
+                {
+                  pic = ImageCache::getInstance()->getBagPic();
+                  blit (pic, buffer, pos, armyset->get_scale ());
+                }
+              else if (gm->getBuilding(from) != Maptile::NONE)
+                {
+                  guint32 s = gm->getBuildingSize(from);
+                  bool same = false;
+                  if (gm->getLocation(from)->contains(tile) ||
+                      LocationBox(tile, s).contains(from))
+                    same = true;
+                  if (gm->canPutBuilding
+                      (gm->getBuilding(from), s, tile, false) == true ||
+                      same)
+                    display_moving_building (from, pos);
+                }
+            }
+          else
+            buffer_gc->set_source_rgb(move_box_color.get_red(),
+                                      move_box_color.get_green(),
+                                      move_box_color.get_blue());
+          buffer_gc->move_to(pos.x+1, pos.y+1);
+          buffer_gc->rel_line_to(tilesize-2, 0);
+          buffer_gc->rel_line_to(0, tilesize-2);
+          buffer_gc->rel_line_to(-tilesize +2, 0);
+          buffer_gc->rel_line_to(0, -tilesize+2);
+          buffer_gc->set_line_width(1.0);
+          buffer_gc->stroke();
+          break;
+
+        case STACK:
+          pic = ImageCache::getInstance()->getArmyPic
+            (Playerlist::getInstance()->getActiveplayer()->getArmyset(), 0,
+             Playerlist::getInstance()->getActiveplayer(), NULL, true, 0);
+
+          blit (pic, buffer, pos, armyset->get_scale ());
+          break;
+
+        case CITY:
+          pic = ImageCache::getInstance()->getCityPic(0, Playerlist::getInstance()->getActiveplayer(), GameMap::getInstance()->getCitysetId());
+          blit (pic, buffer, pos, GameMap::getCityset()->get_scale ());
+          break;
+
+        case RUIN:
+          pic = ImageCache::getInstance()->getRuinPic(0, GameMap::getInstance()->getCitysetId());
+          blit (pic, buffer, pos, GameMap::getCityset()->get_scale ());
+          break;
+
+        case TEMPLE:
+          pic = ImageCache::getInstance()->getTemplePic(0, GameMap::getInstance()->getCitysetId());
+          blit (pic, buffer, pos, GameMap::getCityset()->get_scale ());
+          break;
+
+        case SIGNPOST:
+          pic = ImageCache::getInstance()->getSignpostPic();
+          blit (pic, buffer, pos, GameMap::getCityset()->get_scale ());
+          break;
+
+        case ROAD:
+            {
+              Road *r = GameMap::getRoad(*i);
+              if (r)
+                pic = ImageCache::getInstance()->getRoadPic(r->getType());
+              else
+                pic = ImageCache::getInstance()->getRoadPic(CreateScenario::calculateRoadType(*i));
+              blit (pic, buffer, pos, GameMap::getTileset()->get_scale ());
+            }
+          break;
+        case STONE:
+            {
+              Tileset *t = GameMap::getTileset();
+              Stone *s = GameMap::getStone(*i);
+              if (s)
+                pic = t->getStoneImage(s->getType());
+              else
+                {
+                  Road *r = GameMap::getRoad(*i);
+                  if (r)
+                    pic = t->getStoneImage(Stone::getRandomType
+                                           (Road::Type(r->getType())));
+                  else
+                    pic = t->getStoneImage
+                      (Stone::ROAD_ALL_DIRECTIONS_STONES_NW_NE_SW_SE);
+                }
+              if (pic)
+                blit (pic, buffer, pos, GameMap::getTileset()->get_scale ());
+            }
+          break;
+        case PORT:
+          pic = ImageCache::getInstance()->getPortPic();
+          blit (pic, buffer, pos, GameMap::getCityset()->get_scale ());
+          break;
+        case BRIDGE:
+          pic = ImageCache::getInstance()->getBridgePic(tile_to_bridge_type(*i));
+          blit (pic, buffer, pos, GameMap::getCityset()->get_scale ());
+          break;
+        case BAG:
+            {
+              pic = ImageCache::getInstance()->getBagPic();
+              //Vector<int> offset = Vector<int>(tilesize,tilesize) - 
+                //Vector<int>(pic->get_width(), pic->get_height());
+              blit (pic, buffer, pos, armyset->get_scale ());
+            }
+          break;
+        case FIGHT:
+            {
+              pic =
+                ImageCache::getInstance()->getCursorPic
+                (ImageCache::SWORD, FontSize::getInstance ()->get_height ());
+              PixMask *copy = pic->copy();
+              PixMask::scale (copy, tilesize * 0.66, tilesize * 0.66);
+              copy->blit_centered(buffer, pos +
+                         Vector<int>(tilesize /2, tilesize /2));
+              delete copy;
+            }
+          break;
+        }
+    }
+  return;
 }

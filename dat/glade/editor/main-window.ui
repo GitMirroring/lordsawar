@@ -367,6 +367,24 @@
                             <accelerator key="g" signal="activate"/>
                           </object>
                         </child>
+                        <child>
+                          <object class="GtkMenuItem" id="zoom_in_menuitem">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Zoom In</property>
+                            <property name="use_underline">True</property>
+                            <accelerator key="plus" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkMenuItem" id="zoom_out_menuitem">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Zoom Out</property>
+                            <property name="use_underline">True</property>
+                            <accelerator key="minus" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>

@@ -261,6 +261,11 @@ MainWindow::MainWindow(Glib::ustring load_filename)
       (method(on_fullscreen_activated));
     xml->get_widget("toggle_grid_menuitem", toggle_grid_menuitem);
     toggle_grid_menuitem->signal_activate().connect (method(on_grid_toggled));
+    xml->get_widget("zoom_in_menuitem", zoom_in_menuitem);
+    zoom_in_menuitem->signal_activate().connect (method(on_zoom_in_activated));
+    xml->get_widget("zoom_out_menuitem", zoom_out_menuitem);
+    zoom_out_menuitem->signal_activate().connect
+      (method(on_zoom_out_activated));
     xml->get_widget("smooth_map_menuitem", smooth_map_menuitem);
     smooth_map_menuitem->signal_activate().connect
       (method(on_smooth_map_activated));
@@ -2250,3 +2255,28 @@ bool MainWindow::on_configure_event (GdkEventConfigure *e)
     }
   return false;
 }
+
+void MainWindow::on_zoom_in_activated ()
+{
+  zoom (GameMap::getInstance()->getTileset()->get_scale () + ZOOM_STEP);
+}
+
+void MainWindow::on_zoom_out_activated ()
+{
+  zoom (GameMap::getInstance()->getTileset()->get_scale () - ZOOM_STEP);
+}
+
+void MainWindow::zoom (double scale)
+{
+  if (scale < 0.4)
+    scale = 0.4;
+  if (scale > 3.0)
+    scale = 3.0;
+  GameMap::getInstance()->getTileset()->set_scale (scale);
+  GameMap::getInstance()->getCityset()->set_scale (scale);
+  for (auto& i : *Playerlist::getInstance())
+    Armysetlist::getInstance()->get((*i).getArmyset())->set_scale (scale);
+  redraw();
+  bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+}
+

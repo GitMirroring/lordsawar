@@ -84,6 +84,8 @@ class MainWindow: public sigc::trackable
     Gtk::MenuItem *edit_fight_order_menuitem;
     Gtk::MenuItem *toggle_tile_graphics_menuitem;
     Gtk::MenuItem *toggle_grid_menuitem;
+    Gtk::MenuItem *zoom_in_menuitem;
+    Gtk::MenuItem *zoom_out_menuitem;
     Gtk::MenuItem *smooth_map_menuitem;
     Gtk::MenuItem *smooth_screen_menuitem;
     Gtk::MenuItem *switch_sets_menuitem;
@@ -156,6 +158,8 @@ class MainWindow: public sigc::trackable
 
     void on_fullscreen_activated();
     void on_grid_toggled();
+    void on_zoom_in_activated ();
+    void on_zoom_out_activated ();
 
     void on_random_all_cities_activated();
     void on_random_unnamed_cities_activated();
@@ -271,6 +275,7 @@ class MainWindow: public sigc::trackable
 
     bool on_window_state_event (GdkEventWindowState *e);
     bool on_configure_event (GdkEventConfigure *e);
+    void zoom (double scale);
 
     int d_width;
     int d_height;
@@ -280,6 +285,7 @@ class MainWindow: public sigc::trackable
     std::list<Army*> battle_calculator_attackers;
     std::list<Army*> battle_calculator_defenders;
     Gtk::Allocation unmaximized_box;
+
     
 };
 

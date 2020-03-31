@@ -104,6 +104,7 @@ class EditorBigMap: public BigMap
     std::vector<Vector<int> > get_screen_tiles();
     void bring_up_details();
     void display_moving_building(Vector<int> src, Vector<int> dest);
+    void blit (PixMask *src, Cairo::RefPtr<Cairo::Surface> dest, Vector<int> pos, double scale);
 };
 
 #endif
