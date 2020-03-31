@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,15 +28,22 @@
 class RewardlistDialog: public LwEditorDialog
 {
  public:
-    RewardlistDialog(Gtk::Window &parent);
+    RewardlistDialog(Gtk::Window &parent, bool select, bool clear);
     ~RewardlistDialog() {};
 
+    int run ();
+    Reward *get_reward () {return d_reward;}
+
  private:
+    bool d_select;
+    bool d_clear;
     Reward *d_reward; //current reward
     Gtk::TreeView *rewards_treeview;
     Gtk::Button *add_button;
     Gtk::Button *remove_button;
     Gtk::Button *edit_button;
+    Gtk::Button *clear_button;
+    Gtk::Button *close_button;
 
     class RewardsColumns: public Gtk::TreeModelColumnRecord {
     public:
@@ -57,8 +64,6 @@ class RewardlistDialog: public LwEditorDialog
     void on_remove_clicked();
     void on_edit_clicked();
     void on_reward_selected();
-
-
 };
 
 #endif

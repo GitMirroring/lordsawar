@@ -75,7 +75,6 @@ libeditor_la_SOURCES =\
 	itemlist-dialog.cpp itemlist-dialog.h \
 	reward-editor-dialog.cpp reward-editor-dialog.h \
 	select-item-dialog.cpp select-item-dialog.h \
-	select-reward-dialog.cpp select-reward-dialog.h \
 	rewardlist-dialog.cpp rewardlist-dialog.h \
 	select-hidden-ruin-dialog.cpp select-hidden-ruin-dialog.h \
 	RenamableLocation.cpp RenamableLocation.h  \

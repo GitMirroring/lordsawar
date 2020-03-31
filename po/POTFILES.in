@@ -91,7 +91,6 @@
 [type: gettext/glade]dat/glade/editor/select-army-dialog.ui
 [type: gettext/glade]dat/glade/editor/select-hidden-ruin-dialog.ui
 [type: gettext/glade]dat/glade/editor/select-item-dialog.ui
-[type: gettext/glade]dat/glade/editor/select-reward-dialog.ui
 [type: gettext/glade]dat/glade/editor/signpost-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/stack-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/temple-editor-dialog.ui
@@ -272,7 +271,6 @@ src/editor/armyset-window.cpp
 src/editor/cityset-window.cpp
 src/editor/rewardlist-dialog.cpp
 src/editor/select-item-dialog.cpp
-src/editor/select-reward-dialog.cpp
 src/editor/players-dialog.cpp
 src/editor/editorbigmap.cpp
 src/editor/editablesmallmap.cpp

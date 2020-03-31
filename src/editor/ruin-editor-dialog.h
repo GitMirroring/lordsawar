@@ -51,7 +51,6 @@ class RuinEditorDialog: public LwEditorDialog
     Gtk::Switch *random_reward_switch;
     Gtk::Button *reward_button;
     Ruin *ruin;
-    Reward *reward;
     CreateScenarioRandomize *d_randomizer;
 
     void set_keeper_name();

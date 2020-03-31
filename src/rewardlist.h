@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class Rewardlist : public std::list<Reward*>, public sigc::trackable
 	// Methods that operate on the class data and modify the class.
 
         //! deletes a reward from the list
-        void deleteReward(Reward* s);
+        void deleteReward(const Reward* s);
 
 	//! Return a random reward from the list and remove it.
         Reward *pop (Reward::Type type);
@@ -55,7 +55,7 @@ class Rewardlist : public std::list<Reward*>, public sigc::trackable
         iterator flErase(iterator object);
 
         //! Behaves like std::list::remove(), but frees pointers as well
-        bool flRemove(Reward* object);
+        bool flRemove(const Reward* object);
 
 
 	// Methods that operate on the class data and do not modify the class.

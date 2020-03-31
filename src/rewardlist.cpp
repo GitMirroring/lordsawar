@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ void Rewardlist::deleteInstance()
     s_instance = 0;
 }
 
-void Rewardlist::deleteReward(Reward* s)
+void Rewardlist::deleteReward(const Reward* s)
 {
   for (const_iterator it = this->begin(); it != this->end(); it++)
     if ((*it) == s)
@@ -118,10 +118,10 @@ Rewardlist::iterator Rewardlist::flErase(iterator object)
   return erase(object);
 }
 
-bool Rewardlist::flRemove(Reward* object)
+bool Rewardlist::flRemove(const Reward* object)
 {
   debug("removing reward with id " << object->getId() << endl);
-  iterator rewardit = find(begin(), end(), object);
+  const_iterator rewardit = find(begin(), end(), object);
   if (rewardit != end())
     {
       delete object;

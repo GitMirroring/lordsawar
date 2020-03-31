@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2009, 2011, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007-2009, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -557,7 +557,7 @@ Glib::ustring Reward::getDescription() const
 	{
 	  const Reward_Allies *a = dynamic_cast<const Reward_Allies *>(this);
 	  if (a->getArmy())
-	    s += String::ucompose(_("Allies: %1 x %2"), a->getArmy()->getName(),
+	    s += String::ucompose(_("%1 x %2"), a->getArmy()->getName(),
 				  a->getNoOfAllies());
 	  return s;
 	}
@@ -565,14 +565,14 @@ Glib::ustring Reward::getDescription() const
 	{
 	  const Reward_Item *i = dynamic_cast<const Reward_Item *>(this);
 	  if (i->getItem())
-	    s += String::ucompose(_("Item: %1"), i->getItem()->getName());
+	    s += i->getItem()->getName();
 	  return s;
 	}
     case Reward::RUIN:
 	{
 	  const Reward_Ruin *r = dynamic_cast<const Reward_Ruin *>(this);
 	  if (r->getRuin())
-	    s += String::ucompose(_("Site: %1"), r->getRuin()->getName());
+	    s += r->getRuin()->getName();
 	  return s;
 	}
     case Reward::MAP:

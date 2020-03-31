@@ -31,9 +31,10 @@
 #include "stack.h"
 #include "army.h"
 #include "reward.h"
+#include "rewardlist.h"
 
 #include "select-army-dialog.h"
-#include "reward-editor-dialog.h"
+#include "rewardlist-dialog.h"
 #include "RenamableLocation.h"
 
 #define method(x) sigc::mem_fun(*this, &RuinEditorDialog::x)
@@ -43,7 +44,6 @@ RuinEditorDialog::RuinEditorDialog(Gtk::Window &parent, Ruin *r, CreateScenarioR
 {
   d_randomizer = randomizer;
   ruin = r;
-  reward = NULL;
 
   xml->get_widget("name_entry", name_entry);
   name_entry->set_max_length (MAX_LENGTH_FOR_RUIN_NAME);
@@ -105,14 +105,7 @@ RuinEditorDialog::RuinEditorDialog(Gtk::Window &parent, Ruin *r, CreateScenarioR
   xml->get_widget("reward_button", reward_button);
   reward_button->signal_clicked().connect(method(on_reward_clicked));
 
-  if (ruin->getReward() == NULL)
-    random_reward_switch->set_active (true);
-  else
-    {
-      reward = ruin->getReward();
-      random_reward_switch->set_active (false);
-    }
-
+  random_reward_switch->set_active (ruin->getReward () == NULL);
   set_reward_name();
 }
 
@@ -277,11 +270,7 @@ void RuinEditorDialog::on_new_reward_toggled()
 {
   if (random_reward_switch->get_active () == true)
     {
-      if (reward)
-        {
-          delete reward;
-          reward = NULL;
-        }
+      ruin->setReward (NULL);
       set_reward_name();
     }
   new_reward_hbox->set_sensitive(!random_reward_switch->get_active());
@@ -289,21 +278,35 @@ void RuinEditorDialog::on_new_reward_toggled()
 
 void RuinEditorDialog::on_reward_clicked()
 {
-  Player *neutral = Playerlist::getInstance ()->getNeutral();
-  RewardEditorDialog d(*dialog, neutral, false, NULL);
-  d.run();
-  if (reward)
+  Reward *copy = NULL;
+  if (ruin->getReward ())
     {
-      delete reward;
-      reward = NULL;
+      copy = Reward::copy (ruin->getReward ());
+      Rewardlist::getInstance ()->push_front (copy);
     }
+  RewardlistDialog d(*dialog, true, copy != NULL);
+  d.run();
   if (d.get_reward())
-    reward = d.get_reward();
+    {
+      ruin->setReward (Reward::copy (d.get_reward ()));
+      Rewardlist::getInstance()->deleteReward (d.get_reward ());
+    }
+  else
+    {
+      if (copy)
+        {
+          ruin->setReward (NULL);
+          Rewardlist::getInstance()->deleteReward (copy);
+        }
+      random_reward_switch->set_active (true);
+    }
+
   set_reward_name();
 }
 
 void RuinEditorDialog::set_reward_name()
 {
+  Reward *reward = ruin->getReward ();
   Glib::ustring name;
   if (reward)
     name = reward->getName();

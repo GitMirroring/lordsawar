@@ -18,7 +18,6 @@ armyset-info-dialog.ui \
 itemlist-dialog.ui \
 reward-editor-dialog.ui \
 select-item-dialog.ui \
-select-reward-dialog.ui \
 reward-list-dialog.ui \
 select-hidden-ruin-dialog.ui \
 tileset-window.ui \

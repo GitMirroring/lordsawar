@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -31,39 +31,49 @@
 
 #define method(x) sigc::mem_fun(*this, &RewardlistDialog::x)
 
-RewardlistDialog::RewardlistDialog(Gtk::Window &parent)
+RewardlistDialog::RewardlistDialog(Gtk::Window &parent, bool select, bool clear)
  : LwEditorDialog(parent, "reward-list-dialog.ui")
 {
-    xml->get_widget("rewards_treeview", rewards_treeview);
-    xml->get_widget("add_button", add_button);
-    add_button->signal_clicked().connect (method(on_add_clicked));
-    xml->get_widget("remove_button", remove_button);
-    remove_button->signal_clicked().connect (method(on_remove_clicked));
-    xml->get_widget("edit_button", edit_button);
-    edit_button->signal_clicked().connect (method(on_edit_clicked));
+  d_select = select;
+  d_clear = clear;
+  d_reward = NULL;
+  xml->get_widget("close_button", close_button);
+  if (select)
+    {
+      dialog->set_title (_("Select a reward"));
+      close_button->set_label (_("Select"));
+    }
+  xml->get_widget("clear_button", clear_button);
+  xml->get_widget("rewards_treeview", rewards_treeview);
+  xml->get_widget("add_button", add_button);
+  add_button->signal_clicked().connect (method(on_add_clicked));
+  xml->get_widget("remove_button", remove_button);
+  remove_button->signal_clicked().connect (method(on_remove_clicked));
+  xml->get_widget("edit_button", edit_button);
+  edit_button->signal_clicked().connect (method(on_edit_clicked));
 
-    rewards_list = Gtk::ListStore::create(rewards_columns);
-    rewards_treeview->set_model(rewards_list);
-    rewards_treeview->append_column("", rewards_columns.name);
-    rewards_treeview->set_headers_visible(false);
+  rewards_list = Gtk::ListStore::create(rewards_columns);
+  rewards_treeview->set_model(rewards_list);
+  rewards_treeview->append_column("", rewards_columns.name);
+  rewards_treeview->set_headers_visible(false);
 
-    Rewardlist *rewardlist = Rewardlist::getInstance();
-    Rewardlist::iterator iter = rewardlist->begin();
-    for (;iter != rewardlist->end(); iter++)
-      addReward(*iter);
-      
-    guint32 max = rewardlist->size();
-    if (max)
-      {
-	Gtk::TreeModel::Row row;
-	row = rewards_treeview->get_model()->children()[0];
-	if(row)
-	  rewards_treeview->get_selection()->select(row);
-      }
+  Rewardlist *rewardlist = Rewardlist::getInstance();
+  Rewardlist::iterator iter = rewardlist->begin();
+  for (;iter != rewardlist->end(); iter++)
+    addReward(*iter);
 
+  rewards_treeview->get_selection()->signal_changed().connect
+    (method(on_reward_selected));
+  guint32 max = rewardlist->size();
+  if (max)
+    {
+      Gtk::TreeModel::Row row;
+      row = rewards_treeview->get_model()->children()[0];
+      if(row)
+        rewards_treeview->get_selection()->select(row);
+    }
 
-    update_rewardlist_buttons();
-    rewards_treeview->get_selection()->signal_changed().connect (method(on_reward_selected));
+  update_rewardlist_buttons();
 }
 
 void
@@ -73,11 +83,14 @@ RewardlistDialog::update_rewardlist_buttons()
     {
       remove_button->set_sensitive(false);
       edit_button->set_sensitive(false);
+      if (d_select)
+        close_button->set_sensitive (false);
     }
   else
     {
       remove_button->set_sensitive(true);
       edit_button->set_sensitive(true);
+      close_button->set_sensitive (true);
     }
 }
 
@@ -90,6 +103,10 @@ void RewardlistDialog::addReward(Reward *reward)
 
 void RewardlistDialog::on_reward_selected()
 {
+  Glib::RefPtr<Gtk::TreeSelection> selection =
+    rewards_treeview->get_selection();
+  Gtk::TreeModel::iterator i = selection->get_selected();
+  d_reward = (*i)[rewards_columns.reward];
   update_rewardlist_buttons();
 }
 
@@ -105,6 +122,7 @@ void RewardlistDialog::on_add_clicked()
       (*i)[rewards_columns.name] = reward->getName();
       (*i)[rewards_columns.reward] = reward;
       Rewardlist::getInstance()->push_back(reward);
+      rewards_treeview->get_selection()->select(i);
     }
 
 }
@@ -153,4 +171,15 @@ void RewardlistDialog::on_edit_clicked()
 	}
     }
 
+}
+
+int RewardlistDialog::run ()
+{
+  dialog->show_all ();
+  if (!d_clear)
+    clear_button->set_visible (false);
+  int response = dialog->run ();
+  if (response != Gtk::RESPONSE_ACCEPT)
+    d_reward = NULL;
+  return response;
 }
