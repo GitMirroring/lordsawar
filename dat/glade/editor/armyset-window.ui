@@ -535,6 +535,7 @@
                                                     <property name="invisible_char">●</property>
                                                     <property name="width_chars">5</property>
                                                     <property name="text" translatable="yes">0</property>
+                                                    <property name="xalign">1</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
                                                     <property name="orientation">vertical</property>
@@ -598,6 +599,7 @@
                                                     <property name="invisible_char">●</property>
                                                     <property name="width_chars">4</property>
                                                     <property name="text" translatable="yes">0</property>
+                                                    <property name="xalign">1</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
                                                     <property name="orientation">vertical</property>
@@ -659,6 +661,7 @@
                                                     <property name="invisible_char">●</property>
                                                     <property name="width_chars">5</property>
                                                     <property name="text" translatable="yes">0</property>
+                                                    <property name="xalign">1</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
                                                     <property name="orientation">vertical</property>
@@ -2310,6 +2313,7 @@ In Forests</property>
                                                         <property name="invisible_char">●</property>
                                                         <property name="width_chars">5</property>
                                                         <property name="text" translatable="yes">0</property>
+                                                        <property name="xalign">1</property>
                                                         <property name="primary_icon_activatable">False</property>
                                                         <property name="secondary_icon_activatable">False</property>
                                                         <property name="orientation">vertical</property>
@@ -2377,6 +2381,7 @@ In Forests</property>
                                                     <property name="invisible_char">●</property>
                                                     <property name="width_chars">5</property>
                                                     <property name="text" translatable="yes">2</property>
+                                                    <property name="xalign">1</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
                                                     <property name="orientation">vertical</property>
@@ -2437,6 +2442,7 @@ In Forests</property>
                                                     <property name="invisible_char">●</property>
                                                     <property name="width_chars">5</property>
                                                     <property name="text" translatable="yes">0</property>
+                                                    <property name="xalign">1</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
                                                     <property name="orientation">vertical</property>
@@ -2497,6 +2503,7 @@ In Forests</property>
                                                     <property name="invisible_char">●</property>
                                                     <property name="width_chars">5</property>
                                                     <property name="text" translatable="yes">0</property>
+                                                    <property name="xalign">1</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
                                                     <property name="orientation">vertical</property>
@@ -2558,6 +2565,7 @@ In Forests</property>
                                                     <property name="invisible_char">●</property>
                                                     <property name="width_chars">5</property>
                                                     <property name="text" translatable="yes">0</property>
+                                                    <property name="xalign">1</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
                                                     <property name="orientation">vertical</property>
@@ -2619,6 +2627,7 @@ In Forests</property>
                                                     <property name="invisible_char">●</property>
                                                     <property name="width_chars">5</property>
                                                     <property name="text" translatable="yes">3</property>
+                                                    <property name="xalign">1</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
                                                     <property name="orientation">vertical</property>

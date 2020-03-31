@@ -253,6 +253,7 @@
                           <object class="GtkSpinButton" id="size_spinbutton">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <property name="xalign">1</property>
                             <property name="orientation">vertical</property>
                             <property name="adjustment">adjustment2</property>
                           </object>

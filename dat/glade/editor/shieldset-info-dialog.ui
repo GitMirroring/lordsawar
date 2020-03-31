@@ -324,6 +324,7 @@ Width/Height</property>
                                           <object class="GtkSpinButton" id="small_width_spinbutton">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
+                                            <property name="xalign">1</property>
                                             <property name="orientation">vertical</property>
                                             <property name="adjustment">adjustment2</property>
                                           </object>
@@ -337,6 +338,7 @@ Width/Height</property>
                                           <object class="GtkSpinButton" id="small_height_spinbutton">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
+                                            <property name="xalign">1</property>
                                             <property name="orientation">vertical</property>
                                             <property name="adjustment">adjustment3</property>
                                           </object>
@@ -392,6 +394,7 @@ Width/Height</property>
                                           <object class="GtkSpinButton" id="medium_width_spinbutton">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
+                                            <property name="xalign">1</property>
                                             <property name="orientation">vertical</property>
                                             <property name="adjustment">adjustment4</property>
                                           </object>
@@ -405,6 +408,7 @@ Width/Height</property>
                                           <object class="GtkSpinButton" id="medium_height_spinbutton">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
+                                            <property name="xalign">1</property>
                                             <property name="orientation">vertical</property>
                                             <property name="adjustment">adjustment5</property>
                                           </object>
@@ -460,6 +464,7 @@ Width/Height</property>
                                           <object class="GtkSpinButton" id="large_width_spinbutton">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
+                                            <property name="xalign">1</property>
                                             <property name="orientation">vertical</property>
                                             <property name="adjustment">adjustment6</property>
                                           </object>
@@ -473,6 +478,7 @@ Width/Height</property>
                                           <object class="GtkSpinButton" id="large_height_spinbutton">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
+                                            <property name="xalign">1</property>
                                             <property name="orientation">vertical</property>
                                             <property name="adjustment">adjustment7</property>
                                           </object>

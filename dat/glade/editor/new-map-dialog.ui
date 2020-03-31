@@ -545,6 +545,7 @@
                             <property name="width_chars">3</property>
                             <property name="max_width_chars">3</property>
                             <property name="text" translatable="yes">50</property>
+                            <property name="xalign">1</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
                             <property name="adjustment">adjustment11</property>
@@ -605,6 +606,7 @@
                             <property name="width_chars">3</property>
                             <property name="max_width_chars">3</property>
                             <property name="text" translatable="yes">75</property>
+                            <property name="xalign">1</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
                             <property name="adjustment">adjustment12</property>
@@ -1072,6 +1074,7 @@
                           <object class="GtkSpinButton" id="num_players_spinbutton">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <property name="xalign">1</property>
                             <property name="adjustment">adjustment13</property>
                           </object>
                           <packing>
