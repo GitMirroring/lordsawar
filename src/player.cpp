@@ -3,7 +3,8 @@
 // Copyright (C) 2004, 2005 Andrea Paternesi
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2005 Bryan Duff
-// Copyright (C) 2007-2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2017,
+// 2020 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -1963,7 +1964,7 @@ bool Player::stackDisband(Stack* s)
 
 void Player::doHeroDropItem(Hero *h, Item *i, Vector<int> pos, bool &splash)
 {
-  if (GameMap::getInstance()->getTile(pos)->getType() == Tile::WATER)
+  if (GameMap::getInstance()->canDropBag(pos) == false)
     {
       h->getBackpack()->removeFromBackpack(i);
       delete i;

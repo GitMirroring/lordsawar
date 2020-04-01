@@ -952,6 +952,14 @@ class GameMap: public sigc::trackable
 	bool canPutBuilding(Maptile::Building bldg, guint32 size, Vector<int> to, bool making_islands = true);
 
 
+        /** Check if we can put some items here.
+         *
+         * @param pos  where on the map we're dropping the bag
+         *
+         * @return Returns True if we can drop it, otherwise false.
+         */
+        bool canDropBag (Vector<int> pos);
+
         /** Check if a stack of the given size, owned by the given player, can be added to the given position.
          * @param size The number of army units to check if we can add.
          * @param p Only stacks owned by this player are considered.
@@ -978,7 +986,7 @@ class GameMap: public sigc::trackable
 
         /** Move a bag of stuff from one position on the map, to another.
          *
-         * @param from The source position of a bag of stuff.
+         * @param bag The bag of stuff we're moving.
          * @param to The destination position.
          *
          * \note Every square has a Backpack object, but only some of them
@@ -987,7 +995,7 @@ class GameMap: public sigc::trackable
          * If there are items in the Backpack located at the source position, 
          * they are removed and added to the destination position.
          */
-	void moveBackpack(Vector<int> from, Vector<int> to);
+	void moveBackpack(MapBackpack *bag, Vector<int> to);
 
         /** Returns the size of the building at the given position on the map.
          *

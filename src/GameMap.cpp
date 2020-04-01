@@ -1407,6 +1407,13 @@ void GameMap::reloadArmyset(Armyset *armyset)
   Armysetlist::getInstance()->reload(armyset->getId());
 }
 
+bool GameMap::canDropBag (Vector<int> pos)
+{
+  if (getTile(pos)->getType() == Tile::WATER)
+    return false;
+  return true;
+}
+
 bool GameMap::canPutBuilding(Maptile::Building bldg, guint32 size, Vector<int> to, bool making_islands)
 {
   bool can_move = true;
@@ -1680,10 +1687,10 @@ MapBackpack *GameMap::getBackpack(Vector<int> pos)
     return NULL;
 }
 		    
-void GameMap::moveBackpack(Vector<int> from, Vector<int> to)
+void GameMap::moveBackpack(MapBackpack *bag, Vector<int> to)
 {
-  getBackpack(to)->add(getBackpack(from));
-  getBackpack(from)->clear();
+  getBackpack(to)->add(bag);
+  bag->clear();
 }
 
 bool GameMap::removeRuin(Vector<int> pos)

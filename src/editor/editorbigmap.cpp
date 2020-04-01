@@ -59,20 +59,20 @@
 #include "tileset.h"
 #include "font-size.h"
 
-
 EditorBigMap::EditorBigMap()
  : BigMap(false)
 {
-    mouse_pos = Vector<int>(-1, -1);
-    prev_mouse_pos = Vector<int>(0, 0);
+  mouse_pos = Vector<int>(-1, -1);
+  prev_mouse_pos = Vector<int>(0, 0);
 
-    moving_objects_from = Vector<int>(-1,-1);
-    mouse_state = NONE;
-    input_locked = false;
-    pointer = POINTER;
-    pointer_size = 1;
-    pointer_terrain = Tile::GRASS;
-    pointer_tile_style_id = -1;
+  moving_objects_from = Vector<int>(-1,-1);
+  mouse_state = NONE;
+  input_locked = false;
+  pointer = POINTER;
+  pointer_size = 1;
+  pointer_terrain = Tile::GRASS;
+  pointer_tile_style_id = -1;
+  moving_bag = NULL;
 }
 
 void EditorBigMap::set_pointer(Pointer p, int size, Tile::Type t, 
@@ -315,7 +315,11 @@ void EditorBigMap::change_map_under_cursor()
           if (GameMap::getInstance()->getBuilding(tile) != Maptile::NONE ||
               GameMap::getStack(tile) != NULL ||
               GameMap::getBackpack(tile)->empty() == false)
-            moving_objects_from = tile;
+            {
+              moving_objects_from = tile;
+              if (GameMap::getBackpack(tile)->empty() == false)
+                moving_bag = GameMap::getBackpack (tile);
+            }
         }
       else
         {
@@ -353,7 +357,16 @@ void EditorBigMap::change_map_under_cursor()
                 }
             }
           else if (gm->getBackpack(from)->empty() == false)
-            gm->moveBackpack(from, tile);
+            {
+              if (gm->canDropBag (tile))
+                {
+                  if (moving_bag->getPos () != tile)
+                    gm->moveBackpack(moving_bag, tile);
+                  moving_bag = NULL;
+                }
+              else
+                break;
+            }
           else if (gm->getBuilding(from) != Maptile::NONE)
             {
               guint32 s = gm->getBuildingSize(from);

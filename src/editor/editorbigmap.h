@@ -31,6 +31,7 @@
 #include "Tile.h"
 #include "UniquelyIdentified.h"
 
+class MapBackpack;
 //! Scenario editor.  Specializatoin of the BigMap class for the editor.
 class EditorBigMap: public BigMap
 {
@@ -94,6 +95,8 @@ class EditorBigMap: public BigMap
     enum {
 	NONE, DRAGGING, MOVE_DRAGGING
     } mouse_state;
+
+    MapBackpack *moving_bag;
 
     virtual void after_draw();
     int tile_to_road_type(Vector<int> tile);
