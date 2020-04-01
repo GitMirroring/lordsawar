@@ -34,6 +34,7 @@
 RewardlistDialog::RewardlistDialog(Gtk::Window &parent, bool select, bool clear)
  : LwEditorDialog(parent, "reward-list-dialog.ui")
 {
+  d_changed = false;
   d_select = select;
   d_clear = clear;
   d_reward = NULL;
@@ -114,7 +115,8 @@ void RewardlistDialog::on_reward_selected()
   Glib::RefPtr<Gtk::TreeSelection> selection =
     rewards_treeview->get_selection();
   Gtk::TreeModel::iterator i = selection->get_selected();
-  d_reward = (*i)[rewards_columns.reward];
+  if (i)
+    d_reward = (*i)[rewards_columns.reward];
   update_rewardlist_buttons();
 }
 
@@ -125,6 +127,7 @@ void RewardlistDialog::on_add_clicked()
   d.run();
   if (d.get_reward())
     {
+      d_changed = true;
       Reward *reward = d.get_reward();
       Gtk::TreeIter i = rewards_list->append();
       (*i)[rewards_columns.name] = reward->getName();
@@ -132,32 +135,31 @@ void RewardlistDialog::on_add_clicked()
       Rewardlist::getInstance()->push_back(reward);
       rewards_treeview->get_selection()->select(i);
     }
-
 }
 
 void RewardlistDialog::on_remove_clicked()
 {
-  //erase the selected row from the treeview
-  //remove the reward from the rewardlist
-  Glib::RefPtr<Gtk::TreeSelection> selection = rewards_treeview->get_selection();
+  Glib::RefPtr<Gtk::TreeSelection> selection =
+    rewards_treeview->get_selection();
   Gtk::TreeModel::iterator iterrow = selection->get_selected();
 
-  if (iterrow) 
+  if (iterrow)
     {
+      d_changed = true;
       Gtk::TreeModel::Row row = *iterrow;
       Reward *a = row[rewards_columns.reward];
       rewards_list->erase(iterrow);
-      Rewardlist::getInstance()->remove(a);
+      Rewardlist::getInstance()->flRemove(a);
     }
 }
 
 void RewardlistDialog::on_edit_clicked()
 {
-  Glib::RefPtr<Gtk::TreeSelection> selection = 
+  Glib::RefPtr<Gtk::TreeSelection> selection =
     rewards_treeview->get_selection();
   Gtk::TreeModel::iterator iterrow = selection->get_selected();
 
-  if (iterrow) 
+  if (iterrow)
     {
       Gtk::TreeModel::Row row = *iterrow;
       Reward *reward = row[rewards_columns.reward];
@@ -166,22 +168,28 @@ void RewardlistDialog::on_edit_clicked()
       d.run();
       if (d.get_reward())
 	{
-	  Rewardlist::getInstance()->remove(reward);
+          d_changed = true;
+          Rewardlist::iterator i =
+            std::find (Rewardlist::getInstance ()->begin (),
+                       Rewardlist::getInstance ()->end (), reward);
+          delete reward;
 	  reward = d.get_reward();
+          *i = reward;
 	  (*iterrow)[rewards_columns.name] = reward->getName();
 	  (*iterrow)[rewards_columns.reward] = reward;
-	  Rewardlist::getInstance()->push_back(reward);
+          d_reward = reward;
 	}
       else
 	{
+          d_changed = true;
 	  rewards_list->erase(iterrow);
-	  Rewardlist::getInstance()->remove(reward);
+	  Rewardlist::getInstance()->flRemove(reward);
+          d_reward = NULL;
 	}
     }
-
 }
 
-int RewardlistDialog::run ()
+bool RewardlistDialog::run ()
 {
   dialog->show_all ();
   if (!d_clear)
@@ -195,5 +203,6 @@ int RewardlistDialog::run ()
   int response = dialog->run ();
   if (response != Gtk::RESPONSE_ACCEPT)
     d_reward = NULL;
-  return response;
+
+  return d_changed;
 }

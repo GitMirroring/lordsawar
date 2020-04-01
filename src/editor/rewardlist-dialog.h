@@ -31,10 +31,11 @@ class RewardlistDialog: public LwEditorDialog
     RewardlistDialog(Gtk::Window &parent, bool select, bool clear);
     ~RewardlistDialog() {};
 
-    int run ();
+    bool run ();
     Reward *get_reward () {return d_reward;}
 
  private:
+    bool d_changed;
     bool d_select;
     bool d_clear;
     Reward *d_reward; //current reward

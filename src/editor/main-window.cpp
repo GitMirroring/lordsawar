@@ -1578,8 +1578,7 @@ void MainWindow::on_edit_items_activated()
 void MainWindow::on_edit_rewards_activated()
 {
   RewardlistDialog d(*window, false, false);
-  int response = d.run_and_hide();
-  if (response == Gtk::RESPONSE_ACCEPT)
+  if (d.run())
     {
       needs_saving = true;
       update_window_title();
