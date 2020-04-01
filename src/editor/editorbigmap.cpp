@@ -793,12 +793,15 @@ void EditorBigMap::after_draw()
                     {
                       Playerlist *plist = Playerlist::getInstance();
                       pic = ImageCache::getInstance()->getArmyPic
-                        (plist->getActiveplayer()->getArmyset(), 0,
-                         plist->getActiveplayer(), NULL, true, 0);
+                        (s->getOwner()->getArmyset(), 0,
+                         s->getOwner (), NULL, true, 0);
                       blit (pic, buffer, pos, armyset->get_scale ());
+                      Player *o = plist->getActiveplayer ();
+                      plist->setActiveplayer (s->getOwner());
                       pic = ImageCache::getInstance()->getFlagPic
                         (gm->countArmyUnits(s->getPos()),
-                         plist->getActiveplayer());
+                         s->getOwner ());
+                      plist->setActiveplayer (o);
                       blit (pic, buffer, pos, gm->getTileset()->get_scale ());
                     }
                 }
