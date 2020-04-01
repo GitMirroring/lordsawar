@@ -1667,6 +1667,7 @@ bool GameMap::moveStack(Stack *stack, Vector<int> to)
     stack = Stacklist::changeOwnership(stack, c->getOwner());
   getStacks(stack->getPos())->arriving(stack);
   updateShips(stack->getPos());
+  updateTowers(stack->getPos());
 
   return moved;
 }
@@ -1793,7 +1794,10 @@ bool GameMap::putPort(Port *p)
   putBuilding(p, Maptile::PORT);
   //is there a stack here?
   if (GameMap::getStack(p->getPos()) != NULL)
-    updateShips(p->getPos());
+    {
+      updateShips(p->getPos());
+      updateTowers (p->getPos ());
+    }
   return true;
 }
 
@@ -1878,6 +1882,7 @@ bool GameMap::removeBridge(Vector<int> pos)
       removeBuilding(b);
       Bridgelist::getInstance()->subtract(b);
       updateShips(pos);
+      updateTowers(pos);
       return true;
     }
   return false;
@@ -1888,7 +1893,10 @@ bool GameMap::putBridge(Bridge *b)
   Bridgelist::getInstance()->add(b);
   setBuilding(b->getPos(), Maptile::BRIDGE);
   if (GameMap::getStack(b->getPos()) != NULL)
-    updateShips(b->getPos());
+    {
+      updateShips(b->getPos());
+      updateTowers (b->getPos ());
+    }
   return true;
 }
 
@@ -2152,6 +2160,7 @@ bool GameMap::putStack(Stack *s)
   Playerlist::getActiveplayer()->addStack(s);
   getStacks(s->getPos())->add(s);
   updateShips(s->getPos());
+  updateTowers (s->getPos());
   return true;
 }
 
