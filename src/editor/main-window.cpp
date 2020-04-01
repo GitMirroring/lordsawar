@@ -1147,10 +1147,14 @@ void MainWindow::on_tileset_saved(guint32 id)
 
 void MainWindow::on_fullscreen_activated()
 {
-    if (fullscreen_menuitem->get_active())
-	window->fullscreen();
-    else
-	window->unfullscreen();
+  if (fullscreen_menuitem->get_active())
+    window->fullscreen();
+  else
+    {
+      window->unfullscreen();
+      window->resize (unmaximized_box.get_width (),
+                      unmaximized_box.get_height ());
+    }
 }
 
 void MainWindow::on_grid_toggled()
