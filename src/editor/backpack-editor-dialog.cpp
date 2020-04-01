@@ -59,29 +59,14 @@ void BackpackEditorDialog::hide()
 
 int BackpackEditorDialog::run()
 {
+  update_buttons ();
   dialog->show_all();
   return dialog->run ();
-
-  /*
-  fill_bag();
-  on_item_selection_changed();
-  int response = dialog->run();
-  if (response == Gtk::RESPONSE_ACCEPT)
-    {
-      backpack->removeAllFromBackpack();
-      backpack->add(working);
-    }
-  return response;
-  */
 }
 
 void BackpackEditorDialog::on_item_selection_changed()
 {
-  Gtk::TreeIter i = item_treeview->get_selection()->get_selected();
-  if (i)
-    remove_button->set_sensitive(true);
-  else
-    remove_button->set_sensitive(false);
+  update_buttons ();
 }
 
 void BackpackEditorDialog::on_remove_item_clicked()
@@ -125,4 +110,15 @@ void BackpackEditorDialog::fill_bag()
   for (Backpack::iterator i = backpack->begin(); i != backpack->end(); ++i)
     add_item(*i);
   return;
+}
+
+void BackpackEditorDialog::update_buttons ()
+{
+  Glib::RefPtr<Gtk::TreeSelection> selection =
+    item_treeview->get_selection();
+  Gtk::TreeModel::iterator iterrow = selection->get_selected();
+  if (iterrow)
+    remove_button->set_sensitive (true);
+  else
+    remove_button->set_sensitive (false);
 }

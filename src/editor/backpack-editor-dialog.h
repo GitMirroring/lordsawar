@@ -60,6 +60,7 @@ class BackpackEditorDialog: public LwEditorDialog
 
     void add_item(Item *item);
     void fill_bag();
+    void update_buttons ();
 };
 
 #endif
