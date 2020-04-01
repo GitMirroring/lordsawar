@@ -720,7 +720,7 @@ void EditorBigMap::after_draw()
   Gdk::RGBA terrain_box_color = Gdk::RGBA();
   terrain_box_color.set_rgba(200.0/255.0, 200.0/255.0, 200.0/255.0);
   Gdk::RGBA erase_box_color = Gdk::RGBA();
-  erase_box_color.set_rgba(200.0/255.0, 50.0/255.0, 50.0/255.0);
+  erase_box_color.set_rgba(1.0, 1.0, 1.0);
   Gdk::RGBA move_box_color = Gdk::RGBA();
   move_box_color.set_rgba(50.0/255.0, 200.0/255.0, 50.0/255.0);
   Gdk::RGBA moving_box_color = Gdk::RGBA();
@@ -748,6 +748,7 @@ void EditorBigMap::after_draw()
           buffer_gc->rel_line_to(-tilesize +2, 0);
           buffer_gc->rel_line_to(0, -tilesize+2);
           buffer_gc->set_line_width(1.0);
+          buffer_gc->unset_dash ();
           buffer_gc->stroke();
           break;
 
@@ -761,6 +762,12 @@ void EditorBigMap::after_draw()
           buffer_gc->rel_line_to(-tilesize +2, 0);
           buffer_gc->rel_line_to(0, -tilesize+2);
           buffer_gc->set_line_width(1.0);
+            {
+              std::vector<double> dashes;
+              dashes.push_back (tilesize / 7);
+              dashes.push_back (tilesize / 7);
+              buffer_gc->set_dash (dashes, 0);
+            }
           buffer_gc->stroke();
           break;
 
@@ -771,6 +778,7 @@ void EditorBigMap::after_draw()
               buffer_gc->set_source_rgb(moving_box_color.get_red(),
                                         moving_box_color.get_green(),
                                         moving_box_color.get_blue());
+              buffer_gc->unset_dash ();
               GameMap *gm = GameMap::getInstance();
               Vector<int> from = moving_objects_from;
               if (gm->getStack(from) != NULL)
