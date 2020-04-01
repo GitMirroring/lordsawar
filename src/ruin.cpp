@@ -52,6 +52,8 @@ Ruin::Ruin(const Ruin& ruin)
 {
   if (ruin.d_occupant)
     d_occupant = new Stack(*ruin.d_occupant);
+  else
+    d_occupant = NULL;
   if (ruin.d_reward)
     d_reward = Reward::copy (ruin.d_reward);
   else
@@ -65,6 +67,8 @@ Ruin::Ruin(const Ruin& ruin, Vector<int> pos)
 {
   if (ruin.d_occupant)
     d_occupant = new Stack(*ruin.d_occupant);
+  else
+    d_occupant = NULL;
   if (ruin.d_reward)
     d_reward = Reward::copy (ruin.d_reward);
   else
