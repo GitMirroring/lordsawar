@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2010, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ class Player;
 class Signpost;
 class Ruin;
 class RoadEditorTip;
-class StoneEditorTip;
 
 #include "UniquelyIdentified.h"
 
@@ -264,7 +263,6 @@ class MainWindow: public sigc::trackable
     void update_window_title();
     void on_bag_selected(Vector<int> pos);
     void on_road_edited(Vector<int> pos, int new_type);
-    void on_stone_edited(Vector<int> pos, int new_type);
     void on_stack_selected_for_battle_calculator(Stack *s);
     void add_attacker_to_battle_calculator(Stack *s);
     void add_defender_to_battle_calculator(Stack *s);
@@ -276,12 +274,12 @@ class MainWindow: public sigc::trackable
     bool on_window_state_event (GdkEventWindowState *e);
     bool on_configure_event (GdkEventConfigure *e);
     void zoom (double scale);
+    bool close_road_editor_tip ();
 
     int d_width;
     int d_height;
     Glib::ustring d_load_filename;// filename given on the command line.
     RoadEditorTip *road_editor_tip;
-    StoneEditorTip *stone_editor_tip;
     std::list<Army*> battle_calculator_attackers;
     std::list<Army*> battle_calculator_defenders;
     Gtk::Allocation unmaximized_box;

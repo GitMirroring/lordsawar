@@ -83,7 +83,7 @@ libeditor_la_SOURCES =\
 	editor-splash-window.cpp editor-splash-window.h \
 	fight-order-editor-dialog.cpp fight-order-editor-dialog.h \
 	road-editor-tip.cpp road-editor-tip.h \
-	stone-editor-tip.cpp stone-editor-tip.h \
+	stone-editor-dialog.cpp stone-editor-dialog.h \
 	battle-calculator-dialog.cpp battle-calculator-dialog.h \
 	media-dialog.cpp media-dialog.h \
 	validation-dialog.cpp validation-dialog.h

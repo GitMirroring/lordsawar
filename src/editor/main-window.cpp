@@ -92,7 +92,7 @@
 #include "RenamableLocation.h"
 #include "fight-order-editor-dialog.h"
 #include "road-editor-tip.h"
-#include "stone-editor-tip.h"
+#include "stone-editor-dialog.h"
 #include "rnd.h"
 #include "stacklist.h"
 #include "battle-calculator-dialog.h"
@@ -113,7 +113,6 @@ MainWindow::MainWindow(Glib::ustring load_filename)
   d_create_scenario_names = NULL;
   needs_saving = false;
   road_editor_tip = NULL;
-  stone_editor_tip = NULL;
   unmaximized_box = Gtk::Allocation(0,0,1,1);
   Glib::RefPtr<Gtk::Builder> xml = 
     BuilderCache::editor_get("main-window.ui");
@@ -733,28 +732,29 @@ void MainWindow::init_map_state()
 
 bool MainWindow::on_bigmap_mouse_button_event(GdkEventButton *e)
 {
-    if (e->type != GDK_BUTTON_PRESS && e->type != GDK_BUTTON_RELEASE)
-	return true;	// useless event
+  if (e->type != GDK_BUTTON_PRESS && e->type != GDK_BUTTON_RELEASE)
+    return true;	// useless event
 
-    if (bigmap)
+  if (bigmap)
     {
-	button_event = e;	// save it for later use
-	bigmap->mouse_button_event(to_input_event(e));
-	if (smallmap)
-	  smallmap->draw();
-	needs_saving = true;
-        update_window_title();
+      if (e->type == GDK_BUTTON_PRESS && close_road_editor_tip ())
+        return true;
+
+      button_event = e;	// save it for later use
+      bigmap->mouse_button_event(to_input_event(e));
+      if (smallmap)
+        smallmap->draw();
+      needs_saving = true;
+      update_window_title();
     }
-    
-    return true;
+
+  return true;
 }
 
 bool MainWindow::on_bigmap_mouse_motion_event(GdkEventMotion *e)
 {
   static guint prev = 0;
   if (road_editor_tip)
-    return true;
-  if (stone_editor_tip)
     return true;
   if (bigmap)
     {
@@ -783,13 +783,16 @@ bool MainWindow::on_bigmap_leave_event()
 
 bool MainWindow::on_smallmap_mouse_button_event(GdkEventButton *e)
 {
-    if (e->type != GDK_BUTTON_PRESS && e->type != GDK_BUTTON_RELEASE)
-	return true;	// useless event
-    
-    if (smallmap)
-	smallmap->mouse_button_event(to_input_event(e));
-    
+  if (e->type != GDK_BUTTON_PRESS && e->type != GDK_BUTTON_RELEASE)
+    return true;	// useless event
+
+  if (e->type == GDK_BUTTON_PRESS && close_road_editor_tip ())
     return true;
+
+  if (smallmap)
+    smallmap->mouse_button_event(to_input_event(e));
+
+  return true;
 }
 
 bool MainWindow::on_smallmap_mouse_motion_event(GdkEventMotion *e)
@@ -1296,6 +1299,8 @@ void MainWindow::on_tile_style_radiobutton_toggled()
 
 void MainWindow::on_terrain_radiobutton_toggled()
 {
+  if (close_road_editor_tip ())
+    return;
   remove_tile_style_buttons();
   setup_tile_style_buttons(get_terrain());
   on_pointer_radiobutton_toggled();
@@ -1305,19 +1310,21 @@ void MainWindow::on_terrain_radiobutton_toggled()
 
 void MainWindow::on_pointer_radiobutton_toggled()
 {
-    EditorBigMap::Pointer pointer = EditorBigMap::POINTER;
-    int size = 1;
-    
-    int i = get_pointer_index();
-    pointer = pointer_items[i].pointer;
-    size = pointer_items[i].size;
-    
-    if (bigmap)
-	bigmap->set_pointer(pointer, size, get_terrain(),
-			    get_tile_style_id());
-    players_hbox->set_sensitive (pointer == EditorBigMap::STACK || 
-				 pointer == EditorBigMap::CITY);
-    update_buttons();
+  EditorBigMap::Pointer pointer = EditorBigMap::POINTER;
+  int size = 1;
+
+  if (close_road_editor_tip ())
+    return;
+  int i = get_pointer_index();
+  pointer = pointer_items[i].pointer;
+  size = pointer_items[i].size;
+
+  if (bigmap)
+    bigmap->set_pointer(pointer, size, get_terrain(),
+                        get_tile_style_id());
+  players_hbox->set_sensitive (pointer == EditorBigMap::STACK || 
+                               pointer == EditorBigMap::CITY);
+  update_buttons();
 }
 
 Tile::Type MainWindow::get_terrain()
@@ -1535,12 +1542,16 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object)
     }
     else if (Stone *st = dynamic_cast<Stone*>(object))
     {
-      if (stone_editor_tip)
-        delete stone_editor_tip;
-      MapTipPosition mpos = bigmap->map_tip_position(st->getPos());
       Road *road = GameMap::getRoad(st->getPos());
-      stone_editor_tip = new StoneEditorTip(bigmap_image, mpos, st, road);
-      stone_editor_tip->stone_picked.connect(method(on_stone_edited));
+      Stone *stone = GameMap::getStone(st->getPos());
+
+      StoneEditorDialog d(*window, stone, road);
+      if (d.run ())
+        {
+          needs_saving = true;
+          update_window_title();
+        }
+      redraw();
     }
     else if (MapBackpack *b = dynamic_cast<MapBackpack*>(object))
       {
@@ -1991,20 +2002,9 @@ bool MainWindow::on_bigmap_scrolled(GdkEventScroll* event)
 void MainWindow::on_road_edited(Vector<int> pos, int type)
 {
   needs_saving = true;
-  delete road_editor_tip;
-  road_editor_tip = NULL;
+  close_road_editor_tip ();
   Road *road = new Road (pos, Road::Type(type));
   GameMap::getInstance()->putRoad(road, false);
-  redraw();
-}
-
-void MainWindow::on_stone_edited(Vector<int> pos, int type)
-{
-  needs_saving = true;
-  delete stone_editor_tip;
-  stone_editor_tip = NULL;
-  Stone *stone = GameMap::getStone(pos);
-  stone->setType(Stone::Type(type));
   redraw();
 }
 
@@ -2283,3 +2283,13 @@ void MainWindow::zoom (double scale)
   bigmap->screen_size_changed(bigmap_image->get_allocation()); 
 }
 
+bool MainWindow::close_road_editor_tip ()
+{
+  if (road_editor_tip)
+    {
+      delete road_editor_tip;
+      road_editor_tip = NULL;
+      return true;
+    }
+  return false;
+}

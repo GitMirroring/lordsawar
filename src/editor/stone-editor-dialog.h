@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,41 +16,42 @@
 //  02110-1301, USA.
 
 #pragma once
-#ifndef STONE_EDITOR_TIP_H
-#define STONE_EDITOR_TIP_H
+#ifndef STONE_EDITOR_DIALOG_H
+#define STONE_EDITOR_DIALOG_H
 
-#include <memory>
-#include <sigc++/trackable.h>
 #include <gtkmm.h>
-#include "defs.h"
+#include "lw-editor-dialog.h"
 #include "stone.h"
-#include "map-tip-position.h"
 
 class Road;
 class PixMask;
-// shows a tooltip like window with information about an army
-class StoneEditorTip: public sigc::trackable
+
+// dialog for changing the type of a standing stone
+class StoneEditorDialog: public LwEditorDialog
 {
  public:
-    // the tip is shown above target, simply delete the object to hide it again
-    StoneEditorTip(Gtk::Widget *target, MapTipPosition mpos, Stone *s, Road *r);
-    ~StoneEditorTip() {delete window;}
-    sigc::signal<void,Vector<int>,int> stone_picked;
+    StoneEditorDialog(Gtk::Window &parent, Stone *stone, Road *road);
+    ~StoneEditorDialog();
 
+    bool run();
+    void hide() {dialog->hide();}
+
+    int get_selected_type () const;
+    
  private:
-    Gtk::Window* window;
-    Gtk::Box *button_box;
-    Gtk::RadioButton* buttons[STONE_TYPES];
-    Gtk::RadioButton::Group group;
-    Road *road;
-    Stone *stone;
+    bool d_changed;
+    Gtk::Grid *grid;
+    Road *d_road;
+    Stone *d_stone;
+    int selected_type;
+
+    std::vector<Gtk::ToggleButton *> type_toggles;
+    bool ignore_toggles;
     std::vector<Stone::Type> types;
 
-    void fill_stone_buttons();
-    void connect_signals();
-    void on_stone_selected(int type);
-
+    void on_type_toggled(Gtk::ToggleButton *toggle);
     void fill_pixbuf (int i);
+    int lookup_slot (Gtk::ToggleButton *toggle);
     PixMask *get_grass_image();
 };
 

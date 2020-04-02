@@ -1746,7 +1746,9 @@ bool GameMap::removeStone(Vector<int> pos)
   Stone *s = GameMap::getStone(pos);
   if (s)
     {
-      removeBuilding(s);
+      if (getBuilding(s->getPos()) == Maptile::STONE)
+        setBuilding(s->getPos(), Maptile::NONE);
+
       Stonelist::getInstance()->subtract(s);
       return true;
     }
