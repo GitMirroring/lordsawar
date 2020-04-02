@@ -2299,8 +2299,8 @@ void MainWindow::zoom (double scale)
   GameMap::getInstance()->getCityset()->set_scale (scale);
   for (auto& i : *Playerlist::getInstance())
     Armysetlist::getInstance()->get((*i).getArmyset())->set_scale (scale);
-  redraw();
   bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+  redraw();
 }
 
 bool MainWindow::close_road_editor_tip ()
