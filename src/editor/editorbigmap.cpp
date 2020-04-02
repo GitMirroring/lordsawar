@@ -785,13 +785,14 @@ void EditorBigMap::after_draw()
           break;
 
         case MOVE:
+              
+          buffer_gc->unset_dash ();
           if (moving_objects_from != Vector<int>(-1,-1))
             {
               Vector<int> tile = *i;
               buffer_gc->set_source_rgb(moving_box_color.get_red(),
                                         moving_box_color.get_green(),
                                         moving_box_color.get_blue());
-              buffer_gc->unset_dash ();
               GameMap *gm = GameMap::getInstance();
               Vector<int> from = moving_objects_from;
               if (gm->getStack(from) != NULL)
