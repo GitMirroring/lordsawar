@@ -397,7 +397,12 @@ void MainWindow::setup_terrain_radiobuttons()
 	item.button->signal_toggled().connect(method(on_terrain_radiobutton_toggled));
 	Glib::RefPtr<Gdk::Pixbuf> pic;
 	PixMask *pix = (*(*(*tile).begin())->begin())->getImage()->copy();
-	PixMask::scale(pix, 20, 20);
+        int fs = FontSize::getInstance ()->get_height ();
+        double ratio = 3.7;
+        double new_height = fs * ratio;
+        int new_width =
+          ImageCache::calculate_width_from_adjusted_height (pix, new_height);
+        PixMask::scale (pix, new_width, new_height);
 	item.button->add(*manage(new Gtk::Image(pix->to_pixbuf())));
 	delete pix;
 
@@ -1223,7 +1228,12 @@ void MainWindow::setup_tile_style_buttons(Tile::Type terrain)
             (method(on_tile_style_radiobutton_toggled));
 
           PixMask *pix = tilestyle->getImage()->copy();
-          PixMask::scale(pix, 40, 40);
+          int fs = FontSize::getInstance ()->get_height ();
+          double ratio = 3.7;
+          double new_height = fs * ratio;
+          int new_width =
+            ImageCache::calculate_width_from_adjusted_height (pix, new_height);
+          PixMask::scale (pix, new_width, new_height);
           item.button->add(*manage(new Gtk::Image(pix->to_pixbuf())));
           delete pix;
           item.tile_style_id = tilestyle->getId();
@@ -2219,7 +2229,14 @@ void MainWindow::update_terrain_buttons()
       Tileset *ts = GameMap::getTileset();
       Tile *tile = (*ts)[ts->getIndex(i.terrain)];
       PixMask *px = (*(*(*tile).begin())->begin())->getImage()->copy();
-      PixMask::scale(px, 20, 20);
+      {
+        int fs = FontSize::getInstance ()->get_height ();
+        double ratio = 3.7;
+        double new_height = fs * ratio;
+        int new_width =
+          ImageCache::calculate_width_from_adjusted_height (px, new_height);
+        PixMask::scale (px, new_width, new_height);
+      }
       if (i.button->get_active())
         {
           Gtk::Image *image = new Gtk::Image(px->to_pixbuf());
