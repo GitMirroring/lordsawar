@@ -52,7 +52,6 @@ StoneEditorDialog::StoneEditorDialog(Gtk::Window &parent, Stone *stone, Road *r)
     types = Stone::getTypes ();
 
   // fill in types
-  const int no_columns = 5;
   for (unsigned int i = 0; i < types.size(); ++i)
     {
       Gtk::ToggleButton *toggle = manage(new Gtk::ToggleButton);
@@ -61,9 +60,7 @@ StoneEditorDialog::StoneEditorDialog(Gtk::Window &parent, Stone *stone, Road *r)
       type_toggles.push_back(toggle);
       fill_pixbuf (i);
 
-      int x = i % no_columns;
-      int y = i / no_columns;
-      grid->attach(*toggle, x, y, 1 , 1);
+      grid->add (*toggle);
       toggle->show_all();
 
       if (types[i] == stone->getType())
@@ -153,8 +150,7 @@ bool StoneEditorDialog::run()
 void StoneEditorDialog::on_type_toggled(Gtk::ToggleButton *toggle)
 {
   d_changed = true;
-  selected_type = lookup_slot (toggle);
-  /*
+  //selected_type = lookup_slot (toggle);
   int i = lookup_slot (toggle);
   if (toggle->get_active () == false)
     {
@@ -171,7 +167,6 @@ void StoneEditorDialog::on_type_toggled(Gtk::ToggleButton *toggle)
       type_toggles[j]->set_active(toggle == type_toggles[j]);
     ignore_toggles = false;
     fill_pixbuf (selected_type);
-    */
 }
 
 int StoneEditorDialog::lookup_slot (Gtk::ToggleButton *toggle)

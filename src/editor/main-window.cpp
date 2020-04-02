@@ -321,7 +321,8 @@ MainWindow::MainWindow(Glib::ustring load_filename)
     xml->get_widget ("help_about_menuitem", help_about_menuitem);
     help_about_menuitem->signal_activate().connect
       (method(on_help_about_activated));
-  terrain_tile_style_grid = new Gtk::Grid();
+  terrain_tile_style_grid = new Gtk::FlowBox();
+  terrain_tile_style_grid->property_selection_mode () = Gtk::SELECTION_NONE;
   terrain_tile_style_viewport->add(*terrain_tile_style_grid);
 }
 
@@ -1202,7 +1203,7 @@ void MainWindow::setup_tile_style_buttons(Tile::Type terrain)
 
   auto_item.button->signal_toggled().connect
     (method(on_tile_style_radiobutton_toggled));
-  terrain_tile_style_grid->attach(*manage(auto_item.button), 0, 0, 1, 1);
+  terrain_tile_style_grid->add(*manage(auto_item.button));
 
   auto_item.tile_style_id = -1;
   tile_style_items.push_back(auto_item);
@@ -1223,7 +1224,7 @@ void MainWindow::setup_tile_style_buttons(Tile::Type terrain)
           item.button->set_group(group);
           item.button->property_draw_indicator() = false;
 
-          terrain_tile_style_grid->attach(*manage(item.button), c, r, 1, 1);
+          terrain_tile_style_grid->add(*manage(item.button));
           item.button->signal_toggled().connect
             (method(on_tile_style_radiobutton_toggled));
 

@@ -40,7 +40,7 @@ class StoneEditorDialog: public LwEditorDialog
     
  private:
     bool d_changed;
-    Gtk::Grid *grid;
+    Gtk::FlowBox *grid;
     Road *d_road;
     Stone *d_stone;
     int selected_type;

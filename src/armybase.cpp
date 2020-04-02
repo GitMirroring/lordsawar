@@ -260,3 +260,52 @@ guint32 ArmyBase::bonusFlagFromString(const Glib::ustring str)
   else if (str == "ArmyBase::SUB2ENEMYSTACK") return ArmyBase::SUB2ENEMYSTACK;
   return ArmyBase::ADD1STRINOPEN;
 }
+
+Glib::ustring ArmyBase::getMoveBonusDescription() const
+{
+  guint32 bonus = getMoveBonus ();
+  if (bonus == Tile::isFlying ())
+    return _("Flies");
+  else
+    {
+      if (bonus == Tile::GRASS)
+        return "";
+      else
+        {
+          Glib::ustring s = "";
+          bool first = true;
+          if (bonus & Tile::WATER)
+            {
+              s += (first ? " " : ", ") +
+                Tile::tileTypeToFriendlyName(Tile::WATER);
+              first = false;
+            }
+          if (bonus & Tile::FOREST)
+            {
+              s += (first ? " " : ", ") +
+                Tile::tileTypeToFriendlyName(Tile::FOREST);
+              first = false;
+            }
+          if (bonus & Tile::HILLS)
+            {
+              s += (first ? " " : ", ") +
+                Tile::tileTypeToFriendlyName(Tile::HILLS);
+              first = false;
+            }
+          if (bonus & Tile::MOUNTAIN)
+            {
+              s += (first ? " " : ", ") +
+                Tile::tileTypeToFriendlyName(Tile::MOUNTAIN);
+              first = false;
+            }
+          if (bonus & Tile::SWAMP)
+            {
+              s += (first ? " " : ", ") +
+                Tile::tileTypeToFriendlyName(Tile::SWAMP);
+              first = false;
+            }
+          return s;
+        }
+    }
+  return "";
+}

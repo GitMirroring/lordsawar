@@ -48,7 +48,7 @@ class SelectArmyDialog: public LwEditorDialog
     ArmyInfoTip* army_info_tip;
     Gtk::Label *army_info_label1;
     Gtk::Label *army_info_label2;
-    Gtk::Grid *toggles_table;
+    Gtk::FlowBox *toggles_table;
     Gtk::Button *select_button;
     Gtk::Button *clear_button;
     std::vector<guint32> armysets;
@@ -59,16 +59,13 @@ class SelectArmyDialog: public LwEditorDialog
     bool d_awardable;
     bool d_hero_too;
 
-    std::vector<Gtk::ToggleButton *> army_toggles;
+    std::vector<Gtk::Image*> army_toggles;
     bool ignore_toggles;
     std::vector<const ArmyProto*> selectable;
 
-    void on_army_toggled(Gtk::ToggleButton *toggle);
-    bool on_army_button_event(GdkEventButton *e, Gtk::ToggleButton *toggle);
-    
     void fill_in_army_toggles();
     void fill_in_army_info();
-    void set_select_button_state();
+    void on_army_selected ();
 };
 
 #endif

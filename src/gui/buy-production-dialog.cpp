@@ -59,7 +59,7 @@ BuyProductionDialog::BuyProductionDialog(Gtk::Window &parent, City *c)
     strength_label->set_text ("--");
     upkeep_label->set_text ("--");
 
-    Gtk::Grid *toggles_table; 
+    Gtk::FlowBox *toggles_table; 
     xml->get_widget("production_toggles_table", toggles_table);
     
     const Armysetlist* al = Armysetlist::getInstance();
@@ -75,7 +75,7 @@ BuyProductionDialog::BuyProductionDialog(Gtk::Window &parent, City *c)
       }
 
     // fill in production options
-    const int no_columns = 4;
+    //const int no_columns = 4;
     for (unsigned int i = 0; i < purchasables.size(); ++i)
     {
 	Gtk::ToggleButton *toggle = manage(new Gtk::ToggleButton);
@@ -84,9 +84,10 @@ BuyProductionDialog::BuyProductionDialog(Gtk::Window &parent, City *c)
 	production_toggles.push_back(toggle);
         fill_pixbuf (i);
 
-	int x = i % no_columns;
-	int y = i / no_columns;
-	toggles_table->attach(*toggle, x, y, 1 , 1);
+	//int x = i % no_columns;
+	//int y = i / no_columns;
+	//toggles_table->attach(*toggle, x, y, 1 , 1);
+	toggles_table->add (*toggle);
 	toggle->show_all();
 
 	toggle->signal_toggled().connect(sigc::bind(method(on_production_toggled), toggle));

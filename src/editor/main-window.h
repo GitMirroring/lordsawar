@@ -105,7 +105,7 @@ class MainWindow: public sigc::trackable
     Gtk::MenuItem *battle_calculator_menuitem;
     Gtk::MenuItem *help_about_menuitem;
     Gtk::Viewport *terrain_tile_style_viewport;
-    Gtk::Grid *terrain_tile_style_grid;
+    Gtk::FlowBox *terrain_tile_style_grid;
     Gtk::Image *smallmap_image;
     Glib::ustring current_save_filename;
     bool needs_saving;
