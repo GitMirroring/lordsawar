@@ -51,6 +51,7 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">New</property>
                         <property name="use_underline">True</property>
+                        <accelerator key="n" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -59,6 +60,7 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Open...</property>
                         <property name="use_underline">True</property>
+                        <accelerator key="o" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -67,6 +69,7 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Save</property>
                         <property name="use_underline">True</property>
+                        <accelerator key="s" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -75,6 +78,7 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Save As...</property>
                         <property name="use_underline">True</property>
+                        <accelerator key="s" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -97,6 +101,7 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Quit</property>
                         <property name="use_underline">True</property>
+                        <accelerator key="q" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                   </object>
