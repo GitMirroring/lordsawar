@@ -1,5 +1,6 @@
 //  Copyright (C) 2007, 2008 Ole Laursen
-//  Copyright (C) 2007-2009, 2011, 2012, 2014-2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2015, 2016, 2017,
+//  2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -189,6 +190,8 @@ class GameWindow: public sigc::trackable
     Game* game;
     GameButtonBox *game_button_box;
     Gtk::Label *pos_label;
+
+    GdkEventButton *button_event;
     
     bool on_delete_event();
 

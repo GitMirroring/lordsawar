@@ -1,5 +1,6 @@
 //  Copyright (C) 2007, 2008, Ole Laursen
-//  Copyright (C) 2007-2012, 2014-2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017,
+//  2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -663,7 +664,10 @@ bool GameWindow::on_bigmap_mouse_button_event(GdkEventButton *e)
     return true;	// useless event
 
   if (game)
-    game->get_bigmap().mouse_button_event(to_input_event(e));
+    {
+      button_event = e;
+      game->get_bigmap().mouse_button_event(to_input_event(e));
+    }
 
   return true;
 }
@@ -3063,8 +3067,8 @@ void GameWindow::on_popup_stack_menu (Stack *stack)
   item->signal_activate().connect (method(on_disband_activated));
   item->show();
   menu->add(*item);
-  //menu->set_parent_window (window->get_window());
-  menu->popup(3, 0);
+  menu->accelerate (*window);
+  menu->popup_at_pointer (reinterpret_cast<const GdkEvent*>(button_event));
 }
 
 void GameWindow::on_pointing_at_new_tile(Vector<int> tile)

@@ -1463,10 +1463,11 @@ void MainWindow::on_objects_selected(std::vector<UniquelyIdentified *> objects)
 	    Gtk::MenuItem *item = manage(new Gtk::MenuItem(s));
 	    item->signal_activate().connect
               (sigc::bind(method(popup_dialog_for_object), *i));
+	    menu->append(*item);
 	    item->show();
-	    menu->add(*item);
 	}
-	menu->popup(button_event->button, button_event->time);
+        menu->accelerate (*window);
+	menu->popup_at_pointer(reinterpret_cast<const GdkEvent*>(button_event));
     }
 }
 
@@ -2043,7 +2044,8 @@ void MainWindow::on_stack_selected_for_battle_calculator(Stack *s)
       item->show();
       menu->add(*item);
     }
-  menu->popup(button_event->button, button_event->time);
+  menu->accelerate (*window);
+  menu->popup_at_pointer(reinterpret_cast<const GdkEvent*>(button_event));
 }
 
 void MainWindow::add_attacker_to_battle_calculator(Stack *s)
