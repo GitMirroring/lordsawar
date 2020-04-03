@@ -103,6 +103,8 @@
 
 #define method(x) sigc::mem_fun(*this, &MainWindow::x)
 
+#define EDITOR_DIALOG_BUTTON_TILE_PIC_FONTSIZE_MULTIPLE 3.7
+
 MainWindow::MainWindow(Glib::ustring load_filename)
 {
   Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme() = false;
@@ -126,8 +128,6 @@ MainWindow::MainWindow(Glib::ustring load_filename)
 
     // the map image
     xml->get_widget("bigmap_image", bigmap_image);
-    //bigmap_drawingarea->set_double_buffered(false);
-    //bigmap_drawingarea->set_app_paintable(true);
     bigmap_image->signal_draw().connect (sigc::hide(method(on_bigmap_exposed)));
     bigmap_image->signal_size_allocate().connect(method(on_bigmap_surface_changed));
     xml->get_widget("bigmap_eventbox", bigmap_eventbox);
@@ -357,7 +357,37 @@ void MainWindow::setup_pointer_radiobutton(Glib::RefPtr<Gtk::Builder> xml,
     item.image_file = image_file;
     pointer_items.push_back(item);
 
-    Gtk::Image *image = new Gtk::Image(File::getEditorFile(image_file));
+    bool br = false;
+    PixMask *p = PixMask::create (File::getEditorFile(image_file), br);
+    double ratio = EDITOR_DIALOG_BUTTON_TILE_PIC_FONTSIZE_MULTIPLE;
+    switch (pointer)
+      {
+      case EditorBigMap::MOVE:
+      case EditorBigMap::FIGHT:
+        ratio = 3.1;
+        break;
+      case EditorBigMap::POINTER:
+      case EditorBigMap::TERRAIN:
+      case EditorBigMap::ERASE:
+        ratio = 2.5;
+        break;
+      case EditorBigMap::STACK:
+      case EditorBigMap::CITY:
+      case EditorBigMap::RUIN:
+      case EditorBigMap::TEMPLE:
+      case EditorBigMap::SIGNPOST:
+      case EditorBigMap::ROAD:
+      case EditorBigMap::PORT:
+      case EditorBigMap::BRIDGE:
+      case EditorBigMap::BAG:
+      case EditorBigMap::STONE:
+        break;
+      }
+    double new_height = FontSize::getInstance()->get_height () * ratio;
+    int new_width =
+      ImageCache::calculate_width_from_adjusted_height (p, new_height);
+    PixMask::scale (p, new_width, new_height);
+    Gtk::Image *image = new Gtk::Image(p->to_pixbuf ());
     item.button->set_icon_widget(*image);
     item.button->show_all();
     item.button->queue_draw();
@@ -376,7 +406,6 @@ void MainWindow::setup_terrain_radiobuttons()
     Tileset *tset = GameMap::getTileset();
     Gtk::RadioButton::Group group;
     bool group_set = false;
-    const int no_columns = 6;
     for (unsigned int i = 0; i < tset->size(); ++i)
     {
 	Tile *tile = (*tset)[i];
@@ -392,14 +421,12 @@ void MainWindow::setup_terrain_radiobuttons()
 	}
 	item.button->property_draw_indicator() = false;
 
-	int row = i / no_columns, column = i % no_columns;
-	
-	terrain_type_table->attach(*item.button, column, row, 1, 1);
+	terrain_type_table->add (*item.button);
 	item.button->signal_toggled().connect(method(on_terrain_radiobutton_toggled));
 	Glib::RefPtr<Gdk::Pixbuf> pic;
 	PixMask *pix = (*(*(*tile).begin())->begin())->getImage()->copy();
         int fs = FontSize::getInstance ()->get_height ();
-        double ratio = 3.7;
+        double ratio = 2.7;
         double new_height = fs * ratio;
         int new_width =
           ImageCache::calculate_width_from_adjusted_height (pix, new_height);
@@ -412,7 +439,6 @@ void MainWindow::setup_terrain_radiobuttons()
     }
 
     terrain_type_table->show_all();
-    update_terrain_buttons();
 }
 
 void MainWindow::show()
@@ -1230,7 +1256,7 @@ void MainWindow::setup_tile_style_buttons(Tile::Type terrain)
 
           PixMask *pix = tilestyle->getImage()->copy();
           int fs = FontSize::getInstance ()->get_height ();
-          double ratio = 3.7;
+          double ratio = EDITOR_DIALOG_BUTTON_TILE_PIC_FONTSIZE_MULTIPLE;
           double new_height = fs * ratio;
           int new_width =
             ImageCache::calculate_width_from_adjusted_height (pix, new_height);
@@ -1316,7 +1342,6 @@ void MainWindow::on_terrain_radiobutton_toggled()
   setup_tile_style_buttons(get_terrain());
   on_pointer_radiobutton_toggled();
   auto_select_appropriate_pointer();
-  update_terrain_buttons();
 }
 
 void MainWindow::on_pointer_radiobutton_toggled()
@@ -1335,7 +1360,6 @@ void MainWindow::on_pointer_radiobutton_toggled()
                         get_tile_style_id());
   players_hbox->set_sensitive (pointer == EditorBigMap::STACK || 
                                pointer == EditorBigMap::CITY);
-  update_buttons();
 }
 
 Tile::Type MainWindow::get_terrain()
@@ -2195,62 +2219,6 @@ void MainWindow::on_random_assign_capital_cities_activated()
     }
 
   redraw();
-}
-
-void MainWindow::update_buttons()
-{
-  for (auto &i : pointer_items)
-    {
-      if (i.button->get_active())
-        {
-          bool br = false;
-          PixMask *p = PixMask::create (File::getEditorFile(i.image_file), br);
-          double ratio = 2.3;
-          double new_height = FontSize::getInstance()->get_height () * ratio;
-          int new_width =
-            ImageCache::calculate_width_from_adjusted_height (p, new_height);
-          PixMask::scale (p, new_width, new_height);
-          Gtk::Image *image = new Gtk::Image(p->to_pixbuf());
-          i.button->set_icon_widget(*image);
-          delete p;
-        }
-      else
-        {
-          Gtk::Image *image = new Gtk::Image(File::getEditorFile(i.image_file));
-          i.button->set_icon_widget(*image);
-        }
-      i.button->show_all();
-    }
-}
-
-void MainWindow::update_terrain_buttons()
-{
-  for (auto i : terrain_items)
-    {
-      Tileset *ts = GameMap::getTileset();
-      Tile *tile = (*ts)[ts->getIndex(i.terrain)];
-      PixMask *px = (*(*(*tile).begin())->begin())->getImage()->copy();
-      {
-        int fs = FontSize::getInstance ()->get_height ();
-        double ratio = 3.7;
-        double new_height = fs * ratio;
-        int new_width =
-          ImageCache::calculate_width_from_adjusted_height (px, new_height);
-        PixMask::scale (px, new_width, new_height);
-      }
-      if (i.button->get_active())
-        {
-          Gtk::Image *image = new Gtk::Image(px->to_pixbuf());
-          i.button->set_image(*image);
-        }
-      else
-        {
-          Gtk::Image *image = new Gtk::Image(px->to_pixbuf());
-          i.button->set_image(*image);
-        }
-      i.button->show_all();
-      delete px;
-    }
 }
 
 bool MainWindow::on_window_state_event (GdkEventWindowState *e)

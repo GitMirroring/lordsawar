@@ -109,7 +109,7 @@ class MainWindow: public sigc::trackable
     Gtk::Image *smallmap_image;
     Glib::ustring current_save_filename;
     bool needs_saving;
-    Gtk::Grid *terrain_type_table;
+    Gtk::FlowBox *terrain_type_table;
     Gtk::Label *mouse_position_label;
     Gtk::RadioToolButton *pointer_radiobutton;
     Gtk::Box *players_hbox;
@@ -268,8 +268,6 @@ class MainWindow: public sigc::trackable
     void add_defender_to_battle_calculator(Stack *s);
     void append_defender_to_battle_calculator(Stack *s);
     void change_city_ownership(City *city, Player *player);
-    void update_buttons();
-    void update_terrain_buttons();
 
     bool on_window_state_event (GdkEventWindowState *e);
     bool on_configure_event (GdkEventConfigure *e);
