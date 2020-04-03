@@ -26,7 +26,7 @@
 #include "ucompose.hpp"
 #include "defs.h"
 #include "File.h"
-#include "GameScenario.h"
+#include "scenario-list.h"
 
 #define method(x) sigc::mem_fun(*this, &LoadScenarioDialog::x)
 
@@ -54,17 +54,13 @@ LoadScenarioDialog::LoadScenarioDialog(Gtk::Window &parent)
     .connect(method(on_selection_changed));
   scenarios_treeview->signal_row_activated().connect(sigc::hide(sigc::hide(method(on_scenario_activated))));
   // add the scenarios
-  add_scenario("random.map");
-  std::list<Glib::ustring> lm = File::scanMaps();
-  for (std::list<Glib::ustring>::iterator i = lm.begin(), end = lm.end();
-       i != end; ++i)
-    add_scenario(File::getMapFile(*i));
-  lm.clear();
-  lm = File::scanUserMaps();
-  for (std::list<Glib::ustring>::iterator i = lm.begin(), end = lm.end();
-       i != end; ++i)
-    add_scenario(File::getUserMapFile(*i));
+  Gtk::TreeIter i = scenarios_list->append();
+  (*i)[scenarios_columns.filename] = "random.map";
+  (*i)[scenarios_columns.name] = _("Random Scenario");
+  (*i)[scenarios_columns.details] = NULL;
 
+  for (auto j : *ScenarioList::getInstance ())
+    add_scenario (j);
 
   Gtk::TreeModel::Row row;
   row = scenarios_treeview->get_model()->children()[0];
@@ -93,22 +89,12 @@ Glib::ustring LoadScenarioDialog::get_scenario_filename()
   return selected_filename;
 }
 
-void LoadScenarioDialog::add_scenario(Glib::ustring filename)
+void LoadScenarioDialog::add_scenario(ScenarioDetails *d)
 {
   Gtk::TreeIter i = scenarios_list->append();
-  (*i)[scenarios_columns.filename] = filename;
-  if (filename == "random.map") 
-    {
-      (*i)[scenarios_columns.name] = _("Random Scenario");
-      return;
-    }
-  bool broken = false;
-  Glib::ustring name = "", comment = "", id = "";
-  guint32 player_count = 0, city_count = 0;
-  selected_filename = Glib::ustring((*i)[scenarios_columns.filename]);
-  GameScenario::loadDetails(selected_filename, broken, player_count, city_count, name, comment, id);
-  if (broken == false)
-    (*i)[scenarios_columns.name] = name;
+  (*i)[scenarios_columns.filename] = d->getFilename ();
+  (*i)[scenarios_columns.name] = d->getName ();
+  (*i)[scenarios_columns.details] = d;
 }
 
 void LoadScenarioDialog::on_selection_changed()
@@ -118,6 +104,7 @@ void LoadScenarioDialog::on_selection_changed()
   if (i)
     {
       Glib::ustring filename = (*i)[scenarios_columns.filename];
+      ScenarioDetails *details = (*i)[scenarios_columns.details];
       if (filename == "random.map")
 	{
 	  load_button->set_sensitive(true);
@@ -130,26 +117,13 @@ void LoadScenarioDialog::on_selection_changed()
 	  return;
 	}
 
-      selected_filename = filename;
-      bool broken = false;
-      Glib::ustring name, comment, id;
-      guint32 player_count = 0, city_count = 0;
-      GameScenario::loadDetails(filename, broken, player_count, city_count, name, comment, id);
-
-      if (broken == true)
-	{
-	  std::cerr << "Error: Could not parse " << selected_filename << std::endl;
-	  load_button->set_sensitive(false);
-	  return;
-	}
-	  
       remove_scenario_button->set_sensitive(true);
       load_button->set_sensitive(true);
       num_players_label->set_markup 
-	("<b>" + String::ucompose("%1", player_count - 1) + "</b>");
+	("<b>" + String::ucompose("%1", details->getNumberOfPlayers () - 1) + "</b>");
       num_cities_label->set_markup 
-	("<b>" + String::ucompose("%1", city_count) + "</b>");
-      description_textview->get_buffer()->set_text(comment);
+	("<b>" + String::ucompose("%1", details->getNumberOfCities ()) + "</b>");
+      description_textview->get_buffer()->set_text(details->getDescription ());
     }
   else
     load_button->set_sensitive(false);
@@ -179,7 +153,9 @@ void LoadScenarioDialog::on_add_scenario_clicked()
       // copy it into our ~/.lordsawar/ dir.
       File::copy (filename, File::getUserMapFile(mapname));
       // add it to the list
-      add_scenario(File::getUserMapFile(mapname));
+      if (ScenarioList::getInstance ()->add_file
+          (File::getUserMapFile (mapname)))
+        add_scenario (ScenarioList::getInstance()->back ());
     }
   delete load_map_filechooser;
 }
@@ -198,11 +174,22 @@ void LoadScenarioDialog::on_remove_scenario_clicked()
       Glib::ustring filename = (*i)[scenarios_columns.filename];
       if (filename == "random.map")
         return;
-      File::erase(filename);
-      scenarios_list->erase(i);
-      description_textview->get_buffer()->set_text("");
-      num_players_label->set_text ("");
-      num_cities_label->set_text ("");
+      if (ScenarioList::getInstance ()->remove_file (filename))
+        {
+          scenarios_list->erase(i);
+          description_textview->get_buffer()->set_text("");
+          num_players_label->set_text ("");
+          num_cities_label->set_text ("");
+        }
+      else
+        {
+          Glib::ustring errmsg = Glib::strerror(errno);
+          Glib::ustring msg = _("Error!  Scenario could not be removed.");
+          msg += "\n" + filename + "\n" + errmsg;
+          Gtk::MessageDialog d(*dialog, msg);
+          d.run();
+          d.hide();
+        }
     }
   return;
 }

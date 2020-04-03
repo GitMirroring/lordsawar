@@ -399,8 +399,9 @@ Glib::ustring File::getSetDir(Glib::ustring ext, bool system)
   return "";
 }
 
-void File::erase(Glib::ustring filename)
+bool File::erase(Glib::ustring filename)
 {
+  bool success = true;
   if (File::exists(filename))
     {
       Glib::RefPtr<Gio::File> file = Gio::File::create_for_path(filename);
@@ -411,8 +412,12 @@ void File::erase(Glib::ustring filename)
       catch (const Glib::Error &ex) 
         {
           std::cerr << ex.what() << " " << filename << std::endl;
+          success = false;
         }
     }
+  else
+    success = false;
+  return success;
 }
 
 void File::erase_dir(Glib::ustring filename)

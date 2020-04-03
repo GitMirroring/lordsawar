@@ -24,6 +24,8 @@
 
 #include "lw-dialog.h"
 
+class ScenarioDetails;
+
 // dialog for choosing a scenario
 class LoadScenarioDialog: public LwDialog
 {
@@ -48,10 +50,12 @@ class LoadScenarioDialog: public LwDialog
     class ScenariosColumns: public Gtk::TreeModelColumnRecord {
     public:
 	ScenariosColumns() 
-        { add(name); add(filename); }
+        { add(name); add(filename); add (details);}
 	
 	Gtk::TreeModelColumn<Glib::ustring> name;
 	Gtk::TreeModelColumn<Glib::ustring> filename;
+	Gtk::TreeModelColumn<ScenarioDetails *> details;
+
     };
     const ScenariosColumns scenarios_columns;
     Glib::RefPtr<Gtk::ListStore> scenarios_list;
@@ -59,7 +63,7 @@ class LoadScenarioDialog: public LwDialog
     Glib::ustring selected_filename;
     
     void on_selection_changed();
-    void add_scenario(Glib::ustring filename);
+    void add_scenario(ScenarioDetails *d);
     void on_add_scenario_clicked();
     void on_remove_scenario_clicked();
     int copy_file (Glib::ustring from, Glib::ustring to);

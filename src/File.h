@@ -122,7 +122,7 @@ class File
 	static bool nameEndsWith(Glib::ustring filename, Glib::ustring extension);
 
 	//! delete a file from the filesystem.
-	static void erase(Glib::ustring filename);
+	static bool erase(Glib::ustring filename);
 
 	//! delete an empty directory from the filesystem.
 	static void erase_dir(Glib::ustring filename);
