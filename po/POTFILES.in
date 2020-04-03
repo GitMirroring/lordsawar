@@ -217,6 +217,8 @@ src/Threat.cpp
 src/tileset.cpp
 src/tartan.cpp
 src/ScenarioMedia.cpp
+src/scenario-list.cpp
+src/scenario-details.cpp
 src/gui/image-helpers.cpp
 src/gui/city-window.cpp
 src/gui/preferences-dialog.cpp
