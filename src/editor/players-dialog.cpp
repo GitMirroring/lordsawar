@@ -221,10 +221,14 @@ void PlayersDialog::cell_data_gold(Gtk::CellRenderer *renderer,
 void PlayersDialog::on_gold_edited(const Glib::ustring &path,
 				   const Glib::ustring &new_text)
 {
-  int gold = atoi(new_text.c_str());
-  (*player_list->get_iter(Gtk::TreePath(path)))[player_columns.gold] = gold;
-  d_changed = true;
-  update_player ();
+  Gtk::TreeIter i = player_list->get_iter(Gtk::TreePath(path));
+  if ((*i)[player_columns.type] != NO_PLAYER_TYPE)
+    {
+      int gold = atoi(new_text.c_str());
+      (*i)[player_columns.gold] = gold;
+      d_changed = true;
+      update_player ();
+    }
 }
 
 void PlayersDialog::cell_data_name(Gtk::CellRenderer *renderer,
@@ -237,9 +241,14 @@ void PlayersDialog::cell_data_name(Gtk::CellRenderer *renderer,
 void PlayersDialog::on_name_edited(const Glib::ustring &path,
 				   const Glib::ustring &new_text)
 {
-  (*player_list->get_iter(Gtk::TreePath(path)))[player_columns.name] = new_text;
-  d_changed = true;
-  update_player ();
+  Gtk::TreeIter i = player_list->get_iter(Gtk::TreePath(path));
+  Glib::ustring type = (*i)[player_columns.type];
+  if (type != NO_PLAYER_TYPE)
+    {
+      (*i)[player_columns.name] = new_text;
+      d_changed = true;
+      update_player ();
+    }
 }
 
 void PlayersDialog::on_randomize_gold_pressed()
@@ -247,14 +256,17 @@ void PlayersDialog::on_randomize_gold_pressed()
   for (Gtk::TreeIter i = player_list->children().begin(),
        end = player_list->children().end(); i != end; ++i)
     {
-      int gold = 0;
-      d_random->getBaseGold(100, &gold);
-      gold = d_random->adjustBaseGold(gold);
-      (*i)[player_columns.gold] = gold;
-      Player *p = (*i)[player_columns.player];
-      p->setGold (gold);
+      if ((*i)[player_columns.type] != NO_PLAYER_TYPE)
+        {
+          int gold = 0;
+          d_random->getBaseGold(100, &gold);
+          gold = d_random->adjustBaseGold(gold);
+          (*i)[player_columns.gold] = gold;
+          Player *p = (*i)[player_columns.player];
+          p->setGold (gold);
+          d_changed = true;
+        }
     }
-  d_changed = true;
 }
 
 void PlayersDialog::on_all_players_on_pressed()

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,8 +32,10 @@ class ItemlistDialog: public LwEditorDialog
  public:
     ItemlistDialog(Gtk::Window &parent);
     ~ItemlistDialog() {}
+    bool item_was_changed () const {return d_changed;}
 
  private:
+    bool d_changed;
     Glib::ustring current_save_filename;
     const ArmyProto *selected_summon_army;
     const ArmyProto *selected_banish_army;
@@ -147,6 +149,7 @@ class ItemlistDialog: public LwEditorDialog
     void update_raise_defender_army_type_name();
     void on_persuade_neutral_city_toggled();
     void on_teleport_to_city_toggled();
+    void connect_signals ();
 };
 
 #endif

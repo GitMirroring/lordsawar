@@ -29,6 +29,9 @@ struct Rectangle
     Rectangle(int x_, int y_, int w_, int h_)
 	: pos(x_, y_), dim(w_, h_), x(pos.x), y(pos.y), w(dim.x), h(dim.y) {}
 
+    Rectangle(Vector<int> pos_)
+	: pos(pos_), dim(Vector<int>(1,1)), x(pos.x), y(pos.y), w(dim.x), h(dim.y) {}
+    
     Rectangle(Vector<int> pos_, Vector<int> dim_)
 	: pos(pos_), dim(dim_), x(pos.x), y(pos.y), w(dim.x), h(dim.y) {}
     

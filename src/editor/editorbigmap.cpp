@@ -114,6 +114,7 @@ void EditorBigMap::mouse_button_event(MouseButtonEvent e)
   else if (e.button == MouseButtonEvent::RIGHT_BUTTON
            && e.state == MouseButtonEvent::PRESSED)
     bring_up_details();
+  return;
 }
 
 void EditorBigMap::mouse_motion_event(MouseMotionEvent e)
@@ -354,6 +355,7 @@ void EditorBigMap::change_map_under_cursor()
                       //also we need to clear the active stack to have it show.
                       gm->getStack(tile)->getOwner()->setActivestack(0);
                     }
+                  changed_tiles = Rectangle (s->getPos ());
                 }
             }
           else if (gm->getBackpack(from)->empty() == false)
@@ -361,7 +363,10 @@ void EditorBigMap::change_map_under_cursor()
               if (gm->canDropBag (tile))
                 {
                   if (moving_bag->getPos () != tile)
-                    gm->moveBackpack(moving_bag, tile);
+                    {
+                      gm->moveBackpack(moving_bag, tile);
+                      changed_tiles = Rectangle (tile);
+                    }
                   moving_bag = NULL;
                 }
               else
@@ -372,12 +377,18 @@ void EditorBigMap::change_map_under_cursor()
               guint32 s = gm->getBuildingSize(from);
               if (gm->canPutBuilding
                   (gm->getBuilding(from), s, tile, false) == true)
-                gm->moveBuilding(from, tile);
+                {
+                  gm->moveBuilding(from, tile);
+                  changed_tiles = Rectangle (tile);
+                }
               else
                 {
                   if (gm->getLocation(from)->contains(tile) ||
                       LocationBox(tile, s).contains(from))
-                    gm->moveBuilding(from, tile);
+                    {
+                      gm->moveBuilding(from, tile);
+                      changed_tiles = Rectangle (tile);
+                    }
                 }
             }
           moving_objects_from = Vector<int>(-1,-1);
@@ -386,10 +397,7 @@ void EditorBigMap::change_map_under_cursor()
     case ERASE:
       // check if there is a building or a stack there and remove it
       if (GameMap::getInstance()->eraseTile(tile))
-        {
-          changed_tiles.pos = tile;
-          changed_tiles.dim = Vector<int>(1, 1);
-        }
+        changed_tiles = Rectangle (tile);
       break;
 
     case STACK:
@@ -415,6 +423,7 @@ void EditorBigMap::change_map_under_cursor()
           GameMap::getInstance()->putStack(s);
           //if we're on a city, change the allegiance of the stack
           //and it's armies to that of the city
+          changed_tiles = Rectangle (s->getPos ());
           if (GameMap::getInstance()->getBuilding(s->getPos()) == Maptile::CITY)
             {
               City *c = GameMap::getCity(s->getPos());
@@ -441,7 +450,10 @@ void EditorBigMap::change_map_under_cursor()
             objects_selected.emit(seq);
         }
       else
-        GameMap::getInstance()->putNewCity(tile);
+        {
+          GameMap::getInstance()->putNewCity(tile);
+          changed_tiles = Rectangle (tile);
+        }
       break;
 
     case RUIN:
@@ -456,7 +468,10 @@ void EditorBigMap::change_map_under_cursor()
             objects_selected.emit(seq);
         }
       else
-        GameMap::getInstance()->putNewRuin(tile);
+        {
+          GameMap::getInstance()->putNewRuin(tile);
+          changed_tiles = Rectangle (tile);
+        }
       break;
 
     case TEMPLE:
@@ -471,7 +486,10 @@ void EditorBigMap::change_map_under_cursor()
             objects_selected.emit(seq);
         }
       else
-        GameMap::getInstance()->putNewTemple(tile);
+        {
+          GameMap::getInstance()->putNewTemple(tile);
+          changed_tiles = Rectangle (tile);
+        }
       break;
 
     case SIGNPOST:
@@ -494,6 +512,7 @@ void EditorBigMap::change_map_under_cursor()
                 break;
               Signpost *s = new Signpost(tile);
               GameMap::getInstance()->putSignpost(s);
+              changed_tiles = Rectangle (tile);
             }
           break;
         }
@@ -506,6 +525,7 @@ void EditorBigMap::change_map_under_cursor()
             break;
           Port *p = new Port(tile);
           GameMap::getInstance()->putPort(p);
+          changed_tiles = Rectangle (tile);
           break;
         }
 
@@ -516,6 +536,7 @@ void EditorBigMap::change_map_under_cursor()
               GameMap::getInstance()->removeBridge(tile);
               Bridge *b = new Bridge(tile, tile_to_bridge_type (tile));
               GameMap::getInstance()->putBridge(b);
+              changed_tiles = Rectangle (tile);
               break;
             }
           bool bridge_placeable = GameMap::getInstance()->canPutBuilding
@@ -524,6 +545,7 @@ void EditorBigMap::change_map_under_cursor()
             break;
           Bridge *b = new Bridge(tile, tile_to_bridge_type (tile));
           GameMap::getInstance()->putBridge(b);
+          changed_tiles = Rectangle (tile);
           break;
         }
 
@@ -592,6 +614,7 @@ void EditorBigMap::change_map_under_cursor()
                 type = Stone::getRandomType(Road::Type(r->getType()));
               Stone *s = new Stone(tile, type);
               GameMap::getInstance()->putStone(s);
+              changed_tiles = Rectangle (tile);
             }
         }
       break;
@@ -601,6 +624,7 @@ void EditorBigMap::change_map_under_cursor()
     map_tiles_changed.emit(changed_tiles);
 
   draw();
+  return ;
 }
 
 void EditorBigMap::bring_up_details()

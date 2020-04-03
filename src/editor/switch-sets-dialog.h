@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class Armyset;
 class Cityset;
 class Shieldset;
 
-//! Scenario editor.  Change the army/tile/city/shieldsets of the map.
+//! Switch Sets.  Change the army/tile/city/shieldsets of the map.
 class SwitchSetsDialog: public LwEditorDialog
 {
  public:
@@ -48,6 +48,9 @@ class SwitchSetsDialog: public LwEditorDialog
     bool get_tileset_changed() const {return tileset_changed;}
     bool get_cityset_changed() const {return cityset_changed;}
     bool get_shieldset_changed() const {return shieldset_changed;}
+
+    bool get_set_changed () const {return armyset_changed || tileset_changed ||
+      cityset_changed || shieldset_changed;}
     
  private:
     Gtk::ComboBoxText *tile_size_combobox;

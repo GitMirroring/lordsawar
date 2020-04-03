@@ -539,6 +539,7 @@ void MainWindow::show_initial_map()
       remove_tile_style_buttons();
       setup_tile_style_buttons(Tile::GRASS);
     }
+  update_window_title ();
 }
 
 void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ustring tileset, Glib::ustring shieldset, Glib::ustring cityset, Glib::ustring armyset)
@@ -778,11 +779,9 @@ bool MainWindow::on_bigmap_mouse_button_event(GdkEventButton *e)
         return true;
 
       button_event = e;	// save it for later use
-      bigmap->mouse_button_event(to_input_event(e));
+      bigmap->mouse_button_event(to_input_event (e));
       if (smallmap)
         smallmap->draw();
-      needs_saving = true;
-      update_window_title();
     }
 
   return true;
@@ -1450,11 +1449,22 @@ void MainWindow::init_maps()
 	sigc::mem_fun(smallmap, &SmallMap::set_view));
     bigmap->map_tiles_changed.connect(
 	sigc::mem_fun(smallmap, &SmallMap::redraw_tiles));
+    bigmap->map_tiles_changed.connect(
+	sigc::mem_fun(this, &MainWindow::on_bigmap_tiles_changed));
     smallmap->view_changed.connect(
 	sigc::mem_fun(bigmap, &EditorBigMap::set_view));
 
     //trigger the bigmap to resize the view box in the smallmap
     bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+}
+
+void MainWindow::on_bigmap_tiles_changed (Rectangle r)
+{
+  if (r.w > 0 && r.h > 0)
+    {
+      needs_saving = true;
+      update_window_title ();
+    }
 }
 
 void MainWindow::on_mouse_on_tile(Vector<int> tile)
@@ -1612,12 +1622,14 @@ void MainWindow::on_smooth_map_activated()
 					  GameMap::getWidth(), true);
   redraw();
   needs_saving = true;
+  update_window_title ();
 }
 
 void MainWindow::on_smooth_screen_activated()
 {
   bigmap->smooth_view();
   needs_saving = true;
+  update_window_title ();
 }
 
 void MainWindow::on_edit_items_activated()
@@ -1626,8 +1638,11 @@ void MainWindow::on_edit_items_activated()
   int response = d.run_and_hide();
   if (response == Gtk::RESPONSE_ACCEPT)
     {
-      needs_saving = true;
-      update_window_title();
+      if (d.item_was_changed ())
+        {
+          needs_saving = true;
+          update_window_title();
+        }
     }
 }
 
@@ -1647,6 +1662,8 @@ void MainWindow::randomize_city(City *c)
   if (name != "")
     c->setName(name);
   c->setRandomArmytypes(true, 1);
+  needs_saving = true;
+  update_window_title();
 }
 
 void MainWindow::on_random_all_cities_activated()
@@ -1654,20 +1671,14 @@ void MainWindow::on_random_all_cities_activated()
   Citylist *cl = Citylist::getInstance();
   for (Citylist::iterator it = cl->begin(); it != cl->end(); it++)
     randomize_city(*it);
-  needs_saving = true;
-  update_window_title();
 }
 
 void MainWindow::on_random_unnamed_cities_activated()
 {
   Citylist *cl = Citylist::getInstance();
   for (Citylist::iterator it = cl->begin(); it != cl->end(); it++)
-    {
-      if ((*it)->isUnnamed() == true)
-	randomize_city(*it);
-    }
-  needs_saving = true;
-  update_window_title();
+    if ((*it)->isUnnamed() == true)
+      randomize_city(*it);
 }
 
 void MainWindow::randomize_ruin(Ruin *r)
@@ -1678,6 +1689,8 @@ void MainWindow::randomize_ruin(Ruin *r)
       Location *l = r;
       RenamableLocation *renamable_ruin = static_cast<RenamableLocation*>(l);
       renamable_ruin->setName(name);
+      needs_saving = true;
+      update_window_title();
     }
 }
 
@@ -1686,20 +1699,14 @@ void MainWindow::on_random_all_ruins_activated()
   Ruinlist *rl = Ruinlist::getInstance();
   for (Ruinlist::iterator it = rl->begin(); it != rl->end(); it++)
     randomize_ruin(*it);
-  needs_saving = true;
-  update_window_title();
 }
 
 void MainWindow::on_random_unnamed_ruins_activated()
 {
   Ruinlist *rl = Ruinlist::getInstance();
   for (Ruinlist::iterator it = rl->begin(); it != rl->end(); it++)
-    {
-      if ((*it)->isUnnamed() == true)
-	randomize_ruin(*it);
-    }
-  needs_saving = true;
-  update_window_title();
+    if ((*it)->isUnnamed() == true)
+      randomize_ruin(*it);
 }
 
 void MainWindow::on_random_all_temples_activated()
@@ -1714,10 +1721,10 @@ void MainWindow::on_random_all_temples_activated()
 	  RenamableLocation *renamable_temple = 
 	    static_cast<RenamableLocation*>(l);
 	  renamable_temple->setName(name);
+          needs_saving = true;
+          update_window_title();
 	}
     }
-  needs_saving = true;
-  update_window_title();
 }
 
 void MainWindow::on_random_unnamed_temples_activated()
@@ -1734,11 +1741,11 @@ void MainWindow::on_random_unnamed_temples_activated()
 	      RenamableLocation *renamable_temple = 
 		static_cast<RenamableLocation*>(l);
 	      renamable_temple->setName(name);
+              needs_saving = true;
+              update_window_title();
 	    }
 	}
     }
-  needs_saving = true;
-  update_window_title();
 }
 
 void MainWindow::randomize_signpost(Signpost *signpost)
@@ -1751,7 +1758,11 @@ void MainWindow::randomize_signpost(Signpost *signpost)
 
     name = d_create_scenario_names->getDynamicSignpost(signpost);
   if (name != "")
-    signpost->setName(name);
+    {
+      signpost->setName(name);
+      needs_saving = true;
+      update_window_title();
+    }
 }
 
 void MainWindow::on_random_all_signs_activated()
@@ -1759,20 +1770,14 @@ void MainWindow::on_random_all_signs_activated()
   Signpostlist *sl = Signpostlist::getInstance();
   for (Signpostlist::iterator it = sl->begin(); it != sl->end(); it++)
     randomize_signpost(*it);
-  needs_saving = true;
-  update_window_title();
 }
 
 void MainWindow::on_random_unnamed_signs_activated()
 {
   Signpostlist *sl = Signpostlist::getInstance();
   for (Signpostlist::iterator it = sl->begin(); it != sl->end(); it++)
-    {
-      if ((*it)->getName() == DEFAULT_SIGNPOST)
-	randomize_signpost(*it);
-    }
-  needs_saving = true;
-  update_window_title();
+    if ((*it)->getName() == DEFAULT_SIGNPOST)
+      randomize_signpost(*it);
 }
 
 void MainWindow::on_help_about_activated()
@@ -1889,7 +1894,7 @@ void MainWindow::on_switch_sets_activated()
 {
   SwitchSetsDialog d(*window);
   int response = d.run();
-  if (response == Gtk::RESPONSE_ACCEPT)
+  if (response == Gtk::RESPONSE_ACCEPT && d.get_set_changed ())
     {
       needs_saving = true;
       update_window_title();
@@ -1954,13 +1959,10 @@ void MainWindow::fill_players()
 void MainWindow::update_window_title()
 {
   Glib::ustring title = "";
-  if (current_save_filename != "")
-    {
-      if (needs_saving == true)
-        title +="*";
-      title += File::get_basename(current_save_filename, true);
-      title += " - ";
-    }
+  if (needs_saving)
+    title += "*";
+  title += game_scenario->getName();
+  title += " - ";
   title += _("Scenario Builder");
   window->set_title(title);
 }
@@ -2022,6 +2024,7 @@ void MainWindow::on_remove_all_stacks_activated()
         p->clearStacklist();
       redraw();
       needs_saving = true;
+      update_window_title ();
     }
 }
 
@@ -2030,7 +2033,10 @@ void MainWindow::on_edit_fight_order_activated()
   FightOrderEditorDialog d(*window);
   d.run();
   if (d.get_modified())
-    needs_saving = true;
+    {
+      needs_saving = true;
+      update_window_title ();
+    }
 }
 
 bool MainWindow::on_bigmap_scrolled(GdkEventScroll* event)
@@ -2043,6 +2049,7 @@ bool MainWindow::on_bigmap_scrolled(GdkEventScroll* event)
 void MainWindow::on_road_edited(Vector<int> pos, int type)
 {
   needs_saving = true;
+  update_window_title();
   close_road_editor_tip ();
   Road *road = new Road (pos, Road::Type(type));
   GameMap::getInstance()->putRoad(road, false);
@@ -2128,7 +2135,10 @@ void MainWindow::on_edit_scenario_media_activated()
   MediaDialog d (*window, game_scenario);
   d.run();
   if (d.get_needs_saving())
-    needs_saving = true;
+    {
+      needs_saving = true;
+      update_window_title ();
+    }
 }
 
 Glib::ustring MainWindow::getDefaultMapFilename()
@@ -2197,6 +2207,7 @@ void MainWindow::on_random_assign_capital_cities_activated()
             }
         }
       needs_saving = true;
+      update_window_title ();
     }
 
   //for each player except neutral, pick a new capital
@@ -2220,6 +2231,7 @@ void MainWindow::on_random_assign_capital_cities_activated()
           capital->setCapital(true);
           capital->setCapitalOwner(p);
           needs_saving = true;
+          update_window_title ();
         }
     }
 
