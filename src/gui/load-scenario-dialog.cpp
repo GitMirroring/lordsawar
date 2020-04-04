@@ -117,6 +117,7 @@ void LoadScenarioDialog::on_selection_changed()
 	  return;
 	}
 
+      selected_filename = filename;
       remove_scenario_button->set_sensitive(true);
       load_button->set_sensitive(true);
       num_players_label->set_markup 
