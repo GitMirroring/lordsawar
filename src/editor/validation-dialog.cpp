@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2014 Ben Asselstine
+//  Copyright (C) 2010, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,7 +40,8 @@ ValidationDialog::ValidationDialog(Gtk::Window &parent, std::list<Glib::ustring>
   xml->get_widget("scrolledwindow", scrolled_window);
   if (errors.size() == 0 && warnings.size() == 0)
     {
-      label->set_text(_("No errors"));
+      Glib::ustring msg = _("The scenario is valid.");
+      label->set_markup("<b>" + msg + "</b>");
       scrolled_window->set_no_show_all (true);
       scrolled_window->set_visible (false);
     }
