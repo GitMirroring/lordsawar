@@ -325,6 +325,7 @@ MainWindow::MainWindow(Glib::ustring load_filename)
   terrain_tile_style_grid = new Gtk::FlowBox();
   terrain_tile_style_grid->property_selection_mode () = Gtk::SELECTION_NONE;
   terrain_tile_style_viewport->add(*terrain_tile_style_grid);
+  SmallMap::s_quick = true;
 }
 
 MainWindow::~MainWindow()
@@ -340,6 +341,7 @@ MainWindow::~MainWindow()
   d_create_scenario_names->cleanup();
   delete d_create_scenario_names;
   delete window;
+  SmallMap::s_quick = false;
 }
 
 void MainWindow::setup_pointer_radiobutton(Glib::RefPtr<Gtk::Builder> xml,

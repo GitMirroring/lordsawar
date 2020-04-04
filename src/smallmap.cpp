@@ -84,7 +84,7 @@ void SmallMap::center_view_on_tile(Vector<int> pos, bool slide_me)
              GameMap::get_dim() - view.dim);
 
   sliding = false;
-  if (slide_me)
+  if (slide_me && sleep_interval > 0)
     slide_view(Rectangle(pos.x, pos.y, view.w, view.h));
   else
     set_view(Rectangle(pos.x, pos.y, view.w, view.h));
@@ -107,7 +107,7 @@ void SmallMap::center_view_on_pixel(Vector<int> pos, bool slide_me)
 
   pos = clip(Vector<int>(0, 0), pos, GameMap::get_dim() - view.dim);
 
-  if (slide_me)
+  if (slide_me && sleep_interval > 0)
     slide_view(Rectangle(pos.x, pos.y, view.w, view.h));
   else
     set_view(Rectangle(pos.x, pos.y, view.w, view.h));
