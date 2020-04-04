@@ -848,8 +848,6 @@
                     <property name="bottom_padding">6</property>
                     <child>
                       <object class="GtkScrolledWindow" id="scrolledwindow1">
-                        <property name="width_request">200</property>
-                        <property name="height_request">160</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="hadjustment">adjustment1</property>
