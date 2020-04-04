@@ -34,3 +34,8 @@ when we get a networked game and add the tilesets, etc to our personal collectio
 3x3 forests in the editor causes crazy tiles.  not being smoothed properly.
 
 should we do anything when an armyset, etc gets removed from disk after it is loaded
+
+add a way to reset the hero names in the editor
+add a way to reset the items in the editor
+add a way to reset the player names in the editor
+
