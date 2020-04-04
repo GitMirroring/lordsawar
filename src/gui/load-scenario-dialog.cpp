@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ LoadScenarioDialog::LoadScenarioDialog(Gtk::Window &parent)
   xml->get_widget("load_button", load_button);
   xml->get_widget("num_players_label", num_players_label);
   xml->get_widget("num_cities_label", num_cities_label);
+  xml->get_widget("dialog-vbox", dialog_vbox);
 
   scenarios_list = Gtk::ListStore::create(scenarios_columns);
   xml->get_widget("treeview", scenarios_treeview);
@@ -81,6 +82,40 @@ void LoadScenarioDialog::run()
   if (response != Gtk::RESPONSE_ACCEPT)
     selected_filename = "";
 
+  if (selected_filename.empty () == false &&
+      selected_filename != "random.map")
+    {
+      bool valid = false;
+
+      Gtk::TreeIter i = scenarios_treeview->get_selection()->get_selected();
+      ScenarioDetails *d = (*i)[scenarios_columns.details];
+      if (d->getNumberOfCities () > 1 && d->getNumberOfPlayers() > 1)
+        {
+          setup_progress_bar ();
+          bool broken = false;
+
+          GameScenario::load_tick.connect (method (tick_progress));
+          GameScenario::load_finish.connect (method (finish_progress));
+          GameScenario *g = new GameScenario (selected_filename, broken);
+          if (g)
+            {
+              if (!broken)
+                {
+                  std::list<Glib::ustring> errors;
+                  std::list<Glib::ustring> warnings;
+                  valid = g->validate (errors, warnings);
+                }
+              delete g;
+            }
+        }
+      if (!valid)
+        {
+          selected_filename = "";
+          Gtk::MessageDialog di(_("The scenario isn't valid."));
+          di.run();
+          di.hide ();
+        }
+    }
   dialog->get_size(width, height);
 }
 
@@ -198,4 +233,52 @@ void LoadScenarioDialog::on_remove_scenario_clicked()
 void LoadScenarioDialog::on_scenario_activated()
 {
   load_button->activate();
+}
+
+void LoadScenarioDialog::setup_progress_bar ()
+{
+  progress_treeview = Gtk::manage (new Gtk::TreeView ());
+  progress_treeview->property_headers_visible () = false;
+  progress_liststore = Gtk::ListStore::create(progress_columns);
+  progress_treeview->set_model (progress_liststore);
+  progressrow = *(progress_liststore->append());
+  auto cell = Gtk::make_managed<Gtk::CellRendererProgress>();
+  cell->property_text () = "";
+  int cols_count = progress_treeview->append_column ("progress", *cell);
+  auto pColumn = progress_treeview->get_column(cols_count -1);
+  if (pColumn)
+    pColumn->add_attribute(cell->property_value (), progress_columns.perc);
+
+  dialog_vbox->pack_end (*progress_treeview, true, true);
+  dialog_vbox->show_all ();
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
+  dialog_vbox->set_sensitive(false);
+}
+
+void LoadScenarioDialog::tick_progress ()
+{
+  if (!progress_treeview)
+    return;
+  if (progressrow[progress_columns.perc] < 88)
+    {
+      progressrow[progress_columns.perc] =
+        progressrow[progress_columns.perc] + 13;
+      while (g_main_context_iteration(NULL, FALSE)); //doEvents
+    }
+}
+
+void LoadScenarioDialog::finish_progress ()
+{
+  if (!progress_treeview)
+    return;
+  //finish off the progressbar
+  while (progressrow[progress_columns.perc] < 100)
+    {
+      progressrow[progress_columns.perc] =
+        progressrow[progress_columns.perc] + 1;
+      while (g_main_context_iteration(NULL, FALSE)); //doEvents
+      Glib::usleep (10000);
+    }
+  progressrow[progress_columns.perc] = 100;
+  dialog->hide ();
 }

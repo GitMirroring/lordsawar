@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ class XML_Helper;
 class Tar_Helper;
 
 //! A class to hold several scenario options.
-/** 
+/**
  * This class has two functions. On the one hand side, it holds some data
  * about the current scenario being played (such as the name), on the other
  * hand it has a kind of supervisor function. Loading and saving works in
@@ -51,9 +51,9 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	static Glib::ustring d_tag;
 	static Glib::ustring d_top_tag;
 
-        enum PlayMode 
+        enum PlayMode
 	  {
-	    HOTSEAT = 0, 
+	    HOTSEAT = 0,
 	    NETWORKED = 1
 	  };
 
@@ -61,16 +61,16 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	static GameScenario::PlayMode playModeFromString(const Glib::ustring str);
 
         /** Initializes an "empty" scenario
-          * 
+          *
           * @param name     the name of the scenario
           * @param comment  the comment for the scenario
           * @param turnmode the turnmode (see NextTurn for description)
           */
         GameScenario(Glib::ustring name, Glib::ustring comment,
 		     GameScenario::PlayMode playmode = GameScenario::HOTSEAT);
-        
+
         /** Load the game scenario using a specified save game
-          * 
+          *
           * @param savegame     the full name of the saved-game to load
           * @param broken       set to true if something goes wrong
           */
@@ -106,15 +106,15 @@ class GameScenario: public GameScenarioOptions, public TarFile
 
         //! Sets the description of the scenario.
         void setComment(Glib::ustring comment) {d_comment = comment;}
-        
+
         //! Sets the copyright of the scenario.
         void setCopyright(Glib::ustring copy) {d_copyright = copy;}
-        
+
         //! Sets the license of the scenario.
         void setLicense(Glib::ustring license) {d_license = license;}
-        
+
         /** Saves the game. See XML_Helper for further explanations.
-          * 
+          *
           * @param filename     the full name of the save game file
           * @return true if all went well, false otherwise
           */
@@ -123,7 +123,6 @@ class GameScenario: public GameScenarioOptions, public TarFile
         bool loadWithHelper(XML_Helper &helper, Glib::ustring dir);
         bool saveWithHelper(XML_Helper &helper) const;
 
-        
 	guint32 getPlayMode() const {return d_playmode;};
 	void setPlayMode(GameScenario::PlayMode mode) {d_playmode = mode;};
 
@@ -147,6 +146,10 @@ class GameScenario: public GameScenarioOptions, public TarFile
         static void support_backward_compatibility();
 
 	void inhibitAutosaveRemoval(bool i) {inhibit_autosave_removal = i;}
+
+        //for progress bar
+        static sigc::signal<void> load_tick;
+        static sigc::signal<void> load_finish;
     private:
 	  /** Callback function for loading a game. See XML_Helper for details.
 	   *

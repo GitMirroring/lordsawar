@@ -80,6 +80,9 @@
 Glib::ustring GameScenario::d_tag = "scenario";
 Glib::ustring GameScenario::d_top_tag = PACKAGE;
 
+sigc::signal<void> GameScenario::load_tick;
+sigc::signal<void> GameScenario::load_finish;
+
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
@@ -107,26 +110,35 @@ GameScenario::GameScenario(Glib::ustring savegame, bool& broken)
     loaded_game_filename("")
 {
   Tar_Helper t(savegame, std::ios::in, broken);
+  load_tick.emit ();
   if (broken == false)
     {
       loaded_game_filename = savegame;
       loadArmysets(&t);
+      load_tick.emit ();
       loadTilesets(&t);
+      load_tick.emit ();
       loadCitysets(&t);
+      load_tick.emit ();
       loadShieldsets(&t);
+      load_tick.emit ();
       std::list<Glib::ustring> ext;
       ext.push_back(MAP_EXT);
       ext.push_back(SAVE_EXT);
       Glib::ustring filename = t.getFirstFile(ext, broken);
       XML_Helper helper(filename, std::ios::in);
       broken = loadWithHelper(helper, File::get_dirname(savegame));
+      load_tick.emit ();
       ScenarioMedia::getInstance()->instantiateImages(t, broken);
+      load_tick.emit ();
       ScenarioMedia::getInstance()->copySounds(t, broken);
+      load_tick.emit ();
       helper.close();
       File::erase(filename);
       t.Close();
       if (broken)
         cleanup();
+      load_finish.emit();
     }
   else
     {

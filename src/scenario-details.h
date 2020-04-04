@@ -72,7 +72,6 @@ class ScenarioDetails
 	//! Get the name of the scenario.
 	Glib::ustring getFilename() const {return d_filename;}
 
-
     protected:
 
 	// DATA
