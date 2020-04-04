@@ -45,7 +45,8 @@ battle-calculator-dialog.ui \
 media-dialog.ui \
 validation-dialog.ui \
 stone-editor-dialog.ui \
-editor-save-changes-dialog.ui
+editor-save-changes-dialog.ui \
+heroes-dialog.ui
 
 EXTRA_DIST = $(glade_DATA) \
 README

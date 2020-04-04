@@ -1,7 +1,8 @@
 // Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2006-2008, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014, 2015, 2017,
+// 2020 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -73,6 +74,8 @@
 #include "rnd.h"
 #include "game-actionlist.h"
 #include "ScenarioMedia.h"
+#include "herotemplates.h"
+#include "heroproto.h"
 
 Glib::ustring GameScenario::d_tag = "scenario";
 Glib::ustring GameScenario::d_top_tag = PACKAGE;
@@ -613,6 +616,7 @@ bool GameScenario::loadWithHelper(XML_Helper& helper, Glib::ustring dir)
   helper.registerTag(VectoredUnitlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
   helper.registerTag(GameActionlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
   helper.registerTag(ScenarioMedia::d_tag, sigc::mem_fun(this, &GameScenario::load));
+  helper.registerTag(HeroTemplates::d_tag, sigc::mem_fun(this, &GameScenario::load));
 
   if (!helper.parseXML())
     broken = true;
@@ -743,6 +747,8 @@ bool GameScenario::saveWithHelper(XML_Helper &helper) const
   retval &= QuestsManager::getInstance()->save(&helper);
   retval &= VectoredUnitlist::getInstance()->save(&helper);
   retval &= GameActionlist::getInstance()->save(&helper);
+  if (HeroTemplates::getInstance()->isDefault () == false)
+    retval &= HeroTemplates::getInstance()->save(&helper);
 
   //save the private GameScenario data last due to dependencies
   retval &= helper.openTag(GameScenario::d_tag);
@@ -960,6 +966,11 @@ bool GameScenario::load(Glib::ustring tag, XML_Helper* helper)
       return true;
     }
 
+  if (tag == HeroTemplates::d_tag)
+    {
+      HeroTemplates::getInstance(helper);
+      return true;
+    }
   return false;
 }
 
@@ -1058,6 +1069,18 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
 	  errors.push_back(s);
 	  break;
 	}
+      std::vector<HeroProto*> heroes =
+        HeroTemplates::getInstance()->getHeroes (it->getId());
+      guint32 num_heroes = heroes.size ();
+      for (auto h : heroes)
+        delete h;
+      if (num_heroes == 0)
+        {
+	  s = String::ucompose (_("The player called `%1' lacks a hero."),
+                                it->getName().c_str());
+	  errors.push_back(s);
+          break;
+        }
     }
 
   guint32 count = 0;
@@ -1441,6 +1464,7 @@ void GameScenario::cleanup()
   GameMap::deleteInstance();
   GameActionlist::deleteInstance();
   ScenarioMedia::deleteInstance();
+  HeroTemplates::deleteInstance ();
   if (fl_counter)
     {
       delete fl_counter;

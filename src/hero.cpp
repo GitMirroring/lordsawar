@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2017, 2020 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -136,6 +136,17 @@ Glib::ustring Hero::genderToString(const Hero::Gender gender)
   return "Hero::FEMALE";
 }
 
+Glib::ustring Hero::genderToFriendlyName (const Hero::Gender gender)
+{
+  switch (gender)
+    {
+    case Hero::NONE: return "NONE";
+    case Hero::MALE: return _("Male");
+    case Hero::FEMALE: return _("Female");
+    }
+  return _("Female");
+}
+
 Hero::Gender Hero::genderFromString(const Glib::ustring str)
 {
   if (str.size() > 0 && isdigit(str.c_str()[0]))
@@ -143,6 +154,14 @@ Hero::Gender Hero::genderFromString(const Glib::ustring str)
   if (str == "Hero::MALE") return Hero::MALE;
   else if (str == "Hero::NONE") return Hero::NONE;
   else if (str == "Hero::FEMALE") return Hero::FEMALE;
+  return Hero::FEMALE;
+}
+
+Hero::Gender Hero::friendlyNameToGender (Glib::ustring str)
+{
+  if (str == _("Male")) return Hero::MALE;
+  else if (str == "NONE") return Hero::NONE;
+  else if (str == _("Female")) return Hero::FEMALE;
   return Hero::FEMALE;
 }
 

@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
 //  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -31,26 +31,47 @@
 
 HeroTemplates* HeroTemplates::d_instance = 0;
 
+Glib::ustring HeroTemplates::d_tag = "herotemplates";
+Glib::ustring HeroTemplates::d_child_tag = "herotemplate";
+
 HeroTemplates* HeroTemplates::getInstance()
 {
-    if (!d_instance)
-        d_instance = new HeroTemplates();
+  if (!d_instance)
+    d_instance = new HeroTemplates();
 
-    return d_instance;
+  return d_instance;
+}
+
+HeroTemplates* HeroTemplates::getInstance(XML_Helper *helper)
+{
+  if (d_instance)
+    deleteInstance();
+
+  d_instance = new HeroTemplates (helper);
+  return d_instance;
 }
 
 void HeroTemplates::deleteInstance()
 {
-    if (d_instance != 0)
-        delete d_instance;
+  if (d_instance != 0)
+    delete d_instance;
 
-    d_instance = 0;
+  d_instance = 0;
 }
-
 
 HeroTemplates::HeroTemplates()
 {
-  loadHeroTemplates();
+  XML_Helper helper(File::getMiscFile("heronames.xml"), std::ios::in);
+
+  loadHeroTemplates(&helper);
+  if (!helper.parseXML())
+    std::cerr << String::ucompose(_("Error!  can't load heronames file `%1'.  Exiting."), File::getMiscFile("heronames.xml")) << std::endl;
+  helper.close();
+}
+
+HeroTemplates::HeroTemplates(XML_Helper *helper)
+{
+  loadHeroTemplates(helper);
 }
 
 HeroTemplates::~HeroTemplates()
@@ -97,7 +118,7 @@ HeroProto *HeroTemplates::getRandomHero(int player_id)
   return d_herotemplates[player_id][num];
 }
 
-int HeroTemplates::loadHeroTemplates()
+void HeroTemplates::loadHeroesFromArmysets ()
 {
   d_male_heroes.clear();
   d_female_heroes.clear();
@@ -107,7 +128,7 @@ int HeroTemplates::loadHeroTemplates()
   Armyset *as = Armysetlist::getInstance()->get(p->getArmyset());
   for (Armyset::iterator j = as->begin(); j != as->end(); ++j)
     {
-      const ArmyProto *a = 
+      const ArmyProto *a =
         Armysetlist::getInstance()->getArmy (p->getArmyset(), (*j)->getId());
       if (a->isHero())
 	{
@@ -124,22 +145,18 @@ int HeroTemplates::loadHeroTemplates()
       female_hero->setGender(Hero::FEMALE);
       d_female_heroes.push_back(female_hero);
     }
-
-  XML_Helper helper(File::getMiscFile("heronames.xml"), std::ios::in);
-
-  helper.registerTag("herotemplate", sigc::mem_fun((*this), &HeroTemplates::load));
-
-  if (!helper.parseXML())
-    {
-      std::cerr << String::ucompose(_("Error!  can't load heronames file `%1'.  Exiting."), File::getMiscFile("heronames.xml")) << std::endl;
-      exit(-1);
-    }
-
-  helper.close();
-  return 0;
 }
 
-      
+void HeroTemplates::loadHeroTemplates(XML_Helper *helper)
+{
+  loadHeroesFromArmysets ();
+
+  helper->registerTag(HeroTemplates::d_child_tag,
+                      sigc::mem_fun((*this), &HeroTemplates::load));
+
+  return;
+}
+
 bool HeroTemplates::load(Glib::ustring tag, XML_Helper *helper)
 {
   if (tag == "herotemplate")
@@ -184,3 +201,83 @@ bool HeroTemplates::load(Glib::ustring tag, XML_Helper *helper)
   return true;
 }
 
+std::vector<HeroProto*> HeroTemplates::getHeroes (int player_id)
+{
+  std::vector<HeroProto*> out;
+  for (auto h : d_herotemplates[player_id])
+    out.push_back (new HeroProto (*h));
+  return out;
+}
+
+void HeroTemplates::replaceHeroes (int player_id, std::vector<HeroProto*> he)
+{
+  for (guint32 i = 0; i < d_herotemplates[player_id].size (); i++)
+    delete d_herotemplates[player_id][i];
+  d_herotemplates[player_id].clear ();
+  for (guint32 i = 0; i < he.size (); i++)
+    d_herotemplates[player_id].push_back (he[i]);
+}
+
+bool HeroTemplates::isDefault() const
+{
+  bool same = true;
+  HeroTemplates *def = new HeroTemplates ();
+
+  for (guint32 i = 0; i < MAX_PLAYERS; i++)
+    {
+      std::vector<HeroProto*> h1 = d_herotemplates[i];
+      std::vector<HeroProto*> h2 = def->d_herotemplates[i];
+      if (h1.size () != h2.size ())
+        {
+          same = false;
+          break;
+        }
+      for (guint32 j = 0; j < h1.size (); j++)
+        {
+          if (h1[j]->getName () != h2[j]->getName ())
+            {
+              same = false;
+              break;
+            }
+          if (h1[j]->getOwnerId () != h2[j]->getOwnerId ())
+            {
+              same = false;
+              break;
+            }
+          if (h1[j]->getGender () != h2[j]->getGender ())
+            {
+              same = false;
+              break;
+            }
+        }
+    }
+  delete def;
+  return same;
+}
+
+bool HeroTemplates::save(XML_Helper* helper) const
+{
+    bool retval = true;
+
+    retval &= helper->openTag(HeroTemplates::d_tag);
+
+    for (guint32 i = 0; i < MAX_PLAYERS; i++)
+      {
+        for (guint32 j = 0; j < d_herotemplates[i].size (); j++)
+          {
+            HeroProto *h = d_herotemplates[i][j];
+            retval &= helper->openTag(HeroTemplates::d_child_tag);
+            retval &= helper->saveData("name", h->getName ());
+            Glib::ustring gender_str =
+              Hero::genderToString(Hero::Gender(h->getGender ()));
+            retval &= helper->saveData("gender", gender_str);
+            OwnerId o = *h;
+            retval &= o.save (helper);
+            retval &= helper->closeTag();
+          }
+      }
+
+    retval &= helper->closeTag();
+
+    return retval;
+}

@@ -34,6 +34,7 @@
 #include "ucompose.hpp"
 #include "game-parameters.h"
 #include "CreateScenarioRandomize.h"
+#include "heroes-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &PlayersDialog::x)
 
@@ -67,6 +68,8 @@ PlayersDialog::PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *rando
   randomize_gold_button->signal_clicked().connect (method(on_randomize_gold_pressed));
   xml->get_widget("all_players_on_button", all_players_on_button);
   all_players_on_button->signal_clicked().connect (method(on_all_players_on_pressed));
+  xml->get_widget("heroes_button", heroes_button);
+  heroes_button->signal_clicked().connect (method(on_edit_heroes_pressed));
   xml->get_widget("player_treeview", player_treeview);
   player_treeview->set_model(player_list);
 
@@ -281,4 +284,15 @@ void PlayersDialog::on_all_players_on_pressed()
       (*i)[player_columns.player] = p;
     }
   d_changed = true;
+}
+
+void PlayersDialog::on_edit_heroes_pressed ()
+{
+  Gtk::TreeIter i = player_treeview->get_selection()->get_selected();
+  Gtk::TreeModel::Path path = player_treeview->get_model()->get_path (i);
+  guint32 player_id = atoi (path.to_string ().c_str ());
+  Glib::ustring name = (*i)[player_columns.name];
+  HeroesDialog d (*dialog, player_id, name);
+  if (d.run ())
+    d_changed = true;
 }

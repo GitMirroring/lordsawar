@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
 //  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -29,28 +29,59 @@ class HeroProto;
 class XML_Helper;
 
 //! A list of Item objects.
-/** 
+/**
  * The HeroTemplates holds all hero templates together.
- * 
+ *
  * It is implemented as a singleton. Upon creation, it reads the hero
  * description file and initialises an internal list.
+ *
+ * We can also load it from a saved game file if present.
  */
 class HeroTemplates
 {
     public:
+	//! The xml tag of this object in a saved-game file.
+	static Glib::ustring d_tag;
+
+	//! The xml object holds several of entities named this.
+	static Glib::ustring d_child_tag;
+
         //! Returns the singleton instance.
 	static HeroTemplates* getInstance();
+
+        //! Instantiate the object from a saved-game file.
+	static HeroTemplates* getInstance(XML_Helper *helper);
 
         //! Explicitly deletes the singleton instance.
         static void deleteInstance();
 
+        //! Get all the heroes belonging to the player with the given id.
+        /**
+         * The caller is responsible for freeing the returned objects.
+         * (or pass them back with replaceHeroes)
+         */
+        std::vector<HeroProto*> getHeroes (int player_id);
+
+        //! Replace all the heroes belonging to the player with the given id.
+        /**
+         * HeroTemplates takes control of the HeroProto objects passed in.
+         * This means the caller doesn't free them.
+         */
+        void replaceHeroes (int player_id, std::vector<HeroProto*> he);
+
         HeroProto *getRandomHero(int player_id);
 
 	HeroProto *getRandomHero(Hero::Gender gender, int player_id);
-        
+
+        //! Save the list of hero templates to a saved-game file.
+        bool save(XML_Helper* helper) const;
+
+        bool isDefault () const;
     protected:
 	//! Default constructor. The function reads in the heronames file and produces a set of hero templates to be randomly selected from.
 	HeroTemplates();
+        //! Construct the object from an opened saved-game file.
+	HeroTemplates(XML_Helper *helper);
 	//! Destructor.
         ~HeroTemplates();
 
@@ -67,7 +98,9 @@ class HeroTemplates
 
         static HeroTemplates* d_instance;
 
-        int loadHeroTemplates();
+        void loadHeroTemplates(XML_Helper *helper);
+
+        void loadHeroesFromArmysets ();
 };
 
 #endif

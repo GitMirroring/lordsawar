@@ -1,5 +1,5 @@
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2014, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2017, 2020 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -148,6 +148,12 @@ class Hero : public Army
 
 	//! Convert a Hero::Gender enumerated value to a string.
 	static Glib::ustring genderToString(const Hero::Gender gender);
+
+        //! Convert a Hero::Gender to an easy to read string.
+        static Glib::ustring genderToFriendlyName (const Hero::Gender gender);
+
+        //! Convert an easy to read string to a  Hero::Gender.
+        static Hero::Gender friendlyNameToGender (Glib::ustring name);
 
         /** 
 	 * Increase the Hero unit's level, and increase one of three stats;

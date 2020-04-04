@@ -61,6 +61,7 @@ class PlayersDialog: public LwEditorDialog
     Gtk::TreeViewColumn name_column;
     Gtk::Button *randomize_gold_button;
     Gtk::Button *all_players_on_button;
+    Gtk::Button *heroes_button;
 
     class PlayerTypeColumns: public Gtk::TreeModelColumnRecord {
     public:
@@ -87,6 +88,7 @@ class PlayersDialog: public LwEditorDialog
 		    int gold, Player *player);
     void on_randomize_gold_pressed();
     void on_all_players_on_pressed();
+    void on_edit_heroes_pressed();
     CreateScenarioRandomize *d_random;
 
     void update_player ();

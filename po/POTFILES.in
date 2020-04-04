@@ -119,6 +119,7 @@
 [type: gettext/glade]dat/glade/editor/media-dialog.ui
 [type: gettext/glade]dat/glade/editor/validation-dialog.ui
 [type: gettext/glade]dat/glade/editor/stone-editor-dialog.ui
+[type: gettext/glade]dat/glade/editor/heroes-dialog.ui
 [type: gettext/glade]dat/glade/game-button-box-large-screen.ui
 [type: gettext/glade]dat/glade/fighter.ui
 [type: gettext/xml]dat/shield/default/default.lws.in
@@ -309,6 +310,7 @@ src/editor/media-dialog.cpp
 src/editor/validation-dialog.cpp
 src/editor/stone-editor-dialog.cpp
 src/editor/image-file-filter.cpp
+src/editor/heroes-dialog.cpp
 src/utils/import.cpp
 src/gui/city-info-tip.cpp
 src/gui/game-lobby-dialog.cpp
