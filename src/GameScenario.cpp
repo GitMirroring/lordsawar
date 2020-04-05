@@ -76,6 +76,7 @@
 #include "ScenarioMedia.h"
 #include "herotemplates.h"
 #include "heroproto.h"
+#include "keeper.h"
 
 Glib::ustring GameScenario::d_tag = "scenario";
 Glib::ustring GameScenario::d_top_tag = PACKAGE;
@@ -373,25 +374,75 @@ bool GameScenario::setupMapRewards()
   return true;
 }
 
-bool GameScenario::setupRuinRewards()
+bool GameScenario::setupRuinOccupants()
 {
-  debug("GameScenario::setupRuinRewards")
+  debug("GameScenario::setupRuinOccupants")
     for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
 	 it != Ruinlist::getInstance()->end(); it++)
       {
-	if ((*it)->isHidden() == true)
-	  {
-	    //add it to the reward list
-	    Reward_Ruin *newReward = new Reward_Ruin((*it)); //make a reward
-	    newReward->setName(newReward->getDescription());
-	    Rewardlist::getInstance()->push_back(newReward); //add it
-	  }
-	else
-	  {
-	    if ((*it)->hasSage() == false && (*it)->getReward() == NULL)
-	      (*it)->populateWithRandomReward();
-	  }
+        if ((*it)->getOccupant () == NULL)
+          {
+            const ArmyProto *a = Keeper::randomRuinDefender ();
+            Keeper *keeper = new Keeper (a, (*it)->getPos ());
+            (*it)->setOccupant (keeper);
+          }
       }
+  return true;
+}
+
+bool GameScenario::setupRuinRewards(int difficulty)
+{
+  debug("GameScenario::setupRuinRewards")
+
+    //the more difficult the scenario is, the more likely we are to have
+    //hidden ruins
+    guint32 chance = 0;
+    if (difficulty <= 70)
+      chance = 1;
+    else if (difficulty <= 80)
+      chance = 2;
+    else if (difficulty <= 90)
+      chance = 3;
+    else
+      chance = 4;
+
+    guint32 num_hidden = 0;
+    for (auto i : *Ruinlist::getInstance ())
+      if (i->isHidden ())
+        num_hidden++;
+    guint32 num_not_hidden = Ruinlist::getInstance ()->size () - num_hidden;
+    // first, mark some ruins as hidden for rewards
+    // only til we have as many hidden ruins as we have non-hidden ruins
+    for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
+         it != Ruinlist::getInstance()->end(); it++)
+      {
+        if ((*it)->isHidden () == false && Rnd::rand() % 100 < chance &&
+            (*it)->hasSage() == false && (*it)->getReward() == NULL &&
+            num_hidden < num_not_hidden)
+          {
+            (*it)->setHidden (true);
+            num_hidden++;
+            num_not_hidden--;
+          }
+      }
+
+  // now we populate the rewards
+  for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
+       it != Ruinlist::getInstance()->end(); it++)
+    {
+      if ((*it)->isHidden() == true)
+        {
+          //add it to the reward list
+          Reward_Ruin *newReward = new Reward_Ruin((*it)); //make a reward
+          newReward->setName(newReward->getDescription());
+          Rewardlist::getInstance()->push_back(newReward); //add it
+        }
+      else
+        {
+          if ((*it)->hasSage() == false && (*it)->getReward() == NULL)
+            (*it)->populateWithRandomReward();
+        }
+    }
   return true;
 }
 
@@ -413,12 +464,13 @@ bool GameScenario::setupItemRewards()
   return true;
 }
 
-bool GameScenario::setupRewards(bool hidden_map)
+bool GameScenario::setupRewards(bool hidden_map, int difficulty)
 {
   if (Rewardlist::getInstance()->size() != 0)
     return true;
   setupItemRewards();
-  setupRuinRewards();
+  setupRuinOccupants ();
+  setupRuinRewards(difficulty);
   if (hidden_map)
     setupMapRewards();
   return true;
@@ -1120,6 +1172,17 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
       warnings.push_back(s);
     }
 
+  for (auto it: *Ruinlist::getInstance())
+    {
+      if (it->getOccupant () && it->getOccupant ()->getName () == "" &&
+          it->getOccupant()->getStack ())
+        {
+          s = String::ucompose("%1 has an unnamed keeper", it->getName ());
+          warnings.push_back(s);
+          break;
+        }
+    }
+
   count = 0;
   for (auto it: *Templelist::getInstance())
     {
@@ -1177,7 +1240,7 @@ void GameScenario::initialize(GameParameters g)
   setupFog(g.hidden_map);
   setupCities(g.quick_start, g.build_production_mode);
   setupStacks(g.hidden_map);
-  setupRewards(g.hidden_map);
+  setupRewards(g.hidden_map, g.difficulty);
   setupDiplomacy(g.diplomacy);
   if (s_random_turns)
     Playerlist::getInstance()->randomizeOrder();

@@ -63,6 +63,7 @@ class Triumphs;
 class Sage;
 class StackReflist;
 class Maptile;
+class Keeper;
 
 //! The abstract player class.
 /** 
@@ -1381,6 +1382,9 @@ class Player: public sigc::trackable
         //! Emitted whenever the stack's status has changed.
         sigc::signal<void, Stack*> supdatingStack;
 
+        //! Emitted whenever a hero drops a bag.
+        sigc::signal<void> sbagdropped;
+
         //! Emitted whenever the active stack comes to a stop.
         sigc::signal<void, Stack*> shaltedStack;
 
@@ -1416,7 +1420,7 @@ class Player: public sigc::trackable
 	 * @param keeper   The keeper of the ruin.
 	 */
 	//! Emitted when a fight in a ruin is started.
-        sigc::signal<void, Stack *, Stack *> ruinfight_started;
+        sigc::signal<void, Stack *, Keeper *> ruinfight_started;
 
 	/**
 	 * @param result   If we defeated the ruin's keeper or not.
@@ -1696,7 +1700,7 @@ class Player: public sigc::trackable
 	 *         Fight::DRAW (Fight::Result).
          */
 	//! Callback to adjudicate fights in ruins.
-        Fight::Result stackRuinFight(Stack** attacker, Stack** defender, bool &stackdied, std::list<History*> &attacker_history, std::list<History*> &defender_history);
+        Fight::Result stackRuinFight(Stack** attacker, Keeper* defender, bool &stackdied, std::list<History*> &attacker_history, std::list<History*> &defender_history);
 
 	void AI_maybeBuyScout(City *c);
 

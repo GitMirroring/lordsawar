@@ -29,6 +29,7 @@ class Signpost;
 class Army;
 class Player;
 class Reward;
+class Keeper;
 
 //! Generates random values for various map buildings.
 class CreateScenarioRandomize
@@ -54,7 +55,7 @@ class CreateScenarioRandomize
 	bool randomSignpostsEmpty() {return d_signposts->empty();}
 	Glib::ustring getDynamicSignpost(Signpost *signpost);
 	int getNumSignposts() {return d_signposts->size();}
-	Army * getRandomRuinKeeper(Player *p);
+	Keeper * getRandomRuinKeeper(Vector<int> pos);
 	Reward *getNewRandomReward();
 
 

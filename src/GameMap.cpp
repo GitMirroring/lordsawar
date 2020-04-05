@@ -65,6 +65,7 @@
 #include "SightMap.h"
 #include "reward.h"
 #include "rewardlist.h"
+#include "keeper.h"
 
 Glib::ustring GameMap::d_tag = "map";
 Glib::ustring GameMap::d_itemstack_tag = "itemstack";
@@ -1357,9 +1358,12 @@ void GameMap::switchArmysets(Armyset *armyset)
   //change the keepers in ruins
   for (auto i: *Ruinlist::getInstance())
     {
-      Stack *s = i->getOccupant();
-      if (s == NULL)
+      Keeper *k = i->getOccupant();
+      if (k == NULL)
 	continue;
+      Stack *s = k->getStack ();
+      if (s == NULL)
+        continue;
       s->removeArmiesWithoutArmyType(armyset->getId());
       for (Stack::iterator j = s->begin(); j != s->end(); j++)
 	Armyset::switchArmysetForRuinKeeper(*j, armyset);

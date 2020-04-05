@@ -122,6 +122,7 @@
 #include "new-network-game-dialog.h"
 #include "rnd.h"
 #include "font-size.h"
+#include "keeper.h"
 
 #define method(x) sigc::mem_fun(*this, &GameWindow::x)
 
@@ -1710,7 +1711,7 @@ void GameWindow::on_ruin_searched(Ruin *ruin, Stack *stack, Reward *reward)
   dialog.run_and_hide();
 }
 
-void GameWindow::on_ruinfight_started(Stack *attackers, Stack *defenders)
+void GameWindow::on_ruinfight_started(Stack *attackers, Keeper *keeper)
 {
   LwDialog dialog(*window, "ruinfight-started-dialog.ui");
   //so and so encounters a wolf...
@@ -1720,9 +1721,9 @@ void GameWindow::on_ruinfight_started(Stack *attackers, Stack *defenders)
   xml->get_widget("label", label);
   Glib::ustring s = label->get_text();
   s = "\n\n";
-  s += String::ucompose(_("%1 encounters some %2..."),
+  s += String::ucompose(_("%1 encounters %2..."),
                         attackers->getFirstHero()->getName(),
-                        defenders->getStrongestArmy()->getName());
+                        keeper->getName());
   label->set_text(s);
   dialog.run_and_hide();
 }

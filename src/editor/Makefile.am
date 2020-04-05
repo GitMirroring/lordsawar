@@ -87,7 +87,8 @@ libeditor_la_SOURCES =\
 	battle-calculator-dialog.cpp battle-calculator-dialog.h \
 	media-dialog.cpp media-dialog.h \
 	validation-dialog.cpp validation-dialog.h \
-	heroes-dialog.cpp heroes-dialog.h
+	heroes-dialog.cpp heroes-dialog.h \
+	keeper-editor-dialog.cpp keeper-editor-dialog.h
 
 localedir = $(datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@

@@ -162,9 +162,10 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	  void quickStartAIHeadStart();
 	  bool setupFog(bool hidden_map);
 	  bool setupCities(GameParameters::QuickStartPolicy quick_start, GameParameters::BuildProductionMode build);
-	  bool setupRewards(bool hidden_map);
+	  bool setupRewards(bool hidden_map, int difficulty);
 	  bool setupMapRewards();
-	  bool setupRuinRewards();
+	  bool setupRuinOccupants();
+	  bool setupRuinRewards(int difficulty);
 	  bool setupItemRewards();
 	  bool setupStacks(bool hidden_map);
 	  void setupDiplomacy(bool diplomacy);

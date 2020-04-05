@@ -182,10 +182,6 @@
 			<d_diplomatic_proposals>0 0 0 0 0 0 0 0 </d_diplomatic_proposals>
 			<d_diplomatic_scores>8 8 8 8 8 8 8 8 </d_diplomatic_scores>
 			<d_observable>true</d_observable>
-			<action>
-				<d_type>Action::FIGHT_ORDER</d_type>
-				<d_order>11 15 2 13 14 1 3 6 7 10 12 16 22 24 0 4 8 9 17 18 21 19 20 23 25 26 27 28 </d_order>
-			</action>
 			<stacklist>
 				<d_active>0</d_active>
 			</stacklist>
@@ -377,10 +373,6 @@
 			<d_diplomatic_proposals>0 0 0 0 0 0 0 0 </d_diplomatic_proposals>
 			<d_diplomatic_scores>8 8 8 8 8 8 8 8 </d_diplomatic_scores>
 			<d_observable>true</d_observable>
-			<action>
-				<d_type>Action::FIGHT_ORDER</d_type>
-				<d_order>11 15 2 13 14 1 3 6 7 10 12 16 22 24 0 4 8 9 17 18 21 19 20 23 25 26 27 28 </d_order>
-			</action>
 			<stacklist>
 				<d_active>0</d_active>
 			</stacklist>
@@ -572,10 +564,6 @@
 			<d_diplomatic_proposals>0 0 0 0 0 0 0 0 </d_diplomatic_proposals>
 			<d_diplomatic_scores>8 8 8 8 8 8 8 8 </d_diplomatic_scores>
 			<d_observable>true</d_observable>
-			<action>
-				<d_type>Action::FIGHT_ORDER</d_type>
-				<d_order>11 15 2 13 14 1 3 6 7 10 12 16 22 24 0 4 8 9 17 18 21 19 20 23 25 26 27 28 </d_order>
-			</action>
 			<stacklist>
 				<d_active>0</d_active>
 			</stacklist>
@@ -767,10 +755,6 @@
 			<d_diplomatic_proposals>0 0 0 0 0 0 0 0 </d_diplomatic_proposals>
 			<d_diplomatic_scores>8 8 8 8 8 8 8 8 </d_diplomatic_scores>
 			<d_observable>true</d_observable>
-			<action>
-				<d_type>Action::FIGHT_ORDER</d_type>
-				<d_order>11 15 2 13 14 1 3 6 7 10 12 16 22 24 0 4 8 9 17 18 21 19 20 23 25 26 27 28 </d_order>
-			</action>
 			<stacklist>
 				<d_active>0</d_active>
 			</stacklist>
@@ -962,10 +946,6 @@
 			<d_diplomatic_proposals>0 0 0 0 0 0 0 0 </d_diplomatic_proposals>
 			<d_diplomatic_scores>8 8 8 8 8 8 8 8 </d_diplomatic_scores>
 			<d_observable>true</d_observable>
-			<action>
-				<d_type>Action::FIGHT_ORDER</d_type>
-				<d_order>11 15 2 13 14 1 3 6 7 10 12 16 22 24 0 4 8 9 17 18 21 19 20 23 25 26 27 28 </d_order>
-			</action>
 			<stacklist>
 				<d_active>0</d_active>
 			</stacklist>
@@ -1473,11 +1453,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1512,11 +1492,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1551,12 +1531,12 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>true</d_capital>
 			<d_capital_owner>0</d_capital_owner>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1591,11 +1571,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1630,11 +1610,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1669,11 +1649,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1708,11 +1688,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1747,11 +1727,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1786,11 +1766,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1825,11 +1805,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1864,12 +1844,12 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>true</d_capital>
 			<d_capital_owner>6</d_capital_owner>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1904,11 +1884,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1943,11 +1923,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -1982,11 +1962,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2021,12 +2001,12 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>true</d_capital>
 			<d_capital_owner>2</d_capital_owner>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2061,11 +2041,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2100,11 +2080,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2139,11 +2119,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2178,11 +2158,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2217,11 +2197,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2256,11 +2236,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2295,11 +2275,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2334,11 +2314,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Spiders</d_name>
@@ -2373,11 +2353,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2412,11 +2392,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Spiders</d_name>
@@ -2451,11 +2431,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>99</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Spiders</d_name>
@@ -2490,11 +2470,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2529,11 +2509,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>99</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Spiders</d_name>
@@ -2568,11 +2548,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2607,11 +2587,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2646,11 +2626,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2685,11 +2665,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2724,11 +2704,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Spiders</d_name>
@@ -2763,12 +2743,12 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>true</d_capital>
 			<d_capital_owner>3</d_capital_owner>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2803,11 +2783,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2842,11 +2822,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2881,11 +2861,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2920,11 +2900,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -2959,11 +2939,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Spiders</d_name>
@@ -2998,11 +2978,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -3037,11 +3017,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -3076,11 +3056,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -3115,11 +3095,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -3154,11 +3134,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -3193,11 +3173,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -3232,11 +3212,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -3271,11 +3251,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -3310,11 +3290,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -3349,11 +3329,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -3388,11 +3368,11 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
 			<d_burnt>false</d_burnt>
+			<d_build_production>true</d_build_production>
 			<d_capital>false</d_capital>
 			<d_vectoring>-1 -1</d_vectoring>
 			<d_active_production_slot>-1</d_active_production_slot>
 			<d_duration>-1</d_duration>
-                        <d_build_production>true</d_build_production>
 			<slot>
 				<armyprodbase>
 					<d_name>Scouts</d_name>
@@ -10466,6 +10446,8 @@ Teach the impudent men at last!</d_name>
 			<d_type>Road::CONNECTS_EAST</d_type>
 		</road>
 	</roadlist>
+	<stonelist>
+	</stonelist>
 	<portlist>
 		<port>
 			<d_id>9</d_id>
@@ -12686,6 +12668,8 @@ Teach the impudent men at last!</d_name>
 	</questlist>
 	<vectoredunitlist>
 	</vectoredunitlist>
+	<turnlist>
+	</turnlist>
 	<scenario>
 		<d_id>{98C4EA14-0567-0AC9-9150-6EC9A4854D8C}</d_id>
 		<d_name>Duel Of The Gods</d_name>
@@ -12713,18 +12697,17 @@ This scenario was created by Bob Heeter for the 1997 Warlords 2 World Championsh
 Copyright (C) 2015 Ben Asselstine</d_copyright>
 		<d_license>Licensed under the GPLv3+.</d_license>
 		<d_turn>0</d_turn>
-		<d_turnmode>true</d_turnmode>
 		<d_view_enemies>false</d_view_enemies>
 		<d_view_production>false</d_view_production>
 		<d_quests>GameParameters::ONE_QUEST_PER_PLAYER</d_quests>
-		<d_vectoring_mode>GameParameters::VECTORING_ALWAYS_TWO_TURNS</d_vectoring_mode>
-		<d_build_production_mode>GameParameters::BUILD_PRODUCTION_ALWAYS</d_build_production_mode>
-		<d_sacking_mode>GameParameters::SACKING_ALWAYS</d_sacking_mode>
 		<d_hidden_map>false</d_hidden_map>
 		<d_diplomacy>false</d_diplomacy>
 		<d_cusp_of_war>false</d_cusp_of_war>
 		<d_neutral_cities>GameParameters::AVERAGE</d_neutral_cities>
 		<d_razing_cities>GameParameters::ALWAYS</d_razing_cities>
+		<d_vectoring_mode>GameParameters::VECTORING_ALWAYS_TWO_TURNS</d_vectoring_mode>
+		<d_build_production_mode>GameParameters::BUILD_PRODUCTION_ALWAYS</d_build_production_mode>
+		<d_sacking_mode>GameParameters::SACKING_ALWAYS</d_sacking_mode>
 		<d_intense_combat>false</d_intense_combat>
 		<d_military_advisor>false</d_military_advisor>
 		<d_random_turns>false</d_random_turns>

@@ -532,6 +532,7 @@ void Stacklist::on_stack_died (Stack *stack)
 	lit.disconnect();
     }
   d_id.erase(d_id.find(stack->getId()));
+  sstackDied.emit ();
   return;
 }
 void Stacklist::on_stack_starts_moving (Stack *stack)

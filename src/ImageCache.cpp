@@ -2856,27 +2856,27 @@ PixMask *DialogPixMaskCacheItem::generate(DialogPixMaskCacheItem i)
       ratio = DIALOG_NEW_HERO_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_CONQUERED_CITY:
-      p = ImageCache::getInstance ()->getCityDefeatedPic ();
+      p = ImageCache::getInstance ()->getCityDefeatedPic ()->copy ();
       ratio = DIALOG_CONQUERED_CITY_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_WINNING:
-      p = ImageCache::getInstance ()->getWinningPic();
+      p = ImageCache::getInstance ()->getWinningPic()->copy ();
       ratio = DIALOG_WINNING_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_RUIN_SUCCESS:
-      p = ImageCache::getInstance ()->getRuinSuccessPic();
+      p = ImageCache::getInstance ()->getRuinSuccessPic()->copy ();
       ratio = DIALOG_RUIN_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_RUIN_DEFEAT:
-      p = ImageCache::getInstance ()->getRuinDefeatPic();
+      p = ImageCache::getInstance ()->getRuinDefeatPic()->copy ();
       ratio = DIALOG_RUIN_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_PARLEY_OFFERED:
-      p = ImageCache::getInstance ()->getParleyOfferedPic();
+      p = ImageCache::getInstance ()->getParleyOfferedPic()->copy ();
       ratio = DIALOG_PARLEY_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_PARLEY_REFUSED:
-      p = ImageCache::getInstance ()->getParleyRefusedPic();
+      p = ImageCache::getInstance ()->getParleyRefusedPic()->copy ();
       ratio = DIALOG_PARLEY_PIC_FONT_SIZE_MULTIPLE;
       break;
 

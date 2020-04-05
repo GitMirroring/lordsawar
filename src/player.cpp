@@ -86,6 +86,7 @@
 #include "rnd.h"
 #include "game-actionlist.h"
 #include "turn-actionlist.h"
+#include "keeper.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::flush<<std::endl;}
 #define debug(x)
@@ -1382,28 +1383,29 @@ Fight::Result ruinfight (Stack **attacker, Stack **defender)
   return result;
 }
 
-Fight::Result Player::stackRuinFight (Stack **attacker, Stack **defender,
+Fight::Result Player::stackRuinFight (Stack **attacker, Keeper *defender,
                                       bool &stackdied,
                                       std::list<History*> &attacker_history,
                                       std::list<History*> &defender_history)
 {
     Fight::Result result = Fight::DRAW;
-    if (*defender == NULL)
+    if (defender->getStack () == NULL)
       return Fight::ATTACKER_WON;
     debug("stackRuinFight: player = " << getName()<<" at position "
-          <<(*defender)->getPos().x<<","<<(*defender)->getPos().y);
+          <<(*defender)->getStack ()->getPos().x<<","<<(*defender)->getStack ()->getPos().y);
 
-    ruinfight_started.emit(*attacker, *defender);
-    result = ruinfight (attacker, defender);
+    ruinfight_started.emit(*attacker, defender);
+    Stack *defender_stack = defender->getStack ();
+    result = ruinfight (attacker, &defender_stack);
+
     ruinfight_finished.emit(result);
-
     // cleanup
     
     // get attacker and defender heroes and more...
     std::list<Stack*> attackers;
     attackers.push_back(*attacker);
     std::list<Stack*> defenders;
-    defenders.push_back(*defender);
+    defenders.push_back(defender_stack);
 
     cleanupAfterFight(attackers, defenders, attacker_history, defender_history);
     bool exists =
@@ -1442,10 +1444,10 @@ Reward* Player::stackSearchRuin(Stack* s, Ruin* r, bool &stackdied)
 {
   std::list<History*> attacker_history;
   std::list<History*> defender_history;
-  Stack *keeper = r->getOccupant();
+  Keeper *keeper = r->getOccupant();
   if (keeper)
     {
-      Fight::Result result = stackRuinFight(&s, &keeper, stackdied,
+      Fight::Result result = stackRuinFight(&s, keeper, stackdied,
                                             attacker_history, defender_history);
       //we delete it here because keepers are not in any players' stacklist.
       if (result == Fight::ATTACKER_WON)
@@ -1997,6 +1999,7 @@ bool Player::doHeroDropAllItems(Hero *h, Vector<int> pos, bool &splash)
 {
   while (h->getBackpack()->empty() == false)
     doHeroDropItem(h, h->getBackpack()->front(), pos, splash);
+  sbagdropped.emit ();
   supdatingStack.emit(0);
   return true;
 }
@@ -2306,7 +2309,13 @@ guint32 Player::removeDeadArmies(std::list<Stack*>& stacks,
 
         if ((*it)->empty())
           {
-            if (owner)
+            bool ruinstack = false;
+            if (owner == Playerlist::getInstance ()->getNeutral () &&
+                GameMap::getInstance ()->getBuilding ((*it)->getPos ()) ==
+                Maptile::RUIN)
+              ruinstack = true;
+
+            if (!ruinstack)
               {
                 debug("Yes, removing this stack from the owner's stacklist");
                 bool found = owner->deleteStack(*it);
@@ -4205,10 +4214,11 @@ bool Player::doHeroUseItem(Hero *hero, Item *item, Player *victim,
       Ruin *ruin = GameMap::getInstance()->getRuin(pos);
       if (ruin && ruin->isSearched() == false)
         {
-          if (ruin->getOccupant() && ruin->getOccupant()->size() > 0)
+          if (ruin->getOccupant() && ruin->getOccupant ()->getStack () &&
+              ruin->getOccupant()->getStack ()->size() > 0)
             {
-              Glib::ustring name = ruin->getOccupant()->front()->getName();
-              addStack(ruin->getOccupant());
+              Glib::ustring name = ruin->getOccupant()->getName();
+              addStack(ruin->getOccupant()->getStack ());
               ruin->clearOccupant();
               keeper_captured.emit(hero, ruin, name);
             }
@@ -4455,9 +4465,12 @@ void Player::doRuinsReset()
     return;
   for (auto it: *Ruinlist::getInstance())
     {
-      Stack* keeper = it->getOccupant();
+      Keeper* keeper = it->getOccupant();
       if (keeper)
-        keeper->reset();
+        {
+          if (keeper->getStack ())
+            keeper->getStack ()->reset();
+        }
     }
 }
 

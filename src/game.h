@@ -1,4 +1,4 @@
-// Copyright (C) 2006-2010, 2014, 2015, 2016, 2017 Ben Asselstine
+// Copyright (C) 2006-2010, 2014, 2015, 2016, 2017, 2020 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -129,7 +129,7 @@ class Game
     sigc::signal<Reward*, Ruin*, Sage*, Stack*> sage_visited;
     sigc::signal<void, LocationBox, Fight &> fight_started;
     sigc::signal<void, LocationBox> abbreviated_fight_started;
-    sigc::signal<void, Stack *, Stack *> ruinfight_started;
+    sigc::signal<void, Stack *, Keeper*> ruinfight_started;
     sigc::signal<void, float> advice_asked;
     sigc::signal<void, Fight::Result> ruinfight_finished;
     sigc::signal<bool, Player *, HeroProto *, City *, int> hero_offers_service;
@@ -223,7 +223,7 @@ class Game
     bool stack_searches_ruin(Stack *stack);
     bool stack_searches_temple(Stack *stack);
     void on_use_item(Item *item);
-    void on_ruinfight_started(Stack *attacker, Stack *defender);
+    void on_ruinfight_started(Stack *attacker, Keeper *keeper);
     void on_ruinfight_finished(Fight::Result result);
 
     //! Callback when the army of a human player reaches a new level.
@@ -256,6 +256,9 @@ class Game
     void on_save_game(Glib::ustring filename);
     guint32 on_get_round();
     void on_pointing_at_new_tile (Vector<int> tile);
+
+    void on_bag_dropped ();
+    void on_stack_died ();
 
     GameScenario* d_gameScenario;
     NextTurn* d_nextTurn;

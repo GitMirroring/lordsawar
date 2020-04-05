@@ -33,6 +33,7 @@
 #include "SightMap.h"
 #include "reward.h"
 #include "rnd.h"
+#include "keeper.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -111,12 +112,11 @@ guint32 CreateScenarioRandomize::getRandomCityIncome(bool capital)
     return 15 + (Rnd::rand() % 12);
 }
 
-Army * CreateScenarioRandomize::getRandomRuinKeeper(Player *p)
+Keeper* CreateScenarioRandomize::getRandomRuinKeeper(Vector<int> pos)
 {
-  const ArmyProto *a= Armysetlist::getInstance()->get(p->getArmyset())->getRandomRuinKeeper();
+  const ArmyProto *a = Keeper::randomRuinDefender();
   if (a)
-    return (new Army(*a, p));
-
+    return new Keeper (a, pos);
   return NULL;
 }
 

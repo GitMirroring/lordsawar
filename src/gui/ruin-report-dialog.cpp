@@ -29,6 +29,7 @@
 #include "ruinlist.h"
 #include "templelist.h"
 #include "playerlist.h"
+#include "keeper.h"
 
 #define method(x) sigc::mem_fun(*this, &RuinReportDialog::x)
 
@@ -128,25 +129,29 @@ void RuinReportDialog::fill_in_ruin_info()
 	  //add the difficulty hint.
 	  if (ruin->getOccupant() != NULL)
 	    {
-	      Stack *s = ruin->getOccupant();
-	      switch ((*s->front()).getStat(Army::STRENGTH))
-		{
-		case 9: 
-		  hint += _("It is especially well-guarded."); break;
-		case 8: 
-		  hint += _("Rumour speaks of a formidable force within."); 
-		  break;
-		case 7: 
-		  hint += _("Even heroes are wary of this site."); break;
-		case 6: 
-		  hint += _("Bones litter this place."); break;
-		case 5: case 4: case 3: case 2: case 1: 
-		  hint += _("It is guarded."); break;
-		case 0: 
-		  hint += ""; break;
-		default: 
-		  hint += ""; break;
-		}
+	      Keeper *keeper = ruin->getOccupant();
+              Stack *s = keeper->getStack ();
+              if (s)
+                {
+                  switch ((*s->front()).getStat(Army::STRENGTH))
+                    {
+                    case 9: 
+                      hint += _("It is especially well-guarded."); break;
+                    case 8: 
+                      hint += _("Rumour speaks of a formidable force within."); 
+                      break;
+                    case 7: 
+                      hint += _("Even heroes are wary of this site."); break;
+                    case 6: 
+                      hint += _("Bones litter this place."); break;
+                    case 5: case 4: case 3: case 2: case 1: 
+                      hint += _("It is guarded."); break;
+                    case 0: 
+                      hint += ""; break;
+                    default: 
+                      hint += ""; break;
+                    }
+                }
 	    }
 	  else
 	    hint += _("Bones litter this place.");

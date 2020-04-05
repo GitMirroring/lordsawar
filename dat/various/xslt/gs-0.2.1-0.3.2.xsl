@@ -61,4 +61,24 @@
          </city>
 </xsl:template>
 
+<xsl:template match="ruin">
+         <ruin>
+                 <xsl:copy-of select="d_id"/>
+                 <xsl:copy-of select="d_x"/>
+                 <xsl:copy-of select="d_y"/>
+                 <xsl:copy-of select="d_name"/>
+                 <xsl:copy-of select="d_description"/>
+                 <xsl:copy-of select="d_type"/>
+                 <xsl:copy-of select="d_searched"/>
+                 <xsl:copy-of select="d_sage"/>
+                 <xsl:copy-of select="d_hidden"/>
+                 <xsl:copy-of select="d_owner"/>
+                 <keeper>
+                   <d_name>some defenders</d_name>
+                 <xsl:copy-of select="stack"/>
+                 <xsl:copy-of select="reward"/>
+                 </keeper>
+         </ruin>
+</xsl:template>
+
 </xsl:stylesheet>

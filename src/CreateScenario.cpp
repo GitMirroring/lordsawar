@@ -69,6 +69,7 @@
 #include "history.h"
 #include "game-parameters.h"
 #include "rnd.h"
+#include "keeper.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -557,28 +558,13 @@ bool CreateScenario::setupRuins(bool strongholds_invisible, int sage_factor,
             continue;
           }
 
-
-        //one in ten ruins doesn't have a guardian
-        if (Rnd::rand() % no_guardian_factor == 0 && (*it)->getType() == Ruin::RUIN) 
-          continue;
-
-        // and set a guardian
-        Stack* s;
-        Army* a = 0;
-        Vector<int> pos = (*it)->getPos();
-        
-	a = getRandomRuinKeeper(Playerlist::getInstance()->getNeutral());
-        if (a)
-          {
-            //create a stack:
-            s = new Stack(0, pos);
-            
-            s->push_back(a);
-            a = 0;
-
-            //now mark this stack as guard
-            (*it)->setOccupant(s);
-          }
+        // and set a guardian / occupant / keeper / lone defender, etc
+        // but one in ten ruins doesn't have a guardian
+        if (Rnd::rand() % no_guardian_factor == 0 &&
+            (*it)->getType() == Ruin::RUIN) 
+          (*it)->setOccupant (new Keeper (NULL, (*it)->getPos ()));
+        else
+          (*it)->setOccupant (getRandomRuinKeeper ((*it)->getPos ()));
     }
 
     return true;

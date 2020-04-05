@@ -1,4 +1,4 @@
-// Copyright (C) 2006-2010, 2014, 2015, 2016, 2017 Ben Asselstine
+// Copyright (C) 2006-2010, 2014, 2015, 2016, 2017, 2020 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -178,6 +178,9 @@ void Game::addPlayer(Player *p)
     (p->getStacklist()->soldpos.connect
      (sigc::mem_fun(this, &Game::stack_leaves_tile)));
   connections[p->getId()].push_back
+    (p->getStacklist()->sstackDied.connect
+     (sigc::mem_fun(this, &Game::on_stack_died)));
+  connections[p->getId()].push_back
     (p->aborted_turn.connect (sigc::mem_fun
 	   (game_stopped, &sigc::signal<void>::emit)));
 
@@ -194,6 +197,8 @@ void Game::addPlayer(Player *p)
 				      &sigc::signal<void>::emit)));
   connections[p->getId()].push_back
     (p->supdatingStack.connect (sigc::mem_fun(this, &Game::stackUpdate)));
+  connections[p->getId()].push_back
+    (p->sbagdropped.connect (sigc::mem_fun(this, &Game::on_bag_dropped)));
   connections[p->getId()].push_back
     (p->sinvadingCity.connect(sigc::mem_fun(this, &Game::invading_city)));
   connections[p->getId()].push_back
@@ -1417,10 +1422,10 @@ bool Game::stack_searches_temple(Stack *stack)
   return hero_got_quest;
 }
 
-void Game::on_ruinfight_started(Stack *attacker, Stack *defender)
+void Game::on_ruinfight_started(Stack *attacker, Keeper *keeper)
 {
   if (Playerlist::getActiveplayer()->isComputer() == false)
-    ruinfight_started.emit(attacker, defender);
+    ruinfight_started.emit(attacker, keeper);
 }
 
 void Game::on_ruinfight_finished(Fight::Result result)
@@ -1446,4 +1451,14 @@ guint32 Game::on_get_round()
 void Game::on_pointing_at_new_tile (Vector<int> tile)
 {
   pointing_at_new_tile.emit(tile);
+}
+
+void Game::on_bag_dropped ()
+{
+  redraw ();
+}
+
+void Game::on_stack_died ()
+{
+  redraw ();
 }

@@ -59,6 +59,7 @@ class NextTurn;
 class LocationBox;
 class StatusBox;
 class Profile;
+class Keeper;
 
 /** The main window in which all the game action is going on.
   *
@@ -274,7 +275,7 @@ class GameWindow: public sigc::trackable
     void on_ruin_rewarded(Reward_Ruin *reward);
     void on_fight_started(LocationBox box, Fight &fight);
     void on_abbreviated_fight_started(LocationBox box);
-    void on_ruinfight_started(Stack *attackers, Stack *defenders);
+    void on_ruinfight_started(Stack *attackers, Keeper *keeper);
     void on_ruinfight_finished(Fight::Result result);
     bool on_hero_offers_service(Player *player, HeroProto *hero, City *city, int gold);
     bool on_enemy_offers_surrender(int numEnemies);

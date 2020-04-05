@@ -120,6 +120,7 @@
 [type: gettext/glade]dat/glade/editor/validation-dialog.ui
 [type: gettext/glade]dat/glade/editor/stone-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/heroes-dialog.ui
+[type: gettext/glade]dat/glade/editor/keeper-dialog.ui
 [type: gettext/glade]dat/glade/game-button-box-large-screen.ui
 [type: gettext/glade]dat/glade/fighter.ui
 [type: gettext/xml]dat/shield/default/default.lws.in
@@ -311,6 +312,7 @@ src/editor/validation-dialog.cpp
 src/editor/stone-editor-dialog.cpp
 src/editor/image-file-filter.cpp
 src/editor/heroes-dialog.cpp
+src/editor/keeper-editor-dialog.cpp
 src/utils/import.cpp
 src/gui/city-info-tip.cpp
 src/gui/game-lobby-dialog.cpp
@@ -375,6 +377,7 @@ src/file-compat.h
 src/game-client-decoder.cpp
 src/namelist.cpp
 src/stone.cpp
+src/keeper.cpp
 dat/various/items/items.xml.in
 dat/citynames.xml.in
 dat/templenames.xml.in

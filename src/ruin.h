@@ -1,6 +1,6 @@
 // Copyright (C) 2001, 2003 Michael Bartl
 // Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 class Stack;
 class Reward;
 class Sage;
+class Keeper;
 
 //! A ruin on the game map.
 /** 
@@ -71,7 +72,7 @@ class Ruin : public NamedLocation, public sigc::trackable
           */
         Ruin(Vector<int> pos, guint32 width, 
 	     Glib::ustring name = DEFAULT_RUIN_NAME, int type = Ruin::RUIN, 
-	     Stack* occupant = 0, bool searched = false, bool hidden = false, 
+	     Keeper* occupant = 0, bool searched = false, bool hidden = false, 
 	     Player *owner = 0, bool sage = false);
 
         //! Copy constructor.
@@ -99,7 +100,7 @@ class Ruin : public NamedLocation, public sigc::trackable
         bool isSearched() const {return d_searched;}
 
         //! Returns the keeper that guards the ruin from Hero units.
-        Stack* getOccupant() const {return d_occupant;}
+        Keeper* getOccupant() const {return d_occupant;}
 
 	//! Returns whether or not this is a "hidden" ruin.
 	bool isHidden() const {return d_hidden;}
@@ -129,7 +130,7 @@ class Ruin : public NamedLocation, public sigc::trackable
         void setSearched(bool searched) {d_searched = searched; }
         
         //! Set the keeper of the ruin.
-        void setOccupant(Stack* occupant);
+        void setOccupant(Keeper* occupant);
 
         //! Remove the keeper.
         void clearOccupant();
@@ -196,10 +197,11 @@ class Ruin : public NamedLocation, public sigc::trackable
 
 	//! The keeper of the ruin.
 	/**
-	 * The Hero unit fights this stack when it is searched.  The stack
-	 * consists of a single Army unit that is cabable of defending ruins.
+	 * The Hero unit fights this named stack when it is searched.  The
+         * stack consists of a single Army unit that is cabable of defending
+         * ruins.
 	 */
-        Stack* d_occupant;
+        Keeper* d_occupant;
 
 	//! Whether or not the ruin is a hidden ruin.
 	/**

@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -53,6 +53,7 @@
 #include "stackreflist.h"
 #include "city.h"
 #include "game-actionlist.h"
+#include "keeper.h"
 
 #define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 //#define debug(x)
@@ -518,7 +519,10 @@ void NetworkPlayer::decodeActionRuin(const Action_Ruin *action)
   Stack *explorer = d_stacklist->getStackById(action->getStackId());
   Ruin *r = Ruinlist::getInstance()->getById(action->getRuinId());
   bool searched = action->getSearchSuccessful();
-  Stack* keeper = r->getOccupant();
+  Keeper *keeper = r->getOccupant();
+  Stack *stack = NULL;
+  if (keeper)
+    stack = keeper->getStack ();
 
   Fight::Result result = Fight::ATTACKER_WON;
   if (searched == false)
@@ -535,7 +539,7 @@ void NetworkPlayer::decodeActionRuin(const Action_Ruin *action)
       if (result == Fight::ATTACKER_WON) 
         {
           // whack the keeper
-          for (Stack::iterator i = keeper->begin(); i != keeper->end(); ++i)
+          for (Stack::iterator i = stack->begin(); i != stack->end(); ++i)
             (*i)->setHP(0);
         }
       else if (result == Fight::DEFENDER_WON)
@@ -546,7 +550,7 @@ void NetworkPlayer::decodeActionRuin(const Action_Ruin *action)
 
       std::list<Stack *> attackers, defenders;
       attackers.push_back(explorer);
-      defenders.push_back(keeper);
+      defenders.push_back(stack);
 
       std::list<History*> attacker_history;
       std::list<History*> defender_history;

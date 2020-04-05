@@ -92,7 +92,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">●</property>
-                        <property name="width_chars">25</property>
+                        <property name="width_chars">0</property>
                         <property name="primary_icon_activatable">False</property>
                         <property name="secondary_icon_activatable">False</property>
                       </object>
@@ -162,7 +162,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">●</property>
-                        <property name="width_chars">25</property>
+                        <property name="width_chars">0</property>
                         <property name="primary_icon_activatable">False</property>
                         <property name="secondary_icon_activatable">False</property>
                       </object>
@@ -268,7 +268,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="valign">end</property>
-                            <property name="label" translatable="yes">Keeper</property>
+                            <property name="label" translatable="yes">Random Keeper</property>
                             <attributes>
                               <attribute name="underline" value="True"/>
                             </attributes>
@@ -284,12 +284,10 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="halign">center</property>
-                            <property name="spacing">6</property>
                             <child>
-                              <object class="GtkButton" id="keeper_button">
+                              <object class="GtkSwitch" id="random_keeper_switch">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="receives_default">False</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -305,19 +303,15 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkBox" id="new_keeper_hbox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="halign">center</property>
-                            <property name="margin_top">6</property>
-                            <property name="spacing">6</property>
                             <child>
-                              <object class="GtkButton" id="randomize_keeper_button">
-                                <property name="label" translatable="yes">Randomize</property>
+                              <object class="GtkButton" id="keeper_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
-                                <property name="use_underline">True</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>

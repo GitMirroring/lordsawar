@@ -1,6 +1,6 @@
 // Copyright (C) 2001, 2003 Michael Bartl
 // Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,12 +22,13 @@
 #include "GameMap.h"
 #include "rewardlist.h"
 #include "Sage.h"
+#include "keeper.h"
 #include "xmlhelper.h"
 #include "rnd.h"
 
 Glib::ustring Ruin::d_tag = "ruin";
 
-Ruin::Ruin(Vector<int> pos, guint32 width, Glib::ustring name, int type, Stack* occupant, bool searched, bool hidden, Player *owner, bool sage)
+Ruin::Ruin(Vector<int> pos, guint32 width, Glib::ustring name, int type, Keeper* occupant, bool searched, bool hidden, Player *owner, bool sage)
 :NamedLocation(pos, width, name,
 	        name + _(" is inhabited by monsters and full of treasure!")), 
     d_searched(searched), 
@@ -51,7 +52,7 @@ Ruin::Ruin(const Ruin& ruin)
     d_sage(ruin.d_sage)
 {
   if (ruin.d_occupant)
-    d_occupant = new Stack(*ruin.d_occupant);
+    d_occupant = new Keeper(*ruin.d_occupant);
   else
     d_occupant = NULL;
   if (ruin.d_reward)
@@ -66,7 +67,7 @@ Ruin::Ruin(const Ruin& ruin, Vector<int> pos)
     d_sage(ruin.d_sage)
 {
   if (ruin.d_occupant)
-    d_occupant = new Stack(*ruin.d_occupant);
+    d_occupant = new Keeper(*ruin.d_occupant);
   else
     d_occupant = NULL;
   if (ruin.d_reward)
@@ -79,31 +80,32 @@ Ruin::Ruin(XML_Helper* helper, guint32 width)
     :NamedLocation(helper, width), d_type(0), d_occupant(0), 
     d_hidden(0), d_owner(0), d_sage(0), d_reward(0)
 {
-    guint32 ui;
-    Glib::ustring type_str;
-    helper->getData(type_str, "type");
-    d_type = ruinTypeFromString(type_str);
-    helper->getData(d_searched, "searched");
-    helper->getData(d_sage, "sage");
-    helper->getData(d_hidden, "hidden");
-    if (d_hidden || d_searched)
-      {
-        helper->getData(ui, "owner");
-	if (ui != MAX_PLAYERS)
-          d_owner = Playerlist::getInstance()->getPlayer(ui);
-	else
-	  d_owner = NULL;
-      }
-    else
-      d_owner = NULL;
+  helper->registerTag(Keeper::d_tag, sigc::mem_fun(this, &Ruin::load));
+  guint32 ui;
+  Glib::ustring type_str;
+  helper->getData(type_str, "type");
+  d_type = ruinTypeFromString(type_str);
+  helper->getData(d_searched, "searched");
+  helper->getData(d_sage, "sage");
+  helper->getData(d_hidden, "hidden");
+  if (d_hidden || d_searched)
+    {
+      helper->getData(ui, "owner");
+      if (ui != MAX_PLAYERS)
+        d_owner = Playerlist::getInstance()->getPlayer(ui);
+      else
+        d_owner = NULL;
+    }
+  else
+    d_owner = NULL;
 
-    //mark the location as being occupied by a ruin on the map
-    for (unsigned int i = 0; i < getSize(); i++)
-      for (unsigned int j = 0; j < getSize(); j++)
-	{
-	  Vector<int> pos = getPos() + Vector<int>(i, j);
-	  GameMap::getInstance()->getTile(pos)->setBuilding(Maptile::RUIN);
-	}
+  //mark the location as being occupied by a ruin on the map
+  for (unsigned int i = 0; i < getSize(); i++)
+    for (unsigned int j = 0; j < getSize(); j++)
+      {
+        Vector<int> pos = getPos() + Vector<int>(i, j);
+        GameMap::getInstance()->getTile(pos)->setBuilding(Maptile::RUIN);
+      }
 }
 
 Ruin::~Ruin()
@@ -166,10 +168,10 @@ bool Ruin::load(Glib::ustring tag, XML_Helper* helper)
 	return true;
     }
 
-  if (tag == Stack::d_tag)
+  if (tag == Keeper::d_tag)
     {
-      Stack* s = new Stack(helper);
-      d_occupant = s;
+      Keeper* k = new Keeper(helper);
+      d_occupant = k;
       return true;
     }
 
@@ -217,7 +219,7 @@ void Ruin::setSage(bool sage)
     d_type = RUIN;
 }
 
-void Ruin::setOccupant(Stack* occupant)
+void Ruin::setOccupant(Keeper* occupant)
 {
   if (d_occupant)
     delete d_occupant;

@@ -936,7 +936,7 @@ void GameBigMap::after_draw()
 
 	  p = tile_to_buffer_pos(p);
 
-	  draw_stack (stack, buffer);
+          draw_stack (stack, buffer);
 
 	  PixMask *tmp = NULL;
 	  if (stack->size() > 1)

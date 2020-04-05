@@ -220,6 +220,8 @@ class Stacklist : public std::list<Stack*>, public sigc::trackable
 	//! The stack in the stacklist is leaving an old tile.
 	sigc::signal<void, Stack*, Vector<int> > soldpos;
 
+        //! A stack died
+        sigc::signal<void> sstackDied;
 
 	// Static Methods
 

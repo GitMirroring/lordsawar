@@ -2219,15 +2219,21 @@ void MainWindow::on_random_assign_capital_cities_activated()
     {
       if (p == Playerlist::getInstance()->getNeutral())
         continue;
-      std::vector<City*> cities;
+      std::vector<City*> neutral_cities;
+      std::vector<City*> player_cities;
       for (auto c : *Citylist::getInstance())
         {
-          if (c->getOwner() == Playerlist::getInstance()->getNeutral() ||
-              c->getOwner() == p)
-            cities.push_back(c);
+          if (c->getOwner() == Playerlist::getInstance()->getNeutral())
+            neutral_cities.push_back(c);
+          if (c->getOwner() == p)
+            player_cities.push_back(c);
         }
           
       //pick one.
+
+      std::vector<City*> cities = player_cities;
+      if (cities.empty ())
+        cities = neutral_cities;
       if (cities.empty() == false)
         {
           City *capital = cities[Rnd::rand() % cities.size()];

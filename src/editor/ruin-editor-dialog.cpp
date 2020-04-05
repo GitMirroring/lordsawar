@@ -36,6 +36,8 @@
 #include "select-army-dialog.h"
 #include "rewardlist-dialog.h"
 #include "RenamableLocation.h"
+#include "keeper-editor-dialog.h"
+#include "keeper.h"
 
 #define method(x) sigc::mem_fun(*this, &RuinEditorDialog::x)
 
@@ -62,13 +64,12 @@ RuinEditorDialog::RuinEditorDialog(Gtk::Window &parent, Ruin *r, CreateScenarioR
 
   xml->get_widget("keeper_button", keeper_button);
   keeper_button->signal_clicked().connect(method(on_keeper_clicked));
+  xml->get_widget("new_keeper_hbox", new_keeper_hbox);
+  xml->get_widget("random_keeper_switch", random_keeper_switch);
+  random_keeper_switch->property_active().signal_changed().connect(method(on_new_keeper_toggled));
 
   xml->get_widget("randomize_name_button", randomize_name_button);
   randomize_name_button->signal_clicked().connect(method(on_randomize_name_clicked));
-
-  xml->get_widget("randomize_keeper_button", randomize_keeper_button);
-  randomize_keeper_button->signal_clicked().connect
-    (method(on_randomize_keeper_clicked));
 
   set_keeper_name();
 
@@ -106,6 +107,7 @@ RuinEditorDialog::RuinEditorDialog(Gtk::Window &parent, Ruin *r, CreateScenarioR
   reward_button->signal_clicked().connect(method(on_reward_clicked));
 
   random_reward_switch->set_active (ruin->getReward () == NULL);
+  random_keeper_switch->set_active (ruin->getOccupant () == NULL);
   set_reward_name();
 }
 
@@ -114,70 +116,18 @@ int RuinEditorDialog::run()
   dialog->show_all();
   return dialog->run();
 }
-/*
-int RuinEditorDialog::run()
-{
-    dialog->show_all();
-    int response = dialog->run();
-
-    if (response == Gtk::RESPONSE_ACCEPT)
-    {
-        Location *l = ruin;
-        RenamableLocation *renamable_ruin = static_cast<RenamableLocation*>(l);
-        renamable_ruin->setName(name_entry->get_text());
-	renamable_ruin->setDescription(description_entry->get_text());
-	ruin->setType(type_entry->get_value_as_int());
-
-	// get rid of old occupant and insert new
-	Stack *occupant = ruin->getOccupant();
-	if (occupant)
-	    delete occupant;
-
-	if (keeper->empty())
-          {
-	    delete keeper;
-	    keeper = 0;
-          }
-        else
-          ruin->setOccupant(keeper);
-
-        ruin->setHidden(hidden_switch->get_active());
-        if (hidden_switch->get_active())
-          {
-	    // set owner
-	    int c = 0, row = player_combobox->get_active_row_number();
-	    Player *player = Playerlist::getInstance()->getNeutral();
-	    for (Playerlist::iterator i = Playerlist::getInstance()->begin(),
-		     end = Playerlist::getInstance()->end(); i != end; ++i, ++c)
-	        if (c == row)
-	        {
-		    player = *i;
-		    break;
-	        }
-	    ruin->setOwner(player);
-          }
-        else
-          ruin->setOwner(NULL);
-	keeper = 0;
-      ruin->setReward(reward);
-    }
-    else
-    {
-        //put the ruin name back.
-	if (name_entry->get_text() != Ruin::getDefaultName())
-	  d_randomizer->pushRandomRuinName(name_entry->get_text());
-	delete keeper;
-	keeper = 0;
-    }
-    return response;
-}
-*/
 
 void RuinEditorDialog::set_keeper_name()
 {
   Glib::ustring name;
-  if (ruin->getOccupant () && !ruin->getOccupant ()->empty())
-    name = ruin->getOccupant ()->getStrongestArmy()->getName();
+  Keeper *keeper = ruin->getOccupant ();
+  if (keeper)
+    {
+      if (keeper->getName () == "")
+        name = _("No keeper");
+      else
+        name = keeper->getName ();
+    }
   else
     name = _("No keeper");
 
@@ -223,25 +173,16 @@ void RuinEditorDialog::update_hidden_status ()
 
 void RuinEditorDialog::on_keeper_clicked()
 {
-  Player *neutral = Playerlist::getInstance()->getNeutral();
-  SelectArmyDialog d(*dialog, true, neutral, false, true);
+  KeeperEditorDialog d(*dialog, ruin->getOccupant (), ruin->getPos (),
+                       d_randomizer);
+
   d.run();
 
-  const ArmyProto *army = d.get_selected_army();
-  if (army)
-    {
-      Stack *occupant = new Stack(0, ruin->getPos());
-      Army *a = new Army(*army, neutral);
-      occupant->push_back(a);
-      ruin->setOccupant(occupant);
-    }
-  else
-    {
-      if (ruin->getOccupant())
-        ruin->clearOccupant ();
-    }
-
+  Keeper *keeper = d.get_keeper ();
+  ruin->setOccupant (keeper);
   set_keeper_name();
+  if (keeper == NULL)
+    random_keeper_switch->set_active (true);
 }
 
 void RuinEditorDialog::on_randomize_name_clicked()
@@ -256,14 +197,20 @@ void RuinEditorDialog::on_randomize_name_clicked()
     }
 }
 
-void RuinEditorDialog::on_randomize_keeper_clicked()
+void RuinEditorDialog::on_new_keeper_toggled()
 {
-  Stack *occupant = new Stack(0, ruin->getPos());
-  Army *a = d_randomizer->getRandomRuinKeeper
-    (Playerlist::getInstance()->getNeutral());
-  occupant->push_back (a);
-  ruin->setOccupant (occupant);
-  set_keeper_name();
+  if (random_keeper_switch->get_active () == true)
+    {
+      ruin->setOccupant (NULL);
+      set_keeper_name();
+    }
+  else
+    {
+      Keeper *keeper = new Keeper (NULL, ruin->getPos ());
+      ruin->setOccupant (keeper);
+      set_keeper_name();
+    }
+  new_keeper_hbox->set_sensitive(!random_keeper_switch->get_active());
 }
 
 void RuinEditorDialog::on_new_reward_toggled()
