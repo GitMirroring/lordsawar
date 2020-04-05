@@ -59,6 +59,9 @@ public:
     //! Get rid of the stack.
     void clearStack ();
 
+    //! assign the name from the first army in the stack.
+    void rename ();
+
     //! Save the stack to an opened saved-game file.
     bool save(XML_Helper* helper) const;
 

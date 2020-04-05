@@ -39,8 +39,15 @@ void Keeper::add (const ArmyProto *army, Vector<int> pos)
   d_stack = new Stack (neutral, pos);
   Army *a = new Army(*army, neutral);
   d_stack->push_back(a);
+  rename ();
+}
+
+void Keeper::rename ()
+{
   // e.g. some Giants, etc
-  setName(String::ucompose (_("some %1"), a->getName ()));
+  setName ("");
+  if (d_stack && d_stack->empty () == false)
+    setName(String::ucompose (_("some %1"), d_stack->front ()->getName ()));
 }
 
 Keeper::Keeper(const Keeper& object)

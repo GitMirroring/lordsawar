@@ -1367,6 +1367,7 @@ void GameMap::switchArmysets(Armyset *armyset)
       s->removeArmiesWithoutArmyType(armyset->getId());
       for (Stack::iterator j = s->begin(); j != s->end(); j++)
 	Armyset::switchArmysetForRuinKeeper(*j, armyset);
+      k->rename();
     }
   for (auto i: *Playerlist::getInstance())
     {
