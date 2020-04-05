@@ -2,7 +2,8 @@
 // Copyright (C) 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004, 2005 Bryan Duff
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006-2009, 2012, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2012, 2014, 2015, 2017,
+// 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -53,6 +54,8 @@ class Location;
 class BigMap: public sigc::trackable
 {
  public:
+    static bool s_show_hidden_ruins;
+
     BigMap(bool headless);
     virtual ~BigMap();
 

@@ -326,6 +326,7 @@ MainWindow::MainWindow(Glib::ustring load_filename)
   terrain_tile_style_grid->property_selection_mode () = Gtk::SELECTION_NONE;
   terrain_tile_style_viewport->add(*terrain_tile_style_grid);
   SmallMap::s_quick = true;
+  BigMap::s_show_hidden_ruins = true;
 }
 
 MainWindow::~MainWindow()
@@ -342,6 +343,7 @@ MainWindow::~MainWindow()
   delete d_create_scenario_names;
   delete window;
   SmallMap::s_quick = false;
+  BigMap::s_show_hidden_ruins = false;
 }
 
 void MainWindow::setup_pointer_radiobutton(Glib::RefPtr<Gtk::Builder> xml,

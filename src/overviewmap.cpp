@@ -42,6 +42,7 @@
 #include "bridge.h"
 #include "rnd.h"
 #include "gui/font-size.h"
+#include "bigmap.h"
 
 OverviewMap::OverviewMap(bool headless)
 {
@@ -530,11 +531,14 @@ void OverviewMap::draw()
        it != Ruinlist::getInstance()->end(); it++)
     {
       Ruin *r = *it;
-      if (r->isHidden() == true &&
-          r->getOwner() != Playerlist::getViewingplayer())
-        continue;
-      if (r->isVisible(Playerlist::getViewingplayer()) == false)
-        continue;
+      if (BigMap::s_show_hidden_ruins == false)
+        {
+          if (r->isHidden() == true &&
+              r->getOwner() != Playerlist::getViewingplayer())
+            continue;
+          if (r->isVisible(Playerlist::getViewingplayer()) == false)
+            continue;
+        }
       Vector<int> pos = r->getPos();
       pos = mapToSurface(pos);
 
