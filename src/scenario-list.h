@@ -61,6 +61,9 @@ class ScenarioList : public std::list<ScenarioDetails*>
         //! Explicitly deletes the singleton instance.
         static void deleteInstance();
         
+        //! Our list is sorted by scenario name.
+        static bool compare(const ScenarioDetails *l, const ScenarioDetails *r);
+
     protected:
 
 	//! Default constructor.

@@ -16,6 +16,7 @@
 //  02110-1301, USA.
 
 #include <assert.h>
+#include <algorithm>
 #include <sigc++/functors/mem_fun.h>
 
 #include "scenario-list.h"
@@ -63,6 +64,12 @@ ScenarioList::ScenarioList()
       else
         delete scen;
     }
+  sort (compare);
+}
+
+bool ScenarioList::compare(const ScenarioDetails *lhs, const ScenarioDetails *rhs)
+{
+  return lhs->getName().compare (rhs->getName ()) < 0;
 }
 
 ScenarioList::~ScenarioList()
