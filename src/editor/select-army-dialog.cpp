@@ -35,18 +35,14 @@
 
 #define method(x) sigc::mem_fun(*this, &SelectArmyDialog::x)
 
-SelectArmyDialog::SelectArmyDialog(Gtk::Window &parent, bool clear, Player *p,
-                                   bool hero_too, bool defends_ruins,
-                                   bool awardable)
+SelectArmyDialog::SelectArmyDialog(Gtk::Window &parent, Mode mode,
+                                   Player *p, int pre_selected_type)
  : LwEditorDialog(parent, "select-army-dialog.ui")
 {
-  d_clear = clear;
+  d_clear = pre_selected_type != -1;
   army_info_tip = NULL;
-  d_hero_too = hero_too;
-  d_defends_ruins = defends_ruins;
   player = p;
-  d_awardable = awardable;
-  selected_army = 0;
+  selected_army = NULL;
 
   xml->get_widget("army_info_label1", army_info_label1);
   xml->get_widget("army_info_label2", army_info_label2);
@@ -55,9 +51,23 @@ SelectArmyDialog::SelectArmyDialog(Gtk::Window &parent, bool clear, Player *p,
 
   xml->get_widget("army_toggles_table", toggles_table);
 
-  fill_in_army_toggles();
+  fill_in_army_toggles(mode);
   toggles_table->signal_selected_children_changed().connect (method (on_army_selected));
-  toggles_table->select_child (*toggles_table->get_child_at_index (0));
+  if (selectable.empty () == false)
+    {
+      if (pre_selected_type > -1)
+        preselect_army ((guint32)pre_selected_type);
+      else
+        toggles_table->select_child (*toggles_table->get_child_at_index (0));
+      on_army_selected ();
+    }
+}
+
+void SelectArmyDialog::preselect_army (guint32 army_type)
+{
+  for (guint32 i = 0; i < selectable.size (); i++)
+    if (selectable[i]->getId () == army_type)
+      toggles_table->select_child (*toggles_table->get_child_at_index (i));
 }
 
 void SelectArmyDialog::run()
@@ -67,17 +77,16 @@ void SelectArmyDialog::run()
   int response = dialog->run();
 
   if (response != Gtk::RESPONSE_ACCEPT)
-    selected_army = 0;
+    selected_army = NULL;
 }
 
-void SelectArmyDialog::fill_in_army_toggles()
+void SelectArmyDialog::fill_in_army_toggles(Mode mode)
 {
   const Armysetlist* al = Armysetlist::getInstance();
 
   if (!player)
     player = Playerlist::getInstance()->getNeutral();
   int armyset = player->getArmyset();
-  bool pushed_back = false;
 
   // fill in selectable armies
   selectable.clear();
@@ -85,25 +94,19 @@ void SelectArmyDialog::fill_in_army_toggles()
   for (Armyset::iterator j = as->begin(); j != as->end(); ++j)
     {
       const ArmyProto *a = al->getArmy(armyset, (*j)->getId());
-      if (a->isHero() && d_hero_too == false)
-        continue;
-      if ((d_defends_ruins && a->getDefendsRuins()) ||
-          (!d_defends_ruins && !d_awardable))
-        {
-          pushed_back = true;
-          selectable.push_back(a);
-        }
-      if (((d_awardable && a->getAwardable()) ||
-           (!d_defends_ruins && !d_awardable)) && !pushed_back)
+      if (mode == SELECT_NORMAL_WITH_HERO)
         selectable.push_back(a);
-      pushed_back = false;
+      else if (mode == SELECT_NORMAL && a->isHero () == false)
+        selectable.push_back(a);
+      else if (mode == SELECT_RUIN_DEFENDER && a->getDefendsRuins())
+        selectable.push_back(a);
+      else if (mode == SELECT_REWARDABLE_ARMY && a->getAwardable())
+        selectable.push_back(a);
     }
 
   // fill in army options
   army_toggles.clear();
   toggles_table->foreach(sigc::mem_fun(toggles_table, &Gtk::Container::remove));
-  //toggles_table->insert_row (0);
-  //toggles_table->insert_column (0);
   guint32 fs = FontSize::getInstance ()->get_height ();
   for (unsigned int i = 0; i < selectable.size(); ++i)
     {

@@ -80,6 +80,7 @@ class ItemlistDialog: public LwEditorDialog
     Gtk::SpinButton *add_mp_spinbutton;
     Gtk::Button *defender_army_type_button;
     Gtk::SpinButton *num_defenders_spinbutton;
+    std::vector<sigc::connection> connections;
 
 
     class ItemsColumns: public Gtk::TreeModelColumnRecord {
@@ -134,6 +135,7 @@ class ItemlistDialog: public LwEditorDialog
     void on_add_mp_toggled();
     void on_summon_monster_toggled();
     void on_summon_army_type_clicked();
+    void on_building_type_to_summon_on_changed ();
     void update_summon_army_type_name();
     void on_disease_city_toggled();
     void on_steal_percent_changed();
@@ -150,6 +152,8 @@ class ItemlistDialog: public LwEditorDialog
     void on_persuade_neutral_city_toggled();
     void on_teleport_to_city_toggled();
     void connect_signals ();
+    void disconnect_signals ();
+    void load_widgets ();
 };
 
 #endif

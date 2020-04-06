@@ -77,7 +77,11 @@ bool KeeperEditorDialog::run()
 void KeeperEditorDialog::on_keeper_clicked()
 {
   Player *neutral = Playerlist::getInstance ()->getNeutral ();
-  SelectArmyDialog d(*dialog, true, neutral, false, true, false);
+  int army_type = -1;
+  if (d_keeper->getStack ())
+    army_type = d_keeper->getStack ()->front()->getId ();
+  SelectArmyDialog d(*dialog, SelectArmyDialog::SELECT_RUIN_DEFENDER, neutral,
+                     army_type);
   d.run();
   Glib::ustring oldname =  "";
   Glib::ustring newname =  "";
@@ -122,7 +126,7 @@ void KeeperEditorDialog::set_keeper_button_name()
   if (d_keeper->getStack () && d_keeper->getStack()->empty () == false)
     name = d_keeper->getStack()->front()->getName();
   else
-    name = _("No keeper");
+    name = _("No army type selected");
 
   keeper_button->set_label(name);
 }

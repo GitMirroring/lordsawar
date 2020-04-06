@@ -40,7 +40,6 @@ TempleEditorDialog::TempleEditorDialog(Gtk::Window &parent, Temple *t, CreateSce
     xml->get_widget("name_entry", name_entry);
     name_entry->signal_changed().connect (method(on_name_changed));
     name_entry->set_text(temple->getName());
-    name_entry->set_max_length (MAX_LENGTH_FOR_RUIN_NAME);
 
     xml->get_widget("description_entry", description_entry);
     description_entry->signal_changed().connect

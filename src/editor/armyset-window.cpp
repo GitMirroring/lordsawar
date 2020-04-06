@@ -904,7 +904,6 @@ void ArmySetWindow::fill_army_info(ArmyProto *army)
 {
   fill_army_images (army);
   name_entry->set_text(army->getName());
-  name_entry->set_max_length (MAX_LENGTH_FOR_ARMY_NAME);
   description_textview->get_buffer()->set_text(army->getDescription());
   double turns = army->getProduction();
   production_spinbutton->set_value(turns);

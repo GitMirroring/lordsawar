@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2010, 2011, 2014 Ben Asselstine
+// Copyright (C) 2008, 2010, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,19 +40,26 @@ ItemProto::ItemProto(XML_Helper* helper)
     helper->getData(bonus_str, "bonus");
     d_bonus = bonusFlagsFromString(bonus_str);
 
+    d_has_army_type_to_summon = false;
+    d_has_army_type_to_raise = false;
+    d_has_army_type_to_kill = false;
     if (isUsable())
       {
         helper->getData(d_uses_left, "uses_left");
         if (d_bonus & ItemProto::STEAL_GOLD)
           helper->getData(d_steal_gold_percent, "steal_gold_percent");
         if (d_bonus & ItemProto::BANISH_WORMS)
-          helper->getData(d_army_type_to_kill, "army_type_to_kill");
+          {
+            helper->getData(d_army_type_to_kill, "army_type_to_kill");
+            d_has_army_type_to_kill = true;
+          }
         if (d_bonus & ItemProto::SUMMON_MONSTER)
           {
             helper->getData(d_army_type_to_summon, "army_type_to_summon");
             Glib::ustring str;
             helper->getData(str, "building_type_to_summon_on");
             d_building_type_to_summon_on = Maptile::buildingFromString(str);
+            d_has_army_type_to_summon = true;
           }
         if (d_bonus & ItemProto::DISEASE_CITY)
           helper->getData(d_percent_armies_to_kill, "percent_armies_to_kill");
@@ -62,6 +69,7 @@ ItemProto::ItemProto(XML_Helper* helper)
           {
             helper->getData(d_army_type_to_raise, "army_type_to_raise");
             helper->getData(d_num_armies_to_raise, "num_armies_to_raise");
+            d_has_army_type_to_raise = true;
           }
       }
     else
@@ -83,12 +91,15 @@ ItemProto::ItemProto(Glib::ustring name)
 {
   d_bonus = 0;
   d_uses_left = 0;
+  d_has_army_type_to_kill = false;
   d_army_type_to_kill = 0;
   d_steal_gold_percent = 0.0;
+  d_has_army_type_to_summon = false;
   d_army_type_to_summon = 0;
   d_building_type_to_summon_on = 0;
   d_percent_armies_to_kill = 0.0;
   d_mp_to_add = 0;
+  d_has_army_type_to_raise = false;
   d_army_type_to_raise = 0;
   d_num_armies_to_raise = 0;
 }
@@ -102,7 +113,10 @@ ItemProto::ItemProto(const ItemProto& orig)
     d_percent_armies_to_kill(orig.d_percent_armies_to_kill),
     d_mp_to_add(orig.d_mp_to_add),
     d_army_type_to_raise(orig.d_army_type_to_raise),
-    d_num_armies_to_raise(orig.d_num_armies_to_raise)
+    d_num_armies_to_raise(orig.d_num_armies_to_raise),
+    d_has_army_type_to_kill (orig.d_has_army_type_to_kill),
+    d_has_army_type_to_summon (orig.d_has_army_type_to_summon),
+    d_has_army_type_to_raise (orig.d_has_army_type_to_raise)
 {
 }
 

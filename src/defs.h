@@ -176,14 +176,6 @@ const double ZOOM_STEP = 0.1;
 
 const Glib::ustring DEFAULT_CONFIG_FILENAME = "lordsawarrc";
 
-//having really long names messes up some of the interfaces, so we have
-//this unfortunate limit
-const int MAX_LENGTH_FOR_PLAYER_NAME = 20;
-const int MAX_LENGTH_FOR_NETWORKED_GAME_NAME = 20;
-const int MAX_LENGTH_FOR_ITEM_NAME = 20;
-const int MAX_LENGTH_FOR_RUIN_NAME = 20;
-const int MAX_LENGTH_FOR_ARMY_NAME = 20;
-
 //1 in x chance of standing stone being on a road tile for random map.
 const unsigned int ROAD_STONE_CHANCE = 150;
 //1 in x chance of standing stone being on a grass tile for random map.

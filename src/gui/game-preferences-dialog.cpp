@@ -51,7 +51,6 @@ void GamePreferencesDialog::init(Glib::ustring filename)
   xml->get_widget("players_vbox", players_vbox);
   xml->get_widget("game_name_label", game_name_label);
   xml->get_widget("game_name_entry", game_name_entry);
-  game_name_entry->set_max_length (MAX_LENGTH_FOR_NETWORKED_GAME_NAME);
   xml->get_widget("num_players_spinbutton", num_players_spinbutton);
   num_players_spinbutton->signal_changed().connect(method(on_num_players_changed));
   num_players_spinbutton->signal_insert_text().connect
@@ -175,7 +174,6 @@ void GamePreferencesDialog::add_player(GameParameters::Player::Type type,
   player_type->append(NO_PLAYER_TYPE);
   player_type->signal_changed().connect (method(on_player_type_changed));
   Gtk::Entry *player_name = new Gtk::Entry();
-  player_name->set_max_length (MAX_LENGTH_FOR_PLAYER_NAME);
   player_name->signal_changed().connect (method(on_player_name_changed));
   player_name->set_text(name);
 

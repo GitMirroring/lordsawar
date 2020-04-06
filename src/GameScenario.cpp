@@ -1178,8 +1178,7 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
           it->getOccupant()->getStack ())
         {
           s = String::ucompose("%1 has an unnamed keeper", it->getName ());
-          warnings.push_back(s);
-          break;
+          errors.push_back(s);
         }
     }
 
@@ -1229,6 +1228,22 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
   if (GameMap::checkBuildingTerrain(Maptile::SIGNPOST, false))
     errors.push_back(_("One or more signs are on water."));
   
+  for (auto it: *Itemlist::getInstance())
+    {
+      ItemProto *i = it.second;
+      if (i->getBonus (ItemProto::BANISH_WORMS) &&
+          i->hasArmyTypeToKill () == false)
+        errors.push_back(String::ucompose (_("%1 doesn't have an army type specified for Kill All Units Of Giant Worms"), i->getName ()));
+
+      if (i->getBonus (ItemProto::SUMMON_MONSTER) &&
+          i->hasArmyTypeToSummon () == false)
+        errors.push_back(String::ucompose (_("%1 doesn't have an army type specified for Summon Monster"), i->getName ()));
+
+      if (i->getBonus (ItemProto::RAISE_DEFENDERS) &&
+          i->hasArmyTypeToRaise () == false)
+        errors.push_back(String::ucompose (_("%1 doesn't have an army type specified for Raise Defenders In City"), i->getName ()));
+    }
+
   if (errors.size() ==  0)
     return true;
   return false;

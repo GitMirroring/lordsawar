@@ -251,7 +251,11 @@ void RewardEditorDialog::set_item_name()
 
 void RewardEditorDialog::on_ally_clicked()
 {
-  SelectArmyDialog d(*dialog, true, d_player, false, false, true);
+  int army_type = -1;
+  if (ally)
+    army_type = ally->getId ();
+  SelectArmyDialog d(*dialog, SelectArmyDialog::SELECT_REWARDABLE_ARMY,
+                     d_player, army_type);
   d.run();
   if (d.get_selected_army())
     {

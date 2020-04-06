@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,14 +25,14 @@
 class XML_Helper;
 
 //! A carryable type of thing that confers special properties on it's holder.
-/** 
- * This class describes an item prototype.  Items are carried by heroes in a 
+/**
+ * This class describes an item prototype.  Items are carried by heroes in a
  * backpack, and each item has a "kind".  The item prototype is this kind.
- * When Items are carried they give special abilities to that hero, and 
+ * When Items are carried they give special abilities to that hero, and
  * perhaps the stack it is included in.
  * Items can be dropped onto the ground, and picked up from the ground.
  * When a hero dies, all of that hero's items get dropped onto the ground.
- * 
+ *
  */
 
 class ItemProto: public Renamable
@@ -56,11 +56,11 @@ class ItemProto: public Renamable
 	  //! Add 3 to the strength of the wearer.
 	  ADD3STR         = 0x00000004,
 	  //! Add 1 to the strength of the Stack.
-	  ADD1STACK       = 0x00000008, 
+	  ADD1STACK       = 0x00000008,
 	  //! Add 2 to the strength of the Stack.
 	  ADD2STACK       = 0x00000010,
 	  //! Add 3 to the strength of the Stack.
-	  ADD3STACK       = 0x00000020, 
+	  ADD3STACK       = 0x00000020,
 	  //! Provides the gift of flight to the Stack.
 	  FLYSTACK        = 0x00000040,
 	  //! Makes the stack go two times as far.
@@ -72,11 +72,11 @@ class ItemProto: public Renamable
 	  //! Add 4 gold to the Player's treasury per City it holds.
 	  ADD4GOLDPERCITY = 0x00000400,
 	  //! Add 5 gold to the Player's treasury per City it holds.
-	  ADD5GOLDPERCITY = 0x00000800, 
+	  ADD5GOLDPERCITY = 0x00000800,
           //! Steal half of a player's gold.
-          STEAL_GOLD      = 0x00001000, 
+          STEAL_GOLD      = 0x00001000,
           //! Sink all of a player's boats.
-          SINK_SHIPS      = 0x00002000, 
+          SINK_SHIPS      = 0x00002000,
           //! Pick up any bags of items that are on the ground.
           PICK_UP_BAGS    = 0x00004000,
           //! Provide 2 movement points to the stack.
@@ -109,7 +109,7 @@ class ItemProto: public Renamable
 
 	static guint32 bonusFlagsFromString(const Glib::ustring str);
 	static Glib::ustring bonusFlagsToString(const guint32 bonus);
-        
+
 	//! Loading constructor.
         ItemProto(XML_Helper* helper);
 
@@ -121,7 +121,7 @@ class ItemProto: public Renamable
 
         //! Destructor.
         virtual ~ItemProto() {};
-        
+
         //! Save the item to the opened saved-game file.
         bool save(XML_Helper* helper) const;
         //! Save the item, but not the enclosing d_tag.
@@ -138,49 +138,61 @@ class ItemProto: public Renamable
 
 	//! Remove a bonus from the Item.
 	void removeBonus(ItemProto::Bonus bonus);
-        
+
 	//! Return some text describing the item's special abilities.
         Glib::ustring getBonusDescription() const;
 
         //! Return if the item is usable or not.
-        bool isUsable() const {return d_bonus & USABLE;};
+        bool isUsable() const {return d_bonus & USABLE;}
 
-        guint32 getNumberOfUsesLeft() const {return d_uses_left;};
+        guint32 getNumberOfUsesLeft() const {return d_uses_left;}
 
         //! Set the number of uses left.
-        void setNumberOfUsesLeft(guint32 uses_left) {d_uses_left = uses_left;};
+        void setNumberOfUsesLeft(guint32 uses_left) {d_uses_left = uses_left;}
 
-        bool usableOnVictimPlayer() const { if (d_bonus & SINK_SHIPS || d_bonus & STEAL_GOLD) return true; else return false;};
+        bool usableOnVictimPlayer() const { if (d_bonus & SINK_SHIPS || d_bonus & STEAL_GOLD) return true; else return false;}
 
-        bool usableOnEnemyCity() const { if (d_bonus & DISEASE_CITY) return true; else return false;};
-        bool usableOnFriendlyCity() const { if (d_bonus & RAISE_DEFENDERS) return true; else return false;};
-        bool usableOnNeutralCity() const { if (d_bonus & PERSUADE_NEUTRALS) return true; else return false;};
-        bool usableOnAnyCity() const { if (d_bonus & TELEPORT_TO_CITY) return true; else return false;};
+        bool usableOnEnemyCity() const { if (d_bonus & DISEASE_CITY) return true; else return false;}
+        bool usableOnFriendlyCity() const { if (d_bonus & RAISE_DEFENDERS) return true; else return false;}
+        bool usableOnNeutralCity() const { if (d_bonus & PERSUADE_NEUTRALS) return true; else return false;}
+        bool usableOnAnyCity() const { if (d_bonus & TELEPORT_TO_CITY) return true; else return false;}
 
-        guint32 getArmyTypeToKill() const {return d_army_type_to_kill;};
-        void setArmyTypeToKill(guint32 type) {d_army_type_to_kill = type;};
+        bool hasArmyTypeToKill () const {return d_has_army_type_to_kill;}
+        void clearArmyTypeToKill ()
+          {d_has_army_type_to_kill = false; d_army_type_to_kill = 0;}
+        guint32 getArmyTypeToKill() const {return d_army_type_to_kill;}
+        void setArmyTypeToKill(guint32 type)
+          {d_army_type_to_kill = type; d_has_army_type_to_kill = true;}
 
-        double getPercentGoldToSteal() const {return d_steal_gold_percent;};
-        void setPercentGoldToSteal(double p) {d_steal_gold_percent = p;};
+        double getPercentGoldToSteal() const {return d_steal_gold_percent;}
+        void setPercentGoldToSteal(double p) {d_steal_gold_percent = p;}
 
-        guint32 getArmyTypeToSummon() const {return d_army_type_to_summon;};
-        void setArmyTypeToSummon(guint32 type) {d_army_type_to_summon = type;};
+        bool hasArmyTypeToSummon() const {return d_has_army_type_to_summon;}
+        void clearArmyTypeToSummon ()
+          {d_has_army_type_to_summon = false; d_army_type_to_summon = 0;}
+        guint32 getArmyTypeToSummon() const {return d_army_type_to_summon;}
+        void setArmyTypeToSummon(guint32 type)
+          {d_army_type_to_summon = type; d_has_army_type_to_summon = true;}
 
-        guint32 getBuildingTypeToSummonOn() const {return d_building_type_to_summon_on;};
-        void setBuildingTypeToSummonOn(guint32 type) {d_building_type_to_summon_on = type;};
+        guint32 getBuildingTypeToSummonOn() const {return d_building_type_to_summon_on;}
+        void setBuildingTypeToSummonOn(guint32 type) {d_building_type_to_summon_on = type;}
 
         bool isCurrentlyUsable(guint32 building, bool bags_on_map, bool victims_left, bool ruin_has_occupant, bool friendly_cities_present, bool enemy_cities_present, bool neutral_cities_present);
         double getPercentArmiesToKill() const {return d_percent_armies_to_kill;};
-        void setPercentArmiesToKill(double p) {d_percent_armies_to_kill = p;};
+        void setPercentArmiesToKill(double p) {d_percent_armies_to_kill = p;}
 
-        guint32 getMovementPointsToAdd() const {return d_mp_to_add;};
-        void setMovementPointsToAdd(guint32 mp) {d_mp_to_add = mp;};
+        guint32 getMovementPointsToAdd() const {return d_mp_to_add;}
+        void setMovementPointsToAdd(guint32 mp) {d_mp_to_add = mp;}
 
-        guint32 getArmyTypeToRaise() const {return d_army_type_to_raise;};
-        void setArmyTypeToRaise(guint32 type) {d_army_type_to_raise = type;};
+        bool hasArmyTypeToRaise () const {return d_has_army_type_to_raise;}
+        void clearArmyTypeToRaise ()
+          {d_has_army_type_to_raise = false; d_army_type_to_raise = 0;}
+        guint32 getArmyTypeToRaise() const {return d_army_type_to_raise;}
+        void setArmyTypeToRaise(guint32 type)
+          {d_army_type_to_raise = type; d_has_army_type_to_raise = true;}
 
-        guint32 getNumberOfArmiesToRaise() const {return d_num_armies_to_raise;};
-        void setNumberOfArmiesToRaise(guint32 num) {d_num_armies_to_raise = num;};
+        guint32 getNumberOfArmiesToRaise() const {return d_num_armies_to_raise;}
+        void setNumberOfArmiesToRaise(guint32 num) {d_num_armies_to_raise = num;}
 
     protected:
 	//! The item's bonus.
@@ -188,7 +200,7 @@ class ItemProto: public Renamable
 	 * This value is a bitwise OR-ing of the values in ItemProto::Bonus.
 	 */
         guint32 d_bonus;
-        
+
         //! The number of uses this item has before it is spent.
         guint32 d_uses_left;
 
@@ -219,6 +231,15 @@ class ItemProto: public Renamable
 
         //! How many armies to create when RAISE_DEFENDERS is used.
         guint32 d_num_armies_to_raise;
+
+        //! Whether or not d_army_type_to_kill has a value
+        bool d_has_army_type_to_kill;
+
+        //! Whether or not d_army_type_to_summon has a value
+        bool d_has_army_type_to_summon;
+
+        //! Whether or not d_army_type_to_raise has a value
+        bool d_has_army_type_to_raise;
     private:
 
 	static Glib::ustring bonusFlagToString(ItemProto::Bonus type);

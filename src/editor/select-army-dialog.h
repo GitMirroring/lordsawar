@@ -34,9 +34,15 @@ class Player;
 class SelectArmyDialog: public LwEditorDialog
 {
  public:
-    SelectArmyDialog(Gtk::Window &parent, bool clear, Player *p,
-                     bool hero_too = false, bool defends_ruins = false,
-		     bool rewardable = false);
+    enum Mode
+      {
+        SELECT_NORMAL_WITH_HERO,
+        SELECT_NORMAL,
+        SELECT_RUIN_DEFENDER,
+        SELECT_REWARDABLE_ARMY
+      };
+    SelectArmyDialog(Gtk::Window &parent, Mode mode, Player *p,
+                     int pre_selected_type);
     ~SelectArmyDialog() {}
 
     void run();
@@ -45,6 +51,7 @@ class SelectArmyDialog: public LwEditorDialog
     
  private:
     bool d_clear;
+
     ArmyInfoTip* army_info_tip;
     Gtk::Label *army_info_label1;
     Gtk::Label *army_info_label2;
@@ -55,17 +62,15 @@ class SelectArmyDialog: public LwEditorDialog
 
     const ArmyProto *selected_army;
     Player *player;
-    bool d_defends_ruins;
-    bool d_awardable;
-    bool d_hero_too;
 
     std::vector<Gtk::Image*> army_toggles;
     bool ignore_toggles;
     std::vector<const ArmyProto*> selectable;
 
-    void fill_in_army_toggles();
+    void fill_in_army_toggles(Mode mode);
     void fill_in_army_info();
     void on_army_selected ();
+    void preselect_army (guint32 army_type);
 };
 
 #endif

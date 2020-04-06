@@ -48,7 +48,6 @@ RuinEditorDialog::RuinEditorDialog(Gtk::Window &parent, Ruin *r, CreateScenarioR
   ruin = r;
 
   xml->get_widget("name_entry", name_entry);
-  name_entry->set_max_length (MAX_LENGTH_FOR_RUIN_NAME);
   name_entry->signal_changed ().connect (method (on_name_changed));
   name_entry->set_text(ruin->getName());
   xml->get_widget("description_entry", description_entry);
