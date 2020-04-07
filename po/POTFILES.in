@@ -313,6 +313,7 @@ src/editor/stone-editor-dialog.cpp
 src/editor/image-file-filter.cpp
 src/editor/heroes-dialog.cpp
 src/editor/keeper-editor-dialog.cpp
+src/editor/army-chooser-button.cpp
 src/utils/import.cpp
 src/gui/city-info-tip.cpp
 src/gui/game-lobby-dialog.cpp

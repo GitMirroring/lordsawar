@@ -88,7 +88,8 @@ libeditor_la_SOURCES =\
 	media-dialog.cpp media-dialog.h \
 	validation-dialog.cpp validation-dialog.h \
 	heroes-dialog.cpp heroes-dialog.h \
-	keeper-editor-dialog.cpp keeper-editor-dialog.h
+	keeper-editor-dialog.cpp keeper-editor-dialog.h \
+	army-chooser-button.cpp army-chooser-button.h
 
 localedir = $(datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@

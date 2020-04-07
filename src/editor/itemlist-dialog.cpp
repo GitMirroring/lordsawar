@@ -32,8 +32,7 @@
 #include "playerlist.h"
 #include "armysetlist.h"
 #include "ucompose.hpp"
-#include "select-army-dialog.h"
-
+#include "army-chooser-button.h"
 #define method(x) sigc::mem_fun(*this, &ItemlistDialog::x)
 
 ItemlistDialog::ItemlistDialog(Gtk::Window &parent)
@@ -41,10 +40,21 @@ ItemlistDialog::ItemlistDialog(Gtk::Window &parent)
 {
   d_changed = false;
   d_itemlist = Itemlist::getInstance();
-  selected_summon_army = NULL;
-  selected_banish_army = NULL;
-  selected_defender_army = NULL;
 
+  kill_army_type_button =
+    new ArmyChooserButton (parent, xml, "kill_army_type_button",
+                           Playerlist::getInstance()->getNeutral (),
+                           SelectArmyDialog::SELECT_RUIN_DEFENDER);
+
+  summon_army_type_button =
+    new ArmyChooserButton (parent, xml, "summon_army_type_button",
+                           Playerlist::getInstance()->getNeutral (),
+                           SelectArmyDialog::SELECT_NORMAL);
+
+  defender_army_type_button =
+    new ArmyChooserButton (parent, xml, "defender_army_type_button",
+                           Playerlist::getInstance()->getNeutral (),
+                           SelectArmyDialog::SELECT_NORMAL);
   load_widgets ();
 
   items_list = Gtk::ListStore::create(items_columns);
@@ -70,6 +80,13 @@ ItemlistDialog::ItemlistDialog(Gtk::Window &parent)
   update_itemlist_buttons();
 }
 
+ItemlistDialog::~ItemlistDialog()
+{
+  delete kill_army_type_button;
+  delete summon_army_type_button;
+  delete defender_army_type_button;
+}
+
 void ItemlistDialog::load_widgets ()
 {
   xml->get_widget("name_entry", name_entry);
@@ -77,8 +94,6 @@ void ItemlistDialog::load_widgets ()
   xml->get_widget("add_item_button", add_item_button);
   xml->get_widget("remove_item_button", remove_item_button);
   xml->get_widget("item_vbox", item_vbox);
-  xml->get_widget("kill_army_type_button", kill_army_type_button);
-  xml->get_widget("summon_army_type_button", summon_army_type_button);
   xml->get_widget("building_type_to_summon_on_combobox", 
                   building_type_to_summon_on_combobox);
   xml->get_widget("disease_city_switch", disease_city_switch);
@@ -86,7 +101,6 @@ void ItemlistDialog::load_widgets ()
                   disease_armies_percent_spinbutton);
 
   xml->get_widget("raise_defenders_switch", raise_defenders_switch);
-  xml->get_widget("defender_army_type_button", defender_army_type_button);
   xml->get_widget("num_defenders_spinbutton", num_defenders_spinbutton);
   xml->get_widget("persuade_neutral_city_switch", 
                   persuade_neutral_city_switch);
@@ -123,13 +137,13 @@ void ItemlistDialog::connect_signals ()
   connections.push_back (name_entry->signal_changed().connect (method(on_name_changed)));
   connections.push_back (add_item_button->signal_clicked().connect (method(on_add_item_clicked)));
   connections.push_back (remove_item_button->signal_clicked().connect (method(on_remove_item_clicked)));
-  connections.push_back (kill_army_type_button->signal_clicked().connect(method(on_kill_army_type_clicked)));
-  connections.push_back (summon_army_type_button->signal_clicked().connect(method(on_summon_army_type_clicked)));
+  connections.push_back (kill_army_type_button->army_selected.connect(method(on_kill_army_type_selected)));
+  connections.push_back (summon_army_type_button->army_selected.connect(method(on_summon_army_type_selected)));
   connections.push_back (disease_city_switch->property_active().signal_changed().connect(method(on_disease_city_toggled)));
   connections.push_back (disease_armies_percent_spinbutton->signal_changed().connect(method(on_disease_armies_percent_changed)));
   connections.push_back (disease_armies_percent_spinbutton->signal_insert_text().connect (sigc::hide(sigc::hide(method(on_disease_armies_percent_text_changed)))));
   connections.push_back (raise_defenders_switch->property_active().signal_changed().connect (method(on_raise_defenders_toggled)));
-  connections.push_back (defender_army_type_button->signal_clicked().connect (method(on_defender_type_clicked)));
+  connections.push_back (defender_army_type_button->army_selected.connect (method(on_defender_type_selected)));
   connections.push_back (num_defenders_spinbutton->signal_changed().connect (method(on_num_defenders_changed)));
   connections.push_back (num_defenders_spinbutton->signal_insert_text().connect
     (sigc::hide(sigc::hide(method(on_num_defenders_text_changed)))));
@@ -227,8 +241,8 @@ void ItemlistDialog::on_item_selected()
 
 void ItemlistDialog::fill_item_info(ItemProto *item)
 {
-  name_entry->set_text(item->getName());
   disconnect_signals ();
+  name_entry->set_text(item->getName());
   add1str_switch->set_active(item->getBonus(ItemProto::ADD1STR));
   add2str_switch->set_active(item->getBonus(ItemProto::ADD2STR));
   add3str_switch->set_active(item->getBonus(ItemProto::ADD3STR));
@@ -267,14 +281,32 @@ void ItemlistDialog::fill_item_info(ItemProto *item)
   disease_city_switch->set_active(item->getBonus(ItemProto::DISEASE_CITY));
   disease_armies_percent_spinbutton->set_sensitive(disease_city_switch->get_active());
   disease_armies_percent_spinbutton->set_value(item->getPercentArmiesToKill());
-  update_kill_army_type_name();
-  update_summon_army_type_name();
+
+  if (item->hasArmyTypeToKill ())
+    kill_army_type_button->select (item->getArmyTypeToKill ());
+  else
+    kill_army_type_button->clear_selected_army ();
+  kill_army_type_button->set_sensitive(banish_worms_switch->get_active());
+
+  if (item->hasArmyTypeToSummon ())
+    summon_army_type_button->select (item->getArmyTypeToSummon ());
+  else
+    summon_army_type_button->clear_selected_army ();
+
+  summon_army_type_button->set_sensitive(summon_monster_switch->get_active());
+
   raise_defenders_switch->set_active
     (item->getBonus(ItemProto::RAISE_DEFENDERS));
   num_defenders_spinbutton->set_sensitive
     (raise_defenders_switch->get_active());
   num_defenders_spinbutton->set_value(item->getNumberOfArmiesToRaise());
-  update_raise_defender_army_type_name();
+
+  if (item->hasArmyTypeToRaise ())
+    defender_army_type_button->select (item->getArmyTypeToRaise());
+  else
+    defender_army_type_button->clear_selected_army ();
+  defender_army_type_button->set_sensitive(raise_defenders_switch->get_active());
+
   persuade_neutral_city_switch->set_active 
     (item->getBonus(ItemProto::PERSUADE_NEUTRALS));
   teleport_to_city_switch->set_active 
@@ -442,9 +474,8 @@ void ItemlistDialog::on_banish_worms_toggled()
   kill_army_type_button->set_sensitive(banish_worms_switch->get_active());
   if (banish_worms_switch->get_active() == false)
     {
-      selected_banish_army = NULL;
       d_item->clearArmyTypeToKill ();
-      update_kill_army_type_name();
+      kill_army_type_button->clear_selected_army ();
     }
 }
 
@@ -470,57 +501,19 @@ void ItemlistDialog::on_uses_changed()
   else
     return;
 }
-	
-void ItemlistDialog::on_kill_army_type_clicked()
-{
-    Player *neutral = Playerlist::getInstance()->getNeutral();
-    int army_type =
-      d_item->hasArmyTypeToKill() ? d_item->getArmyTypeToKill () : -1;
-    SelectArmyDialog d(*dialog, SelectArmyDialog::SELECT_RUIN_DEFENDER,
-                       neutral, army_type);
-    d.run();
 
-    selected_banish_army = d.get_selected_army();
-    if (selected_banish_army)
-      d_item->setArmyTypeToKill(selected_banish_army->getId());
+void ItemlistDialog::on_kill_army_type_selected (const ArmyProto *a)
+{
+    if (a)
+      d_item->setArmyTypeToKill(a->getId());
     else
       {
         d_item->clearArmyTypeToKill ();
         banish_worms_switch->property_active () = false;
       }
-
-    update_kill_army_type_name();
     d_changed = true;
 }
 
-void ItemlistDialog::update_kill_army_type_name()
-{
-    Player *neutral = Playerlist::getInstance()->getNeutral();
-    Glib::ustring name;
-    Glib::ustring oldname = kill_army_type_button->get_label();
-    if (banish_worms_switch->get_active() == true)
-      {
-        kill_army_type_button->property_sensitive() = true;
-        if (selected_banish_army)
-          {
-            Armysetlist *asl = Armysetlist::getInstance();
-            name = asl->getArmy(neutral->getArmyset(), 
-                                d_item->getArmyTypeToKill())->getName();
-          }
-        else
-          name = _("No army type selected");
-      }
-    else
-      {
-        name = _("No army type selected");
-        kill_army_type_button->property_sensitive() = false;
-      }
-    
-    kill_army_type_button->set_label(name);
-    if (oldname != name && oldname != "")
-      d_changed = true;
-}
-	
 void ItemlistDialog::on_capture_keeper_toggled()
 {
   on_switch_toggled(capture_keeper_switch, ItemProto::CAPTURE_KEEPER);
@@ -535,24 +528,16 @@ void ItemlistDialog::on_summon_monster_toggled()
     (summon_monster_switch->get_active());
   if (summon_monster_switch->get_active() == false)
     {
-      selected_summon_army =  NULL;
       d_item->clearArmyTypeToSummon();
       building_type_to_summon_on_combobox->set_active (0);
-      update_summon_army_type_name();
+      summon_army_type_button->clear_selected_army ();
     }
 }
     
-void ItemlistDialog::on_summon_army_type_clicked()
+void ItemlistDialog::on_summon_army_type_selected(const ArmyProto *a)
 {
-  Player *neutral = Playerlist::getInstance()->getNeutral();
-  int army_type =
-    d_item->hasArmyTypeToSummon() ? d_item->getArmyTypeToSummon () : -1;
-  SelectArmyDialog d(*dialog, SelectArmyDialog::SELECT_NORMAL, neutral,
-                     army_type);
-  d.run();
-  selected_summon_army = d.get_selected_army();
-  if (selected_summon_army)
-    d_item->setArmyTypeToSummon(selected_summon_army->getId());
+  if (a)
+    d_item->setArmyTypeToSummon(a->getId());
   else
     {
       d_item->clearArmyTypeToSummon ();
@@ -560,36 +545,7 @@ void ItemlistDialog::on_summon_army_type_clicked()
       summon_monster_switch->property_active () = false;
     }
 
-  update_summon_army_type_name();
   d_changed = true;
-}
-
-void ItemlistDialog::update_summon_army_type_name()
-{
-    Player *neutral = Playerlist::getInstance()->getNeutral();
-    Glib::ustring name;
-    Glib::ustring oldname = summon_army_type_button->get_label();
-    if (summon_monster_switch->get_active() == true)
-      {
-        summon_army_type_button->set_sensitive(true);
-        if (selected_summon_army)
-          {
-            Armysetlist *asl = Armysetlist::getInstance();
-            name = asl->getArmy(neutral->getArmyset(), 
-                                d_item->getArmyTypeToSummon())->getName();
-          }
-        else
-          name = _("No army type selected");
-      }
-    else
-      {
-	name = _("No army type selected");
-        summon_army_type_button->set_sensitive(false);
-      }
-    
-    summon_army_type_button->set_label(name);
-    if (oldname != name && oldname != "")
-      d_changed = true;
 }
 
 void ItemlistDialog::on_disease_city_toggled()
@@ -622,10 +578,9 @@ void ItemlistDialog::on_raise_defenders_toggled()
     (raise_defenders_switch->get_active());
   if (raise_defenders_switch->get_active() == false)
     {
-      selected_defender_army =  NULL;
       d_item->clearArmyTypeToRaise();
+      defender_army_type_button->clear_selected_army ();
       num_defenders_spinbutton->set_value (1);
-      update_raise_defender_army_type_name();
     }
 }
 
@@ -690,57 +645,20 @@ void ItemlistDialog::on_num_defenders_text_changed()
   on_num_defenders_changed();
 }
 
-void ItemlistDialog::on_defender_type_clicked()
+void ItemlistDialog::on_defender_type_selected(const ArmyProto *a)
 {
-    Player *neutral = Playerlist::getInstance()->getNeutral();
-    int army_type =
-      d_item->hasArmyTypeToRaise() ? d_item->getArmyTypeToRaise () : -1;
-    SelectArmyDialog d(*dialog, SelectArmyDialog::SELECT_NORMAL, neutral,
-                       army_type);
-    d.run();
+  if (a)
+    d_item->setArmyTypeToRaise(a->getId());
+  else
+    {
+      d_item->clearArmyTypeToRaise ();
+      raise_defenders_switch->property_active () = false;
+      num_defenders_spinbutton->set_value(1);
+    }
 
-    selected_defender_army = d.get_selected_army();
-    if (selected_defender_army)
-      d_item->setArmyTypeToRaise(selected_defender_army->getId());
-    else
-      {
-        d_item->clearArmyTypeToRaise ();
-        raise_defenders_switch->property_active () = false;
-      }
-
-    update_raise_defender_army_type_name();
-    d_changed = true;
+  d_changed = true;
 }
 
-void ItemlistDialog::update_raise_defender_army_type_name()
-{
-    Player *neutral = Playerlist::getInstance()->getNeutral();
-    Glib::ustring name;
-    Glib::ustring oldname = defender_army_type_button->get_label();
-
-    if (raise_defenders_switch->get_active() == true)
-      {
-        defender_army_type_button->set_sensitive(true);
-        if (selected_defender_army)
-          {
-            Armysetlist *asl = Armysetlist::getInstance();
-            name = asl->getArmy(neutral->getArmyset(), 
-                                d_item->getArmyTypeToRaise())->getName();
-          }
-        else
-          name = _("No army type selected");
-      }
-    else
-      {
-	name = _("No army type selected");
-        defender_army_type_button->set_sensitive(false);
-      }
-    
-    defender_army_type_button->set_label(name);
-    if (oldname != name && oldname != "")
-      d_changed = true;
-}
-  
 void ItemlistDialog::on_building_type_to_summon_on_changed ()
 {
   guint32 row = building_type_to_summon_on_combobox->get_active_row_number ();

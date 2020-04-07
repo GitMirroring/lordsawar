@@ -27,6 +27,7 @@ class Item;
 class ArmyProto;
 class Ruin;
 class Player;
+class ArmyChooserButton;
 
 //! Scenario editor.  Edits rewards.
 class RewardEditorDialog: public LwEditorDialog
@@ -53,7 +54,7 @@ class RewardEditorDialog: public LwEditorDialog
     Gtk::Button *randomize_gold_button;
     Gtk::Button *item_button;
     Gtk::Button *randomize_item_button;
-    Gtk::Button *ally_button;
+    ArmyChooserButton *ally_button;
     Gtk::Button *randomize_allies_button;
     Gtk::SpinButton *num_allies_spinbutton;
     Gtk::SpinButton *map_x_spinbutton;
@@ -69,10 +70,8 @@ class RewardEditorDialog: public LwEditorDialog
     void on_clear_item_clicked();
     void on_randomize_item_clicked();
     void set_item_name();
-    void on_ally_clicked();
+    void on_ally_selected(const ArmyProto *a);
     void on_randomize_allies_clicked();
-    void on_clear_ally_clicked();
-    void set_ally_name();
     void on_randomize_map_clicked();
     void on_hidden_ruin_clicked();
     void on_randomize_hidden_ruin_clicked();

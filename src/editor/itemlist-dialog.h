@@ -25,21 +25,19 @@
 #include "lw-editor-dialog.h"
 
 class ArmyProto;
+class ArmyChooserButton;
 
 //! Scenario editor.  Edits the global list of Item objects in the scenario.
 class ItemlistDialog: public LwEditorDialog
 {
  public:
     ItemlistDialog(Gtk::Window &parent);
-    ~ItemlistDialog() {}
+    ~ItemlistDialog();
     bool item_was_changed () const {return d_changed;}
 
  private:
     bool d_changed;
     Glib::ustring current_save_filename;
-    const ArmyProto *selected_summon_army;
-    const ArmyProto *selected_banish_army;
-    const ArmyProto *selected_defender_army;
     Itemlist *d_itemlist; //current itemlist
     ItemProto *d_item; //current item
     Gtk::Entry *name_entry;
@@ -72,13 +70,13 @@ class ItemlistDialog: public LwEditorDialog
     Gtk::Switch *persuade_neutral_city_switch;
     Gtk::Switch *teleport_to_city_switch;
     Gtk::SpinButton *uses_spinbutton;
-    Gtk::Button *kill_army_type_button;
+    ArmyChooserButton *kill_army_type_button;
     Gtk::SpinButton *steal_percent_spinbutton;
-    Gtk::Button *summon_army_type_button;
+    ArmyChooserButton *summon_army_type_button;
     Gtk::ComboBox *building_type_to_summon_on_combobox;
     Gtk::SpinButton *disease_armies_percent_spinbutton;
     Gtk::SpinButton *add_mp_spinbutton;
-    Gtk::Button *defender_army_type_button;
+    ArmyChooserButton *defender_army_type_button;
     Gtk::SpinButton *num_defenders_spinbutton;
     std::vector<sigc::connection> connections;
 
@@ -128,13 +126,12 @@ class ItemlistDialog: public LwEditorDialog
     void on_banish_worms_toggled();
     void on_burn_bridge_toggled();
     void on_uses_changed();
-    void on_kill_army_type_clicked();
-    void update_kill_army_type_name();
+    void on_kill_army_type_selected (const ArmyProto *a);
     void on_capture_keeper_toggled();
     void on_pickup_bags_toggled();
     void on_add_mp_toggled();
     void on_summon_monster_toggled();
-    void on_summon_army_type_clicked();
+    void on_summon_army_type_selected(const ArmyProto *a);
     void on_building_type_to_summon_on_changed ();
     void update_summon_army_type_name();
     void on_disease_city_toggled();
@@ -145,10 +142,9 @@ class ItemlistDialog: public LwEditorDialog
     void on_add_mp_changed();
     void on_add_mp_text_changed();
     void on_raise_defenders_toggled();
-    void on_defender_type_clicked();
+    void on_defender_type_selected(const ArmyProto *a);
     void on_num_defenders_changed();
     void on_num_defenders_text_changed();
-    void update_raise_defender_army_type_name();
     void on_persuade_neutral_city_toggled();
     void on_teleport_to_city_toggled();
     void connect_signals ();

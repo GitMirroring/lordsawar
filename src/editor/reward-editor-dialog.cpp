@@ -34,6 +34,7 @@
 #include "select-hidden-ruin-dialog.h"
 #include "armyproto.h"
 #include "SightMap.h"
+#include "army-chooser-button.h"
 
 #define method(x) sigc::mem_fun(*this, &RewardEditorDialog::x)
 
@@ -61,11 +62,12 @@ RewardEditorDialog::RewardEditorDialog(Gtk::Window &parent, Player *player, bool
   set_item_name();
 
   xml->get_widget("num_allies_spinbutton", num_allies_spinbutton);
-  xml->get_widget("ally_button", ally_button);
-  ally_button->signal_clicked().connect (method(on_ally_clicked));
+  ally_button =
+    new ArmyChooserButton (parent, xml, "ally_button", d_player,
+                          SelectArmyDialog::SELECT_REWARDABLE_ARMY);
+  ally_button->army_selected.connect (method (on_ally_selected));
   xml->get_widget("randomize_allies_button", randomize_allies_button);
   randomize_allies_button->signal_clicked().connect (method(on_randomize_allies_clicked));
-  set_ally_name();
 
   xml->get_widget("map_x_spinbutton", map_x_spinbutton);
   xml->get_widget("map_y_spinbutton", map_y_spinbutton);
@@ -96,6 +98,7 @@ RewardEditorDialog::RewardEditorDialog(Gtk::Window &parent, Player *player, bool
 	{
 	  reward = new Reward_Allies(*static_cast<Reward_Allies*>(r));
 	  ally = new ArmyProto(*static_cast<Reward_Allies*>(reward)->getArmy());
+          ally_button->select (ally->getId());
 	}
       else if (r->getType() == Reward::RUIN)
 	{
@@ -135,7 +138,7 @@ void RewardEditorDialog::fill_in_reward_info()
     {
       Reward_Allies *r = static_cast<Reward_Allies*>(reward);
       num_allies_spinbutton->set_value(r->getNoOfAllies());
-      set_ally_name();
+      ally_button->select (r->getArmy()->getId ());
       reward_type_combobox->set_active (2);
     }
   else if (reward->getType() == Reward::MAP)
@@ -249,35 +252,22 @@ void RewardEditorDialog::set_item_name()
   item_button->set_label(name);
 }
 
-void RewardEditorDialog::on_ally_clicked()
+void RewardEditorDialog::on_ally_selected(const ArmyProto *a)
 {
-  int army_type = -1;
-  if (ally)
-    army_type = ally->getId ();
-  SelectArmyDialog d(*dialog, SelectArmyDialog::SELECT_REWARDABLE_ARMY,
-                     d_player, army_type);
-  d.run();
-  if (d.get_selected_army())
+  if (a)
     {
-      on_clear_ally_clicked();
-      ally = new ArmyProto(*(d.get_selected_army()));
-      set_ally_name();
+      if (ally)
+        delete ally;
+      ally = new ArmyProto(*a);
     }
   else
     {
-      on_clear_ally_clicked();
-      set_ally_name();
+      if (ally)
+        {
+          delete ally;
+          ally = NULL;
+        }
     }
-}
-
-void RewardEditorDialog::on_clear_ally_clicked()
-{
-  if (ally)
-    {
-      delete ally;
-      ally = NULL;
-    }
-  set_ally_name();
 }
 
 void RewardEditorDialog::on_randomize_allies_clicked()
@@ -286,22 +276,11 @@ void RewardEditorDialog::on_randomize_allies_clicked()
   if (!a)
     return;
 
-  on_clear_ally_clicked();
-  ally = new ArmyProto(*a);
-  num_allies_spinbutton->set_value(Reward_Allies::getRandomAmountOfAllies());
-
-  set_ally_name();
-}
-
-void RewardEditorDialog::set_ally_name()
-{
-  Glib::ustring name;
   if (ally)
-    name = ally->getName();
-  else
-    name = _("No army type selected");
-
-  ally_button->set_label(name);
+    delete ally;
+  ally = new ArmyProto(*a);
+  ally_button->select (ally->getId());
+  num_allies_spinbutton->set_value(Reward_Allies::getRandomAmountOfAllies());
 }
 
 void RewardEditorDialog::on_randomize_map_clicked()

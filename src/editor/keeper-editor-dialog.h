@@ -24,6 +24,8 @@
 #include "vector.h"
 
 class Keeper;
+class ArmyChooserButton;
+class ArmyProto;
 class CreateScenarioRandomize;
 
 //! Scenario editor.  Edits the defender of a ruin.
@@ -32,7 +34,7 @@ class KeeperEditorDialog: public LwEditorDialog
  public:
     KeeperEditorDialog(Gtk::Window &parent, Keeper *k, Vector<int> pos,
                        CreateScenarioRandomize *randomize);
-    ~KeeperEditorDialog() {}
+    ~KeeperEditorDialog();
 
     bool run();
 
@@ -43,15 +45,15 @@ class KeeperEditorDialog: public LwEditorDialog
     Vector<int> d_pos;
     Keeper *d_keeper;
     CreateScenarioRandomize *d_randomizer;
-    Gtk::Button *keeper_button;
+    ArmyChooserButton *keeper_button;
     Gtk::Button *randomize_button;
     Gtk::Entry *name_entry;
 
-    void on_keeper_clicked();
     void on_randomize_clicked();
-    void set_keeper_button_name();
     void on_name_changed ();
     void fill_in_keeper_info ();
+
+    void on_keeper_selected (const ArmyProto *a);
 };
 
 #endif

@@ -43,6 +43,16 @@ ItemProto::ItemProto(XML_Helper* helper)
     d_has_army_type_to_summon = false;
     d_has_army_type_to_raise = false;
     d_has_army_type_to_kill = false;
+    d_uses_left = 0;
+    d_steal_gold_percent = 0.0;
+    d_army_type_to_kill = 0;
+    d_army_type_to_summon = 0;
+    d_building_type_to_summon_on = 0;
+    d_percent_armies_to_kill = 0.0;
+    d_mp_to_add = 0;
+    d_army_type_to_raise = 0;
+    d_num_armies_to_raise = 0;
+
     if (isUsable())
       {
         helper->getData(d_uses_left, "uses_left");
@@ -71,18 +81,6 @@ ItemProto::ItemProto(XML_Helper* helper)
             helper->getData(d_num_armies_to_raise, "num_armies_to_raise");
             d_has_army_type_to_raise = true;
           }
-      }
-    else
-      {
-        d_uses_left = 0;
-        d_steal_gold_percent = 0.0;
-        d_army_type_to_kill = 0;
-        d_army_type_to_summon = 0;
-        d_building_type_to_summon_on = 0;
-        d_percent_armies_to_kill = 0.0;
-        d_mp_to_add = 0;
-        d_army_type_to_raise = 0;
-        d_num_armies_to_raise = 0;
       }
 }
 
