@@ -270,68 +270,124 @@
                       <object class="GtkMenu" id="random_menuitem_menu">
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkMenuItem" id="random_all_cities_menuitem">
+                          <object class="GtkMenuItem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">All Cities</property>
+                            <property name="label" translatable="yes">Cities</property>
                             <property name="use_underline">True</property>
+                            <child type="submenu">
+                              <object class="GtkMenu">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkMenuItem" id="random_all_cities_menuitem">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">All Cities</property>
+                                    <property name="use_underline">True</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkMenuItem" id="random_unnamed_cities_menuitem">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Unnamed Cities</property>
+                                    <property name="use_underline">True</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkMenuItem" id="random_unnamed_cities_menuitem">
+                          <object class="GtkMenuItem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Unnamed Cities</property>
+                            <property name="label" translatable="yes">Ruins</property>
                             <property name="use_underline">True</property>
+                            <child type="submenu">
+                              <object class="GtkMenu">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkMenuItem" id="random_all_ruins_menuitem">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">All Ruins</property>
+                                    <property name="use_underline">True</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkMenuItem" id="random_unnamed_ruins_menuitem">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Unnamed Ruins</property>
+                                    <property name="use_underline">True</property>
+                                    <signal name="activate" handler="on_random_unnamed_ruins_menuitem_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkMenuItem" id="random_all_ruins_menuitem">
+                          <object class="GtkMenuItem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">All Ruins</property>
+                            <property name="label" translatable="yes">Temples</property>
                             <property name="use_underline">True</property>
+                            <child type="submenu">
+                              <object class="GtkMenu">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkMenuItem" id="random_all_temples_menuitem">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">All Temples</property>
+                                    <property name="use_underline">True</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkMenuItem" id="random_unnamed_temples_menuitem">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Unnamed Temples</property>
+                                    <property name="use_underline">True</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkMenuItem" id="random_unnamed_ruins_menuitem">
+                          <object class="GtkMenuItem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Unnamed Ruins</property>
+                            <property name="label" translatable="yes">Signs</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_random_unnamed_ruins_menuitem_activate" swapped="no"/>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem" id="random_all_temples_menuitem">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">All Temples</property>
-                            <property name="use_underline">True</property>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem" id="random_unnamed_temples_menuitem">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Unnamed Temples</property>
-                            <property name="use_underline">True</property>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem" id="random_all_signs_menuitem">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">All Signs</property>
-                            <property name="use_underline">True</property>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem" id="random_unnamed_signs_menuitem">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Unnamed Signs</property>
-                            <property name="use_underline">True</property>
+                            <child type="submenu">
+                              <object class="GtkMenu">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkMenuItem" id="random_all_signs_menuitem">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">All Signs</property>
+                                    <property name="use_underline">True</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkMenuItem" id="random_unnamed_signs_menuitem">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Unnamed Signs</property>
+                                    <property name="use_underline">True</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
                           </object>
                         </child>
                         <child>
