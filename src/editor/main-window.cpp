@@ -577,7 +577,19 @@ void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ust
     guint32 armyset_id = Armysetlist::getInstance()->get(armyset)->getId();
     Shieldsetlist *ssl = Shieldsetlist::getInstance();
     Shieldset *ss = ssl->get(shieldset);
-    Glib::ustring name = d_create_scenario_names->getPlayerName(Shield::NEUTRAL);
+
+    for (guint32 i = Shield::WHITE; i <= Shield::BLACK; i++)
+      {
+        Glib::ustring name =
+          d_create_scenario_names->getPlayerName(Shield::Colour(i));
+        Player *human = new RealPlayer (name, armyset_id,
+                                        ssl->getColor(ss->getId (), i),
+                                        width, height, Player::HUMAN, i);
+        Playerlist::getInstance()->add(human);
+      }
+
+    Glib::ustring name =
+      d_create_scenario_names->getPlayerName(Shield::NEUTRAL);
     Player* neutral = new AI_Dummy(name, armyset_id, 
 				   ssl->getColor(ss->getId(), MAX_PLAYERS), 
 				   width, height, MAX_PLAYERS);
@@ -589,13 +601,13 @@ void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ust
     // fill the map with tile type
     Tileset *tset = GameMap::getTileset();
     for (unsigned int i = 0; i < tset->size(); ++i)
-    {
-	if ((*tset)[i]->getType() == fill_style)
-	{
-	    GameMap::getInstance()->fill(i);
-	    break;
-	}
-    }
+      {
+        if ((*tset)[i]->getType() == fill_style)
+          {
+            GameMap::getInstance()->fill(i);
+            break;
+          }
+      }
 
     init_map_state();
     GameMap::getInstance()->calculateBlockedAvenues();
