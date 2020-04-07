@@ -154,9 +154,9 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
     signposts_scale->set_value(20);
     mountains_scale->set_value(5);
     on_map_size_changed();
-	
-    width_spinbutton->set_value(MAP_SIZE_TINY_WIDTH);
-    height_spinbutton->set_value(MAP_SIZE_TINY_HEIGHT);
+    width_spinbutton->set_value (MAP_SIZE_NORMAL_WIDTH);
+    height_spinbutton->set_value (MAP_SIZE_NORMAL_HEIGHT);
+
     random_names_switch->set_active(true);
     num_players_spinbutton->set_value(8);
 }
@@ -246,6 +246,8 @@ void NewMapDialog::on_map_size_changed()
 {
   switch (map_size_combobox->get_active_row_number()) {
   case MAP_SIZE_SMALL:
+    width_spinbutton->set_value (MAP_SIZE_SMALL_WIDTH);
+    height_spinbutton->set_value (MAP_SIZE_SMALL_HEIGHT);
     cities_scale->set_value(15);
     ruins_scale->set_value(20);
     temples_scale->set_value(20);
@@ -254,6 +256,8 @@ void NewMapDialog::on_map_size_changed()
     break;
 
   case MAP_SIZE_TINY:
+    width_spinbutton->set_value (MAP_SIZE_TINY_WIDTH);
+    height_spinbutton->set_value (MAP_SIZE_TINY_HEIGHT);
     cities_scale->set_value(10);
     ruins_scale->set_value(15);
     temples_scale->set_value(15);
@@ -263,6 +267,8 @@ void NewMapDialog::on_map_size_changed()
 
   case MAP_SIZE_NORMAL:
   default:
+    width_spinbutton->set_value (MAP_SIZE_NORMAL_WIDTH);
+    height_spinbutton->set_value (MAP_SIZE_NORMAL_HEIGHT);
     cities_scale->set_value(20);
     ruins_scale->set_value(25);
     temples_scale->set_value(25);
@@ -270,6 +276,8 @@ void NewMapDialog::on_map_size_changed()
     height_spinbutton->set_sensitive (false);
     break;
   case MAP_SIZE_CUSTOM:
+    width_spinbutton->set_value (MAP_SIZE_NORMAL_WIDTH);
+    height_spinbutton->set_value (MAP_SIZE_NORMAL_HEIGHT);
     cities_scale->set_value(20);
     ruins_scale->set_value(25);
     temples_scale->set_value(25);
