@@ -299,7 +299,7 @@ void RewardEditorDialog::set_ally_name()
   if (ally)
     name = ally->getName();
   else
-    name = _("No ally");
+    name = _("No army type selected");
 
   ally_button->set_label(name);
 }
