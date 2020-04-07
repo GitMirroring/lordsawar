@@ -33,7 +33,7 @@ ShieldSetInfoDialog::ShieldSetInfoDialog(Gtk::Window &parent, Shieldset *s)
  : LwEditorDialog(parent, "shieldset-info-dialog.ui")
 {
   d_shieldset = s;
-  dialog->set_title(_("Shieldset Properties"));
+  dialog->set_title(_("Shield Set Properties"));
 
   xml->get_widget("close_button", close_button);
   xml->get_widget("status_label", status_label);

@@ -408,7 +408,7 @@ void ArmySetWindow::on_new_armyset_activated()
 
 bool ArmySetWindow::make_new_armyset ()
 {
-  Glib::ustring msg = _("Save these changes before making a new armyset?");
+  Glib::ustring msg = _("Save these changes before making a new Army Set?");
   if (check_discard (msg) == false)
     return false;
   save_armyset_menuitem->set_sensitive (false);
@@ -444,13 +444,13 @@ void ArmySetWindow::on_load_armyset_activated()
 bool ArmySetWindow::load_armyset ()
 {
   bool ret = false;
-  Glib::ustring msg = _("Save these changes before opening a new armyset?");
+  Glib::ustring msg = _("Save these changes before opening a new Army Set?");
   if (check_discard (msg) == false)
     return ret;
   Gtk::FileChooserDialog chooser(*window,
-				 _("Choose an Armyset to Open"));
+				 _("Choose an Army Set to Open"));
   Glib::RefPtr<Gtk::FileFilter> lwa_filter = Gtk::FileFilter::create();
-  lwa_filter->set_name(_("LordsAWar Armysets (*.lwa)"));
+  lwa_filter->set_name(_("LordsAWar Army Sets (*.lwa)"));
   lwa_filter->add_pattern("*" + ARMYSET_EXT);
   chooser.add_filter(lwa_filter);
   chooser.set_current_folder(File::getSetDir(Armyset::file_extension, false));
@@ -488,15 +488,15 @@ void ArmySetWindow::on_validate_armyset_activated()
   valid = String::utrim (d_armyset->getName ()) != "";
   if (!valid)
     {
-      Glib::ustring s = _("The name of the armyset is invalid.");
+      Glib::ustring s = _("The name of the Army Set is invalid.");
       msgs.push_back(s);
     }
   valid = d_armyset->size() > 0;
   if (!valid)
-    msgs.push_back(_("There must be at least one army unit in the armyset."));
+    msgs.push_back(_("There must be at least one army unit in the Army Set."));
   valid = d_armyset->validateHero();
   if (!valid)
-    msgs.push_back(_("There must be at least one hero in the armyset."));
+    msgs.push_back(_("There must be at least one hero in the Army Set."));
   valid = d_armyset->validatePurchasables();
   if (!valid)
     msgs.push_back(_("There must be at least one army unit with a production cost of more than zero."));
@@ -532,7 +532,7 @@ void ArmySetWindow::on_validate_armyset_activated()
     msgs.push_back(_("An army unit does not have a name."));
 
   if (msgs.empty() == true && isValidName () == false)
-    msgs.push_back(_("The name of the armyset is not unique."));
+    msgs.push_back(_("The name of the Army Set is not unique."));
 
   Glib::ustring msg = "";
   for (std::list<Glib::ustring>::iterator it = msgs.begin(); it != msgs.end();
@@ -543,7 +543,7 @@ void ArmySetWindow::on_validate_armyset_activated()
     }
 
   if (msg == "")
-    msg = _("The armyset is valid.");
+    msg = _("The Army Set is valid.");
 
   Gtk::MessageDialog dialog(*window, msg);
   dialog.run();
@@ -585,7 +585,7 @@ bool ArmySetWindow::save_current_armyset_file_as ()
       Gtk::FileChooserDialog chooser(*window, _("Choose a Name"),
                                      Gtk::FILE_CHOOSER_ACTION_SAVE);
       Glib::RefPtr<Gtk::FileFilter> lwa_filter = Gtk::FileFilter::create();
-      lwa_filter->set_name(_("LordsAWar Armysets (*.lwa)"));
+      lwa_filter->set_name(_("LordsAWar Army Sets (*.lwa)"));
       lwa_filter->add_pattern("*" + ARMYSET_EXT);
       chooser.add_filter(lwa_filter);
       chooser.set_current_folder(File::getSetDir(ARMYSET_EXT, false));
@@ -663,7 +663,7 @@ bool ArmySetWindow::save_current_armyset_file (Glib::ustring filename)
   else
     {
       Glib::ustring errmsg = Glib::strerror(errno);
-      Glib::ustring msg = _("Error!  Armyset could not be saved.");
+      Glib::ustring msg = _("Error!  Army Set could not be saved.");
       msg += "\n" + current_save_filename + "\n" + errmsg;
       Gtk::MessageDialog dialog(*window, msg);
       dialog.run();
@@ -880,7 +880,7 @@ void ArmySetWindow::fill_army_image(Gtk::Button *button, Gtk::Image *image, Shie
     }
   else
     {
-      button->set_label(_("no image set"));
+      button->set_label(_("No image set"));
       image->clear();
     }
 }
@@ -1485,9 +1485,9 @@ bool ArmySetWindow::load_armyset(Glib::ustring filename)
     {
       Glib::ustring msg;
       if (unsupported_version)
-        msg = _("Error!  The version of the armyset is unsupported.");
+        msg = _("Error!  The version of Army Set is unsupported.");
       else
-        msg = _("Error!  Armyset could not be loaded.");
+        msg = _("Error!  Army Set could not be loaded.");
       Gtk::MessageDialog dialog(*window, msg);
       current_save_filename = old_current_save_filename;
       dialog.run();
@@ -1506,7 +1506,7 @@ bool ArmySetWindow::load_armyset(Glib::ustring filename)
     {
       delete d_armyset;
       d_armyset = NULL;
-      Gtk::MessageDialog td(*window, _("Couldn't load armyset images."));
+      Gtk::MessageDialog td(*window, _("Couldn't load Army Set images."));
       td.run();
       td.hide();
       return false;
@@ -1585,7 +1585,7 @@ void ArmySetWindow::update_window_title()
     title += "*";
   title += d_armyset->getName();
   title += " - ";
-  title += _("Armyset Editor");
+  title += _("Army Set Editor");
   window->set_title(title);
 }
 
@@ -1790,8 +1790,8 @@ bool ArmySetWindow::check_save_valid (bool existing)
           Playerlist::getInstance()->hasArmyset(d_armyset->getId()))
         {
           Glib::ustring errmsg =
-            _("Armyset is invalid, and is also one of the current working armysets.");
-          Glib::ustring msg = _("Error!  Armyset could not be saved.");
+            _("Army Set is invalid, and is also one of the current working Army Sets.");
+          Glib::ustring msg = _("Error!  Army Set could not be saved.");
           msg += "\n" + current_save_filename + "\n" + errmsg;
           Gtk::MessageDialog dialog(*window, msg);
           dialog.run();
@@ -1802,7 +1802,7 @@ bool ArmySetWindow::check_save_valid (bool existing)
         {
           Gtk::MessageDialog
             dialog(*window,
-                   _("The armyset is invalid.  Do you want to proceed?"));
+                   _("The Army Set is invalid.  Do you want to proceed?"));
           dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
           int response = dialog.run();
           dialog.hide();
@@ -1838,7 +1838,7 @@ bool ArmySetWindow::check_name_valid (bool existing)
       if (newname.empty() == true)
         {
           Glib::ustring msg =
-            _("The armyset has an invalid name.\nChange it and save again.");
+            _("The Army Set has an invalid name.\nChange it and save again.");
           Gtk::MessageDialog d(*window, msg);
           d.run();
           d.hide();
@@ -1848,7 +1848,7 @@ bool ArmySetWindow::check_name_valid (bool existing)
       else
         {
           Glib::ustring msg =
-            String::ucompose (_("The armyset has an invalid name.\nChange it to '%1'?"), newname);
+            String::ucompose (_("The Army Set has an invalid name.\nChange it to '%1'?"), newname);
           Gtk::MessageDialog d(*window, msg);
           d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
           int response = d.run();
@@ -1882,7 +1882,7 @@ bool ArmySetWindow::check_name_valid (bool existing)
       if (newname.empty() == true)
         {
           Glib::ustring msg =
-            _("The armyset has the same name as another armyset.\nChange it and save again.");
+            _("The Army Set has the same name as another one.\nChange it and save again.");
           Gtk::MessageDialog d(*window, msg);
           d.run();
           d.hide();
@@ -1892,7 +1892,7 @@ bool ArmySetWindow::check_name_valid (bool existing)
       else
         {
           Glib::ustring msg =
-            String::ucompose (_("The armyset has the same name as another armyset.\nChange it to '%1' instead?."), newname);
+            String::ucompose (_("The Army Set has the same name as another one.\nChange it to '%1' instead?."), newname);
 
           Gtk::MessageDialog d(*window, msg);
           d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);

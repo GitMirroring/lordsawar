@@ -45,9 +45,9 @@
 #include "font-size.h"
 #include "image-file-filter.h"
 
-Glib::ustring no_shield_msg = N_("no image set");
+Glib::ustring no_shield_msg = N_("No image set");
 
-Glib::ustring no_tartan_msg = N_("no image set");
+Glib::ustring no_tartan_msg = N_("No image set");
 
 #define method(x) sigc::mem_fun(*this, &ShieldSetWindow::x)
 
@@ -172,7 +172,7 @@ ShieldSetWindow::update_shield_panel()
 
 bool ShieldSetWindow::make_new_shieldset ()
 {
-  Glib::ustring msg = _("Save these changes before making a new shieldset?");
+  Glib::ustring msg = _("Save these changes before making a new Shield Set?");
   if (check_discard (msg) == false)
     return false;
   save_shieldset_menuitem->set_sensitive (false);
@@ -252,13 +252,13 @@ bool ShieldSetWindow::check_discard (Glib::ustring msg)
 bool ShieldSetWindow::load_shieldset ()
 {
   bool ret = false;
-  Glib::ustring msg = _("Save these changes before opening a new shieldset?");
+  Glib::ustring msg = _("Save these changes before opening a new Shield Set?");
   if (check_discard (msg) == false)
     return ret;
   Gtk::FileChooserDialog chooser(*window,
-				 _("Choose a Shieldset to Open"));
+				 _("Choose a Shield Set to Open"));
   Glib::RefPtr<Gtk::FileFilter> lws_filter = Gtk::FileFilter::create();
-  lws_filter->set_name(_("LordsAWar Shieldsets (*.lws)"));
+  lws_filter->set_name(_("LordsAWar Shield Sets (*.lws)"));
   lws_filter->add_pattern("*" + SHIELDSET_EXT);
   chooser.add_filter(lws_filter);
   chooser.set_current_folder(File::getSetDir(Shieldset::file_extension, false));
@@ -309,14 +309,14 @@ void ShieldSetWindow::on_validate_shieldset_activated()
     return;
   bool valid = d_shieldset->validateNumberOfShields();
   if (!valid)
-    msgs.push_back(_("The shieldset must have 9 shields in it."));
+    msgs.push_back(_("The Shield Set must have 9 shields in it."));
 
   if (msgs.empty () == true)
     {
       valid = String::utrim (d_shieldset->getName ()) != "";
       if (!valid)
         {
-          Glib::ustring s = _("The name of the shieldset is invalid.");
+          Glib::ustring s = _("The name of the Shield Set is invalid.");
           msgs.push_back(s);
         }
     }
@@ -362,7 +362,7 @@ void ShieldSetWindow::on_validate_shieldset_activated()
       (!d_shieldset->getLargeWidth() || !d_shieldset->getLargeHeight()))
     msgs.push_back(_("The height or width of a large shield image is zero."));
   if (msgs.empty() == true && isValidName () == false)
-    msgs.push_back(_("The name of the shieldset is not unique."));
+    msgs.push_back(_("The name of the Shield Set is not unique."));
 
   Glib::ustring msg = "";
   for (std::list<Glib::ustring>::iterator it = msgs.begin(); it != msgs.end();
@@ -370,7 +370,7 @@ void ShieldSetWindow::on_validate_shieldset_activated()
     msg += (*it) + "\n";
 
   if (msg == "")
-    msg = _("The shieldset is valid.");
+    msg = _("The Shield Set is valid.");
 
   Gtk::MessageDialog dialog(*window, msg);
   dialog.run();
@@ -402,7 +402,7 @@ bool ShieldSetWindow::check_name_valid (bool existing)
       if (newname.empty() == true)
         {
           Glib::ustring msg =
-            _("The shieldset has an invalid name.\nChange it and save again.");
+            _("The Shield Set has an invalid name.\nChange it and save again.");
           Gtk::MessageDialog d(*window, msg);
           d.run();
           d.hide();
@@ -412,7 +412,7 @@ bool ShieldSetWindow::check_name_valid (bool existing)
       else
         {
           Glib::ustring msg =
-            String::ucompose (_("The shieldset has an invalid name.\nChange it to '%1'?"), newname);
+            String::ucompose (_("The Shield Set has an invalid name.\nChange it to '%1'?"), newname);
           Gtk::MessageDialog d(*window, msg);
           d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
           int response = d.run();
@@ -446,7 +446,7 @@ bool ShieldSetWindow::check_name_valid (bool existing)
       if (newname.empty() == true)
         {
           Glib::ustring msg =
-            _("The shieldset has the same name as another shieldset.\nChange it and save again.");
+            _("The Shield Set has the same name as another one.\nChange it and save again.");
           Gtk::MessageDialog d(*window, msg);
           d.run();
           d.hide();
@@ -456,7 +456,7 @@ bool ShieldSetWindow::check_name_valid (bool existing)
       else
         {
           Glib::ustring msg =
-            String::ucompose (_("The shieldset has the same name as another shieldset.\nChange it to '%1' instead?."), newname);
+            String::ucompose (_("The Shield Set has the same name as another one.\nChange it to '%1' instead?."), newname);
 
           Gtk::MessageDialog d(*window, msg);
           d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -482,8 +482,8 @@ bool ShieldSetWindow::check_save_valid (bool existing)
           GameMap::getInstance()->getShieldsetId() == d_shieldset->getId())
         {
           Glib::ustring errmsg =
-            _("Shieldset is invalid, and is also the current working shieldset.");
-          Glib::ustring msg = _("Error!  Shieldset could not be saved.");
+            _("Shield Set is invalid, and is also the current working Shield Set.");
+          Glib::ustring msg = _("Error!  Shield Set could not be saved.");
           msg += "\n" + current_save_filename + "\n" + errmsg;
           Gtk::MessageDialog dialog(*window, msg);
           dialog.run();
@@ -494,7 +494,7 @@ bool ShieldSetWindow::check_save_valid (bool existing)
         {
           Gtk::MessageDialog
             dialog(*window,
-                   _("The shieldset is invalid.  Do you want to proceed?"));
+                   _("The Shield Set is invalid.  Do you want to proceed?"));
           dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
           int response = dialog.run();
           dialog.hide();
@@ -519,7 +519,7 @@ bool ShieldSetWindow::save_current_shieldset_file_as ()
       Gtk::FileChooserDialog chooser(*window, _("Choose a Name"),
                                      Gtk::FILE_CHOOSER_ACTION_SAVE);
       Glib::RefPtr<Gtk::FileFilter> lws_filter = Gtk::FileFilter::create();
-      lws_filter->set_name(_("LordsAWar Shieldsets (*.lws)"));
+      lws_filter->set_name(_("LordsAWar Shield Sets (*.lws)"));
       lws_filter->add_pattern("*" + SHIELDSET_EXT);
       chooser.add_filter(lws_filter);
       chooser.set_current_folder(File::getSetDir(SHIELDSET_EXT, false));
@@ -601,7 +601,7 @@ bool ShieldSetWindow::save_current_shieldset_file (Glib::ustring filename)
     {
       Glib::ustring errmsg = Glib::strerror(errno);
       Glib::ustring msg;
-      msg = _("Error!  Shieldset could not be saved.");
+      msg = _("Error!  Shield Set could not be saved.");
       msg += "\n" + current_save_filename + "\n" +
         errmsg;
       Gtk::MessageDialog dialog(*window, msg);
@@ -776,9 +776,9 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
     {
       Glib::ustring msg;
       if (unsupported_version)
-        msg = _("Error!  The version of the shieldset is not supported.");
+        msg = _("Error!  The version of Shield Set is not supported.");
       else
-        msg = _("Error!  Shieldset could not be loaded.");
+        msg = _("Error!  Shield Set could not be loaded.");
       Gtk::MessageDialog dialog(*window, msg);
       current_save_filename = old_current_save_filename;
       dialog.run();
@@ -800,7 +800,7 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
     {
       delete d_shieldset;
       d_shieldset = NULL;
-      Gtk::MessageDialog td(*window, _("Couldn't load shieldset images."));
+      Gtk::MessageDialog td(*window, _("Couldn't load Shield Set images."));
       td.run();
       td.hide();
       return false;
@@ -969,7 +969,7 @@ void ShieldSetWindow::update_window_title()
     title += "*";
   title += d_shieldset->getName();
   title += " - ";
-  title += _("Shieldset Editor");
+  title += _("Shield Set Editor");
   window->set_title(title);
 }
 

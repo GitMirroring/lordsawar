@@ -84,7 +84,7 @@
                           <object class="GtkMenuItem" id="import_map_from_sav_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Import from Saved Game</property>
+                            <property name="label" translatable="yes">Import from Saved Game...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -93,7 +93,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="tooltip_text" translatable="yes">Save a picture of the map.</property>
-                            <property name="label" translatable="yes">Export As Image</property>
+                            <property name="label" translatable="yes">Export As Image...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -101,7 +101,7 @@
                           <object class="GtkMenuItem" id="validate_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Validate</property>
+                            <property name="label" translatable="yes">Validate...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -139,13 +139,14 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Map Properties</property>
                             <property name="use_underline">True</property>
+                            <accelerator key="Return" signal="activate" modifiers="GDK_MOD1_MASK"/>
                           </object>
                         </child>
                         <child>
                           <object class="GtkMenuItem" id="edit_players_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Players</property>
+                            <property name="label" translatable="yes">Players...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -153,7 +154,7 @@
                           <object class="GtkMenuItem" id="edit_items_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Items</property>
+                            <property name="label" translatable="yes">Items...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -161,7 +162,7 @@
                           <object class="GtkMenuItem" id="edit_rewards_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Rewards</property>
+                            <property name="label" translatable="yes">Rewards...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -180,13 +181,14 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Smooth Entire Map</property>
                             <property name="use_underline">True</property>
+                            <accelerator key="s" signal="activate" modifiers="GDK_SHIFT_MASK"/>
                           </object>
                         </child>
                         <child>
                           <object class="GtkMenuItem" id="switch_sets_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Switch Image Sets</property>
+                            <property name="label" translatable="yes">Switch Image Sets...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -194,7 +196,7 @@
                           <object class="GtkMenuItem" id="edit_armyset_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Armyset</property>
+                            <property name="label" translatable="yes">Army Set...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -202,7 +204,7 @@
                           <object class="GtkMenuItem" id="edit_cityset_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Cityset</property>
+                            <property name="label" translatable="yes">City Set...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -210,7 +212,7 @@
                           <object class="GtkMenuItem" id="edit_shieldset_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Shieldset</property>
+                            <property name="label" translatable="yes">Shield Set...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -218,7 +220,7 @@
                           <object class="GtkMenuItem" id="edit_tileset_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Tileset</property>
+                            <property name="label" translatable="yes">Tile Set...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -234,7 +236,7 @@
                           <object class="GtkMenuItem" id="edit_smallmap_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Miniature Map</property>
+                            <property name="label" translatable="yes">Miniature Map...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -242,7 +244,7 @@
                           <object class="GtkMenuItem" id="edit_fight_order_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Fight Order</property>
+                            <property name="label" translatable="yes">Fight Order...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -250,7 +252,7 @@
                           <object class="GtkMenuItem" id="edit_scenario_media_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Scenario Media</property>
+                            <property name="label" translatable="yes">Scenario Media...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>

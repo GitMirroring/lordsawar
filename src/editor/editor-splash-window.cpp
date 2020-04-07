@@ -45,26 +45,26 @@ int EditorSplashWindow::run()
   bool broken = false;
   window->show_all();
   progressbar->property_fraction() = 0.0;
-  progressbar->property_text() = _("Loading Armysets");
+  progressbar->property_text() = _("Loading Army Sets");
   while (g_main_context_iteration(NULL, FALSE));
   ImageCache::getInstance();
   Armysetlist::getInstance()->instantiateImages(broken);
   if (broken)
     return -1;
   progressbar->property_fraction() = 0.25;
-  progressbar->property_text() = _("Loading Citysets");
+  progressbar->property_text() = _("Loading City Sets");
   while (g_main_context_iteration(NULL, FALSE));
   Citysetlist::getInstance()->instantiateImages(broken);
   if (broken)
     return -1;
   progressbar->property_fraction() = 0.50;
-  progressbar->property_text() = _("Loading Tilesets");
+  progressbar->property_text() = _("Loading Tile Sets");
   while (g_main_context_iteration(NULL, FALSE));
   Tilesetlist::getInstance()->instantiateImages(broken);
   if (broken)
     return -1;
   progressbar->property_fraction() = 0.75;
-  progressbar->property_text() = _("Loading Shieldsets");
+  progressbar->property_text() = _("Loading Shield Sets");
   while (g_main_context_iteration(NULL, FALSE));
   Shieldsetlist::getInstance()->instantiateImages(broken);
   if (broken)

@@ -142,7 +142,7 @@
                               <object class="GtkLabel">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Shieldset</property>
+                                <property name="label" translatable="yes">Shield Set</property>
                                 <attributes>
                                   <attribute name="underline" value="True"/>
                                 </attributes>

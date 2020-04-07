@@ -136,7 +136,7 @@ void
 CitySetWindow::update_cityset_panel()
 {
   cityset_alignment->set_sensitive(d_cityset != NULL);
-  Glib::ustring no_image = _("no image set");
+  Glib::ustring no_image = _("No image set");
   Glib::ustring s;
   if (d_cityset && d_cityset->getCitiesFilename().empty() == false)
     s = d_cityset->getCitiesFilename();
@@ -189,7 +189,7 @@ CitySetWindow::update_cityset_panel()
 
 bool CitySetWindow::make_new_cityset ()
 {
-  Glib::ustring msg = _("Save these changes before making a new cityset?");
+  Glib::ustring msg = _("Save these changes before making a new City Set?");
   if (check_discard (msg) == false)
     return false;
   save_cityset_menuitem->set_sensitive (false);
@@ -231,7 +231,7 @@ void CitySetWindow::on_validate_cityset_activated()
       bool valid = String::utrim (d_cityset->getName ()) != "";
       if (!valid)
         {
-          Glib::ustring s = _("The name of the cityset is invalid.");
+          Glib::ustring s = _("The name of the City Set is invalid.");
           msgs.push_back(s);
         }
     }
@@ -256,7 +256,7 @@ void CitySetWindow::on_validate_cityset_activated()
   if (d_cityset->validateTempleTileWidth() == false)
     msgs.push_back(_("The tile width for temples must be over zero."));
   if (msgs.empty() == true && isValidName () == false)
-    msgs.push_back(_("The name of the cityset is not unique."));
+    msgs.push_back(_("The name of the City Set is not unique."));
 
   Glib::ustring msg = "";
   for (std::list<Glib::ustring>::iterator it = msgs.begin(); it != msgs.end();
@@ -267,7 +267,7 @@ void CitySetWindow::on_validate_cityset_activated()
     }
 
   if (msg == "")
-    msg = _("The cityset is valid.");
+    msg = _("The City Set is valid.");
 
   Gtk::MessageDialog dialog(*window, msg);
   dialog.run();
@@ -290,7 +290,7 @@ bool CitySetWindow::save_current_cityset_file_as ()
       Gtk::FileChooserDialog chooser(*window, _("Choose a Name"),
                                      Gtk::FILE_CHOOSER_ACTION_SAVE);
       Glib::RefPtr<Gtk::FileFilter> lwc_filter = Gtk::FileFilter::create();
-      lwc_filter->set_name(_("LordsAWar Citysets (*.lwc)"));
+      lwc_filter->set_name(_("LordsAWar City Sets (*.lwc)"));
       lwc_filter->add_pattern("*" + CITYSET_EXT);
       chooser.add_filter(lwc_filter);
       chooser.set_current_folder(File::getSetDir(CITYSET_EXT, false));
@@ -365,7 +365,7 @@ bool CitySetWindow::save_current_cityset_file (Glib::ustring filename)
   else
     {
       Glib::ustring errmsg = Glib::strerror(errno);
-      Glib::ustring msg = _("Error!  Cityset could not be saved.");
+      Glib::ustring msg = _("Error!  City Set could not be saved.");
       msg += "\n" + current_save_filename + "\n" + errmsg;
       Gtk::MessageDialog dialog(*window, msg);
       dialog.run();
@@ -414,13 +414,13 @@ void CitySetWindow::on_help_about_activated()
 bool CitySetWindow::load_cityset ()
 {
   bool ret = false;
-  Glib::ustring msg = _("Save these changes before opening a new cityset?");
+  Glib::ustring msg = _("Save these changes before opening a new City Set?");
   if (check_discard (msg) == false)
     return ret;
   Gtk::FileChooserDialog chooser(*window,
-				 _("Choose a Cityset to Open"));
+				 _("Choose a City Set to Open"));
   Glib::RefPtr<Gtk::FileFilter> lwc_filter = Gtk::FileFilter::create();
-  lwc_filter->set_name(_("LordsAWar Citysets (*.lwc)"));
+  lwc_filter->set_name(_("LordsAWar City Sets (*.lwc)"));
   lwc_filter->add_pattern("*" + CITYSET_EXT);
   chooser.add_filter(lwc_filter);
   chooser.set_current_folder(File::getSetDir(Cityset::file_extension, false));
@@ -459,9 +459,9 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
     {
       Glib::ustring msg;
       if (unsupported_version)
-        msg = _("Error!  The version of cityset is unsupported.");
+        msg = _("Error!  The version of City Set is unsupported.");
       else
-        msg = _("Error!  Cityset could not be loaded.");
+        msg = _("Error!  City Set could not be loaded.");
       Gtk::MessageDialog dialog(*window, msg);
       current_save_filename = old_current_save_filename;
       dialog.run();
@@ -479,7 +479,7 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
     {
       delete d_cityset;
       d_cityset = NULL;
-      Gtk::MessageDialog td(*window, _("Couldn't load cityset images."));
+      Gtk::MessageDialog td(*window, _("Couldn't load City Set images."));
       td.run();
       td.hide();
       return false;
@@ -797,7 +797,7 @@ void CitySetWindow::update_window_title()
     title += "*";
   title += d_cityset->getName();
   title += " - ";
-  title += _("Cityset Editor");
+  title += _("City Set Editor");
   window->set_title(title);
 }
 
@@ -879,8 +879,8 @@ bool CitySetWindow::check_save_valid (bool existing)
           GameMap::getInstance()->getCitysetId() == d_cityset->getId())
         {
           Glib::ustring errmsg =
-            _("Cityset is invalid, and is also the current working cityset.");
-          Glib::ustring msg = _("Error!  Cityset could not be saved.");
+            _("City Set is invalid, and is also the current working City Set.");
+          Glib::ustring msg = _("Error!  City Set could not be saved.");
           msg += "\n" + current_save_filename + "\n" + errmsg;
           Gtk::MessageDialog dialog(*window, msg);
           dialog.run();
@@ -891,7 +891,7 @@ bool CitySetWindow::check_save_valid (bool existing)
         {
           Gtk::MessageDialog
             dialog(*window,
-                   _("The cityset is invalid.  Do you want to proceed?"));
+                   _("The City Set is invalid.  Do you want to proceed?"));
           dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
           int response = dialog.run();
           dialog.hide();
@@ -926,7 +926,7 @@ bool CitySetWindow::check_name_valid (bool existing)
       if (newname.empty() == true)
         {
           Glib::ustring msg =
-            _("The cityset has an invalid name.\nChange it and save again.");
+            _("The City Set has an invalid name.\nChange it and save again.");
           Gtk::MessageDialog d(*window, msg);
           d.run();
           d.hide();
@@ -936,7 +936,7 @@ bool CitySetWindow::check_name_valid (bool existing)
       else
         {
           Glib::ustring msg =
-            String::ucompose (_("The cityset has an invalid name.\nChange it to '%1'?"), newname);
+            String::ucompose (_("The City Set has an invalid name.\nChange it to '%1'?"), newname);
           Gtk::MessageDialog d(*window, msg);
           d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
           int response = d.run();
@@ -970,7 +970,7 @@ bool CitySetWindow::check_name_valid (bool existing)
       if (newname.empty() == true)
         {
           Glib::ustring msg =
-            _("The cityset has the same name as another cityset.\nChange it and save again.");
+            _("The City Set has the same name as another one.\nChange it and save again.");
           Gtk::MessageDialog d(*window, msg);
           d.run();
           d.hide();
@@ -980,7 +980,7 @@ bool CitySetWindow::check_name_valid (bool existing)
       else
         {
           Glib::ustring msg =
-            String::ucompose (_("The cityset has the same name as another cityset.\nChange it to '%1' instead?."), newname);
+            String::ucompose (_("The City Set has the same name as another one.\nChange it to '%1' instead?."), newname);
 
           Gtk::MessageDialog d(*window, msg);
           d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);

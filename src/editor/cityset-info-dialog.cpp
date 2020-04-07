@@ -32,7 +32,7 @@ CitySetInfoDialog::CitySetInfoDialog(Gtk::Window &parent, Cityset *c)
  : LwEditorDialog(parent, "cityset-info-dialog.ui")
 {
   d_cityset = c;
-  dialog->set_title(_("Cityset Properties"));
+  dialog->set_title(_("City Set Properties"));
 
   xml->get_widget("close_button", close_button);
   xml->get_widget("status_label", status_label);

@@ -33,7 +33,7 @@ TileSetInfoDialog::TileSetInfoDialog(Gtk::Window &parent, Tileset *s)
  : LwEditorDialog(parent, "tileset-info-dialog.ui")
 {
   d_tileset = s;
-  dialog->set_title(_("Tileset Properties"));
+  dialog->set_title(_("Tile Set Properties"));
 
   xml->get_widget("close_button", close_button);
   xml->get_widget("status_label", status_label);

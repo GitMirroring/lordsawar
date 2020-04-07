@@ -5,7 +5,7 @@
   <object class="GtkListStore" id="liststore1"/>
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Shieldset Editor</property>
+    <property name="title" translatable="yes">Shield Set Editor</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
     <property name="gravity">static</property>
@@ -71,7 +71,7 @@
                       <object class="GtkMenuItem" id="validate_shieldset_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Validate</property>
+                        <property name="label" translatable="yes">Validate...</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -108,8 +108,9 @@
                       <object class="GtkMenuItem" id="edit_shieldset_info_menuitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Shieldset Properties</property>
+                        <property name="label" translatable="yes">Shield Set Properties</property>
                         <property name="use_underline">True</property>
+                        <accelerator key="Return" signal="activate" modifiers="GDK_MOD1_MASK"/>
                       </object>
                     </child>
                     <child>

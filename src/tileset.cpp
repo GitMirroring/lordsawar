@@ -488,7 +488,7 @@ public:
 	if (!helper.parseXML())
 	  {
             unsupported = unsupported_version;
-            std::cerr << String::ucompose(_("Error!  can't load tileset `%1'."), filename) << std::endl;
+            std::cerr << String::ucompose(_("Error!  can't load Tile Set `%1'."), filename) << std::endl;
 	    if (tileset != NULL)
 	      delete tileset;
 	    tileset = NULL;
@@ -752,7 +752,7 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
 void Tileset::instantiateImages(bool scale, bool &broken)
 {
   int siz = getTileSize();
-  debug("Loading images for tileset " << getName());
+  debug("Loading images for Tile Set " << getName());
   uninstantiateImages();
   broken = false;
   Tar_Helper t(getConfigurationFile(), std::ios::in, broken);

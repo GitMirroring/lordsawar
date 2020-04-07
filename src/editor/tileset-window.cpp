@@ -337,7 +337,7 @@ void TileSetWindow::fill_tilestyleset_info(TileStyleSet *t)
   if (!t || t->getName() == "")
     {
       tilestyles_list->clear();
-      image_button->set_label(_("no image set"));
+      image_button->set_label(_("No image set"));
       update_tilestyle_panel();
       return;
     }
@@ -345,7 +345,7 @@ void TileSetWindow::fill_tilestyleset_info(TileStyleSet *t)
   if (t->getName().empty() == false)
     image_button->set_label(t->getName());
   else
-    image_button->set_label(_("no image set"));
+    image_button->set_label(_("No image set"));
   //add the tilestyles to the tilestyles_treeview
   tilestyles_list->clear();
   for (unsigned int i = 0; i < t->size(); i++)
@@ -411,7 +411,7 @@ void TileSetWindow::on_new_tileset_activated()
 
 bool TileSetWindow::make_new_tileset ()
 {
-  Glib::ustring msg = _("Save these changes before making a new tileset?");
+  Glib::ustring msg = _("Save these changes before making a new Tile Set?");
   if (check_discard (msg) == false)
     return false;
   save_tileset_menuitem->set_sensitive (false);
@@ -483,13 +483,13 @@ void TileSetWindow::connect_tilestyle_treeview ()
 bool TileSetWindow::load_tileset ()
 {
   bool ret = false;
-  Glib::ustring msg = _("Save these changes before opening a new tileset?");
+  Glib::ustring msg = _("Save these changes before opening a new Tile Set?");
   if (check_discard (msg) == false)
     return ret;
   Gtk::FileChooserDialog chooser(*window,
-				 _("Choose a Tileset to Open"));
+				 _("Choose a Tile Set to Open"));
   Glib::RefPtr<Gtk::FileFilter> lwt_filter = Gtk::FileFilter::create();
-  lwt_filter->set_name(_("LordsAWar Tilesets (*.lwt)"));
+  lwt_filter->set_name(_("LordsAWar Tile Sets (*.lwt)"));
   lwt_filter->add_pattern("*" + TILESET_EXT);
   chooser.add_filter(lwt_filter);
   chooser.set_current_folder(File::getSetDir(Tileset::file_extension, false));
@@ -537,7 +537,7 @@ bool TileSetWindow::save_current_tileset_file_as ()
       Gtk::FileChooserDialog chooser(*window, _("Choose a Name"),
                                      Gtk::FILE_CHOOSER_ACTION_SAVE);
       Glib::RefPtr<Gtk::FileFilter> lwt_filter = Gtk::FileFilter::create();
-      lwt_filter->set_name(_("LordsAWar Tilesets (*.lwt)"));
+      lwt_filter->set_name(_("LordsAWar Tile Sets (*.lwt)"));
       lwt_filter->add_pattern("*" + TILESET_EXT);
       chooser.add_filter(lwt_filter);
       chooser.set_current_folder(File::getSetDir(TILESET_EXT, false));
@@ -618,7 +618,7 @@ bool TileSetWindow::save_current_tileset_file (Glib::ustring filename)
   else
     {
       Glib::ustring errmsg = Glib::strerror(errno);
-      Glib::ustring msg = _("Error!  Tileset could not be saved.");
+      Glib::ustring msg = _("Error!  Tile Set could not be saved.");
       msg += "\n" + current_save_filename + "\n" + errmsg;
       Gtk::MessageDialog dialog(*window, msg);
       dialog.run();
@@ -1527,9 +1527,9 @@ bool TileSetWindow::load_tileset(Glib::ustring filename)
     {
       Glib::ustring msg;
       if (unsupported_version)
-        msg = _("Error!  The version of the tileset is unsupported.");
+        msg = _("Error!  The version of Tile Set is unsupported.");
       else
-        msg = _("Error!  Tileset could not be loaded.");
+        msg = _("Error!  Tile Set could not be loaded.");
       Gtk::MessageDialog dialog(*window, msg);
       current_save_filename = old_current_save_filename;
       dialog.run();
@@ -1547,7 +1547,7 @@ bool TileSetWindow::load_tileset(Glib::ustring filename)
     {
       delete d_tileset;
       d_tileset = NULL;
-      Gtk::MessageDialog td(*window, _("Couldn't load tileset images."));
+      Gtk::MessageDialog td(*window, _("Couldn't load Tile Set images."));
       td.run();
       td.hide();
       return false;
@@ -1583,7 +1583,7 @@ void TileSetWindow::update_window_title()
     title += "*";
   title += d_tileset->getName();
   title += " - ";
-  title += _("Tileset Editor");
+  title += _("Tile Set Editor");
   window->set_title(title);
 }
 
@@ -1594,21 +1594,21 @@ void TileSetWindow::on_validate_tileset_activated()
     return;
   bool valid = String::utrim (d_tileset->getName ()) != "";
   if (!valid)
-    msgs.push_back (_("The name of the tileset is invalid."));
+    msgs.push_back (_("The name of the Tile Set is invalid."));
   if (d_tileset->empty() == true)
-    msgs.push_back(_("There must be at least one tile in the tileset."));
+    msgs.push_back(_("There must be at least one tile in the Tile Set."));
   if (d_tileset->getIndex(Tile::GRASS) == -1)
-    msgs.push_back(_("There must be a grass tile in the tileset."));
+    msgs.push_back(_("There must be a grass tile in the Tile Set."));
   if (d_tileset->getIndex(Tile::WATER) == -1)
-    msgs.push_back(_("There must be a water tile in the tileset."));
+    msgs.push_back(_("There must be a water tile in the Tile Set."));
   if (d_tileset->getIndex(Tile::FOREST) == -1)
-    msgs.push_back(_("There must be a forest tile in the tileset."));
+    msgs.push_back(_("There must be a forest tile in the Tile Set."));
   if (d_tileset->getIndex(Tile::HILLS) == -1)
-    msgs.push_back(_("There must be a hills tile in the tileset."));
+    msgs.push_back(_("There must be a hills tile in the Tile Set."));
   if (d_tileset->getIndex(Tile::MOUNTAIN) == -1)
-    msgs.push_back(_("There must be a mountain tile in the tileset."));
+    msgs.push_back(_("There must be a mountain tile in the Tile Set."));
   if (d_tileset->getIndex(Tile::SWAMP) == -1)
-    msgs.push_back(_("There must be a swamp tile in the tileset."));
+    msgs.push_back(_("There must be a swamp tile in the Tile Set."));
   for (Tileset::iterator it = d_tileset->begin(); it != d_tileset->end(); ++it)
     {
       if ((*it)->empty())
@@ -1661,7 +1661,7 @@ void TileSetWindow::on_validate_tileset_activated()
     msgs.push_back(_("A set of flag images are required."));
 
   if (isValidName () == false)
-    msgs.push_back(_("The name of the tileset is not unique."));
+    msgs.push_back(_("The name of the Tile Set is not unique."));
 
   Glib::ustring msg = "";
   for (std::list<Glib::ustring>::iterator it = msgs.begin(); it != msgs.end();
@@ -1672,7 +1672,7 @@ void TileSetWindow::on_validate_tileset_activated()
     }
 
   if (msg == "")
-    msg = _("The tileset is valid.");
+    msg = _("The Tile Set is valid.");
 
   Gtk::MessageDialog dialog(*window, msg);
   dialog.run();
@@ -1768,8 +1768,8 @@ bool TileSetWindow::check_save_valid (bool existing)
           GameMap::getInstance()->getTilesetId() == d_tileset->getId())
         {
           Glib::ustring errmsg =
-            _("Tileset is invalid, and is also the current working tileset.");
-          Glib::ustring msg = _("Error!  Tileset could not be saved.");
+            _("Tile Set is invalid, and is also the current working Tile Set.");
+          Glib::ustring msg = _("Error!  Tile Set could not be saved.");
           msg += "\n" + current_save_filename + "\n" + errmsg;
           Gtk::MessageDialog dialog(*window, msg);
           dialog.run();
@@ -1780,7 +1780,7 @@ bool TileSetWindow::check_save_valid (bool existing)
         {
           Gtk::MessageDialog
             dialog(*window,
-                   _("The tileset is invalid.  Do you want to proceed?"));
+                   _("The Tile Set is invalid.  Do you want to proceed?"));
           dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
           int response = dialog.run();
           dialog.hide();
@@ -1815,7 +1815,7 @@ bool TileSetWindow::check_name_valid (bool existing)
       if (newname.empty() == true)
         {
           Glib::ustring msg =
-            _("The tileset has an invalid name.\nChange it and save again.");
+            _("The Tile Set has an invalid name.\nChange it and save again.");
           Gtk::MessageDialog d(*window, msg);
           d.run();
           d.hide();
@@ -1825,7 +1825,7 @@ bool TileSetWindow::check_name_valid (bool existing)
       else
         {
           Glib::ustring msg =
-            String::ucompose (_("The tileset has an invalid name.\nChange it to '%1'?"), newname);
+            String::ucompose (_("The Tile Set has an invalid name.\nChange it to '%1'?"), newname);
           Gtk::MessageDialog d(*window, msg);
           d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
           int response = d.run();
@@ -1859,7 +1859,7 @@ bool TileSetWindow::check_name_valid (bool existing)
       if (newname.empty() == true)
         {
           Glib::ustring msg =
-            _("The tileset has the same name as another tileset.\nChange it and save again.");
+            _("The Tile Set has the same name as another one.\nChange it and save again.");
           Gtk::MessageDialog d(*window, msg);
           d.run();
           d.hide();
@@ -1869,7 +1869,7 @@ bool TileSetWindow::check_name_valid (bool existing)
       else
         {
           Glib::ustring msg =
-            String::ucompose (_("The tileset has the same name as another tileset.\nChange it to '%1' instead?."), newname);
+            String::ucompose (_("The Tile Set has the same name as another one.\nChange it to '%1' instead?."), newname);
 
           Gtk::MessageDialog d(*window, msg);
           d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -1933,5 +1933,4 @@ bool TileSetWindow::isValidName ()
  35. load a writable tileset, remove stones, quit-save it.  load it
  36. create a new tileset, add a fog picture, save invalid set, close, load it
  37. load a writable tileset, remove fog, quit-save it.  load it
-
 */

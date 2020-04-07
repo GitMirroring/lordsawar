@@ -165,7 +165,7 @@ public:
 	if (!helper.parseXML())
 	  {
             unsupported = unsupported_version;
-            std::cerr << String::ucompose(_("Error!  can't load shieldset `%1'."), filename) << std::endl;
+            std::cerr << String::ucompose(_("Error!  can't load Shield Set `%1'."), filename) << std::endl;
 	    if (shieldset != NULL)
 	      delete shieldset;
 	    shieldset = NULL;

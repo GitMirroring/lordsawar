@@ -9,7 +9,7 @@
   </object>
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Tileset Editor</property>
+    <property name="title" translatable="yes">Tile Set Editor</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
     <property name="gravity">static</property>
@@ -79,7 +79,7 @@
                           <object class="GtkMenuItem" id="validate_tileset_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Validate</property>
+                            <property name="label" translatable="yes">Validate...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -116,15 +116,16 @@
                           <object class="GtkMenuItem" id="edit_tileset_info_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Tileset Properties</property>
+                            <property name="label" translatable="yes">Tile Set Properties</property>
                             <property name="use_underline">True</property>
+                            <accelerator key="Return" signal="activate" modifiers="GDK_MOD1_MASK"/>
                           </object>
                         </child>
                         <child>
                           <object class="GtkMenuItem" id="army_unit_selector_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Army Unit Selector</property>
+                            <property name="label" translatable="yes">Army Unit Selector...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -132,7 +133,7 @@
                           <object class="GtkMenuItem" id="explosion_picture_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Explosion Picture</property>
+                            <property name="label" translatable="yes">Explosion Picture...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -140,7 +141,7 @@
                           <object class="GtkMenuItem" id="roads_picture_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Roads Picture</property>
+                            <property name="label" translatable="yes">Roads Picture...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -148,7 +149,7 @@
                           <object class="GtkMenuItem" id="stones_picture_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Standing Stones Picture</property>
+                            <property name="label" translatable="yes">Standing Stones Picture...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -156,7 +157,7 @@
                           <object class="GtkMenuItem" id="bridges_picture_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Bridges Picture</property>
+                            <property name="label" translatable="yes">Bridges Picture...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -164,7 +165,7 @@
                           <object class="GtkMenuItem" id="fog_picture_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Fog Picture</property>
+                            <property name="label" translatable="yes">Fog Picture...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -172,7 +173,7 @@
                           <object class="GtkMenuItem" id="flags_picture_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Flag Picture</property>
+                            <property name="label" translatable="yes">Flag Picture...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -180,7 +181,7 @@
                           <object class="GtkMenuItem" id="organize_tilestyles_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Organize TileStyles</property>
+                            <property name="label" translatable="yes">Organize TileStyles...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -188,7 +189,7 @@
                           <object class="GtkMenuItem" id="smallmap_building_colors_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Mini-Map Building Colours</property>
+                            <property name="label" translatable="yes">Mini-Map Building Colours...</property>
                             <property name="use_underline">True</property>
                           </object>
                         </child>
@@ -210,7 +211,7 @@
                           <object class="GtkMenuItem" id="preview_tile_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Preview Tile</property>
+                            <property name="label" translatable="yes">Preview Tile...</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_preview_tile_menuitem_activate" swapped="no"/>
                           </object>

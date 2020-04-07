@@ -34,7 +34,7 @@ ArmySetInfoDialog::ArmySetInfoDialog(Gtk::Window &parent, Armyset *armyset)
  : LwEditorDialog(parent, "armyset-info-dialog.ui")
 {
   d_armyset = armyset;
-  dialog->set_title(_("Armyset Properties"));
+  dialog->set_title(_("Army Set Properties"));
 
   xml->get_widget("close_button", close_button);
   xml->get_widget("status_label", status_label);
