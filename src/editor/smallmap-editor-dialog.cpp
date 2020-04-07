@@ -258,7 +258,6 @@ void SmallmapEditorDialog::setup_pointer_radiobuttons(Glib::RefPtr<Gtk::Builder>
 			      EditableSmallMap::CITY, 1);
     setup_pointer_radiobutton(b, "erase", "button_erase",
 			      EditableSmallMap::ERASE, 1);
-  update_buttons();
 }
 
 void SmallmapEditorDialog::on_pointer_radiobutton_toggled()
@@ -281,7 +280,6 @@ void SmallmapEditorDialog::on_pointer_radiobutton_toggled()
 	smallmap->set_pointer(pointer, size, get_terrain());
 
     update_cursor();
-    update_buttons();
 }
 
 void SmallmapEditorDialog::update_cursor()
@@ -349,33 +347,6 @@ void SmallmapEditorDialog::on_map_edited()
   if (get_terrain() == Tile::WATER)
     smallmap->resize();
   smallmap->check_road();
-}
-
-void SmallmapEditorDialog::update_buttons()
-{
-  for (auto &i : pointer_items)
-    {
-      if (i.button->get_active())
-        {
-          bool br = false;
-          PixMask *p = PixMask::create (File::getEditorFile(i.image_file), br);
-          double ratio = 2.3;
-          double new_height = FontSize::getInstance()->get_height () * ratio;
-          int new_width =
-            ImageCache::calculate_width_from_adjusted_height (p, new_height);
-          PixMask::scale (p, new_width, new_height);
-
-          Gtk::Image *image = new Gtk::Image(p->to_pixbuf());
-          i.button->set_image(*image);
-          delete p;
-        }
-      else
-        {
-          Gtk::Image *image = new Gtk::Image(File::getEditorFile(i.image_file));
-          i.button->set_image(*image);
-        }
-      i.button->show_all();
-    }
 }
 
 void SmallmapEditorDialog::update_terrain_buttons()

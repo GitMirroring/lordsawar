@@ -92,7 +92,6 @@ class SmallmapEditorDialog: public LwEditorDialog
 
     void update_cursor();
     void update_terrain_buttons();
-    void update_buttons();
 
     Tile::Type get_terrain();
 
