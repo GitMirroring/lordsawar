@@ -249,7 +249,7 @@
                                 </child>
                                 <child>
                                   <object class="GtkButton" id="attacker_edit_hero_button">
-                                    <property name="label" translatable="yes">Edit Hero</property>
+                                    <property name="label" translatable="yes">Hero Details</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">True</property>
@@ -521,7 +521,7 @@
                                 </child>
                                 <child>
                                   <object class="GtkButton" id="defender_edit_hero_button">
-                                    <property name="label" translatable="yes">Edit Hero</property>
+                                    <property name="label" translatable="yes">Hero Details</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">True</property>
