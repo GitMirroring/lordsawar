@@ -1,6 +1,6 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -168,3 +168,11 @@ Temple* Templelist::getNearestVisibleTemple(const Vector<int>& pos, int dist) co
   return NULL;
 }
 
+guint32 Templelist::countUnamedTemples () const
+{
+  guint32 count = 0;
+  for (const_iterator it = begin (); it != end (); it++)
+    if ((*it)->getName () == DEFAULT_TEMPLE_NAME)
+      count++;
+  return count;
+}

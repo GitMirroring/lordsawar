@@ -2,7 +2,7 @@
 // Copyright (C) 2001, 2002, 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2005, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -98,6 +98,9 @@ class Citylist : public LocationList<City*>, public sigc::trackable
 
 	//! Count the total number of inhabitable cities.
 	int countCities() const;
+
+        //! Count the number of cities with the default name.
+        guint32 countUnamedCities () const;
 
 	//! Have each of the cities owned by the given player, pay gold pieces.
 	/**

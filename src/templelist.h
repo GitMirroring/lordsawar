@@ -1,6 +1,6 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -101,6 +101,9 @@ class Templelist : public LocationList<Temple*>, public sigc::trackable
 	 */
 	Temple* getNearestVisibleAndUsefulTemple(Stack *stack, double percent_can_be_blessed, int dist) const;
 
+
+        //! Count the number of temples that have the default name.
+        guint32 countUnamedTemples () const;
 
 	// Static Methods
 

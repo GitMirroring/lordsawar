@@ -1,6 +1,6 @@
 // Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -236,6 +236,12 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 
 	//! Return the number of players left alive, not including neutral.
 	guint32 countPlayersAlive() const;
+
+        //! Return the total number of stacks on the map.
+        guint32 countAllStacks () const;
+
+        //! Return true if one non-neutral player doesn't have a capital city.
+        bool playerHasNoCapitalCity () const;
 
 	//! Return the list of activities that the given hero has accomplished.
 	std::list<History *>getHistoryForHeroId(guint32 id) const;

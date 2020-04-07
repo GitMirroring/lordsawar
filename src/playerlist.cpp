@@ -973,3 +973,23 @@ guint32 Playerlist::getTurnOrderNumber(const Player *p)
     }
   return count;
 }
+
+guint32 Playerlist::countAllStacks () const
+{
+  guint32 count = 0;
+  for (const_iterator i = begin(); i != end(); i++)
+    count += (*i)->getStacklist ()->size ();
+  return count;
+}
+
+bool Playerlist::playerHasNoCapitalCity () const
+{
+  for (const_iterator i = begin (); i != end (); i++)
+    {
+      if (*i != d_neutral &&
+          Citylist::getInstance ()->countCities (*i) > 0 &&
+          Citylist::getInstance ()->getCapitalCity (*i) == NULL)
+        return true;
+    }
+  return false;
+}

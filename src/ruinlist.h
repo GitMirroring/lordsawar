@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001 Michael Bartl
 // Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004 John Farrell
-// Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -140,6 +140,9 @@ class Ruinlist : public LocationList<Ruin*>, public sigc::trackable
 
         guint32 countUnexploredRuins(Player *owner) const;
         guint32 countExploredRuins(Player *owner) const;
+
+        //! Count the number of ruins that have the default name.
+        guint32 countUnamedRuins () const;
 
 	// Static Methods
         

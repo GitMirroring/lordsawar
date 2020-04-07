@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -86,3 +86,11 @@ bool Signpostlist::load(Glib::ustring tag, XML_Helper* helper)
     return true;
 }
 
+guint32 Signpostlist::countUnamedSignposts () const
+{
+  guint32 count = 0;
+  for (const_iterator it = begin (); it != end (); it++)
+    if ((*it)->getName () == DEFAULT_SIGNPOST)
+      count++;
+  return count;
+}

@@ -274,6 +274,7 @@ class MainWindow: public sigc::trackable
     bool on_configure_event (GdkEventConfigure *e);
     void zoom (double scale);
     bool close_road_editor_tip ();
+    void update_menuitems ();
 
     int d_width;
     int d_height;

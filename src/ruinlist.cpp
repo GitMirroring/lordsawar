@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001 Michael Bartl
 // Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004 John Farrell
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -205,5 +205,14 @@ guint32 Ruinlist::countExploredRuins(Player *owner) const
       if (ruin->isSearched() == true && ruin->getOwner() == owner)
         count++;
     }
+  return count;
+}
+
+guint32 Ruinlist::countUnamedRuins () const
+{
+  guint32 count = 0;
+  for (const_iterator it = begin (); it != end (); it++)
+    if ((*it)->getName () == DEFAULT_RUIN_NAME)
+      count++;
   return count;
 }

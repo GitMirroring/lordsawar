@@ -1969,6 +1969,7 @@ void MainWindow::update_window_title()
   title += " - ";
   title += _("Scenario Builder");
   window->set_title(title);
+  update_menuitems ();
 }
     
 int MainWindow::get_pointer_index()
@@ -2307,4 +2308,41 @@ bool MainWindow::close_road_editor_tip ()
       return true;
     }
   return false;
+}
+
+void MainWindow::update_menuitems ()
+{
+  //no stacks?  can't remove all stacks.
+  bool have_stacks = Playerlist::getInstance()->countAllStacks () > 0;
+  edit_remove_all_stacks_menuitem->set_sensitive (have_stacks);
+
+  bool have_cities = Citylist::getInstance()->size () > 0;
+  random_all_cities_menuitem->set_sensitive (have_cities);
+
+  bool have_unnamed_cities = Citylist::getInstance()->countUnamedCities ();
+  random_unnamed_cities_menuitem->set_sensitive (have_unnamed_cities);
+
+  bool have_ruins = Ruinlist::getInstance()->size () > 0;
+  random_all_ruins_menuitem->set_sensitive (have_ruins);
+
+  bool have_unnamed_ruins = Ruinlist::getInstance()->countUnamedRuins ();
+  random_unnamed_ruins_menuitem->set_sensitive (have_unnamed_ruins);
+
+  bool have_temples =
+    Templelist::getInstance()->size () > 0;
+  random_all_temples_menuitem->set_sensitive (have_temples);
+
+  bool have_unnamed_temples = Templelist::getInstance()->countUnamedTemples ();
+  random_unnamed_temples_menuitem->set_sensitive (have_unnamed_temples);
+
+  bool have_signs = Signpostlist::getInstance()->size () > 0;
+  random_all_signs_menuitem->set_sensitive (have_signs);
+
+  bool have_unnamed_signs =
+    Signpostlist::getInstance()->countUnamedSignposts ();
+  random_unnamed_signs_menuitem->set_sensitive (have_unnamed_signs);
+
+  bool needs_capitals = Playerlist::getInstance()->playerHasNoCapitalCity ();
+  random_assign_capital_cities_menuitem->set_sensitive
+    (Citylist::getInstance ()->size () && needs_capitals);
 }
