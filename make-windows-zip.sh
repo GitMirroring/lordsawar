@@ -25,7 +25,7 @@ fi
 
 zip=`which zip`
 if [ "x$zip" == "x" ]; then
-  echo We need zip.  sudo yum install zip
+  echo We need zip.  sudo dnf install zip
   exit 1
 fi
 
