@@ -26,22 +26,22 @@ fi
 #okay, do we have NSIS?
 makensis=`which makensis 2>/dev/null`
 if [ "x$makensis" == "x" ]; then
-  echo "Error: We need the makensis command.  sudo yum install mingw32-nsis"
+  echo "Error: We need the makensis command.  sudo dnf install mingw32-nsis"
   exit 1
 fi
 mktemp=`which mktemp 2>/dev/null`
 if [ "x$mktemp" == "x" ]; then
-  echo "Error: We need the mktemp command.  sudo yum install coreutils"
+  echo "Error: We need the mktemp command.  sudo dnf install coreutils"
   exit 1
 fi
 find=`which find 2>/dev/null`
 if [ "x$find" == "x" ]; then
-  echo "Error: We need the mktemp command.  sudo yum install findutils"
+  echo "Error: We need the mktemp command.  sudo dnf install findutils"
   exit 1
 fi
 unzip=`which unzip 2>/dev/null`
 if [ "x$unzip" == "x" ]; then
-  echo "Error: We need the mktemp command.  sudo yum install unzip"
+  echo "Error: We need the mktemp command.  sudo dnf install unzip"
   exit 1
 fi
 
