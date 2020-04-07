@@ -42,6 +42,7 @@ class HeroEditorDialog: public LwEditorDialog
     void on_edit_backpack_clicked ();
     void on_name_changed ();
     void on_gender_changed ();
+    void update_buttons ();
 };
 
 #endif

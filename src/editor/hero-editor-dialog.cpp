@@ -43,6 +43,7 @@ HeroEditorDialog::HeroEditorDialog(Gtk::Window &parent, Hero *hero)
   gender_combobox->set_active(d_hero->getGender()-1);
   gender_combobox->signal_changed ().connect (method (on_gender_changed));
   name_entry->signal_changed ().connect (method (on_name_changed));
+  update_buttons ();
 }
 
 int HeroEditorDialog::run()
@@ -55,6 +56,7 @@ void HeroEditorDialog::on_edit_backpack_clicked()
 {
   BackpackEditorDialog d(*dialog, d_hero->getBackpack());
   d.run();
+  update_buttons ();
   return;
 }
 
@@ -66,4 +68,13 @@ void HeroEditorDialog::on_name_changed ()
 void HeroEditorDialog::on_gender_changed ()
 {
   d_hero->setGender(Hero::Gender(gender_combobox->get_active_row_number()+1));
+}
+
+void HeroEditorDialog::update_buttons ()
+{
+  edit_backpack_button->set_label
+    (String::ucompose (ngettext ("Carrying %1 item",
+                                 "Carrying %1 items",
+                                 d_hero->getBackpack()->size ()),
+                       d_hero->getBackpack()->size ()));
 }
