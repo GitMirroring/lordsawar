@@ -44,6 +44,7 @@
 #include "past-chooser.h"
 #include "font-size.h"
 #include "image-file-filter.h"
+#include "timed-message-dialog.h"
 
 Glib::ustring no_shield_msg = N_("No image set");
 
@@ -372,9 +373,8 @@ void ShieldSetWindow::on_validate_shieldset_activated()
   if (msg == "")
     msg = _("The Shield Set is valid.");
 
-  Gtk::MessageDialog dialog(*window, msg);
-  dialog.run();
-  dialog.hide();
+  TimedMessageDialog dialog(*window, msg, 0);
+  dialog.run_and_hide ();
   return;
 }
 
@@ -403,9 +403,8 @@ bool ShieldSetWindow::check_name_valid (bool existing)
         {
           Glib::ustring msg =
             _("The Shield Set has an invalid name.\nChange it and save again.");
-          Gtk::MessageDialog d(*window, msg);
-          d.run();
-          d.hide();
+          TimedMessageDialog d(*window, msg, 0);
+          d.run_and_hide();
           on_edit_shieldset_info_activated ();
           return false;
         }
@@ -413,11 +412,10 @@ bool ShieldSetWindow::check_name_valid (bool existing)
         {
           Glib::ustring msg =
             String::ucompose (_("The Shield Set has an invalid name.\nChange it to '%1'?"), newname);
-          Gtk::MessageDialog d(*window, msg);
-          d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-          int response = d.run();
-          d.hide();
-          if (response == Gtk::RESPONSE_CANCEL)
+          TimedMessageDialog d(*window, msg, 0);
+          d.add_cancel_button ();
+          d.run_and_hide ();
+          if (d.get_response () == Gtk::RESPONSE_CANCEL)
             return false;
           d_shieldset->setName (newname);
         }
@@ -447,9 +445,8 @@ bool ShieldSetWindow::check_name_valid (bool existing)
         {
           Glib::ustring msg =
             _("The Shield Set has the same name as another one.\nChange it and save again.");
-          Gtk::MessageDialog d(*window, msg);
-          d.run();
-          d.hide();
+          TimedMessageDialog d(*window, msg, 0);
+          d.run_and_hide ();
           on_edit_shieldset_info_activated ();
           return false;
         }
@@ -458,11 +455,10 @@ bool ShieldSetWindow::check_name_valid (bool existing)
           Glib::ustring msg =
             String::ucompose (_("The Shield Set has the same name as another one.\nChange it to '%1' instead?."), newname);
 
-          Gtk::MessageDialog d(*window, msg);
-          d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-          int response = d.run();
-          d.hide();
-          if (response == Gtk::RESPONSE_CANCEL)
+          TimedMessageDialog d(*window, msg, 0);
+          d.add_cancel_button ();
+          d.run_and_hide ();
+          if (d.get_response () == Gtk::RESPONSE_CANCEL)
             return false;
           d_shieldset->setName (newname);
         }
@@ -485,20 +481,19 @@ bool ShieldSetWindow::check_save_valid (bool existing)
             _("Shield Set is invalid, and is also the current working Shield Set.");
           Glib::ustring msg = _("Error!  Shield Set could not be saved.");
           msg += "\n" + current_save_filename + "\n" + errmsg;
-          Gtk::MessageDialog dialog(*window, msg);
-          dialog.run();
-          dialog.hide();
+          TimedMessageDialog dialog(*window, msg, 0);
+          dialog.run_and_hide();
           return false;
         }
       else
         {
-          Gtk::MessageDialog
+          TimedMessageDialog
             dialog(*window,
-                   _("The Shield Set is invalid.  Do you want to proceed?"));
-          dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-          int response = dialog.run();
-          dialog.hide();
-          if (response == Gtk::RESPONSE_CANCEL)
+                   _("The Shield Set is invalid.  Do you want to proceed?"),
+                   0);
+          dialog.add_cancel_button ();
+          dialog.run_and_hide ();
+          if (dialog.get_response () == Gtk::RESPONSE_CANCEL)
             return false;
         }
     }
@@ -604,9 +599,8 @@ bool ShieldSetWindow::save_current_shieldset_file (Glib::ustring filename)
       msg = _("Error!  Shield Set could not be saved.");
       msg += "\n" + current_save_filename + "\n" +
         errmsg;
-      Gtk::MessageDialog dialog(*window, msg);
-      dialog.run();
-      dialog.hide();
+      TimedMessageDialog dialog(*window, msg, 0);
+      dialog.run_and_hide ();
     }
   return ok;
 }
@@ -779,10 +773,9 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
         msg = _("Error!  The version of Shield Set is not supported.");
       else
         msg = _("Error!  Shield Set could not be loaded.");
-      Gtk::MessageDialog dialog(*window, msg);
+      TimedMessageDialog dialog(*window, msg, 0);
       current_save_filename = old_current_save_filename;
-      dialog.run();
-      dialog.hide();
+      dialog.run_and_hide ();
       return false;
     }
   disconnect_shield_treeview ();
@@ -800,9 +793,8 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
     {
       delete d_shieldset;
       d_shieldset = NULL;
-      Gtk::MessageDialog td(*window, _("Couldn't load Shield Set images."));
-      td.run();
-      td.hide();
+      TimedMessageDialog td(*window, _("Couldn't load Shield Set images."), 0);
+      td.run_and_hide();
       return false;
     }
       
@@ -894,13 +886,12 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
                 delete p;
               if (broken)
                 {
-                  Gtk::MessageDialog
+                  TimedMessageDialog
                     td (*d,
                         String::ucompose
                         (_("Couldn't make sense of the image:\n%1"),
-                         d->get_filename ()));
-                  td.run();
-                  td.hide();
+                         d->get_filename ()), 0);
+                  td.run_and_hide();
                 }
               else
                 {
@@ -923,12 +914,11 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
           else
             {
               Glib::ustring errmsg = Glib::strerror(errno);
-              Gtk::MessageDialog
+              TimedMessageDialog
                 td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
                                         f, d_shieldset->getConfigurationFile(),
-                                        errmsg));
-              td.run();
-              td.hide();
+                                        errmsg), 0);
+              td.run_and_hide ();
             }
 	  update_shield_panel();
         }
@@ -1068,12 +1058,12 @@ void ShieldSetWindow::process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialo
   else
     {
       Glib::ustring errmsg = Glib::strerror(errno);
-      Gtk::MessageDialog
+      TimedMessageDialog
         td(*d, String::ucompose(_("Couldn't add %1 to:\n%2\n%3"),
                                d->get_filename (),
-                               d_shieldset->getConfigurationFile(), errmsg));
-      td.run();
-      td.hide();
+                               d_shieldset->getConfigurationFile(), errmsg),
+           0);
+      td.run_and_hide();
     }
 }
 
@@ -1102,13 +1092,12 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
                 delete p;
               if (broken)
                 {
-                  Gtk::MessageDialog
+                  TimedMessageDialog
                     td (*d,
                         String::ucompose
                         (_("Couldn't make sense of the image:\n%1"),
-                         d->get_filename ()));
-                  td.run();
-                  td.hide();
+                         d->get_filename ()), 0);
+                  td.run_and_hide ();
                 }
               else
                 {
@@ -1130,12 +1119,11 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
           else
             {
               Glib::ustring errmsg = Glib::strerror(errno);
-              Gtk::MessageDialog
+              TimedMessageDialog
                 td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
                                         file, d_shieldset->getConfigurationFile(),
-                                        errmsg));
-              td.run();
-              td.hide();
+                                        errmsg), 0);
+              td.run_and_hide ();
             }
           update_shield_panel();
         }
@@ -1165,12 +1153,12 @@ void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk:
   else
     {
       Glib::ustring errmsg = Glib::strerror(errno);
-      Gtk::MessageDialog
+      TimedMessageDialog
         td(*d, String::ucompose(_("Couldn't add %1 to:\n%2\n%3"),
                                d->get_filename (),
-                               d_shieldset->getConfigurationFile(), errmsg));
-      td.run();
-      td.hide();
+                               d_shieldset->getConfigurationFile(), errmsg),
+           0);
+      td.run_and_hide ();
     }
 }
 

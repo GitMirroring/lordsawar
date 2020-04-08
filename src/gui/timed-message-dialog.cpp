@@ -32,15 +32,26 @@ TimedMessageDialog::TimedMessageDialog(Gtk::Window &parent, Glib::ustring messag
   d_timeout = timeout;
   d_timer_count = 0;
   d_grace = grace;
-    
-  window = new Gtk::MessageDialog(message); 
+
+  window = new Gtk::MessageDialog(message);
+
   window->set_message(message);
-  window->signal_response().connect (sigc::hide(method(on_response)));
+  window->signal_response().connect (method(on_response));
   window->set_transient_for(parent);
+  window->set_modal ();
+  window->property_window_position () = Gtk::WIN_POS_CENTER_ON_PARENT;
 }
 
-void TimedMessageDialog::on_response()
+void TimedMessageDialog::add_cancel_button ()
 {
+  window->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+}
+
+void TimedMessageDialog::on_response(int response)
+{
+  if (response == Gtk::RESPONSE_OK)
+    response = Gtk::RESPONSE_ACCEPT;
+  d_response = response;
   window->hide();
   main_loop->quit();
 }
@@ -71,7 +82,7 @@ bool TimedMessageDialog::tick()
   else
     {
       int secs = d_timeout - d_timer_count;
-      Glib::ustring s = 
+      Glib::ustring s =
         String::ucompose(ngettext("This message will disappear in %1 second.",
                                   "This message will disappear in %1 seconds.",
                                   secs), secs);
@@ -86,12 +97,12 @@ bool TimedMessageDialog::tick()
 
   return Timing::STOP;
 }
-    
+
 void TimedMessageDialog::set_title(Glib::ustring title)
 {
   window->set_title(title);
 }
-    
+
 void TimedMessageDialog::set_image(Glib::RefPtr<Gdk::Pixbuf> picture)
 {
   Gtk::Image *image = new Gtk::Image(picture);

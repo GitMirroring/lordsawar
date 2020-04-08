@@ -42,6 +42,7 @@
 #include "editor-quit-dialog.h"
 #include "GameMap.h"
 #include "editor-save-changes-dialog.h"
+#include "timed-message-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &CitySetWindow::x)
 
@@ -269,9 +270,8 @@ void CitySetWindow::on_validate_cityset_activated()
   if (msg == "")
     msg = _("The City Set is valid.");
 
-  Gtk::MessageDialog dialog(*window, msg);
-  dialog.run();
-  dialog.hide();
+  TimedMessageDialog dialog(*window, msg, 0);
+  dialog.run_and_hide();
 
   return;
 }
@@ -367,9 +367,8 @@ bool CitySetWindow::save_current_cityset_file (Glib::ustring filename)
       Glib::ustring errmsg = Glib::strerror(errno);
       Glib::ustring msg = _("Error!  City Set could not be saved.");
       msg += "\n" + current_save_filename + "\n" + errmsg;
-      Gtk::MessageDialog dialog(*window, msg);
-      dialog.run();
-      dialog.hide();
+      TimedMessageDialog dialog(*window, msg, 0);
+      dialog.run_and_hide();
     }
   return ok;
 }
@@ -462,10 +461,9 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
         msg = _("Error!  The version of City Set is unsupported.");
       else
         msg = _("Error!  City Set could not be loaded.");
-      Gtk::MessageDialog dialog(*window, msg);
+      TimedMessageDialog dialog(*window, msg, 0);
       current_save_filename = old_current_save_filename;
-      dialog.run();
-      dialog.hide();
+      dialog.run_and_hide();
       return false;
     }
   if (d_cityset)
@@ -479,9 +477,8 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
     {
       delete d_cityset;
       d_cityset = NULL;
-      Gtk::MessageDialog td(*window, _("Couldn't load City Set images."));
-      td.run();
-      td.hide();
+      TimedMessageDialog td(*window, _("Couldn't load City Set images."), 0);
+      td.run_and_hide();
       return false;
     }
   save_cityset_menuitem->set_sensitive (true);
@@ -807,9 +804,8 @@ void CitySetWindow::show_add_file_error(Gtk::Dialog &d, Glib::ustring file)
   Glib::ustring m =
     String::ucompose(_("Couldn't add %1 to:\n%2\n%3"),
                      file, d_cityset->getConfigurationFile(), errmsg);
-  Gtk::MessageDialog td(d, m);
-  td.run();
-  td.hide();
+  TimedMessageDialog td(d, m, 0);
+  td.run_and_hide();
 }
 
 void CitySetWindow::show_remove_file_error(Gtk::Dialog &d, Glib::ustring file)
@@ -818,9 +814,8 @@ void CitySetWindow::show_remove_file_error(Gtk::Dialog &d, Glib::ustring file)
   Glib::ustring m =
     String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
                      file, d_cityset->getConfigurationFile(), errmsg);
-  Gtk::MessageDialog td(d, m);
-  td.run();
-  td.hide();
+  TimedMessageDialog td(d, m, 0);
+  td.run_and_hide();
 }
 
 CitySetWindow::~CitySetWindow()
@@ -882,20 +877,18 @@ bool CitySetWindow::check_save_valid (bool existing)
             _("City Set is invalid, and is also the current working City Set.");
           Glib::ustring msg = _("Error!  City Set could not be saved.");
           msg += "\n" + current_save_filename + "\n" + errmsg;
-          Gtk::MessageDialog dialog(*window, msg);
-          dialog.run();
-          dialog.hide();
+          TimedMessageDialog dialog(*window, msg, 0);
+          dialog.run_and_hide();
           return false;
         }
       else
         {
-          Gtk::MessageDialog
+          TimedMessageDialog
             dialog(*window,
-                   _("The City Set is invalid.  Do you want to proceed?"));
-          dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-          int response = dialog.run();
-          dialog.hide();
-          if (response == Gtk::RESPONSE_CANCEL)
+                   _("The City Set is invalid.  Do you want to proceed?"), 0);
+          dialog.add_cancel_button ();
+          dialog.run_and_hide ();
+          if (dialog.get_response () == Gtk::RESPONSE_CANCEL)
             return false;
         }
     }
@@ -927,9 +920,8 @@ bool CitySetWindow::check_name_valid (bool existing)
         {
           Glib::ustring msg =
             _("The City Set has an invalid name.\nChange it and save again.");
-          Gtk::MessageDialog d(*window, msg);
-          d.run();
-          d.hide();
+          TimedMessageDialog d(*window, msg, 0);
+          d.run_and_hide();
           on_edit_cityset_info_activated ();
           return false;
         }
@@ -937,11 +929,10 @@ bool CitySetWindow::check_name_valid (bool existing)
         {
           Glib::ustring msg =
             String::ucompose (_("The City Set has an invalid name.\nChange it to '%1'?"), newname);
-          Gtk::MessageDialog d(*window, msg);
-          d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-          int response = d.run();
-          d.hide();
-          if (response == Gtk::RESPONSE_CANCEL)
+          TimedMessageDialog d(*window, msg, 0);
+          d.add_cancel_button ();
+          d.run_and_hide ();
+          if (d.get_response () == Gtk::RESPONSE_CANCEL)
             return false;
           d_cityset->setName (newname);
         }
@@ -971,9 +962,8 @@ bool CitySetWindow::check_name_valid (bool existing)
         {
           Glib::ustring msg =
             _("The City Set has the same name as another one.\nChange it and save again.");
-          Gtk::MessageDialog d(*window, msg);
-          d.run();
-          d.hide();
+          TimedMessageDialog d(*window, msg, 0);
+          d.run_and_hide();
           on_edit_cityset_info_activated ();
           return false;
         }
@@ -982,11 +972,10 @@ bool CitySetWindow::check_name_valid (bool existing)
           Glib::ustring msg =
             String::ucompose (_("The City Set has the same name as another one.\nChange it to '%1' instead?."), newname);
 
-          Gtk::MessageDialog d(*window, msg);
-          d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-          int response = d.run();
-          d.hide();
-          if (response == Gtk::RESPONSE_CANCEL)
+          TimedMessageDialog d(*window, msg, 0);
+          d.add_cancel_button ();
+          d.run_and_hide ();
+          if (d.get_response () == Gtk::RESPONSE_CANCEL)
             return false;
           d_cityset->setName (newname);
         }

@@ -23,6 +23,7 @@
 #include "defs.h"
 #include "File.h"
 #include "image-file-filter.h"
+#include "timed-message-dialog.h"
 
 ImageFileFilter* ImageFileFilter::s_instance = 0;
 
@@ -63,7 +64,7 @@ bool ImageFileFilter::hasInvalidExt (Glib::ustring filename)
           
 void ImageFileFilter::showErrorDialog(Gtk::Dialog *d)
 {
-  Gtk::MessageDialog e(*d, _("Only PNG and SVG files can be used as images."));
-  e.run();
-  e.hide();
+  TimedMessageDialog e(*d, _("Only PNG and SVG files can be used as images."),
+                       0);
+  e.run_and_hide ();
 }

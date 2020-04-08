@@ -2012,28 +2012,16 @@ void MainWindow::on_remove_all_stacks_activated()
   bool remove_stacks = false;
   if (num_stacks)
     {
-      Gtk::Dialog *dialog = new Gtk::Dialog();
-      dialog->property_transient_for() = window;
-      dialog->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-      dialog->add_button(Gtk::Stock::OK, Gtk::RESPONSE_ACCEPT);
-      Gtk::Box *box = dialog->get_content_area ();
       Glib::ustring s =
         String::ucompose(ngettext("This will remove %1 stack.\nAre you sure?",
                                   "This will remove %1 stacks.\nAre you sure?",
                                   num_stacks),
                          num_stacks);
-      Gtk::Label l;
-      l.set_text (s);
-      l.set_margin_left (10);
-      l.set_margin_right (10);
-      l.set_margin_top (10);
-      l.set_margin_bottom (10);
-      box->add(l);
-      box->show_all();
-      int response = dialog->run();
-      if (response == Gtk::RESPONSE_ACCEPT)
+      TimedMessageDialog dialog(*window, s, 0);
+      dialog.add_cancel_button ();
+      dialog.run_and_hide();
+      if (dialog.get_response () == Gtk::RESPONSE_ACCEPT)
         remove_stacks = true;
-      delete dialog;
     }
   if (remove_stacks)
     {

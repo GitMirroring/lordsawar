@@ -30,6 +30,7 @@
 #include "font-size.h"
 #include "ImageCache.h"
 #include "image-file-filter.h"
+#include "timed-message-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &ImageEditorDialog::x)
 
@@ -195,12 +196,11 @@ void ImageEditorDialog::on_imagebutton_clicked ()
             delete p;
           if (broken)
             {
-              Gtk::MessageDialog
+              TimedMessageDialog
                 td(*d,
                    String::ucompose(_("Couldn't make sense of the image:\n%1"),
-                                    d->get_filename ()));
-              td.run();
-              td.hide();
+                                    d->get_filename ()), 0);
+              td.run_and_hide ();
             }
           else
             {

@@ -31,6 +31,7 @@
 #include "past-chooser.h"
 #include "font-size.h"
 #include "image-file-filter.h"
+#include "timed-message-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &TilesetFlagEditorDialog::x)
 
@@ -123,23 +124,21 @@ bool TilesetFlagEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
       else
         {
           Glib::ustring errmsg = Glib::strerror(errno);
-          Gtk::MessageDialog
+          TimedMessageDialog
             td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
                                     d->get_filename (),
                                     d_tileset->getConfigurationFile(),
-                                    errmsg));
-          td.run();
-          td.hide();
+                                    errmsg), 0);
+          td.run_and_hide ();
           broken = true;
         }
     }
   else
     {
-      Gtk::MessageDialog
+      TimedMessageDialog
         td(*d, String::ucompose(_("Couldn't make sense of the image:\n%1"),
-                                d->get_filename ()));
-      td.run();
-      td.hide();
+                                d->get_filename ()), 0);
+      td.run_and_hide ();
       broken = true;
     }
   return broken;
@@ -342,12 +341,11 @@ void TilesetFlagEditorDialog::on_flag_imagebutton_clicked ()
       else
         {
           Glib::ustring errmsg = Glib::strerror(errno);
-          Gtk::MessageDialog
+          TimedMessageDialog
             td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
                                     f, d_tileset->getConfigurationFile(),
-                                    errmsg));
-          td.run();
-          td.hide();
+                                    errmsg), 0);
+          td.run_and_hide ();
         }
     }
   d->hide();

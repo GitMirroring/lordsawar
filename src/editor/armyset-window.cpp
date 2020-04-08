@@ -46,6 +46,7 @@
 #include "playerlist.h"
 #include "GameMap.h"
 #include "font-size.h"
+#include "timed-message-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &ArmySetWindow::x)
 
@@ -545,9 +546,8 @@ void ArmySetWindow::on_validate_armyset_activated()
   if (msg == "")
     msg = _("The Army Set is valid.");
 
-  Gtk::MessageDialog dialog(*window, msg);
-  dialog.run();
-  dialog.hide();
+  TimedMessageDialog dialog(*window, msg, 0);
+  dialog.run_and_hide();
   return;
 }
 
@@ -665,9 +665,8 @@ bool ArmySetWindow::save_current_armyset_file (Glib::ustring filename)
       Glib::ustring errmsg = Glib::strerror(errno);
       Glib::ustring msg = _("Error!  Army Set could not be saved.");
       msg += "\n" + current_save_filename + "\n" + errmsg;
-      Gtk::MessageDialog dialog(*window, msg);
-      dialog.run();
-      dialog.hide();
+      TimedMessageDialog dialog(*window, msg, 0);
+      dialog.run_and_hide();
     }
   return ok;
 }
@@ -1488,10 +1487,9 @@ bool ArmySetWindow::load_armyset(Glib::ustring filename)
         msg = _("Error!  The version of Army Set is unsupported.");
       else
         msg = _("Error!  Army Set could not be loaded.");
-      Gtk::MessageDialog dialog(*window, msg);
+      TimedMessageDialog dialog(*window, msg, 0);
       current_save_filename = old_current_save_filename;
-      dialog.run();
-      dialog.hide();
+      dialog.run_and_hide();
       return false;
     }
   armies_list->clear();
@@ -1506,9 +1504,8 @@ bool ArmySetWindow::load_armyset(Glib::ustring filename)
     {
       delete d_armyset;
       d_armyset = NULL;
-      Gtk::MessageDialog td(*window, _("Couldn't load Army Set images."));
-      td.run();
-      td.hide();
+      TimedMessageDialog td(*window, _("Couldn't load Army Set images."), 0);
+      td.run_and_hide();
       return false;
     }
   for (Armyset::iterator i = d_armyset->begin(); i != d_armyset->end(); ++i)
@@ -1707,9 +1704,8 @@ void ArmySetWindow::show_add_file_error(Armyset *a, Gtk::Window &d, Glib::ustrin
   Glib::ustring errmsg = Glib::strerror(errno);
   Glib::ustring m = String::ucompose(_("Couldn't add %1 to:\n%2\n%3"), file,
                                      a->getConfigurationFile(), errmsg);
-  Gtk::MessageDialog td(d, m);
-  td.run();
-  td.hide();
+  TimedMessageDialog td(d, m, 0);
+  td.run_and_hide();
 }
 
 void ArmySetWindow::show_remove_file_error(Armyset *a, Gtk::Window &d, Glib::ustring file)
@@ -1718,9 +1714,8 @@ void ArmySetWindow::show_remove_file_error(Armyset *a, Gtk::Window &d, Glib::ust
   Glib::ustring m =
     String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"), file,
                      a->getConfigurationFile(), errmsg);
-  Gtk::MessageDialog td(d, m);
-  td.run();
-  td.hide();
+  TimedMessageDialog td(d, m, 0);
+  td.run_and_hide();
 }
 
 void ArmySetWindow::refresh_armies()
@@ -1793,20 +1788,18 @@ bool ArmySetWindow::check_save_valid (bool existing)
             _("Army Set is invalid, and is also one of the current working Army Sets.");
           Glib::ustring msg = _("Error!  Army Set could not be saved.");
           msg += "\n" + current_save_filename + "\n" + errmsg;
-          Gtk::MessageDialog dialog(*window, msg);
-          dialog.run();
-          dialog.hide();
+          TimedMessageDialog dialog(*window, msg, 0);
+          dialog.run_and_hide();
           return false;
         }
       else
         {
-          Gtk::MessageDialog
+          TimedMessageDialog
             dialog(*window,
-                   _("The Army Set is invalid.  Do you want to proceed?"));
-          dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-          int response = dialog.run();
-          dialog.hide();
-          if (response == Gtk::RESPONSE_CANCEL)
+                   _("The Army Set is invalid.  Do you want to proceed?"), 0);
+          dialog.add_cancel_button ();
+          dialog.run_and_hide();
+          if (dialog.get_response () == Gtk::RESPONSE_CANCEL)
             return false;
         }
     }
@@ -1839,9 +1832,8 @@ bool ArmySetWindow::check_name_valid (bool existing)
         {
           Glib::ustring msg =
             _("The Army Set has an invalid name.\nChange it and save again.");
-          Gtk::MessageDialog d(*window, msg);
-          d.run();
-          d.hide();
+          TimedMessageDialog d(*window, msg, 0);
+          d.run_and_hide();
           on_edit_armyset_info_activated ();
           return false;
         }
@@ -1849,11 +1841,10 @@ bool ArmySetWindow::check_name_valid (bool existing)
         {
           Glib::ustring msg =
             String::ucompose (_("The Army Set has an invalid name.\nChange it to '%1'?"), newname);
-          Gtk::MessageDialog d(*window, msg);
-          d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-          int response = d.run();
-          d.hide();
-          if (response == Gtk::RESPONSE_CANCEL)
+          TimedMessageDialog d(*window, msg, 0);
+          d.add_cancel_button ();
+          d.run_and_hide();
+          if (d.get_response () == Gtk::RESPONSE_CANCEL)
             return false;
           d_armyset->setName (newname);
         }
@@ -1883,9 +1874,8 @@ bool ArmySetWindow::check_name_valid (bool existing)
         {
           Glib::ustring msg =
             _("The Army Set has the same name as another one.\nChange it and save again.");
-          Gtk::MessageDialog d(*window, msg);
-          d.run();
-          d.hide();
+          TimedMessageDialog d(*window, msg, 0);
+          d.run_and_hide();
           on_edit_armyset_info_activated ();
           return false;
         }
@@ -1894,11 +1884,10 @@ bool ArmySetWindow::check_name_valid (bool existing)
           Glib::ustring msg =
             String::ucompose (_("The Army Set has the same name as another one.\nChange it to '%1' instead?."), newname);
 
-          Gtk::MessageDialog d(*window, msg);
-          d.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-          int response = d.run();
-          d.hide();
-          if (response == Gtk::RESPONSE_CANCEL)
+          TimedMessageDialog d(*window, msg, 0);
+          d.add_cancel_button ();
+          d.run_and_hide ();
+          if (d.get_response () == Gtk::RESPONSE_CANCEL)
             return false;
           d_armyset->setName (newname);
         }

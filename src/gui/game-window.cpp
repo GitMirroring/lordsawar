@@ -1463,12 +1463,8 @@ void GameWindow::on_player_died(Player *player)
 
 void GameWindow::on_message_requested(Glib::ustring msg)
 {
-  // FIXME: this is a bit crude, maybe beef it up
-  Gtk::MessageDialog dialog(*window, msg);
-  //TimedMessageDialog dialog(*window, msg, 30, 5);
-  dialog.show_all();
-  dialog.run();
-  dialog.hide();
+  TimedMessageDialog dialog(*window, msg, 0);
+  dialog.run_and_hide ();
 }
 
 void GameWindow::on_progress_status_changed(Glib::ustring string)

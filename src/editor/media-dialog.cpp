@@ -33,6 +33,7 @@
 #include "playerlist.h"
 #include "past-chooser.h"
 #include "ImageCache.h"
+#include "timed-message-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &MediaDialog::x)
 
@@ -179,13 +180,12 @@ void MediaDialog::on_image_button_activated(sigc::slot<Glib::ustring> getName, s
           else
             {
               Glib::ustring errmsg = Glib::strerror(errno);
-              Gtk::MessageDialog
+              TimedMessageDialog
                 td(*d.get_dialog (),
                    String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
                                     d.get_filename (),
-                                    t->getConfigurationFile(), errmsg));
-              td.run();
-              td.hide();
+                                    t->getConfigurationFile(), errmsg), 0);
+              td.run_and_hide ();
             }
         }
     }
@@ -202,14 +202,13 @@ void MediaDialog::on_image_button_activated(sigc::slot<Glib::ustring> getName, s
           else
             {
               Glib::ustring errmsg = Glib::strerror(errno);
-              Gtk::MessageDialog
+              TimedMessageDialog
                 td(*d.get_dialog (),
                    String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
                                     imgname,
                                     t->getConfigurationFile(),
-                                    errmsg));
-              td.run();
-              td.hide();
+                                    errmsg), 0);
+              td.run_and_hide ();
             }
         }
     }
@@ -241,14 +240,13 @@ void MediaDialog::on_masked_image_button_activated(sigc::slot<Glib::ustring> get
       else
         {
           Glib::ustring errmsg = Glib::strerror(errno);
-          Gtk::MessageDialog
+          TimedMessageDialog
             td(*d.get_dialog (),
                String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
                                 d.get_filename (),
                                 t->getConfigurationFile(),
-                                errmsg));
-          td.run();
-          td.hide();
+                                errmsg), 0);
+          td.run_and_hide ();
         }
     }
   else if (response == Gtk::RESPONSE_REJECT)
@@ -264,13 +262,12 @@ void MediaDialog::on_masked_image_button_activated(sigc::slot<Glib::ustring> get
           else
             {
               Glib::ustring errmsg = Glib::strerror(errno);
-              Gtk::MessageDialog
+              TimedMessageDialog
                 td(*d.get_dialog (),
                    String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
                                     imgname, t->getConfigurationFile(),
-                                    errmsg));
-              td.run();
-              td.hide();
+                                    errmsg), 0);
+              td.run_and_hide ();
             }
         }
     }
@@ -308,10 +305,9 @@ void MediaDialog::on_sound_button_activated(sigc::slot<Glib::ustring> getName, s
     {
       if (File::nameEndsWith(d.get_filename (), ".ogg") != true)
         {
-          Gtk::MessageDialog td(d,
-                                _("Only OGG files can be used for sound."));
-          td.run();
-          td.hide();
+          TimedMessageDialog td(d,
+                                _("Only OGG files can be used for sound."), 0);
+          td.run_and_hide();
         }
 
       if (d.get_filename () != getDefaultFilename ())
@@ -332,13 +328,12 @@ void MediaDialog::on_sound_button_activated(sigc::slot<Glib::ustring> getName, s
           else
             {
               Glib::ustring errmsg = Glib::strerror(errno);
-              Gtk::MessageDialog
+              TimedMessageDialog
                 td(d,
                    String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
                                     d.get_filename (),
-                                    t->getConfigurationFile(), errmsg));
-              td.run();
-              td.hide();
+                                    t->getConfigurationFile(), errmsg), 0);
+              td.run_and_hide ();
             }
         }
     }
@@ -355,14 +350,13 @@ void MediaDialog::on_sound_button_activated(sigc::slot<Glib::ustring> getName, s
           else
             {
               Glib::ustring errmsg = Glib::strerror(errno);
-              Gtk::MessageDialog
+              TimedMessageDialog
                 td(d,
                    String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
                                     sndname + ".ogg",
                                     t->getConfigurationFile(),
-                                    errmsg));
-              td.run();
-              td.hide();
+                                    errmsg), 0);
+              td.run_and_hide ();
             }
         }
     }

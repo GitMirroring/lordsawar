@@ -27,6 +27,7 @@
 #include "defs.h"
 #include "File.h"
 #include "scenario-list.h"
+#include "timed-message-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &LoadScenarioDialog::x)
 
@@ -111,9 +112,8 @@ void LoadScenarioDialog::run()
       if (!valid)
         {
           selected_filename = "";
-          Gtk::MessageDialog di(_("The scenario isn't valid."));
-          di.run();
-          di.hide ();
+          TimedMessageDialog di(*dialog, _("The scenario isn't valid."), 0);
+          di.run_and_hide();
         }
     }
   dialog->get_size(width, height);
@@ -222,9 +222,8 @@ void LoadScenarioDialog::on_remove_scenario_clicked()
           Glib::ustring errmsg = Glib::strerror(errno);
           Glib::ustring msg = _("Error!  Scenario could not be removed.");
           msg += "\n" + filename + "\n" + errmsg;
-          Gtk::MessageDialog d(*dialog, msg);
-          d.run();
-          d.hide();
+          TimedMessageDialog d(*dialog, msg, 0);
+          d.run_and_hide();
         }
     }
   return;

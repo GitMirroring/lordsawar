@@ -31,18 +31,23 @@ class TimedMessageDialog: public sigc::trackable
 		       int grace = 30);
     ~TimedMessageDialog() {delete window;};
 
+    void add_cancel_button ();
+
     void set_title(Glib::ustring title);
     void set_image(Glib::RefPtr<Gdk::Pixbuf> picture);
     void run_and_hide();
     
+    int get_response () {return d_response;}
+
  private:
     Gtk::MessageDialog *window;
     Glib::RefPtr<Glib::MainLoop> main_loop;
-    bool tick();
-    void on_response();
     int d_timeout;
     int d_timer_count;
     int d_grace;
+    int d_response;
+    bool tick();
+    void on_response(int response);
 };
 
 #endif
