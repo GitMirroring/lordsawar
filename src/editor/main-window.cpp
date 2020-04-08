@@ -1,5 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007-2010, 2012, 2014, 2015, 2016, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2016, 2017,
+//  2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -269,6 +270,9 @@ MainWindow::MainWindow(Glib::ustring load_filename)
     xml->get_widget("zoom_out_menuitem", zoom_out_menuitem);
     zoom_out_menuitem->signal_activate().connect
       (method(on_zoom_out_activated));
+    xml->get_widget("best_fit_menuitem", best_fit_menuitem);
+    best_fit_menuitem->signal_activate().connect
+      (method(on_best_fit_activated));
     xml->get_widget("smooth_map_menuitem", smooth_map_menuitem);
     smooth_map_menuitem->signal_activate().connect
       (method(on_smooth_map_activated));
@@ -547,6 +551,7 @@ void MainWindow::show_initial_map()
       setup_tile_style_buttons(Tile::GRASS);
     }
   update_window_title ();
+  set_default_bigmap_zoom ();
 }
 
 void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ustring tileset, Glib::ustring shieldset, Glib::ustring cityset, Glib::ustring armyset)
@@ -2294,8 +2299,10 @@ void MainWindow::zoom (double scale)
 {
   if (scale < minimum_zoom_scale)
     scale = minimum_zoom_scale;
+  zoom_in_menuitem->set_sensitive (scale > minimum_zoom_scale);
   if (scale > maximum_zoom_scale)
     scale = maximum_zoom_scale;
+  zoom_out_menuitem->set_sensitive (scale < maximum_zoom_scale);
   GameMap::getInstance()->getTileset()->set_scale (scale);
   GameMap::getInstance()->getCityset()->set_scale (scale);
   for (auto& i : *Playerlist::getInstance())
@@ -2354,4 +2361,20 @@ void MainWindow::update_menuitems ()
   bool needs_capitals = Playerlist::getInstance()->playerHasNoCapitalCity ();
   random_assign_capital_cities_menuitem->set_sensitive
     (Citylist::getInstance ()->size () && needs_capitals);
+}
+
+void MainWindow::set_default_bigmap_zoom ()
+{
+  Glib::RefPtr<Gdk::Display> d = Gdk::Display::get_default ();
+
+  long double pixels_per_mm =
+    (double) d->get_default_screen ()->get_height () /
+    (double) d->get_monitor_at_window (window->get_window ())->get_height_mm ();
+
+  zoom (BigMap::get_default_zoom_scale (pixels_per_mm));
+}
+
+void MainWindow::on_best_fit_activated ()
+{
+  set_default_bigmap_zoom ();
 }

@@ -55,6 +55,7 @@
 #define debug(x)
 
 bool BigMap::s_show_hidden_ruins;
+const double BigMap::target_tile_size_in_mm = 10.0;
 
 BigMap::BigMap(bool headless)
     : d_headless (headless), d_renderer(0), buffer(0), d_fighting(LocationBox(Vector<int>(-1,-1)))
@@ -698,4 +699,11 @@ bool BigMap::scroll(GdkEventScroll *event)
   set_view(n);
   view_changed.emit(view);
   return true;
+}
+
+double BigMap::get_default_zoom_scale (long double pixels_per_mm)
+{
+  guint32 target_ts = target_tile_size_in_mm * pixels_per_mm;
+  guint32 ts = GameMap::getInstance ()->getUnscaledTileSize ();
+  return (double)target_ts / (double)ts;
 }

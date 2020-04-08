@@ -400,6 +400,15 @@
                           </object>
                         </child>
                         <child>
+                          <object class="GtkMenuItem" id="best_fit_menuitem">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Best Fit</property>
+                            <property name="use_underline">True</property>
+                            <accelerator key="1" signal="activate"/>
+                          </object>
+                        </child>
+                        <child>
                           <object class="GtkSeparatorMenuItem" id="separator3">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>

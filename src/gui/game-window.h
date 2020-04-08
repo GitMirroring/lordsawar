@@ -166,6 +166,7 @@ class GameWindow: public sigc::trackable
     Gtk::MenuItem *preferences_menuitem;
     Gtk::MenuItem *zoom_in_menuitem;
     Gtk::MenuItem *zoom_out_menuitem;
+    Gtk::MenuItem *best_fit_menuitem;
     Gtk::MenuItem *quick_help_menuitem;
     Gtk::Image *smallmap_image;
     Gtk::Image *bigmap_image;
@@ -235,6 +236,7 @@ class GameWindow: public sigc::trackable
     void on_preferences_activated();
     void on_zoom_in_activated();
     void on_zoom_out_activated();
+    void on_best_fit_activated();
     void zoom (double scale);
     void on_group_ungroup_activated();
     
@@ -347,6 +349,7 @@ class GameWindow: public sigc::trackable
 
     bool on_window_state_event (GdkEventWindowState *e);
     bool on_configure_event (GdkEventConfigure *e);
+    void set_default_bigmap_zoom ();
 public:
     bool d_quick_fights; //do we speed up fights for this player's turn?
     Glib::ustring stop_action; //hackhackhack

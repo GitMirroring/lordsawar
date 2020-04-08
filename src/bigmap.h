@@ -55,6 +55,7 @@ class BigMap: public sigc::trackable
 {
  public:
     static bool s_show_hidden_ruins;
+    static const double target_tile_size_in_mm;
 
     BigMap(bool headless);
     virtual ~BigMap();
@@ -95,6 +96,13 @@ class BigMap: public sigc::trackable
     bool scroll(GdkEventScroll *event);
     
     Cairo::RefPtr<Cairo::Surface> get_surface() const {return outgoing;}
+
+    //! Calculate the zoom factor.
+    /**
+     * Our desired tile size in millimeters is TARGET_TILE_SIZE_IN_MM.
+     */
+    static double get_default_zoom_scale (long double pixels_per_mm);
+
  protected:
     bool d_headless;
     MapRenderer* d_renderer;

@@ -2343,6 +2343,12 @@ guint32 GameMap::getTileSize() const
   return ts->getTileSize();
 }
 
+guint32 GameMap::getUnscaledTileSize() const
+{
+  Tileset *ts = GameMap::getTileset();
+  return ts->getUnscaledTileSize();
+}
+
 guint32 GameMap::getTilesetId() const
 {
   if (GameMap::getTileset())

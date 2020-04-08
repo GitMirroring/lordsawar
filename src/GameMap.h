@@ -136,8 +136,11 @@ class GameMap: public sigc::trackable
           */
         void setTileset(Glib::ustring tileset);
 
-        //! Return the width of a tile on the BigMap in pixels.
+        //! Return the width of a tile on the BigMap in pixels after scaling.
         guint32 getTileSize() const;
+
+        //! Return the width of a tile on the BigMap in pixels before scaling.
+        guint32 getUnscaledTileSize() const;
 
         //! Return the id of the current Tileset.  Returns zero if a valid tileset hasn't been set yet.
         guint32 getTilesetId() const;

@@ -88,6 +88,7 @@ class MainWindow: public sigc::trackable
     Gtk::MenuItem *toggle_grid_menuitem;
     Gtk::MenuItem *zoom_in_menuitem;
     Gtk::MenuItem *zoom_out_menuitem;
+    Gtk::MenuItem *best_fit_menuitem;
     Gtk::MenuItem *smooth_map_menuitem;
     Gtk::MenuItem *smooth_screen_menuitem;
     Gtk::MenuItem *switch_sets_menuitem;
@@ -162,6 +163,7 @@ class MainWindow: public sigc::trackable
     void on_grid_toggled();
     void on_zoom_in_activated ();
     void on_zoom_out_activated ();
+    void on_best_fit_activated ();
 
     void on_random_all_cities_activated();
     void on_random_unnamed_cities_activated();
@@ -278,6 +280,7 @@ class MainWindow: public sigc::trackable
     void zoom (double scale);
     bool close_road_editor_tip ();
     void update_menuitems ();
+    void set_default_bigmap_zoom ();
 
     int d_width;
     int d_height;

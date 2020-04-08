@@ -1127,7 +1127,8 @@ void Driver::init_game_window()
     (method(on_game_ended_and_load_network_game));
 
   //make the width+height suitable for the screen size.
-  Glib::RefPtr<Gdk::Screen> screen = Gdk::Display::get_default()->get_default_screen();
+  Glib::RefPtr<Gdk::Screen> screen =
+    Gdk::Display::get_default()->get_default_screen();
   guint32 screen_height = screen->get_height();
   guint32 height = 450;
   if (screen_height <= 600)

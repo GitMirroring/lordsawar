@@ -250,6 +250,8 @@ GameWindow::GameWindow()
   zoom_in_menuitem->signal_activate().connect (method(on_zoom_in_activated));
   xml->get_widget("zoom_out_menuitem", zoom_out_menuitem);
   zoom_out_menuitem->signal_activate().connect (method(on_zoom_out_activated));
+  xml->get_widget("best_fit_menuitem", best_fit_menuitem);
+  best_fit_menuitem->signal_activate().connect (method(on_best_fit_activated));
 
   xml->get_widget("show_lobby_menuitem", show_lobby_menuitem);
   show_lobby_menuitem->signal_activate().connect (method(on_show_lobby_activated));
@@ -371,6 +373,17 @@ void GameWindow::show()
   Gdk::EventMask event_mask = window->get_window()->get_events ();
   event_mask |= Gdk::STRUCTURE_MASK;
   window->get_window()->set_events (event_mask);
+}
+
+void GameWindow::set_default_bigmap_zoom ()
+{
+  Glib::RefPtr<Gdk::Display> d = Gdk::Display::get_default ();
+
+  long double pixels_per_mm =
+    (double) d->get_default_screen ()->get_height () /
+    (double) d->get_monitor_at_window (window->get_window ())->get_height_mm ();
+
+  zoom (BigMap::get_default_zoom_scale (pixels_per_mm));
 }
 
 void GameWindow::init(int width, int height)
@@ -636,6 +649,8 @@ bool GameWindow::setup_game(GameScenario *game_scenario, NextTurn *nextTurn)
   if (game)
     delete game;
   game = new Game(game_scenario, nextTurn);
+
+  set_default_bigmap_zoom ();
 
   game_button_box->setup_signals(game);
     
@@ -3099,8 +3114,13 @@ bool GameWindow::on_configure_event (GdkEventConfigure *e)
     }
   return false;
 }
-    
+
 void GameWindow::on_quick_help_activated()
 {
   show_quick_help.emit();
+}
+
+void GameWindow::on_best_fit_activated ()
+{
+  set_default_bigmap_zoom();
 }
