@@ -72,6 +72,8 @@ class Keeper;
 class GameWindow: public sigc::trackable
 {
  public:
+     static double minimum_zoom_scale;
+     static double maximum_zoom_scale;
     GameWindow();
     ~GameWindow();
 

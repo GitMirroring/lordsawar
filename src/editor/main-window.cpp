@@ -106,6 +106,9 @@
 
 #define EDITOR_DIALOG_BUTTON_TILE_PIC_FONTSIZE_MULTIPLE 3.7
 
+double MainWindow::minimum_zoom_scale = 0.4;
+double MainWindow::maximum_zoom_scale = 3.0;
+
 MainWindow::MainWindow(Glib::ustring load_filename)
 {
   Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme() = false;
@@ -2278,19 +2281,21 @@ bool MainWindow::on_configure_event (GdkEventConfigure *e)
 void MainWindow::on_zoom_in_activated ()
 {
   zoom (GameMap::getInstance()->getTileset()->get_scale () + ZOOM_STEP);
+  update_menuitems ();
 }
 
 void MainWindow::on_zoom_out_activated ()
 {
   zoom (GameMap::getInstance()->getTileset()->get_scale () - ZOOM_STEP);
+  update_menuitems ();
 }
 
 void MainWindow::zoom (double scale)
 {
-  if (scale < 0.4)
-    scale = 0.4;
-  if (scale > 3.0)
-    scale = 3.0;
+  if (scale < minimum_zoom_scale)
+    scale = minimum_zoom_scale;
+  if (scale > maximum_zoom_scale)
+    scale = maximum_zoom_scale;
   GameMap::getInstance()->getTileset()->set_scale (scale);
   GameMap::getInstance()->getCityset()->set_scale (scale);
   for (auto& i : *Playerlist::getInstance())
@@ -2312,6 +2317,10 @@ bool MainWindow::close_road_editor_tip ()
 
 void MainWindow::update_menuitems ()
 {
+  double scale = GameMap::getInstance()->getTileset()->get_scale ();
+  zoom_out_menuitem->set_sensitive (scale > minimum_zoom_scale);
+  zoom_in_menuitem->set_sensitive (scale < maximum_zoom_scale);
+
   //no stacks?  can't remove all stacks.
   bool have_stacks = Playerlist::getInstance()->countAllStacks () > 0;
   edit_remove_all_stacks_menuitem->set_sensitive (have_stacks);

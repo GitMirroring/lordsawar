@@ -45,6 +45,9 @@ class RoadEditorTip;
 class MainWindow: public sigc::trackable
 {
  public:
+    static double minimum_zoom_scale;
+    static double maximum_zoom_scale;
+
     MainWindow(Glib::ustring load_filename = "");
     ~MainWindow();
 

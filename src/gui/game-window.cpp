@@ -126,6 +126,9 @@
 
 #define method(x) sigc::mem_fun(*this, &GameWindow::x)
 
+double GameWindow::minimum_zoom_scale = 0.4;
+double GameWindow::maximum_zoom_scale = 3.0;
+
 GameWindow::GameWindow()
 {
   game_winner = NULL;
@@ -1146,10 +1149,12 @@ void GameWindow::on_production_activated()
 
 void GameWindow::zoom (double scale)
 {
-  if (scale < 0.4)
-    scale = 0.4;
-  if (scale > 3.0)
-    scale = 3.0;
+  if (scale < minimum_zoom_scale)
+    scale = minimum_zoom_scale;
+  zoom_in_menuitem->set_sensitive (scale > minimum_zoom_scale);
+  if (scale > maximum_zoom_scale)
+    scale = maximum_zoom_scale;
+  zoom_out_menuitem->set_sensitive (scale < maximum_zoom_scale);
   GameMap::getInstance()->getTileset()->set_scale (scale);
   GameMap::getInstance()->getCityset()->set_scale (scale);
   for (auto& i : *Playerlist::getInstance())
