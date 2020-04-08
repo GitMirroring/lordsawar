@@ -69,6 +69,7 @@ class ScenarioMedia
         Glib::ustring getHeroNewLevelFemaleImageName() {return d_hero_newlevel_female_name;}
         Glib::ustring getSmallMedalsImageName() {return d_small_medals_name;}
         Glib::ustring getBigMedalsImageName() {return d_big_medals_name;}
+        Glib::ustring getCommentatorImageName() {return d_commentator_name;}
         Glib::ustring getBlessSoundName() {return d_bless_name;}
         Glib::ustring getHeroSoundName() {return d_hero_name;}
         Glib::ustring getBattleSoundName() {return d_battle_name;}
@@ -93,6 +94,7 @@ class ScenarioMedia
           {return d_small_medal_images.size () > i ? d_small_medal_images[i] : NULL;}
         PixMask *getBigMedalImage(guint32 i)
           {return d_big_medal_images.size () > i ? d_big_medal_images[i] : NULL;}
+        PixMask *getCommentatorImage() {return d_commentator_image;}
 
         void clearNextTurnImage(bool clear_name = true);
         void clearCityDefeatedImage(bool clear_name = true);
@@ -107,6 +109,7 @@ class ScenarioMedia
         void clearBigMedalImage(bool clear_name = true);
         void clearHeroNewLevelMaleImage (bool clear_name = true);
         void clearHeroNewLevelFemaleImage (bool clear_name = true);
+        void clearCommentatorImage (bool clear_name = true);
 
         bool instantiateNextTurnImage(TarFile *t);
         bool instantiateCityDefeatedImage(TarFile *t);
@@ -121,6 +124,7 @@ class ScenarioMedia
         bool instantiateBigMedalImage(TarFile *t);
         bool instantiateHeroNewLevelMaleImage (TarFile *t);
         bool instantiateHeroNewLevelFemaleImage (TarFile *t);
+        bool instantiateCommentatorImage (TarFile *t);
 
         MusicItem* getSoundEffect(Glib::ustring n);
         std::vector<Glib::ustring> getBackgroundMusic() const {return d_bgMap;}
@@ -140,6 +144,7 @@ class ScenarioMedia
         void setHeroNewLevelFemaleImageName(Glib::ustring n) {d_hero_newlevel_female_name = n;}
         void setSmallMedalsImageName(Glib::ustring n) {d_small_medals_name = n;}
         void setBigMedalsImageName(Glib::ustring n) {d_big_medals_name = n;}
+        void setCommentatorImageName(Glib::ustring n) {d_commentator_name = n;}
 
         void setNextTurnImage(PixMask *i) {d_next_turn_image = i;}
         void setCityDefeatedImage(PixMask *i) {d_city_defeated_image = i;}
@@ -161,6 +166,7 @@ class ScenarioMedia
           { if (n < d_small_medal_images.size ()) d_small_medal_images[n] = i;}
         void setBigMedalsImage(guint32 n, PixMask *i)
           {if (n < d_big_medal_images.size ()) d_big_medal_images[n] = i;}
+        void setCommentatorImage (PixMask *i) {d_commentator_image = i;}
 
         void setBlessSoundName(Glib::ustring n) {d_bless_name = n;}
         void setHeroSoundName(Glib::ustring n) {d_hero_name = n;}
@@ -196,6 +202,7 @@ class ScenarioMedia
         static Glib::ustring getDefaultHeroNewLevelFemaleImageFilename();
         static Glib::ustring getDefaultSmallMedalsImageFilename();
         static Glib::ustring getDefaultBigMedalsImageFilename();
+        static Glib::ustring getDefaultCommentatorImageFilename();
         static Glib::ustring getDefaultBlessSoundFilename();
         static Glib::ustring getDefaultHeroSoundFilename();
         static Glib::ustring getDefaultBattleSoundFilename();
@@ -230,6 +237,7 @@ class ScenarioMedia
         Glib::ustring d_hero_newlevel_female_name;
         Glib::ustring d_small_medals_name;
         Glib::ustring d_big_medals_name;
+        Glib::ustring d_commentator_name;
         Glib::ustring d_bless_name;
         Glib::ustring d_hero_name;
         Glib::ustring d_battle_name;
@@ -255,6 +263,7 @@ class ScenarioMedia
         PixMask *d_hero_newlevel_female_mask;
         std::vector<PixMask *> d_small_medal_images;
         std::vector<PixMask *> d_big_medal_images;
+        PixMask *d_commentator_image;
 
         //helpers
         void instantiateMaskedImage(Tar_Helper &t, Glib::ustring name, PixMask **image, PixMask **mask, bool &broken);

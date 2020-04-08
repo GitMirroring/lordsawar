@@ -54,6 +54,7 @@ private:
     Gtk::Button *d_parley_refused_button;
     Gtk::Button *d_small_medals_button;
     Gtk::Button *d_big_medals_button;
+    Gtk::Button *d_commentator_button;
     Gtk::Button *d_bless_button;
     Gtk::Button *d_hero_button;
     Gtk::Button *d_battle_button;
@@ -76,6 +77,7 @@ private:
     void on_parley_refused_button_activated();
     void on_small_medals_button_activated();
     void on_big_medals_button_activated();
+    void on_commentator_button_activated();
     void on_bless_button_activated();
     void on_hero_button_activated();
     void on_battle_button_activated();

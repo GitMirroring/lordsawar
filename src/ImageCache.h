@@ -154,6 +154,7 @@ class ImageCache
       DIALOG_RUIN_DEFEAT,
       DIALOG_PARLEY_OFFERED,
       DIALOG_PARLEY_REFUSED,
+      DIALOG_COMMENTATOR,
     };
 
         //! Method for getting/creating the soliton instance.
@@ -481,6 +482,7 @@ class ImageCache
         PixMask* getRuinDefeatPic();
         PixMask *getParleyOfferedPic();
         PixMask *getParleyRefusedPic();
+        PixMask *getCommentatorPic ();
 
         PixMask* getGameButtonImage(guint32 type);
 
@@ -578,6 +580,7 @@ class ImageCache
         PixMask *d_ruindefeat;
         PixMask *d_parleyoffered;
         PixMask *d_parleyrefused;
+        PixMask *d_commentator;
 };
 
 //! Helper class for selector box items in the ImageCache.

@@ -1,6 +1,7 @@
 // Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006-2011, 2014-2016, 2020 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2016,
+// 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -121,6 +122,7 @@ ImageCache::ImageCache()
     d_ruindefeat = NULL;
     d_parleyoffered = NULL;
     d_parleyrefused = NULL;
+    d_commentator = NULL;
 }
 
 bool ImageCache::loadDiplomacyImages()
@@ -359,6 +361,8 @@ ImageCache::~ImageCache()
     delete d_parleyoffered;
   if (d_parleyrefused)
     delete d_parleyrefused;
+  if (d_commentator)
+    delete d_commentator;
   reset();
 }
 
@@ -1725,6 +1729,22 @@ PixMask* ImageCache::getParleyRefusedPic ()
   return d_parleyrefused;
 }
 
+PixMask* ImageCache::getCommentatorPic ()
+{
+  PixMask *i = ScenarioMedia::getInstance()->getCommentatorImage();
+  if (i)
+    return i;
+  if (!d_commentator)
+    {
+      bool broken = false;
+      i = PixMask::create(ScenarioMedia::getDefaultCommentatorImageFilename(),
+                          broken);
+      if (!broken)
+        d_commentator = i;
+    }
+  return d_commentator;
+}
+
 void ImageCache::add_underline (PixMask **p, Gdk::RGBA color, guint32 font_size)
 {
   int height = (*p)->get_height () +
@@ -2879,7 +2899,10 @@ PixMask *DialogPixMaskCacheItem::generate(DialogPixMaskCacheItem i)
       p = ImageCache::getInstance ()->getParleyRefusedPic()->copy ();
       ratio = DIALOG_PARLEY_PIC_FONT_SIZE_MULTIPLE;
       break;
-
+    case ImageCache::DIALOG_COMMENTATOR:
+      p = ImageCache::getInstance ()->getCommentatorPic()->copy ();
+      ratio = DIALOG_COMMENTATOR_PIC_FONT_SIZE_MULTIPLE;
+      break;
     }
   if (p)
     {

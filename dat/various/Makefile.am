@@ -43,7 +43,8 @@ various_DATA = \
     parley_refused.png \
     hero-newlevel-female.png \
     hero-newlevel-male.png \
-    tilestyles.png
+    tilestyles.png \
+    commentator.png
 
 EXTRA_DIST = \
     README \
@@ -86,4 +87,5 @@ EXTRA_DIST = \
     parley_refused.png \
     hero-newlevel-female.png \
     hero-newlevel-male.png \
-    tilestyles.png
+    tilestyles.png \
+    commentator.png

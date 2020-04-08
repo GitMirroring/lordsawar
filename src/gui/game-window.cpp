@@ -2819,16 +2819,12 @@ void GameWindow::give_some_cheese(Player *winner)
 
 void GameWindow::on_commentator_comments(Glib::ustring comment)
 {
-  ImageCache *gc = ImageCache::getInstance();
   TimedMessageDialog dialog (*window, comment, 0);
   dialog.set_title(_("The Warlord Says..."));
-    
-  PixMask *img = 
-    gc->getGameButtonPic(ImageCache::DIPLOMACY_NO_PROPOSALS,
-                         FontSize::getInstance ()->get_height ())->copy();
-  int size = img->get_height () * 3;
-  PixMask::scale(img, size, size);
-  dialog.set_image(img->to_pixbuf());
+
+  dialog.set_image (ImageCache::getInstance()->getDialogPic
+                    (ImageCache::DIALOG_COMMENTATOR,
+                     FontSize::getInstance ()->get_height ())->to_pixbuf());
   dialog.run_and_hide();
 }
       

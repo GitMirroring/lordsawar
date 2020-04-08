@@ -58,14 +58,14 @@ ScenarioMedia::ScenarioMedia()
     d_ruin_defeat_name(""), d_parley_offered_name(""),
     d_parley_refused_name(""), d_hero_newlevel_male_name(""),
     d_hero_newlevel_female_name(""), d_small_medals_name(""),
-    d_big_medals_name(""), d_bless_name(""), d_hero_name(""), d_battle_name(""),
-    d_defeat_name(""), d_victory_name(""), d_back_name (""),
-    d_next_turn_image(0), d_city_defeated_image(0), d_winning_image(0),
-    d_male_hero_image(0), d_female_hero_image(0),
+    d_big_medals_name(""), d_commentator_name (""), d_bless_name(""),
+    d_hero_name(""), d_battle_name(""), d_defeat_name(""), d_victory_name(""),
+    d_back_name (""), d_next_turn_image(0), d_city_defeated_image(0),
+    d_winning_image(0), d_male_hero_image(0), d_female_hero_image(0),
     d_ruin_success_image(0), d_ruin_defeat_image(0), d_parley_offered_image(0),
     d_parley_refused_image(0), d_hero_newlevel_male_image(0),
     d_hero_newlevel_male_mask(0), d_hero_newlevel_female_image(0),
-    d_hero_newlevel_female_mask(0)
+    d_hero_newlevel_female_mask(0), d_commentator_image(0)
 {
   for (guint32 i = 0; i < MEDAL_TYPES; i++)
     {
@@ -80,14 +80,14 @@ ScenarioMedia::ScenarioMedia(XML_Helper *helper)
     d_ruin_defeat_name(""), d_parley_offered_name(""),
     d_parley_refused_name(""), d_hero_newlevel_male_name(""),
     d_hero_newlevel_female_name(""), d_small_medals_name(""),
-    d_big_medals_name(""), d_bless_name(""), d_hero_name(""), d_battle_name(""),
-    d_defeat_name(""), d_victory_name(""), d_back_name (""),
-    d_next_turn_image(0), d_city_defeated_image(0), d_winning_image(0),
-    d_male_hero_image(0), d_female_hero_image(0),
+    d_big_medals_name(""), d_commentator_name(""), d_bless_name(""),
+    d_hero_name(""), d_battle_name(""), d_defeat_name(""), d_victory_name(""),
+    d_back_name (""), d_next_turn_image(0), d_city_defeated_image(0),
+    d_winning_image(0), d_male_hero_image(0), d_female_hero_image(0),
     d_ruin_success_image(0), d_ruin_defeat_image(0), d_parley_offered_image(0),
     d_parley_refused_image(0), d_hero_newlevel_male_image(0),
     d_hero_newlevel_male_mask(0), d_hero_newlevel_female_image(0),
-    d_hero_newlevel_female_mask(0)
+    d_hero_newlevel_female_mask(0), d_commentator_image(0)
 {
   helper->getData(d_next_turn_name, "next_turn_image");
   File::add_png_if_no_ext (d_next_turn_name);
@@ -115,6 +115,8 @@ ScenarioMedia::ScenarioMedia(XML_Helper *helper)
   File::add_png_if_no_ext (d_small_medals_name);
   helper->getData(d_big_medals_name, "big_medals_image");
   File::add_png_if_no_ext (d_big_medals_name);
+  helper->getData(d_commentator_name, "commentator_image");
+  File::add_png_if_no_ext (d_commentator_name);
   helper->getData(d_bless_name, "bless_sound");
   helper->getData(d_hero_name,"d_hero_name");
   helper->getData(d_battle_name,"d_battle_name");
@@ -138,6 +140,7 @@ bool ScenarioMedia::anyValueSet() const
       d_hero_newlevel_female_name != "" ||
       d_small_medals_name != "" ||
       d_big_medals_name != "" ||
+      d_commentator_name != "" ||
       d_bless_name != "" ||
       d_hero_name != "" ||
       d_battle_name != "" ||
@@ -169,6 +172,7 @@ bool ScenarioMedia::save(XML_Helper* helper) const
                              d_hero_newlevel_female_name);
   retval &= helper->saveData("small_medals_image", d_small_medals_name);
   retval &= helper->saveData("big_medals_image", d_big_medals_name);
+  retval &= helper->saveData("commentator_image", d_commentator_name);
   retval &= helper->saveData("bless_sound", d_bless_name);
   retval &= helper->saveData("d_hero_name", d_hero_name);
   retval &= helper->saveData("d_battle_name", d_battle_name);
@@ -242,6 +246,9 @@ void ScenarioMedia::uninstantiateImages()
     if (i)
       delete i;
   d_big_medal_images.clear();
+  if (d_commentator_image)
+    delete d_commentator_image;
+  d_commentator_image = NULL;
 }
 
 void ScenarioMedia::instantiateImageRow(Tar_Helper &t, Glib::ustring name, int num, std::vector<PixMask *>&images, bool &broken)
@@ -355,6 +362,8 @@ void ScenarioMedia::instantiateImages(Tar_Helper &t, bool &broken)
     instantiateImageRow (t, d_small_medals_name, MEDAL_TYPES, d_small_medal_images, broken);
   if (!broken)
     instantiateImageRow (t, d_big_medals_name, MEDAL_TYPES, d_big_medal_images, broken);
+  if (!broken)
+    instantiateImage (t, d_commentator_name, &d_commentator_image, broken);
 }
 
 MusicItem* ScenarioMedia::getSoundEffect(Glib::ustring n)
@@ -390,6 +399,8 @@ void ScenarioMedia::getFilenames(std::list<Glib::ustring> &files)
     files.push_back (getSmallMedalsImageName());
   if (getBigMedalsImageName() != "")
     files.push_back (getBigMedalsImageName());
+  if (getCommentatorImageName() != "")
+    files.push_back (getCommentatorImageName());
   if (getBlessSoundName() != "")
     files.push_back (getBlessSoundName() + ".ogg");
   if (getHeroSoundName() != "")
@@ -467,6 +478,11 @@ Glib::ustring ScenarioMedia::getDefaultSmallMedalsImageFilename()
 Glib::ustring ScenarioMedia::getDefaultBigMedalsImageFilename()
 {
   return File::getVariousFile("bigmedals.png");
+}
+
+Glib::ustring ScenarioMedia::getDefaultCommentatorImageFilename()
+{
+  return File::getVariousFile("commentator.png");
 }
 
 Glib::ustring ScenarioMedia::getDefaultBlessSoundFilename()
@@ -643,6 +659,16 @@ void ScenarioMedia::clearBigMedalImage(bool clear_name)
         delete p;
       setBigMedalsImage (i, NULL);
     }
+}
+
+void ScenarioMedia::clearCommentatorImage(bool clear_name)
+{
+  if (clear_name)
+    setCommentatorImageName ("");
+  PixMask *p = getCommentatorImage ();
+  if (p)
+    delete p;
+  setCommentatorImage (NULL);
 }
 
 bool ScenarioMedia::instantiateNextTurnImage(TarFile *t)
@@ -964,4 +990,29 @@ bool ScenarioMedia::instantiateHeroNewLevelFemaleImage (TarFile *t)
         }
     }
   return broken;
+}
+
+bool ScenarioMedia::instantiateCommentatorImage(TarFile *t)
+{
+  Glib::ustring imgname = getCommentatorImageName();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearCommentatorImage (false);
+              setCommentatorImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
 }

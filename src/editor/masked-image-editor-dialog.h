@@ -40,7 +40,6 @@ class MaskedImageEditorDialog: public LwEditorDialog
 {
  public:
     static const int MAX_IMAGES_WIDTH;
-    //MaskedImageEditorDialog(Gtk::Window &parent, Glib::ustring filename, double ratio, Shieldset *shieldset = NULL);
     MaskedImageEditorDialog(Gtk::Window &parent, Glib::ustring filename, PixMask *image, PixMask *mask, double ratio, Shieldset *shieldset = NULL);
     ~MaskedImageEditorDialog();
 

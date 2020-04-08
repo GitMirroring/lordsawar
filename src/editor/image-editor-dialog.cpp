@@ -81,7 +81,7 @@ void ImageEditorDialog::update_imagebutton_label (Glib::ustring filename)
   if (f.empty () == false)
     imagebutton->set_label (f);
   else
-    imagebutton->set_label (_("no image set"));
+    imagebutton->set_label (_("No image set"));
 }
 
 bool ImageEditorDialog::load_frames (Glib::ustring filename)

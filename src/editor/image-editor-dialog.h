@@ -34,7 +34,6 @@
 class ImageEditorDialog: public LwEditorDialog
 {
  public:
-    //ImageEditorDialog(Gtk::Window &parent, Glib::ustring filename, int num_frames, double ratio);
     ImageEditorDialog(Gtk::Window &parent, Glib::ustring bname, int num_frames, std::vector<PixMask*> f, double ratio);
     ~ImageEditorDialog();
 

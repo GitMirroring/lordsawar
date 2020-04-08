@@ -127,7 +127,7 @@ void MaskedImageEditorDialog::update_panel()
     imagebutton->set_label (f);
   else
     {
-      imagebutton->set_label (_("no image set"));
+      imagebutton->set_label (_("No image set"));
       show_image ();
     }
   if (d_image)

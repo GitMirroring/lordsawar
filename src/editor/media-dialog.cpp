@@ -32,6 +32,7 @@
 #include "shieldset.h"
 #include "playerlist.h"
 #include "past-chooser.h"
+#include "ImageCache.h"
 
 #define method(x) sigc::mem_fun(*this, &MediaDialog::x)
 
@@ -79,6 +80,9 @@ MediaDialog::MediaDialog(Gtk::Window &parent, TarFile *tarfile)
   xml->get_widget("big_medals_button", d_big_medals_button);
   d_big_medals_button->signal_clicked().connect
     (method(on_big_medals_button_activated));
+  xml->get_widget("commentator_button", d_commentator_button);
+  d_commentator_button->signal_clicked().connect
+    (method(on_commentator_button_activated));
   xml->get_widget("bless_button", d_bless_button);
   d_bless_button->signal_clicked().connect(method(on_bless_button_activated));
   xml->get_widget("hero_button", d_hero_button);
@@ -131,6 +135,7 @@ void MediaDialog::fill_in_buttons()
   fill_image_button (d_parley_refused_button, sm->getParleyRefusedImageName());
   fill_image_button (d_small_medals_button, sm->getSmallMedalsImageName());
   fill_image_button (d_big_medals_button, sm->getBigMedalsImageName());
+  fill_image_button (d_commentator_button, sm->getCommentatorImageName());
 
   fill_sound_button (d_bless_button, sm->getBlessSoundName());
   fill_sound_button (d_hero_button, sm->getHeroSoundName());
@@ -368,8 +373,7 @@ void MediaDialog::on_next_turn_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   std::vector<PixMask *> frames;
-  if (sm->getNextTurnImage ())
-    frames.push_back (sm->getNextTurnImage ());
+  frames.push_back (ImageCache::getInstance()->getNextTurnPic ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getNextTurnImageName),
      sigc::mem_fun (sm, &ScenarioMedia::setNextTurnImageName), 1, frames);
@@ -383,8 +387,7 @@ void MediaDialog::on_city_defeated_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   std::vector<PixMask *> frames;
-  if (sm->getCityDefeatedImage ())
-    frames.push_back (sm->getCityDefeatedImage ());
+  frames.push_back (ImageCache::getInstance()->getCityDefeatedPic ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getCityDefeatedImageName),
      sigc::mem_fun (sm, &ScenarioMedia::setCityDefeatedImageName), 1, frames);
@@ -398,8 +401,7 @@ void MediaDialog::on_winning_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   std::vector<PixMask *> frames;
-  if (sm->getWinningImage ())
-    frames.push_back (sm->getWinningImage ());
+  frames.push_back (ImageCache::getInstance()->getWinningPic ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getWinningImageName),
      sigc::mem_fun (sm, &ScenarioMedia::setWinningImageName), 1, frames);
@@ -413,8 +415,7 @@ void MediaDialog::on_hero_male_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   std::vector<PixMask *> frames;
-  if (sm->getMaleHeroImage ())
-    frames.push_back (sm->getMaleHeroImage ());
+  frames.push_back (ImageCache::getInstance()->getHeroPic (Hero::MALE));
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getMaleHeroImageName),
      sigc::mem_fun (sm, &ScenarioMedia::setMaleHeroImageName), 1, frames);
@@ -428,8 +429,7 @@ void MediaDialog::on_hero_female_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   std::vector<PixMask *> frames;
-  if (sm->getFemaleHeroImage ())
-    frames.push_back (sm->getFemaleHeroImage ());
+  frames.push_back (ImageCache::getInstance()->getHeroPic (Hero::FEMALE));
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getFemaleHeroImageName),
      sigc::mem_fun (sm, &ScenarioMedia::setFemaleHeroImageName), 1, frames);
@@ -443,8 +443,7 @@ void MediaDialog::on_ruin_success_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   std::vector<PixMask *> frames;
-  if (sm->getRuinSuccessImage ())
-    frames.push_back (sm->getRuinSuccessImage ());
+  frames.push_back (ImageCache::getInstance()->getRuinSuccessPic ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getRuinSuccessImageName),
      sigc::mem_fun (sm, &ScenarioMedia::setRuinSuccessImageName), 1, frames);
@@ -458,8 +457,7 @@ void MediaDialog::on_ruin_defeat_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   std::vector<PixMask *> frames;
-  if (sm->getRuinDefeatImage ())
-    frames.push_back (sm->getRuinDefeatImage ());
+  frames.push_back (ImageCache::getInstance()->getRuinDefeatPic ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getRuinDefeatImageName),
      sigc::mem_fun (sm, &ScenarioMedia::setRuinDefeatImageName), 1, frames);
@@ -472,11 +470,11 @@ void MediaDialog::on_ruin_defeat_button_activated()
 void MediaDialog::on_hero_newlevel_male_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  PixMask *im = ImageCache::getInstance ()->getNewLevelImage(false, false);
+  PixMask *ma = ImageCache::getInstance ()->getNewLevelImage(false, true);
   on_masked_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getHeroNewLevelMaleImageName),
-     sm->getHeroNewLevelMaleImage(),
-     sm->getHeroNewLevelMaleMask(),
-     sigc::mem_fun (sm, &ScenarioMedia::setHeroNewLevelMaleImageName),
+     im, ma, sigc::mem_fun (sm, &ScenarioMedia::setHeroNewLevelMaleImageName),
      Shieldsetlist::getInstance()->get(Playerlist::getActiveplayer()->getId()));
   if (sm->getHeroNewLevelMaleImageName ().empty () == false)
     sm->instantiateHeroNewLevelMaleImage (d_tarfile);
@@ -487,11 +485,11 @@ void MediaDialog::on_hero_newlevel_male_button_activated()
 void MediaDialog::on_hero_newlevel_female_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
+  PixMask *im = ImageCache::getInstance ()->getNewLevelImage(true, false);
+  PixMask *ma = ImageCache::getInstance ()->getNewLevelImage(true, true);
   on_masked_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getHeroNewLevelFemaleImageName),
-     sm->getHeroNewLevelFemaleImage(),
-     sm->getHeroNewLevelFemaleMask(),
-     sigc::mem_fun (sm, &ScenarioMedia::setHeroNewLevelFemaleImageName),
+     im, ma, sigc::mem_fun (sm, &ScenarioMedia::setHeroNewLevelFemaleImageName),
      Shieldsetlist::getInstance()->get(Playerlist::getActiveplayer()->getId()));
   if (sm->getHeroNewLevelFemaleImageName ().empty () == false)
     sm->instantiateHeroNewLevelFemaleImage (d_tarfile);
@@ -503,8 +501,7 @@ void MediaDialog::on_parley_offered_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   std::vector<PixMask *> frames;
-  if (sm->getParleyOfferedImage ())
-    frames.push_back (sm->getParleyOfferedImage ());
+  frames.push_back (ImageCache::getInstance ()->getParleyOfferedPic ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getParleyOfferedImageName),
      sigc::mem_fun (sm, &ScenarioMedia::setParleyOfferedImageName), 1, frames);
@@ -518,8 +515,7 @@ void MediaDialog::on_parley_refused_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   std::vector<PixMask *> frames;
-  if (sm->getParleyRefusedImage ())
-    frames.push_back (sm->getParleyRefusedImage ());
+  frames.push_back (ImageCache::getInstance ()->getParleyRefusedPic ());
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getParleyRefusedImageName),
      sigc::mem_fun (sm, &ScenarioMedia::setParleyRefusedImageName), 1, frames);
@@ -534,8 +530,7 @@ void MediaDialog::on_small_medals_button_activated()
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   std::vector<PixMask *> frames;
   for (guint32 i = 0; i < MEDAL_TYPES; i++)
-    if (sm->getSmallMedalImage (i))
-      frames.push_back (sm->getSmallMedalImage (i));
+    frames.push_back (ImageCache::getInstance()->getMedalImage (false, i));
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getSmallMedalsImageName),
      sigc::mem_fun (sm, &ScenarioMedia::setSmallMedalsImageName), MEDAL_TYPES,
@@ -551,8 +546,7 @@ void MediaDialog::on_big_medals_button_activated()
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   std::vector<PixMask *> frames;
   for (guint32 i = 0; i < MEDAL_TYPES; i++)
-    if (sm->getBigMedalImage (i))
-      frames.push_back (sm->getBigMedalImage (i));
+    frames.push_back (ImageCache::getInstance()->getMedalImage (true, i));
   on_image_button_activated
     (sigc::mem_fun (sm, &ScenarioMedia::getBigMedalsImageName),
      sigc::mem_fun (sm, &ScenarioMedia::setBigMedalsImageName), MEDAL_TYPES,
@@ -561,6 +555,20 @@ void MediaDialog::on_big_medals_button_activated()
     sm->instantiateBigMedalImage (d_tarfile);
   else
     sm->clearBigMedalImage ();
+}
+
+void MediaDialog::on_commentator_button_activated()
+{
+  ScenarioMedia *sm = ScenarioMedia::getInstance();
+  std::vector<PixMask *> frames;
+  frames.push_back (ImageCache::getInstance ()->getCommentatorPic ());
+  on_image_button_activated
+    (sigc::mem_fun (sm, &ScenarioMedia::getCommentatorImageName),
+     sigc::mem_fun (sm, &ScenarioMedia::setCommentatorImageName), 1, frames);
+  if (sm->getCommentatorImageName ().empty () == false)
+    sm->instantiateCommentatorImage (d_tarfile);
+  else
+    sm->clearCommentatorImage ();
 }
 
 void MediaDialog::on_bless_button_activated()
