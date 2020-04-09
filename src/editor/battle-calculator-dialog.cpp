@@ -476,6 +476,8 @@ void BattleCalculatorDialog::on_defender_strength_edited(const Glib::ustring &pa
 
 void BattleCalculatorDialog::on_city_toggled()
 {
+  if (city_switch->property_active () == true)
+    terrain_combobox->set_active (0);
   terrain_combobox->set_sensitive(!city_switch->property_active());
 }
 
