@@ -1860,53 +1860,55 @@ void MainWindow::clear_save_file_of_scenario_specific_data()
 
 void MainWindow::on_import_map_activated()
 {
-    Gtk::FileChooserDialog chooser(*window, _("Choose Game to Load Map from"));
-    Glib::RefPtr<Gtk::FileFilter> sav_filter = Gtk::FileFilter::create();
-    sav_filter->set_name(_("LordsAWar Saved Games (*.sav)"));
-    sav_filter->add_pattern("*" + SAVE_EXT);
-    chooser.add_filter(sav_filter);
-    chooser.set_current_folder(File::getSavePath());
+  Gtk::FileChooserDialog chooser(*window, _("Choose Game to Load Map from"));
+  Glib::RefPtr<Gtk::FileFilter> sav_filter = Gtk::FileFilter::create();
+  sav_filter->set_name(_("LordsAWar Saved Games (*.sav)"));
+  sav_filter->add_pattern("*" + SAVE_EXT);
+  chooser.add_filter(sav_filter);
+  chooser.set_current_folder(File::getSavePath());
 
-    chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    chooser.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
-    chooser.set_default_response(Gtk::RESPONSE_ACCEPT);
-	
-    chooser.show_all();
-    int res = chooser.run();
-    
-    if (res == Gtk::RESPONSE_ACCEPT)
+  chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  chooser.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
+  chooser.set_default_response(Gtk::RESPONSE_ACCEPT);
+
+  chooser.show_all();
+  int res = chooser.run();
+
+  if (res == Gtk::RESPONSE_ACCEPT)
     {
-        Glib::ustring filename = chooser.get_filename();
-	chooser.hide();
+      Glib::ustring filename = chooser.get_filename();
+      chooser.hide();
 
-	clear_map_state();
+      clear_map_state();
 
-	bool broken;
-	if (game_scenario)
-	  delete game_scenario;
-	game_scenario = new GameScenario(filename, broken);
-        game_scenario->setDirectory(File::get_dirname(filename));
+      bool broken;
+      if (game_scenario)
+        delete game_scenario;
+      game_scenario = new GameScenario(filename, broken);
+      game_scenario->setDirectory(File::get_dirname(filename));
 
-	if (broken)
-	{
+      if (broken)
+        {
           TimedMessageDialog dialog
             (*window, String::ucompose(_("Could not load game %1."),
                                        filename), 0);
           dialog.run_and_hide();
-	    current_save_filename = "";
-	    return;
-	}
+          current_save_filename = "";
+          return;
+        }
 
-	if (d_create_scenario_names)
-	  delete d_create_scenario_names;
-	d_create_scenario_names = new CreateScenarioRandomize();
+      if (d_create_scenario_names)
+        delete d_create_scenario_names;
+      d_create_scenario_names = new CreateScenarioRandomize();
 
-	//now lets get rid of stuff.
-	clear_save_file_of_scenario_specific_data();
+      //now lets get rid of stuff.
+      clear_save_file_of_scenario_specific_data();
 
-	init_map_state();
-	bigmap->screen_size_changed(bigmap_image->get_allocation()); 
-        fill_players();
+      init_map_state();
+      bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+      fill_players();
+      needs_saving = false;
+      update_window_title();
     }
 }
       
