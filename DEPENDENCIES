@@ -34,10 +34,10 @@ on Ubuntu you need the following packages:
 sudo apt-get install automake autoconf libtool m4 autotools-dev autopoint g++ libsigc++-2.0-dev libglibmm-2.4-dev libgtkmm-3.0-dev gettext git libgstreamermm-1.0-dev intltool libarchive-dev libxslt1-dev libxml++2.6-dev
 
 on Mageia you need the following packages:
-urpmi automake autoconf libtool m4 gettext gcc-c++ libsigc++2.0-devel lib64glibmm2.4-devel lib64gtkmm3.0-devel git lib64gstreamermm0.10-devel intltool libarchive-devel libxslt-devel libxml++2.6-devel
+sudo urpmi automake autoconf libtool m4 gettext gcc-c++ libsigc++2.0-devel lib64glibmm2.4-devel lib64gtkmm3.0-devel git lib64gstreamermm1.0-devel intltool libarchive-devel libxslt-devel libxml++2.6-devel
 
 on Fedora you need the following packages:
-dnf install libglademm24-devel gtkmm30-devel gettext gstreamermm-devel libxml++-devel libsigc++20-devel intltool automake autoconf m4 git libarchive-devel glade3 libxslt-devel gcc-c++ libtool
+sudo dnf install libglademm24-devel gtkmm30-devel gettext gstreamermm-devel libxml++-devel libsigc++20-devel intltool automake autoconf m4 git libarchive-devel glade3 libxslt-devel gcc-c++ libtool
 
 (Several other rpms are needed, but these others will automatically be present in any normal workstation build, or will automatically be pulled in by rpm dependenices for the packages listed here).
 
