@@ -790,6 +790,7 @@ void MainWindow::init_map_state()
     init_maps();
     on_pointer_radiobutton_toggled();
     on_terrain_radiobutton_toggled();
+    on_best_fit_activated ();
 }
 
 bool MainWindow::on_bigmap_mouse_button_event(GdkEventButton *e)
