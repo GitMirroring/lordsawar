@@ -133,7 +133,6 @@ MainWindow::MainWindow(Glib::ustring load_filename)
 
     // the map image
     xml->get_widget("bigmap_image", bigmap_image);
-    bigmap_image->signal_draw().connect (sigc::hide(method(on_bigmap_exposed)));
     bigmap_image->signal_size_allocate().connect(method(on_bigmap_surface_changed));
     xml->get_widget("bigmap_eventbox", bigmap_eventbox);
 
@@ -154,7 +153,6 @@ MainWindow::MainWindow(Glib::ustring load_filename)
       (sigc::hide(method(on_bigmap_leave_event)));
     bigmap_eventbox->signal_scroll_event().connect (method(on_bigmap_scrolled));
     xml->get_widget("smallmap_image", smallmap_image);
-    smallmap_image->signal_draw().connect (sigc::hide(method(on_smallmap_exposed)));
     Gtk::EventBox *map_eventbox;
     xml->get_widget("map_eventbox", map_eventbox);
     map_eventbox->add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK |
@@ -472,30 +470,9 @@ void MainWindow::on_bigmap_surface_changed(Gtk::Allocation box)
   if (box.get_width() != last_box.get_width() || box.get_height() != last_box.get_height())
     {
       bigmap->screen_size_changed(bigmap_image->get_allocation());
-      redraw();
+      redraw(true);
     }
   last_box = box;
-}
-
-bool MainWindow::on_bigmap_exposed()
-{
-  return true;
-  Cairo::RefPtr<Cairo::Surface> surface = bigmap->get_surface();
-  Glib::RefPtr<Gdk::Pixbuf> pixbuf = 
-    Gdk::Pixbuf::create(surface, 0, 0, bigmap_image->get_allocated_width(), bigmap_image->get_allocated_height());
-  bigmap_image->property_pixbuf() = pixbuf;
-  return true;
-}
-
-bool MainWindow::on_smallmap_exposed()
-{
-  return true;
-  Cairo::RefPtr<Cairo::Surface> surface = smallmap->get_surface();
-  Glib::RefPtr<Gdk::Pixbuf> pixbuf = 
-    Gdk::Pixbuf::create(surface, 0, 0, 
-                        smallmap->get_width(), smallmap->get_height());
-  smallmap_image->property_pixbuf() = pixbuf;
-  return true;
 }
 
 void MainWindow::init()
@@ -1451,7 +1428,7 @@ void MainWindow::init_maps()
     // init the smallmap
     if (smallmap)
       delete smallmap;
-    smallmap =new SmallMap (false);
+    smallmap = new SmallMap (false);
     smallmap->resize();
     smallmap->map_changed.connect(sigc::hide(method(on_smallmap_changed)));
 
@@ -1464,24 +1441,25 @@ void MainWindow::init_maps()
     bigmap->map_changed.connect(method(on_bigmap_changed));
     bigmap->map_water_changed.connect (method(on_smallmap_water_changed));
     bigmap->bag_selected.connect (method(on_bag_selected));
-    bigmap->stack_selected_for_battle_calculator.connect(method(on_stack_selected_for_battle_calculator));
-                                       
+    bigmap->stack_selected_for_battle_calculator.connect
+      (method(on_stack_selected_for_battle_calculator));
 
     // grid is on by default
     bigmap->toggle_grid();
-    
+
     // connect the two maps
-    bigmap->view_changed.connect(
-	sigc::mem_fun(smallmap, &SmallMap::set_view));
-    bigmap->map_tiles_changed.connect(
-	sigc::mem_fun(smallmap, &SmallMap::redraw_tiles));
-    bigmap->map_tiles_changed.connect(
-	sigc::mem_fun(this, &MainWindow::on_bigmap_tiles_changed));
-    smallmap->view_changed.connect(
-	sigc::mem_fun(bigmap, &EditorBigMap::set_view));
+    bigmap->view_changed.connect
+      (sigc::mem_fun(smallmap, &SmallMap::set_view));
+    bigmap->map_tiles_changed.connect
+      (sigc::mem_fun(smallmap, &SmallMap::redraw_tiles));
+    bigmap->map_tiles_changed.connect
+      (sigc::mem_fun(this, &MainWindow::on_bigmap_tiles_changed));
+    smallmap->view_changed.connect
+      (sigc::mem_fun(bigmap, &EditorBigMap::set_view));
 
     //trigger the bigmap to resize the view box in the smallmap
     bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+    smallmap->center_view ();
 }
 
 void MainWindow::on_bigmap_tiles_changed (Rectangle r)
@@ -1912,10 +1890,12 @@ void MainWindow::on_import_map_activated()
     }
 }
       
-void MainWindow::redraw()
+void MainWindow::redraw(bool center)
 {
   bigmap->draw();
   smallmap->draw();
+  if (center)
+    smallmap->center_view ();
 }
 
 void MainWindow::on_switch_sets_activated()

@@ -248,12 +248,10 @@ class MainWindow: public sigc::trackable
 
     void auto_select_appropriate_pointer();
 
-    bool on_bigmap_exposed();
-    bool on_smallmap_exposed();
     void on_bigmap_surface_changed(Gtk::Allocation box);
     void on_save_as_activated(Gtk::FileChooserDialog *chooser);
     bool on_bigmap_scrolled(GdkEventScroll* event);
-    void redraw();
+    void redraw(bool center = false);
     void fill_players();
     void on_battle_calculator_activated();
 

@@ -223,3 +223,9 @@ void SmallMap::move_map_in_dir(Vector<int> dir)
   set_view(new_view);
   view_changed.emit(view);
 }
+
+void SmallMap::center_view ()
+{
+  set_view (Rectangle ((GameMap::get_dim () / 2) - (view.dim / 2), view.dim));
+  view_changed.emit(view);
+}

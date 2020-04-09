@@ -113,6 +113,9 @@ public:
      */
     void center_view_on_pixel(Vector<int> pos, bool slide);
 
+    //! Center the little white box in the center of the map graphic.
+    void center_view ();
+
     //! Move the view one tile in the given direction.
     void move_map_in_dir(Vector<int> dir);
 
