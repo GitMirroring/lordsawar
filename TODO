@@ -41,3 +41,5 @@ i guess there's the larger issue of 'undo' in the editor.
 d_gender gets saved out twice in a heroproto.  the armyproto also has it.  this doesn't seem to hurt anything but it should probably be gotten to the bottom of.
 
 figure out 1.65 in smallmap.cpp.
+
+scenario builder: make minimap selector start in the center 
