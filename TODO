@@ -43,3 +43,5 @@ d_gender gets saved out twice in a heroproto.  the armyproto also has it.  this 
 figure out 1.65 in smallmap.cpp.
 
 scenario builder: make minimap selector start in the center 
+
+bag not being scaled at all
