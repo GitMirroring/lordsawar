@@ -66,25 +66,6 @@ Tilesetlist::~Tilesetlist()
   clear();
 }
 
-void Tilesetlist::getSizes(std::list<guint32> &sizes) const
-{
-  for (const_iterator i = begin(); i != end(); i++)
-    {
-      if (find (sizes.begin(), sizes.end(), (*i)->getTileSize()) == sizes.end())
-	sizes.push_back((*i)->getTileSize());
-    }
-}
-
-std::list<Glib::ustring> Tilesetlist::getValidNames(guint32 tilesize) const
-{
-  std::list<Glib::ustring> names;
-  for (const_iterator it = begin(); it != end(); it++)
-    if ((*it)->getTileSize() == tilesize && (*it)->validate() == true)
-      names.push_back((*it)->getName());
-  names.sort(case_insensitive);
-  return names;
-}
-
 void Tilesetlist::uninstantiateImages()
 {
   for (iterator it = begin(); it != end(); it++)

@@ -117,16 +117,6 @@ ArmyProto* Armysetlist::lookupWeakestQuickestArmy(guint32 id) const
   return NULL;
 }
 
-std::list<Glib::ustring> Armysetlist::getValidNames(guint32 tilesize)
-{
-  std::list<Glib::ustring> names;
-  for (iterator it = begin(); it != end(); it++)
-    if ((*it)->getTileSize() == tilesize && (*it)->validate() == true)
-      names.push_back((*it)->getName());
-  names.sort(case_insensitive);
-  return names;
-}
-
 PixMask* Armysetlist::getShipMask (guint32 id)
 {
   for (iterator it = begin(); it != end(); it++)
@@ -175,15 +165,6 @@ PixMask* Armysetlist::getStandardMask (guint32 id)
 	return (*it)->getStandardMask();
     }
   return NULL;
-}
-
-void Armysetlist::getSizes(std::list<guint32> &sizes)
-{
-  for (iterator i = begin(); i != end(); i++)
-    {
-      if (find (sizes.begin(), sizes.end(), (*i)->getTileSize()) == sizes.end())
-	sizes.push_back((*i)->getTileSize());
-    }
 }
 
 void Armysetlist::instantiateImages(bool &broken)

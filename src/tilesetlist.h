@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -44,12 +44,6 @@ class Tilesetlist : public SetList<Tileset>, public sigc::trackable
     public:
 
 	// Methods that operate on class data but do not modify the class.
-
-        //! Returns the names of tilesets that have the given tile size.
-	std::list<Glib::ustring> getValidNames(guint32 tilesize) const;
-
-        //! Returns the different tilesizes present in the tilesetlist.
-	void getSizes(std::list<guint32> &sizes) const;
 
         SmallTile *getSmallTile(Glib::ustring basename, Tile::Type type) const;
 

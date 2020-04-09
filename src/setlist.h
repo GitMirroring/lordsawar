@@ -313,6 +313,27 @@ public:
         return get((*it).second)->getBaseName();
       }
 
+    void getSizes(std::list<guint32> &sizes) const
+      {
+        for (class SetList<T>::const_iterator it = this->begin(); 
+             it != this->end(); it++)
+          sizes.push_back((*it)->getUnscaledTileSize());
+        sizes.sort ();
+        sizes.unique ();
+      }
+
+    std::list<Glib::ustring> getValidNames(guint32 tilesize) const
+      {
+        std::list<Glib::ustring> names;
+        for (class SetList<T>::const_iterator it = this->begin(); 
+             it != this->end(); it++)
+          if ((*it)->getUnscaledTileSize() == tilesize &&
+              (*it)->validate() == true)
+            names.push_back((*it)->getName());
+        names.sort(case_insensitive);
+        return names;
+      }
+
     bool reload(guint32 id) 
       {
         T *set = get(id);

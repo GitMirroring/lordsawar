@@ -63,25 +63,6 @@ Citysetlist::~Citysetlist()
   clear();
 }
 
-std::list<Glib::ustring> Citysetlist::getValidNames(guint32 tilesize)
-{
-  std::list<Glib::ustring> names;
-  for (iterator it = begin(); it != end(); it++)
-    if ((*it)->getTileSize() == tilesize && (*it)->validate() == true)
-      names.push_back((*it)->getName());
-  names.sort(case_insensitive);
-  return names;
-}
-
-void Citysetlist::getSizes(std::list<guint32> &sizes)
-{
-  for (iterator i = begin(); i != end(); i++)
-    {
-      if (find (sizes.begin(), sizes.end(), (*i)->getTileSize()) == sizes.end())
-	sizes.push_back((*i)->getTileSize());
-    }
-}
-
 void Citysetlist::instantiateImages(bool &broken)
 {
   broken = false;

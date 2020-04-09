@@ -1,6 +1,6 @@
 // Copyright (C) 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -87,12 +87,6 @@ class Armysetlist : public SetList<Armyset>, public sigc::trackable
 	//! Get the planted standard mask for the given Armyset.
 	PixMask* getStandardMask (guint32 id);
         guint32 getTileSize(guint32 id);
-
-        //! Returns the different tilesizes present in the armysetlist.
-	void getSizes(std::list<guint32> &sizes);
-
-        //! Returns the names of armysets that have the given tile size.
-	std::list<Glib::ustring> getValidNames(guint32 tilesize);
 
 	void instantiateImages(bool &broken);
 	void uninstantiateImages();

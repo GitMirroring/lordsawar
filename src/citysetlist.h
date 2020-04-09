@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2010, 2011, 2014 Ben Asselstine
+// Copyright (C) 2008, 2010, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -44,12 +44,6 @@ class Citysetlist : public SetList<Cityset>, public sigc::trackable
 
         //! Explicitly delete the singleton instance of this class.
         static void deleteInstance();
-
-        //! Returns the names of citysets that have the given tile size.
-	std::list<Glib::ustring> getValidNames(guint32 tilesize);
-
-        //! Returns the different tilesizes present in the citysetlist.
-	void getSizes(std::list<guint32> &sizes);
 
 	void instantiateImages(bool &broken);
 	void uninstantiateImages();
