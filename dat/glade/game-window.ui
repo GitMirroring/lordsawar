@@ -100,7 +100,6 @@
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Order</property>
                     <property name="use_underline">True</property>
-                    <signal name="activate" handler="on_order_menuitem_activate" swapped="no"/>
                     <child type="submenu">
                       <object class="GtkMenu" id="order_menuitem_menu">
                         <property name="can_focus">False</property>
@@ -110,7 +109,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Fight Order</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_fight_order_menuitem_activate" swapped="no"/>
                             <accelerator key="i" signal="activate"/>
                           </object>
                         </child>
@@ -120,7 +118,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Move All</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_move_all_menuitem_activate" swapped="no"/>
                             <accelerator key="m" signal="activate"/>
                           </object>
                         </child>
@@ -130,7 +127,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Disband</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_disband_menuitem_activate" swapped="no"/>
                             <accelerator key="q" signal="activate"/>
                           </object>
                         </child>
@@ -140,7 +136,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Signpost</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_signpost_menuitem_activate" swapped="no"/>
                             <accelerator key="x" signal="activate"/>
                           </object>
                         </child>
@@ -150,7 +145,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Group/Ungroup</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_group_ungroup_menuitem_activate" swapped="no"/>
                             <accelerator key="space" signal="activate"/>
                           </object>
                         </child>
@@ -160,7 +154,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Stay Here</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_leave_menuitem_activate" swapped="no"/>
                             <accelerator key="Escape" signal="activate"/>
                           </object>
                         </child>
@@ -170,7 +163,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Next</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_next_menuitem_activate" swapped="no"/>
                             <accelerator key="Return" signal="activate"/>
                           </object>
                         </child>
@@ -186,7 +178,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Resign</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_resign_menuitem_activate" swapped="no"/>
                             <accelerator key="r" signal="activate"/>
                           </object>
                         </child>
@@ -209,7 +200,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Army</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_army_report_menuitem_activate" swapped="no"/>
                             <accelerator key="a" signal="activate"/>
                           </object>
                         </child>
@@ -219,7 +209,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">City</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_city_report_menuitem_activate" swapped="no"/>
                             <accelerator key="k" signal="activate"/>
                           </object>
                         </child>
@@ -229,7 +218,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Gold</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_gold_report_menuitem_activate" swapped="no"/>
                             <accelerator key="g" signal="activate"/>
                           </object>
                         </child>
@@ -239,7 +227,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Production</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_production_report_menuitem_activate" swapped="no"/>
                             <accelerator key="n" signal="activate"/>
                           </object>
                         </child>
@@ -249,7 +236,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Winning</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_winning_report_menuitem_activate" swapped="no"/>
                             <accelerator key="w" signal="activate"/>
                           </object>
                         </child>
@@ -259,7 +245,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Diplomacy</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_diplomacy_report_menuitem_activate" swapped="no"/>
                             <accelerator key="d" signal="activate"/>
                           </object>
                         </child>
@@ -290,7 +275,6 @@
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Hero</property>
                     <property name="use_underline">True</property>
-                    <signal name="activate" handler="on_hero_menuitem_activate" swapped="no"/>
                     <child type="submenu">
                       <object class="GtkMenu" id="hero_menuitem_menu">
                         <property name="can_focus">False</property>
@@ -300,7 +284,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Inspect</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_inspect_menuitem_activate" swapped="no"/>
                             <accelerator key="comma" signal="activate"/>
                           </object>
                         </child>
@@ -310,7 +293,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Plant Flag</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_plant_standard_menuitem_activate" swapped="no"/>
                             <accelerator key="f" signal="activate"/>
                           </object>
                         </child>
@@ -320,7 +302,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Levels</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_levels_menuitem_activate" swapped="no"/>
                             <accelerator key="u" signal="activate"/>
                           </object>
                         </child>
@@ -330,7 +311,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Search</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_search_menuitem_activate" swapped="no"/>
                             <accelerator key="z" signal="activate"/>
                           </object>
                         </child>
@@ -382,30 +362,44 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkMenuItem" id="zoom_in_menuitem">
+                          <object class="GtkMenuItem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Zoom In</property>
+                            <property name="label" translatable="yes">Zoom</property>
                             <property name="use_underline">True</property>
-                            <accelerator key="plus" signal="activate" modifiers="GDK_CONTROL_MASK"/>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem" id="zoom_out_menuitem">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Zoom Out</property>
-                            <property name="use_underline">True</property>
-                            <accelerator key="minus" signal="activate" modifiers="GDK_CONTROL_MASK"/>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem" id="best_fit_menuitem">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Reset Zoom</property>
-                            <property name="use_underline">True</property>
-                            <accelerator key="1" signal="activate"/>
+                            <child type="submenu">
+                              <object class="GtkMenu">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkMenuItem" id="zoom_in_menuitem">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Zoom In</property>
+                                    <property name="use_underline">True</property>
+                                    <accelerator key="plus" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkMenuItem" id="zoom_out_menuitem">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Zoom Out</property>
+                                    <property name="use_underline">True</property>
+                                    <accelerator key="minus" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkMenuItem" id="best_fit_menuitem">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Reset Zoom</property>
+                                    <property name="use_underline">True</property>
+                                    <accelerator key="1" signal="activate"/>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
                           </object>
                         </child>
                         <child>
@@ -420,7 +414,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Army Bonus</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_army_bonus_menuitem_activate" swapped="no"/>
                             <accelerator key="o" signal="activate"/>
                           </object>
                         </child>
@@ -430,7 +423,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Items</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_item_bonus_menuitem_activate" swapped="no"/>
                             <accelerator key="t" signal="activate"/>
                           </object>
                         </child>
@@ -482,7 +474,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Ruins</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_ruin_report_menuitem_activate" swapped="no"/>
                             <accelerator key="period" signal="activate"/>
                           </object>
                         </child>
@@ -492,7 +483,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Stack</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_stack_info_menuitem_activate" swapped="no"/>
                             <accelerator key="s" signal="activate"/>
                           </object>
                         </child>
@@ -506,7 +496,6 @@
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">History</property>
                     <property name="use_underline">True</property>
-                    <signal name="activate" handler="on_history_menuitem_activate" swapped="no"/>
                     <child type="submenu">
                       <object class="GtkMenu" id="history_menuitem_menu">
                         <property name="can_focus">False</property>
@@ -516,7 +505,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">City</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_city_history_menuitem_activate" swapped="no"/>
                             <accelerator key="h" signal="activate"/>
                           </object>
                         </child>
@@ -534,7 +522,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Events</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_event_history_menuitem_activate" swapped="no"/>
                             <accelerator key="e" signal="activate"/>
                           </object>
                         </child>
@@ -544,7 +531,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Gold</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_gold_history_menuitem_activate" swapped="no"/>
                             <accelerator key="j" signal="activate"/>
                           </object>
                         </child>
@@ -554,7 +540,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Winners</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_winner_history_menuitem_activate" swapped="no"/>
                             <accelerator key="y" signal="activate"/>
                           </object>
                         </child>
@@ -570,7 +555,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Triumphs</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_triumphs_menuitem_activate" swapped="no"/>
                             <accelerator key="l" signal="activate"/>
                           </object>
                         </child>
@@ -594,7 +578,6 @@
                             <property name="can_focus">False</property>
                             <property name="use_underline">True</property>
                             <property name="use_stock">True</property>
-                            <signal name="activate" handler="on_help_about_activated" swapped="no"/>
                           </object>
                         </child>
                         <child>
@@ -625,7 +608,6 @@
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Turn</property>
                     <property name="use_underline">True</property>
-                    <signal name="activate" handler="on_turn_menuitem_activate" swapped="no"/>
                     <child type="submenu">
                       <object class="GtkMenu" id="turn_menuitem_menu">
                         <property name="can_focus">False</property>
@@ -635,7 +617,6 @@
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">End Turn</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_end_turn_menuitem_activate" swapped="no"/>
                             <accelerator key="E" signal="activate" modifiers="GDK_MOD1_MASK"/>
                           </object>
                         </child>

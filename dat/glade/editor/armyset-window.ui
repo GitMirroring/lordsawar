@@ -169,7 +169,6 @@
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Edit</property>
                 <property name="use_underline">True</property>
-                <signal name="activate" handler="on_edit_menuitem_activate" swapped="no"/>
                 <child type="submenu">
                   <object class="GtkMenu" id="edit_menuitem_menu">
                     <property name="can_focus">False</property>
@@ -234,7 +233,6 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <signal name="activate" handler="on_help_about_activated" swapped="no"/>
                       </object>
                     </child>
                   </object>
