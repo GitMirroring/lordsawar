@@ -2366,12 +2366,8 @@ void MainWindow::update_menuitems ()
 void MainWindow::set_default_bigmap_zoom ()
 {
   Glib::RefPtr<Gdk::Display> d = Gdk::Display::get_default ();
-
-  long double pixels_per_mm =
-    (double) d->get_default_screen ()->get_height () /
-    (double) d->get_monitor_at_window (window->get_window ())->get_height_mm ();
-
-  zoom (BigMap::get_default_zoom_scale (pixels_per_mm));
+  zoom (BigMap::get_default_zoom_scale
+        (d->get_default_screen ()->get_height ()));
 }
 
 void MainWindow::on_best_fit_activated ()
