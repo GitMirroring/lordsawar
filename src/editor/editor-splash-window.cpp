@@ -43,6 +43,7 @@ EditorSplashWindow::EditorSplashWindow()
 int EditorSplashWindow::run()
 {
   bool broken = false;
+  window->set_modal ();
   window->show_all();
   progressbar->property_fraction() = 0.0;
   progressbar->property_text() = _("Loading Army Sets");
