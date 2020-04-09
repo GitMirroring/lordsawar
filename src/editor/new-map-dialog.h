@@ -88,7 +88,7 @@ class NewMapDialog: public LwEditorDialog
 
     void on_fill_style_changed();
     void on_map_size_changed();
-
+    void update_button ();
     void add_fill_style(Tile::Type tile_type);
 
     guint32 get_active_tile_size();

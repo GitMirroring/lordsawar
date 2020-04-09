@@ -40,6 +40,7 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
  : LwEditorDialog(parent, "new-map-dialog.ui")
 {
     map_set = false;
+    fill_style_combobox = NULL;
     
     xml->get_widget("map_size_combobox", map_size_combobox);
     xml->get_widget("width_spinbutton", width_spinbutton);
@@ -223,9 +224,8 @@ void NewMapDialog::run()
 	  map.signposts = int(signposts_scale->get_value());
           map.generate_roads = random_roads_switch->get_active();
           map.random_names = random_names_switch->get_active();
-          map.num_players = int(num_players_spinbutton->get_value());
 	}
-
+      map.num_players = int(num_players_spinbutton->get_value());
       map_set = true;
     }
   else
@@ -240,6 +240,7 @@ void NewMapDialog::on_fill_style_changed()
   random_map_container->set_sensitive(random_selected);
   random_roads_switch->set_sensitive(random_selected);
   random_names_switch->set_sensitive(random_selected);
+  update_button ();
 }
 
 void NewMapDialog::on_map_size_changed()
@@ -318,8 +319,6 @@ void NewMapDialog::on_tile_size_changed()
     }
 
   tile_theme_combobox->set_active(default_id);
-  if (tile_theme_combobox->get_model()->children().size() == 0)
-    accept_button->set_sensitive(false);
 
   army_theme_combobox->remove_all();
   Armysetlist *al = Armysetlist::getInstance();
@@ -336,8 +335,6 @@ void NewMapDialog::on_tile_size_changed()
     }
 
   army_theme_combobox->set_active(default_id);
-  if (army_theme_combobox->get_model()->children().size() == 0)
-    accept_button->set_sensitive(false);
 
   city_theme_combobox->remove_all();
   Citysetlist *cl = Citysetlist::getInstance();
@@ -354,11 +351,54 @@ void NewMapDialog::on_tile_size_changed()
     }
 
   city_theme_combobox->set_active(default_id);
-  if (city_theme_combobox->get_model()->children().size() == 0)
-    accept_button->set_sensitive(false);
+  update_button ();
+}
+
+void NewMapDialog::update_button ()
+{
+  bool sens = true;
+  if (city_theme_combobox->get_model()->children().size() == 0 ||
+      army_theme_combobox->get_model()->children().size() == 0 ||
+      tile_theme_combobox->get_model()->children().size() == 0)
+    sens = false;
+
+  if (fill_style_combobox)
+    {
+      int row = fill_style_combobox->get_active_row_number();
+      assert(row >= 0 && row < int(fill_style.size()));
+      bool random_selected = fill_style[row] == -1;
+      if (random_selected)
+        accept_button->set_label (_("Create Random Map"));
+      else
+        {
+          switch (Tile::Type (fill_style[row]))
+            {
+            case Tile::GRASS:
+              accept_button->set_label (_("Create Grass Map"));
+              break;
+            case Tile::WATER:
+              accept_button->set_label (_("Create Water Map"));
+              break;
+            case Tile::FOREST:
+              accept_button->set_label (_("Create Forest Map"));
+              break;
+            case Tile::HILLS:
+              accept_button->set_label (_("Create Hills Map"));
+              break;
+            case Tile::MOUNTAIN:
+              accept_button->set_label (_("Create Mountains Map"));
+              break;
+            case Tile::SWAMP:
+              accept_button->set_label (_("Create Swamp Map"));
+              break;
+            }
+        }
+    }
+  accept_button->set_sensitive(sens);
 }
 
 NewMapDialog::~NewMapDialog()
 {
   notebook->property_show_tabs () = false;
 }
+

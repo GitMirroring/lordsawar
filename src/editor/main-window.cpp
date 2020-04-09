@@ -583,16 +583,7 @@ void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ust
     Playerlist::getInstance()->setNeutral(neutral);
     Playerlist::getInstance()->nextPlayer();
 
-    // fill the map with tile type
-    Tileset *tset = GameMap::getTileset();
-    for (unsigned int i = 0; i < tset->size(); ++i)
-      {
-        if ((*tset)[i]->getType() == fill_style)
-          {
-            GameMap::getInstance()->fill(i);
-            break;
-          }
-      }
+    GameMap::getInstance()->fill(fill_style);
 
     init_map_state();
     GameMap::getInstance()->calculateBlockedAvenues();
@@ -758,7 +749,7 @@ void MainWindow::clear_map_state()
       delete d_create_scenario_names;
       d_create_scenario_names = NULL;
     }
-    ImageCache::deleteInstance();
+  ImageCache::deleteInstance();
 }
 
 void MainWindow::init_map_state()
