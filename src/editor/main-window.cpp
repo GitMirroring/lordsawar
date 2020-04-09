@@ -906,6 +906,7 @@ void MainWindow::on_new_map_activated()
               pl->syncPlayer(player);
             }
         }
+      Playerlist::getInstance()->setActiveplayer(Playerlist::getInstance()->getNeutral());
       needs_saving = true;
       update_window_title();
     }
