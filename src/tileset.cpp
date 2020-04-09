@@ -624,8 +624,9 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
             {
               if (scale)
                 {
-                  if (roadpics[i]->get_width() != (int)getTileSize())
-                    PixMask::scale(roadpics[i], getTileSize(), getTileSize());
+                  if (roadpics[i]->get_width() != (int)getUnscaledTileSize())
+                    PixMask::scale(roadpics[i], getUnscaledTileSize(),
+                                   getUnscaledTileSize());
                 }
               setRoadImage(i, roadpics[i]);
             }
@@ -643,8 +644,9 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
             {
               if (scale)
                 {
-                  if (stonepics[i]->get_width() != (int)getTileSize())
-                    PixMask::scale(stonepics[i], getTileSize(), getTileSize());
+                  if (stonepics[i]->get_width() != (int)getUnscaledTileSize())
+                    PixMask::scale(stonepics[i], getUnscaledTileSize(),
+                                   getUnscaledTileSize());
                 }
               setStoneImage(i, stonepics[i]);
             }
@@ -661,8 +663,9 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
             {
               if (scale)
                 {
-                  if (bridgepics[i]->get_width() != (int)getTileSize())
-                    PixMask::scale(bridgepics[i], getTileSize(), getTileSize());
+                  if (bridgepics[i]->get_width() != (int)getUnscaledTileSize())
+                    PixMask::scale(bridgepics[i], getUnscaledTileSize(),
+                                   getUnscaledTileSize());
                 }
               setBridgeImage(i, bridgepics[i]);
             }
@@ -679,8 +682,9 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
             {
               if (scale)
                 {
-                  if (fogpics[i]->get_width() != (int)getTileSize())
-                    PixMask::scale(fogpics[i], getTileSize(), getTileSize());
+                  if (fogpics[i]->get_width() != (int)getUnscaledTileSize())
+                    PixMask::scale(fogpics[i], getUnscaledTileSize(),
+                                   getUnscaledTileSize());
                 }
               setFogImage(i, fogpics[i]);
             }
@@ -693,7 +697,8 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
       std::vector<PixMask* > maskpics;
       bool success;
       success =
-        FlagPixMaskCacheItem::loadFlagImages (flags_filename, getTileSize(),
+        FlagPixMaskCacheItem::loadFlagImages (flags_filename,
+                                              getUnscaledTileSize(),
                                               flagpics, maskpics, scale);
       if (success)
         {
@@ -712,7 +717,7 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
     {
       bool success =
         SelectorPixMaskCacheItem::loadSelectorImages (selector_filename, 
-                                                      getTileSize(), 
+                                                      getUnscaledTileSize(), 
                                                       images, masks, scale);
       if (success)
         {
@@ -733,8 +738,8 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
     {
       bool success =
         SelectorPixMaskCacheItem::loadSelectorImages (small_selector_filename, 
-                                                      getTileSize(), images,
-                                                      masks, scale);
+                                                      getUnscaledTileSize(),
+                                                      images, masks, scale);
       if (success)
         {
           setNumberOfSmallSelectorFrames(images.size());
@@ -751,7 +756,7 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
 
 void Tileset::instantiateImages(bool scale, bool &broken)
 {
-  int siz = getTileSize();
+  int siz = getUnscaledTileSize();
   debug("Loading images for Tile Set " << getName());
   uninstantiateImages();
   broken = false;
@@ -897,7 +902,7 @@ bool Tileset::addTileStyleSet(Tile *tile, Glib::ustring filename)
   TileStyle::Type tilestyle_type;
   tilestyle_type = TileStyle::UNKNOWN;
   TileStyleSet *set = 
-    new TileStyleSet(filename, getTileSize(), success, tilestyle_type);
+    new TileStyleSet(filename, getUnscaledTileSize(), success, tilestyle_type);
   if (!success)
     {
       delete set;
@@ -1199,7 +1204,7 @@ bool Tileset::instantiateFlagImages()
           std::vector<PixMask* > flagpics, maskpics;
           bool success =
             FlagPixMaskCacheItem::loadFlagImages (filename,
-                                                  getTileSize(),
+                                                  getUnscaledTileSize(),
                                                   flagpics, maskpics,
                                                   false);
           if (success)
@@ -1231,10 +1236,8 @@ bool Tileset::instantiateSmallSelectorImages()
         {
           std::vector<PixMask* > images, masks;
           bool success =
-            SelectorPixMaskCacheItem::loadSelectorImages (filename, 
-                                                          getTileSize(), 
-                                                          images, masks,
-                                                          false);
+            SelectorPixMaskCacheItem::loadSelectorImages
+            (filename, getUnscaledTileSize(), images, masks, false);
           if (success)
             {
               setNumberOfSmallSelectorFrames(images.size());
@@ -1266,10 +1269,8 @@ bool Tileset::instantiateLargeSelectorImages()
         {
           std::vector<PixMask* > images, masks;
           bool success =
-            SelectorPixMaskCacheItem::loadSelectorImages (filename, 
-                                                          getTileSize(), 
-                                                          images, masks,
-                                                          false);
+            SelectorPixMaskCacheItem::loadSelectorImages
+            (filename, getUnscaledTileSize(), images, masks, false);
           if (success)
             {
               setNumberOfSelectorFrames(images.size());
@@ -1331,7 +1332,7 @@ bool Tileset::instantiateFogImages()
 guint32 Tileset::get_default_tile_size ()
 {
   Tileset *t = new Tileset (1, "");
-  guint32 ts = t->getTileSize ();
+  guint32 ts = t->getUnscaledTileSize ();
   delete t;
   return ts;
 }

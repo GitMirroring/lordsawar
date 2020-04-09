@@ -337,7 +337,7 @@ void Cityset::instantiateImages(Glib::ustring port_filename,
   if (signpost_filename.empty() == false && !broken)
     setSignpostImage (PixMask::create(signpost_filename, broken));
 
-  int citysize = getTileSize() * d_city_tile_width;
+  int citysize = getUnscaledTileSize() * d_city_tile_width;
   if (cities_filename.empty() == false && !broken)
     {
       std::vector<PixMask* > pics;
@@ -384,8 +384,9 @@ void Cityset::instantiateImages(Glib::ustring port_filename,
             {
               if (scale)
                 {
-                  if (pics[i]->get_width() != (int)getTileSize())
-                    PixMask::scale(pics[i], getTileSize(), getTileSize());
+                  if (pics[i]->get_width() != (int)getUnscaledTileSize())
+                    PixMask::scale(pics[i], getUnscaledTileSize(),
+                                   getUnscaledTileSize());
                 }
               setTowerImage(i, pics[i]);
             }
@@ -398,7 +399,7 @@ void Cityset::instantiateImages(Glib::ustring port_filename,
                                                         RUIN_TYPES, broken);
       if (!broken)
         {
-          int ruinsize = getTileSize() * d_ruin_tile_width;
+          int ruinsize = getUnscaledTileSize() * d_ruin_tile_width;
           for (unsigned int i = 0; i < RUIN_TYPES ; i++)
             {
               if (scale)
@@ -417,7 +418,7 @@ void Cityset::instantiateImages(Glib::ustring port_filename,
       pics = disassemble_row(temples_filename, TEMPLE_TYPES, broken);
       if (!broken)
         {
-          int templesize = getTileSize() * d_temple_tile_width;
+          int templesize = getUnscaledTileSize() * d_temple_tile_width;
           for (unsigned int i = 0; i < TEMPLE_TYPES ; i++)
             {
               if (scale)
@@ -937,7 +938,7 @@ bool Cityset::instantiateTowerImages ()
 guint32 Cityset::get_default_tile_size ()
 {
   Cityset *c = new Cityset (1, "");
-  guint32 ts = c->getTileSize ();
+  guint32 ts = c->getUnscaledTileSize ();
   delete c;
   return ts;
 }

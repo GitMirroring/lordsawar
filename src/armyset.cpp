@@ -22,7 +22,6 @@
 
 #include "armyset.h"
 #include "File.h"
-#include "ImageCache.h"
 #include "shield.h"
 #include "gui/image-helpers.h"
 #include "armysetlist.h"
@@ -33,6 +32,7 @@
 #include "ucompose.hpp"
 #include "xmlhelper.h"
 #include "rnd.h"
+#include "player.h"
 
 Glib::ustring Armyset::d_tag = "armyset";
 Glib::ustring Armyset::file_extension = ARMYSET_EXT;
@@ -497,7 +497,7 @@ void Armyset::instantiateImages(bool scale, bool &broken)
     return;
 
   for (iterator it = begin(); it != end(); ++it)
-    (*it)->instantiateImages(getTileSize(), &t, scale, broken);
+    (*it)->instantiateImages(getUnscaledTileSize(), &t, scale, broken);
 
   Glib::ustring ship_filename = "";
   Glib::ustring flag_filename = "";
@@ -569,7 +569,7 @@ void Armyset::loadShipPic(Glib::ustring image_filename, bool scale,
     {
       if (scale)
         {
-          int s = getTileSize();
+          int s = getUnscaledTileSize();
           PixMask::scale(half[0], s, s);
           PixMask::scale(half[1], s, s);
         }
@@ -602,7 +602,7 @@ void Armyset::loadStandardPic(Glib::ustring image_filename, bool scale,
     {
       if (scale)
         {
-          int s = getTileSize();
+          int s = getUnscaledTileSize();
           PixMask::scale(half[0], s, s);
           PixMask::scale(half[1], s, s);
         }
@@ -1054,7 +1054,7 @@ bool Armyset::instantiateShipImage ()
 guint32 Armyset::get_default_tile_size ()
 {
   Armyset *a = new Armyset (1, "");
-  guint32 ts = a->getTileSize ();
+  guint32 ts = a->getUnscaledTileSize ();
   delete a;
   return ts;
 }
