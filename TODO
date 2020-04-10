@@ -43,3 +43,5 @@ d_gender gets saved out twice in a heroproto.  the armyproto also has it.  this 
 figure out 1.65 in smallmap.cpp.
 
 bag not being scaled at all
+
+save in the set editors doesn't work like the scenario builder.  we should always be able to save, even when we don't have a file.  e.g. save is save-as when we need it to be.
