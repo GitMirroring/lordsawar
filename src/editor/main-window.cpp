@@ -875,6 +875,7 @@ void MainWindow::on_new_map_activated()
             }
         }
       Playerlist::getInstance()->setActiveplayer(Playerlist::getInstance()->getNeutral());
+      fill_players ();
       needs_saving = true;
       update_window_title();
     }
