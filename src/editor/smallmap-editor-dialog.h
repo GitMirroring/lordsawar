@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2010, 2012, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include <vector>
 #include <gtkmm.h>
 
+#include "vector.h"
 #include "editablesmallmap.h"
 #include "lw-editor-dialog.h"
 
@@ -43,13 +44,13 @@ class SmallmapEditorDialog: public LwEditorDialog
     Gtk::Grid *terrain_type_table;
     Gtk::Box *building_types_hbox;
     Gtk::RadioButton *road_start_radiobutton;
-    Gtk::Entry *road_start_entry;
-    Gtk::Entry *road_finish_entry;
     Gtk::RadioButton *road_finish_radiobutton;
     Gtk::Button *create_road_button;
     Gtk::Button *clear_points_button;
     Gtk::RadioButton *pointer_radiobutton;
     Gtk::EventBox *map_eventbox;
+    Vector<int> road_start_point;
+    Vector<int> road_finish_point;
 
     struct PointerItem
     {
@@ -92,9 +93,8 @@ class SmallmapEditorDialog: public LwEditorDialog
 
     void update_cursor();
     void update_terrain_buttons();
-
+    void update_road_buttons ();
     Tile::Type get_terrain();
-
 };
 
 #endif

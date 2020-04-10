@@ -57,8 +57,6 @@ SmallmapEditorDialog::SmallmapEditorDialog(Gtk::Window &parent)
     xml->get_widget("building_types_hbox", building_types_hbox);
     xml->get_widget("road_start_radiobutton", road_start_radiobutton);
     road_start_radiobutton->signal_toggled().connect(method(on_road_start_toggled));
-    xml->get_widget("road_start_entry", road_start_entry);
-    xml->get_widget("road_finish_entry", road_finish_entry);
     xml->get_widget("road_finish_radiobutton", road_finish_radiobutton);
     road_finish_radiobutton->signal_toggled().connect(method(on_road_finish_toggled));
     xml->get_widget("create_road_button", create_road_button);
@@ -70,6 +68,9 @@ SmallmapEditorDialog::SmallmapEditorDialog(Gtk::Window &parent)
     setup_terrain_radiobuttons();
     pointer_radiobutton->set_active(true);
     d_needs_saving = false;
+    road_start_point = Vector<int>(-1,-1);
+    road_finish_point = Vector<int>(-1,-1);
+    update_road_buttons ();
 }
 
 void SmallmapEditorDialog::hide()
@@ -121,10 +122,11 @@ void SmallmapEditorDialog::on_create_road_clicked()
     
 void SmallmapEditorDialog::on_clear_points_clicked()
 {
-  road_start_entry->set_text("");
-  road_finish_entry->set_text("");
+  road_start_point = Vector<int>(-1,-1);
+  road_finish_point = Vector<int>(-1,-1);
   smallmap->clear_road();
   pointer_radiobutton->set_active();
+  update_road_buttons ();
 }
     
 void SmallmapEditorDialog::on_road_start_toggled()
@@ -324,20 +326,24 @@ bool SmallmapEditorDialog::on_smallmap_exposed()
 void SmallmapEditorDialog::on_road_start_placed(Vector<int> pos)
 {
   Glib::ustring s = String::ucompose("%1,%2", pos.x, pos.y);
-  road_start_entry->set_text(s);
+  road_start_point = pos;
   pointer_radiobutton->set_active();
   GameMap::getInstance()->calculateBlockedAvenues();
+  update_road_buttons ();
 }
 
 void SmallmapEditorDialog::on_road_finish_placed(Vector<int> pos)
 {
   Glib::ustring s = String::ucompose("%1,%2", pos.x, pos.y);
-  road_finish_entry->set_text(s);
+  road_finish_point = pos;
   pointer_radiobutton->set_active();
+  GameMap::getInstance()->calculateBlockedAvenues();
+  update_road_buttons ();
 }
 
 void SmallmapEditorDialog::on_road_can_be_created(bool create_road)
 {
+  update_road_buttons ();
   create_road_button->set_sensitive(create_road);
 }
       
@@ -370,4 +376,25 @@ void SmallmapEditorDialog::update_terrain_buttons()
       i.button->show_all();
       delete px;
     }
+}
+
+void SmallmapEditorDialog::update_road_buttons ()
+{
+  clear_points_button->set_sensitive
+    (road_start_point != Vector<int>(-1,-1) ||
+     road_finish_point != Vector<int>(-1,-1));
+  create_road_button->set_sensitive
+    (road_start_point != Vector<int>(-1,-1) &&
+     road_finish_point != Vector<int>(-1,-1));
+  if (road_start_point == Vector<int>(-1,-1))
+    road_start_radiobutton->set_label (_("No point set"));
+  else
+    road_start_radiobutton->set_label
+      (String::ucompose (_("%1, %2"), road_start_point.x, road_start_point.y));
+  if (road_finish_point == Vector<int>(-1,-1))
+    road_finish_radiobutton->set_label (_("No point set"));
+  else
+    road_finish_radiobutton->set_label
+      (String::ucompose (_("%1, %2"), road_finish_point.x,
+                         road_finish_point.y));
 }
