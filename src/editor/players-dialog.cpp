@@ -66,8 +66,6 @@ PlayersDialog::PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *rando
 
   xml->get_widget("randomize_gold_button", randomize_gold_button);
   randomize_gold_button->signal_clicked().connect (method(on_randomize_gold_pressed));
-  xml->get_widget("all_players_on_button", all_players_on_button);
-  all_players_on_button->signal_clicked().connect (method(on_all_players_on_pressed));
   xml->get_widget("heroes_button", heroes_button);
   heroes_button->signal_clicked().connect (method(on_edit_heroes_pressed));
   xml->get_widget("player_treeview", player_treeview);
@@ -270,20 +268,6 @@ void PlayersDialog::on_randomize_gold_pressed()
           d_changed = true;
         }
     }
-}
-
-void PlayersDialog::on_all_players_on_pressed()
-{
-  for (Gtk::TreeIter i = player_list->children().begin(),
-       end = player_list->children().end(); i != end; ++i)
-    {
-      (*i)[player_type_columns.type] = HUMAN_PLAYER_TYPE;
-      GameParameters::Player player = to_player (i);
-      Playerlist::getInstance ()->syncPlayer(player);
-      Player *p = Playerlist::getInstance ()->getPlayer(player.id);
-      (*i)[player_columns.player] = p;
-    }
-  d_changed = true;
 }
 
 void PlayersDialog::on_edit_heroes_pressed ()
