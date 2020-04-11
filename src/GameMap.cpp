@@ -1719,10 +1719,20 @@ bool GameMap::containsWater(Rectangle rect)
   return false;
 }
 
+bool GameMap::containsForest(Rectangle rect)
+{
+  for (int y = rect.y; y < rect.y + rect.h; y++)
+    for (int x = rect.x; x < rect.x + rect.w; x++)
+      if (getTile(x, y)->getType() == Tile::FOREST)
+        return true;
+  return false;
+}
+
 bool GameMap::putRuin(Ruin *r)
 {
   Ruinlist::getInstance()->add(r);
-  if (containsWater(r->getArea()))
+  if (containsWater(r->getArea()) ||
+      containsForest (r->getArea ()))
     putTerrain(r->getArea(), Tile::GRASS);
   putBuilding(r, Maptile::RUIN);
   return true;
@@ -1763,7 +1773,9 @@ bool GameMap::removeStone(Vector<int> pos)
 bool GameMap::putStone(Stone *s)
 {
   Stonelist::getInstance()->add(s);
-  putTerrain(s->getArea(), Tile::GRASS);
+  if (containsWater(s->getArea()) ||
+      containsForest (s->getArea ()))
+    putTerrain(s->getArea(), Tile::GRASS);
   if (getBuilding(s->getPos()) != Maptile::ROAD)
     setBuilding(s->getPos(), Maptile::STONE);
   return true;
@@ -1784,7 +1796,8 @@ bool GameMap::removeTemple(Vector<int> pos)
 bool GameMap::putTemple(Temple *t)
 {
   Templelist::getInstance()->add(t);
-  if (containsWater(t->getArea()))
+  if (containsWater(t->getArea()) ||
+      containsForest (t->getArea ()))
     putTerrain(t->getArea(), Tile::GRASS);
   putBuilding(t, Maptile::TEMPLE);
   return true;
@@ -1830,7 +1843,8 @@ bool GameMap::removeSignpost(Vector<int> pos)
 bool GameMap::putSignpost(Signpost *s)
 {
   Signpostlist::getInstance()->add(s);
-  if (containsWater(s->getArea()))
+  if (containsWater(s->getArea()) ||
+      containsForest (s->getArea ()))
     putTerrain(s->getArea(), Tile::GRASS);
   putBuilding(s, Maptile::SIGNPOST);
   return true;
@@ -1936,6 +1950,10 @@ Rectangle GameMap::putTerrain(Rectangle r, Tile::Type type, int tile_style_id, b
           {
             //it's always grass under cities.
             if (t->getBuilding() == Maptile::CITY)
+              t->setIndex(tileset->getIndex(Tile::GRASS));
+            else if (type == Tile::FOREST &&
+                     t->getBuilding() != Maptile::ROAD &&
+                     t->getBuilding() != Maptile::NONE)
               t->setIndex(tileset->getIndex(Tile::GRASS));
             else
               t->setIndex(index);

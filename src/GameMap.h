@@ -1442,6 +1442,7 @@ class GameMap: public sigc::trackable
         //! Callback for item loading used during loading.
         bool loadItems(Glib::ustring tag, XML_Helper* helper);
         bool containsWater (Rectangle rect);
+        bool containsForest (Rectangle rect);
         bool isBlockedAvenue(int x, int y, int destx, int desty);
         bool isDock(Vector<int> pos);
 	void close_circles (int minx, int miny, int maxx, int maxy);
