@@ -28,7 +28,9 @@
             <property name="can_focus">False</property>
             <property name="label" translatable="yes">LordsAWar!</property>
             <attributes>
+              <attribute name="style" value="italic"/>
               <attribute name="weight" value="bold"/>
+              <attribute name="scale" value="2.2999999999999998"/>
             </attributes>
           </object>
           <packing>
@@ -41,9 +43,6 @@
           <object class="GtkBox" id="contents_hbox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <child>
-              <placeholder/>
-            </child>
             <child>
               <object class="GtkProgressBar" id="progressbar">
                 <property name="visible">True</property>
