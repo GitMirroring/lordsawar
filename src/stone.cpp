@@ -199,9 +199,64 @@ std::vector<Stone::Type> Stone::getSuitableTypes (const Road::Type type)
   return stones;
 }
 
+std::vector<Stone::Type> Stone::getSuitableTypes ()
+{
+  std::vector<Stone::Type> stones;
+  stones.push_back (ROAD_E_AND_W_STONE_N);
+  stones.push_back (ROAD_E_AND_W_STONE_S);
+  stones.push_back (ROAD_N_AND_S_STONE_W);
+  stones.push_back (ROAD_N_AND_S_STONE_E);
+  stones.push_back (ROAD_ALL_DIRECTIONS_STONE_NW);
+  stones.push_back (ROAD_ALL_DIRECTIONS_STONE_NE);
+  stones.push_back (ROAD_ALL_DIRECTIONS_STONE_SW);
+  stones.push_back (ROAD_ALL_DIRECTIONS_STONE_SE);
+  stones.push_back (ROAD_N_AND_W_STONE_NW);
+  stones.push_back (ROAD_N_AND_W_STONE_SE);
+  stones.push_back (ROAD_N_AND_E_STONE_NE);
+  stones.push_back (ROAD_N_AND_E_STONE_SW);
+  stones.push_back (ROAD_S_AND_E_STONE_NW);
+  stones.push_back (ROAD_S_AND_E_STONE_SE);
+  stones.push_back (ROAD_W_AND_S_STONE_SW);
+  stones.push_back (ROAD_W_AND_S_STONE_NE);
+  stones.push_back (ROAD_N_AND_S_AND_E_STONE_NE);
+  stones.push_back (ROAD_N_AND_S_AND_E_STONE_SE);
+  stones.push_back (ROAD_N_AND_S_AND_E_STONE_W);
+  stones.push_back (ROAD_E_W_AND_N_STONE_NW);
+  stones.push_back (ROAD_E_W_AND_N_STONE_NE);
+  stones.push_back (ROAD_E_W_AND_N_STONE_S);
+  stones.push_back (ROAD_E_W_AND_S_STONE_SW);
+  stones.push_back (ROAD_E_W_AND_S_STONE_SE);
+  stones.push_back (ROAD_E_W_AND_S_STONE_N);
+  stones.push_back (ROAD_N_S_AND_W_STONE_NW);
+  stones.push_back (ROAD_N_S_AND_W_STONE_SW);
+  stones.push_back (ROAD_N_S_AND_W_STONE_E);
+  stones.push_back (ROAD_W_STONE_N);
+  stones.push_back (ROAD_W_STONE_S);
+  stones.push_back (ROAD_W_STONE_E);
+  stones.push_back (ROAD_N_STONE_W);
+  stones.push_back (ROAD_N_STONE_E);
+  stones.push_back (ROAD_N_STONE_S);
+  stones.push_back (ROAD_E_STONE_N);
+  stones.push_back (ROAD_E_STONE_S);
+  stones.push_back (ROAD_E_STONE_W);
+  stones.push_back (ROAD_S_STONE_W);
+  stones.push_back (ROAD_S_STONE_E);
+  stones.push_back (ROAD_S_STONE_N);
+  return stones;
+}
+
 int Stone::getRandomType (const Road::Type type)
 {
   std::vector<Stone::Type> stones = Stone::getSuitableTypes(type);
+
+  if (stones.empty())
+    return Stone::ROAD_E_AND_W_STONE_N;
+  return stones[Rnd::rand() % stones.size()];
+}
+
+int Stone::getRandomType ()
+{
+  std::vector<Stone::Type> stones = Stone::getSuitableTypes();
 
   if (stones.empty())
     return Stone::ROAD_E_AND_W_STONE_N;

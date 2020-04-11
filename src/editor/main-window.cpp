@@ -102,6 +102,7 @@
 #include "validation-dialog.h"
 #include "font-size.h"
 #include "scenario-list.h"
+#include "CreateScenario.h"
 
 #define method(x) sigc::mem_fun(*this, &MainWindow::x)
 
@@ -597,11 +598,14 @@ void MainWindow::set_random_map(int width, int height,
 				int grass, int water, int swamp, int forest,
 				int hills, int mountains,
 				int cities, int ruins, int temples,
-				int signposts, Glib::ustring tileset,
-				Glib::ustring shieldset, Glib::ustring cityset,
-				Glib::ustring armyset, bool generate_roads,
-                                bool random_names)
+				int signposts, int stones,
+                                int stone_road_chance,
+                                Glib::ustring tileset, Glib::ustring shieldset,
+                                Glib::ustring cityset, Glib::ustring armyset,
+                                bool generate_roads, bool random_names,
+                                NewMapDialog *d)
 {
+    d->setup_progress_bar ();
     clear_map_state();
 
     GameMap::deleteInstance();
@@ -632,11 +636,14 @@ void MainWindow::set_random_map(int width, int height,
     // create a random map
     MapGenerator gen;
         
+    gen.progress.connect (sigc::mem_fun (d, &NewMapDialog::tick_progress));
     // first, fill the generator with data
     gen.setNoCities(cities);
     gen.setNoRuins(ruins);
     gen.setNoTemples(temples);
     gen.setNoSignposts(signposts);
+    gen.setNoStones(stones);
+    gen.setChanceOfStoneOnRoad (stone_road_chance);
     
     // if sum > 100 (percent), divide everything by a factor, the numeric error
     // is said to be grass
@@ -725,6 +732,11 @@ void MainWindow::set_random_map(int width, int height,
         on_random_all_temples_activated();
         on_random_all_signs_activated();
       }
+    if (generate_roads)
+      for (auto pos : gen.getRoadStones ())
+        Stonelist::getInstance ()->add (new Stone (pos));
+    CreateScenario::updateRoadsBridgesAndStones ();
+    redraw ();
 }
 
 void MainWindow::clear_map_state()
@@ -850,13 +862,14 @@ void MainWindow::on_new_map_activated()
   if (d.map_set)
     {
       if (d.map.fill_style == -1)
-        set_random_map(d.map.width, d.map.height,
-                       d.map.grass, d.map.water, d.map.swamp, d.map.forest,
-                       d.map.hills, d.map.mountains,
-                       d.map.cities, d.map.ruins, d.map.temples, 
-                       d.map.signposts, d.map.tileset, 
-                       d.map.shieldset, d.map.cityset, d.map.armyset,
-                       d.map.generate_roads, d.map.random_names);
+        set_random_map (d.map.width, d.map.height,
+                        d.map.grass, d.map.water, d.map.swamp, d.map.forest,
+                        d.map.hills, d.map.mountains,
+                        d.map.cities, d.map.ruins, d.map.temples, 
+                        d.map.signposts, d.map.stones, d.map.stone_road_chance,
+                        d.map.tileset, d.map.shieldset, d.map.cityset,
+                        d.map.armyset, d.map.generate_roads,
+                        d.map.random_names, &d);
       else
         set_filled_map(d.map.width, d.map.height, d.map.fill_style, 
                        d.map.tileset, d.map.shieldset, d.map.cityset,

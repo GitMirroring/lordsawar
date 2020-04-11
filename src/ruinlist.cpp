@@ -28,6 +28,7 @@
 #include "GameMap.h"
 #include "cityset.h"
 #include "citysetlist.h"
+#include "keeper.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -214,5 +215,31 @@ guint32 Ruinlist::countUnamedRuins () const
   for (const_iterator it = begin (); it != end (); it++)
     if ((*it)->getName () == DEFAULT_RUIN_NAME)
       count++;
+  return count;
+}
+
+guint32 Ruinlist::countKeepers () const
+{
+  guint32 count = 0;
+  for (const_iterator it = begin (); it != end (); it++)
+    if ((*it)->getOccupant ())
+      {
+        if ((*it)->getOccupant ()->getStack ())
+          count++;
+      }
+    else
+      count++;
+  return count;
+}
+
+guint32 Ruinlist::countEmptyKeepers () const
+{
+  guint32 count = 0;
+  for (const_iterator it = begin (); it != end (); it++)
+    if ((*it)->getOccupant ())
+      {
+        if ((*it)->getOccupant ()->getStack () == NULL)
+          count++;
+      }
   return count;
 }

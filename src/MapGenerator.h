@@ -3,7 +3,7 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2004 David Barnsdale
 // Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2014 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2014, 2020 Ben Asselstine
 // Copyright (C) 2008 Janek Kozicki
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -72,9 +72,9 @@ class MapGenerator
         MapGenerator();
         ~MapGenerator();
 
-	//! Set the cityset that will be used to generate the map.
+	//! Set the cityset that will be used to generate the map
 	/**
-	 * the cityset tells us how many tiles a city takes up.
+	 * The cityset tells us how many tiles a city takes up.
 	 */
 	void setCityset(Cityset *cs) {cityset = cs;};
 
@@ -84,8 +84,14 @@ class MapGenerator
         //! Set the number of ruins
         int setNoRuins(int noruins);
 
-        //! Set the number of ruins
+        //! Set the number of signs
         int setNoSignposts(int nosignposts);
+
+        //! Set the number of standing stones
+        int setNoStones (int nostones);
+
+        //! Set the 1/x chance of putting a standing stone along the roadside
+        int setChanceOfStoneOnRoad (int chance);
 
         //! Set the number of temples
         int setNoTemples(int notemples);
@@ -109,6 +115,7 @@ class MapGenerator
         //! Get number of temples
         int getNoTemples() const {return d_notemples;}
 
+        std::vector<Vector<int> > getRoadStones () {return d_road_stones;}
 
         /** Creates a map
           * 
@@ -148,7 +155,7 @@ class MapGenerator
          * @param status   A description of what's being generated.
          */
         //! Emitted when the generator generates something
-        sigc::signal<void, double, Glib::ustring> progress;
+        sigc::signal<void, double> progress;
 
     protected:
         //! Fills the terrain map with grass
@@ -199,8 +206,14 @@ class MapGenerator
 	void placeBridge(Vector<int> pos, int type);
         
 
-        //! put standing stones on grassy tiles.
-        void  makeStandingStones();
+        //! Put standing stones on grassy tiles and optionally also roads.
+        /**
+         * @param roads when true, positions for stones along the road are
+         * also obtained.
+         *
+         * @return we return the positions of stones along roadsides.
+         */
+        std::vector<Vector<int> > makeStandingStones(bool roads);
 
         /**
           * Once makeRivers() finds a connection path between two bodies of water
@@ -237,42 +250,41 @@ class MapGenerator
           */
         bool seekPlain(int& x,int& y);
 
-        /** Designates the places where the cities will be by setting characters 
-          * on the building map.  Creates an island if it
-          * finds only water or occupied places.
-          *
-          * @param cities       the number of cities to distribute
-          */
-        void makeCities(int cities);
-
-        //! Returns true if position (x,y) is free for a city
-        bool canPutCity(int x, int y);
-
         //! Places a city at a certain location
-        void putCity(int x, int y, int& city_count);
+        void placeCity(Vector<int> pos);
 
-        /** Designates the location of buildings across the map. Creates an island 
-          * if there is only water or occupied places.
-          *
-          * @param b            the type of the building
-          * @param building     the number of buildings to distribute
-          */
-        void makeBuildings(Maptile::Building b, int building);
+        //! Places a ruin at a certain location
+        void placeRuin(Vector<int> pos);
 
-        //! Returns true if position (x,y) is free for buildings
-        bool canPutBuilding(int x, int y);
+        //! Places a temple at a certain location
+        void placeTemple(Vector<int> pos);
 
-        /** Tries to place a city around a certain position.
-          * 
-          * This function is used internally for placing ports, that
-          * is why some of the parameters may be a bit strange.
-          * 
-          * @param px           x coordinate of position
-          * @param py           y coordinate
-          * @param city_count   increased if the city is placed
-          */
-        bool tryToPlaceCity(int px, int py, int& city_count);
+        //! Places a signpost at a certain location
+        void placeSign (Vector<int> pos);
 
+        //! Designates the location of buildings across the map.
+        /** 
+         * Try to put a building on grass, then if we can't do that convert
+         * some other piece of land to grass and put it there, and if we can't
+         * do that, make an island.  Always watch out that we're not
+         * overlapping buildings.
+         *
+         * @param total        the number of buildings we're putting down
+         * @param width        how many tiles the building takes up, 1x1 2x2
+         * @param place        the method to actually place the building
+         */
+        void makeBuildings(int total, int width,
+                           sigc::slot<void,Vector<int> > place);
+
+        //! Check if we can put a building on the map
+        /**
+         * @param pos           the position on the map to drop the building
+         * @param width         how many tiles the building takes up
+         * @param allowed       which Tile::Types the building can be on
+         * @return              true if placed, false if not
+         */
+        bool canPlaceBuilding(Vector<int> pos, guint32 width, std::vector<Tile::Type> allowed);
+        bool canPutBuildingTile(Vector<int> pos, guint32 width, std::vector<Tile::Type> allowed);
 
         /** Normalizes the terrain
           * 
@@ -325,7 +337,6 @@ class MapGenerator
         std::vector<std::pair < int , Vector<int> > > findBridgePlaces();
 	bool placePort(int x, int y);
 	void calculateBlockedAvenue(int x, int y);
-	bool inhospitableTerrain(int x, int y, unsigned int width);
 
 
         //Data
@@ -337,7 +348,13 @@ class MapGenerator
         int d_height;
         int d_pswamp, d_pwater, d_pforest, d_phills, d_pmountains;
         unsigned int d_nocities, d_notemples, d_noruins, d_nosignposts;
+        unsigned int d_nostones;
+        unsigned int d_stone_road_chance;
 	Cityset *cityset;
+        std::vector<Vector<int> > d_road_stones;
+
+        void placeBldg (Vector<int> pos, Maptile::Building b, guint32 width);
+
 };
 
 #endif

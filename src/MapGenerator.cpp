@@ -3,7 +3,8 @@
 // Copyright (C) 2004 David Barnsdale
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2006-2010, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2017,
+// 2020 Ben Asselstine
 // Copyright (C) 2008 Janek Kozicki
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -22,6 +23,7 @@
 //  02110-1301, USA.
 
 #include <iostream>
+#include <algorithm>
 #include <math.h>  
 #include <set>
 
@@ -52,6 +54,7 @@
 #include "cityset.h"
 #include "overviewmap.h"
 #include "rnd.h"
+#include "signpostlist.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -63,7 +66,8 @@ MapGenerator::MapGenerator()
     //set reasonable default values
     :d_terrain(0), d_building(0), d_pswamp(2), d_pwater(25), d_pforest(3),
     d_phills(5), d_pmountains(5), d_nocities(11), d_notemples(9), d_noruins(20),
-    d_nosignposts(30), cityset(NULL)
+    d_nosignposts(30), d_nostones (40), d_stone_road_chance (ROAD_STONE_CHANCE),
+    cityset(NULL)
 
 {
     d_xdir[0]=0;d_xdir[1]=-1;d_xdir[2]=-1;d_xdir[3]=-1;d_xdir[4]=0;d_xdir[5]=1;d_xdir[6]=1;d_xdir[7]=1;
@@ -105,6 +109,26 @@ int MapGenerator::setNoSignposts(int nosignposts)
 
     int tmp = d_nosignposts;
     d_nosignposts = nosignposts;
+    return tmp;
+}
+
+int MapGenerator::setNoStones (int nostones)
+{
+    if (nostones< 0)
+        return -1;
+
+    int tmp = d_nostones;
+    d_nostones = nostones;
+    return tmp;
+}
+
+int MapGenerator::setChanceOfStoneOnRoad (int chance)
+{
+    if (chance <= 0)
+        return -1;
+
+    int tmp = d_stone_road_chance;
+    d_stone_road_chance = chance;
     return tmp;
 }
 
@@ -150,20 +174,16 @@ void MapGenerator::cleanupRoads()
 }
 
 /** 
- * Generates a random map . The map is stored as a char array of size 
- * 100x100. Each character stands for something. We use :
+ * Generates a random map.  The map is stored as a char array of size 
+ * 100x100 or whatever.  Each character stands for something.  We use:
  * M = mountains
  * h = hills
  * ~ = water
  * $ = forest
  * . = plains
  * _ = swamps
- * C = city/castle
- * r = ruins
- * T = temple
- *   = nothing
- * c = part of city/castle
- * See the TileMapTypes enum at the beginning of the class definition.
+ *
+ * The buildings are handled separately.
  *
  * See printMap() which is used for debugging maps.
  */
@@ -171,6 +191,7 @@ void MapGenerator::makeMap(int width, int height, bool roads)
 {
     d_width = width;
     d_height = height;
+    d_road_stones.clear ();
 
     //initialize terrain and building arrays
     d_terrain = new Tile::Type[width*height];
@@ -183,73 +204,90 @@ void MapGenerator::makeMap(int width, int height, bool roads)
    
     // create the terrain
     debug("flattening plains");
-    progress.emit(.090, _("flattening plains..."));
+    progress.emit(.070);
     makePlains();
+
     debug("raining water");
-    progress.emit(.180, _("raining water..."));
+    progress.emit(.140);
     makeTerrain(Tile::WATER, d_pwater, true);  
     makeStreamer(Tile::WATER, d_pwater/3, 3);
-    rescueLoneTiles(Tile::WATER,Tile::GRASS,true);
+    rescueLoneTiles(Tile::WATER, Tile::GRASS,true);
     makeRivers();
     verifyIslands();
+
     debug("raising hills");
-    progress.emit(.270, _("raising hills..."));
+    progress.emit(.210);
     makeTerrain(Tile::HILLS, d_phills, false);
+
     debug("raising mountains");
-    progress.emit(.360, _("raising mountains..."));
+    progress.emit(.280);
     makeTerrain(Tile::MOUNTAIN, d_pmountains, false);
     makeStreamer(Tile::MOUNTAIN, d_pmountains/3, 3);
     rescueLoneTiles(Tile::MOUNTAIN,Tile::GRASS,false);
     surroundMountains(0, d_width, 0, d_height);
+
     debug("planting forest");
-    progress.emit(.450, _("planting forests..."));
+    progress.emit(.350);
     makeTerrain(Tile::FOREST, d_pforest, false);
+
     debug("watering swamps");
-    progress.emit(.540, _("watering swamps..."));
+    progress.emit(.420);
     makeTerrain(Tile::SWAMP, d_pswamp, false);
+
     debug("normalizing terrain");
-    progress.emit(.630, _("normalizing terrain..."));
+    progress.emit(.490);
     normalize();
 
     // place buildings
     debug("building cities");
-    progress.emit(.720, _("building cities..."));
-    makeCities(d_nocities);
+    progress.emit(.560);
+    makeBuildings (d_nocities, cityset->getCityTileWidth (),
+                   sigc::mem_fun(this, &MapGenerator::placeCity));
 
     if (roads)
       {
 	debug("paving roads");
-	progress.emit(.810, _("paving roads..."));
+	progress.emit(.630);
 	makeRoads();
       }
-    rescueLoneTiles(Tile::MOUNTAIN,Tile::HILLS,false);
 
     debug("ruining ruins");
-    progress.emit(.810, _("ruining ruins..."));
-    makeBuildings(Maptile::RUIN,d_noruins);
+    progress.emit(.700);
+    makeBuildings (d_noruins, cityset->getRuinTileWidth (),
+                   sigc::mem_fun(this, &MapGenerator::placeRuin));
+
     debug("spawning temples");
-    progress.emit(.900, _("spawning temples..."));
-    makeBuildings(Maptile::TEMPLE,d_notemples);
+    progress.emit(.770);
+    makeBuildings (d_notemples, cityset->getTempleTileWidth (),
+                   sigc::mem_fun(this, &MapGenerator::placeTemple));
+
     debug("building bridges");
     if (roads == true)
       {
-        progress.emit(.950, _("building bridges..."));
+        progress.emit(.840);
         makeBridges();
       }
     cleanupRoads();
-    debug("raising signs");
-    progress.emit(.990, _("raising signs..."));
-    makeBuildings(Maptile::SIGNPOST,d_nosignposts);
 
+    debug("raising signs");
+    progress.emit(.910);
+    makeBuildings (d_nosignposts, 1,
+                   sigc::mem_fun(this, &MapGenerator::placeSign));
+
+    rescueLoneTiles(Tile::MOUNTAIN, Tile::HILLS, false);
+
+    progress.emit(.980);
     makeCitiesAccessible();
 
-    makeStandingStones();
+    progress.emit(.990);
+    d_road_stones = makeStandingStones(roads);
 
+    progress.emit(1.0);
     debug("Done making map.");
 }
 
-#define  NORTH_SOUTH_BRIDGE 1
-#define  EAST_WEST_BRIDGE 2
+#define NORTH_SOUTH_BRIDGE 1
+#define EAST_WEST_BRIDGE 2
 
 void MapGenerator::placeBridge(Vector<int> pos, int type)
 {
@@ -306,17 +344,97 @@ bool MapGenerator::canPlaceBridge(Vector<int> pos, int type, Vector<int> &src, V
   return false;
 }
 
-void MapGenerator::makeStandingStones()
+std::vector<Vector<int> > MapGenerator::makeStandingStones(bool also_roads)
 {
+  std::vector<Vector<int> > road_stones;
+  Glib::ustring orig_tileset = GameMap::getInstance()->getTilesetBaseName();
+  Glib::ustring orig_shieldset = GameMap::getInstance()->getShieldsetBaseName();
+  Glib::ustring orig_cityset = GameMap::getInstance()->getCitysetBaseName();
+  Citylist::deleteInstance ();
+  Roadlist::deleteInstance();
+  Ruinlist::deleteInstance ();
+  Templelist::deleteInstance ();
+  Signpostlist::deleteInstance ();
+  Stonelist::deleteInstance();
+
+  GameMap::setWidth(d_width);
+  GameMap::setHeight(d_height);
+  GameMap::getInstance("default", "default", "default")->fill(this);
+
+  //the game map class smooths the map, so let's take what it smoothed.
+  for (int y = 0; y < d_height; y++)
+    for (int x = 0; x < d_width; x++)
+      d_terrain[y*d_width + x] = 
+        GameMap::getInstance()->getTile(x, y)->getType();
+  for (int y = 0; y < d_height; y++)
+    for (int x = 0; x < d_width; x++)
+      {
+        Vector<int> pos = Vector<int>(x,y);
+	if (d_building[y*d_width + x] == Maptile::CITY)
+	  Citylist::getInstance()->add
+	    (new City(pos, cityset->getCityTileWidth()));
+	else if (d_building[y*d_width + x] == Maptile::ROAD)
+	  Roadlist::getInstance()->add(new Road(pos));
+	else if (d_building[y*d_width + x] == Maptile::RUIN)
+	  Ruinlist::getInstance()->add
+	    (new Ruin(pos, cityset->getRuinTileWidth()));
+	else if (d_building[y*d_width + x] == Maptile::TEMPLE)
+	  Templelist::getInstance()->add
+	    (new Temple(pos, cityset->getTempleTileWidth()));
+	else if (d_building[y*d_width + x] == Maptile::SIGNPOST)
+	  Signpostlist::getInstance()->add(new Signpost(pos));
+      }
+
+  std::vector<Vector<int> > grass;
   for (int i = 0; i < d_height; i++)
     for (int j = 0; j < d_width; j++)
-      if (d_terrain[j*d_width + i] == Tile::GRASS &&
-          d_building[j*d_width + i] == Maptile::NONE)
-        {
-          if (Rnd::rand() % GRASS_STONE_CHANCE == 0)
-            d_building[j*d_width + i] = Maptile::STONE;
-        }
+      {
+        Vector<int> pos = Vector<int> (j, i);
+        bool city = Citylist::getInstance ()->getObjectAt (pos) != NULL;
+        bool temple = Templelist::getInstance ()->getObjectAt (pos) != NULL;
+        bool ruin = Ruinlist::getInstance ()->getObjectAt (pos) != NULL;
+        if (d_terrain[i*d_width + j] == Tile::GRASS &&
+            GameMap::getInstance()->getBuilding (pos) == Maptile::NONE &&
+            !city && !temple && !ruin)
+          grass.push_back (pos);
+      }
+
+  std::random_shuffle (grass.begin (), grass.end ());
+  unsigned int limit = d_nostones;
+  if (grass.size () < limit)
+    limit = grass.size ();
+  for (unsigned int k = 0; k < limit; k++)
+    {
+      Vector<int> pos = grass[k];
+      int i = pos.x;
+      int j = pos.y;
+      d_building[j*d_width + i] = Maptile::STONE;
+    }
+
+  if (also_roads && d_stone_road_chance > 0)
+    {
+      std::vector<Vector<int> > roads;
+      for (int i = 0; i < d_height; i++)
+        for (int j = 0; j < d_width; j++)
+          if (d_terrain[i*d_width + j] == Tile::GRASS &&
+              d_building[i*d_width + j] == Maptile::ROAD)
+            roads.push_back (Vector<int>(j, i));
+      for (auto pos : roads)
+        if (Rnd::rand() % d_stone_road_chance == 0)
+          road_stones.push_back (pos);
+    }
+  Roadlist::deleteInstance();
+  Ruinlist::deleteInstance();
+  Templelist::deleteInstance();
+  GameMap::deleteInstance();
+  Citylist::deleteInstance();
+  Signpostlist::deleteInstance();
+  Stonelist::deleteInstance();
+  Bridgelist::deleteInstance();
+  GameMap::getInstance(orig_tileset, orig_shieldset, orig_cityset);
+  return road_stones;
 }
+
 
 void MapGenerator::makeBridges()
 {
@@ -425,7 +543,6 @@ void MapGenerator::makeBridges()
           if (path_leg2)
             delete path_leg2;
         }
-      progress.emit (.950, _("paving bridges..."));
     }
 
   Roadlist::deleteInstance();
@@ -440,36 +557,34 @@ void MapGenerator::makeBridges()
 
 void MapGenerator::printMap(int j, int i)
 {
-    char ch='?';
-    bool adom_convention=true; // well, except mountains
-    switch(d_terrain[j*d_width + i])
+  char ch = '?';
+  switch(d_terrain[j*d_width + i])
     {
-        case Tile::MOUNTAIN:  ch=adom_convention ? 'M' : 'M';break; // mountains
-        case Tile::HILLS   :  ch=adom_convention ? '~' : 'h';break; // hills
-        case Tile::WATER   :  ch=adom_convention ? '=' : '~';break; // water
-        case Tile::FOREST  :  ch=adom_convention ? '&' : '$';break; // forest
-        case Tile::GRASS   :  ch=adom_convention ? '.' : '.';break; // plains
-        case Tile::SWAMP   :  ch=adom_convention ? '"' : '_';break; // swamps
-
-            // cannot print those, actually because they don't exist in Tile::Type
-            //     ch='C';break; // city/castle
-            //     ch='r';break; // ruins
-            //     ch='T';break; // temple
-            //     ch=' ';break; // nothing
-            //     ch='c';break; // part of city/castle
+    case Tile::MOUNTAIN:
+      ch = 'M'; break;
+    case Tile::HILLS:
+      ch = 'h'; break;
+    case Tile::WATER:
+      ch = '~'; break;
+    case Tile::FOREST:
+      ch = '$'; break;
+    case Tile::GRASS:
+      ch = '.'; break;
+    case Tile::SWAMP:
+      ch = '_'; break;
     }
-    std::cout << ch;
+  std::cout << ch;
 }
 
 void MapGenerator::printMap()
 {
-    for(int j = 0; j < d_height; j++)
+  for(int j = 0; j < d_height; j++)
     {
-        for(int i = 0; i < d_width; i++)
-            printMap(j,i);
-        std::cout << "\n";
+      for(int i = 0; i < d_width; i++)
+        printMap(j, i);
+      std::cout << "\n";
     }
-    std::cout << "\n";
+  std::cout << "\n";
 }
 
 const Tile::Type* MapGenerator::getMap(int& width, int& height) const
@@ -1121,186 +1236,146 @@ bool MapGenerator::seekPlain(int& x, int& y)
     return false;
 }
 
-bool MapGenerator::inhospitableTerrain(int x, int y, unsigned int width)
+bool MapGenerator::canPlaceBuilding(Vector<int> pos, guint32 width, std::vector<Tile::Type> allowed)
 {
   for (unsigned int i = 0; i < width; i++)
     for (unsigned int j = 0; j < width; j++)
-      if (d_terrain[(y+i)*d_width +(x+j)] == Tile::WATER ||
-	  d_terrain[(y+i)*d_width +(x+j)] == Tile::MOUNTAIN)
-	return true;
-  return false;
-}
-
-void MapGenerator::makeCities(int cities)
-{
-
-    int city_count = 0;
-    int iterations = 0;
-    
-    // place the cities
-    while(city_count < cities)
-    {
-        int x = Rnd::rand()%(d_width-2);
-        int y = Rnd::rand()%(d_height-2);
-        if (inhospitableTerrain(x, y, cityset->getCityTileWidth()) && (iterations < 1000))
-        {
-            iterations++;
-            continue;
-        }
-        
-        // check if we can put the building
-        if (!canPutCity(x, y) && iterations < 1000)
-        {
-            iterations++;
-            continue;
-        }
-        
-        putCity(x, y, city_count);
-        iterations=0;
-    }
-    
-}
-
-bool MapGenerator::canPutCity(int x,int y)
-{
-  for (unsigned int i = 0; i < cityset->getCityTileWidth(); i++)
-    for (unsigned int j = 0; j < cityset->getCityTileWidth(); j++)
-      if (canPutBuilding(x+i,y+j) == false)
+      if (canPutBuildingTile(pos + Vector<int>(i,j), width, allowed) == false)
         return false;
         
   return true;
 }
 
-void MapGenerator::putCity(int x, int y, int& city_count)
+bool MapGenerator::canPutBuildingTile(Vector<int> pos, guint32 width, std::vector<Tile::Type> allowed)
 {
-        d_building[y*d_width + x] = Maptile::CITY;
+  int found = false;
+  for (auto t : allowed)
+    if (d_terrain[pos.y * d_width + pos.x] == t)
+      {
+        found = true;
+        break;
+      }
+  if (!found)
+    return false;
 
-        //cities shall only sit on grass tiles
-	for (unsigned int i = 0; i < cityset->getCityTileWidth(); i++)
-	  for (unsigned int j = 0; j < cityset->getCityTileWidth(); j++)
-	    d_terrain[(y+i)*d_width + (x+j)] = Tile::GRASS;
-        //cities cannot neighbor with mountain tiles
-        for (int Y = -1; Y <= (int)cityset->getCityTileWidth(); ++Y )
-            for (int X = -1; X <= (int)cityset->getCityTileWidth(); ++X)
-                if (d_terrain[(y+Y)*d_width + x+X] == Tile::MOUNTAIN)
-                    d_terrain[(y+Y)*d_width + x+X] = Tile::HILLS;
+  int tooclose;
+  tooclose = GameMap::calculateTilesPerOverviewMapTile(d_width, d_height);
+  tooclose++;
+  //if the building is close to the map boundaries, return false
+  if (pos.x <= tooclose || pos.x >= (d_width - tooclose) || 
+      pos.y <= tooclose || pos.y >= (d_height - tooclose))
+    return false;
 
-        city_count++;
+  int dist = width + tooclose;
+  //if there is another building too close, return false
+  for (int locx = pos.x - dist; locx <= pos.x + dist; locx++)
+    for (int locy = pos.y - dist; locy <= pos.y + dist; locy++)
+      {
+        if (offmap(locx, locy))
+          continue;
+        if (d_building[locy * d_width + locx] != Maptile::NONE)
+          return false;
+      }  
+  // everything okay here! return true
+  return true;
+
 }
 
-void MapGenerator::makeBuildings(Maptile::Building b, int building)
+void MapGenerator::makeBuildings(int total, int width,
+                                 sigc::slot<void,Vector<int> > place)
 {
-    int i, j, x, y;
-    int iterations = 10;
-    bool found_place = false;
+  int count = 0;
 
-    unsigned int width = 1;
+  std::vector<Vector<int> > points;
 
-    switch (b)
-      {
-      case Maptile::CITY:
-	width = cityset->getCityTileWidth(); break;
-      case Maptile::RUIN:
-	width = cityset->getRuinTileWidth(); break;
-      case Maptile::TEMPLE:
-	width = cityset->getTempleTileWidth(); break;
-      case Maptile::NONE:
-      case Maptile::SIGNPOST:
-      case Maptile::ROAD:
-      case Maptile::STONE:
-      case Maptile::PORT:
-      case Maptile::BRIDGE:
-	width = 1;
-	break;
-      }
+  for (int i = width; i < d_height - width; i++)
+    for (int j = width; j < d_width - width; j++)
+      if (d_building[j*d_width + i] == Maptile::NONE) 
+        points.push_back (Vector<int>(j, i));
+  std::random_shuffle (points.begin (), points.end ());
 
-   //If number of iterations is smaller 10, look for a suitable
-   //place. If this number is exceeded, place the temple on an
-   //island if neccessary.
-    for (i = 0; i < building; i++)
-    {        
-	for (j = 0; j < iterations; j++)
-	{
-             x = Rnd::rand()%d_width;
-             y = Rnd::rand()%d_height;
-        
-	     found_place = true;
-	     for (unsigned int k = 0; k < width; k++)
-	       for (unsigned int l = 0; l < width; l++)
-		 if (canPutBuilding(x+k, y+l) == false)
-		   found_place = false;
+  std::vector<Vector<int> > positions;
+  std::vector<Tile::Type> allowed;
+  for (int phase = 0; phase < 3; phase++)
+    {
+      positions.clear ();
+      switch (phase)
+        {
+        case 0:
+          // first we check the free grassy areas
+          allowed.push_back (Tile::GRASS);
+          break;
+        case 1:
+          // then we check all land
+          allowed.push_back (Tile::FOREST);
+          allowed.push_back (Tile::HILLS);
+          allowed.push_back (Tile::MOUNTAIN);
+          allowed.push_back (Tile::SWAMP);
+          break;
+        case 2:
+          // finally we stoop to making islands
+          allowed.push_back (Tile::WATER);
+          break;
+        }
+      for (auto pos : points)
+        if (canPlaceBuilding (pos, width, allowed))
+          positions.push_back (pos);
 
-	     if (found_place == true)
-	       break;
-	}
+      std::random_shuffle (positions.begin (), positions.end ());
 
-	if (found_place == true)
-	{
-             d_terrain[y*d_width + x] = Tile::GRASS;
-             d_building[y*d_width + x] = b;
-	     found_place = false;
-	}
+      unsigned int limit = total;
+      if (positions.size () + count < limit)
+        limit = positions.size () + count;
+
+      for (unsigned int i = count, j = 0; i < limit; i++, j++)
+        if (canPlaceBuilding (positions[j], width, allowed))
+          {
+            place(positions[j]);
+            count++;
+          }
+      if (count >= total)
+        break;
     }
 }
 
-/** 
- * canPutBuilding
- * Checks if we can put a building at the specified place. 
- * If we are on a square with water, we cannot put it
- * nor if it is too close.
- * Checks for neighboring buildings yet sometimes these
- * are bang next to each other - why?
- * UL: Propably too many tries, then the algorithm forces the
- * building to be placed.
- */
-
-bool MapGenerator::canPutBuilding(int x,int y)
+void MapGenerator::placeBldg (Vector<int> pos, Maptile::Building b,
+                              guint32 width)
 {
-    // if the building is on water or mountains, return false
-    if (d_terrain[y*d_width +x] != Tile::GRASS )
-        return false;
+  int y = pos.y;
+  int x = pos.x;
+  d_building[y*d_width + x] = b;
 
-    int tooclose;
-    tooclose = GameMap::calculateTilesPerOverviewMapTile(d_width, d_height);
-    tooclose++;
-    //if the building is close to the map boundaries, return false
-    if (x <= tooclose || x >= (d_width - tooclose) || 
-        y <= tooclose || y >= (d_height - tooclose))
-        return false;
+  //ruins shall only sit on grass tiles
+  for (unsigned int i = 0; i < width; i++)
+    for (unsigned int j = 0; j < width; j++)
+      d_terrain[(y+i)*d_width + (x+j)] = Tile::GRASS;
 
-    int dist = (int)cityset->getCityTileWidth() + tooclose;
-    //if there is another building too close, return false
-    for (int locx = x-dist; locx <= x+dist; locx++)
-        for (int locy = y-dist; locy <= y+dist; locy++)
-        {
-            if (offmap(locx, locy))
-                continue;
-            if (d_building[locy*d_width + locx] != Maptile::NONE)
-                return false;
-        }  
-    // everything okay here! return true
-    return true;
-    
+  //ruins cannot neighbor with mountain tiles
+  for (int Y = -1; Y <= (int)width; ++Y )
+    for (int X = -1; X <= (int)width; ++X)
+      if (d_terrain[(y+Y)*d_width + x+X] == Tile::MOUNTAIN)
+        d_terrain[(y+Y)*d_width + x+X] = Tile::HILLS;
 }
 
-bool MapGenerator::tryToPlaceCity(int px,int py ,int& city_count)
+void MapGenerator::placeCity(Vector<int> pos)
 {
-    // first, try to place the city at the given location
-    if (canPutCity(px, py))
-    { 
-        putCity(px, py, city_count);
-        return true;
-    } 
-    
-    // else try all surrounding squares
-    for (int dir = 0; dir < 8; dir++)
-        if (canPutCity(px + d_xdir[dir], py + d_ydir[dir]))
-        {
-            putCity(px + d_xdir[dir], py + d_ydir[dir], city_count);
-            return true;
-        }
+  placeBldg (pos, Maptile::CITY, cityset->getCityTileWidth ());
+}
 
-    return false;                   
+
+void MapGenerator::placeRuin(Vector<int> pos)
+{
+  placeBldg (pos, Maptile::RUIN, cityset->getRuinTileWidth ());
+}
+
+void MapGenerator::placeTemple (Vector<int> pos)
+{
+  placeBldg (pos, Maptile::TEMPLE, cityset->getTempleTileWidth ());
+}
+
+void MapGenerator::placeSign (Vector<int> pos)
+{
+  placeBldg (pos, Maptile::SIGNPOST, 1);
 }
 
 void MapGenerator::normalize()
@@ -1718,7 +1793,6 @@ void MapGenerator::makeRoads()
           if (roads_built > Citylist::getInstance()->size()/3)
             break;
         }
-      progress.emit(.810, _("paving roads..."));
     }
 
   Roadlist::deleteInstance();

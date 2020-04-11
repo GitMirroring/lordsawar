@@ -178,8 +178,6 @@ const Glib::ustring DEFAULT_CONFIG_FILENAME = "lordsawarrc";
 
 //1 in x chance of standing stone being on a road tile for random map.
 const unsigned int ROAD_STONE_CHANCE = 150;
-//1 in x chance of standing stone being on a grass tile for random map.
-const unsigned int GRASS_STONE_CHANCE = 1500;
 
 //how tall an army icon appears on a dialog relative to default font height
 const double DIALOG_ARMY_PIC_FONTSIZE_MULTIPLE = 3.636363634;

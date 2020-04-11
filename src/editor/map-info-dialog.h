@@ -42,6 +42,20 @@ class MapInfoDialog: public LwEditorDialog
     Gtk::TextView *license_textview;
     Gtk::Notebook *notebook;
     GameScenario *game_scenario;
+    Gtk::Label *cities_label;
+    Gtk::Label *ruins_label;
+    Gtk::Label *temples_label;
+    Gtk::Label *signposts_label;
+    Gtk::Label *stones_label;
+    Gtk::Label *ports_label;
+    Gtk::Label *roads_label;
+    Gtk::Label *bridges_label;
+    Gtk::Label *stacks_label;
+    Gtk::Label *armies_label;
+    Gtk::Label *keepers_label;
+    Gtk::Label *items_label;
+    Gtk::Label *rewards_label;
+    Gtk::Label *bags_label;
 
     void on_name_changed();
     void on_copyright_changed ();

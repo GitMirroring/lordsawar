@@ -548,6 +548,9 @@ class GameMap: public sigc::trackable
          */
 	static MapBackpack *getBackpack(Vector<int> pos);
 
+        //! Return how many bags of stuff there are on the map.
+        static guint32 countBags ();
+
         /** Check if the given Stack is able to search the Maptile it is on.
          *
          * @param stack A pointer to the stack to check if it can search.

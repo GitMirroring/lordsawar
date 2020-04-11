@@ -179,8 +179,14 @@ class Stone: public Location
         //! Returns a random suitable stone type for a given road type.
         static int getRandomType (const Road::Type type);
 
+        //! Returns a random suitable stone type for the field.
+        static int getRandomType ();
+
         //! Returns which stone types are suitable for a given road type.
         static std::vector<Stone::Type> getSuitableTypes (const Road::Type type);
+        //! Returns which stone types are suitable for being in the field.
+        static std::vector<Stone::Type> getSuitableTypes ();
+
         static std::vector<Stone::Type> getTypes ();
     protected:
 

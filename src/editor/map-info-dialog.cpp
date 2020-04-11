@@ -26,6 +26,19 @@
 #include "defs.h"
 #include "signpost.h"
 #include "GameScenario.h"
+#include "citylist.h"
+#include "ruinlist.h"
+#include "templelist.h"
+#include "signpostlist.h"
+#include "stonelist.h"
+#include "portlist.h"
+#include "roadlist.h"
+#include "bridgelist.h"
+#include "playerlist.h"
+#include "stacklist.h"
+#include "Itemlist.h"
+#include "rewardlist.h"
+#include "GameMap.h"
 
 #define method(x) sigc::mem_fun(*this, &MapInfoDialog::x)
 
@@ -51,6 +64,54 @@ MapInfoDialog::MapInfoDialog(Gtk::Window &parent, GameScenario *g)
   license_textview->get_buffer()->signal_changed().connect
     (method(on_license_changed));
   xml->get_widget ("notebook", notebook);
+  xml->get_widget ("cities_label", cities_label);
+  xml->get_widget ("ruins_label", ruins_label);
+  xml->get_widget ("temples_label", temples_label);
+  xml->get_widget ("signposts_label", signposts_label);
+  xml->get_widget ("stones_label", stones_label);
+  xml->get_widget ("ports_label", ports_label);
+  xml->get_widget ("roads_label", roads_label);
+  xml->get_widget ("bridges_label", bridges_label);
+  xml->get_widget ("stacks_label", stacks_label);
+  xml->get_widget ("armies_label", armies_label);
+  xml->get_widget ("keepers_label", keepers_label);
+  xml->get_widget ("items_label", items_label);
+  xml->get_widget ("rewards_label", rewards_label);
+  xml->get_widget ("bags_label", bags_label);
+  cities_label->property_label () =
+    String::ucompose ("%1", Citylist::getInstance()->size ());
+  ruins_label->property_label () =
+    String::ucompose ("%1", Ruinlist::getInstance()->size ());
+  temples_label->property_label () =
+    String::ucompose ("%1", Templelist::getInstance()->size ());
+  signposts_label->property_label () =
+    String::ucompose ("%1", Signpostlist::getInstance()->size ());
+  stones_label->property_label () =
+    String::ucompose ("%1", Stonelist::getInstance()->size ());
+  ports_label->property_label () =
+    String::ucompose ("%1", Portlist::getInstance()->size ());
+  roads_label->property_label () =
+    String::ucompose ("%1", Roadlist::getInstance()->size ());
+  bridges_label->property_label () =
+    String::ucompose ("%1", Bridgelist::getInstance()->size ());
+  stacks_label->property_label () =
+    String::ucompose ("%1", Playerlist::getInstance()->countAllStacks ());
+  armies_label->property_label () =
+    String::ucompose ("%1", Stacklist::getNoOfArmies ());
+  guint32 num_empty = Ruinlist::getInstance()->countEmptyKeepers ();
+  if (!num_empty)
+    keepers_label->property_label () =
+      String::ucompose ("%1", Ruinlist::getInstance()->countKeepers ());
+  else
+    keepers_label->property_label () =
+      String::ucompose (_("%1, %2 empty"),
+                        Ruinlist::getInstance()->countKeepers (), num_empty);
+  items_label->property_label () =
+    String::ucompose ("%1", Itemlist::getInstance ()->size ());
+  rewards_label->property_label () =
+    String::ucompose ("%1", Rewardlist::getInstance ()->size ());
+  bags_label->property_label () =
+    String::ucompose ("%1", GameMap::countBags ());
 }
 
 bool MapInfoDialog::run()

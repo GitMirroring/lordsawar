@@ -38,6 +38,7 @@ class Player;
 class Signpost;
 class Ruin;
 class RoadEditorTip;
+class NewMapDialog;
 
 #include "UniquelyIdentified.h"
 
@@ -222,11 +223,13 @@ class MainWindow: public sigc::trackable
 			Glib::ustring cityset, Glib::ustring armyset);
     void set_random_map(int width, int height,
 			int grass, int water, int swamp, int forest,
-			int hills, int mountains,
-			int cities, int ruins, int temples, int signposts,
-			Glib::ustring tileset, Glib::ustring shieldset,
-			Glib::ustring cityset, Glib::ustring armyset,
-                        bool generate_roads, bool random_names);
+			int hills, int mountains, int cities, int ruins,
+                        int temples, int signposts, int stones,
+                        int stone_road_chance,
+                        Glib::ustring tileset, Glib::ustring shieldset,
+                        Glib::ustring cityset, Glib::ustring armyset,
+                        bool generate_roads, bool random_names,
+                        NewMapDialog *d);
 
     void clear_map_state();
     void init_map_state();

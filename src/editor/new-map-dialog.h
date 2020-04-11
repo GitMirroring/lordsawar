@@ -37,26 +37,32 @@ class NewMapDialog: public LwEditorDialog
     void run();
 
     struct Map
-    {
-	int fill_style;
-	int width, height;
-	int grass, water, swamp, forest, hills, mountains;
-	int cities, ruins, temples;
-	int signposts;
-	Glib::ustring tileset;
-	Glib::ustring shieldset;
-	Glib::ustring cityset;
-	Glib::ustring armyset;
+      {
+        int fill_style;
+        int width, height;
+        int grass, water, swamp, forest, hills, mountains;
+        int cities, ruins, temples;
+        int signposts, stones;
+        Glib::ustring tileset;
+        Glib::ustring shieldset;
+        Glib::ustring cityset;
+        Glib::ustring armyset;
         bool generate_roads;
         bool random_names;
         int num_players;
-    };
+        int stone_road_chance;
+      };
 
     Map map;
     
     bool map_set;
     
+    void setup_progress_bar ();
+    void tick_progress (double p);
+
  private:
+  
+    Gtk::Box *dialog_vbox;
     Gtk::ComboBox *map_size_combobox;
     Gtk::SpinButton *width_spinbutton;
     Gtk::SpinButton *height_spinbutton;
@@ -77,10 +83,12 @@ class NewMapDialog: public LwEditorDialog
     Gtk::Scale *ruins_scale;
     Gtk::Scale *temples_scale;
     Gtk::Scale *signposts_scale;
+    Gtk::Scale *stones_scale;
     Gtk::Button *accept_button;
     Gtk::Switch *random_roads_switch;
     Gtk::Switch *random_names_switch;
     Gtk::SpinButton *num_players_spinbutton;
+    Gtk::SpinButton *stone_road_spinbutton;
     Gtk::Notebook *notebook;
 
     enum { MAP_SIZE_NORMAL = 0, MAP_SIZE_SMALL, MAP_SIZE_TINY, 
@@ -88,12 +96,26 @@ class NewMapDialog: public LwEditorDialog
 
     void on_fill_style_changed();
     void on_map_size_changed();
+    void on_random_roads_toggled ();
     void update_button ();
     void add_fill_style(Tile::Type tile_type);
 
     guint32 get_active_tile_size();
     void on_tile_size_changed();
     std::vector<int> fill_style;
+
+    Gtk::TreeView *progress_treeview;
+
+    class ProgressModelColumns : public Gtk::TreeModel::ColumnRecord
+      {
+    public:
+        ProgressModelColumns ()
+          { add (perc);}
+        Gtk::TreeModelColumn<int> perc;
+      };
+    ProgressModelColumns progress_columns;
+    Glib::RefPtr<Gtk::ListStore> progress_liststore;
+    Gtk::TreeModel::Row progress_row;
 };
 
 #endif

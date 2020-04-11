@@ -42,6 +42,7 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
     map_set = false;
     fill_style_combobox = NULL;
     
+    xml->get_widget("dialog-vbox", dialog_vbox);
     xml->get_widget("map_size_combobox", map_size_combobox);
     xml->get_widget("width_spinbutton", width_spinbutton);
     xml->get_widget("height_spinbutton", height_spinbutton);
@@ -56,10 +57,14 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
     xml->get_widget("ruins_scale", ruins_scale);
     xml->get_widget("temples_scale", temples_scale);
     xml->get_widget("signposts_scale", signposts_scale);
+    xml->get_widget("stones_scale", stones_scale);
     xml->get_widget("accept_button", accept_button);
     xml->get_widget("random_roads_switch", random_roads_switch);
+    random_roads_switch->property_active().signal_changed().connect
+      (method(on_random_roads_toggled));
     xml->get_widget("random_names_switch", random_names_switch);
     xml->get_widget("num_players_spinbutton", num_players_spinbutton);
+    xml->get_widget("stone_road_spinbutton", stone_road_spinbutton);
     xml->get_widget ("notebook", notebook);
 
     // fill in tile themes combobox
@@ -153,6 +158,7 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
     forest_scale->set_value(3);
     hills_scale->set_value(5);
     signposts_scale->set_value(20);
+    stones_scale->set_value(40);
     mountains_scale->set_value(5);
     on_map_size_changed();
     width_spinbutton->set_value (MAP_SIZE_NORMAL_WIDTH);
@@ -160,6 +166,8 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
 
     random_names_switch->set_active(true);
     num_players_spinbutton->set_value(8);
+    stone_road_spinbutton->set_value (ROAD_STONE_CHANCE);
+    stone_road_spinbutton->set_sensitive (false);
 }
 
 void NewMapDialog::run()
@@ -222,8 +230,10 @@ void NewMapDialog::run()
 	  map.ruins = int(ruins_scale->get_value());
 	  map.temples = int(temples_scale->get_value());
 	  map.signposts = int(signposts_scale->get_value());
+	  map.stones = int(stones_scale->get_value());
           map.generate_roads = random_roads_switch->get_active();
           map.random_names = random_names_switch->get_active();
+          map.stone_road_chance = int(stone_road_spinbutton->get_value());
 	}
       map.num_players = int(num_players_spinbutton->get_value());
       map_set = true;
@@ -397,8 +407,40 @@ void NewMapDialog::update_button ()
   accept_button->set_sensitive(sens);
 }
 
+void NewMapDialog::on_random_roads_toggled ()
+{
+  stone_road_spinbutton->set_sensitive (random_roads_switch->get_active ());
+}
+
+void NewMapDialog::setup_progress_bar ()
+{
+  progress_treeview = Gtk::manage (new Gtk::TreeView ());
+  progress_treeview->property_headers_visible () = false;
+  progress_liststore = Gtk::ListStore::create(progress_columns);
+  progress_treeview->set_model (progress_liststore);
+  progress_row = *(progress_liststore->append());
+  auto cell = Gtk::make_managed<Gtk::CellRendererProgress>();
+  cell->property_text () = "";
+  int cols_count = progress_treeview->append_column ("progress", *cell);
+  auto pColumn = progress_treeview->get_column(cols_count -1);
+  if (pColumn)
+    pColumn->add_attribute(cell->property_value (), progress_columns.perc);
+
+  dialog_vbox->pack_end (*progress_treeview, true, true);
+  dialog_vbox->show_all ();
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
+  dialog_vbox->set_sensitive(false);
+}
+
+void NewMapDialog::tick_progress (double p)
+{
+  if (!progress_treeview)
+    return;
+  progress_row[progress_columns.perc] = p * 100.0;
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
+}
+
 NewMapDialog::~NewMapDialog()
 {
   notebook->property_show_tabs () = false;
 }
-

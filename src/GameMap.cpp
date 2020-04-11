@@ -2708,3 +2708,16 @@ Signpost* GameMap::getSignpost(Movable *m)
 {
   return getSignpost(m->getPos());
 }
+
+guint32 GameMap::countBags ()
+{
+  guint32 count = 0;
+  for (int i = 0; i < s_width; i++)
+    for (int j = 0; j < s_height; j++)
+      {
+        MapBackpack *bag = getBackpack (Vector<int>(i, j));
+        if (bag && bag->empty () == false)
+          count++;
+      }
+  return count;
+}

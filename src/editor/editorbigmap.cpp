@@ -658,9 +658,7 @@ void EditorBigMap::smooth_view()
 {
   GameMap::getInstance()->applyTileStyles(view.y, view.x, view.y+view.h, 
 					  view.x+view.w, true);
-  Roadlist::iterator i = Roadlist::getInstance()->begin();
-  for (; i != Roadlist::getInstance()->end(); i++)
-    (*i)->setType(CreateScenario::calculateRoadType((*i)->getPos()));
+  CreateScenario::updateRoadsBridgesAndStones ();
   draw();
 }
 

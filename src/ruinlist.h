@@ -144,6 +144,12 @@ class Ruinlist : public LocationList<Ruin*>, public sigc::trackable
         //! Count the number of ruins that have the default name.
         guint32 countUnamedRuins () const;
 
+        //! Count the ruins that have a defender.
+        guint32 countKeepers () const;
+
+        //! Count the ruins that don't have a defender.
+        guint32 countEmptyKeepers () const;
+
 	// Static Methods
         
 	//! Returns the singleton instance.  Creates a new one if required.

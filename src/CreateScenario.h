@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2006, 2007, 2008, 2009, 2012, 2014, 2015 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2012, 2014, 2015, 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -81,6 +81,9 @@ class CreateScenario : public CreateScenarioRandomize
         //! Set the number of signposts on the map
         void setNoSignposts(int number);
 
+        //! Set the number of standing stones on the map
+        void setNoStones(int number);
+
         //! Set the number of temples
         void setNoTemples(int number);
 
@@ -132,11 +135,17 @@ class CreateScenario : public CreateScenarioRandomize
 
 	MapGenerator *getGenerator() const {return d_generator;};
 	static int calculateRoadType (Vector<int> t);
+	static int calculateBridgeType (Vector<int> t);
+        static int calculateStoneType (Vector<int> t);
         
         //! Emitted when the generator generates something
 	sigc::signal<void> progress;
 
         static int calculateNumberOfSignposts(int width, int height, int grass);
+
+        //! Determine the types for roads/bridges and standing stones.
+        static void updateRoadsBridgesAndStones();
+
     private:
         //! Creates the map and distributes cities, temples and ruins
         bool createMap();
@@ -159,6 +168,9 @@ class CreateScenario : public CreateScenarioRandomize
 			int no_guardian_factor, int stronghold_factor);
 
 
+        //! Set up standing stones along roads and in the field
+        static bool setupStandingStones(std::vector<Vector<int> > road_stones);
+
 	//! Set up the standard set of items
 	bool setupItems();
 
@@ -172,9 +184,8 @@ class CreateScenario : public CreateScenarioRandomize
 	//! and if we're not playing with diplomacy we start out at war.
         bool setupPlayers(bool random_turns, int base_gold);
 
-	bool setupRoads();
-        void setupStandingStonesOnRoads();
-	bool setupBridges();
+	static bool setupRoads();
+	static bool setupBridges();
 
 	void quickStart();
 

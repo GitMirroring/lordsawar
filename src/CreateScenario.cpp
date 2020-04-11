@@ -2,7 +2,8 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006-2010, 2012, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2017,
+// 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -98,7 +99,8 @@ CreateScenario::CreateScenario(int width, int height)
     setHeight(height);
 
     d_generator = new MapGenerator();
-    d_generator->progress.connect (sigc::hide(sigc::hide(sigc::mem_fun(*this, &CreateScenario::on_progress))));
+    d_generator->progress.connect
+      (sigc::hide(sigc::mem_fun(*this, &CreateScenario::on_progress)));
 }
 
 CreateScenario::~CreateScenario()
@@ -184,6 +186,13 @@ void CreateScenario::setNoSignposts (int nosignposts)
     debug("CreateScenario::setNoSignposts")
 
     d_generator->setNoSignposts(nosignposts);
+}
+
+void CreateScenario::setNoStones (int nostones)
+{
+    debug("CreateScenario::setNoStones")
+
+    d_generator->setNoStones(nostones);
 }
 
 void CreateScenario::setNoTemples(int notemples)
@@ -306,6 +315,9 @@ bool CreateScenario::create(const GameParameters &g)
   if (!setupBridges())
     return false;
 
+  if (!setupStandingStones(d_generator->getRoadStones ()))
+    return false;
+
   if (!distributePlayers())
     return false;
 
@@ -319,22 +331,7 @@ bool CreateScenario::create(const GameParameters &g)
   if (!setupSignposts(signpost_ratio))
     return false;
 
-  setupStandingStonesOnRoads();
   return true;
-}
-
-void CreateScenario::setupStandingStonesOnRoads()
-{
-  for (auto r : *Roadlist::getInstance())
-    {
-      if (Rnd::rand() % ROAD_STONE_CHANCE == 0)
-        {
-          Stone *stone =
-            new Stone (r->getPos(),
-                       Stone::getRandomType(Road::Type(r->getType())));
-          Stonelist::getInstance()->add(stone);
-        }
-    }
 }
 
 bool CreateScenario::dump(Glib::ustring filename) const
@@ -591,6 +588,24 @@ bool CreateScenario::setupSignposts(int ratio)
   return true;
 }
 
+bool CreateScenario::setupStandingStones(std::vector<Vector<int> > road_stones)
+{
+  for (auto s : *Stonelist::getInstance ())
+    s->setType (CreateScenario::calculateStoneType(s->getPos ()));
+
+  for (auto pos : road_stones)
+    {
+      Road *r = Roadlist::getInstance()->getObjectAt (pos);
+      if (r)
+        {
+          int type = CreateScenario::calculateStoneType(r->getPos ());
+          Stonelist::getInstance ()->add (new Stone (pos, type));
+        }
+    }
+  return true;
+}
+
+
 bool CreateScenario::setupPlayers(bool random_turns, 
 				  int base_gold)
 {
@@ -687,6 +702,20 @@ void CreateScenario::getCityDifficulty(int difficulty,
     *number_of_armies_factor = 0;
 }
 
+int CreateScenario::calculateStoneType (Vector<int> t)
+{
+  Road *r = Roadlist::getInstance()->getObjectAt(t);
+  if (r)
+    return Stone::getRandomType(Road::Type(r->getType()));
+  else
+    return Stone::getRandomType();
+}
+
+int CreateScenario::calculateBridgeType (Vector<int> t)
+{
+  return Bridgelist::getInstance()->calculateType(t);
+}
+
 int CreateScenario::calculateRoadType (Vector<int> t)
 {
     // examine neighbour tiles to discover whether there's a road or
@@ -757,3 +786,14 @@ int CreateScenario::calculateNumberOfSignposts(int width, int height, int grass)
   int area = width * height;
   return int(area * (grass / 100.0) * SIGNPOST_FREQUENCY);
 }
+
+void CreateScenario::updateRoadsBridgesAndStones()
+{
+  for (auto i : *Roadlist::getInstance ())
+    i->setType(CreateScenario::calculateRoadType(i->getPos()));
+  for (auto i : *Bridgelist::getInstance ())
+    i->setType(CreateScenario::calculateBridgeType(i->getPos()));
+  for (auto i : *Stonelist::getInstance ())
+    i->setType(CreateScenario::calculateStoneType(i->getPos()));
+}
+
