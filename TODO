@@ -27,21 +27,21 @@ upload to dl.sv.gnu.org.  cd /releases/lordsawar
 gtk 4, use Gtk::Overlay with Gtk::Image to make our tiles.
 
 
-in the editor, images that we supply for graphics need to have a width that is a multiple of the height.  we're only doing that for tilestylesets right now but the policy could be more widely applied to prevent garbage in garbage out.
+in the editor, images that we supply for graphics often need to have a width that is a multiple of the height.  we're only doing that for tilestylesets right now but the policy could be more widely applied to prevent garbage in garbage out.
 
 when we get a networked game and add the tilesets, etc to our personal collection, we need to ensure a unique name
 
-3x3 forests in the editor causes crazy tiles.  not being smoothed properly.
+3x3 forests in the editor can cause crazy tiles.  not being smoothed properly.
 
 should we do anything when an armyset, etc gets removed from disk after it is loaded
 
 add a way to reset the hero names in the editor, and items, and player names.
-i guess there's the larger issue of 'undo' in the editor.
+i guess there's the larger issue of 'undo'.
 
 d_gender gets saved out twice in a heroproto.  the armyproto also has it.  this doesn't seem to hurt anything but it should probably be gotten to the bottom of.
 
-figure out 1.65 in smallmap.cpp.
+figure out the mysterious 1.65 number in smallmap.cpp.
 
-bag not being scaled at all
+bag not being scaled at all in armyset.  should it be?  it sticks out.
 
 save in the set editors doesn't work like the scenario builder.  we should always be able to save, even when we don't have a file.  e.g. save is save-as when we need it to be.
