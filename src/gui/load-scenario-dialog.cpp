@@ -32,7 +32,8 @@
 #define method(x) sigc::mem_fun(*this, &LoadScenarioDialog::x)
 
 LoadScenarioDialog::LoadScenarioDialog(Gtk::Window &parent)
- : LwDialog(parent, "load-scenario-dialog.ui")
+ : LwDialog(parent, "load-scenario-dialog.ui"),
+    name_column("", name_renderer)
 {
   xml->get_widget("description_textview", description_textview);
   xml->get_widget("load_button", load_button);
@@ -43,7 +44,6 @@ LoadScenarioDialog::LoadScenarioDialog(Gtk::Window &parent)
   scenarios_list = Gtk::ListStore::create(scenarios_columns);
   xml->get_widget("treeview", scenarios_treeview);
   scenarios_treeview->set_model(scenarios_list);
-  scenarios_treeview->append_column("", scenarios_columns.name);
 
   xml->get_widget("add_scenario_button", add_scenario_button);
   add_scenario_button->signal_clicked().connect
@@ -58,8 +58,11 @@ LoadScenarioDialog::LoadScenarioDialog(Gtk::Window &parent)
   // add the scenarios
   Gtk::TreeIter i = scenarios_list->append();
   (*i)[scenarios_columns.filename] = "random.map";
-  (*i)[scenarios_columns.name] = _("Random Scenario");
   (*i)[scenarios_columns.details] = NULL;
+
+  name_renderer.property_editable() = false;
+  name_column.set_cell_data_func(name_renderer, method(cell_data_name));
+  scenarios_treeview->append_column(name_column);
 
   for (auto j : *ScenarioList::getInstance ())
     add_scenario (j);
@@ -68,6 +71,25 @@ LoadScenarioDialog::LoadScenarioDialog(Gtk::Window &parent)
   row = scenarios_treeview->get_model()->children()[0];
   if(row)
     scenarios_treeview->get_selection()->select(row);
+}
+
+void LoadScenarioDialog::cell_data_name(Gtk::CellRenderer *renderer,
+                                        const Gtk::TreeIter& i)
+{
+  ScenarioDetails *details = (*i)[scenarios_columns.details];
+
+  if (details == NULL)
+    dynamic_cast<Gtk::CellRendererText*>(renderer)->property_text () =
+      _("Random Scenario");
+  else
+    {
+      if (details->getName () == "")
+        dynamic_cast<Gtk::CellRendererText*>(renderer)->property_markup () =
+          "<i>" + _("(untitled)") + "</i>";
+      else
+        dynamic_cast<Gtk::CellRendererText*>(renderer)->property_text() =
+          details->getName();
+    }
 }
 
 void LoadScenarioDialog::run()
@@ -128,7 +150,6 @@ void LoadScenarioDialog::add_scenario(ScenarioDetails *d)
 {
   Gtk::TreeIter i = scenarios_list->append();
   (*i)[scenarios_columns.filename] = d->getFilename ();
-  (*i)[scenarios_columns.name] = d->getName ();
   (*i)[scenarios_columns.details] = d;
 }
 

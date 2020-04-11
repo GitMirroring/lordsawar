@@ -50,9 +50,8 @@ class LoadScenarioDialog: public LwDialog
     class ScenariosColumns: public Gtk::TreeModelColumnRecord {
     public:
 	ScenariosColumns() 
-        { add(name); add(filename); add (details);}
+        { add(filename); add (details);}
 	
-	Gtk::TreeModelColumn<Glib::ustring> name;
 	Gtk::TreeModelColumn<Glib::ustring> filename;
 	Gtk::TreeModelColumn<ScenarioDetails *> details;
 
@@ -60,6 +59,9 @@ class LoadScenarioDialog: public LwDialog
     const ScenariosColumns scenarios_columns;
     Glib::RefPtr<Gtk::ListStore> scenarios_list;
     
+    Gtk::CellRendererText name_renderer;
+    Gtk::TreeViewColumn name_column;
+
     Glib::ustring selected_filename;
     
     void on_selection_changed();
@@ -84,6 +86,7 @@ class LoadScenarioDialog: public LwDialog
     void setup_progress_bar ();
     void finish_progress ();
     void tick_progress ();
+    void cell_data_name(Gtk::CellRenderer *renderer, const Gtk::TreeIter &i);
 };
 
 #endif
