@@ -3,7 +3,7 @@
   <!ENTITY legal SYSTEM "legal.xml">
 <!ENTITY app "<application>LordsAWar!</application>">
 <!ENTITY appversion "0.3.2">
-<!ENTITY date "March 2020">
+<!ENTITY date "May 2020">
 <!ENTITY manrevision "0.3.2">
 ]>
 
@@ -156,7 +156,7 @@ A temple is where army units can go to get blessed, and heroes can start quests.
 <listitem>
 Port
 <para>
-A port is where army units can go on a ship, or off a ship.
+A port is where army units can go on a ship, or off a ship.  (This can also happen from cities or bridges.)
 </para>
 <screenshot>
 <mediaobject>
@@ -189,7 +189,7 @@ The length of flag shows how many army units are in the stack.  The first row ha
 </mediaobject>
 </screenshot> 
 <para>
-Stacks appear as a ship when they are in the water.  When  a stack is in defend mode it appears to be in a tower.  The stack size flag is not shown when the stack is in defend mode.  This means your opponent does not know the number of army units in the stack.
+Stacks appear as a ship when they are in the water.  When  a stack is in defend mode it appears to be in a tower.  The stack size flag is not shown when the stack is in defend mode.  This means your opponent does not know the number of army units in the stack.  It takes a turn for the stack to "dig in" into defend mode.
 </para>
 <screenshot> 
 <mediaobject>
@@ -459,12 +459,12 @@ Above the number of moves is a picture denoting what kind of tiles the stack can
 <screenshot> 
 <mediaobject>
 <imageobject>
-<imagedata fileref="figures/main_screen_move_bonus_flying.png" format="PNG"/>
+<imagedata fileref="figures/main_screen_group_stack_button.png" format="PNG"/>
 </imageobject>
 </mediaobject>
 </screenshot> 
 <para>
-The "UnGrp" button shows that the army units on this map tile are all grouped together in a single stack.  Toggle this button to ungroup them all.
+The "Grp" button shows that the army units on this map tile are not grouped together into a single stack.  Toggle this button to group them all.  Instead of clicking you can also just press the space bar.
 </para>
 <para>
 Whereas the stack moves as slow as it's slowest unit, the movement bonuses of a single army unit confer to all army units in the stack (except for the flying movement bonus).  This means it is often handy to have a scout unit in your stack even though it only has a strength of 1.
@@ -1099,7 +1099,7 @@ A list of all army units that are available for the player to purchase are shown
 After making a selection, click on the buy button to purchase the unit.  Take special care when purchasing a new army unit because it will replace the currently selected army unit type in the city screen!
 </para>
 <para>
-Some army units are not shown in this screen because cannot be bought at any price.  Special units like dragons or ghosts cannot be purchased, and instead must be awarded to a hero, or already present as production in a city.
+Some army units are not shown in this screen because they can't be bought at any price.  Special units like dragons or ghosts can however be awarded to a hero, or already present as production in a city.
 </para>
 </sect2>
 </sect1>
