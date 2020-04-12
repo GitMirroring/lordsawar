@@ -180,7 +180,7 @@ const Glib::ustring DEFAULT_CONFIG_FILENAME = "lordsawarrc";
 const unsigned int ROAD_STONE_CHANCE = 150;
 
 //how tall an army icon appears on a dialog relative to default font height
-const double DIALOG_ARMY_PIC_FONTSIZE_MULTIPLE = 3.636363634;
+const double DIALOG_ARMY_PIC_FONTSIZE_MULTIPLE = 4.936363634;
 //scale for the small shield pictures that appear on dialogs
 const double DIALOG_SMALL_SHIELD_PIC_FONTSIZE_MULTIPLE = 0.727272727;
 //scale for the medium shield pictures that appear on dialogs
