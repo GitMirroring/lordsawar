@@ -828,7 +828,7 @@ void CitySetWindow::on_tutorial_video_activated()
 {
   GError *errs = NULL;
   gtk_show_uri(window->get_screen()->gobj(),
-               "http://vimeo.com/97837645", 0, &errs);
+               "http://vimeo.com/406899445", 0, &errs);
 }
 
 bool CitySetWindow::check_discard (Glib::ustring msg)
