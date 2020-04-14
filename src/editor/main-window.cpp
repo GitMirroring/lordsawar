@@ -1085,6 +1085,7 @@ void MainWindow::on_shieldset_saved(guint32 id)
       GameMap::getInstance()->reloadShieldset();
       fill_players();
       bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+      on_best_fit_activated ();
       redraw();
       needs_saving = true;
       update_window_title();
@@ -1116,6 +1117,7 @@ void MainWindow::on_armyset_saved(guint32 id)
       Armysetlist::getInstance()->reload(id);
       GameMap::getInstance()->switchArmysets(Armysetlist::getInstance()->get(id));
       bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+      on_best_fit_activated ();
       redraw();
       needs_saving = true;
       update_window_title();
@@ -1142,6 +1144,7 @@ void MainWindow::on_cityset_saved(guint32 id)
       ImageCache::getInstance()->reset();
       GameMap::getInstance()->reloadCityset();
       bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+      on_best_fit_activated ();
       redraw();
       needs_saving = true;
       update_window_title();
@@ -1186,6 +1189,7 @@ void MainWindow::on_tileset_saved(guint32 id)
       bigmap->screen_size_changed(bigmap_image->get_allocation()); 
       setup_terrain_radiobuttons();
       on_terrain_radiobutton_toggled();
+      on_best_fit_activated ();
       redraw();
       needs_saving = true;
       update_window_title();
