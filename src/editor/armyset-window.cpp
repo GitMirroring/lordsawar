@@ -1736,7 +1736,7 @@ void ArmySetWindow::on_tutorial_video_activated()
 {
   GError *errs = NULL;
   gtk_show_uri(window->get_screen()->gobj(),
-               "http://vimeo.com/97927589", 0, &errs);
+               "http://vimeo.com/407659798", 0, &errs);
   return;
 }
 
