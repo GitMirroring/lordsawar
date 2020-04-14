@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2014 Ben Asselstine
+//  Copyright (C) 2010, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -47,14 +47,17 @@ TilesetSmallmapBuildingColorsDialog::TilesetSmallmapBuildingColorsDialog(Gtk::Wi
 void TilesetSmallmapBuildingColorsDialog::on_road_color_chosen()
 {
   d_tileset->setRoadColor(road_colorbutton->get_rgba());
+  d_changed = true;
 }
 
 void TilesetSmallmapBuildingColorsDialog::on_ruin_color_chosen()
 {
   d_tileset->setRuinColor(ruin_colorbutton->get_rgba());
+  d_changed = true;
 }
 
 void TilesetSmallmapBuildingColorsDialog::on_temple_color_chosen()
 {
   d_tileset->setTempleColor(temple_colorbutton->get_rgba());
+  d_changed = true;
 }

@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2014 Ben Asselstine
+//  Copyright (C) 2010, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,7 +29,9 @@ class TilesetSmallmapBuildingColorsDialog: public LwEditorDialog
     TilesetSmallmapBuildingColorsDialog(Gtk::Window &parent, Tileset *tileset);
     ~TilesetSmallmapBuildingColorsDialog() {}
 
+    bool get_changed () {return d_changed;}
  private:
+    bool d_changed;
     Tileset *d_tileset;
     Gtk::ColorButton *road_colorbutton;
     Gtk::ColorButton *ruin_colorbutton;
