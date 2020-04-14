@@ -1919,6 +1919,7 @@ void MainWindow::on_switch_sets_activated()
           setup_terrain_radiobuttons();
           on_terrain_radiobutton_toggled();
         }
+      on_best_fit_activated ();
       redraw();
       fill_players();
     }
