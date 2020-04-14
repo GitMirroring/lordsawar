@@ -1717,7 +1717,7 @@ void TileSetWindow::on_tutorial_video_activated()
 {
   GError *errs = NULL;
   gtk_show_uri(window->get_screen()->gobj(),
-               "http://vimeo.com/96931755", 0, &errs);
+               "http://vimeo.com/407781865", 0, &errs);
   return;
 }
 
