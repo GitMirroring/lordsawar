@@ -1241,6 +1241,8 @@ void TileSetWindow::on_smallmap_building_colors_activated()
 {
   TilesetSmallmapBuildingColorsDialog d(*window, d_tileset);
   d.run_and_hide();
+  if (d.get_changed ())
+    dirty ();
 }
 
 void TileSetWindow::on_tilestyle_id_selected(guint32 id)
