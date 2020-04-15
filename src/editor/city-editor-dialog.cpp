@@ -154,6 +154,16 @@ CityEditorDialog::CityEditorDialog(Gtk::Window &parent, City *cit, CreateScenari
   update_buttons();
 }
 
+CityEditorDialog::~CityEditorDialog ()
+{
+  for (Gtk::TreeIter i = army_list->children().begin(),
+       end = army_list->children().end(); i != end; ++i)
+    {
+      const ArmyProdBase *a = (*i)[army_columns.army];
+      delete a;
+    }
+}
+
 void CityEditorDialog::change_city_ownership()
 {
   // set allegiance
@@ -195,7 +205,12 @@ void CityEditorDialog::on_remove_clicked()
 {
   Gtk::TreeIter i = army_treeview->get_selection()->get_selected();
   if (i)
-    army_list->erase(i);
+    {
+      const ArmyProdBase *a = (*i)[army_columns.army];
+      delete a;
+      (*i)[army_columns.army] = NULL;
+      army_list->erase(i);
+    }
 
   update_armies ();
   set_button_sensitivity();
@@ -238,16 +253,17 @@ void CityEditorDialog::add_army(const ArmyProdBase *a)
   Player *player = get_selected_player();
   ImageCache *gc = ImageCache::getInstance();
   Gtk::TreeIter i = army_list->append();
-  (*i)[army_columns.army] = a;
+  const ArmyProdBase *aa = new ArmyProdBase (*a);
+  (*i)[army_columns.army] = aa;
   guint32 fs = FontSize::getInstance ()->get_height ();
   (*i)[army_columns.image] = gc->getArmyPic(player->getArmyset(),
-					    a->getTypeId(), player,
+					    aa->getTypeId(), player,
 					    NULL, false, fs)->to_pixbuf();
-  (*i)[army_columns.strength] = a->getStrength();
-  (*i)[army_columns.moves] = a->getMaxMoves();
+  (*i)[army_columns.strength] = aa->getStrength();
+  (*i)[army_columns.moves] = aa->getMaxMoves();
   (*i)[army_columns.upkeep] = a->getUpkeep();
-  (*i)[army_columns.duration] = a->getProduction();
-  (*i)[army_columns.name] = a->getName();
+  (*i)[army_columns.duration] = aa->getProduction();
+  (*i)[army_columns.name] = aa->getName();
   army_treeview->get_selection()->select(i);
 
   set_button_sensitivity();
