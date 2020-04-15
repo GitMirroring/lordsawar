@@ -280,6 +280,8 @@ bool EditableSmallMap::create_road()
           if (GameMap::getInstance()->getBuilding(pos) == Maptile::NONE)
             GameMap::getInstance()->putNewRoad(pos);
         }
+      else if (gm->getBuilding(pos) == Maptile::STONE)
+        GameMap::getInstance()->putNewRoad(pos);
     }
   Rectangle r = Rectangle(0,0,GameMap::getWidth(), GameMap::getHeight());
   redraw_tiles(r);
