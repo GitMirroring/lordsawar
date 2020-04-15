@@ -66,6 +66,7 @@ ValidationDialog::ValidationDialog(Gtk::Window &parent, std::list<Glib::ustring>
       Glib::ustring s;
       for (auto w : warnings)
         s += w + newline;
+      textview->get_buffer()->set_text(s);
     }
   else if (errors.size() && warnings.size())
     {
