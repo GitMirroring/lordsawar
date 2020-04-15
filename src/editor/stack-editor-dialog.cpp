@@ -196,6 +196,11 @@ void StackEditorDialog::update_armies ()
       GameMap::getInstance()->putStack(new_stack);
       Playerlist::getInstance()->setActiveplayer(old_active);
       stack = new_stack;
+  
+      Stack::iterator i = stack->begin ();
+      for (Gtk::TreeIter j = army_list->children().begin(),
+           jend = army_list->children().end(); j != jend; ++j, ++i)
+      (*j)[army_columns.army] = *i;
     }
 }
 
