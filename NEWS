@@ -1,13 +1,20 @@
+LordsAWar! version 0.3.2, a clone of the turn-based strategy game Warlords II, has been released with the following changes: 
 
-LordsAWar! version 0.3.2, a clone of the turn-based strategy game Warlords II, has been released with the following changes:
+* added zoom in/out.
+* added 2-finger scrolling.
+* some graphics are scaled according to font size for hi-dpi users.
+* added a new french translation.  Thanks James!
+* added a 'battle calculator' to the scenario builder.
+* added a "quick help" window to show key commands, mouse tips.
+* moved the scenario builder to the main menu.
+* fixed problems with the map generator.
+* added standing stones as a kind of decoration to maps.
+* added progress bars to various dialogs.
+* fixing bugs with fullscreen/unfullscreen.
+* better saving/loading in army set, city set, shield set and tile set editors.
+* hero templates can now be edited in the scenario builder.
+* media dialog now shows default images.
+* added a popup context menu for stacks.
+* now showing the army bonus in the city window.
 
- * now using a new dark theme.
- * moved the scenario builder to the main menu.
- * added zoom in/out on the main map.
- * added 2-finger scrolling.
- * added a popup context menu for stacks.
- * now showing the army bonus in the city window.
- * added a new french translation.  Thanks James!
- * added a 'battle calculator' to the scenario builder.
-
-Please consider donating to the LordsAWar! project: http://lordsawar.nongnu.org
+Please consider donating to the LordsAWar project! See the donate button here: http://lordsawar.nongnu.org
