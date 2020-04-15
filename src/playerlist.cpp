@@ -2,7 +2,7 @@
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -985,11 +985,8 @@ guint32 Playerlist::countAllStacks () const
 bool Playerlist::playerHasNoCapitalCity () const
 {
   for (const_iterator i = begin (); i != end (); i++)
-    {
-      if (*i != d_neutral &&
-          Citylist::getInstance ()->countCities (*i) > 0 &&
-          Citylist::getInstance ()->getCapitalCity (*i) == NULL)
-        return true;
-    }
+    if (*i != d_neutral &&
+        Citylist::getInstance ()->getCapitalCity (*i) == NULL)
+      return true;
   return false;
 }

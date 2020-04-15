@@ -2354,7 +2354,7 @@ void MainWindow::update_menuitems ()
 
   bool needs_capitals = Playerlist::getInstance()->playerHasNoCapitalCity ();
   random_assign_capital_cities_menuitem->set_sensitive
-    (Citylist::getInstance ()->size () && needs_capitals);
+    (Citylist::getInstance ()->empty () == false && needs_capitals);
 }
 
 void MainWindow::set_default_bigmap_zoom ()
