@@ -75,6 +75,7 @@
 #include "../editor/editor-splash-window.h"
 #include "smallmap.h"
 #include "ScenarioMedia.h"
+#include "load-progress-window.h"
 
 #define method(x) sigc::mem_fun(*this, &Driver::x)
 
@@ -1137,10 +1138,17 @@ void Driver::init_game_window()
   game_window->init(width, height);
 }
 
-GameScenario *Driver::load_game(Glib::ustring file_path)
+GameScenario *Driver::load_game(Glib::ustring file_path, Gtk::Window *w)
 {
     bool broken = false;
+    LoadProgressWindow *p = new LoadProgressWindow (w);
+    GameScenario::load_tick.connect
+      (sigc::mem_fun (p, &LoadProgressWindow::tick_progress));
+    GameScenario::load_finish.connect
+      (sigc::mem_fun (p, &LoadProgressWindow::finish_progress));
+    p->run ();
     GameScenario* game_scenario = new GameScenario(file_path, broken);
+    p->hide ();
 
     if (broken)
       {

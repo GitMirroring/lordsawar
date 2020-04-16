@@ -81,7 +81,8 @@ liblwgui_la_SOURCES = \
     lw-dialog.cpp lw-dialog.h \
     builder-cache.cpp builder-cache.h \
     tartan-progress-bar.cpp tartan-progress-bar.h \
-    font-size.cpp font-size.h
+    font-size.cpp font-size.h \
+    load-progress-window.cpp load-progress-window.h
 
 liblwgui_la_LIBADD = @LTLIBOBJS@
 

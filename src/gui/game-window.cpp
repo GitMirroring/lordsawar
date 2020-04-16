@@ -123,6 +123,7 @@
 #include "rnd.h"
 #include "font-size.h"
 #include "keeper.h"
+#include "load-progress-window.h"
 
 #define method(x) sigc::mem_fun(*this, &GameWindow::x)
 
@@ -814,6 +815,7 @@ void GameWindow::on_load_game_activated()
   chooser.show_all();
   int res = chooser.run();
   chooser.hide();
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
 
   if (res == Gtk::RESPONSE_ACCEPT)
     {
@@ -963,7 +965,15 @@ void GameWindow::on_game_stopped()
 	  game = NULL;
 	}
       bool broken = false;
+    
+      LoadProgressWindow *p = new LoadProgressWindow (window);
+      GameScenario::load_tick.connect
+        (sigc::mem_fun (p, &LoadProgressWindow::tick_progress));
+      GameScenario::load_finish.connect
+        (sigc::mem_fun (p, &LoadProgressWindow::finish_progress));
+      p->run ();
       GameScenario* game_scenario = new GameScenario(d_load_filename, broken);
+      p->hide ();
 
       if (broken)
 	{

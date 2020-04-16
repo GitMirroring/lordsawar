@@ -75,6 +75,7 @@
 [type: gettext/glade]dat/glade/use-item-on-player-dialog.ui
 [type: gettext/glade]dat/glade/use-item-on-city-dialog.ui
 [type: gettext/glade]dat/glade/new-random-map-dialog.ui
+[type: gettext/glade]dat/glade/load-progress-window.ui
 [type: gettext/glade]dat/glade/quick-help-window.ui
 [type: gettext/glade]dat/glade/editor/armyset-info-dialog.ui
 [type: gettext/glade]dat/glade/editor/armyset-window.ui
@@ -265,6 +266,7 @@ src/gui/new-random-map-dialog.cpp
 src/gui/use-item-on-city-dialog.cpp
 src/gui/tartan-progress-bar.cpp
 src/gui/quick-help-window.cpp
+src/gui/load-progress-window.cpp
 src/CreateScenarioRandomize.cpp
 src/vectoredunitlist.cpp
 src/editor/itemlist-dialog.cpp

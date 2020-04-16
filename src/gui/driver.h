@@ -97,7 +97,7 @@ class Driver: public sigc::trackable
     void on_client_could_not_connect();
 
     GameScenario *new_game(GameParameters g);
-    GameScenario *load_game(Glib::ustring file_path);
+    GameScenario *load_game(Glib::ustring file_path, Gtk::Window *w = NULL);
     void stress_test();
     void stressTestNextRound();
 
