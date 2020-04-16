@@ -328,6 +328,9 @@ MainWindow::MainWindow(Glib::ustring load_filename)
     xml->get_widget ("help_about_menuitem", help_about_menuitem);
     help_about_menuitem->signal_activate().connect
       (method(on_help_about_activated));
+    xml->get_widget ("tutorial_menuitem", tutorial_menuitem);
+    tutorial_menuitem->signal_activate().connect
+      (method(on_tutorial_activated));
   terrain_tile_style_grid = new Gtk::FlowBox();
   terrain_tile_style_grid->property_selection_mode () = Gtk::SELECTION_NONE;
   terrain_tile_style_viewport->add(*terrain_tile_style_grid);
@@ -2367,4 +2370,12 @@ void MainWindow::set_default_bigmap_zoom ()
 void MainWindow::on_best_fit_activated ()
 {
   set_default_bigmap_zoom ();
+}
+
+void MainWindow::on_tutorial_activated()
+{
+  GError *errs = NULL;
+  gtk_show_uri(window->get_screen()->gobj(),
+               "https://vimeo.com/408293387", 0, &errs);
+  return;
 }

@@ -109,6 +109,7 @@ class MainWindow: public sigc::trackable
     Gtk::MenuItem *random_assign_capital_cities_menuitem;
     Gtk::MenuItem *battle_calculator_menuitem;
     Gtk::MenuItem *help_about_menuitem;
+    Gtk::MenuItem *tutorial_menuitem;
     Gtk::Viewport *terrain_tile_style_viewport;
     Gtk::FlowBox *terrain_tile_style_grid;
     Gtk::Image *smallmap_image;
@@ -177,6 +178,7 @@ class MainWindow: public sigc::trackable
     void on_random_assign_capital_cities_activated();
 
     void on_help_about_activated();
+    void on_tutorial_activated();
     
     struct PointerItem
     {
