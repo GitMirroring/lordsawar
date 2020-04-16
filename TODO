@@ -47,5 +47,3 @@ bag not being scaled at all in armyset.  should it be?  it sticks out.
 save in the set editors doesn't work like the scenario builder.  we should always be able to save, even when we don't have a file.  e.g. save is save-as when we need it to be.
 
 saw a crash when switching to a newly made shieldset in the editor.  can't reproduce.  saw the same with a tileset.
-
-need a progress bar for loading a game, everything just freezes for a while
