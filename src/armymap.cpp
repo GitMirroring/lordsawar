@@ -56,7 +56,7 @@ void ArmyMap::draw_stacks()
           PixMask *tmp = 
             ImageCache::getInstance()->getShieldPic(1, (*it)->getOwner(),
                                                     true, 0)->copy();
-          PixMask::scale(tmp, tmp->get_width()/2, tmp->get_height()/2);
+          PixMask::scale(tmp, tmp->get_width()/1.4, tmp->get_height()/1.4);
 
           pos = mapToSurface(pos);
           tmp->blit_centered(surface, pos);
