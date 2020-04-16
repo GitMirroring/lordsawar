@@ -303,6 +303,8 @@ GameWindow::GameWindow()
   triumphs_menuitem->signal_activate().connect (method(on_triumphs_activated));
   xml->get_widget("help_about_menuitem", help_about_menuitem);
   help_about_menuitem->signal_activate().connect (method(on_help_about_activated));
+  xml->get_widget ("tutorial_menuitem", tutorial_menuitem);
+  tutorial_menuitem->signal_activate().connect (method(on_tutorial_activated));
   xml->get_widget("online_help_menuitem", online_help_menuitem);
   online_help_menuitem->signal_activate().connect
     (method(on_online_help_activated));
@@ -3129,4 +3131,12 @@ void GameWindow::on_quick_help_activated()
 void GameWindow::on_best_fit_activated ()
 {
   set_default_bigmap_zoom();
+}
+
+void GameWindow::on_tutorial_activated ()
+{
+  GError *errs = NULL;
+  gtk_show_uri(window->get_screen()->gobj(),
+               "https://vimeo.com/408594978", 0, &errs);
+  return;
 }

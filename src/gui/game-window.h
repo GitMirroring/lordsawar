@@ -155,6 +155,7 @@ class GameWindow: public sigc::trackable
     Gtk::MenuItem *production_report_menuitem;
     Gtk::MenuItem *triumphs_menuitem;
     Gtk::MenuItem *help_about_menuitem;
+    Gtk::MenuItem *tutorial_menuitem;
     Gtk::MenuItem *online_help_menuitem;
     Gtk::MenuItem *quit_menuitem;
     Gtk::MenuItem *toggle_grid_menuitem;
@@ -254,6 +255,7 @@ class GameWindow: public sigc::trackable
     void on_winner_history_activated();
     void on_triumphs_activated();
     void on_help_about_activated();
+    void on_tutorial_activated();
     void on_online_help_activated();
     void on_quick_help_activated();
 
