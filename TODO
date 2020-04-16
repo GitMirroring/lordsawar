@@ -49,6 +49,3 @@ save in the set editors doesn't work like the scenario builder.  we should alway
 saw a crash when switching to a newly made shieldset in the editor.  can't reproduce.  saw the same with a tileset.
 
 need a progress bar for loading a game, everything just freezes for a while
-
-why aren't our army units in the field being shown in the army report
-  they are, why so small?
