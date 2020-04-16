@@ -1354,6 +1354,7 @@ bool Game::recruitHero(HeroProto *hero, City *city, int gold)
     retval = city->getOwner()->chooseHero (hero, city, gold);
   else
     {
+      update_sidebar_stats ();
       retval = hero_offers_service.emit (city->getOwner(), hero, city, gold);
       if (d_gameScenario->getRound() == 1)
         city_visited.emit(city);
