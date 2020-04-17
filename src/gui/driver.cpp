@@ -964,13 +964,15 @@ void Driver::on_new_game_requested(GameParameters g, GamePreferencesDialog *gpd)
 	return;
       }
     start_game_progress_tick.emit ();
-
     start_game_progress_finish.emit ();
-    if (splash_window)
-	splash_window->hide();
 
     NextTurn *next_turn = new NextTurnHotseat();
     init_game_window();
+    
+    if (gpd)
+      gpd->hide ();
+    if (splash_window)
+      splash_window->hide();
     
     game_window->show();
     game_window->new_game(game_scenario, next_turn);
