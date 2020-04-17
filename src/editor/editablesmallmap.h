@@ -1,4 +1,4 @@
-// Copyright (C) 2010, 2014, 2015 Ben Asselstine
+// Copyright (C) 2010, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ private:
     void change_map(Vector<int> pos);
 
 
-    Rectangle get_cursor_rectangle(Vector<int> current_tile);
+    LwRectangle get_cursor_rectangle(Vector<int> current_tile);
     // DATA
  
     Pointer pointer;

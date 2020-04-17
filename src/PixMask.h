@@ -99,7 +99,7 @@ class PixMask
      PixMask* scale(int xsize, int ysize, 
 		    Gdk::InterpType interp = Gdk::INTERP_NEAREST);
      
-     void blit(Rectangle src, Cairo::RefPtr<Cairo::Surface> pixmap, Vector<int> dest);
+     void blit(LwRectangle src, Cairo::RefPtr<Cairo::Surface> pixmap, Vector<int> dest);
 };
 
 #endif

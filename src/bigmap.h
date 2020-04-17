@@ -65,17 +65,17 @@ class BigMap: public sigc::trackable
     bool get_toggled () const {return d_grid_toggled;}
 
     // view the rectangle, measured in tiles
-    void set_view(Rectangle rect);
+    void set_view(LwRectangle rect);
     void screen_size_changed(Gtk::Allocation box);
     Gtk::Allocation get_allocation() {return image;};
 
     // return a good position of a map tip given that it should be close to the
     // tiles in tile_area without covering them
-    MapTipPosition map_tip_position(Rectangle tile_area);
+    MapTipPosition map_tip_position(LwRectangle tile_area);
     MapTipPosition map_tip_position(Vector<int> tile);
 
     // emitted when the view has changed because of user interactions
-    sigc::signal<void, Rectangle> view_changed;
+    sigc::signal<void, LwRectangle> view_changed;
 
     // Emitted after a call to SmallMap::Draw.
     /**
@@ -105,13 +105,13 @@ class BigMap: public sigc::trackable
     bool d_headless;
     MapRenderer* d_renderer;
 
-    Rectangle view;		// approximate view of screen, in tiles
+    LwRectangle view;		// approximate view of screen, in tiles
     Vector<int> view_pos; 	// precise position of view in pixels
 
     Cairo::RefPtr<Cairo::Surface> buffer;	// the buffer we draw things in
     Cairo::RefPtr<Cairo::Surface> outgoing; //goes out to the gtk::image
     Cairo::RefPtr<Cairo::Context> buffer_gc;
-    Rectangle buffer_view;	// current view of the buffer, in tiles
+    LwRectangle buffer_view;	// current view of the buffer, in tiles
 
     bool input_locked;
     bool blank_screen;
@@ -136,8 +136,8 @@ class BigMap: public sigc::trackable
     void draw_stack(Stack *s, Cairo::RefPtr<Cairo::Surface> surface);
     LocationBox d_fighting;
  private:
-    void draw_buffer(Rectangle map_view, Cairo::RefPtr<Cairo::Surface> surface);
-    void draw_buffer_tiles(Rectangle map_view, Cairo::RefPtr<Cairo::Surface> surface);
+    void draw_buffer(LwRectangle map_view, Cairo::RefPtr<Cairo::Surface> surface);
+    void draw_buffer_tiles(LwRectangle map_view, Cairo::RefPtr<Cairo::Surface> surface);
 
     void draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> surface);
     void clip_viewable_buffer(Cairo::RefPtr<Cairo::Surface> pixmap, Vector<int> pos, Cairo::RefPtr<Cairo::Surface> out);

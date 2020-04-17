@@ -1159,7 +1159,7 @@ void MainWindow::on_edit_smallmap_activated()
   SmallmapEditorDialog d(*window);
   bool changed = d.run();
   d.hide();
-  Rectangle r = Rectangle(0, 0, GameMap::getWidth(), GameMap::getHeight());
+  LwRectangle r = LwRectangle(0, 0, GameMap::getWidth(), GameMap::getHeight());
   smallmap->redraw_tiles(r);
   smallmap->resize();
   redraw();
@@ -1474,7 +1474,7 @@ void MainWindow::init_maps()
     smallmap->center_view ();
 }
 
-void MainWindow::on_bigmap_tiles_changed (Rectangle r)
+void MainWindow::on_bigmap_tiles_changed (LwRectangle r)
 {
   if (r.w > 0 && r.h > 0)
     {

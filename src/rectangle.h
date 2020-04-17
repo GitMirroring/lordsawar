@@ -21,24 +21,25 @@
 
 #include "vector.h"
 
-//! A general purpose rectangle struct.
-struct Rectangle
+//! A general purpose rectangle.
+class LwRectangle
 {
-    Rectangle() : x(pos.x), y(pos.y), w(dim.x), h(dim.y) {}
+public:
+    LwRectangle() : x(pos.x), y(pos.y), w(dim.x), h(dim.y) {}
 
-    Rectangle(int x_, int y_, int w_, int h_)
+    LwRectangle(int x_, int y_, int w_, int h_)
 	: pos(x_, y_), dim(w_, h_), x(pos.x), y(pos.y), w(dim.x), h(dim.y) {}
 
-    Rectangle(Vector<int> pos_)
+    LwRectangle(Vector<int> pos_)
 	: pos(pos_), dim(Vector<int>(1,1)), x(pos.x), y(pos.y), w(dim.x), h(dim.y) {}
     
-    Rectangle(Vector<int> pos_, Vector<int> dim_)
+    LwRectangle(Vector<int> pos_, Vector<int> dim_)
 	: pos(pos_), dim(dim_), x(pos.x), y(pos.y), w(dim.x), h(dim.y) {}
     
-    Rectangle(const Rectangle &other)
+    LwRectangle(const LwRectangle &other)
 	: pos(other.pos), dim(other.dim), x(pos.x), y(pos.y), w(dim.x), h(dim.y) {}
 
-    const Rectangle &operator=(const Rectangle &other)
+    const LwRectangle &operator=(const LwRectangle &other)
     {
 	pos = other.pos;
 	dim = other.dim;
@@ -51,26 +52,26 @@ struct Rectangle
     int &x, &y, &w, &h;
 };
 
-inline bool operator==(const Rectangle &lhs, const Rectangle &rhs)
+inline bool operator==(const LwRectangle &lhs, const LwRectangle &rhs)
 {
     return lhs.pos == rhs.pos && lhs.dim == rhs.dim;
 }
 
-inline bool operator!=(const Rectangle &lhs, const Rectangle &rhs)
+inline bool operator!=(const LwRectangle &lhs, const LwRectangle &rhs)
 {
     return !(lhs == rhs);
 }
 
-inline bool is_inside(const Rectangle &r, Vector<int> v)
+inline bool is_inside(const LwRectangle &r, Vector<int> v)
 {
     return r.x <= v.x && v.x < r.x + r.w
 	&& r.y <= v.y && v.y < r.y + r.h;
 }
 
-inline bool is_overlapping(const Rectangle &r1, const Rectangle &r2)
+inline bool is_overlapping(const LwRectangle &r1, const LwRectangle &r2)
 {
     // find the leftmost rectangle
-    Rectangle const *l, *r;
+    LwRectangle const *l, *r;
     if (r1.x <= r2.x)
     {
 	l = &r1;
@@ -87,7 +88,7 @@ inline bool is_overlapping(const Rectangle &r1, const Rectangle &r2)
 	return false;
 
     // find the upper rectangle
-    Rectangle const *u, *d;
+    LwRectangle const *u, *d;
     if (r1.y <= r2.y)
     {
 	u = &r1;

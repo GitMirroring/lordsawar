@@ -2,7 +2,8 @@
 // Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
 // Copyright (C) 2004 Thomas Plonka
-// Copyright (C) 2006-2010, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2017,
+// 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -44,7 +45,7 @@ SmallMap::SmallMap(bool headless)
       sleep_interval = TIMER_SMALLMAP_REFRESH;
 }
 
-void SmallMap::set_view(Rectangle new_view)
+void SmallMap::set_view(LwRectangle new_view)
 {
     if (view != new_view)
     {
@@ -85,9 +86,9 @@ void SmallMap::center_view_on_tile(Vector<int> pos, bool slide_me)
 
   sliding = false;
   if (slide_me && sleep_interval > 0)
-    slide_view(Rectangle(pos.x, pos.y, view.w, view.h));
+    slide_view(LwRectangle(pos.x, pos.y, view.w, view.h));
   else
-    set_view(Rectangle(pos.x, pos.y, view.w, view.h));
+    set_view(LwRectangle(pos.x, pos.y, view.w, view.h));
 	  
   view_changed.emit(view);
 }
@@ -108,9 +109,9 @@ void SmallMap::center_view_on_pixel(Vector<int> pos, bool slide_me)
   pos = clip(Vector<int>(0, 0), pos, GameMap::get_dim() - view.dim);
 
   if (slide_me && sleep_interval > 0)
-    slide_view(Rectangle(pos.x, pos.y, view.w, view.h));
+    slide_view(LwRectangle(pos.x, pos.y, view.w, view.h));
   else
-    set_view(Rectangle(pos.x, pos.y, view.w, view.h));
+    set_view(LwRectangle(pos.x, pos.y, view.w, view.h));
 
   view_changed.emit(view);
 }
@@ -185,7 +186,7 @@ int SmallMap::slide (int x, int y)
   return x;
 }
 
-void SmallMap::slide_view(Rectangle new_view)
+void SmallMap::slide_view(LwRectangle new_view)
 {
   if (view != new_view)
     {
@@ -193,7 +194,7 @@ void SmallMap::slide_view(Rectangle new_view)
       sliding_to = new_view;
       while (1)
 	{
-	  Rectangle tmp_view(view);
+	  LwRectangle tmp_view(view);
 	  tmp_view.x = slide(tmp_view.x, new_view.x);
 	  tmp_view.y = slide(tmp_view.y, new_view.y);
 
@@ -213,7 +214,7 @@ void SmallMap::slide_view(Rectangle new_view)
 
 void SmallMap::move_map_in_dir(Vector<int> dir)
 {
-  Rectangle new_view = view;
+  LwRectangle new_view = view;
   new_view.pos += dir;
   if (new_view.pos.x + new_view.w >= GameMap::getWidth() ||
       new_view.pos.y + new_view.h >= GameMap::getHeight() ||
@@ -226,6 +227,6 @@ void SmallMap::move_map_in_dir(Vector<int> dir)
 
 void SmallMap::center_view ()
 {
-  set_view (Rectangle ((GameMap::get_dim () / 2) - (view.dim / 2), view.dim));
+  set_view (LwRectangle ((GameMap::get_dim () / 2) - (view.dim / 2), view.dim));
   view_changed.emit(view);
 }

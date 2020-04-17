@@ -262,7 +262,7 @@ void LoadScenarioDialog::setup_progress_bar ()
   progress_liststore = Gtk::ListStore::create(progress_columns);
   progress_treeview->set_model (progress_liststore);
   progressrow = *(progress_liststore->append());
-  auto cell = Gtk::make_managed<Gtk::CellRendererProgress>();
+  auto cell = Gtk::manage (new Gtk::CellRendererProgress());
   cell->property_text () = "";
   int cols_count = progress_treeview->append_column ("progress", *cell);
   auto pColumn = progress_treeview->get_column(cols_count -1);

@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2014, 2015 Ben Asselstine
+// Copyright (C) 2008, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -31,12 +31,12 @@ SightMap::SightMap(XML_Helper* helper)
 }
 
 SightMap::SightMap(Glib::ustring name, Vector<int> p, guint32 height, guint32 width)
-:Rectangle(p, Vector<int>(width, height)), Renamable(name)
+:LwRectangle(p, Vector<int>(width, height)), Renamable(name)
 {
 }
 
 SightMap::SightMap(const SightMap& orig)
-:Rectangle(orig), Renamable(orig)
+:LwRectangle(orig), Renamable(orig)
 {
 }
 

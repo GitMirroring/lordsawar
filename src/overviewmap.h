@@ -1,5 +1,6 @@
 // Copyright (C) 2006 Ulf Lorenz
-// Copyright (C) 2007-2012, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017,
+// 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -111,7 +112,7 @@ class OverviewMap : public sigc::trackable
      *
      * @param tiles  The rectangle to redraw.
      */
-    void redraw_tiles(Rectangle tiles);
+    void redraw_tiles(LwRectangle tiles);
 
     //! Returns the map graphic.
     /**
@@ -234,7 +235,7 @@ class OverviewMap : public sigc::trackable
     void draw_hero(Vector<int> pos, bool white);
 
     //! Redraw the specified region.
-    void draw_terrain_tiles(Rectangle r);
+    void draw_terrain_tiles(LwRectangle r);
 
     //! Returns a maptile, but takes map_tiles_per_tile into account.
     Maptile* getTile(int x, int y);

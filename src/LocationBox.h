@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2000, 2001, 2002, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -85,8 +85,8 @@ class LocationBox : public Immovable
     guint32 getSize() const {return d_size;}
 
     //! Returns a rectangle that describes the location.
-    Rectangle getArea() const
-	{ return Rectangle(getPos().x, getPos().y, d_size, d_size); }
+    LwRectangle getArea() const
+	{ return LwRectangle(getPos().x, getPos().y, d_size, d_size); }
 
 
     // Methods that operate on the class data and do not modify the class.

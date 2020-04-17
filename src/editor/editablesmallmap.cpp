@@ -49,12 +49,12 @@ void EditableSmallMap::after_draw()
   map_changed.emit(surface, Gdk::Rectangle(0, 0, get_width(), get_height()));
 }
 
-Rectangle EditableSmallMap::get_cursor_rectangle(Vector<int> current_tile)
+LwRectangle EditableSmallMap::get_cursor_rectangle(Vector<int> current_tile)
 {
     int offset = (pointer_size - 1) / 2;
     Vector<int> tile = current_tile - Vector<int>(offset, offset);
 
-    return Rectangle (tile.x, tile.y, pointer_size, pointer_size);
+    return LwRectangle (tile.x, tile.y, pointer_size, pointer_size);
 }
 
 void EditableSmallMap::change_map(Vector<int> tile)
@@ -72,7 +72,7 @@ void EditableSmallMap::change_map(Vector<int> tile)
           int erase_size = 3;
           int offset = (erase_size - 1) / 2;
           Vector<int> box = tile - Vector<int>(offset, offset);
-          Rectangle r(box.x, box.y, erase_size, erase_size);
+          LwRectangle r(box.x, box.y, erase_size, erase_size);
           bool erased = GameMap::getInstance()->eraseTiles(r);
           if (erased)
             map_edited.emit();
@@ -91,7 +91,7 @@ void EditableSmallMap::change_map(Vector<int> tile)
               pointer_terrain != Tile::GRASS)
             break;
 
-          Rectangle tiles = GameMap::getInstance()->putTerrain
+          LwRectangle tiles = GameMap::getInstance()->putTerrain
             (get_cursor_rectangle(tile), pointer_terrain, -1, true);
           redraw_tiles(tiles);
           map_edited.emit();
@@ -283,7 +283,7 @@ bool EditableSmallMap::create_road()
       else if (gm->getBuilding(pos) == Maptile::STONE)
         GameMap::getInstance()->putNewRoad(pos);
     }
-  Rectangle r = Rectangle(0,0,GameMap::getWidth(), GameMap::getHeight());
+  LwRectangle r = LwRectangle(0,0,GameMap::getWidth(), GameMap::getHeight());
   redraw_tiles(r);
   draw();
   map_edited.emit();

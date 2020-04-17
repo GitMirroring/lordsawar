@@ -247,7 +247,7 @@ class MainWindow: public sigc::trackable
     void on_smallmap_water_changed();
     void on_objects_selected(std::vector<UniquelyIdentified *> objects);
     void on_mouse_on_tile(Vector<int> tile);
-    void on_bigmap_tiles_changed (Rectangle r);
+    void on_bigmap_tiles_changed (LwRectangle r);
     
     void popup_dialog_for_object(UniquelyIdentified *object);
 

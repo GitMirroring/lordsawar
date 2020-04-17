@@ -1,5 +1,6 @@
 // Copyright (C) 2006, 2007 Ulf Lorenz
-// Copyright (C) 2006-2012, 2014, 2015, 2017, 2020 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017,
+// 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -408,13 +409,13 @@ void OverviewMap::resize(Vector<int> max_dimensions, float scale)
     if (tile)
       draw_radial_gradient(tile->getSmallTile()->getColor(),
                            tile->getSmallTile()->getSecondColor(), d.x, d.y);
-    draw_terrain_tiles(Rectangle(0, 0, d.x, d.y));
+    draw_terrain_tiles(LwRectangle(0, 0, d.x, d.y));
     surface = Cairo::Surface::create(empty, Cairo::CONTENT_COLOR_ALPHA, d.x, d.y);
     surface_gc = Cairo::Context::create(surface);
 
 }
 
-void OverviewMap::redraw_tiles(Rectangle tiles)
+void OverviewMap::redraw_tiles(LwRectangle tiles)
 {
     if (tiles.w > 0 && tiles.h > 0)
     {
@@ -439,7 +440,7 @@ void OverviewMap::redraw_tiles(Rectangle tiles)
 	if (pos.y + dim.y >= int(GameMap::getHeight() * pixels_per_tile))
 	    dim.y = int(GameMap::getHeight() * pixels_per_tile) - pos.y;
 
-	draw_terrain_tiles(Rectangle(pos, dim));
+	draw_terrain_tiles(LwRectangle(pos, dim));
     }
     draw();
 }
@@ -470,7 +471,7 @@ Maptile* OverviewMap::getTile(int x, int y)
   return favoured_tile;
 }
 
-void OverviewMap::draw_terrain_tiles(Rectangle r)
+void OverviewMap::draw_terrain_tiles(LwRectangle r)
 {
   Gdk::RGBA rd = GameMap::getTileset()->getRoadColor();
   r.w *= map_tiles_per_tile;

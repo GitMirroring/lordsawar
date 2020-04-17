@@ -115,8 +115,8 @@ class GameMap: public sigc::trackable
 	static Vector<int> get_dim() { return Vector<int>(s_width, s_height); }
 	
         //! Returns the dimensions of the map, as a Rectangle.
-	static Rectangle get_boundary()
-	    { return Rectangle(0, 0, s_width, s_height); }
+	static LwRectangle get_boundary()
+	    { return LwRectangle(0, 0, s_width, s_height); }
 
         //! Returns a pointer to the current Tileset for the map.
         static Tileset* getTileset();
@@ -764,7 +764,7 @@ class GameMap: public sigc::trackable
          * \note This method changes the TileStyle associated with a tile's 
          * Maptile object.
 	 */
-	void applyTileStyles (Rectangle r, bool smooth_terrain);
+	void applyTileStyles (LwRectangle r, bool smooth_terrain);
 
 	/** Smooth a portion of the terrain on the big map. 
 	 *
@@ -1361,7 +1361,7 @@ class GameMap: public sigc::trackable
          *
          * @return Returns True if anything was removed.  Otherwise, False.
          */
-        bool eraseTiles(Rectangle r);
+        bool eraseTiles(LwRectangle r);
 
         /** Returns a Location from the given position on the map.
          *
@@ -1414,7 +1414,7 @@ class GameMap: public sigc::trackable
          *
          * @return Returns the region altered as a Rectangle.
          */
-        Rectangle putTerrain(Rectangle r, Tile::Type type, 
+        LwRectangle putTerrain(LwRectangle r, Tile::Type type, 
                              int tile_style_id = -1, 
                              bool always_alter_tilestyles = false);
 
@@ -1441,8 +1441,8 @@ class GameMap: public sigc::trackable
     private:
         //! Callback for item loading used during loading.
         bool loadItems(Glib::ustring tag, XML_Helper* helper);
-        bool containsWater (Rectangle rect);
-        bool containsForest (Rectangle rect);
+        bool containsWater (LwRectangle rect);
+        bool containsForest (LwRectangle rect);
         bool isBlockedAvenue(int x, int y, int destx, int desty);
         bool isDock(Vector<int> pos);
 	void close_circles (int minx, int miny, int maxx, int maxy);

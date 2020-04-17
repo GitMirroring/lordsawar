@@ -81,7 +81,7 @@ BigMap::~BigMap()
     delete d_renderer;
 }
 
-void BigMap::set_view(Rectangle new_view)
+void BigMap::set_view(LwRectangle new_view)
 {
     int tilesize = GameMap::getInstance()->getTileSize();
     
@@ -194,7 +194,7 @@ void BigMap::screen_size_changed(Gtk::Allocation box)
 {
     int ts = GameMap::getInstance()->getTileSize();
 
-    Rectangle new_view = view;
+    LwRectangle new_view = view;
     
     new_view.w = box.get_width() / ts;
     new_view.h = box.get_height() / ts;
@@ -241,15 +241,15 @@ Vector<int> BigMap::mouse_pos_to_tile_offset(Vector<int> pos)
 
 MapTipPosition BigMap::map_tip_position(Vector<int> tile)
 {
-  return map_tip_position (Rectangle(tile.x, tile.y, 1, 1)); 
+  return map_tip_position (LwRectangle(tile.x, tile.y, 1, 1)); 
 }
 
-MapTipPosition BigMap::map_tip_position(Rectangle tile_area)
+MapTipPosition BigMap::map_tip_position(LwRectangle tile_area)
 {
     // convert area to pixels on the screen
     int tilesize = GameMap::getInstance()->getTileSize();
 
-    Rectangle area(tile_area.pos * tilesize - view_pos,
+    LwRectangle area(tile_area.pos * tilesize - view_pos,
 		   tile_area.dim * tilesize);
 
     // calculate screen edge distances
@@ -423,7 +423,7 @@ bool BigMap::saveAsBitmap(Glib::ustring filename)
   
   bool orig_grid = d_grid_toggled;
   d_grid_toggled = false;
-  draw_buffer(Rectangle (0, 0, GameMap::getWidth(), GameMap::getHeight()), surf);
+  draw_buffer(LwRectangle (0, 0, GameMap::getWidth(), GameMap::getHeight()), surf);
   d_grid_toggled = orig_grid;
   Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create(surf, 0, 0, width, height);
   pixbuf->save (filename, "png");
@@ -620,7 +620,7 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
   pixmask->blit(surface, tile_to_buffer_pos(tile));
 }
 
-void BigMap::draw_buffer_tiles(Rectangle map_view, Cairo::RefPtr<Cairo::Surface> surface)
+void BigMap::draw_buffer_tiles(LwRectangle map_view, Cairo::RefPtr<Cairo::Surface> surface)
 {
   for (int i = map_view.x; i < map_view.x + map_view.w; i++)
     for (int j = map_view.y; j < map_view.y + map_view.h; j++)
@@ -628,7 +628,7 @@ void BigMap::draw_buffer_tiles(Rectangle map_view, Cairo::RefPtr<Cairo::Surface>
 	draw_buffer_tile(Vector<int>(i,j), surface);
 }
 
-void BigMap::draw_buffer(Rectangle map_view, Cairo::RefPtr<Cairo::Surface> surface)
+void BigMap::draw_buffer(LwRectangle map_view, Cairo::RefPtr<Cairo::Surface> surface)
 {
   draw_buffer_tiles(map_view, surface);
 }
@@ -649,7 +649,7 @@ bool BigMap::scroll(GdkEventScroll *event)
 {
   if (input_locked)
     return true;
-  Rectangle n = view;
+  LwRectangle n = view;
   switch (event->direction)
     {
     case GDK_SCROLL_SMOOTH:

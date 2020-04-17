@@ -1,5 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007-2011, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2017,
+//  2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -263,7 +264,7 @@ void GameBigMap::mouse_button_event(MouseButtonEvent e)
                 {
                   if (active->setPathOfStackToPreviousDestination(stack))
                     {
-                      Rectangle old_view = view;
+                      LwRectangle old_view = view;
                       active->stackMove(stack);
                       if (!active->getActivestack())
                         {
@@ -824,7 +825,7 @@ void GameBigMap::mouse_motion_event(MouseMotionEvent e)
 	    delta.y += 1;
 	  if (tile.y < view.y)
 	    delta.y -= 1;
-	  Rectangle new_view = view;
+	  LwRectangle new_view = view;
 	  new_view.pos += delta;
 	  set_view (new_view);
 	  view_changed.emit(view);

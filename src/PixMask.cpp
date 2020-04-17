@@ -191,7 +191,7 @@ void PixMask::blit(Cairo::RefPtr<Cairo::Surface> dest, int dest_x, int dest_y)
   context->paint();
 }
      
-void PixMask::blit(Rectangle src, Cairo::RefPtr<Cairo::Surface> p, Vector<int> dest)
+void PixMask::blit(LwRectangle src, Cairo::RefPtr<Cairo::Surface> p, Vector<int> dest)
 {
   Cairo::RefPtr<Cairo::Context> context = Cairo::Context::create(p);
   // Select the clipping rectangle
@@ -209,7 +209,7 @@ void PixMask::blit(Rectangle src, Cairo::RefPtr<Cairo::Surface> p, Vector<int> d
 void PixMask::blit(Vector<int> tile, int ts, Cairo::RefPtr<Cairo::Surface> p, Vector<int> dest)
 {
   Vector<int> src = tile * ts;
-  blit (Rectangle(src.x, src.y, ts, ts), p, dest);
+  blit (LwRectangle(src.x, src.y, ts, ts), p, dest);
 }
 
 void PixMask::scale(PixMask*& p, int xsize, int ysize, Gdk::InterpType interp)

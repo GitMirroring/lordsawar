@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2014 Ben Asselstine
+// Copyright (C) 2008, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class XML_Helper;
  * used once by a player to defog a portion of the hidden map.
  */
 
-class SightMap: public Rectangle, public Renamable
+class SightMap: public LwRectangle, public Renamable
 {
     public:
 	//! The xml tag of this object in a saved-game file.

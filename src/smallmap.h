@@ -2,7 +2,7 @@
 // Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
 // Copyright (C) 2004 Thomas Plonka
-// Copyright (C) 2007, 2008, 2009, 2014, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2017, 2020 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -73,9 +73,9 @@ public:
      *
      * @param new_view  The portion of the map graphic to highlight.
      */
-    void set_view(Rectangle new_view);
+    void set_view(LwRectangle new_view);
 
-    Rectangle get_view() const {return view;};
+    LwRectangle get_view() const {return view;};
 
     //! Zip to the selected portion of the SmallMap from the old position.
     /**
@@ -83,7 +83,7 @@ public:
      *
      * @param new_view  The portion of the map graphic to highlight.
      */
-    void slide_view(Rectangle new_view);
+    void slide_view(LwRectangle new_view);
 
     //! Realize the given mouse button event.
     void mouse_button_event(MouseButtonEvent e);
@@ -126,14 +126,14 @@ public:
      * Classes that use SmallMap must catch this signal to display the change
      * in position of the little white box.
      */
-    sigc::signal<void, Rectangle> view_changed;
+    sigc::signal<void, LwRectangle> view_changed;
 
     //! Emitted during sliding animation after a call to Smallmap::slide_view.
     /**
      * Classes that use SmallMap must catch this signal to display the 
      * animation of the little white box.
      */
-    sigc::signal<void, Rectangle> view_slid;
+    sigc::signal<void, LwRectangle> view_slid;
 
     // Emitted after a call to SmallMap::Draw.
     /**
@@ -158,7 +158,7 @@ private:
     /**
      * This rectangle represents the selected portion of the map.
      */
-    Rectangle view;
+    LwRectangle view;
 
     //! Whether or not to ignore mouse clicks and movement.
     /**
@@ -171,7 +171,7 @@ private:
     bool sliding;
 
     //! The position that we're sliding to.
-    Rectangle sliding_to;
+    LwRectangle sliding_to;
 
     //! When sliding the box, it sleeps this long per frame (in microseconds).
     guint32 sleep_interval;

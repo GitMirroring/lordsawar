@@ -348,7 +348,7 @@ void GamePreferencesDialog::on_start_game_clicked()
   progress_liststore = Gtk::ListStore::create(progress_columns);
   progress_treeview->set_model (progress_liststore);
   row = *(progress_liststore->append());
-  auto cell = Gtk::make_managed<Gtk::CellRendererProgress>();
+  auto cell = Gtk::manage (new Gtk::CellRendererProgress());
   cell->property_text () = "";
   int cols_count = progress_treeview->append_column ("progress", *cell);
   auto pColumn = progress_treeview->get_column(cols_count -1);

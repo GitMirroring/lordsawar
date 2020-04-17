@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ class EditorBigMap: public BigMap
     sigc::signal<void, Vector<int> > mouse_on_tile;
 
     // emitted when the map is changed by the user
-    sigc::signal<void, Rectangle> map_tiles_changed;
+    sigc::signal<void, LwRectangle> map_tiles_changed;
 
     // emitted when the water on the map is altered.
     sigc::signal<void> map_water_changed;
@@ -103,7 +103,7 @@ class EditorBigMap: public BigMap
     int tile_to_bridge_type(Vector<int> tile);
     void change_map_under_cursor();
     std::vector<Vector<int> > get_cursor_tiles();
-    Rectangle get_cursor_rectangle();
+    LwRectangle get_cursor_rectangle();
     std::vector<Vector<int> > get_screen_tiles();
     void bring_up_details();
     void display_moving_building(Vector<int> src, Vector<int> dest);

@@ -865,7 +865,7 @@ void GameMap::demote_lone_tile(int minx, int miny, int maxx, int maxy,
       }
 }
 
-void GameMap::applyTileStyles (Rectangle r, bool smooth_terrain)
+void GameMap::applyTileStyles (LwRectangle r, bool smooth_terrain)
 {
   applyTileStyles (r.y, r.x, r.y + r.h, r.x + r.w, smooth_terrain);
 }
@@ -1710,7 +1710,7 @@ bool GameMap::removeRuin(Vector<int> pos)
   return false;
 }
 
-bool GameMap::containsWater(Rectangle rect)
+bool GameMap::containsWater(LwRectangle rect)
 {
   for (int y = rect.y; y < rect.y + rect.h; y++)
     for (int x = rect.x; x < rect.x + rect.w; x++)
@@ -1719,7 +1719,7 @@ bool GameMap::containsWater(Rectangle rect)
   return false;
 }
 
-bool GameMap::containsForest(Rectangle rect)
+bool GameMap::containsForest(LwRectangle rect)
 {
   for (int y = rect.y; y < rect.y + rect.h; y++)
     for (int x = rect.x; x < rect.x + rect.w; x++)
@@ -1928,7 +1928,7 @@ bool GameMap::putBridge(Bridge *b)
   return true;
 }
 
-Rectangle GameMap::putTerrain(Rectangle r, Tile::Type type, int tile_style_id, bool always_alter_tilestyles)
+LwRectangle GameMap::putTerrain(LwRectangle r, Tile::Type type, int tile_style_id, bool always_alter_tilestyles)
 {
   bool replaced = false;
   Tileset *tileset = GameMap::getTileset();
@@ -2011,7 +2011,7 @@ void GameMap::clearBuilding(Vector<int> pos, guint32 width)
 
 void GameMap::putBuilding(LocationBox *b, Maptile::Building building)
 {
-  Rectangle r = b->getArea();
+  LwRectangle r = b->getArea();
   for (int x = r.x; x < r.x + r.w; ++x)
     for (int y = r.y; y < r.y + r.h; ++y)
       {
@@ -2025,7 +2025,7 @@ void GameMap::putBuilding(LocationBox *b, Maptile::Building building)
 
 void GameMap::removeBuilding(LocationBox *b)
 {
-  Rectangle r = b->getArea();
+  LwRectangle r = b->getArea();
   for (int x = r.x; x < r.x + r.w; ++x)
     for (int y = r.y; y < r.y + r.h; ++y)
       {
@@ -2403,7 +2403,7 @@ Glib::ustring GameMap::getShieldsetBaseName() const
   return d_shieldset;
 }
 
-bool GameMap::eraseTiles(Rectangle r)
+bool GameMap::eraseTiles(LwRectangle r)
 {
   bool erased = false;
   for (int x = r.x; x < r.x + r.w; ++x)
