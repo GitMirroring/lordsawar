@@ -1255,13 +1255,14 @@ void Driver::stress_test()
   //next turn and game_Scenario get deleted inside game.
   size_t mins = (time(NULL) - start) / 60;
   printf("duration: %lu mins, turns: %d ", mins, game_scenario->getRound());
-  fflush(stdout);
   printf("winner type: %s\n", Player::playerTypeToString(Player::Type(Playerlist::getInstance()->getFirstLiving()->getType())).c_str());
   Glib::ustring s = 
     File::getTempFile(File::getCacheDir(),
                       String::ucompose ("run-seed-%1", 
                                         Main::instance().random_number_seed));
-  game_scenario->saveGame(s + SAVE_EXT);
+  if (game_scenario->saveGame(s + SAVE_EXT) == false)
+    printf ("couldn't save '%s%s'\n", s.c_str (), SAVE_EXT.c_str ());
+  fflush(stdout);
 
   //nextTurn and game_scenario get deleted in game.
 }
