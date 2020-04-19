@@ -3137,6 +3137,6 @@ void GameWindow::on_tutorial_activated ()
 {
   GError *errs = NULL;
   gtk_show_uri(window->get_screen()->gobj(),
-               "https://vimeo.com/408594978", 0, &errs);
+               "https://vimeo.com/409439854", 0, &errs);
   return;
 }
