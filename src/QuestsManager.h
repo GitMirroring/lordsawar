@@ -299,13 +299,18 @@ class QuestsManager : public sigc::trackable
 	 */
 	void cityAction(City *c, Stack *s, CityDefeatedAction action, int gold);
 
+
+        std::vector<Quest*> getActiveQuests ();
         // DATA
         
 	//! A hash of all Quests in this QuestsManager.  Lookup by HeroId.
         std::map<guint32,Quest*> d_quests;
 
-        //! A list of quests that have been marked as 'to-delete'.
+        //! A list of quests that have been marked as expiring
         std::list<Quest*> d_inactive_quests;
+
+        //! A list of quests that have been marked as completed
+        std::list<Quest*> d_completed_quests;
 
 	//! A vector of isFeasible function pointers.
         /** 

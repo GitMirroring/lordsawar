@@ -85,11 +85,14 @@ QuestsManager::QuestsManager(XML_Helper* helper)
 
 QuestsManager::~QuestsManager()
 {
-    std::map<guint32,Quest*>::iterator it;
+  d_completed_quests.unique ();
+  for (auto q : d_completed_quests)
+    delete q;
 
-    for (it = d_quests.begin(); it != d_quests.end(); it++) 
-        delete (*it).second;
-    cleanup();
+  for (std::map<guint32,Quest*>::iterator it = d_quests.begin();
+       it != d_quests.end(); it++)
+    delete (*it).second;
+  cleanup();
 }
 
 Quest* QuestsManager::createNewQuest(guint32 heroId, bool razing_possible)
@@ -137,33 +140,33 @@ Quest* QuestsManager::createNewQuest(guint32 heroId, bool razing_possible)
             quest = new QuestPillageGold(*this, heroId);
             break;
     }
-    
+
     if (quest)
     {
         d_quests[heroId] = quest;
     }
-    
+
     return quest;
 }
 
 Quest* QuestsManager::createNewKillHeroQuest(guint32 heroId, guint32 targetHeroId)
 {
   Quest *quest = new QuestKillHero(*this, heroId, targetHeroId);
-    
+
   d_quests[heroId] = quest;
-  
+
   return quest;
 }
 
-Quest* QuestsManager::createNewEnemyArmiesQuest(guint32 heroId, 
-						guint32 num_armies, 
+Quest* QuestsManager::createNewEnemyArmiesQuest(guint32 heroId,
+						guint32 num_armies,
 						guint32 victim_player_id)
 {
-  Quest *quest = new QuestEnemyArmies(*this, heroId, num_armies, 
+  Quest *quest = new QuestEnemyArmies(*this, heroId, num_armies,
 				      victim_player_id);
-    
+
   d_quests[heroId] = quest;
-  
+
   return quest;
 }
 
@@ -172,7 +175,7 @@ Quest* QuestsManager::createNewCitySackQuest(guint32 heroId, guint32 cityId)
   Quest *quest = new QuestCitySack(*this, heroId, cityId);
 
   d_quests[heroId] = quest;
-  
+
   return quest;
 }
 
@@ -181,7 +184,7 @@ Quest* QuestsManager::createNewCityRazeQuest(guint32 heroId, guint32 cityId)
   Quest *quest = new QuestCityRaze(*this, heroId, cityId);
 
   d_quests[heroId] = quest;
-  
+
   return quest;
 }
 
@@ -190,17 +193,17 @@ Quest* QuestsManager::createNewCityOccupyQuest(guint32 heroId, guint32 cityId)
   Quest *quest = new QuestCityOccupy(*this, heroId, cityId);
 
   d_quests[heroId] = quest;
-  
+
   return quest;
 }
 
-Quest* QuestsManager::createNewEnemyArmytypeQuest(guint32 heroId, 
+Quest* QuestsManager::createNewEnemyArmytypeQuest(guint32 heroId,
 						  guint32 armyTypeId)
 {
   Quest *quest = new QuestEnemyArmytype(*this, heroId, armyTypeId);
 
   d_quests[heroId] = quest;
-  
+
   return quest;
 }
 
@@ -209,13 +212,13 @@ Quest* QuestsManager::createNewPillageGoldQuest(guint32 heroId, guint32 amount)
   Quest *quest = new QuestPillageGold(*this, heroId, amount);
 
   d_quests[heroId] = quest;
-  
+
   return quest;
 }
 
 void QuestsManager::questCompleted(guint32 heroId)
 {
-    Quest *quest = d_quests[heroId];
+    Quest *quest = getHeroQuest (heroId);
     Player *p = quest->getHero()->getOwner();
 
     p->heroCompletesQuest(quest->getHero());
@@ -236,20 +239,22 @@ void QuestsManager::questCompleted(guint32 heroId)
     delete stacks;
 
     //debug("deactivate quest");
-    //deactivateQuest(heroId);
+
+    quest->deactivate ();
     d_quests.erase(heroId);
+    d_completed_quests.push_back (quest);
     //debug("quest deactivated");
 }
 
 void QuestsManager::questExpired(guint32 heroId)
 {
-    Quest *quest = d_quests[heroId];
+    Quest *quest = getHeroQuest (heroId);
 
     if (quest == 0)
         return;
-    
+
     //quest_expired.emit(quest);
-    
+
     debug("deactivate quest");
     deactivateQuest(heroId);
     debug("quest deactivated");
@@ -258,7 +263,7 @@ void QuestsManager::questExpired(guint32 heroId)
 std::vector<Quest*> QuestsManager::getPlayerQuests(const Player *player) const
 {
   std::vector<Quest*> res;
-  // loop through the player's heroes 
+  // loop through the player's heroes
   // for every hero check any pending quests
   const Stacklist* sl = player->getStacklist();
   std::list<Hero*> heroes = sl->getHeroes();
@@ -302,8 +307,8 @@ bool QuestsManager::save(XML_Helper* helper) const
   bool retval = true;
   retval &= helper->openTag(QuestsManager::d_tag);
 
-  for (std::map<guint32,Quest*>::const_iterator it = d_quests.begin(); 
-       it != d_quests.end(); it++) 
+  for (std::map<guint32,Quest*>::const_iterator it = d_quests.begin();
+       it != d_quests.end(); it++)
     {
       if ((*it).second == NULL)
 	continue;
@@ -388,7 +393,7 @@ void QuestsManager::sharedInit()
 
 void QuestsManager::deactivateQuest(guint32 heroId)
 {
-  Quest *q = d_quests[heroId];
+  Quest *q = getHeroQuest (heroId);
   q->deactivate();
   d_inactive_quests.push_back(q);
   // delete it from hash of active quests
@@ -409,60 +414,72 @@ void QuestsManager::cleanup()
     }
 }
 
-void QuestsManager::armyDied(Army *a, std::vector<guint32>& culprits)
+std::vector<Quest*> QuestsManager::getActiveQuests ()
 {
-  //tell all quests that an army died
-  //each quest takes care of what happens when an army dies
-  std::map<guint32,Quest*>::iterator it;
-  for (it = d_quests.begin(); it != d_quests.end(); it++) 
+  std::vector<Quest*> quests;
+  for (std::map<guint32,Quest*>::iterator it = d_quests.begin();
+       it != d_quests.end(); it++)
     {
       if ((*it).second == NULL)
 	continue;
       if ((*it).second->isPendingDeletion() == true)
 	continue;
+      quests.push_back ((*it).second);
+    }
+  return quests;
+}
+
+void QuestsManager::armyDied(Army *a, std::vector<guint32>& culprits)
+{
+  //tell all quests that an army died
+  //each quest takes care of what happens when an army dies
+  std::vector<Quest *> quests = getActiveQuests ();
+  for (auto q : quests)
+    {
       //was this hero a perpetrator?
       bool heroIsCulprit = false;
       for (unsigned int i = 0; i <culprits.size(); i++)
 	{
-	  if (culprits[i] == (*it).second->getHeroId())
+	  if (culprits[i] == q->getHeroId())
 	    {
 	      heroIsCulprit = true;
 	      break;
 	    }
 	}
-      (*it).second->armyDied(a, heroIsCulprit);
+      q->armyDied(a, heroIsCulprit);
     }
 
   //is it a hero that has an outstanding quest?
   //this is what deactivates a quest upon hero death
-  Quest *quest = d_quests[a->getId()];
+  Quest *quest = getHeroQuest (a->getId());
   if (quest && quest->isPendingDeletion() == false)
     questExpired(a->getId());
 }
 
-void QuestsManager::cityAction(City *c, Stack *s, 
+void QuestsManager::cityAction(City *c, Stack *s,
 			       CityDefeatedAction action, int gold)
 {
-  std::map<guint32,Quest*>::iterator it;
-  //did any of the heroes who have outstanding quests do this?
-  for (it = d_quests.begin(); it != d_quests.end(); it++) 
+  std::vector<Quest *> quests = getActiveQuests ();
+  for (auto q : quests)
     {
-      if ((*it).second == NULL)
-	continue;
-      if ((*it).second->isPendingDeletion() == true)
-	continue;
       if (!s)
-	(*it).second->cityAction(c, action, false, gold);
+        q->cityAction(c, action, false, gold);
       else
 	{
+          //XXX XXX XXX why do we have to check for null here?
 	  for (Stack::iterator sit = s->begin(); sit != s->end(); sit++)
 	    {
-	      if ((*it).second == NULL) //fixme: how is this null sometimes?
+              if (q->isPendingDeletion())
 		break;
-	      if ((*sit)->getId() == (*it).second->getHeroId())
-		(*it).second->cityAction(c, action, true, gold);
-	      else
-		(*it).second->cityAction(c, action, false, gold);
+	      if ((*sit)->getId() == q->getHeroId())
+		q->cityAction(c, action, true, gold);
+	    }
+	  for (Stack::iterator sit = s->begin(); sit != s->end(); sit++)
+	    {
+              if (q->isPendingDeletion())
+		break;
+	      if ((*sit)->getId() != q->getHeroId())
+		q->cityAction(c, action, false, gold);
 	    }
 	}
     }
@@ -491,6 +508,10 @@ void QuestsManager::cityOccupied(City *c, Stack *s)
 
 void QuestsManager::nextTurn(Player *p)
 {
+  d_completed_quests.unique ();
+  for (auto q : d_completed_quests)
+    delete q;
+  d_completed_quests.clear ();
   // go through our inactive list and remove quests belonging to us
   for (std::list<Quest*>::iterator it = d_inactive_quests.begin();
        it != d_inactive_quests.end(); it++)

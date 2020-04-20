@@ -69,6 +69,7 @@ StackReflist::iterator AI_Allocation::eraseStack(StackReflist::iterator it)
   setParked(*it, true);
   return d_stacks->eraseStack(it);
 }
+
 void AI_Allocation::deleteStack(Stack* s)
 {
   //this method deletes it from our list of stacks to consider.
@@ -181,9 +182,12 @@ int AI_Allocation::continueQuests()
       if (quest->isPendingDeletion())
         continue;
       Stack *s = d_owner->getStacklist()->getArmyStackById(quest->getHeroId());
-      bool moved = continueQuest(quest, s);
-      if (moved)
-        count++;
+      if (s)
+        {
+          bool moved = continueQuest(quest, s);
+          if (moved)
+            count++;
+        }
     }
   return count;
 }
@@ -221,6 +225,13 @@ int AI_Allocation::continueAttacks()
                   i = eraseStack(i);
                 }
             }
+          else
+            i = d_stacks->begin ();
+            /*
+             * we are iterating over d_stacks and when our stack dies
+             * it gets deleted via deleteStack, and it messes up our
+             * iterator.
+             */
         }
       else if (s->getParked() == false && s->isOnCity() == false &&
                s->hasPath() == true && city != NULL && 
