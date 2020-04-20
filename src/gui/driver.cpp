@@ -1259,9 +1259,10 @@ void Driver::stress_test()
   Glib::ustring s = 
     File::getTempFile(File::getCacheDir(),
                       String::ucompose ("run-seed-%1", 
-                                        Main::instance().random_number_seed));
-  if (game_scenario->saveGame(s + SAVE_EXT) == false)
-    printf ("couldn't save '%s%s'\n", s.c_str (), SAVE_EXT.c_str ());
+                                        Main::instance().random_number_seed)) +
+    SAVE_EXT;
+  game_scenario->saveGame(s);
+
   fflush(stdout);
 
   //nextTurn and game_scenario get deleted in game.
