@@ -57,3 +57,9 @@ new perplayermaskedimagedialog
 
 different armysets per player, 8 players + neutral
   in switch sets there should be a treeview, with player names
+
+add henge/temple type
+
+maybe improve the ai a bit by: disbanding stacks and creating a stronger type somewhere
+
+stress test with seed 691 takes 1000+ turns to complete
