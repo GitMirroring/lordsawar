@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010, 2014, 2015 Ben Asselstine
+// Copyright (C) 2009, 2010, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -421,7 +421,7 @@ bool PathCalculator::isBlocked(const Stack *s, Vector<int> pos, bool enemy_citie
   if (tile->getBuilding() == Maptile::CITY && enemy_cities_block == true)
     {
       City* c = GameMap::getCity(pos);
-      if (c && (c->getOwner() != s->getOwner()))
+      if (c && c->getOwner() != s->getOwner() && c->isBurnt () == false)
 	return true;
     }
 

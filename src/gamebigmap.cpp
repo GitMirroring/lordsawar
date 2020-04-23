@@ -288,7 +288,7 @@ void GameBigMap::mouse_button_event(MouseButtonEvent e)
 
 	  //clicked on an enemy city that is too far away
 	  City *c = GameMap::getCity(tile);
-	  if (c)
+	  if (c && c->isBurnt () == false)
 	    {
 	      //restrict going into enemy cities unless they're only
 	      //one square away
@@ -593,8 +593,6 @@ void GameBigMap::determine_mouse_cursor(Stack *stack, Vector<int> tile)
 	    {
 	      if (c->getOwner() == active)
 		d_cursor = ImageCache::FEET;
-	      else if (c->isBurnt() == true)
-		d_cursor = ImageCache::FEET;
 	      else
 		{
 		  int delta = abs(tile.x - stack->getPos().x);
@@ -616,7 +614,7 @@ void GameBigMap::determine_mouse_cursor(Stack *stack, Vector<int> tile)
 			    d_cursor = ImageCache::SWORD;
 			}
 		    }
-		  else
+		  else if (c->isBurnt () == false)
 		    {
 		      //can i see other ppl's cities?
 		      if (d_see_opponents_production == true)
