@@ -1,0 +1,11 @@
+A list of things to do when releasing.
+
+1. clean the .lwa, .lwt, .lwc, .lws, .map files in dat and rebuild them
+2. build lordsawar.pot
+3. make dist
+4. cross compile for windows, build installer
+5. do the release blurb in the news module for savannah
+6. update and upload newest manual
+7. update the website with screenshots, videos, history chart
+8. verify that the video links work in help menu
+9. test on xorg, windows
