@@ -2934,7 +2934,7 @@ void GameWindow::on_bridge_burned(Hero *hero)
 void GameWindow::on_keeper_captured(Hero *hero, Ruin *ruin, Glib::ustring name)
 {
   Glib::ustring s = 
-    String::ucompose(_("%1 has turned a unit of %2 from %3!"), 
+    String::ucompose(_("%1 has turned %2 from %3!"), 
                      hero->getName(), name, ruin->getName());
   TimedMessageDialog dialog(*window, s, 30);
   dialog.run_and_hide();
