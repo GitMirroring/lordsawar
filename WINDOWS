@@ -38,11 +38,11 @@ When it completes, you will have a lordsawar-windows.zip file.
 
 Yes it's annoying that we copy all of the gnome icons, but we really don't know which ones we're going to use.  Perhaps we could be smarter about it.
 
-The last step is to make the windows installer setup.exe.  The lordsawar-windows.zip file must be created so that the creation script can use it.
+The last step is to make the windows installer lordsawar-setup.exe.  The lordsawar-windows.zip file must be created so that the creation script can use it.
 
 $ ./make-windows-installer.sh
 
-The setup.exe file should now be present in the current working directory.
+The lordsawar-setup.exe file should now be present in the current working directory.
 
 Also try the game executable (not the setup) in wine:
 [first install all of the required 32-bit libraries,
