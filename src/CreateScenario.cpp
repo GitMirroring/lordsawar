@@ -514,9 +514,8 @@ bool CreateScenario::setupTemples()
   for (auto it: *Templelist::getInstance())
     {
       // set a random temple type
-      int type= (int) ((TEMPLE_TYPES*1.0) * (Rnd::rand() / (RAND_MAX + 1.0)));
+      int type = Rnd::rand () % TEMPLE_TYPES;
       it->setType(type);
-
     }
   return true;
 }

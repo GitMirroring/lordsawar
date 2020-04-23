@@ -2,6 +2,7 @@ Copyright and license notices are held in the comments section of each image fil
 
 Use the `pnginfo' program from the www.stillhq.com/pngtools/ software package to read the comments in the image files.
 
-The images in this directory created specifically for lordsawar.
+The images in this directory created specifically for lordsawar, except for the
+henge image in temples.png which was created for the Freelords project.
 
 bigdefault.lwc.in: Copyright (C) 2007, 2009 Ben Asselstine.  This file is licensed under the terms of the GNU General Public License version 3 or later at your option.
