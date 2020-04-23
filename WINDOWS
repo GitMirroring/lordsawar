@@ -1,4 +1,6 @@
-Cross-compiling LordsAWar! for Windows on Fedora 24
+Cross-compiling LordsAWar! for Windows on Fedora 31
+
+Fedora makes it easy to cross-compile for Windows because they make mingw-compiled packages available for almost all of our dependencies.
 
 $ sudo dnf install intltool automake autoconf m4 git libtool glib2-devel mingw32-filesystem mingw32-gcc-c++ mingw32-libarchive mingw32-cairomm mingw32-libsigc++20 mingw32-gettext mingw32-libxslt mingw32-libxml++ mingw32-gtkmm30 mingw32-nsis
 
@@ -41,9 +43,6 @@ The last step is to make the windows installer setup.exe.  The lordsawar-windows
 $ ./make-windows-installer.sh
 
 The setup.exe file should now be present in the current working directory.
-
-
-Try it in a virtual machine from: https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/
 
 Also try the game executable (not the setup) in wine:
 [first install all of the required 32-bit libraries,
