@@ -39,6 +39,8 @@ private:
     Gtk::Window *window;
     Gtk::Button *close_button;
     void on_close_button_clicked ();
+
+    void add_shortcut (Gtk::Box *box);
 };
 
 #endif

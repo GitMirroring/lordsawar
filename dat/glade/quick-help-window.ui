@@ -28,6 +28,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
+                    <property name="spacing">6</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="visible">True</property>
@@ -102,6 +103,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
+                    <property name="spacing">6</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="visible">True</property>
@@ -176,6 +178,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
+                    <property name="spacing">6</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="visible">True</property>
@@ -324,31 +327,17 @@
                     <property name="column_spacing">50</property>
                     <property name="column_homogeneous">True</property>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="group_stack_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Group/Upgroup stack</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Group/Upgroup stack</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -357,11 +346,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Space</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">space</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -376,31 +361,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="deselect_stack_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Deselect stack</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Deselect stack</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -410,10 +381,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Escape</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -428,31 +395,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="next_stack_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Select next stack</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Select next stack</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -461,11 +414,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Enter</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">Return</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -480,31 +429,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="pick_up_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Pick up/drop items</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Pick up/drop items</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -513,11 +448,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Comma</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">comma</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -532,31 +463,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="search_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Search</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Search</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -566,10 +483,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Z</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -584,31 +497,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="move_all_stacks_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Move all stacks</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Move all stacks</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -618,10 +517,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">M</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -636,31 +531,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="disband_stack_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Disband stack</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Disband stack</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -670,10 +551,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Q</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -688,31 +565,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="fight_order_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">View fight order</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">View fight order</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -721,11 +584,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">I (as in igloo)</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">I</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -740,31 +599,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="stack_bonuses_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Show stack bonuses</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Show stack bonuses</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -774,10 +619,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">S</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -792,31 +633,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="army_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Army report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Army report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -826,10 +653,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">A</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -844,31 +667,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="city_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">City report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">City report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -878,10 +687,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">K</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -896,31 +701,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="gold_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Gold report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Gold report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -930,10 +721,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">G</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -948,31 +735,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="production_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Production report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Production report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -982,10 +755,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">N</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1000,31 +769,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="winning_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Winning report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Winning report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1034,10 +789,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">W</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1052,31 +803,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="diplomacy_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Diplomacy report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Diplomacy report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1086,10 +823,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">D</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1104,31 +837,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="quest_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Quest report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Quest report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1137,11 +856,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">=</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">equal</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1156,31 +871,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="hero_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Hero report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Hero report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1190,10 +891,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">U</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1208,31 +905,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="ruin_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Ruin report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Ruin report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1241,11 +924,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Period</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">period</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1260,31 +939,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="hasten_battles_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Make battles go quicker</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Make battles go quicker</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1293,11 +958,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Space</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">space</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1312,31 +973,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="load_game_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Load game</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Load game</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1345,11 +992,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Alt+L</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">&lt;alt&gt;l</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1364,31 +1007,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="save_game_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Save game</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Save game</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1397,11 +1026,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Alt+S</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">&lt;alt&gt;s</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1416,31 +1041,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="game_lobby_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Game Lobby (networked play)</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Game Lobby (networked play)</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1449,11 +1060,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Ctrl+L</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">&lt;ctrl&gt;l</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1468,31 +1075,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="fullscreen_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Toggle fullscreen</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Toggle fullscreen</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1502,10 +1095,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">F11</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1520,31 +1109,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="preferences_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Preferences</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Preferences</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1553,11 +1128,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Ctrl+P</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">&lt;ctrl&gt;p</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1572,31 +1143,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="grid_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Toggle grid</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Toggle grid</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1605,11 +1162,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Shift+G</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">&lt;shift&gt;G</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1624,31 +1177,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="end_turn_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">End turn</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">End turn</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1657,11 +1196,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Alt+E</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">&lt;alt&gt;e</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1676,31 +1211,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="resign_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Resign</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Resign</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1710,10 +1231,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">R</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1728,31 +1245,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="army_abilities_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Army Abilities report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Army Abilities report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1761,11 +1264,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">O (Oh)</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
+                            <property name="label" translatable="yes">O</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1780,31 +1279,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="item_abilities_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Item Abilities report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Item Abilities report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1814,10 +1299,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">T</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1832,31 +1313,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="city_history_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">City History report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">City History report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1866,10 +1333,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">H</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1884,31 +1347,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="event_history_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Event History report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Event History report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1918,10 +1367,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">E</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1936,31 +1381,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="gold_history_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Gold History report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Gold History report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1970,10 +1401,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">J</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1988,31 +1415,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="winning_history_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Winning History report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Winning History report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -2022,10 +1435,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Y</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -2040,31 +1449,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="triumphs_report_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Triumphs report</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Triumphs report</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -2074,10 +1469,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">T</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -2092,31 +1483,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="city_production_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">City Production</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">City Production</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -2126,10 +1503,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">C</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -2144,31 +1517,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="vectoring_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Production Vectoring</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#eeeeeeeeecec"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Production Vectoring</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -2178,10 +1537,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">V</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                              <attribute name="foreground" value="#eeeeeeeeecec"/>
-                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
