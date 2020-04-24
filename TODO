@@ -55,9 +55,8 @@ different boat and standard per player, 8 players
 new perplayermaskedimagedialog
   where the images are on top in a row, and the masks are below them
 
-different armysets per player, 8 players + neutral
-  in switch sets there should be a treeview, with player names
-
 maybe improve the ai a bit by: disbanding stacks and creating a stronger type somewhere
 
 stress test with seed 691 takes 1000+ turns to complete
+
+look at how gedit does the keyboard shortcut graphics
