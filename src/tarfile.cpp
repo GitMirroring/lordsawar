@@ -154,6 +154,7 @@ bool TarFile::saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring
         {
           std::list<Glib::ustring> extensions;
           extensions.push_back (".png");
+          extensions.push_back (".svg");
           extensions.push_back (".ogg");
           if (add_sets)
             {
