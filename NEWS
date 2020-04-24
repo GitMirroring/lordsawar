@@ -1,5 +1,6 @@
 LordsAWar! version 0.3.3, a clone of the turn-based strategy game Warlords II, has been released with the following changes: 
 
 * added a new temple type that looks like stonehenge.
+* in scenario builder, players can be given different army sets.
 
 Please consider donating to the LordsAWar project! See the donate button here: http://lordsawar.nongnu.org
