@@ -580,12 +580,11 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkImageMenuItem" id="help_about_menuitem">
-                            <property name="label">gtk-about</property>
+                          <object class="GtkMenuItem" id="quick_help_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Quick Help</property>
                             <property name="use_underline">True</property>
-                            <property name="use_stock">True</property>
                           </object>
                         </child>
                         <child>
@@ -599,11 +598,12 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkMenuItem" id="quick_help_menuitem">
+                          <object class="GtkImageMenuItem" id="help_about_menuitem">
+                            <property name="label">gtk-about</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Quick Help</property>
                             <property name="use_underline">True</property>
+                            <property name="use_stock">True</property>
                           </object>
                         </child>
                       </object>
