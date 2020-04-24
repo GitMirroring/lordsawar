@@ -175,6 +175,8 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	  bool loadTilesets(Tar_Helper *t);
 	  bool loadCitysets(Tar_Helper *t);
 	  bool loadShieldsets(Tar_Helper *t);
+        
+          std::vector<Glib::ustring> getSetFiles () const;
 
 	  // DATA
 	  Glib::ustring d_name;

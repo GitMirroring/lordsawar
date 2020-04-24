@@ -1118,7 +1118,11 @@ void MainWindow::on_armyset_saved(guint32 id)
       //we're doing reload before, because we need the maps to be updated.
       //but then the armyset* gets changed and the switch has no effect.
       Armysetlist::getInstance()->reload(id);
-      GameMap::getInstance()->switchArmysets(Armysetlist::getInstance()->get(id));
+
+      std::vector<Player*> players =
+        Playerlist::getInstance()->getPlayersWithArmyset (id);
+      for (auto p : players)
+        GameMap::getInstance()->switchArmysets(p, Armysetlist::getInstance()->get(id));
       bigmap->screen_size_changed(bigmap_image->get_allocation()); 
       on_best_fit_activated ();
       redraw();

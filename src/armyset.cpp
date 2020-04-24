@@ -131,7 +131,8 @@ bool Armyset::save(Glib::ustring filename, Glib::ustring ext) const
   helper.close();
   if (broken == true)
     return false;
-  return saveTar(tmpfile, tmpfile + ".tar", goodfilename);
+  std::vector<Glib::ustring> extrafiles;
+  return saveTar(tmpfile, tmpfile + ".tar", goodfilename, extrafiles);
 }
 
 bool Armyset::save(XML_Helper* helper) const

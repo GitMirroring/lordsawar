@@ -124,6 +124,9 @@ class GameMap: public sigc::trackable
         //! Returns a pointer to the current Cityset for the map.
         static Cityset* getCityset();
 
+        //! Returns all of the Armysets.
+        static std::vector<Armyset*> getArmysets ();
+
         //! Returns a pointer to the current Shieldset for the map.
         static Shieldset* getShieldset();
 
@@ -866,6 +869,7 @@ class GameMap: public sigc::trackable
          *
          */
 	void switchArmysets(Armyset *armyset);
+        void switchArmysets(Player *p, Armyset *armyset);
         
         /** Change the current Cityset to a different one.
          *

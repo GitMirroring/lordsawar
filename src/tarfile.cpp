@@ -135,7 +135,7 @@ void TarFile::clean_tmp_dir()
     }
 }
 
-bool TarFile::saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring dest, bool add_sets) const
+bool TarFile::saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring dest, std::vector<Glib::ustring> extra_files) const
 {
   bool broken = false;
   Tar_Helper t(tmptar, std::ios::out, broken);
@@ -156,13 +156,6 @@ bool TarFile::saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring
           extensions.push_back (".png");
           extensions.push_back (".svg");
           extensions.push_back (".ogg");
-          if (add_sets)
-            {
-              extensions.push_back (ARMYSET_EXT);
-              extensions.push_back (TILESET_EXT);
-              extensions.push_back (SHIELDSET_EXT);
-              extensions.push_back (CITYSET_EXT);
-            }
           for (auto ext : extensions)
             {
               std::list<Glib::ustring> files = orig.getFilenames(ext);
@@ -194,6 +187,11 @@ bool TarFile::saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring
           else
             broken = false;
         }
+    }
+  if (extra_files.empty () == false)
+    {
+      for (auto f : extra_files)
+        t.saveFile(f);
     }
   t.Close();
   File::erase(tmpfile);

@@ -1353,6 +1353,64 @@ void GameMap::reloadCityset()
     }
 }
 
+void GameMap::switchArmysets(Player *p, Armyset *armyset)
+{
+  //change the keepers in ruins
+  if (p == Playerlist::getInstance()->getNeutral ())
+    {
+      for (auto i: *Ruinlist::getInstance())
+        {
+          Keeper *k = i->getOccupant();
+          if (k == NULL)
+            continue;
+          Stack *s = k->getStack ();
+          if (s == NULL)
+            continue;
+          s->removeArmiesWithoutArmyType(armyset->getId());
+          for (Stack::iterator j = s->begin(); j != s->end(); j++)
+            Armyset::switchArmysetForRuinKeeper(*j, armyset);
+          k->rename();
+        }
+    }
+
+  //change the armyprodbases in cities.
+  for (auto c: *Citylist::getInstance())
+    {
+      if (c->getOwner() == p)
+        {
+          c->removeArmyProdBasesWithoutAType(armyset->getId());
+          for (unsigned int k = 0; k < c->getSize(); k++)
+            {
+              ArmyProdBase *prodbase = (*c)[k]->getArmyProdBase();
+              if (prodbase)
+                Armyset::switchArmyset(prodbase, armyset);
+            }
+        }
+    }
+
+  //change the armies in the stacklist
+  Stacklist *sl = p->getStacklist();
+  for (Stacklist::iterator j = sl->begin(); j != sl->end(); j++)
+    {
+      Stack *s = (*j);
+      s->removeArmiesWithoutArmyType(armyset->getId());
+      if (s->size() == 0)
+        {
+          GameMap::getInstance()->getStacks(s->getPos())->leaving(s);
+          j=sl->flErase(j);//this doesn't remove the stack from the map of id->stack pointer in stacklist. XXX XXX XXX
+          if (sl->size() > 0)
+            j--;
+          continue;
+        }
+      for (Stack::iterator k = s->begin(); k != s->end(); k++)
+        Armyset::switchArmyset(*k,armyset);
+    }
+
+  //finally, change the player's armyset.
+  p->setArmyset(armyset->getId());
+  //where else are armyset ids hanging around?
+}
+
 void GameMap::switchArmysets(Armyset *armyset)
 {
   //change the keepers in ruins
@@ -2738,4 +2796,12 @@ guint32 GameMap::countBags ()
           count++;
       }
   return count;
+}
+        
+std::vector<Armyset*> GameMap::getArmysets ()
+{
+  std::vector<Armyset*> armysets;
+  for (auto id : Playerlist::getInstance()->getArmysets ())
+    armysets.push_back (Armysetlist::getInstance ()->get(id));
+  return armysets;
 }

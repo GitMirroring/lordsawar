@@ -889,12 +889,18 @@ Player *Playerlist::getWinningPlayer() const
 
 bool Playerlist::hasArmyset(guint32 id) const
 {
+  return getPlayersWithArmyset (id).empty() == false;
+}
+
+std::vector<Player*> Playerlist::getPlayersWithArmyset(guint32 id) const
+{
+  std::vector<Player *> players;
   for (const_iterator it = begin(); it != end(); it++)
     {
       if ((*it)->getArmyset() == id)
-        return true;
+        players.push_back (*it);
     }
-  return false;
+  return players;
 }
 
 void Playerlist::setNewColours(Shieldset *shieldset)
@@ -989,4 +995,13 @@ bool Playerlist::playerHasNoCapitalCity () const
         Citylist::getInstance ()->getCapitalCity (*i) == NULL)
       return true;
   return false;
+}
+        
+std::list<guint32> Playerlist::getArmysets() const
+{
+  std::list<guint32> ids;
+  for (const_iterator i = begin (); i != end (); i++)
+    ids.push_back ((*i)->getArmyset ());
+  ids.unique ();
+  return ids;
 }

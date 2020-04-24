@@ -49,7 +49,7 @@ public:
 
     void clean_tmp_dir();
 
-    bool saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring dest, bool add_sets = false) const;
+    bool saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring dest, std::vector<Glib::ustring> extrafiles) const;
     Glib::ustring getBaseName() const {return d_basename;}
 
     void setBaseName(Glib::ustring bname) {d_basename = bname;}

@@ -780,9 +780,21 @@ bool GameScenario::saveGame(Glib::ustring filename, Glib::ustring extension) con
     return false;
 
   Glib::ustring tmptar = File::get_tmp_file() + ".tar";
-  retval = saveTar(tmpfile, tmptar, goodfilename, true);
+  retval = saveTar(tmpfile, tmptar, goodfilename, getSetFiles ());
 
   return retval;
+}
+
+std::vector<Glib::ustring> GameScenario::getSetFiles () const
+{
+  std::vector<Glib::ustring> sets;
+  sets.push_back (GameMap::getTileset()->getConfigurationFile ());
+  sets.push_back (GameMap::getCityset()->getConfigurationFile ());
+  sets.push_back (GameMap::getShieldset()->getConfigurationFile ());
+
+  for (auto a : GameMap::getArmysets ())
+    sets.push_back (a->getConfigurationFile ());
+  return sets;
 }
 
 bool GameScenario::saveWithHelper(XML_Helper &helper) const

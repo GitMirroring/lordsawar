@@ -256,6 +256,10 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 
         //! Return true if any of the players use the given armyset.
         bool hasArmyset(guint32 id) const;
+        std::vector<Player*> getPlayersWithArmyset(guint32 id) const;
+
+        //! Return the ids of the armysets in use.
+        std::list<guint32> getArmysets() const;
 
         //! Get which numeric sequence the player is in this round
         guint32 getTurnOrderNumber(const Player *p);

@@ -25,6 +25,7 @@
 #include "game-parameters.h"
 #include "lw-editor-dialog.h"
 
+class Player;
 class Tileset;
 class Armyset;
 class Cityset;
@@ -40,7 +41,6 @@ class SwitchSetsDialog: public LwEditorDialog
     int run();
 
     Tileset* get_selected_tileset() {return selected_tileset;}
-    Armyset* get_selected_armyset() {return selected_armyset;}
     Cityset* get_selected_cityset() {return selected_cityset;}
     Shieldset* get_selected_shieldset() {return selected_shieldset;}
 
@@ -56,22 +56,38 @@ class SwitchSetsDialog: public LwEditorDialog
     Gtk::ComboBoxText *tile_size_combobox;
     Gtk::ComboBoxText *tile_theme_combobox;
     Gtk::ComboBoxText *city_theme_combobox;
-    Gtk::ComboBoxText *army_theme_combobox;
     Gtk::ComboBoxText *shield_theme_combobox;
+    Gtk::Grid *armysets_grid;
     Gtk::Button *accept_button;
+    Gtk::Button *make_same_button;
+    std::vector<Gtk::ComboBoxText*> army_theme_comboboxes;
 
     guint32 get_active_tile_size();
     void on_tile_size_changed();
     Tileset* selected_tileset;
     Shieldset* selected_shieldset;
     Cityset* selected_cityset;
-    Armyset* selected_armyset;
+    std::list<sigc::connection> connections;
     bool armyset_changed;
     bool tileset_changed;
     bool cityset_changed;
     bool shieldset_changed;
 
     void switchArmyset(Armyset *armyset);
+    void on_armyset_changed (Gtk::ComboBoxText *c, Player *p);
+    void on_shieldset_changed ();
+    void on_cityset_changed ();
+    void on_tileset_changed ();
+    void on_make_same_activated ();
+
+    void fill_tile_themes (bool &empty);
+    void fill_city_themes (bool &empty);
+    void fill_shield_themes (bool &empty);
+    void fill_army_themes (bool &empty_armysets);
+
+    void connect_signals ();
+    void disconnect_signals ();
+
 };
 
 #endif
