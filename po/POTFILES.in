@@ -125,6 +125,7 @@
 [type: gettext/glade]dat/glade/editor/keeper-dialog.ui
 [type: gettext/glade]dat/glade/editor/editor-save-changes-dialog.ui
 [type: gettext/glade]dat/glade/editor/planted-standard-editor-dialog.ui
+[type: gettext/glade]dat/glade/editor/item-editor-dialog.ui
 [type: gettext/glade]dat/glade/game-button-box-large-screen.ui
 [type: gettext/glade]dat/glade/fighter.ui
 [type: gettext/xml]dat/shield/default/default.lws.in
@@ -323,6 +324,7 @@ src/editor/army-chooser-button.cpp
 src/editor/editor-save-changes-dialog.cpp
 src/editor/tileset-explosion-picture-editor-dialog.cpp
 src/editor/planted-standard-editor-dialog.cpp
+src/editor/item-editor-dialog.cpp
 src/utils/import.cpp
 src/gui/city-info-tip.cpp
 src/gui/game-lobby-dialog.cpp

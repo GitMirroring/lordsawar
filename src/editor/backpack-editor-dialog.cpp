@@ -29,18 +29,22 @@
 #include "ItemProto.h"
 #include "Backpack.h"
 #include "select-item-dialog.h"
+#include "item-editor-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &BackpackEditorDialog::x)
 
 BackpackEditorDialog::BackpackEditorDialog(Gtk::Window &parent, Backpack *pack)
  : LwEditorDialog(parent, "backpack-editor-dialog.ui")
 {
+  d_changed = false;
   backpack = pack;
 
   xml->get_widget("remove_button", remove_button);
+  xml->get_widget("edit_button", edit_button);
   xml->get_widget("add_button", add_button);
   remove_button->signal_clicked().connect(method(on_remove_item_clicked));
   add_button->signal_clicked().connect(method(on_add_item_clicked));
+  edit_button->signal_clicked().connect(method(on_edit_item_clicked));
 
   item_list = Gtk::ListStore::create(item_columns);
   xml->get_widget("treeview", item_treeview);
@@ -57,11 +61,12 @@ void BackpackEditorDialog::hide()
   dialog->hide();
 }
 
-int BackpackEditorDialog::run()
+bool BackpackEditorDialog::run()
 {
   update_buttons ();
   dialog->show_all();
-  return dialog->run ();
+  dialog->run ();
+  return d_changed;
 }
 
 void BackpackEditorDialog::on_item_selection_changed()
@@ -78,6 +83,7 @@ void BackpackEditorDialog::on_remove_item_clicked()
       backpack->removeFromBackpack(item);
       item_list->erase(item_treeview->get_selection()->get_selected());
       on_item_selection_changed();
+      d_changed = true;
     }
 }
 
@@ -93,6 +99,7 @@ void BackpackEditorDialog::on_add_item_clicked()
       backpack->addToBackpack(item);
       add_item(item);
       on_item_selection_changed();
+      d_changed = true;
     }
 }
 
@@ -118,7 +125,26 @@ void BackpackEditorDialog::update_buttons ()
     item_treeview->get_selection();
   Gtk::TreeModel::iterator iterrow = selection->get_selected();
   if (iterrow)
-    remove_button->set_sensitive (true);
+    {
+      remove_button->set_sensitive (true);
+      edit_button->set_sensitive (true);
+    }
   else
-    remove_button->set_sensitive (false);
+    {
+      remove_button->set_sensitive (false);
+      edit_button->set_sensitive (false);
+    }
 }
+
+void BackpackEditorDialog::on_edit_item_clicked()
+{
+  Gtk::TreeIter i = item_treeview->get_selection()->get_selected();
+  if (i)
+    {
+      Item *item = (*i)[item_columns.item];
+      ItemEditorDialog d (*dialog, item);
+      if (d.run ())
+        d_changed = true;
+    }
+}
+

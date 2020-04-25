@@ -32,15 +32,17 @@ class BackpackEditorDialog: public LwEditorDialog
     BackpackEditorDialog(Gtk::Window &parent, Backpack *backpack);
     ~BackpackEditorDialog() {}
 
-    int run();
+    bool run();
     void hide();
     
  private:
+    bool d_changed;
     Backpack *backpack;
 
     Gtk::TreeView *item_treeview;
     Gtk::Button *remove_button;
     Gtk::Button *add_button;
+    Gtk::Button *edit_button;
 
     class ItemColumns: public Gtk::TreeModelColumnRecord {
     public:
@@ -57,6 +59,7 @@ class BackpackEditorDialog: public LwEditorDialog
     void on_item_selection_changed();
     void on_remove_item_clicked();
     void on_add_item_clicked();
+    void on_edit_item_clicked();
 
     void add_item(Item *item);
     void fill_bag();

@@ -1,5 +1,5 @@
 #   Copyright (C) 2007, 2008 Ole Laursen
-#   Copyright (C) 2007, 2008, 2009, 2010, 2015, 2017 Ben Asselstine
+#   Copyright (C) 2007, 2008, 2009, 2010, 2015, 2017, 2020 Ben Asselstine
 #   Copyright (C) 2008 Barry deFreese
 # 
 #   This program is free software; you can redistribute it and/or modify
@@ -80,6 +80,7 @@ libeditor_la_SOURCES =\
 	select-hidden-ruin-dialog.cpp select-hidden-ruin-dialog.h \
 	RenamableLocation.cpp RenamableLocation.h  \
 	backpack-editor-dialog.cpp backpack-editor-dialog.h \
+	item-editor-dialog.cpp item-editor-dialog.h \
 	planted-standard-editor-dialog.cpp planted-standard-editor-dialog.h \
 	hero-editor-dialog.cpp hero-editor-dialog.h \
 	editor-splash-window.cpp editor-splash-window.h \

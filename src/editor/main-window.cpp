@@ -1681,9 +1681,9 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
         if (tag == "bag")
           {
             BackpackEditorDialog d(*window, b);
-            int response = d.run();
-            if (response == Gtk::RESPONSE_ACCEPT)
+            if (d.run())
               {
+                redraw ();
                 needs_saving = true;
                 update_window_title();
               }
@@ -2076,7 +2076,12 @@ void MainWindow::on_bag_selected(Vector<int> tile)
   MapBackpack *bag = 
     GameMap::getInstance()->getTile(tile)->getBackpack();
   BackpackEditorDialog d(*window, dynamic_cast<Backpack*>(bag));
-  d.run();
+  if (d.run())
+    {
+      redraw ();
+      needs_saving = true;
+      update_window_title();
+    }
 }
 
 void MainWindow::on_flag_selected(Vector<int> tile)
