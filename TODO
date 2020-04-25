@@ -49,10 +49,6 @@ saw a crash when switching to a newly made shieldset in the editor.  can't repro
 different selector per player, 8 players
   maybe put these ones in armyset, which override the one in tileset
 
-different boat and standard per player, 8 players
-new perplayermaskedimagedialog
-  where the images are on top in a row, and the masks are below them
-
 maybe improve the ai a bit by: disbanding stacks and creating a stronger type somewhere
 
 stress test with seed 691 takes 1000+ turns to complete
