@@ -249,7 +249,7 @@ class MainWindow: public sigc::trackable
     void on_mouse_on_tile(Vector<int> tile);
     void on_bigmap_tiles_changed (LwRectangle r);
     
-    void popup_dialog_for_object(UniquelyIdentified *object);
+    void popup_dialog_for_object(UniquelyIdentified *object, Glib::ustring tag);
 
     void auto_select_appropriate_pointer();
 
@@ -271,6 +271,7 @@ class MainWindow: public sigc::trackable
     void on_player_toggled(PlayerItem item);
     void update_window_title();
     void on_bag_selected(Vector<int> pos);
+    void on_flag_selected(Vector<int> pos);
     void on_road_edited(Vector<int> pos, int new_type);
     void on_stack_selected_for_battle_calculator(Stack *s);
     void add_attacker_to_battle_calculator(Stack *s);

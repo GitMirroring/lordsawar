@@ -2068,17 +2068,17 @@ PixMask *TilePixMaskCacheItem::generate(TilePixMaskCacheItem i)
           break;
         }
 
-      if (i.has_standard)
-        {
-          player = Playerlist::getInstance()->getPlayer(i.standard_player_id) ;
-          ImageCache::getInstance()->getPlantedStandardPic(player)->blit(pixmap);
-        }
-
       if (i.has_bag)
         {
           PixMask *pic = ImageCache::getInstance()->getBagPic();
           Vector<int>bagsize = Vector<int>(pic->get_width(), pic->get_height());
           pic->blit(pixmap, Vector<int>(uts,uts)-bagsize);
+        }
+
+      if (i.has_standard)
+        {
+          player = Playerlist::getInstance()->getPlayer(i.standard_player_id) ;
+          ImageCache::getInstance()->getPlantedStandardPic(player)->blit(pixmap);
         }
 
       if (i.stack_player_id > -1)

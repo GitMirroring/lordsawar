@@ -83,6 +83,7 @@
 #include "rewardlist-dialog.h"
 #include "timed-message-dialog.h"
 #include "backpack-editor-dialog.h"
+#include "planted-standard-editor-dialog.h"
 #include "MapBackpack.h"
 #include "shieldset-window.h"
 #include "cityset-window.h"
@@ -206,6 +207,8 @@ MainWindow::MainWindow(Glib::ustring load_filename)
 			      EditorBigMap::BAG, 1);
     setup_pointer_radiobutton(xml, "fight", "button_fight",
 			      EditorBigMap::FIGHT, 1);
+    setup_pointer_radiobutton(xml, "draw_flag", "button_flag",
+			      EditorBigMap::FLAG, 1);
 
     xml->get_widget("players_hbox", players_hbox);
     on_pointer_radiobutton_toggled();
@@ -394,6 +397,7 @@ void MainWindow::setup_pointer_radiobutton(Glib::RefPtr<Gtk::Builder> xml,
       case EditorBigMap::PORT:
       case EditorBigMap::BRIDGE:
       case EditorBigMap::BAG:
+      case EditorBigMap::FLAG:
       case EditorBigMap::STONE:
         break;
       }
@@ -1382,7 +1386,8 @@ void MainWindow::on_pointer_radiobutton_toggled()
     bigmap->set_pointer(pointer, size, get_terrain(),
                         get_tile_style_id());
   players_hbox->set_sensitive (pointer == EditorBigMap::STACK || 
-                               pointer == EditorBigMap::CITY);
+                               pointer == EditorBigMap::CITY ||
+                               pointer == EditorBigMap::FLAG);
 }
 
 Tile::Type MainWindow::get_terrain()
@@ -1457,6 +1462,7 @@ void MainWindow::init_maps()
     bigmap->map_changed.connect(method(on_bigmap_changed));
     bigmap->map_water_changed.connect (method(on_smallmap_water_changed));
     bigmap->bag_selected.connect (method(on_bag_selected));
+    bigmap->flag_selected.connect (method(on_flag_selected));
     bigmap->stack_selected_for_battle_calculator.connect
       (method(on_stack_selected_for_battle_calculator));
 
@@ -1501,9 +1507,20 @@ void MainWindow::on_objects_selected(std::vector<UniquelyIdentified *> objects)
 {
     assert(!objects.empty());
 
+    bool bag_and_flag = false;
     if (objects.size() == 1)
+      {
+        MapBackpack *b = dynamic_cast<MapBackpack*>(objects.front ());
+        if (b)
+          {
+            if (b->getFirstPlantedItem () && b->size () > 1)
+              bag_and_flag = true;
+          }
+      }
+
+    if (objects.size() == 1 && !bag_and_flag)
     {
-	popup_dialog_for_object(objects.front());
+	popup_dialog_for_object(objects.front(), "");
     }
     else
     {
@@ -1512,7 +1529,7 @@ void MainWindow::on_objects_selected(std::vector<UniquelyIdentified *> objects)
 	for (std::vector<UniquelyIdentified *>::iterator i = objects.begin(), end = objects.end();
 	     i != end; ++i)
 	{
-	    Glib::ustring s;
+	    Glib::ustring s = "";
 	    if (dynamic_cast<Stack *>(*i))
 		s = _("Stack");
 	    else if (dynamic_cast<City *>(*i))
@@ -1525,23 +1542,55 @@ void MainWindow::on_objects_selected(std::vector<UniquelyIdentified *> objects)
 		s = _("Temple");
 	    else if (dynamic_cast<Road*>(*i))
 		s = _("Road");
-	    else if (dynamic_cast<MapBackpack*>(*i))
-		s = _("Bag");
 	    else if (dynamic_cast<Stone*>(*i))
 		s = _("Standing Stone");
 	    
-	    Gtk::MenuItem *item = manage(new Gtk::MenuItem(s));
-	    item->signal_activate().connect
-              (sigc::bind(method(popup_dialog_for_object), *i));
-	    menu->append(*item);
-	    item->show();
+            if (s.empty () == false)
+              {
+                Gtk::MenuItem *item = manage(new Gtk::MenuItem(s));
+                item->signal_activate().connect
+                  (sigc::bind(method(popup_dialog_for_object), *i, ""));
+                menu->append(*item);
+                item->show();
+              }
 	}
+	for (std::vector<UniquelyIdentified *>::iterator i = objects.begin(), end = objects.end();
+	     i != end; ++i)
+          {
+	    Glib::ustring s = "";
+	    if (dynamic_cast<MapBackpack*>(*i))
+              {
+                bool add_a_bag = true;
+                MapBackpack *b = dynamic_cast<MapBackpack*>(*i);
+                if (b->getFirstPlantedItem ())
+                  {
+                    s = _("Planted Standard");
+                    Gtk::MenuItem *item = manage(new Gtk::MenuItem(s));
+                    item->signal_activate().connect
+                      (sigc::bind(method(popup_dialog_for_object), *i, "flag"));
+                    menu->append(*item);
+                    item->show();
+                    if (b->size () == 1)
+                      add_a_bag = false;
+                  }
+                if (add_a_bag)
+                  {
+                    s = _("Bag");
+                    Gtk::MenuItem *item = manage(new Gtk::MenuItem(s));
+                    item->signal_activate().connect
+                      (sigc::bind(method(popup_dialog_for_object), *i, "bag"));
+                    menu->append(*item);
+                    item->show();
+                  }
+
+              }
+          }
         menu->accelerate (*window);
 	menu->popup_at_pointer(reinterpret_cast<const GdkEvent*>(button_event));
     }
 }
 
-void MainWindow::popup_dialog_for_object(UniquelyIdentified *object)
+void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustring tag)
 {
     if (Stack *s = dynamic_cast<Stack *>(object))
     {
@@ -1626,13 +1675,30 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object)
     }
     else if (MapBackpack *b = dynamic_cast<MapBackpack*>(object))
       {
-	BackpackEditorDialog d(*window, b);
-	int response = d.run();
-	if (response == Gtk::RESPONSE_ACCEPT)
+        if (tag == "")
+          tag = b->getFirstPlantedItem () ? "flag" : "bag";
+
+        if (tag == "bag")
           {
-            needs_saving = true;
-            update_window_title();
+            BackpackEditorDialog d(*window, b);
+            int response = d.run();
+            if (response == Gtk::RESPONSE_ACCEPT)
+              {
+                needs_saving = true;
+                update_window_title();
+              }
           }
+        else if (tag == "flag")
+          {
+            PlantedStandardEditorDialog d (*window, b->getPos ());
+            if (d.run ())
+              {
+                redraw ();
+                needs_saving = true;
+                update_window_title();
+              }
+          }
+
       }
 }
 
@@ -2011,6 +2077,17 @@ void MainWindow::on_bag_selected(Vector<int> tile)
     GameMap::getInstance()->getTile(tile)->getBackpack();
   BackpackEditorDialog d(*window, dynamic_cast<Backpack*>(bag));
   d.run();
+}
+
+void MainWindow::on_flag_selected(Vector<int> tile)
+{
+  PlantedStandardEditorDialog d(*window, tile);
+  if (d.run())
+    {
+      redraw ();
+      needs_saving = true;
+      update_window_title();
+    }
 }
 
 void MainWindow::on_remove_all_stacks_activated()

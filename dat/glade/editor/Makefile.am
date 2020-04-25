@@ -27,6 +27,7 @@ tileset-selector-editor-dialog.ui \
 tileset-flag-editor-dialog.ui \
 tileset-explosion-picture-editor-dialog.ui \
 backpack-editor-dialog.ui \
+planted-standard-editor-dialog.ui \
 hero-editor-dialog.ui \
 masked-image-editor-dialog.ui \
 per-player-masked-image-editor-dialog.ui \

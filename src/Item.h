@@ -88,6 +88,15 @@ class Item: public ItemProto, public UniquelyIdentified
 	//! Return the Player who can plant this particular Item.
 	Player *getPlantableOwner() const; 
 
+        //! Set which player has planted this.
+        void setPlantableOwnerId (guint32 id) {d_plantable_owner_id = id;}
+
+	//! Return the Player who started out with this item.
+	Player *getPlantableOriginalOwner() const; 
+
+        //! Set which player has originally owned this. (for the colour)
+        void setPlantableOriginalOwnerId (guint32 id) {d_plantable_orig_owner_id = id;}
+
 	//! Return the type of this item.
 	guint32 getType() const {return d_type;};
 
@@ -119,6 +128,13 @@ class Item: public ItemProto, public UniquelyIdentified
 	 */
 	//! Whether or not this Item is currently planted.
 	bool d_planted;
+
+	/**
+	 * If the Item is plantable, this value is used to determine if the
+	 * colour of the flag in the ground.
+	 */
+	//! The Id of the Player who originally owned this item.
+	guint32 d_plantable_orig_owner_id;
 
 	//! The item was instantiated from the item prototype that has this id.
 	guint32 d_type;

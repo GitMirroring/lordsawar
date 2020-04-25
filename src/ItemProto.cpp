@@ -250,6 +250,8 @@ Glib::ustring ItemProto::getBonusDescription() const
     s.push_back(_("Take a Neutral City"));
   if (getBonus(ItemProto::TELEPORT_TO_CITY))
     s.push_back(_("Teleport Stack to a City"));
+  if (getBonus(ItemProto::PLANT_TO_VECTOR))
+    s.push_back(_("Army units can be Vectored when Planted"));
 
   if (battle > 0)
     s.push_back(String::ucompose(_("+%1 Battle"), battle));
@@ -257,6 +259,7 @@ Glib::ustring ItemProto::getBonusDescription() const
     s.push_back(String::ucompose(_("+%1 Command"), command));
   if (goldpercity > 0)
     s.push_back(String::ucompose(_("+%1 Gold per City"), goldpercity));
+
 
   Glib::ustring str;
   bool first = true;
@@ -300,6 +303,7 @@ Glib::ustring ItemProto::bonusFlagToString(ItemProto::Bonus bonus)
     case ItemProto::RAISE_DEFENDERS: return "ItemProto::RAISE_DEFENDERS";
     case ItemProto::PERSUADE_NEUTRALS: return "ItemProto::PERSUADE_NEUTRALS";
     case ItemProto::TELEPORT_TO_CITY: return "ItemProto::TELEPORT_TO_CITY";
+    case ItemProto::PLANT_TO_VECTOR: return "ItemProto::PLANT_TO_VECTOR";
     }
   return "ItemProto::ADD1STR";
 }
@@ -355,6 +359,8 @@ Glib::ustring ItemProto::bonusFlagsToString(guint32 bonus)
     bonuses += " " + bonusFlagToString(ItemProto::PERSUADE_NEUTRALS);
   if (bonus & ItemProto::TELEPORT_TO_CITY)
     bonuses += " " + bonusFlagToString(ItemProto::TELEPORT_TO_CITY);
+  if (bonus & ItemProto::PLANT_TO_VECTOR)
+    bonuses += " " + bonusFlagToString(ItemProto::PLANT_TO_VECTOR);
   return bonuses;
 }
 
@@ -391,6 +397,7 @@ guint32 ItemProto::bonusFlagFromString(Glib::ustring str)
   else if (str == "ItemProto::RAISE_DEFENDERS") return ItemProto::RAISE_DEFENDERS;
   else if (str == "ItemProto::PERSUADE_NEUTRALS") return ItemProto::PERSUADE_NEUTRALS;
   else if (str == "ItemProto::TELEPORT_TO_CITY") return ItemProto::TELEPORT_TO_CITY;
+  else if (str == "ItemProto::PLANT_TO_VECTOR") return ItemProto::PLANT_TO_VECTOR;
   return ItemProto::ADD1STR;
 }
 

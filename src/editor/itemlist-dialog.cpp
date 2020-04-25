@@ -129,6 +129,7 @@ void ItemlistDialog::load_widgets ()
   xml->get_widget("uses_spinbutton", uses_spinbutton);
   xml->get_widget("steal_percent_spinbutton", steal_percent_spinbutton);
   xml->get_widget("add_mp_spinbutton", add_mp_spinbutton);
+  xml->get_widget("plantable_switch", plantable_switch);
 }
 
 void ItemlistDialog::connect_signals ()
@@ -178,6 +179,7 @@ void ItemlistDialog::connect_signals ()
   connections.push_back (add_mp_spinbutton->signal_insert_text().connect
     (sigc::hide(sigc::hide(method(on_add_mp_text_changed)))));
   connections.push_back (building_type_to_summon_on_combobox->signal_changed ().connect (method (on_building_type_to_summon_on_changed)));
+  connections.push_back (plantable_switch->property_active().signal_changed().connect (method(on_plantable_toggled)));
 }
 
 void ItemlistDialog::disconnect_signals ()
@@ -663,4 +665,9 @@ void ItemlistDialog::on_building_type_to_summon_on_changed ()
 {
   guint32 row = building_type_to_summon_on_combobox->get_active_row_number ();
   d_item->setBuildingTypeToSummonOn(row);
+}
+
+void ItemlistDialog::on_plantable_toggled()
+{
+  on_switch_toggled(plantable_switch, ItemProto::PLANT_TO_VECTOR);
 }

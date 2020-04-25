@@ -78,6 +78,7 @@ class ItemlistDialog: public LwEditorDialog
     Gtk::SpinButton *add_mp_spinbutton;
     ArmyChooserButton *defender_army_type_button;
     Gtk::SpinButton *num_defenders_spinbutton;
+    Gtk::Switch *plantable_switch;
     std::vector<sigc::connection> connections;
 
 
@@ -147,6 +148,7 @@ class ItemlistDialog: public LwEditorDialog
     void on_num_defenders_text_changed();
     void on_persuade_neutral_city_toggled();
     void on_teleport_to_city_toggled();
+    void on_plantable_toggled();
     void connect_signals ();
     void disconnect_signals ();
     void load_widgets ();

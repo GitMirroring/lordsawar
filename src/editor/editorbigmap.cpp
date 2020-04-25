@@ -591,6 +591,11 @@ void EditorBigMap::change_map_under_cursor()
         bag_selected.emit(tile);
       break;
 
+    case FLAG:
+      if (maptile->getType() != Tile::WATER)
+        flag_selected.emit(tile);
+      break;
+
     case FIGHT:
         {
           Stack *s = GameMap::getStack(tile);
@@ -943,6 +948,13 @@ void EditorBigMap::after_draw()
               pic = ImageCache::getInstance()->getBagPic();
               //Vector<int> offset = Vector<int>(tilesize,tilesize) - 
                 //Vector<int>(pic->get_width(), pic->get_height());
+              blit (pic, buffer, pos, armyset->get_scale ());
+            }
+          break;
+        case FLAG:
+            {
+              Player *neutrals = Playerlist::getInstance()->getNeutral();
+              pic = ImageCache::getInstance()->getPlantedStandardPic(neutrals);
               blit (pic, buffer, pos, armyset->get_scale ());
             }
           break;

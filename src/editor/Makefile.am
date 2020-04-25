@@ -80,6 +80,7 @@ libeditor_la_SOURCES =\
 	select-hidden-ruin-dialog.cpp select-hidden-ruin-dialog.h \
 	RenamableLocation.cpp RenamableLocation.h  \
 	backpack-editor-dialog.cpp backpack-editor-dialog.h \
+	planted-standard-editor-dialog.cpp planted-standard-editor-dialog.h \
 	hero-editor-dialog.cpp hero-editor-dialog.h \
 	editor-splash-window.cpp editor-splash-window.h \
 	fight-order-editor-dialog.cpp fight-order-editor-dialog.h \

@@ -96,7 +96,9 @@ class ItemProto: public Renamable
           //! Coerce a neutral city into flying your flag.
           PERSUADE_NEUTRALS = 0x00400000,
           //! Take the stack to a tile outside of a given city.
-          TELEPORT_TO_CITY  = 0x00800000
+          TELEPORT_TO_CITY = 0x00800000,
+          //! Plantable in the ground.
+          PLANT_TO_VECTOR = 0x01000000
         };
 
         enum UsableItems {
@@ -245,7 +247,6 @@ class ItemProto: public Renamable
 	static Glib::ustring bonusFlagToString(ItemProto::Bonus type);
 	static guint32 bonusFlagFromString(Glib::ustring str);
 
-
 };
 
-#endif //ITEM_PROTOTYPE_H
+#endif //ITEM_PROTO_H

@@ -54,7 +54,8 @@ class EditorBigMap: public BigMap
 	BRIDGE,
 	BAG,
 	FIGHT,
-        STONE
+        STONE,
+	FLAG,
     };
     void set_pointer(Pointer pointer, int size, Tile::Type terrain, 
 		     int tile_style_id);
@@ -76,8 +77,8 @@ class EditorBigMap: public BigMap
     // emitted when the water on the map is altered.
     sigc::signal<void> map_water_changed;
 
-    // emitted when the water on the map is altered.
     sigc::signal<void, Vector<int> > bag_selected;
+    sigc::signal<void, Vector<int> > flag_selected;
     sigc::signal<void, Stack*> stack_selected_for_battle_calculator;
 
     void smooth_view();

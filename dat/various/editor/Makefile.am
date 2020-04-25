@@ -18,6 +18,7 @@ editor_DATA = button_selector.png \
 			button_bridge.png \
 			button_port.png \
 			button_bag.png \
+			button_flag.png \
 			button_move.png \
 			button_fight.png \
 			button_stone.png

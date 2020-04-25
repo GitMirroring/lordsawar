@@ -39,10 +39,12 @@ Item::Item(XML_Helper* helper)
       {
         helper->getData(d_plantable_owner_id, "plantable_owner");
         helper->getData(d_planted, "planted");
+        helper->getData(d_plantable_orig_owner_id, "plantable_orig_owner");
       }
     else
       {
 	d_plantable_owner_id = MAX_PLAYERS;
+	d_plantable_orig_owner_id = d_plantable_owner_id;
 	d_planted = false;
       }
 
@@ -56,34 +58,22 @@ Item::Item(Glib::ustring name, bool plantable, Player *plantable_owner)
   d_type = 0;
   d_bonus = 0;
   d_plantable = plantable;
+  if (d_plantable)
+    d_bonus = ItemProto::PLANT_TO_VECTOR;
   if (plantable_owner)
     d_plantable_owner_id = plantable_owner->getId();
   else
     d_plantable_owner_id = MAX_PLAYERS;
+  d_plantable_orig_owner_id = d_plantable_owner_id;
   d_planted = false;
   //std::cerr << "item created with id " << d_id << std::endl;
 }
-
-/*
-Item::Item(Glib::ustring name, bool plantable, Player *plantable_owner, guint32 id)
-	: ItemProto(name), UniquelyIdentified(id)
-{
-  d_type = 0;
-  d_bonus = 0;
-  d_plantable = plantable;
-  if (plantable_owner)
-    d_plantable_owner_id = plantable_owner->getId();
-  else
-    d_plantable_owner_id = MAX_PLAYERS;
-  d_planted = false;
-  //std::cerr << "item created with id " << d_id << std::endl;
-}
-*/
 
 Item::Item(const Item& orig)
 :ItemProto(orig), UniquelyIdentified(orig), 
     d_plantable(orig.d_plantable), 
     d_plantable_owner_id(orig.d_plantable_owner_id), d_planted(orig.d_planted),
+    d_plantable_orig_owner_id(orig.d_plantable_orig_owner_id),
     d_type(orig.d_type)
 {
 }
@@ -92,8 +82,10 @@ Item::Item(const ItemProto &proto, guint32 type_id)
 :ItemProto(proto), UniquelyIdentified()
 {
   d_type = type_id;
-  d_plantable = false;
+  d_plantable = 
+    (d_bonus & ItemProto::PLANT_TO_VECTOR) == ItemProto::PLANT_TO_VECTOR;
   d_plantable_owner_id = MAX_PLAYERS;
+  d_plantable_orig_owner_id = d_plantable_owner_id;
   d_planted = false;
 }
 
@@ -115,6 +107,7 @@ bool Item::save(XML_Helper* helper) const
     {
       retval &= helper->saveData("plantable_owner", d_plantable_owner_id);
       retval &= helper->saveData("planted", d_planted);
+      retval &= helper->saveData("plantable_orig_owner", d_plantable_orig_owner_id);
     }
   retval &= helper->saveData("id", d_id);
   retval &= helper->saveData("type", d_type);
@@ -139,4 +132,9 @@ bool Item::use()
 Player *Item::getPlantableOwner() const
 {
   return Playerlist::getInstance()->getPlayer(d_plantable_owner_id);
+}
+
+Player *Item::getPlantableOriginalOwner() const
+{
+  return Playerlist::getInstance()->getPlayer(d_plantable_orig_owner_id);
 }

@@ -477,14 +477,14 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
       if (flag)
 	standard_planted = true;
 
-      //only show one of the bag or the flag
       if (standard_planted && flag)
 	{
 	  has_standard = true;
-	  player_standard_id = flag->getPlantableOwner()->getId();
+	  player_standard_id = flag->getPlantableOriginalOwner()->getId();
+          has_bag = backpack->size () > 1;
 	}
       else
-	has_bag = true;
+        has_bag = true;
     }
 
   Stack *stack = GameMap::getStrongestStack(tile);
