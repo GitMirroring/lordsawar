@@ -58,5 +58,3 @@ new perplayermaskedimagedialog
 maybe improve the ai a bit by: disbanding stacks and creating a stronger type somewhere
 
 stress test with seed 691 takes 1000+ turns to complete
-
-use a listbox instead of treeview in heroes dialog
