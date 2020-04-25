@@ -56,3 +56,9 @@ stress test with seed 691 takes 1000+ turns to complete
 put move bonus graphics into tileset
 
 plant a standard in the editor
+
+bag editor doesn't relate changedness
+
+scenario builder can't inspect instances of items
+
+export image doesn't do anything?
