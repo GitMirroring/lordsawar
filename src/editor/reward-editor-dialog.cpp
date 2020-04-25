@@ -247,7 +247,7 @@ void RewardEditorDialog::set_item_name()
   if (item)
     name = item->getName();
   else
-    name = _("No item");
+    name = _("No item set");
 
   item_button->set_label(name);
 }
