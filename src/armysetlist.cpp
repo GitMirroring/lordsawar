@@ -117,14 +117,15 @@ ArmyProto* Armysetlist::lookupWeakestQuickestArmy(guint32 id) const
   return NULL;
 }
 
-PixMask* Armysetlist::getShipMask (guint32 id)
+std::vector<PixMask*> Armysetlist::getShipMasks (guint32 id)
 {
   for (iterator it = begin(); it != end(); it++)
     {
       if ((*it)->getId() == id)
-	return (*it)->getShipMask();
+	return (*it)->getShipMasks();
     }
-  return NULL;
+  std::vector<PixMask*> empt;
+  return empt;
 }
 
 guint32 Armysetlist::getTileSize(guint32 id)
@@ -147,24 +148,26 @@ PixMask* Armysetlist::getBagPic (guint32 id)
   return NULL;
 }
 
-PixMask* Armysetlist::getStandardPic (guint32 id)
+std::vector<PixMask*> Armysetlist::getStandardPics (guint32 id)
 {
   for (iterator it = begin(); it != end(); it++)
     {
       if ((*it)->getId() == id)
-	return (*it)->getStandardPic();
+	return (*it)->getStandardPics();
     }
-  return NULL;
+  std::vector<PixMask*> empt;
+  return empt;
 }
 
-PixMask* Armysetlist::getStandardMask (guint32 id)
+std::vector<PixMask*> Armysetlist::getStandardMasks (guint32 id)
 {
   for (iterator it = begin(); it != end(); it++)
     {
       if ((*it)->getId() == id)
-	return (*it)->getStandardMask();
+	return (*it)->getStandardMasks();
     }
-  return NULL;
+  std::vector<PixMask*> empt;
+  return empt;
 }
 
 void Armysetlist::instantiateImages(bool &broken)
@@ -186,13 +189,14 @@ void Armysetlist::uninstantiateImages()
     (*it)->uninstantiateImages();
 }
 
-PixMask* Armysetlist::getShipPic (guint32 id)
+std::vector<PixMask*> Armysetlist::getShipPics (guint32 id)
 {
   for (iterator it = begin(); it != end(); it++)
     {
       if ((*it)->getId() == id)
-       return (*it)->getShipPic();
+       return (*it)->getShipPics();
     }
-  return NULL;
+  std::vector<PixMask*> empt;
+  return empt;
 }
 

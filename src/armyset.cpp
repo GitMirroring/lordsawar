@@ -42,8 +42,7 @@ Glib::ustring Armyset::file_extension = ARMYSET_EXT;
 
 #define DEFAULT_ARMY_TILE_SIZE 40
 Armyset::Armyset(guint32 id, Glib::ustring name)
- : Set(ARMYSET_EXT, id, name, DEFAULT_ARMY_TILE_SIZE), 
-        d_ship(0), d_shipmask(0), d_standard(0), d_standard_mask(0), d_bag(0)
+ : Set(ARMYSET_EXT, id, name, DEFAULT_ARMY_TILE_SIZE), d_bag(0)
 {
   d_bag_name = "";
   d_stackship_name = "";
@@ -51,8 +50,7 @@ Armyset::Armyset(guint32 id, Glib::ustring name)
 }
 
 Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
- : Set(ARMYSET_EXT, helper), d_ship(0), d_shipmask(0), d_standard(0), 
-    d_standard_mask(0), d_bag(0)
+ : Set(ARMYSET_EXT, helper), d_bag(0)
 {
   d_bag_name = "";
   d_stackship_name = "";
@@ -72,21 +70,20 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
 }
 
 Armyset::Armyset(const Armyset& a)
- : std::list<ArmyProto*>(), sigc::trackable(a), Set(a), d_ship(0), 
-    d_shipmask(0), d_standard(0), d_standard_mask(0), d_bag(0)
+ : std::list<ArmyProto*>(), sigc::trackable(a), Set(a), d_bag(0)
 {
 
-  if (a.d_ship)
-    d_ship = a.d_ship->copy();
+  for (guint32 i = 0; i < a.d_ship.size (); i++)
+    d_ship.push_back (a.d_ship[i]->copy ());
 
-  if (a.d_shipmask)
-    d_shipmask = a.d_shipmask->copy();
+  for (guint32 i = 0; i < a.d_shipmask.size (); i++)
+    d_shipmask.push_back (a.d_shipmask[i]->copy ());
 
-  if (a.d_standard)
-    d_standard = a.d_standard->copy();
+  for (guint32 i = 0; i < a.d_ship.size (); i++)
+    d_standard.push_back (a.d_standard[i]->copy ());
 
-  if (a.d_standard_mask)
-    d_standard_mask = a.d_standard_mask->copy();
+  for (guint32 i = 0; i < a.d_standard_mask.size (); i++)
+    d_standard_mask.push_back (a.d_standard_mask[i]->copy ());
 
   if (a.d_bag)
     d_bag = a.d_bag->copy();
@@ -534,49 +531,49 @@ void Armyset::uninstantiateImages()
   for (iterator it = begin(); it != end(); it++)
     (*it)->uninstantiateImages();
 
-  if (d_ship)
-    delete d_ship;
+  for (guint32 i = 0; i < d_standard.size(); i++)
+    delete d_standard[i];
+  d_standard.clear ();
 
-  if (d_shipmask)
-    delete d_shipmask;
-
-  if (d_standard)
-    delete d_standard;
-
-  if (d_standard_mask)
-    delete d_standard_mask;
+  for (guint32 i = 0; i < d_standard_mask.size(); i++)
+    delete d_standard_mask[i];
+  d_standard_mask.clear ();
 
   if (d_bag)
     delete d_bag;
 
-  d_ship = NULL;
-  d_shipmask = NULL;
-  d_standard = NULL;
-  d_standard_mask = NULL;
+  for (guint32 i = 0; i < d_ship.size(); i++)
+    delete d_ship[i];
+  d_ship.clear ();
+
+  for (guint32 i = 0; i < d_shipmask.size(); i++)
+    delete d_shipmask[i];
+  d_shipmask.clear ();
+
   d_bag = NULL;
 }
 
 void Armyset::loadShipPic(Glib::ustring image_filename, bool scale,
                           bool &broken)
 {
-  if (image_filename.empty() == true)
+  PixMask *p = PixMask::create (image_filename, broken);
+  if (broken)
+    return;
+  std::vector<PixMask*> pics =
+    disassemble_row(p->to_pixbuf (), MAX_PLAYERS, true);
+  std::vector<PixMask*> masks =
+    disassemble_row(p->to_pixbuf (), MAX_PLAYERS, false);
+  delete p;
+  if (scale)
     {
-      broken = true;
-      return;
+      int s = getUnscaledTileSize();
+      for (guint32 i = 0; i < pics.size (); i++)
+        PixMask::scale(pics[i], s, s);
+      for (guint32 i = 0; i < masks.size (); i++)
+        PixMask::scale(masks[i], s, s);
     }
-  std::vector<PixMask*> half;
-  half = disassemble_row(image_filename, 2, broken);
-  if (!broken)
-    {
-      if (scale)
-        {
-          int s = getUnscaledTileSize();
-          PixMask::scale(half[0], s, s);
-          PixMask::scale(half[1], s, s);
-        }
-      setShipImage(half[0]);
-      setShipMask(half[1]);
-    }
+  setShipImages (pics);
+  setShipMasks (masks);
 }
 
 void Armyset::loadBagPic(Glib::ustring image_filename, bool &broken)
@@ -593,23 +590,24 @@ void Armyset::loadBagPic(Glib::ustring image_filename, bool &broken)
 void Armyset::loadStandardPic(Glib::ustring image_filename, bool scale,
                               bool &broken)
 {
-  if (image_filename.empty() == true)
+  PixMask *p = PixMask::create (image_filename, broken);
+  if (broken)
+    return;
+  std::vector<PixMask*> pics =
+    disassemble_row(p->to_pixbuf (), MAX_PLAYERS, true);
+  std::vector<PixMask*> masks =
+    disassemble_row(p->to_pixbuf (), MAX_PLAYERS, false);
+  delete p;
+  if (scale)
     {
-      broken = true;
-      return;
+      int s = getUnscaledTileSize();
+      for (guint32 i = 0; i < pics.size (); i++)
+        PixMask::scale(pics[i], s, s);
+      for (guint32 i = 0; i < masks.size (); i++)
+        PixMask::scale(masks[i], s, s);
     }
-  std::vector<PixMask*> half = disassemble_row(image_filename, 2, broken);
-  if (!broken)
-    {
-      if (scale)
-        {
-          int s = getUnscaledTileSize();
-          PixMask::scale(half[0], s, s);
-          PixMask::scale(half[1], s, s);
-        }
-      setStandardPic(half[0]);
-      setStandardMask(half[1]);
-    }
+  setStandardPics (pics);
+  setStandardMasks (masks);
 }
 
 void Armyset::switchArmysetForRuinKeeper(Army *army, const Armyset *armyset)
@@ -866,10 +864,10 @@ bool Armyset::calculate_preferred_tile_size(guint32 &ts) const
   guint32 tilesize = 0;
   std::map<guint32, guint32> sizecounts;
 
-  if (d_ship)
-    sizecounts[d_ship->get_unscaled_width()]++;
-  if (d_standard)
-    sizecounts[d_standard->get_unscaled_width()]++;
+  if (d_ship.empty () == false)
+    sizecounts[d_ship[0]->get_unscaled_width()]++;
+  if (d_standard.empty () == false)
+    sizecounts[d_standard[0]->get_unscaled_width()]++;
   if (d_bag)
     sizecounts[d_bag->get_unscaled_width()]++;
   for (const_iterator it = begin(); it != end(); it++)
@@ -957,15 +955,23 @@ void Armyset::clearStandardImage (bool clear_name)
   if (clear_name)
     setStandardImageName ("");
 
-  PixMask *p = getStandardPic ();
-  if (p)
-    delete p;
-  setStandardPic (NULL);
+  std::vector<PixMask *>pics = getStandardPics ();
+  for (auto  p : pics)
+    {
+      if (p)
+        delete p;
+    }
+  pics.clear ();
+  setStandardPics (pics);
 
-  p = getStandardMask ();
-  if (p)
-    delete p;
-  setStandardMask (NULL);
+  pics = getStandardMasks ();
+  for (auto p : pics)
+    {
+      if (p)
+        delete p;
+    }
+  pics.clear ();
+  setStandardMasks (pics);
 }
 
 void Armyset::clearBagImage (bool clear_name)
@@ -984,15 +990,23 @@ void Armyset::clearShipImage (bool clear_name)
   if (clear_name)
     setShipImageName ("");
 
-  PixMask *p = getShipPic ();
-  if (p)
-    delete p;
-  setShipImage (NULL);
+  std::vector<PixMask *>pics = getShipPics ();
+  for (auto  p : pics)
+    {
+      if (p)
+        delete p;
+    }
+  pics.clear ();
+  setShipImages (pics);
 
-  p = getShipMask ();
-  if (p)
-    delete p;
-  setShipMask (NULL);
+  pics = getShipMasks ();
+  for (auto p : pics)
+    {
+      if (p)
+        delete p;
+    }
+  pics.clear ();
+  setShipMasks (pics);
 }
 
 bool Armyset::instantiateBagImage ()

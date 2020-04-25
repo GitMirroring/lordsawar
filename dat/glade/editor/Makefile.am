@@ -29,6 +29,7 @@ tileset-explosion-picture-editor-dialog.ui \
 backpack-editor-dialog.ui \
 hero-editor-dialog.ui \
 masked-image-editor-dialog.ui \
+per-player-masked-image-editor-dialog.ui \
 image-editor-dialog.ui \
 editor-quit-dialog.ui \
 tileset-smallmap-building-colors-dialog.ui \

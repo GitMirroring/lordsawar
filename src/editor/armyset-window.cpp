@@ -28,6 +28,7 @@
 #include "builder-cache.h"
 #include "armyset-info-dialog.h"
 #include "masked-image-editor-dialog.h"
+#include "per-player-masked-image-editor-dialog.h"
 
 #include "defs.h"
 #include "Configuration.h"
@@ -680,9 +681,9 @@ void ArmySetWindow::on_save_armyset_activated()
 void ArmySetWindow::on_edit_ship_picture_activated()
 {
   Glib::ustring imgname = d_armyset->getShipImageName();
-  MaskedImageEditorDialog d(*window, imgname,
-                            d_armyset->getShipPic (),
-                            d_armyset->getShipMask (),
+  PerPlayerMaskedImageEditorDialog d(*window, imgname,
+                            d_armyset->getShipPics (),
+                            d_armyset->getShipMasks (),
                             EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
   d.set_title(_("Select a Ship image"));
   int response = d.run();
@@ -722,10 +723,10 @@ void ArmySetWindow::on_edit_ship_picture_activated()
 void ArmySetWindow::on_edit_standard_picture_activated()
 {
   Glib::ustring imgname = d_armyset->getStandardImageName();
-  MaskedImageEditorDialog d(*window, imgname,
-                            d_armyset->getStandardPic (),
-                            d_armyset->getStandardMask (),
-                            EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
+  PerPlayerMaskedImageEditorDialog d(*window, imgname,
+                                     d_armyset->getStandardPics (),
+                                     d_armyset->getStandardMasks (),
+                                     EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
   d.set_title(_("Select a Hero Flag image"));
   int response = d.run();
   if (response == Gtk::RESPONSE_ACCEPT && d.get_filename() != "")

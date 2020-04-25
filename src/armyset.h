@@ -100,16 +100,16 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         bool save(Glib::ustring filename, Glib::ustring ext) const;
 
 	//! Get the image of the stack in a ship (minus the mask).
-	PixMask* getShipPic() const {return d_ship;}
+        std::vector<PixMask*> getShipPics() const {return d_ship;}
 
 	//! Set the image of the stack in a ship
-	void setShipImage(PixMask* ship) {d_ship = ship;};
+	void setShipImages(std::vector<PixMask*> ship) {d_ship = ship;};
 
 	//! Get the mask portion of the image of the stack in a ship.
-	PixMask* getShipMask() const {return d_shipmask;}
+        std::vector<PixMask*> getShipMasks() const {return d_shipmask;}
 
 	//! Set the mask portion of the image of the stack in a ship.
-	void setShipMask(PixMask* shipmask) {d_shipmask = shipmask;};
+	void setShipMasks(std::vector<PixMask*> shipmask) {d_shipmask = shipmask;};
 
         //! Clear the ship name, pic, and mask
         void clearShipImage (bool clear_name = true);
@@ -130,16 +130,16 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         bool instantiateBagImage ();
 
 	//! Get the image of the planted standard (minus the mask).
-	PixMask* getStandardPic() const {return d_standard;}
+        std::vector<PixMask*> getStandardPics() const {return d_standard;}
 
 	//! Set the image of the planted standard (minus the mask).
-	void setStandardPic(PixMask* s) {d_standard = s;};
+	void setStandardPics(std::vector<PixMask*> s) {d_standard = s;};
 
 	//! Get the mask portion of the image of the planted standard.
-	PixMask* getStandardMask() const {return d_standard_mask;}
+        std::vector<PixMask*> getStandardMasks() const {return d_standard_mask;}
 
 	//! Set the mask portion of the image of the planted standard.
-	void setStandardMask(PixMask* s) {d_standard_mask = s;};
+	void setStandardMasks(std::vector<PixMask*> s) {d_standard_mask = s;};
 
         //! Clear the standard (hero's flag) name, pic and mask
         void clearStandardImage (bool clear_name = true);
@@ -245,16 +245,16 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         bool loadArmyProto(Glib::ustring tag, XML_Helper* helper);
         
 	//! The unshaded picture of the stack when it's in a boat.
-	PixMask* d_ship;
+        std::vector<PixMask*> d_ship;
 
 	//! The mask of what to shade with the player's colour on the boat.
-	PixMask* d_shipmask;
+        std::vector<PixMask*> d_shipmask;
 
 	//! The unshaded picture of the planted standard.
-	PixMask* d_standard;
+        std::vector<PixMask*> d_standard;
 
 	//! The mask of what to shade with the player's colour on the standard.
-	PixMask* d_standard_mask;
+        std::vector<PixMask*> d_standard_mask;
 
 	//! The picture of an item when it's lying on the ground.
 	PixMask *d_bag;

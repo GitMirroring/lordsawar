@@ -73,19 +73,19 @@ class Armysetlist : public SetList<Armyset>, public sigc::trackable
         ArmyProto* lookupWeakestQuickestArmy(guint32 id) const;
 
 	//! Get the unshaded ship image for the given Armyset.
-	PixMask* getShipPic (guint32 id);
+        std::vector<PixMask*> getShipPics (guint32 id);
 
 	//! Get the ship mask picture for the given Armyset.
-	PixMask* getShipMask (guint32 id);
+        std::vector<PixMask*> getShipMasks (guint32 id);
 
 	//! Get the unshaded planted standard picture for the given Armyset.
-	PixMask* getStandardPic (guint32 id);
+        std::vector<PixMask*> getStandardPics (guint32 id);
 
 	//! Get the bag of oitems picture for the given Armyset.
 	PixMask* getBagPic (guint32 id);
 
 	//! Get the planted standard mask for the given Armyset.
-	PixMask* getStandardMask (guint32 id);
+        std::vector<PixMask*> getStandardMasks (guint32 id);
         guint32 getTileSize(guint32 id);
 
 	void instantiateImages(bool &broken);

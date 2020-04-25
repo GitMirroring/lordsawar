@@ -2449,10 +2449,21 @@ int MoveBonusPixMaskCacheItem::comp(const MoveBonusPixMaskCacheItem item) const
 PixMask *ShipPixMaskCacheItem::generate(ShipPixMaskCacheItem i)
 {
   // copy the pixmap including player colors
-  return ImageCache::applyMask
-    (Armysetlist::getInstance()->getShipPic(i.armyset),
-     Armysetlist::getInstance()->getShipMask(i.armyset),
-     Playerlist::getInstance()->getPlayer(i.player_id));
+  if (i.player_id != MAX_PLAYERS)
+    {
+      std::vector<PixMask*> pics = Armysetlist::getInstance()->getShipPics(i.armyset);
+      PixMask *pic = pics[i.player_id];
+      std::vector<PixMask*> masks= Armysetlist::getInstance()->getShipMasks(i.armyset);
+      PixMask *mask = masks[i.player_id];
+
+      return ImageCache::applyMask
+        (pic, mask, Playerlist::getInstance()->getPlayer(i.player_id));
+    }
+  else //we can put a neutral ship in the water in the editor
+    {
+      std::vector<PixMask*> pics = Armysetlist::getInstance()->getShipPics(i.armyset);
+      return pics[0]->copy ();
+    }
 }
 
 int ShipPixMaskCacheItem::comp(const ShipPixMaskCacheItem item) const
@@ -2467,11 +2478,24 @@ int ShipPixMaskCacheItem::comp(const ShipPixMaskCacheItem item) const
 
 PixMask *PlantedStandardPixMaskCacheItem::generate(PlantedStandardPixMaskCacheItem i)
 {
-  // copy the pixmap including player colors
-  return ImageCache::applyMask
-    (Armysetlist::getInstance()->getStandardPic(i.armyset),
-     Armysetlist::getInstance()->getStandardMask(i.armyset),
-     Playerlist::getInstance()->getPlayer(i.player_id));
+  if (i.player_id != MAX_PLAYERS)
+    {
+      std::vector<PixMask*> pics =
+        Armysetlist::getInstance()->getStandardPics(i.armyset);
+      PixMask *pic = pics[i.player_id];
+      std::vector<PixMask*> masks =
+        Armysetlist::getInstance()->getStandardMasks(i.armyset);
+      PixMask *mask = masks[i.player_id];
+      // copy the pixmap including player colors
+      return ImageCache::applyMask
+        (pic, mask, Playerlist::getInstance()->getPlayer(i.player_id));
+    }
+  else //we currently can't plant a neutral standard but just in case
+    {
+      std::vector<PixMask*> pics =
+        Armysetlist::getInstance()->getStandardPics(i.armyset);
+      return pics[0]->copy ();
+    }
 }
 
 int PlantedStandardPixMaskCacheItem::comp(const PlantedStandardPixMaskCacheItem item) const
