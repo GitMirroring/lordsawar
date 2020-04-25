@@ -35,74 +35,24 @@
 #include "game-parameters.h"
 #include "CreateScenarioRandomize.h"
 #include "heroes-dialog.h"
+#include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &PlayersDialog::x)
 
-namespace
-{
-    Glib::ustring player_type_to_string(guint32 type)
-    {
-	switch (type)
-	{
-	case Player::HUMAN: return HUMAN_PLAYER_TYPE;
-	case Player::AI_FAST: return EASY_PLAYER_TYPE;
-	case Player::AI_SMART: return HARD_PLAYER_TYPE;
-	default: return NO_PLAYER_TYPE;
-	}
-    }
-}
-
 PlayersDialog::PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *random)
-  : LwEditorDialog(parent, "players-dialog.ui"),
-    type_column(_("Type"), type_renderer),
-    gold_column(_("Gold"), gold_renderer),
-    name_column(_("Name"), name_renderer)
+  : LwEditorDialog(parent, "players-dialog.ui")
 {
   d_random = random;
   d_changed = false;
 
-  // setup the player settings
-  player_list = Gtk::ListStore::create(player_columns);
-
   xml->get_widget("randomize_gold_button", randomize_gold_button);
   randomize_gold_button->signal_clicked().connect (method(on_randomize_gold_pressed));
-  xml->get_widget("heroes_button", heroes_button);
-  heroes_button->signal_clicked().connect (method(on_edit_heroes_pressed));
-  xml->get_widget("player_treeview", player_treeview);
-  player_treeview->set_model(player_list);
-
-  // the type column
-  player_type_list = Gtk::ListStore::create(player_type_columns);
-  Gtk::TreeModel::iterator i;
-  i = player_type_list->append();
-  (*i)[player_type_columns.type] = HUMAN_PLAYER_TYPE;
-  i = player_type_list->append();
-  (*i)[player_type_columns.type] = EASY_PLAYER_TYPE;
-  i = player_type_list->append();
-  (*i)[player_type_columns.type] = HARD_PLAYER_TYPE;
-  i = player_type_list->append();
-  (*i)[player_type_columns.type] = NO_PLAYER_TYPE;
-
-  type_renderer.property_model() = player_type_list;
-  type_renderer.property_text_column() = 0;
-  type_renderer.property_has_entry() = false;
-  type_renderer.property_editable() = true;
-
-  type_renderer.signal_edited().connect(method(on_type_edited));
-  type_column.set_cell_data_func(type_renderer, method(cell_data_type));
-  player_treeview->append_column(type_column);
-
-  // name column
-  name_renderer.property_editable() = true;
-  name_renderer.signal_edited().connect (method(on_name_edited));
-  name_column.set_cell_data_func(name_renderer, method(cell_data_name));
-  player_treeview->append_column(name_column);
-
-  // gold column
-  gold_renderer.property_editable() = true;
-  gold_renderer.signal_edited().connect (method(on_gold_edited));
-  gold_column.set_cell_data_func (gold_renderer, method(cell_data_gold));
-  player_treeview->append_column(gold_column);
+  xml->get_widget("players_grid", players_grid);
+  int px = FontSize::getInstance ()->get_height () / 2;
+  players_grid->property_row_spacing () = px;
+  players_grid->property_column_spacing () = px;
+  Gdk::RGBA white = Gdk::RGBA ("white");
+  players_grid->override_background_color(white);
 
   // add default players
   default_player_names.push_back(random->getPlayerName(Shield::WHITE));
@@ -131,24 +81,23 @@ PlayersDialog::PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *rando
     if (players_to_add[j])
       {
 	Player *player = players_to_add[j];
-	add_player(player_type_to_string(player->getType()),
+	add_player(j,
 		   player->getName(), player->getGold(), player);
 	++current_name;
       }
     else
       {
 	int gold = 0;
-	add_player(NO_PLAYER_TYPE, *current_name, gold, 0);
+	add_player(j, *current_name, gold, NULL);
 	++current_name;
       }
-  player_treeview->set_cursor (Gtk::TreePath ("0"));
 }
 
-GameParameters::Player PlayersDialog::to_player (Gtk::TreeModel::iterator i)
+GameParameters::Player PlayersDialog::to_player (int row)
 {
   GameParameters::Player player;
-  Glib::ustring type = (*i)[player_columns.type];
-  player.name = (*i)[player_columns.name];
+  Glib::ustring type = player_type_comboboxes[row]->get_active_text ();
+  player.name = player_name_entries[row]->get_text ();
   if (type == HUMAN_PLAYER_TYPE)
     player.type = GameParameters::Player::HUMAN;
   else if (type == EASY_PLAYER_TYPE)
@@ -157,23 +106,17 @@ GameParameters::Player PlayersDialog::to_player (Gtk::TreeModel::iterator i)
     player.type = GameParameters::Player::HARD;
   else if (type == NO_PLAYER_TYPE)
     player.type = GameParameters::Player::OFF;
-  Gtk::TreeModel::Path path = player_treeview->get_model()->get_path (i);
-  player.id = atoi (path.to_string ().c_str ());
+  player.id = row;
   return player;
 }
 
-void PlayersDialog::update_player ()
+void PlayersDialog::update_player (int row)
 {
-  Gtk::TreeModel::Path path;
-  Gtk::TreeViewColumn* focus_column;
-  player_treeview->get_cursor (path, focus_column);
-  Gtk::TreeModel::iterator i = player_treeview->get_model()->get_iter(path);
-  GameParameters::Player player = to_player (i);
+  GameParameters::Player player = to_player (row);
   Playerlist::getInstance ()->syncPlayer(player);
   Player *p = Playerlist::getInstance ()->getPlayer(player.id);
-  (*i)[player_columns.player] = p;
   if (p)
-    p->setGold((*i)[player_columns.gold]);
+    p->setGold(player_gold_spinbuttons[row]->get_value ());
 }
 
 bool PlayersDialog::run()
@@ -183,100 +126,130 @@ bool PlayersDialog::run()
   return d_changed;
 }
 
-void PlayersDialog::cell_data_type(Gtk::CellRenderer *renderer,
-                                   const Gtk::TreeIter& i)
+Gtk::Entry * PlayersDialog::add_entry_for_player_name(int row,
+                                                      Glib::ustring name)
 {
-  dynamic_cast<Gtk::CellRendererText*>(renderer)->property_text()
-    = (*i)[player_columns.type];
+  Gtk::Entry *e = Gtk::manage (new Gtk::Entry ());
+  e->set_text (name);
+  e->property_hexpand () = true;
+  e->signal_changed ().connect(sigc::bind (method (on_player_name_changed), row));
+  player_name_entries.push_back (e);
+  return e;
 }
 
-void PlayersDialog::on_type_edited(const Glib::ustring &path,
-                                   const Glib::ustring &new_text)
+Gtk::Button* PlayersDialog::add_button_for_player_heroes (int row)
 {
-  (*player_list->get_iter(Gtk::TreePath(path)))[player_columns.type] = new_text;
+  Gtk::Button *b = Gtk::manage (new Gtk::Button());
+  b->set_label (_("Heroes"));
+  b->signal_clicked ().connect(sigc::bind (method (on_player_heroes_clicked), row));
+  int px = FontSize::getInstance ()->get_height ();
+  b->property_margin_right () = px;
+  player_heroes_buttons.push_back (b);
+  return b;
+}
+
+Gtk::SpinButton* PlayersDialog::add_spinbutton_for_player_gold(int row,
+                                                               int gold)
+{
+  Gtk::SpinButton *b = Gtk::manage (new Gtk::SpinButton());
+  b->set_adjustment (Gtk::Adjustment::create (0, 0, 10000));
+  b->set_value (gold);
+  b->signal_changed ().connect(sigc::bind (method (on_player_gold_changed), row));
+  b->signal_insert_text().connect (sigc::bind(method(on_player_gold_edited), row));
+  player_gold_spinbuttons.push_back (b);
+  return b;
+}
+
+Gtk::ComboBoxText* PlayersDialog::add_combo_for_player_type (int row, Player *p)
+{
+  Gtk::ComboBoxText *c = Gtk::manage (new Gtk::ComboBoxText ());
+
+  c->append (NO_PLAYER_TYPE);
+  c->append (HUMAN_PLAYER_TYPE);
+  c->append (EASY_PLAYER_TYPE);
+  c->append (HARD_PLAYER_TYPE);
+  if (p == NULL)
+    c->set_active (0);
+  else
+    {
+      switch (p->getType ())
+        {
+        case Player::HUMAN: c->set_active (1); break;
+        case Player::AI_FAST: c->set_active (2); break;
+        case Player::AI_SMART: c->set_active (3); break;
+        default: c->set_active (0); break;
+        }
+    }
+  c->signal_changed ().connect(sigc::bind (method (on_player_type_changed), row));
+  int px = FontSize::getInstance ()->get_height ();
+  c->property_margin_left () = px;
+  player_type_comboboxes.push_back (c);
+  return c;
+}
+
+void PlayersDialog::add_player(int row, Glib::ustring name, int gold, Player *p)
+{
+  players_grid->attach (*add_combo_for_player_type (row, p), 0, row + 1);
+  players_grid->attach (*add_entry_for_player_name (row, name), 1, row + 1);
+  players_grid->attach (*add_spinbutton_for_player_gold (row, gold), 2, row + 1);
+  players_grid->attach (*add_button_for_player_heroes (row), 3, row + 1);
+  sensitize_row (row);
+}
+
+void PlayersDialog::on_player_type_changed (int row)
+{
+  sensitize_row (row);
   d_changed = true;
-  update_player ();
+  update_player (row);
 }
 
-void PlayersDialog::add_player(const Glib::ustring &type,
-                               const Glib::ustring &name, int gold, Player *player)
+void PlayersDialog::on_player_name_changed (int row)
 {
-  Gtk::TreeIter i = player_list->append();
-  (*i)[player_columns.type] = type;
-  (*i)[player_columns.name] = name;
-  (*i)[player_columns.gold] = gold;
-  (*i)[player_columns.player] = player;
-
-  player_treeview->get_selection()->select(i);
+  d_changed = true;
+  update_player (row);
 }
 
-void PlayersDialog::cell_data_gold(Gtk::CellRenderer *renderer,
-				  const Gtk::TreeIter& i)
+void PlayersDialog::on_player_gold_changed (int row)
 {
-  dynamic_cast<Gtk::CellRendererSpin*>(renderer)->property_adjustment()
-    = Gtk::Adjustment::create((*i)[player_columns.gold], 0, 10000, 1);
-  dynamic_cast<Gtk::CellRendererSpin*>(renderer)->property_text() =
-    String::ucompose("%1", (*i)[player_columns.gold]);
+  d_changed = true;
+  update_player (row);
 }
 
-void PlayersDialog::on_gold_edited(const Glib::ustring &path,
-				   const Glib::ustring &new_text)
+void PlayersDialog::on_player_gold_edited (const Glib::ustring &text, int *p, int row)
 {
-  Gtk::TreeIter i = player_list->get_iter(Gtk::TreePath(path));
-  if ((*i)[player_columns.type] != NO_PLAYER_TYPE)
-    {
-      int gold = atoi(new_text.c_str());
-      (*i)[player_columns.gold] = gold;
-      d_changed = true;
-      update_player ();
-    }
+  (void) p;
+  (void) text;
+  d_changed = true;
+  update_player (row);
 }
 
-void PlayersDialog::cell_data_name(Gtk::CellRenderer *renderer,
-				  const Gtk::TreeIter& i)
+void PlayersDialog::on_player_heroes_clicked (int row)
 {
-  dynamic_cast<Gtk::CellRendererText*>(renderer)->property_text() =
-    String::ucompose("%1", (*i)[player_columns.name]);
-}
-
-void PlayersDialog::on_name_edited(const Glib::ustring &path,
-				   const Glib::ustring &new_text)
-{
-  Gtk::TreeIter i = player_list->get_iter(Gtk::TreePath(path));
-  Glib::ustring type = (*i)[player_columns.type];
-  if (type != NO_PLAYER_TYPE)
-    {
-      (*i)[player_columns.name] = new_text;
-      d_changed = true;
-      update_player ();
-    }
+  HeroesDialog d (*dialog, row, player_name_entries[row]->get_text ());
+  if (d.run ())
+    d_changed = true;
 }
 
 void PlayersDialog::on_randomize_gold_pressed()
 {
-  for (Gtk::TreeIter i = player_list->children().begin(),
-       end = player_list->children().end(); i != end; ++i)
+  d_changed = true;
+  for (guint32 i = 0; i < player_type_comboboxes.size (); i++)
     {
-      if ((*i)[player_columns.type] != NO_PLAYER_TYPE)
-        {
-          int gold = 0;
-          d_random->getBaseGold(100, &gold);
-          gold = d_random->adjustBaseGold(gold);
-          (*i)[player_columns.gold] = gold;
-          Player *p = (*i)[player_columns.player];
-          p->setGold (gold);
-          d_changed = true;
-        }
+      if (player_type_comboboxes[i]->get_active_row_number () == 0)
+        continue;
+      int gold = 0;
+      d_random->getBaseGold(100, &gold);
+      gold = d_random->adjustBaseGold(gold);
+      Player *p = Playerlist::getInstance()->getPlayer (i);
+      p->setGold (gold);
+      player_gold_spinbuttons[i]->set_value (gold);
     }
 }
 
-void PlayersDialog::on_edit_heroes_pressed ()
+void PlayersDialog::sensitize_row (int i)
 {
-  Gtk::TreeIter i = player_treeview->get_selection()->get_selected();
-  Gtk::TreeModel::Path path = player_treeview->get_model()->get_path (i);
-  guint32 player_id = atoi (path.to_string ().c_str ());
-  Glib::ustring name = (*i)[player_columns.name];
-  HeroesDialog d (*dialog, player_id, name);
-  if (d.run ())
-    d_changed = true;
+  bool sens = player_type_comboboxes[i]->get_active_row_number () != 0;
+  player_name_entries[i]->property_sensitive () = sens;
+  player_heroes_buttons[i]->property_sensitive () = sens;
+  player_gold_spinbuttons[i]->property_sensitive () = sens;
 }

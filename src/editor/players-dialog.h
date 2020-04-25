@@ -39,58 +39,35 @@ class PlayersDialog: public LwEditorDialog
 
  private:
     bool d_changed;
-    Gtk::TreeView *player_treeview;
+    Gtk::Grid *players_grid;
 
-    class PlayerColumns: public Gtk::TreeModelColumnRecord {
-    public:
-	PlayerColumns()
-	    { add(type); add(name); add(gold); add(player); }
-	
-	Gtk::TreeModelColumn<Glib::ustring> type, name;
-	Gtk::TreeModelColumn<int> gold;
-	Gtk::TreeModelColumn<Player *> player;
-    };
-    const PlayerColumns player_columns;
-    Glib::RefPtr<Gtk::ListStore> player_list;
-
-    Gtk::CellRendererCombo type_renderer;
-    Gtk::TreeViewColumn type_column;
-    Gtk::CellRendererSpin gold_renderer;
-    Gtk::TreeViewColumn gold_column;
-    Gtk::CellRendererText name_renderer;
-    Gtk::TreeViewColumn name_column;
     Gtk::Button *randomize_gold_button;
-    Gtk::Button *heroes_button;
-
-    class PlayerTypeColumns: public Gtk::TreeModelColumnRecord {
-    public:
-	PlayerTypeColumns()
-	    { add(type); }
-	
-	Gtk::TreeModelColumn<Glib::ustring> type;
-    };
-    const PlayerTypeColumns player_type_columns;
-    Glib::RefPtr<Gtk::ListStore> player_type_list;
 
     typedef std::vector<Glib::ustring> player_name_seq;
     player_name_seq default_player_names;
 
-    void cell_data_type(Gtk::CellRenderer *renderer, const Gtk::TreeIter &i);
-    void on_type_edited(const Glib::ustring &path,
-			const Glib::ustring &new_text);
-    void cell_data_gold(Gtk::CellRenderer *renderer, const Gtk::TreeIter& i);
-    void on_gold_edited(const Glib::ustring &path, const Glib::ustring &new_text);
-    void cell_data_name(Gtk::CellRenderer *renderer, const Gtk::TreeIter& i);
-    void on_name_edited(const Glib::ustring &path, const Glib::ustring &new_text);
-
-    void add_player(const Glib::ustring &type, const Glib::ustring &name,
-		    int gold, Player *player);
+    void add_player(int row, Glib::ustring name, int gold, Player *player);
     void on_randomize_gold_pressed();
-    void on_edit_heroes_pressed();
     CreateScenarioRandomize *d_random;
+    std::vector<Gtk::ComboBoxText*> player_type_comboboxes;
+    std::vector<Gtk::Entry*> player_name_entries;
+    std::vector<Gtk::SpinButton*> player_gold_spinbuttons;
+    std::vector<Gtk::Button*> player_heroes_buttons;
 
-    void update_player ();
-    GameParameters::Player to_player (Gtk::TreeModel::iterator i);
+    void update_player (int row);
+
+    Gtk::ComboBoxText* add_combo_for_player_type (int row, Player *p);
+    Gtk::Entry* add_entry_for_player_name(int row, Glib::ustring name);
+    Gtk::SpinButton* add_spinbutton_for_player_gold(int row, int gold);
+    Gtk::Button* add_button_for_player_heroes(int row);
+
+    void on_player_type_changed (int row);
+    void on_player_name_changed (int row);
+    void on_player_gold_changed (int row);
+    void on_player_gold_edited (const Glib::ustring &text, int *p, int row);
+    void on_player_heroes_clicked (int row);
+    void sensitize_row (int i);
+    GameParameters::Player to_player (int row);
 };
 
 #endif
