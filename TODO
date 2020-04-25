@@ -38,8 +38,6 @@ should we do anything when an armyset, etc gets removed from disk after it is lo
 add a way to reset the hero names in the editor, and items, and player names.
 i guess there's the larger issue of 'undo'.
 
-d_gender gets saved out twice in a heroproto.  the armyproto also has it.  this doesn't seem to hurt anything but it should probably be gotten to the bottom of.
-
 figure out the mysterious 1.65 number in smallmap.cpp.
 
 bag not being scaled at all in armyset.  should it be?  it sticks out.
