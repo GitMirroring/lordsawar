@@ -89,15 +89,6 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkMenuItem" id="export_as_bitmap_menuitem">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="tooltip_text" translatable="yes">Save a picture of the map.</property>
-                            <property name="label" translatable="yes">Export As Image...</property>
-                            <property name="use_underline">True</property>
-                          </object>
-                        </child>
-                        <child>
                           <object class="GtkMenuItem" id="validate_menuitem">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
