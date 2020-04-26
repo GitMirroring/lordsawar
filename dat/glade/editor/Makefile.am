@@ -24,6 +24,7 @@ tileset-window.ui \
 tileset-info-dialog.ui \
 tile-preview-dialog.ui \
 tileset-selector-editor-dialog.ui \
+armyset-selector-editor-dialog.ui \
 tileset-flag-editor-dialog.ui \
 tileset-explosion-picture-editor-dialog.ui \
 backpack-editor-dialog.ui \

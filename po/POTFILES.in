@@ -98,6 +98,7 @@
 [type: gettext/glade]dat/glade/editor/tile-preview-dialog.ui
 [type: gettext/glade]dat/glade/editor/tileset-info-dialog.ui
 [type: gettext/glade]dat/glade/editor/tileset-selector-editor-dialog.ui
+[type: gettext/glade]dat/glade/editor/armyset-selector-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/tileset-flag-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/tileset-explosion-picture-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/masked-image-editor-dialog.ui
@@ -307,6 +308,7 @@ src/editor/shieldset-info-dialog.cpp
 src/editor/shieldset-window.cpp
 src/editor/tileset-flag-editor-dialog.cpp
 src/editor/tileset-selector-editor-dialog.cpp
+src/editor/armyset-selector-editor-dialog.cpp
 src/editor/editor-quit-dialog.cpp
 src/editor/editor-splash-window.cpp
 src/editor/image-editor-dialog.cpp

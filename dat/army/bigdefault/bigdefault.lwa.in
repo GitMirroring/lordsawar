@@ -9,6 +9,22 @@
 	<d_stackship>stackship</d_stackship>
 	<d_plantedstandard>plantedstandard</d_plantedstandard>
 	<d_bag>items</d_bag>
+        <d_white_small_selector></d_white_small_selector>
+        <d_green_small_selector></d_green_small_selector>
+        <d_yellow_small_selector></d_yellow_small_selector>
+        <d_dark_blue_small_selector></d_dark_blue_small_selector>
+        <d_orange_small_selector></d_orange_small_selector>
+        <d_light_blue_small_selector></d_light_blue_small_selector>
+        <d_red_small_selector></d_red_small_selector>
+        <d_black_small_selector>small_selector</d_black_small_selector>
+        <d_white_large_selector></d_white_large_selector>
+        <d_green_large_selector></d_green_large_selector>
+        <d_yellow_large_selector></d_yellow_large_selector>
+        <d_dark_blue_large_selector></d_dark_blue_large_selector>
+        <d_orange_large_selector></d_orange_large_selector>
+        <d_light_blue_large_selector></d_light_blue_large_selector>
+        <d_red_large_selector></d_red_large_selector>
+        <d_black_large_selector>selector</d_black_large_selector>
 	<armyproto>
                 <d_id>0</d_id>
 		<_d_name>Scouts</_d_name>

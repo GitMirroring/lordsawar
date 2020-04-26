@@ -41,7 +41,9 @@ IMAGES = \
 	$(srcdir)/stackship.png \
 	$(srcdir)/unicorns.png \
 	$(srcdir)/wizards.png \
-	$(srcdir)/wolfriders.png
+	$(srcdir)/wolfriders.png \
+	$(srcdir)/selector.png \
+	$(srcdir)/small_selector.png
 
 EXTRA_DIST = \
 	default.lwa.in \

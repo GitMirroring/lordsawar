@@ -118,6 +118,7 @@ class ArmySetWindow: public sigc::trackable
     Gtk::MenuItem *edit_ship_picture_menuitem;
     Gtk::MenuItem *edit_standard_picture_menuitem;
     Gtk::MenuItem *edit_bag_picture_menuitem;
+    Gtk::MenuItem *edit_selector_menuitem;
     Gtk::MenuItem *quit_menuitem;
     Gtk::MenuItem *help_about_menuitem;
     Gtk::MenuItem *tutorial_menuitem;
@@ -152,6 +153,7 @@ class ArmySetWindow: public sigc::trackable
     void on_edit_standard_picture_activated();
     void on_edit_bag_picture_activated();
     void on_edit_ship_picture_activated();
+    void on_edit_selector_picture_activated();
     void on_help_about_activated();
     void on_tutorial_video_activated();
     void on_army_selected();

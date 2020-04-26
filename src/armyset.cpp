@@ -33,6 +33,7 @@
 #include "xmlhelper.h"
 #include "rnd.h"
 #include "player.h"
+#include "ImageCache.h"
 
 Glib::ustring Armyset::d_tag = "armyset";
 Glib::ustring Armyset::file_extension = ARMYSET_EXT;
@@ -47,6 +48,72 @@ Armyset::Armyset(guint32 id, Glib::ustring name)
   d_bag_name = "";
   d_stackship_name = "";
   d_standard_name = "";
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      setLargeSelectorFilename (c, "");
+      setSmallSelectorFilename (c, "");
+    }
+
+  clear_vectors ();
+}
+
+void Armyset::read_selector_name (XML_Helper *helper, Shield::Colour c, bool large)
+{
+  Glib::ustring name = "";
+  Glib::ustring file = "";
+  if (c == Shield::NEUTRAL)
+    return;
+  switch (c)
+    {
+    case Shield::WHITE: name = "white"; break;
+    case Shield::GREEN: name = "green"; break;
+    case Shield::YELLOW: name = "yellow"; break;
+    case Shield::LIGHT_BLUE: name = "light_blue"; break;
+    case Shield::ORANGE: name = "orange"; break;
+    case Shield::DARK_BLUE: name = "dark_blue"; break;
+    case Shield::RED: name = "red"; break;
+    case Shield::BLACK: name = "black"; break;
+    default: break;
+    }
+  if (large)
+    name += "_large_selector";
+  else
+    name += "_small_selector";
+
+  helper->getData(file, name);
+  File::add_png_if_no_ext (file);
+
+  if (large)
+    {
+      switch (c)
+        {
+        case Shield::WHITE: d_large_white_selector = file; break;
+        case Shield::GREEN: d_large_green_selector = file; break;
+        case Shield::YELLOW: d_large_yellow_selector = file; break;
+        case Shield::LIGHT_BLUE: d_large_light_blue_selector = file; break;
+        case Shield::ORANGE: d_large_orange_selector = file; break;
+        case Shield::DARK_BLUE: d_large_dark_blue_selector = file; break;
+        case Shield::RED: d_large_red_selector = file; break;
+        case Shield::BLACK: d_large_black_selector = file; break;
+        default: break;
+        }
+    }
+  else
+    {
+      switch (c)
+        {
+        case Shield::WHITE: d_small_white_selector = file; break;
+        case Shield::GREEN: d_small_green_selector = file; break;
+        case Shield::YELLOW: d_small_yellow_selector = file; break;
+        case Shield::LIGHT_BLUE: d_small_light_blue_selector = file; break;
+        case Shield::ORANGE: d_small_orange_selector = file; break;
+        case Shield::DARK_BLUE: d_small_dark_blue_selector = file; break;
+        case Shield::RED: d_small_red_selector = file; break;
+        case Shield::BLACK: d_small_black_selector = file; break;
+        default: break;
+        }
+    }
 }
 
 Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
@@ -55,6 +122,14 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
   d_bag_name = "";
   d_stackship_name = "";
   d_standard_name = "";
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      setLargeSelectorFilename (c, "");
+      setSmallSelectorFilename (c, "");
+    }
+
+  clear_vectors ();
   setDirectory(directory);
   guint32 ts;
   helper->getData(ts, "tilesize");
@@ -65,6 +140,13 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
   File::add_png_if_no_ext (d_standard_name);
   helper->getData(d_bag_name, "bag");
   File::add_png_if_no_ext (d_bag_name);
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    read_selector_name (helper, Shield::Colour(i), true);
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    read_selector_name (helper, Shield::Colour(i), false);
+
   helper->registerTag(ArmyProto::d_tag, 
 		      sigc::mem_fun((*this), &Armyset::loadArmyProto));
 }
@@ -72,7 +154,6 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
 Armyset::Armyset(const Armyset& a)
  : std::list<ArmyProto*>(), sigc::trackable(a), Set(a), d_bag(0)
 {
-
   for (guint32 i = 0; i < a.d_ship.size (); i++)
     d_ship.push_back (a.d_ship[i]->copy ());
 
@@ -84,6 +165,80 @@ Armyset::Armyset(const Armyset& a)
 
   for (guint32 i = 0; i < a.d_standard_mask.size (); i++)
     d_standard_mask.push_back (a.d_standard_mask[i]->copy ());
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      setSmallSelectorFilename (c, a.getSmallSelectorFilename (c));
+    }
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      setLargeSelectorFilename (c, a.getLargeSelectorFilename (c));
+    }
+        
+  clear_vectors ();
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      setNumberOfSelectorFrames (c, a.getNumberOfSelectorFrames (c));
+    }
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      setNumberOfSmallSelectorFrames (c, a.getNumberOfSmallSelectorFrames (c));
+    }
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      for (guint32 j = 0; j < getNumberOfSelectorFrames (c); j++)
+        {
+          if (a.getSelectorImage (c, j))
+            setSelectorImage (c, j, a.getSelectorImage (c, j)->copy ());
+          else
+            setSelectorImage (c, j, NULL);
+        }
+    }
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      for (guint32 j = 0; j < getNumberOfSmallSelectorFrames (c); j++)
+        {
+          if (a.getSmallSelectorImage (c, j))
+            setSmallSelectorImage (c, j, a.getSmallSelectorImage (c, j)->copy ());
+          else
+            setSmallSelectorImage (c, j, NULL);
+        }
+    }
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      for (guint32 j = 0; j < getNumberOfSelectorFrames (c); j++)
+        {
+          if (a.getSelectorMask (c, j))
+            setSelectorMask (c, j, a.getSelectorMask (c, j)->copy ());
+          else
+            setSelectorMask (c, j, NULL);
+        }
+    }
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      for (guint32 j = 0; j < getNumberOfSmallSelectorFrames (c); j++)
+        {
+          if (a.getSmallSelectorMask (c, j))
+            setSmallSelectorMask (c, j, a.getSmallSelectorMask (c, j)->copy ());
+          else
+            setSmallSelectorMask (c, j, NULL);
+        }
+    }
 
   if (a.d_bag)
     d_bag = a.d_bag->copy();
@@ -132,6 +287,61 @@ bool Armyset::save(Glib::ustring filename, Glib::ustring ext) const
   return saveTar(tmpfile, tmpfile + ".tar", goodfilename, extrafiles);
 }
 
+void Armyset::write_selector_name (XML_Helper *helper, Shield::Colour c, bool large) const
+{
+  if (c == Shield::NEUTRAL)
+    return;
+  Glib::ustring name = "";
+  switch (c)
+    {
+    case Shield::WHITE: name = "white"; break;
+    case Shield::GREEN: name = "green"; break;
+    case Shield::YELLOW: name = "yellow"; break;
+    case Shield::LIGHT_BLUE: name = "light_blue"; break;
+    case Shield::ORANGE: name = "orange"; break;
+    case Shield::DARK_BLUE: name = "dark_blue"; break;
+    case Shield::RED: name = "red"; break;
+    case Shield::BLACK: name = "black"; break;
+    default: break;
+    }
+  if (large)
+    name += "_large_selector";
+  else
+    name += "_small_selector";
+  Glib::ustring filename = "";
+  if (large)
+    {
+      switch (c)
+        {
+        case Shield::WHITE: filename = d_large_white_selector; break;
+        case Shield::GREEN: filename = d_large_green_selector; break;
+        case Shield::YELLOW: filename = d_large_yellow_selector; break;
+        case Shield::LIGHT_BLUE: filename = d_large_light_blue_selector; break;
+        case Shield::ORANGE: filename = d_large_orange_selector; break;
+        case Shield::DARK_BLUE: filename = d_large_dark_blue_selector; break;
+        case Shield::RED: filename = d_large_red_selector; break;
+        case Shield::BLACK: filename = d_large_black_selector; break;
+        default: break;
+        }
+    }
+  else
+    {
+      switch (c)
+        {
+        case Shield::WHITE: filename = d_small_white_selector; break;
+        case Shield::GREEN: filename = d_small_green_selector; break;
+        case Shield::YELLOW: filename = d_small_yellow_selector; break;
+        case Shield::LIGHT_BLUE: filename = d_small_light_blue_selector; break;
+        case Shield::ORANGE: filename = d_small_orange_selector; break;
+        case Shield::DARK_BLUE: filename = d_small_dark_blue_selector; break;
+        case Shield::RED: filename = d_small_red_selector; break;
+        case Shield::BLACK: filename = d_small_black_selector; break;
+        default: break;
+        }
+    }
+  helper->saveData(name, filename);
+}
+
 bool Armyset::save(XML_Helper* helper) const
 {
     bool retval = true;
@@ -143,6 +353,12 @@ bool Armyset::save(XML_Helper* helper) const
     retval &= helper->saveData("stackship", d_stackship_name);
     retval &= helper->saveData("plantedstandard", d_standard_name);
     retval &= helper->saveData("bag", d_bag_name);
+
+    for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+      write_selector_name (helper, Shield::Colour(i), true);
+
+    for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+      write_selector_name (helper, Shield::Colour(i), false);
 
     for (const_iterator it = begin(); it != end(); it++)
       (*it)->save(helper);
@@ -509,6 +725,7 @@ void Armyset::instantiateImages(bool scale, bool &broken)
 
   if (!broken)
     {
+
       if (ship_filename.empty() == false)
         loadShipPic(ship_filename, scale, broken);
       if (flag_filename.empty() == false)
@@ -523,7 +740,67 @@ void Armyset::instantiateImages(bool scale, bool &broken)
     File::erase(flag_filename);
   if (bag_filename.empty() == false)
     File::erase(bag_filename);
+      
+  bool ret = loadSelectorPics (&t);
+  if (ret == false)
+    broken = false;
   t.Close();
+}
+      
+bool Armyset::loadSelectorPics (Tar_Helper *t)
+{
+  bool broken = false;
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      Glib::ustring filename = "";
+      if (getLargeSelectorFilename (c) != "")
+        filename = t->getFile (getLargeSelectorFilename (c), broken);
+      if (filename.empty () == false)
+        {
+          std::vector<PixMask* > images;
+          std::vector<PixMask* > masks;
+          bool success =
+            SelectorPixMaskCacheItem::loadSelectorImages (filename, 
+                                                          getUnscaledTileSize(), 
+                                                          images, masks, true);
+          if (success)
+            {
+              setNumberOfSelectorFrames(c, images.size());
+              for (unsigned int j = 0; j < images.size(); j++)
+                {
+                  setSelectorImage(c, j, images[j]);
+                  setSelectorMask(c, j, masks[j]);
+                }
+            }
+          File::erase(filename);
+        }
+      if (!broken)
+        {
+          filename = "";
+          if (getSmallSelectorFilename (c) != "")
+            filename = t->getFile (getSmallSelectorFilename (c), broken);
+          if (filename.empty () == false)
+            {
+              std::vector<PixMask* > images;
+              std::vector<PixMask* > masks;
+              bool success =
+                SelectorPixMaskCacheItem::loadSelectorImages
+                (filename, getUnscaledTileSize(), images, masks, true);
+              if (success)
+                {
+                  setNumberOfSmallSelectorFrames(c, images.size());
+                  for (unsigned int j = 0; j < images.size(); j++)
+                    {
+                      setSmallSelectorImage(c, j, images[j]);
+                      setSmallSelectorMask(c, j, masks[j]);
+                    }
+                }
+              File::erase(filename);
+            }
+        }
+    }
+  return broken;
 }
 
 void Armyset::uninstantiateImages()
@@ -538,6 +815,51 @@ void Armyset::uninstantiateImages()
   for (guint32 i = 0; i < d_standard_mask.size(); i++)
     delete d_standard_mask[i];
   d_standard_mask.clear ();
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      for (guint32 j = 0; j < getNumberOfSelectorFrames (c); j++)
+        {
+          PixMask *p = getSelectorImage (c, j);
+          if (p)
+            delete p;
+        }
+    }
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      for (guint32 j = 0; j < getNumberOfSelectorFrames (c); j++)
+        {
+          PixMask *p = getSelectorMask (c, j);
+          if (p)
+            delete p;
+        }
+    }
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      for (guint32 j = 0; j < getNumberOfSmallSelectorFrames (c); j++)
+        {
+          PixMask *p = getSmallSelectorImage (c, j);
+          if (p)
+            delete p;
+        }
+    }
+
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      for (guint32 j = 0; j < getNumberOfSmallSelectorFrames (c); j++)
+        {
+          PixMask *p = getSmallSelectorMask (c, j);
+          if (p)
+            delete p;
+        }
+    }
+  clear_vectors ();
 
   if (d_bag)
     delete d_bag;
@@ -1076,6 +1398,14 @@ guint32 Armyset::get_default_tile_size ()
 
 void Armyset::uninstantiateSameNamedImages (Glib::ustring name)
 {
+  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    {
+      Shield::Colour c = Shield::Colour (i);
+      if (getLargeSelectorFilename (c) == name)
+        clearLargeSelectorImage (c);
+      if (getSmallSelectorFilename (c) == name)
+        clearSmallSelectorImage (c);
+    }
   if (getBagImageName() == name)
     clearBagImage ();
   if (getStandardImageName() == name)
@@ -1091,4 +1421,510 @@ void Armyset::uninstantiateSameNamedImages (Glib::ustring name)
             (*i)->clearImage (c);
         }
     }
+}
+
+void Armyset::clearSmallSelectorImage (Shield::Colour c, bool clear_name)
+{
+  if (clear_name)
+    setSmallSelectorFilename (c, "");
+
+  for (unsigned int i = 0; i < getNumberOfSmallSelectorFrames(c); i++)
+    {
+      PixMask *p = getSmallSelectorImage (c, i);
+      if (p)
+        delete p;
+      setSmallSelectorImage (c, i, NULL);
+      p = getSmallSelectorMask (c, i);
+      if (p)
+        delete p;
+      setSmallSelectorMask (c, i, NULL);
+    }
+}
+
+void Armyset::clearLargeSelectorImage (Shield::Colour c, bool clear_name)
+{
+  if (clear_name)
+    setLargeSelectorFilename (c, "");
+
+  for (unsigned int i = 0; i < getNumberOfSelectorFrames(c); i++)
+    {
+      PixMask *p = getSelectorImage (c, i);
+      if (p)
+        delete p;
+      setSelectorImage (c, i, NULL);
+      p = getSelectorMask (c, i);
+      if (p)
+        delete p;
+      setSelectorMask (c, i, NULL);
+    }
+}
+
+bool Armyset::instantiateSmallSelectorImages()
+{
+  for (int i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    if (instantiateSmallSelectorImages(Shield::Colour (i)) == false)
+      return false;
+  return true;
+}
+
+bool Armyset::instantiateSmallSelectorImages(Shield::Colour c)
+{
+  clearSmallSelectorImage (c, false);
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getSmallSelectorFilename(c);
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          std::vector<PixMask* > images, masks;
+          bool success =
+            SelectorPixMaskCacheItem::loadSelectorImages
+            (filename, getUnscaledTileSize(), images, masks, false);
+          if (success)
+            {
+              setNumberOfSmallSelectorFrames(c, images.size());
+              for (unsigned int i = 0; i < images.size(); i++)
+                {
+                  setSmallSelectorImage(c, i, images[i]);
+                  setSmallSelectorMask(c, i, masks[i]);
+                }
+            }
+          else
+            broken = true;
+        }
+    }
+  return broken;
+}
+
+bool Armyset::instantiateLargeSelectorImages()
+{
+  for (int i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+    if (instantiateLargeSelectorImages(Shield::Colour (i)) == false)
+      return false;
+  return true;
+}
+
+bool Armyset::instantiateLargeSelectorImages(Shield::Colour c)
+{
+  clearLargeSelectorImage (c, false);
+  bool broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return broken;
+  Glib::ustring imgname = getLargeSelectorFilename(c);
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t.getFile(imgname, broken);
+      if (!broken)
+        {
+          std::vector<PixMask* > images, masks;
+          bool success =
+            SelectorPixMaskCacheItem::loadSelectorImages
+            (filename, getUnscaledTileSize(), images, masks, false);
+          if (success)
+            {
+              setNumberOfSelectorFrames(c, images.size());
+              for (unsigned int i = 0; i < images.size(); i++)
+                {
+                  setSelectorImage(c, i, images[i]);
+                  setSelectorMask(c, i, masks[i]);
+                }
+            }
+          else
+            broken = true;
+        }
+    }
+  return broken;
+}
+
+PixMask *Armyset::getSelectorImage(Shield::Colour c, guint32 i) const
+{
+  switch (c)
+    {
+    case Shield::WHITE: return white_selector[i];
+    case Shield::GREEN: return green_selector[i];
+    case Shield::YELLOW: return yellow_selector[i];
+    case Shield::LIGHT_BLUE: return light_blue_selector[i];
+    case Shield::ORANGE: return orange_selector[i];
+    case Shield::DARK_BLUE: return dark_blue_selector[i];
+    case Shield::RED: return red_selector[i];
+    case Shield::BLACK: return black_selector[i];
+    default: return NULL;
+    }
+  return NULL;
+}
+
+PixMask *Armyset::getSelectorMask(Shield::Colour c, guint32 i) const
+{
+  switch (c)
+    {
+    case Shield::WHITE: return white_selectormask[i];
+    case Shield::GREEN: return green_selectormask[i];
+    case Shield::YELLOW: return yellow_selectormask[i];
+    case Shield::LIGHT_BLUE: return light_blue_selectormask[i];
+    case Shield::ORANGE: return orange_selectormask[i];
+    case Shield::DARK_BLUE: return dark_blue_selectormask[i];
+    case Shield::RED: return red_selectormask[i];
+    case Shield::BLACK: return black_selectormask[i];
+    default: return NULL;
+    }
+  return NULL;
+}
+
+PixMask *Armyset::getSmallSelectorImage(Shield::Colour c, guint32 i) const
+{
+  switch (c)
+    {
+    case Shield::WHITE: return white_smallselector[i];
+    case Shield::GREEN: return green_smallselector[i];
+    case Shield::YELLOW: return yellow_smallselector[i];
+    case Shield::LIGHT_BLUE: return light_blue_smallselector[i];
+    case Shield::ORANGE: return orange_smallselector[i];
+    case Shield::DARK_BLUE: return dark_blue_smallselector[i];
+    case Shield::RED: return red_smallselector[i];
+    case Shield::BLACK: return black_smallselector[i];
+    default: return NULL;
+    }
+  return NULL;
+}
+
+PixMask *Armyset::getSmallSelectorMask(Shield::Colour c, guint32 i) const
+{
+  switch (c)
+    {
+    case Shield::WHITE: return white_smallselectormask[i];
+    case Shield::GREEN: return green_smallselectormask[i];
+    case Shield::YELLOW: return yellow_smallselectormask[i];
+    case Shield::LIGHT_BLUE: return light_blue_smallselectormask[i];
+    case Shield::ORANGE: return orange_smallselectormask[i];
+    case Shield::DARK_BLUE: return dark_blue_smallselectormask[i];
+    case Shield::RED: return red_smallselectormask[i];
+    case Shield::BLACK: return black_smallselectormask[i];
+    default: return NULL;
+    }
+  return NULL;
+}
+
+void Armyset::setSmallSelectorImage(Shield::Colour c, guint32 i, PixMask *p)
+{
+  switch (c)
+    {
+    case Shield::WHITE: white_smallselector[i] = p; break;
+    case Shield::GREEN: green_smallselector[i] = p; break;
+    case Shield::YELLOW: yellow_smallselector[i] = p; break;
+    case Shield::LIGHT_BLUE: light_blue_smallselector[i] = p; break;
+    case Shield::ORANGE: orange_smallselector[i] = p; break;
+    case Shield::DARK_BLUE: dark_blue_smallselector[i] = p; break;
+    case Shield::RED: red_smallselector[i] = p; break;
+    case Shield::BLACK: black_smallselector[i] = p; break;
+    default: return;
+    }
+  return;
+}
+
+void Armyset::setSmallSelectorMask(Shield::Colour c, guint32 i, PixMask *p)
+{
+  switch (c)
+    {
+    case Shield::WHITE: white_smallselectormask[i] = p; break;
+    case Shield::GREEN: green_smallselectormask[i] = p; break;
+    case Shield::YELLOW: yellow_smallselectormask[i] = p; break;
+    case Shield::LIGHT_BLUE: light_blue_smallselectormask[i] = p; break;
+    case Shield::ORANGE: orange_smallselectormask[i] = p; break;
+    case Shield::DARK_BLUE: dark_blue_smallselectormask[i] = p; break;
+    case Shield::RED: red_smallselectormask[i] = p; break;
+    case Shield::BLACK: black_smallselectormask[i] = p; break;
+    default: return;
+    }
+  return;
+}
+
+void Armyset::setSelectorImage(Shield::Colour c, guint32 i, PixMask *p)
+{
+  switch (c)
+    {
+    case Shield::WHITE: white_selector[i] = p; break;
+    case Shield::GREEN: green_selector[i] = p; break;
+    case Shield::YELLOW: yellow_selector[i] = p; break;
+    case Shield::LIGHT_BLUE: light_blue_selector[i] = p; break;
+    case Shield::ORANGE: orange_selector[i] = p; break;
+    case Shield::DARK_BLUE: dark_blue_selector[i] = p; break;
+    case Shield::RED: red_selector[i] = p; break;
+    case Shield::BLACK: black_selector[i] = p; break;
+    default: return;
+    }
+  return;
+}
+
+void Armyset::setSelectorMask(Shield::Colour c, guint32 i, PixMask *p)
+{
+  switch (c)
+    {
+    case Shield::WHITE: white_selectormask[i] = p; break;
+    case Shield::GREEN: green_selectormask[i] = p; break;
+    case Shield::YELLOW: yellow_selectormask[i] = p; break;
+    case Shield::LIGHT_BLUE: light_blue_selectormask[i] = p; break;
+    case Shield::ORANGE: orange_selectormask[i] = p; break;
+    case Shield::DARK_BLUE: dark_blue_selectormask[i] = p; break;
+    case Shield::RED: red_selectormask[i] = p; break;
+    case Shield::BLACK: black_selectormask[i] = p; break;
+    default: return;
+    }
+  return;
+}
+
+guint32 Armyset::getNumberOfSelectorFrames(Shield::Colour c) const
+{
+  switch (c)
+    {
+    case Shield::WHITE: return number_of_white_selector_frames;
+    case Shield::GREEN: return number_of_green_selector_frames;
+    case Shield::YELLOW: return number_of_yellow_selector_frames;
+    case Shield::LIGHT_BLUE: return number_of_light_blue_selector_frames;
+    case Shield::ORANGE: return number_of_orange_selector_frames;
+    case Shield::DARK_BLUE: return number_of_dark_blue_selector_frames;
+    case Shield::RED: return number_of_red_selector_frames;
+    case Shield::BLACK: return number_of_black_selector_frames;
+    default: return 0;
+    }
+  return 0;
+}
+
+guint32 Armyset::getNumberOfSmallSelectorFrames(Shield::Colour c) const
+{
+  switch (c)
+    {
+    case Shield::WHITE: return number_of_white_small_selector_frames;
+    case Shield::GREEN: return number_of_green_small_selector_frames;
+    case Shield::YELLOW: return number_of_yellow_small_selector_frames;
+    case Shield::LIGHT_BLUE: return number_of_light_blue_small_selector_frames;
+    case Shield::ORANGE: return number_of_orange_small_selector_frames;
+    case Shield::DARK_BLUE: return number_of_dark_blue_small_selector_frames;
+    case Shield::RED: return number_of_red_small_selector_frames;
+    case Shield::BLACK: return number_of_black_small_selector_frames;
+    default: return 0;
+    }
+  return 0;
+}
+
+void Armyset::setNumberOfSelectorFrames (Shield::Colour c, guint32 num)
+{
+  switch (c)
+    {
+    case Shield::WHITE:
+      white_selector.reserve (num);
+      white_selectormask.reserve (num);
+      number_of_white_selector_frames = num;
+      break;
+    case Shield::GREEN:
+      green_selector.reserve (num);
+      green_selectormask.reserve (num);
+      number_of_green_selector_frames = num;
+      break;
+    case Shield::YELLOW:
+      yellow_selector.reserve (num);
+      yellow_selectormask.reserve (num);
+      number_of_yellow_selector_frames = num;
+      break;
+    case Shield::LIGHT_BLUE:
+      light_blue_selector.reserve (num);
+      light_blue_selectormask.reserve (num);
+      number_of_light_blue_selector_frames = num;
+      break;
+    case Shield::ORANGE:
+      orange_selector.reserve (num);
+      orange_selectormask.reserve (num);
+      number_of_orange_selector_frames = num;
+      break;
+    case Shield::DARK_BLUE:
+      dark_blue_selector.reserve (num);
+      dark_blue_selectormask.reserve (num);
+      number_of_dark_blue_selector_frames = num;
+      break;
+    case Shield::RED:
+      red_selector.reserve (num);
+      red_selectormask.reserve (num);
+      number_of_red_selector_frames = num;
+      break;
+    case Shield::BLACK:
+      black_selector.reserve (num);
+      black_selectormask.reserve (num);
+      number_of_black_selector_frames = num;
+      break;
+    default: return;
+    }
+  return;
+}
+
+void Armyset::setNumberOfSmallSelectorFrames (Shield::Colour c, guint32 num)
+{
+  switch (c)
+    {
+    case Shield::WHITE:
+      white_smallselector.reserve (num);
+      white_smallselectormask.reserve (num);
+      number_of_white_small_selector_frames = num;
+      break;
+    case Shield::GREEN:
+      green_smallselector.reserve (num);
+      green_smallselectormask.reserve (num);
+      number_of_green_small_selector_frames = num;
+      break;
+    case Shield::YELLOW:
+      yellow_smallselector.reserve (num);
+      yellow_smallselectormask.reserve (num);
+      number_of_yellow_small_selector_frames = num;
+      break;
+    case Shield::LIGHT_BLUE:
+      light_blue_smallselector.reserve (num);
+      light_blue_smallselectormask.reserve (num);
+      number_of_light_blue_small_selector_frames = num;
+      break;
+    case Shield::ORANGE:
+      orange_smallselector.reserve (num);
+      orange_smallselectormask.reserve (num);
+      number_of_orange_small_selector_frames = num;
+      break;
+    case Shield::DARK_BLUE:
+      dark_blue_smallselector.reserve (num);
+      dark_blue_smallselectormask.reserve (num);
+      number_of_dark_blue_small_selector_frames = num;
+      break;
+    case Shield::RED:
+      red_smallselector.reserve (num);
+      red_smallselectormask.reserve (num);
+      number_of_red_small_selector_frames = num;
+      break;
+    case Shield::BLACK:
+      black_smallselector.reserve (num);
+      black_smallselectormask.reserve (num);
+      number_of_black_small_selector_frames = num;
+      break;
+    default: return;
+    }
+  return;
+}
+
+Glib::ustring Armyset::getLargeSelectorFilename(Shield::Colour c) const
+{
+  switch (c)
+    {
+    case Shield::WHITE: return d_large_white_selector;
+    case Shield::GREEN: return d_large_green_selector;
+    case Shield::YELLOW: return d_large_yellow_selector;
+    case Shield::LIGHT_BLUE: return d_large_light_blue_selector;
+    case Shield::ORANGE: return d_large_orange_selector;
+    case Shield::DARK_BLUE: return d_large_dark_blue_selector;
+    case Shield::RED: return d_large_red_selector;
+    case Shield::BLACK: return d_large_black_selector;
+    default: return "";
+    }
+  return "";
+}
+
+Glib::ustring Armyset::getSmallSelectorFilename(Shield::Colour c) const
+{
+  switch (c)
+    {
+    case Shield::WHITE: return d_small_white_selector;
+    case Shield::GREEN: return d_small_green_selector;
+    case Shield::YELLOW: return d_small_yellow_selector;
+    case Shield::LIGHT_BLUE: return d_small_light_blue_selector;
+    case Shield::ORANGE: return d_small_orange_selector;
+    case Shield::DARK_BLUE: return d_small_dark_blue_selector;
+    case Shield::RED: return d_small_red_selector;
+    case Shield::BLACK: return d_small_black_selector;
+    default: return "";
+    }
+  return "";
+}
+
+void Armyset::setLargeSelectorFilename(Shield::Colour c, Glib::ustring f)
+{
+  switch (c)
+    {
+    case Shield::WHITE: d_large_white_selector = f; break;
+    case Shield::GREEN: d_large_green_selector = f; break;
+    case Shield::YELLOW: d_large_yellow_selector = f; break;
+    case Shield::LIGHT_BLUE: d_large_light_blue_selector = f; break;
+    case Shield::ORANGE: d_large_orange_selector = f; break;
+    case Shield::DARK_BLUE: d_large_dark_blue_selector = f; break;
+    case Shield::RED: d_large_red_selector = f; break;
+    case Shield::BLACK: d_large_black_selector = f; break;
+    default: return;
+    }
+  return;
+}
+
+void Armyset::setSmallSelectorFilename(Shield::Colour c, Glib::ustring f)
+{
+  switch (c)
+    {
+    case Shield::WHITE: d_small_white_selector = f; break;
+    case Shield::GREEN: d_small_green_selector = f; break;
+    case Shield::YELLOW: d_small_yellow_selector = f; break;
+    case Shield::LIGHT_BLUE: d_small_light_blue_selector = f; break;
+    case Shield::ORANGE: d_small_orange_selector = f; break;
+    case Shield::DARK_BLUE: d_small_dark_blue_selector = f; break;
+    case Shield::RED: d_small_red_selector = f; break;
+    case Shield::BLACK: d_small_black_selector = f; break;
+    default: return;
+    }
+  return;
+}
+
+void Armyset::clear_vectors()
+{
+  number_of_white_selector_frames = 0;
+  number_of_green_selector_frames = 0;
+  number_of_yellow_selector_frames = 0;
+  number_of_light_blue_selector_frames = 0;
+  number_of_orange_selector_frames = 0;
+  number_of_dark_blue_selector_frames = 0;
+  number_of_red_selector_frames = 0;
+  number_of_black_selector_frames = 0;
+  number_of_white_small_selector_frames = 0;
+  number_of_green_small_selector_frames = 0;
+  number_of_yellow_small_selector_frames = 0;
+  number_of_light_blue_small_selector_frames = 0;
+  number_of_orange_small_selector_frames = 0;
+  number_of_dark_blue_small_selector_frames = 0;
+  number_of_red_small_selector_frames = 0;
+  number_of_black_small_selector_frames = 0;
+  white_selector.clear ();
+  green_selector.clear ();
+  yellow_selector.clear ();
+  light_blue_selector.clear ();
+  orange_selector.clear ();
+  dark_blue_selector.clear ();
+  red_selector.clear ();
+  black_selector.clear ();
+  white_selectormask.clear ();
+  green_selectormask.clear ();
+  yellow_selectormask.clear ();
+  light_blue_selectormask.clear ();
+  orange_selectormask.clear ();
+  dark_blue_selectormask.clear ();
+  red_selectormask.clear ();
+  black_selectormask.clear ();
+  white_smallselector.clear ();
+  green_smallselector.clear ();
+  yellow_smallselector.clear ();
+  light_blue_smallselector.clear ();
+  orange_smallselector.clear ();
+  dark_blue_smallselector.clear ();
+  red_smallselector.clear ();
+  black_smallselector.clear ();
+  white_smallselectormask.clear ();
+  green_smallselectormask.clear ();
+  yellow_smallselectormask.clear ();
+  light_blue_smallselectormask.clear ();
+  orange_smallselectormask.clear ();
+  dark_blue_smallselectormask.clear ();
+  red_smallselectormask.clear ();
+  black_smallselectormask.clear ();
 }

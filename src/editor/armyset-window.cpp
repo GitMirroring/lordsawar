@@ -40,6 +40,7 @@
 #include "shieldsetlist.h"
 #include "editor-quit-dialog.h"
 #include "editor-save-changes-dialog.h"
+#include "armyset-selector-editor-dialog.h"
 
 #include "ucompose.hpp"
 
@@ -55,6 +56,7 @@ ArmySetWindow::ArmySetWindow(Glib::ustring load_filename)
 {
   needs_saving = false;
   inhibit_needs_saving = false;
+  inhibit_updates = false;
   d_armyset = NULL;
   Glib::RefPtr<Gtk::Builder> xml = BuilderCache::editor_get("armyset-window.ui");
 
@@ -285,6 +287,9 @@ ArmySetWindow::ArmySetWindow(Glib::ustring load_filename)
   xml->get_widget("edit_ship_picture_menuitem", edit_ship_picture_menuitem);
   edit_ship_picture_menuitem->signal_activate().connect
     (method(on_edit_ship_picture_activated));
+  xml->get_widget("selector_menuitem", edit_selector_menuitem);
+  edit_selector_menuitem->signal_activate().connect
+    (method(on_edit_selector_picture_activated));
   xml->get_widget ("help_about_menuitem", help_about_menuitem);
   help_about_menuitem->signal_activate().connect (method(on_help_about_activated));
   xml->get_widget ("tutorial_menuitem", tutorial_menuitem);
@@ -717,6 +722,16 @@ void ArmySetWindow::on_edit_ship_picture_activated()
         }
       else
         show_remove_file_error(d_armyset, *d.get_dialog(), imgname);
+    }
+}
+
+void ArmySetWindow::on_edit_selector_picture_activated()
+{
+  ArmysetSelectorEditorDialog d(*window, d_armyset);
+  if (d.run ())
+    {
+      needs_saving = true;
+      update_window_title();
     }
 }
 

@@ -36,6 +36,7 @@ libarmysetwindow_la_SOURCES = \
 	armyset-window.cpp armyset-window.h  \
 	armyset-info-dialog.cpp armyset-info-dialog.h \
 	masked-image-editor-dialog.cpp masked-image-editor-dialog.h \
+	armyset-selector-editor-dialog.cpp armyset-selector-editor-dialog.h \
 	per-player-masked-image-editor-dialog.cpp per-player-masked-image-editor-dialog.h \
 	image-editor-dialog.cpp image-editor-dialog.h 
 

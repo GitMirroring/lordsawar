@@ -102,6 +102,41 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 	//! Get the image of the stack in a ship (minus the mask).
         std::vector<PixMask*> getShipPics() const {return d_ship;}
 
+	//! Sets the basename of the file containing the big selector images for the given player.
+	void setLargeSelectorFilename(Shield::Colour c, Glib::ustring p);
+
+	//! Sets the basename of the file containing the small selector images for the given player.
+	void setSmallSelectorFilename(Shield::Colour c, Glib::ustring p);
+
+	//! Sets a big selector image for the given player.
+	void setSelectorImage(Shield::Colour c, guint32 i, PixMask *p);
+
+	//! Sets a big selector mask for the given player.
+	void setSelectorMask(Shield::Colour c, guint32 i, PixMask *p);
+
+	//! Sets a small selector image for the given player.
+	void setSmallSelectorImage(Shield::Colour c, guint32 i, PixMask *p);
+
+	//! Sets a small selector mask for the given player.
+	void setSmallSelectorMask(Shield::Colour c, guint32 i, PixMask *p);
+
+	//! Sets the number of animation frames in the big selector for the given player.
+	void setNumberOfSelectorFrames(Shield::Colour c, guint32 s);
+
+	//! Sets the number of animation frames in the small selector for the given player.
+	void setNumberOfSmallSelectorFrames(Shield::Colour c, guint32 s);
+
+        //!Get rid of the small selector image for the given players
+        void clearSmallSelectorImage (Shield::Colour c, bool clear_name = true);
+
+        //!Get rid of the large selector image for the given players
+        void clearLargeSelectorImage (Shield::Colour c, bool clear_name = true);
+
+        bool instantiateSmallSelectorImages ();
+        bool instantiateSmallSelectorImages(Shield::Colour c);
+        bool instantiateLargeSelectorImages ();
+        bool instantiateLargeSelectorImages(Shield::Colour c);
+
 	//! Set the image of the stack in a ship
 	void setShipImages(std::vector<PixMask*> ship) {d_ship = ship;};
 
@@ -168,6 +203,30 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         //! Find the type id with the highest value and return it.
         guint32 getMaxId() const;
 
+	//! Returns the basename of the file containing big selector images for the given player.
+	Glib::ustring getLargeSelectorFilename(Shield::Colour c) const;
+
+	//! Returns the basename of the file containing small selector images for the given player.
+	Glib::ustring getSmallSelectorFilename(Shield::Colour c) const;
+
+	//! Get the big selector image for the given player.  Pass in the index.
+	PixMask *getSelectorImage(Shield::Colour c, guint32 i) const;
+
+	//! Get the big selector mask for the given player.  Pass in the index.
+	PixMask *getSelectorMask(Shield::Colour c, guint32 i) const;
+
+	//! Get the small selector image for the given player.  Pass in the index.
+	PixMask *getSmallSelectorImage(Shield::Colour c, guint32 i) const;
+
+	//! Get the small selector mask for the given player.  Pass in the index.
+	PixMask *getSmallSelectorMask(Shield::Colour c, guint32 i) const;
+
+	//! Get the number of animation frames in the big selector image for the given player.
+	guint32 getNumberOfSelectorFrames(Shield::Colour c) const;
+
+	//! Get the number of animation frames in the small selector image for the given player.
+	guint32 getNumberOfSmallSelectorFrames(Shield::Colour c) const;
+
 	//! Find an army with a type in this armyset.
 	/**
 	 * Scan the Army prototype objects in this Armyset and return it.
@@ -223,6 +282,7 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 	void loadStandardPic(Glib::ustring image_filename, bool scale, bool &broken);
 	void loadShipPic(Glib::ustring image_filename, bool scale, bool &broken);
 	void loadBagPic(Glib::ustring image_filename, bool &broken);
+        bool loadSelectorPics (Tar_Helper *t);
 
 	static void switchArmyset(Army *army, const Armyset *armyset);
 	static void switchArmyset(ArmyProdBase *army, const Armyset *armyset);
@@ -243,6 +303,10 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 
         //! Callback function for the army tag (see XML_Helper)
         bool loadArmyProto(Glib::ustring tag, XML_Helper* helper);
+
+        void read_selector_name (XML_Helper *helper, Shield::Colour c, bool large);
+        void write_selector_name (XML_Helper *helper, Shield::Colour c, bool large) const;
+        void clear_vectors ();
         
 	//! The unshaded picture of the stack when it's in a boat.
         std::vector<PixMask*> d_ship;
@@ -267,6 +331,198 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 
 	//! The name of the file that holds the picture of the sack of items.
 	Glib::ustring d_bag_name;
+
+	//! The basename of the small selector image, white player.
+	Glib::ustring d_small_white_selector;
+
+	//! The basename of the small selector image, green player.
+	Glib::ustring d_small_green_selector;
+
+	//! The basename of the small selector image, yellow player.
+	Glib::ustring d_small_yellow_selector;
+
+	//! The basename of the small selector image, light blue player.
+	Glib::ustring d_small_light_blue_selector;
+
+	//! The basename of the small selector image, orange player.
+	Glib::ustring d_small_orange_selector;
+
+	//! The basename of the small selector image, dark blue player.
+	Glib::ustring d_small_dark_blue_selector;
+
+	//! The basename of the small selector image, red player.
+	Glib::ustring d_small_red_selector;
+
+	//! The basename of the small selector image, black player.
+	Glib::ustring d_small_black_selector;
+
+	//! the basename of the large selector image, white player.
+	Glib::ustring d_large_white_selector;
+
+	//! The basename of the large selector image, green player.
+	Glib::ustring d_large_green_selector;
+
+	//! The basename of the large selector image, yellow player.
+	Glib::ustring d_large_yellow_selector;
+
+	//! The basename of the large selector image, light blue player.
+	Glib::ustring d_large_light_blue_selector;
+
+	//! The basename of the large selector image, orange player.
+	Glib::ustring d_large_orange_selector;
+
+	//! The basename of the large selector image, dark blue player.
+	Glib::ustring d_large_dark_blue_selector;
+
+	//! The basename of the large selector image, red player.
+	Glib::ustring d_large_red_selector;
+
+	//! The basename of the large selector image, black player.
+	Glib::ustring d_large_black_selector;
+
+        //! The number of animation frames in the big selector, white player.
+        guint32 number_of_white_selector_frames;
+
+        //! The number of animation frames in the big selector, green player.
+        guint32 number_of_green_selector_frames;
+
+        //! The number of animation frames in the big selector, yellow player.
+        guint32 number_of_yellow_selector_frames;
+
+        //! The number of animation frames in the big selector, light blue player.
+        guint32 number_of_light_blue_selector_frames;
+
+        //! The number of animation frames in the big selector, orange player.
+        guint32 number_of_orange_selector_frames;
+
+        //! The number of animation frames in the big selector, dark blue player.
+        guint32 number_of_dark_blue_selector_frames;
+
+        //! The number of animation frames in the big selector, red player.
+        guint32 number_of_red_selector_frames;
+
+        //! The number of animation frames in the big selector, black player.
+        guint32 number_of_black_selector_frames;
+
+        //! The image frames in the big selector, white player.
+        std::vector<PixMask* > white_selector;
+
+        //! The image frames in the big selector, green player.
+        std::vector<PixMask* > green_selector;
+
+        //! The image frames in the big selector, yellow player.
+        std::vector<PixMask* > yellow_selector;
+
+        //! The image frames in the big selector, light blue player.
+        std::vector<PixMask* > light_blue_selector;
+
+        //! The image frames in the big selector, orange player.
+        std::vector<PixMask* > orange_selector;
+
+        //! The image frames in the big selector, dark blue player.
+        std::vector<PixMask* > dark_blue_selector;
+
+        //! The image frames in the big selector, red player.
+        std::vector<PixMask* > red_selector;
+
+        //! The image frames in the big selector, black player.
+        std::vector<PixMask* > black_selector;
+
+        //! The mask frames of the big selector, white player.
+        std::vector<PixMask* > white_selectormask;
+
+        //! The mask frames of the big selector, green player.
+        std::vector<PixMask* > green_selectormask;
+
+        //! The mask frames of the big selector, yellow player.
+        std::vector<PixMask* > yellow_selectormask;
+
+        //! The mask frames of the big selector, light blue player.
+        std::vector<PixMask* > light_blue_selectormask;
+
+        //! The mask frames of the big selector, orange player.
+        std::vector<PixMask* > orange_selectormask;
+
+        //! The mask frames of the big selector, dark blue player.
+        std::vector<PixMask* > dark_blue_selectormask;
+
+        //! The mask frames of the big selector, red player.
+        std::vector<PixMask* > red_selectormask;
+
+        //! The mask frames of the big selector, black player.
+        std::vector<PixMask* > black_selectormask;
+
+        //! The number of animation frames in the small selector, white player.
+        guint32 number_of_white_small_selector_frames;
+
+        //! The number of animation frames in the small selector, green player.
+        guint32 number_of_green_small_selector_frames;
+
+        //! The number of animation frames in the small selector, yellow player.
+        guint32 number_of_yellow_small_selector_frames;
+
+        //! The number of animation frames in the small selector, light blue player.
+        guint32 number_of_light_blue_small_selector_frames;
+
+        //! The number of animation frames in the small selector, orange player.
+        guint32 number_of_orange_small_selector_frames;
+
+        //! The number of animation frames in the small selector, dark blue player.
+        guint32 number_of_dark_blue_small_selector_frames;
+
+        //! The number of animation frames in the small selector, red player.
+        guint32 number_of_red_small_selector_frames;
+
+        //! The number of animation frames in the small selector, black player.
+        guint32 number_of_black_small_selector_frames;
+
+        //! The image frames of the small selector, white player.
+        std::vector<PixMask* > white_smallselector;
+
+        //! The image frames of the small selector, green player.
+        std::vector<PixMask* > green_smallselector;
+
+        //! The image frames of the small selector, yellow player.
+        std::vector<PixMask* > yellow_smallselector;
+
+        //! The image frames of the small selector, light blue player.
+        std::vector<PixMask* > light_blue_smallselector;
+
+        //! The image frames of the small selector, orange player.
+        std::vector<PixMask* > orange_smallselector;
+
+        //! The image frames of the small selector, dark blue player.
+        std::vector<PixMask* > dark_blue_smallselector;
+
+        //! The image frames of the small selector, red player.
+        std::vector<PixMask* > red_smallselector;
+
+        //! The image frames of the small selector, black player.
+        std::vector<PixMask* > black_smallselector;
+
+        //! The mask frames of the small selector, white player.
+        std::vector<PixMask* > white_smallselectormask;
+
+        //! The mask frames of the small selector, green player.
+        std::vector<PixMask* > green_smallselectormask;
+
+        //! The mask frames of the small selector, yellow player.
+        std::vector<PixMask* > yellow_smallselectormask;
+
+        //! The mask frames of the small selector, light blue player.
+        std::vector<PixMask* > light_blue_smallselectormask;
+
+        //! The mask frames of the small selector, orange player.
+        std::vector<PixMask* > orange_smallselectormask;
+
+        //! The mask frames of the small selector, dark blue player.
+        std::vector<PixMask* > dark_blue_smallselectormask;
+
+        //! The mask frames of the small selector, red player.
+        std::vector<PixMask* > red_smallselectormask;
+
+        //! The mask frames of the small selector, black player.
+        std::vector<PixMask* > black_smallselectormask;
 };
 
 bool weakest_quickest (const ArmyProto* first, const ArmyProto* second);

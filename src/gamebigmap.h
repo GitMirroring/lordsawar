@@ -99,11 +99,13 @@ class GameBigMap: public BigMap
     bool control_key_is_down;
 	
     ImageCache::CursorType d_cursor;
+
     void determine_mouse_cursor(Stack *stack, Vector<int> tile);
 
     // for the marching ants around selected stack
     sigc::connection selection_timeout_handler;
     bool on_selection_timeout();
+    void get_selector_frame_limits (Player *p, int &limitbig, int &limitsmall);
 
     virtual void after_draw();
     PathCalculator *path_calculator;

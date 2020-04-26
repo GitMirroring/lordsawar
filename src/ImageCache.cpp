@@ -1773,14 +1773,32 @@ int ImageCache::calculate_width_from_adjusted_height (PixMask *p, double new_hei
 
 PixMask *SelectorPixMaskCacheItem::generate(SelectorPixMaskCacheItem i)
 {
-  Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
+  // armyset selectors override the tileset ones
+  // we can't have a neutral selector, but just in case we change it to white
   Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
+  Shield::Colour c = Shield::Colour (p->getId ());
+  if (c == Shield::NEUTRAL)
+    c = Shield::WHITE;
+  Armyset *as = Armysetlist::getInstance ()->get (p->getArmyset ());
+  Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
   if (i.type == 0)
-    return ImageCache::applyMask(ts->getSelectorImage(i.frame),
-                                 ts->getSelectorMask(i.frame), p);
+    {
+      if (as->getNumberOfSelectorFrames (c) > 0)
+        return ImageCache::applyMask(as->getSelectorImage(c, i.frame),
+                                     as->getSelectorMask(c, i.frame), p);
+      else
+        return ImageCache::applyMask(ts->getSelectorImage(i.frame),
+                                     ts->getSelectorMask(i.frame), p);
+    }
   else
-    return ImageCache::applyMask(ts->getSmallSelectorImage(i.frame),
-                                 ts->getSmallSelectorMask(i.frame), p);
+    {
+      if (as->getNumberOfSmallSelectorFrames (c) > 0)
+        return ImageCache::applyMask(as->getSmallSelectorImage(c, i.frame),
+                                     as->getSmallSelectorMask(c, i.frame), p);
+      else
+        return ImageCache::applyMask(ts->getSmallSelectorImage(i.frame),
+                                     ts->getSmallSelectorMask(i.frame), p);
+    }
 }
 
 int SelectorPixMaskCacheItem::comp(const SelectorPixMaskCacheItem item) const

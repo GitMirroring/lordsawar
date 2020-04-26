@@ -40,6 +40,9 @@
 #include "PathCalculator.h"
 #include "stacktile.h"
 #include "tileset.h"
+#include "armysetlist.h"
+#include "armyset.h"
+#include "shield.h"
 
 #include "timing.h"
 
@@ -859,6 +862,22 @@ void GameBigMap::mouse_motion_event(MouseMotionEvent e)
   last_tile = tile;
 }
 
+void GameBigMap::get_selector_frame_limits (Player *p, int &limitbig, int &limitsmall)
+{
+  Tileset *t = GameMap::getTileset();
+
+  limitbig = (int)t->getNumberOfSelectorFrames();
+  limitsmall = (int)t->getNumberOfSmallSelectorFrames();
+
+  guint32 as = p->getArmyset ();
+  Armyset *a = Armysetlist::getInstance()->get(as);
+  Shield::Colour c = Shield::Colour (p->getId());
+  if (a->getNumberOfSelectorFrames (c))
+    limitbig = (int) a->getNumberOfSelectorFrames (c);
+  if (a->getNumberOfSmallSelectorFrames (c))
+    limitsmall = (int) a->getNumberOfSmallSelectorFrames (c);
+}
+
 void GameBigMap::after_draw()
 {
   if (blank_screen == true)
@@ -924,13 +943,15 @@ void GameBigMap::after_draw()
 	  static int bigframe = -1;
 	  static int smallframe = -1;
 
-          Tileset *t = GameMap::getTileset();
+          int bigframelimit = 0;
+          int smallframelimit = 0;
+          get_selector_frame_limits (stack->getOwner (), bigframelimit, smallframelimit);
 	  bigframe++;
-	  if (bigframe >= (int)t->getNumberOfSelectorFrames())
+	  if (bigframe >= bigframelimit)
 	    bigframe = 0;
 
 	  smallframe++;
-	  if (smallframe >= (int)t->getNumberOfSmallSelectorFrames())
+	  if (smallframe >= smallframelimit)
 	    smallframe = 0;
 
 	  p = tile_to_buffer_pos(p);
