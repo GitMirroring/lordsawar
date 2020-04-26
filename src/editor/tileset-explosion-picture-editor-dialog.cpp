@@ -139,7 +139,7 @@ void TilesetExplosionPictureEditorDialog::update_panel()
     }
   else
     {
-      explosion_imagebutton->set_label (_("no image set"));
+      explosion_imagebutton->set_label (_("No image set"));
       scene_image->clear();
     }
 }

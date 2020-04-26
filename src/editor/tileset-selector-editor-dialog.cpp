@@ -318,7 +318,7 @@ void TilesetSelectorEditorDialog::update_selector_panel()
     selector_imagebutton->set_label (f);
   else
     {
-      selector_imagebutton->set_label (_("no image set"));
+      selector_imagebutton->set_label (_("No image set"));
       clearSelector();
     }
 }

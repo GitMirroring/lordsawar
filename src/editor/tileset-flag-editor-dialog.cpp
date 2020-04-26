@@ -242,7 +242,7 @@ void TilesetFlagEditorDialog::update_flag_panel()
     }
   else
     {
-      flag_imagebutton->set_label (_("no image set"));
+      flag_imagebutton->set_label (_("No image set"));
       if (heartbeat.connected ())
         heartbeat.disconnect ();
       clearFlag();
