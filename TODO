@@ -46,9 +46,6 @@ save in the set editors doesn't work like the scenario builder.  we should alway
 
 saw a crash when switching to a newly made shieldset in the editor.  can't reproduce.  saw the same with a tileset.
 
-different selector per player, 8 players
-  maybe put these ones in armyset, which override the one in tileset
-
 maybe improve the ai a bit by: disbanding stacks and creating a stronger type somewhere
 
 stress test with seed 691 takes 1000+ turns to complete
