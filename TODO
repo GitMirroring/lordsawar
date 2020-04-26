@@ -51,3 +51,5 @@ maybe improve the ai a bit by: disbanding stacks and creating a stronger type so
 stress test with seed 691 takes 1000+ turns to complete
 
 put move bonus graphics into tileset
+
+units with mountain movement should be able to pass over mountains
