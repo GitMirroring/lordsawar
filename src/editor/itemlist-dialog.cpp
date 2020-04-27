@@ -314,6 +314,7 @@ void ItemlistDialog::fill_item_info(ItemProto *item)
   teleport_to_city_switch->set_active 
     (item->getBonus(ItemProto::TELEPORT_TO_CITY));
 
+  plantable_switch->set_active (item->getBonus(ItemProto::PLANT_TO_VECTOR));
   connect_signals ();
 }
 
