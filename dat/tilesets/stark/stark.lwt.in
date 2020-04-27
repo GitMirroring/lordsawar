@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<tileset version="0.2.1">
+<tileset version="0.3.3">
     <d_id>3</d_id>
     <_d_name>Stark</_d_name>
     <d_copyright>Copyright (C) 2007, 2009 Ben Asselstine</d_copyright>
@@ -23,6 +23,12 @@
     <temple_smallmap>
 	<d_color>255 255 255</d_color>
     </temple_smallmap>
+    <d_movebonus_all></d_movebonus_all>
+    <d_movebonus_water></d_movebonus_water>
+    <d_movebonus_forest></d_movebonus_forest>
+    <d_movebonus_hills></d_movebonus_hills>
+    <d_movebonus_mountains></d_movebonus_mountains>
+    <d_movebonus_swamp></d_movebonus_swamp>
     <tile>
         <_d_name>Grass</_d_name>
         <d_moves>2</d_moves>

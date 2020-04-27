@@ -36,6 +36,7 @@ per-player-masked-image-editor-dialog.ui \
 image-editor-dialog.ui \
 editor-quit-dialog.ui \
 tileset-smallmap-building-colors-dialog.ui \
+tileset-move-bonus-image-dialog.ui \
 cityset-info-dialog.ui \
 cityset-window.ui \
 shieldset-info-dialog.ui \
