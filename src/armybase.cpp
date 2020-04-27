@@ -138,10 +138,13 @@ Glib::ustring ArmyBase::getArmyBonusDescription() const
     s += String::ucompose("%1%2", s == "" ? " " : " & ", _("+2 stack"));
   if (bonus & ArmyBase::SUBALLNONHEROBONUS)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("cancel non-hero"));
+			  _("Cancel non-hero"));
   if (bonus & ArmyBase::SUBALLHEROBONUS)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("cancel hero"));
+			  _("Cancel hero"));
+  if (bonus & ArmyBase::CONFER_MOVE_BONUS)
+    s += String::ucompose("%1%2", s == "" ? " " : " & ",
+			  _("Confers move bonus to stack"));
   return s;
 }
 
@@ -188,6 +191,7 @@ Glib::ustring ArmyBase::bonusFlagToString(const ArmyBase::Bonus bonus)
     case ArmyBase::ADD2STRINFOREST: return "ArmyBase::ADD2STRINFOREST";
     case ArmyBase::ADD2STRINHILLS: return "ArmyBase::ADD2STRINHILLS";
     case ArmyBase::SUB2ENEMYSTACK: return "ArmyBase::SUB2ENEMYSTACK";
+    case ArmyBase::CONFER_MOVE_BONUS: return "ArmyBase::CONFER_MOVE_BONUS";
     }
   return "";
 }
@@ -229,6 +233,8 @@ Glib::ustring ArmyBase::bonusFlagsToString(const guint32 bonus)
     bonuses += " " + bonusFlagToString(ArmyBase::ADD2STRINHILLS);
   if (bonus & ArmyBase::SUB2ENEMYSTACK)
     bonuses += " " + bonusFlagToString(ArmyBase::SUB2ENEMYSTACK);
+  if (bonus & ArmyBase::CONFER_MOVE_BONUS)
+    bonuses += " " + bonusFlagToString(ArmyBase::CONFER_MOVE_BONUS);
   return bonuses;
 }
 
@@ -258,6 +264,7 @@ guint32 ArmyBase::bonusFlagFromString(const Glib::ustring str)
   else if (str == "ArmyBase::ADD2STRINFOREST") return ArmyBase::ADD2STRINFOREST;
   else if (str == "ArmyBase::ADD2STRINHILLS") return ArmyBase::ADD2STRINHILLS;
   else if (str == "ArmyBase::SUB2ENEMYSTACK") return ArmyBase::SUB2ENEMYSTACK;
+  else if (str == "ArmyBase::CONFER_MOVE_BONUS") return ArmyBase::CONFER_MOVE_BONUS;
   return ArmyBase::ADD1STRINOPEN;
 }
 

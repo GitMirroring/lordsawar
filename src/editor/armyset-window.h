@@ -106,6 +106,7 @@ class ArmySetWindow: public sigc::trackable
     Gtk::Switch *add2stack_switch;
     Gtk::Switch *suballnonherobonus_switch;
     Gtk::Switch *suballherobonus_switch;
+    Gtk::Switch *confer_move_bonus_switch;
     Gtk::Button *add_army_button;
     Gtk::Button *remove_army_button;
     Gtk::Box *army_vbox;

@@ -651,14 +651,13 @@ guint32 Stack::calculateMoveBonus() const
     }
 
   //calculate move bonuses for non-flying stacks
+  
+  //first we see if any have a move bonus that confers to the whole stack
   for (Stack::const_iterator it = this->begin(); it != this->end(); it++)
     {
       bonus = (*it)->getStat(Army::MOVE_BONUS);
-
-      //only forest and hills extend to all other units in the stack
-      //e.g. scouts
-      d_bonus |= bonus & (Tile::HILLS | Tile::FOREST);
-
+      if (((*it)->getStat(Army::ARMY_BONUS) & ArmyBase::CONFER_MOVE_BONUS) > 0)
+        d_bonus |= bonus;
     }
 
   //check if all army units have the ability to move through forest

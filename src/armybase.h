@@ -68,7 +68,9 @@ class ArmyBase
           //! Provides a +2 strength to army units in the hills.
 	  ADD2STRINHILLS     = 0x00008000, 
 	  //! Negates 2 strength points from an enemy Stack during a Fight.
-	  SUB2ENEMYSTACK     = 0x00010000
+	  SUB2ENEMYSTACK     = 0x00010000,
+	  //! Stack gets whatever movement bonus this army unit has.
+	  CONFER_MOVE_BONUS = 0x00020000
         };
         
 	//! Various kinds of statistics that an instance of Army unit has.

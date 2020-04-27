@@ -256,6 +256,10 @@ ArmySetWindow::ArmySetWindow(Glib::ustring load_filename)
   suballherobonus_switch->property_active().signal_changed().connect
     (sigc::bind(method(on_armybonus_toggled), suballherobonus_switch,
                 Army::SUBALLHEROBONUS));
+  xml->get_widget("confer_move_bonus_switch", confer_move_bonus_switch);
+  confer_move_bonus_switch->property_active().signal_changed().connect
+    (sigc::bind(method (on_armybonus_toggled), confer_move_bonus_switch,
+                Army::CONFER_MOVE_BONUS));
   xml->get_widget("add_army_button", add_army_button);
   add_army_button->signal_clicked().connect (method(on_add_army_clicked));
   xml->get_widget("remove_army_button", remove_army_button);
@@ -379,6 +383,7 @@ ArmySetWindow::update_army_panel()
       add2stack_switch->set_active(false);
       suballnonherobonus_switch->set_active(false);
       suballherobonus_switch->set_active(false);
+      confer_move_bonus_switch->set_active(false);
       white_image->clear();
       green_image->clear();
       yellow_image->clear();
@@ -984,6 +989,8 @@ void ArmySetWindow::fill_army_info(ArmyProto *army)
     ((bonus & Army::SUBALLNONHEROBONUS) == Army::SUBALLNONHEROBONUS);
   suballherobonus_switch->set_active
     ((bonus & Army::SUBALLHEROBONUS) == Army::SUBALLHEROBONUS);
+  confer_move_bonus_switch->set_active
+    ((bonus & Army::CONFER_MOVE_BONUS) == Army::CONFER_MOVE_BONUS);
 }
 
 void ArmySetWindow::on_name_changed()
