@@ -584,7 +584,7 @@ void GamePreferencesDialog::finish_progress ()
     {
       row[progress_columns.perc] = row[progress_columns.perc] + 1;
       while (g_main_context_iteration(NULL, FALSE)); //doEvents
-      Glib::usleep (10000);
+      Glib::usleep (2000);
     }
   row[progress_columns.perc] = 100;
   //dialog->hide ();
