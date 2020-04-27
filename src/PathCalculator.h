@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014 Ben Asselstine
+// Copyright (C) 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -73,6 +73,7 @@ private:
     struct node *nodes;
     const Stack *stack;
     bool flying;
+    bool mountains;
     guint32 d_bonus;
     int land_reset_moves;
     int boat_reset_moves;

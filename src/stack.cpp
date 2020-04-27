@@ -656,9 +656,55 @@ guint32 Stack::calculateMoveBonus() const
       bonus = (*it)->getStat(Army::MOVE_BONUS);
 
       //only forest and hills extend to all other units in the stack
+      //e.g. scouts
       d_bonus |= bonus & (Tile::HILLS | Tile::FOREST);
 
     }
+
+  //check if all army units have the ability to move through forest
+  bool found = true;
+  for (Stack::const_iterator it = this->begin(); it != this->end(); it++)
+    {
+      bonus = (*it)->getStat(Army::MOVE_BONUS);
+      if ((bonus & Tile::FOREST) == 0)
+        found = false;
+    }
+  if (found)
+    d_bonus |= Tile::FOREST;
+
+  //check if all army units have the ability to move through hills
+  found = true;
+  for (Stack::const_iterator it = this->begin(); it != this->end(); it++)
+    {
+      bonus = (*it)->getStat(Army::MOVE_BONUS);
+      if ((bonus & Tile::HILLS) == 0)
+        found = false;
+    }
+  if (found)
+    d_bonus |= Tile::HILLS;
+
+  //check if all army units have the ability to move through mountains
+  found = true;
+  for (Stack::const_iterator it = this->begin(); it != this->end(); it++)
+    {
+      bonus = (*it)->getStat(Army::MOVE_BONUS);
+      if ((bonus & Tile::MOUNTAIN) == 0)
+        found = false;
+    }
+  if (found)
+    d_bonus |= Tile::MOUNTAIN;
+
+  //check if all army units have the ability to move through swamp
+  found = true;
+  for (Stack::const_iterator it = this->begin(); it != this->end(); it++)
+    {
+      bonus = (*it)->getStat(Army::MOVE_BONUS);
+      if ((bonus & Tile::SWAMP) == 0)
+        found = false;
+    }
+  if (found)
+    d_bonus |= Tile::SWAMP;
+
   return d_bonus;
 }
 
@@ -1383,5 +1429,13 @@ bool Stack::fliesWithItemAndNonFlyersOverWaterOrMountains() const
         flies_with_item = true;
     }
   return flies_with_item && size() > 1 && (on_water || on_mountains);
+}
+
+bool Stack::canMoveThroughMountains () const
+{
+  guint32 bonus = calculateMoveBonus();
+  if (bonus == Tile::isFlying())
+    return false;
+  return (bonus & Tile::MOUNTAIN) > 0;
 }
 // End of file

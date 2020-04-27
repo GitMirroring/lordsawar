@@ -1447,7 +1447,7 @@ class GameMap: public sigc::trackable
         bool loadItems(Glib::ustring tag, XML_Helper* helper);
         bool containsWater (LwRectangle rect);
         bool containsForest (LwRectangle rect);
-        bool isBlockedAvenue(int x, int y, int destx, int desty);
+        bool isBlockedAvenue(bool mountains, int x, int y, int destx, int desty);
         bool isDock(Vector<int> pos);
 	void close_circles (int minx, int miny, int maxx, int maxy);
 	void processStyles(Glib::ustring styles, int chars_per_style);

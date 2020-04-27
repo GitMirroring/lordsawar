@@ -1,7 +1,8 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2006-2010, 2012, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2017,
+// 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -186,9 +187,28 @@ class Maptile: public Movable
 
         //! Whether or not there is a building on this tile that belongs on water.
         bool hasWaterBuilding() const;
-        //! Prints some debug information about this maptile.
 
-	bool d_blocked[8];
+        //! Whether a unit can go in a particular direction from this tile.
+        /**
+         * This array holds two sets of blocked avenues.
+         * The first is the standard army unit who can't traverse mountains,
+         * and can't go into water without getting into a boat.
+         * The second is just like the first, but CAN traverse mountains
+         * without needing a road.
+         * Flyers disregard blocked avenues.
+         *
+         * The eight booleans are for the directions in this order:
+         *      +-+-+-+
+         *      |0|4|5|
+         *      +-+-+-+
+         *      |1| |6|
+         *      +-+-+-+
+         *      |2|3|7|
+         *      +-+-+-+
+         *
+         * If one of the values is true, that way is blocked.
+         */
+	bool d_blocked[2][8];
 
 	//! Get the TileStyle associated with this Maptile.
 	TileStyle * getTileStyle() const {return d_tileStyle;}

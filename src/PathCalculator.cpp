@@ -102,7 +102,7 @@ void PathCalculator::populateNodeMap()
 }
 
 PathCalculator::PathCalculator(const Stack *s, bool zig, int city_avoidance, int stack_avoidance)
-:stack(s), flying(s->isFlying()), d_bonus(s->calculateMoveBonus()),
+:stack(s), flying(s->isFlying()), mountains (s->canMoveThroughMountains ()), d_bonus(s->calculateMoveBonus()),
     land_reset_moves(s->getMaxLandMoves()),
     boat_reset_moves(s->getMaxBoatMoves()), zigzag(zig), on_ship(stack->hasShip()), enemy_city_avoidance(city_avoidance), enemy_stack_avoidance(stack_avoidance), delete_stack(false)
 {
@@ -128,6 +128,7 @@ PathCalculator::PathCalculator(Player *p, Vector<int> src, const ArmyProdBase *p
   new_stack->push_back(army);
   stack = new_stack;
   flying = stack->isFlying();
+  mountains = stack->canMoveThroughMountains();
   d_bonus = stack->calculateMoveBonus();
   land_reset_moves = stack->getMaxLandMoves();
   boat_reset_moves = stack->getMaxBoatMoves();
@@ -143,6 +144,7 @@ PathCalculator::PathCalculator(const Stack &s, bool zig, int city_avoidance, int
 {
   stack = new Stack(s);
   flying = stack->isFlying();
+  mountains = stack->canMoveThroughMountains();
   d_bonus = stack->calculateMoveBonus();
   land_reset_moves = stack->getMaxLandMoves();
   boat_reset_moves = stack->getMaxBoatMoves();
@@ -155,7 +157,7 @@ PathCalculator::PathCalculator(const Stack &s, bool zig, int city_avoidance, int
 }
 
 PathCalculator::PathCalculator(const PathCalculator &p)
-:stack(new Stack(*p.stack)), flying(p.flying), d_bonus(p.d_bonus),
+:stack(new Stack(*p.stack)), flying(p.flying), mountains (p.mountains), d_bonus(p.d_bonus),
     land_reset_moves(p.land_reset_moves),
     boat_reset_moves(p.boat_reset_moves), zigzag(p.zigzag), on_ship(p.on_ship),
     enemy_city_avoidance(p.enemy_city_avoidance), enemy_stack_avoidance(p.enemy_stack_avoidance), delete_stack(p.delete_stack)
@@ -383,19 +385,22 @@ PathCalculator::~PathCalculator()
 }
 
 //am i blocked from entering destx,desty from x,y when i'm not flying?
-bool PathCalculator::isBlockedDir(Vector<int> pos, Vector<int> next)
+bool PathCalculator::isBlockedDir(Vector<int> p, Vector<int> next)
 {
-  int diffx = next.x - pos.x;
-  int diffy = next.y - pos.y;
-  if (diffx >= -1 && diffx <= 1 && diffy >= -1 && diffy <= 1) 
+  int dx = next.x - p.x;
+  int dy = next.y - p.y;
+  if (dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1) 
     {
-      int idxs[3][3] =
+      int i[3][3] =
         {
             { 0, 1, 2 },
             { 4, 0, 3 },
             { 5, 6, 7 },
         };
-      return GameMap::getInstance()->getTile(pos)->d_blocked[idxs[diffx+1][diffy+1]];
+      if (mountains)
+        return GameMap::getInstance()->getTile(p)->d_blocked[1][i[dx+1][dy+1]];
+      else
+        return GameMap::getInstance()->getTile(p)->d_blocked[0][i[dx+1][dy+1]];
     }
 
   return false;

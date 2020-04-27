@@ -501,7 +501,7 @@ bool GameMap::isDock(Vector<int> pos)
   return false;
 }
 
-bool GameMap::isBlockedAvenue(int x, int y, int destx, int desty)
+bool GameMap::isBlockedAvenue(bool mountains, int x, int y, int destx, int desty)
 {
   if (offmap(destx, desty))
     return true;
@@ -541,15 +541,18 @@ bool GameMap::isBlockedAvenue(int x, int y, int destx, int desty)
           !from_dock && !to_dock)
         return true;
 
-      //is the tile i'm going to a mountain that doesn't have a road?
-      if (to->getType() == Tile::MOUNTAIN && 
-          getRoad(Vector<int>(destx, desty)) == NULL)
-        return true;
+      if (!mountains)
+        {
+          //is the tile i'm going to a mountain that doesn't have a road?
+          if (to->getType() == Tile::MOUNTAIN && 
+              getRoad(Vector<int>(destx, desty)) == NULL)
+            return true;
 
-      //am i on a mountain without a road?
-      if (from->getType() == Tile::MOUNTAIN &&
-	  getRoad(Vector<int>(x, y)) == NULL)
-        return true;
+          //am i on a mountain without a road?
+          if (from->getType() == Tile::MOUNTAIN &&
+              getRoad(Vector<int>(x, y)) == NULL)
+            return true;
+        }
     }
  return false;
 }
@@ -576,12 +579,14 @@ void GameMap::calculateBlockedAvenue(int i, int j)
       desty = j + diffy;
       if (offmap (destx, desty))
 	{
-	  maptile->d_blocked[k] = true;
+	  maptile->d_blocked[0][k] = true;
 	  continue;
 	}
-      maptile->d_blocked[k] = isBlockedAvenue(i, j, destx, desty);
+      maptile->d_blocked[0][k] = isBlockedAvenue(false, i, j, destx, desty);
+      maptile->d_blocked[1][k] = isBlockedAvenue(true, i, j, destx, desty);
     }
 }
+
 void GameMap::calculateBlockedAvenues()
 {
   for (int i = 0; i < s_width; i++)
