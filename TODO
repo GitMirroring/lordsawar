@@ -1,4 +1,3 @@
-mil advisor not working?
 no blue bar when fighting on a boat? or was that because of the editor.
 where are the defeat and victory sounds being played?
 
@@ -50,3 +49,8 @@ fix up the upgrader by painstakingly providing an upgrade path through each vers
 make a template that encompasses load/saving/editing of a masked image file.
 
 make an svg armyset, tileset, shieldset, cityset to test if it works.
+
+the military advisor is decidedly medieval, might want to make it more neutral for scenarios with other genres.
+  maybe move the text of it into the scenario editor.
+
+military advisor always says 'utter suicide'
