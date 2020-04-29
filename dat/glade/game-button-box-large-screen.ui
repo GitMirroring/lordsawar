@@ -32,7 +32,7 @@
                     <child>
                       <object class="GtkButton" id="move_button">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">Move this stack along its path.</property>
                       </object>
@@ -44,7 +44,7 @@
                     <child>
                       <object class="GtkButton" id="next_movable_button">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">Select the next stack that can move.</property>
                       </object>
@@ -56,7 +56,7 @@
                     <child>
                       <object class="GtkButton" id="park_button">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">Finish moving this stack.</property>
                       </object>
@@ -68,7 +68,7 @@
                     <child>
                       <object class="GtkButton" id="deselect_button">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">Deselect this stack.</property>
                       </object>
@@ -80,7 +80,7 @@
                     <child>
                       <object class="GtkButton" id="center_button">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">Center the map on this stack.</property>
                       </object>
@@ -92,7 +92,7 @@
                     <child>
                       <object class="GtkButton" id="diplomacy_button">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">Diplomacy</property>
                       </object>
@@ -104,7 +104,7 @@
                     <child>
                       <object class="GtkButton" id="defend_button">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">Put this stack in a defensive posture.</property>
                       </object>
@@ -116,7 +116,7 @@
                     <child>
                       <object class="GtkButton" id="search_button">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">Search a temple or ruin.</property>
                       </object>
@@ -128,7 +128,7 @@
                     <child>
                       <object class="GtkButton" id="move_all_button">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">Move all stacks along their routes.</property>
                       </object>
@@ -140,7 +140,7 @@
                     <child>
                       <object class="GtkButton" id="end_turn_button">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">End your turn.</property>
                       </object>
