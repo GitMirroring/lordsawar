@@ -82,8 +82,6 @@ StackTileBox::StackTileBox(BaseObjectType* baseObject, const Glib::RefPtr<Gtk::B
       stack_army_buttons.push_back(button);
       stack_info_box->pack_start(*Gtk::manage(box), Gtk::PACK_SHRINK);
     }
-  memset (army_conn, 0, sizeof (army_conn));
-  memset (stack_conn, 0, sizeof (stack_conn));
   d_inhibit_group_toggle = false;
 }
 

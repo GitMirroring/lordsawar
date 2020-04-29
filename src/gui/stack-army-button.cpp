@@ -60,7 +60,6 @@ StackArmyButton::StackArmyButton(BaseObjectType* baseObject, const Glib::RefPtr<
   xml->get_widget("stack_button", stack_button);
   xml->get_widget("stack_image", stack_image);
   xml->get_widget("stack_button_container", stack_button_container);
-  memset (army_conn, 0, sizeof (army_conn));
 }
 
 StackArmyButton::~StackArmyButton()
