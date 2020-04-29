@@ -176,7 +176,6 @@ bool ShieldSetWindow::make_new_shieldset ()
   Glib::ustring msg = _("Save these changes before making a new Shield Set?");
   if (check_discard (msg) == false)
     return false;
-  save_shieldset_menuitem->set_sensitive (false);
   current_save_filename = "";
   shields_list->clear();
   if (d_shieldset)
@@ -544,7 +543,6 @@ bool ShieldSetWindow::save_current_shieldset_file_as ()
             }
           else
             {
-              save_shieldset_menuitem->set_sensitive (true);
               needs_saving = false;
               d_shieldset->created (filename);
               Glib::ustring dir =
@@ -607,8 +605,13 @@ bool ShieldSetWindow::save_current_shieldset_file (Glib::ustring filename)
 
 void ShieldSetWindow::on_save_shieldset_activated()
 {
-  if (check_save_valid (true))
-    save_current_shieldset_file();
+  if (current_save_filename.empty () == true)
+    on_save_as_activated ();
+  else
+    {
+      if (check_save_valid (true))
+        save_current_shieldset_file();
+    }
 }
 
 void ShieldSetWindow::on_edit_shieldset_info_activated()
@@ -804,7 +807,6 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
       
   if (d_shieldset->empty () == false)
     shields_treeview->set_cursor (Gtk::TreePath ("0"));
-  save_shieldset_menuitem->set_sensitive (true);
   update_shield_panel();
   update_window_title();
   return true;

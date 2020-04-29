@@ -420,7 +420,6 @@ bool TileSetWindow::make_new_tileset ()
   Glib::ustring msg = _("Save these changes before making a new Tile Set?");
   if (check_discard (msg) == false)
     return false;
-  save_tileset_menuitem->set_sensitive (false);
   current_save_filename = "";
   tiles_list->clear();
   tilestyles_list->clear();
@@ -573,7 +572,6 @@ bool TileSetWindow::save_current_tileset_file_as ()
             }
           else
             {
-              save_tileset_menuitem->set_sensitive (true);
               needs_saving = false;
               d_tileset->created (filename);
               Glib::ustring dir =
@@ -634,8 +632,13 @@ bool TileSetWindow::save_current_tileset_file (Glib::ustring filename)
 
 void TileSetWindow::on_save_tileset_activated()
 {
-  if (check_save_valid (true))
-    save_current_tileset_file();
+  if (current_save_filename.empty() == true)
+    on_save_as_activated ();
+  else
+    {
+      if (check_save_valid (true))
+        save_current_tileset_file();
+    }
 }
 
 bool TileSetWindow::quit()
@@ -1577,7 +1580,6 @@ bool TileSetWindow::load_tileset(Glib::ustring filename)
   if (d_tileset->size())
     tiles_treeview->set_cursor (Gtk::TreePath ("0"));
 
-  save_tileset_menuitem->set_sensitive (true);
   update_tileset_buttons();
   update_tilestyleset_buttons();
   update_tile_panel();

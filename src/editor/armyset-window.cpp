@@ -423,7 +423,6 @@ bool ArmySetWindow::make_new_armyset ()
   Glib::ustring msg = _("Save these changes before making a new Army Set?");
   if (check_discard (msg) == false)
     return false;
-  save_armyset_menuitem->set_sensitive (false);
   current_save_filename = "";
   if (d_armyset)
     delete d_armyset;
@@ -626,7 +625,6 @@ bool ArmySetWindow::save_current_armyset_file_as ()
             }
           else
             {
-              save_armyset_menuitem->set_sensitive (true);
               needs_saving = false;
               d_armyset->created (filename);
               Glib::ustring dir =
@@ -684,8 +682,13 @@ bool ArmySetWindow::save_current_armyset_file (Glib::ustring filename)
 
 void ArmySetWindow::on_save_armyset_activated()
 {
-  if (check_save_valid (true))
-    save_current_armyset_file ();
+  if (current_save_filename.empty () == true)
+    on_save_as_activated ();
+  else
+    {
+      if (check_save_valid (true))
+        save_current_armyset_file ();
+    }
 }
 
 void ArmySetWindow::on_edit_ship_picture_activated()
@@ -1540,7 +1543,6 @@ bool ArmySetWindow::load_armyset(Glib::ustring filename)
       if(row)
 	armies_treeview->get_selection()->select(row);
     }
-  save_armyset_menuitem->set_sensitive (true);
   needs_saving = false;
   update_window_title();
   inhibit_scrolldown=false;

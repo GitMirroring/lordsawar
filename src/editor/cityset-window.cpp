@@ -193,7 +193,6 @@ bool CitySetWindow::make_new_cityset ()
   Glib::ustring msg = _("Save these changes before making a new City Set?");
   if (check_discard (msg) == false)
     return false;
-  save_cityset_menuitem->set_sensitive (false);
   current_save_filename = "";
   if (d_cityset)
     delete d_cityset;
@@ -320,7 +319,6 @@ bool CitySetWindow::save_current_cityset_file_as ()
             }
           else
             {
-              save_cityset_menuitem->set_sensitive (true);
               needs_saving = false;
               d_cityset->created (filename);
               Glib::ustring dir =
@@ -375,8 +373,13 @@ bool CitySetWindow::save_current_cityset_file (Glib::ustring filename)
 
 void CitySetWindow::on_save_cityset_activated()
 {
-  if (check_save_valid (true))
-    save_current_cityset_file();
+  if (current_save_filename.empty () == true)
+    on_save_as_activated ();
+  else
+    {
+      if (check_save_valid (true))
+        save_current_cityset_file();
+    }
 }
 
 void CitySetWindow::on_edit_cityset_info_activated()
@@ -481,7 +484,6 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
       td.run_and_hide();
       return false;
     }
-  save_cityset_menuitem->set_sensitive (true);
   update_window_title();
   return true;
 }
