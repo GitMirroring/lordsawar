@@ -36,6 +36,8 @@
 #include "File.h"
 #include "shield.h"
 #include "font-size.h"
+#include "GameMap.h"
+#include "tileset.h"
 
 void ArmyInfoTip::init (Gtk::Widget *target, Glib::RefPtr<Gdk::Pixbuf> image, guint32 move_bonus, Glib::ustring info)
 {
@@ -58,7 +60,7 @@ void ArmyInfoTip::init (Gtk::Widget *target, Glib::RefPtr<Gdk::Pixbuf> image, gu
   Gtk::Image *terrain_image;
   xml->get_widget("terrain_image", terrain_image);
   terrain_image->property_pixbuf() =
-    gc->getMoveBonusPic(move_bonus, false,
+    gc->getMoveBonusPic(GameMap::getTileset()->getId(), move_bonus,
                         FontSize::getInstance ()->get_height ())->to_pixbuf();
   Gtk::Label *info_label;
   xml->get_widget("info_label", info_label);

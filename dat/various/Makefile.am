@@ -22,7 +22,6 @@ various_DATA = \
     hero-inactive.png \
     prodshieldset.png \
     smallruinedcity.png \
-    movebonus.png \
     smallunexploredruin.png \
     smallunexploredstronghold.png \
     smallexploredruin.png \
@@ -66,7 +65,6 @@ EXTRA_DIST = \
     hero-inactive.png \
     prodshieldset.png \
     smallruinedcity.png \
-    movebonus.png \
     smallunexploredruin.png \
     smallunexploredstronghold.png \
     smallexploredruin.png \

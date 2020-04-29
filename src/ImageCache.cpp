@@ -97,7 +97,6 @@ ImageCache::ImageCache()
     loadDiplomacyImages();
     loadCursorImages();
     loadProdShieldImages();
-    loadMoveBonusImages();
     loadMedalImages(ScenarioMedia::getDefaultSmallMedalsImageFilename(),
                     ScenarioMedia::getDefaultBigMedalsImageFilename());
     d_smallruinedcity = loadMiscImage("smallruinedcity.png");
@@ -188,20 +187,6 @@ bool ImageCache::loadProdShieldImages()
   for (unsigned int i = 0; i < PRODUCTION_SHIELD_TYPES; i++)
     d_prodshield[i] = prodshield[i];
   prodshield.clear();
-  return true;
-}
-
-bool ImageCache::loadMoveBonusImages()
-{
-  bool broken = false;
-  //load the movement bonus icons
-  std::vector<PixMask*> movebonus;
-  movebonus = disassemble_row(File::getVariousFile("movebonus.png"),
-                              MOVE_BONUS_TYPES, broken);
-  if (broken)
-    return false;
-  for (unsigned int i = 0; i < MOVE_BONUS_TYPES; i++)
-    d_movebonus[i] = movebonus[i];
   return true;
 }
 
@@ -310,9 +295,6 @@ ImageCache::~ImageCache()
 
   for (unsigned int i = 0; i < PRODUCTION_SHIELD_TYPES; i++)
     delete d_prodshield[i];
-
-  for (unsigned int i = 0; i < MOVE_BONUS_TYPES; i++)
-    delete d_movebonus[i];
 
   delete d_newlevel_male;
   delete d_newlevelmask_male;
@@ -565,7 +547,7 @@ void ImageCache::checkPictures()
         return;
     }
 
-  if (movebonuscache.size() >= MOVE_BONUS_TYPES)
+  if (movebonuscache.size() >= 8) //around half of 17 different combinations
     {
       d_cachesize -= movebonuscache.discardHalf();
       if (d_cachesize < maxcache)
@@ -1061,30 +1043,6 @@ PixMask* ImageCache::getProdShieldPic(guint32 type, bool prod)
   return s;
 }
 
-PixMask* ImageCache::getMoveBonusPic(guint32 bonus, bool has_ship,
-                                     guint32 font_size)
-{
-  guint added = 0;
-  MoveBonusPixMaskCacheItem i;
-  if (bonus == Tile::isFlying()) // show fly icon
-    i.type = 4;
-  else if (bonus & Tile::FOREST && bonus & Tile::HILLS) // show trees and hills
-    i.type = 3;
-  else if (bonus & Tile::HILLS) // show foothills
-    i.type = 2;
-  else if (bonus & Tile::FOREST) // show trees
-    i.type = 1;
-  else // show blank
-    i.type = 0;
-  if (has_ship && bonus != Tile::isFlying()) // (what a) show boat
-    i.type = 5;
-  i.font_size = font_size;
-  PixMask *s = movebonuscache.get(i, added);
-  d_cachesize += added;
-  if (added)
-    checkPictures();
-  return s;
-}
 
 PixMask* ImageCache::getShipPic(const Player* p)
 {
@@ -1272,9 +1230,19 @@ PixMask* ImageCache::getDiplomacyImage(int type, Player::DiplomaticState state)
   return d_diplomacy[type][state];
 }
 
-PixMask* ImageCache::getMoveBonusImage(guint32 type)
+PixMask* ImageCache::getMoveBonusPic(guint32 tileset_id, guint32 bonus, guint32 font_size)
 {
-  return d_movebonus[type];
+  guint added = 0;
+  MoveBonusPixMaskCacheItem i;
+  i.bonus = bonus;
+  i.tileset = tileset_id;
+  i.font_size = font_size;
+
+  PixMask *s = movebonuscache.get(i, added);
+  d_cachesize += added;
+  if (added)
+    checkPictures();
+  return s;
 }
 
 PixMask* ImageCache::getDefaultTileStyleImage(guint32 type)
@@ -2443,22 +2411,240 @@ int ProdShieldPixMaskCacheItem::comp(const ProdShieldPixMaskCacheItem item) cons
     0;
 }
 
-PixMask *MoveBonusPixMaskCacheItem::generate(MoveBonusPixMaskCacheItem i)
+std::vector<PixMask *> MoveBonusPixMaskCacheItem::getMoveBonusImages (Tileset *t, guint32 bonus, int &width, int &height,
+                                                                      double wfrac)
 {
-  PixMask *p = ImageCache::getInstance()->getMoveBonusImage(i.type)->copy();
-  double ratio = DIALOG_MOVE_BONUS_PIC_FONTSIZE_MULTIPLE;
-  double new_height = i.font_size * ratio;
+  std::vector<PixMask *> im;
+
+  if ((bonus & Tile::FOREST) == Tile::FOREST)
+    {
+      PixMask *p = t->getForestMoveBonusImage ();
+      if (p)
+        im.push_back (p);
+    }
+  if ((bonus & Tile::HILLS) == Tile::HILLS)
+    {
+      PixMask *p = t->getHillsMoveBonusImage ();
+      if (p)
+        im.push_back (p);
+    }
+  if ((bonus & Tile::MOUNTAIN) == Tile::MOUNTAIN)
+    {
+      PixMask *p = t->getMountainsMoveBonusImage ();
+      if (p)
+        im.push_back (p);
+    }
+  if ((bonus & Tile::SWAMP) == Tile::SWAMP)
+    {
+      PixMask *p = t->getSwampMoveBonusImage ();
+      if (p)
+        im.push_back (p);
+    }
+
+  width = 0;
+  for (guint32 j = 0; j < im.size (); j++)
+    width += (im[j]->get_width () * wfrac);
+
+  height = 0;
+  for (guint32 j = 0; j < im.size (); j++)
+    if (im[j]->get_height () > height)
+      height = im[j]->get_height ();
+
+  if (width == 0 && height == 0)
+    {
+      width = 32;
+      height = 20;
+    }
+  return im;
+}
+
+PixMask* MoveBonusPixMaskCacheItem::generateTwo (Tileset *t, guint32 bonus)
+{
+  // take the leftmost two thirds of the first, and  the rightmost two thirds
+  // of the second
+  int width, height;
+  std::vector<PixMask *> im = getMoveBonusImages (t, bonus, width, height,
+                                                  2.0/3.0);
+ 
+  Glib::RefPtr<Gdk::Pixbuf> empty_pic =
+    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, width, height);
+  empty_pic->fill(0x00000000);
+  PixMask *p = PixMask::create (empty_pic);
+  if (im.size () != 2)
+    return p;
+
+  std::vector<PixMask*> parts;
+  parts.push_back (im[0]->cropLeftTwoThirds ());
+  parts.push_back (im[1]->cropRightTwoThirds ());
+
+  guint32 x = 0;
+  for (auto part : parts)
+    {
+      part->blit (p->get_pixmap (), x, 0);
+      x += part->get_unscaled_width ();
+    }
+
+  for (auto part : parts)
+    delete part;
+
+  return p;
+}
+
+PixMask* MoveBonusPixMaskCacheItem::generateThree (Tileset *t, guint32 bonus)
+{
+  // take the leftmost half of the first, the center half of the second, and
+  // the rightmost half of the third
+  int width, height;
+  std::vector<PixMask *> im = getMoveBonusImages (t, bonus, width, height,
+                                                  1.0/2.0);
+
+  Glib::RefPtr<Gdk::Pixbuf> empty_pic =
+    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, width, height);
+  empty_pic->fill(0x00000000);
+  PixMask *p = PixMask::create (empty_pic);
+  if (im.size () != 3)
+    return p;
+
+  std::vector<PixMask*> parts;
+  parts.push_back(im[0]->cropLeftHalf ());
+  parts.push_back(im[1]->cropCenterHalf ());
+  parts.push_back(im[2]->cropRightHalf ());
+
+  guint32 x = 0;
+  for (auto part : parts)
+    {
+      part->blit (p->get_pixmap (), x, 0);
+      x += part->get_unscaled_width ();
+    }
+  for (auto part : parts)
+    delete part;
+
+  return p;
+}
+
+PixMask* MoveBonusPixMaskCacheItem::generateFour (Tileset *t, guint32 bonus)
+{
+  //take the center half of all four
+  int width, height;
+  std::vector<PixMask *> im = getMoveBonusImages (t, bonus, width, height,
+                                                  1.0/2.0);
+
+  Glib::RefPtr<Gdk::Pixbuf> empty_pic =
+    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, width, height);
+  empty_pic->fill(0x00000000);
+  PixMask *p = PixMask::create (empty_pic);
+  if (im.size () != 4)
+    return p;
+
+  std::vector<PixMask*> parts;
+  parts.push_back (im[0]->cropCenterHalf ());
+  parts.push_back (im[1]->cropCenterHalf ());
+  parts.push_back (im[2]->cropCenterHalf ());
+  parts.push_back (im[3]->cropCenterHalf ());
+
+  guint32 x = 0;
+  for (auto part : parts)
+    {
+      part->blit (p->get_pixmap (), x, 0);
+      x += part->get_unscaled_width ();
+    }
+
+  for (auto part : parts)
+    delete part;
+
+  return p;
+}
+
+PixMask *MoveBonusPixMaskCacheItem::getMoveBonusPic(Tileset *t, guint32 bonus, guint32 font_size,
+                                                    double ratio)
+{
+  bool all = bonus == Tile::isFlying ();
+  bool water = (bonus & Tile::WATER) == Tile::WATER;
+  bool forest = (bonus & Tile::FOREST) == Tile::FOREST;
+  bool hills = (bonus & Tile::HILLS) == Tile::HILLS;
+  bool mountains = (bonus & Tile::MOUNTAIN) == Tile::MOUNTAIN;
+  bool swamp = (bonus & Tile::SWAMP) == Tile::SWAMP;
+
+  PixMask *p = NULL;
+  if (all)
+    {
+      if (t->getAllMoveBonusImage ())
+        p = t->getAllMoveBonusImage()->copy();
+    }
+  else if (water)
+    {
+      if (t->getWaterMoveBonusImage ())
+        p = t->getWaterMoveBonusImage()->copy();
+    }
+  else if (forest || hills || mountains || swamp)
+    {
+      guint32 count = forest + hills + mountains + swamp;
+      switch (count)
+        {
+        case 1:
+          if (forest)
+            {
+              if (t->getForestMoveBonusImage ())
+                p = t->getForestMoveBonusImage()->copy();
+            }
+          else if (hills)
+            {
+              if (t->getHillsMoveBonusImage())
+                p = t->getHillsMoveBonusImage()->copy();
+            }
+          else if (mountains)
+            {
+              if (t->getMountainsMoveBonusImage())
+                p = t->getMountainsMoveBonusImage()->copy();
+            }
+          else if (swamp)
+            {
+              if (t->getSwampMoveBonusImage())
+                p = t->getSwampMoveBonusImage()->copy();
+            }
+          break;
+        case 2:
+          p = generateTwo (t, bonus);
+          break;
+        case 3:
+          p = generateThree (t, bonus);
+          break;
+        case 4:
+          p = generateFour (t, bonus);
+          break;
+        }
+    }
+  if (p == NULL)
+    {
+      Glib::RefPtr<Gdk::Pixbuf> empty_pic =
+        Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, 32, 20);
+      empty_pic->fill(0x00000000);
+      return PixMask::create (empty_pic);
+    }
+
+  //finally, scale it
+  double new_height = font_size * ratio;
   int new_width =
     ImageCache::calculate_width_from_adjusted_height (p, new_height);
   PixMask::scale (p, new_width, new_height);
+
   return p;
+}
+
+PixMask *MoveBonusPixMaskCacheItem::generate(MoveBonusPixMaskCacheItem i)
+{
+  Tileset *t = Tilesetlist::getInstance()->get(i.tileset);
+  return MoveBonusPixMaskCacheItem::getMoveBonusPic
+    (t, i.bonus, i.font_size, DIALOG_MOVE_BONUS_PIC_FONTSIZE_MULTIPLE);
 }
 
 int MoveBonusPixMaskCacheItem::comp(const MoveBonusPixMaskCacheItem item) const
 {
   return
-    (type < item.type) ? -1 :
-    (type > item.type) ?  1 :
+    (bonus < item.bonus) ? -1 :
+    (bonus > item.bonus) ?  1 :
+    (tileset < item.tileset) ? -1 :
+    (tileset > item.tileset) ?  1 :
     (font_size < item.font_size) ? -1 :
     (font_size > item.font_size) ?  1 :
     0;

@@ -82,6 +82,7 @@ class TileSetWindow: public sigc::trackable
     Gtk::MenuItem *preview_tile_menuitem;
     Gtk::MenuItem *organize_tilestyles_menuitem;
     Gtk::MenuItem *smallmap_building_colors_menuitem;
+    Gtk::MenuItem *move_bonus_images_menuitem;
     Gtk::MenuItem *quit_menuitem;
     Gtk::MenuItem *help_about_menuitem;
     Gtk::MenuItem *tutorial_menuitem;
@@ -159,6 +160,7 @@ class TileSetWindow: public sigc::trackable
     void on_preview_tile_activated();
     void on_organize_tilestyles_activated();
     void on_smallmap_building_colors_activated();
+    void on_move_bonus_images_activated();
     void on_help_about_activated();
     void on_tutorial_video_activated ();
     void on_tile_selected();

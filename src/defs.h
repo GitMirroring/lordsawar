@@ -85,7 +85,6 @@ const unsigned int MAP_SIZE_NORMAL_WIDTH = 112;
 const unsigned int MAP_SIZE_NORMAL_HEIGHT = 156;
 
 const unsigned int PRODUCTION_SHIELD_TYPES = 8;
-const unsigned int MOVE_BONUS_TYPES = 6;
 const unsigned int MEDAL_TYPES = 3;
 const unsigned int NUM_WAYPOINTS = 2;
 const unsigned int NUM_GAME_BUTTON_IMAGES = 12;

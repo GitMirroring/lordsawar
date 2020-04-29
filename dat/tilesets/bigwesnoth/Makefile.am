@@ -23,7 +23,13 @@ IMAGES = \
 	$(srcdir)/selector.png \
 	$(srcdir)/small_selector.png \
 	$(srcdir)/swamp.png \
-	$(srcdir)/water.png
+	$(srcdir)/water.png \
+	$(srcdir)/flight_movebonus.png \
+	$(srcdir)/water_movebonus.png \
+	$(srcdir)/forest_movebonus.png \
+	$(srcdir)/hills_movebonus.png \
+	$(srcdir)/mountains_movebonus.png \
+	$(srcdir)/swamp_movebonus.png
 
 EXTRA_DIST = \
 	bigwesnoth.lwt.in \

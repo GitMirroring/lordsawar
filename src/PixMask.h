@@ -47,13 +47,14 @@ class PixMask
      PixMask* copy();
 
      //! convert this pixmask to a pixbuf.
-     Glib::RefPtr<Gdk::Pixbuf> to_pixbuf();
+     Glib::RefPtr<Gdk::Pixbuf> to_pixbuf() const;
 
      //! draw a pixbuf onto this pixmask.
      void draw_pixbuf(Glib::RefPtr<Gdk::Pixbuf> pixbuf, int src_x, int src_y, int dest_x, int dest_y, int width, int height);
 
      //! scale a pixmask in place (alters pixmask)
      static void scale(PixMask*& pixmask, int xsize, int ysize, Gdk::InterpType intper = Gdk::INTERP_BILINEAR);
+     static void scale(PixMask*& pixmask, double percent, Gdk::InterpType intper = Gdk::INTERP_BILINEAR);
 
      //! draw this pixmask onto a pixmap.
      void blit(Cairo::RefPtr<Cairo::Surface> pixmap, int dest_x, int dest_y);
@@ -64,6 +65,22 @@ class PixMask
 
      Vector<int> get_dim() const;
      Vector<int> get_unscaled_dim() const;
+
+     //! Take the left half of this PixMask and make a new one containing it.
+     PixMask* cropLeftHalf () const;
+
+     //! Take the right half of this PixMask and make a new one containing it.
+     PixMask* cropRightHalf () const;
+
+     //! Take the center half horizontally from this PixMask and make a new one containing it.
+     PixMask* cropCenterHalf () const;
+
+     //! Take the leftmost two thirds of this PixMask and make a new one containing it.
+     PixMask* cropLeftTwoThirds () const;
+
+     //! Take the rightmost two thirds of this PixMask and make a new one containing it.
+     PixMask* cropRightTwoThirds () const;
+
      //! Destructor.
     ~PixMask();
  protected:

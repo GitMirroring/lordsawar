@@ -170,6 +170,58 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
         int countTilesWithPattern(SmallTile::Pattern pattern) const;
 
+        //! Return the basename of the file containing the flight movement bonus image.
+        /**
+         * We name it 'All' because it means all of the movement bonuses are on at
+         * the same time.
+         * This doesn't get all of the move bonus filenames, it gets a single file
+         * representing a movement bonus over all tile types.
+         */
+        Glib::ustring getAllMoveBonusFilename () const
+          {return d_all_movebonus_filename;}
+
+        //! Return the basename of the file containing the water movement bonus image.
+        /**
+         * Shown when a stack is in a boat.
+         */
+        Glib::ustring getWaterMoveBonusFilename () const
+          {return d_water_movebonus_filename;}
+
+        //! Return the basename of the file containing the forest movement bonus image.
+        Glib::ustring getForestMoveBonusFilename () const
+          {return d_forest_movebonus_filename;}
+
+        //! Return the basename of the file containing the hills movement bonus image.
+        Glib::ustring getHillsMoveBonusFilename () const
+          {return d_hills_movebonus_filename;}
+
+        //! Return the basename of the file containing the mountains movement bonus image.
+        Glib::ustring getMountainsMoveBonusFilename () const
+          {return d_mountains_movebonus_filename;}
+
+        //! Return the basename of the file containing the swamp movement bonus image.
+        Glib::ustring getSwampMoveBonusFilename () const
+          {return d_swamp_movebonus_filename;}
+
+        //! Returns the image for the flying movement bonus.
+        PixMask *getAllMoveBonusImage () {return d_all_movebonus;}
+
+        //! Returns the image for the water movement bonus.
+        PixMask *getWaterMoveBonusImage () {return d_water_movebonus;}
+
+        //! Returns the image for the forest movement bonus.
+        PixMask *getForestMoveBonusImage () {return d_forest_movebonus;}
+
+        //! Returns the image for the hills movement bonus.
+        PixMask *getHillsMoveBonusImage () {return d_hills_movebonus;}
+
+        //! Returns the image for the mountains movement bonus.
+        PixMask *getMountainsMoveBonusImage () {return d_mountains_movebonus;}
+
+        //! Returns the image for the swamp movement bonus.
+        PixMask *getSwampMoveBonusImage () {return d_swamp_movebonus;}
+
+
 	// Set Methods
 
 	//! Sets the basename of the file containing the big selector images.
@@ -242,6 +294,54 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	//! Sets the number of animation frames in the small selector.
 	void setNumberOfSmallSelectorFrames(guint32 s) {smallselector.reserve(s);smallselectormask.reserve(s); number_of_small_selector_frames = s;}
+        //! Sets the basename of the file containing the fly movement bonus image.
+        void setAllMoveBonusFilename (Glib::ustring f) 
+          {d_all_movebonus_filename = f;}
+
+        //! Sets the basename of the file containing the water movement bonus image.
+        void setWaterMoveBonusFilename (Glib::ustring f) 
+          {d_water_movebonus_filename = f;}
+
+        //! Sets the basename of the file containing the forest movement bonus image.
+        void setForestMoveBonusFilename (Glib::ustring f) 
+          {d_forest_movebonus_filename = f;}
+
+        //! Sets the basename of the file containing the hills movement bonus image.
+        void setHillsMoveBonusFilename (Glib::ustring f) 
+          {d_hills_movebonus_filename = f;}
+
+        //! Sets the basename of the file containing the mountains movement bonus image.
+        void setMountainsMoveBonusFilename (Glib::ustring f) 
+          {d_mountains_movebonus_filename = f;}
+
+        //! Sets the basename of the file containing the swamp movement bonus image.
+        void setSwampMoveBonusFilename (Glib::ustring f) 
+          {d_swamp_movebonus_filename = f;}
+
+        void clearAllMoveBonusImage(bool clear_name = true);
+        void clearWaterMoveBonusImage(bool clear_name = true);
+        void clearForestMoveBonusImage(bool clear_name = true);
+        void clearHillsMoveBonusImage(bool clear_name = true);
+        void clearMountainsMoveBonusImage(bool clear_name = true);
+        void clearSwampMoveBonusImage(bool clear_name = true);
+
+        //! Sets the image for the flying movement bonus.
+        void setAllMoveBonusImage (PixMask *i) {d_all_movebonus = i;}
+
+        //! Sets the image for the water movement bonus.
+        void setWaterMoveBonusImage (PixMask *i) {d_water_movebonus = i;}
+
+        //! Sets the image for the forest movement bonus.
+        void setForestMoveBonusImage (PixMask *i) {d_forest_movebonus = i;}
+
+        //! Sets the image for the hills movement bonus.
+        void setHillsMoveBonusImage (PixMask *i) {d_hills_movebonus = i;}
+
+        //! Sets the image for the mountains movement bonus.
+        void setMountainsMoveBonusImage (PixMask *i) {d_mountains_movebonus = i;}
+
+        //! Sets the image for the swamp movement bonus.
+        void setSwampMoveBonusImage (PixMask *i) {d_swamp_movebonus = i;}
 
         void clearRoadsImage (bool clear_name = true);
         void clearStonesImage (bool clear_name = true);
@@ -259,6 +359,14 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         bool instantiateLargeSelectorImages();
         bool instantiateExplosionImage();
         bool instantiateFogImages();
+
+        bool instantiateAllMoveBonusImage (TarFile *d);
+        bool instantiateWaterMoveBonusImage (TarFile *d);
+        bool instantiateForestMoveBonusImage (TarFile *d);
+        bool instantiateHillsMoveBonusImage (TarFile *d);
+        bool instantiateMountainsMoveBonusImage (TarFile *d);
+        bool instantiateSwampMoveBonusImage (TarFile *d);
+        bool instantiateMoveBonusImages ();
 
         //! clear the tileset and add the normal tiles to it.
         void populateWithDefaultTiles();
@@ -364,6 +472,12 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 			       Glib::ustring flags_filename,
 			       Glib::ustring selector_filename,
 			       Glib::ustring small_selector_filename,
+                               Glib::ustring all_movebonus_filename,
+                               Glib::ustring water_movebonus_filename,
+                               Glib::ustring forest_movebonus_filename,
+                               Glib::ustring hills_movebonus_filename,
+                               Glib::ustring mountains_movebonus_filename,
+                               Glib::ustring swamp_movebonus_filename,
                                bool scale, bool &broken);
         // DATA
 
@@ -528,6 +642,20 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	//! The fog images.
 	PixMask*fogpic[FOG_TYPES];
+
+        Glib::ustring d_all_movebonus_filename;
+        Glib::ustring d_water_movebonus_filename;
+        Glib::ustring d_forest_movebonus_filename;
+        Glib::ustring d_hills_movebonus_filename;
+        Glib::ustring d_mountains_movebonus_filename;
+        Glib::ustring d_swamp_movebonus_filename;
+
+        PixMask *d_all_movebonus;
+        PixMask *d_water_movebonus;
+        PixMask *d_forest_movebonus;
+        PixMask *d_hills_movebonus;
+        PixMask *d_mountains_movebonus;
+        PixMask *d_swamp_movebonus;
 };
 #endif // TILESET_H
 

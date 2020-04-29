@@ -27,6 +27,8 @@
 #include "player.h"
 #include "ImageCache.h"
 #include "font-size.h"
+#include "GameMap.h"
+#include "tileset.h"
 
 ArmyBonusDialog::ArmyBonusDialog(Gtk::Window &parent, Player *p)
  :LwDialog(parent, "army-bonus-dialog.ui")
@@ -67,7 +69,7 @@ void ArmyBonusDialog::addArmyType(guint32 army_type)
   (*i)[armies_columns.move] = a->getMaxMoves();
   guint32 b = a->getMoveBonus();
   (*i)[armies_columns.move_image] =
-    gc->getMoveBonusPic(b, false,
+    gc->getMoveBonusPic(GameMap::getTileset ()->getId (), b,
                         FontSize::getInstance ()->get_height ())->to_pixbuf();
   (*i)[armies_columns.bonus] = "-";
 

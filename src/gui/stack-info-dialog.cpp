@@ -35,6 +35,7 @@
 #include <assert.h>
 #include "stacktile.h"
 #include "GameMap.h"
+#include "tileset.h"
 #include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &StackInfoDialog::x)
@@ -109,7 +110,7 @@ void StackInfoDialog::addArmy (bool first, Stack *s, Army *h, guint32 modified_s
     {
       image = new Gtk::Image();
       image->property_pixbuf() =
-        gc->getMoveBonusPic(move_bonus, ship,
+        gc->getMoveBonusPic(GameMap::getTileset()->getId(), move_bonus,
                             FontSize::getInstance ()->get_height ())->to_pixbuf();
     }
 

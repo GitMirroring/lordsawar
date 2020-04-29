@@ -222,6 +222,13 @@ void PixMask::scale(PixMask*& p, int xsize, int ysize, Gdk::InterpType interp)
   return;
 }
 
+void PixMask::scale(PixMask*& p, double perc, Gdk::InterpType interp)
+{
+  int xsize = p->get_unscaled_width () * perc;
+  int ysize = p->get_unscaled_height () * perc;
+  PixMask::scale (p, xsize, ysize, interp);
+}
+
 PixMask * PixMask::scale(int xsize, int ysize, Gdk::InterpType interp)
 {
   Glib::RefPtr<Gdk::Pixbuf> pixbuf = to_pixbuf();
@@ -232,7 +239,7 @@ PixMask * PixMask::scale(int xsize, int ysize, Gdk::InterpType interp)
   return pix;
 }
 
-Glib::RefPtr<Gdk::Pixbuf> PixMask::to_pixbuf()
+Glib::RefPtr<Gdk::Pixbuf> PixMask::to_pixbuf() const
 {
   Glib::RefPtr<Gdk::Pixbuf> buf = Gdk::Pixbuf::create(pixmap, 0, 0, width, height);
   Glib::RefPtr<Gdk::Pixbuf> alphabuf = buf->add_alpha(true, 255, 87, 204);
@@ -270,4 +277,57 @@ Vector<int> PixMask::get_dim() const
 Vector<int> PixMask::get_unscaled_dim() const
 {
   return Vector<int>(unscaled_width, unscaled_height);
+}
+
+PixMask* PixMask::cropLeftHalf () const
+{
+  guint32 new_width = (double)unscaled_width * (1.0 / 2.0);
+  Glib::RefPtr<Gdk::Pixbuf> pic =
+    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, new_width,
+                        unscaled_height);
+  to_pixbuf ()->copy_area (0, 0, new_width, height, pic, 0, 0);
+  return PixMask::create (pic);
+}
+
+PixMask* PixMask::cropRightHalf () const
+{
+  guint32 new_width = (double)unscaled_width * (1.0 / 2.0);
+  Glib::RefPtr<Gdk::Pixbuf> pic =
+    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, new_width,
+                        unscaled_height);
+  to_pixbuf ()->copy_area (unscaled_width - new_width, 0,
+                           new_width, height, pic, 0, 0);
+  return PixMask::create (pic);
+}
+
+PixMask* PixMask::cropCenterHalf () const
+{
+  guint32 new_width = (double)unscaled_width * (1.0 / 2.0);
+  Glib::RefPtr<Gdk::Pixbuf> pic =
+    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, new_width,
+                        unscaled_height);
+  to_pixbuf ()->copy_area ((unscaled_width / 2) - (new_width / 2), 0, new_width, height, pic, 0, 0);
+  return PixMask::create (pic);
+
+}
+
+PixMask* PixMask::cropLeftTwoThirds () const
+{
+  guint32 new_width = (double)unscaled_width * (2.0 / 3.0);
+  Glib::RefPtr<Gdk::Pixbuf> pic =
+    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, new_width,
+                        unscaled_height);
+  to_pixbuf ()->copy_area (0, 0, new_width, height, pic, 0, 0);
+  return PixMask::create (pic);
+}
+
+PixMask* PixMask::cropRightTwoThirds () const
+{
+  guint32 new_width = (double)unscaled_width * (2.0 / 3.0);
+  Glib::RefPtr<Gdk::Pixbuf> pic =
+    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, new_width,
+                        unscaled_height);
+  to_pixbuf ()->copy_area (unscaled_width - new_width, 0,
+  new_width, height, pic, 0, 0);
+  return PixMask::create (pic);
 }

@@ -46,6 +46,7 @@
 #include "editor-save-changes-dialog.h"
 #include "tilestyle-organizer-dialog.h"
 #include "tileset-smallmap-building-colors-dialog.h"
+#include "tileset-move-bonus-image-dialog.h"
 #include "GameMap.h"
 #include "font-size.h"
 #include "past-chooser.h"
@@ -188,6 +189,10 @@ TileSetWindow::TileSetWindow(Glib::ustring load_filename)
                     smallmap_building_colors_menuitem);
     smallmap_building_colors_menuitem->signal_activate().connect
       (method(on_smallmap_building_colors_activated));
+    xml->get_widget("move_bonus_images_menuitem",
+                    move_bonus_images_menuitem);
+    move_bonus_images_menuitem->signal_activate().connect
+      (method(on_move_bonus_images_activated));
     xml->get_widget ("help_about_menuitem", help_about_menuitem);
     help_about_menuitem->signal_activate().connect
       (method(on_help_about_activated));
@@ -1245,6 +1250,14 @@ void TileSetWindow::on_smallmap_building_colors_activated()
     dirty ();
 }
 
+void TileSetWindow::on_move_bonus_images_activated()
+{
+  TilesetMoveBonusImageDialog d(*window, d_tileset);
+  d.run_and_hide();
+  if (d.get_changed ())
+    dirty ();
+}
+
 void TileSetWindow::on_tilestyle_id_selected(guint32 id)
 {
   Tile *t = NULL;
@@ -1658,6 +1671,18 @@ void TileSetWindow::on_validate_tileset_activated()
     msgs.push_back(_("A set of fog images are required."));
   if (d_tileset->getFlagsFilename().empty () == true)
     msgs.push_back(_("A set of flag images are required."));
+  if (d_tileset->getAllMoveBonusFilename ().empty () == true)
+    msgs.push_back(_("An all (flight) movement bonus image is required."));
+  if (d_tileset->getWaterMoveBonusFilename ().empty () == true)
+    msgs.push_back(_("A water movement bonus image is required."));
+  if (d_tileset->getForestMoveBonusFilename ().empty () == true)
+    msgs.push_back(_("A forest movement bonus image is required."));
+  if (d_tileset->getHillsMoveBonusFilename ().empty () == true)
+    msgs.push_back(_("A hills movement bonus image is required."));
+  if (d_tileset->getMountainsMoveBonusFilename ().empty () == true)
+    msgs.push_back(_("A mountains movement bonus image is required."));
+  if (d_tileset->getSwampMoveBonusFilename ().empty () == true)
+    msgs.push_back(_("A swamp movement bonus image is required."));
 
   if (isValidName () == false)
     msgs.push_back(_("The name of the Tile Set is not unique."));

@@ -425,7 +425,7 @@ class ImageCache
 	PixMask* getTilePic(int tile_style_id, int fog_type_id, bool has_bag, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid, int stone_type);
 
 
-        PixMask* getMoveBonusPic(guint32 bonus, bool has_ship, guint32 font_size);
+        //PixMask* getMoveBonusPic(guint32 bonus, bool has_ship, guint32 font_size);
         /** Method for getting production shield pictures.
           *
           * As with the other methods, use solely this method to get the 
@@ -451,7 +451,7 @@ class ImageCache
         PixMask* getDiplomacyImage(int type, Player::DiplomaticState state);
         PixMask* getCursorImage(int type);
         PixMask *getProdShieldImage(guint32 type);
-        PixMask* getMoveBonusImage(guint32 type);
+        PixMask* getMoveBonusPic(guint32 tileset_id, guint32 bonus, guint32 font_size);
         PixMask* getDefaultTileStyleImage(guint32 type);
         PixMask* getMedalImage(bool large, int type);
         PixMask *getNewLevelImage(bool female, bool mask);
@@ -507,7 +507,6 @@ class ImageCache
         bool loadDiplomacyImages();
         bool loadCursorImages();
         bool loadProdShieldImages();
-        bool loadMoveBonusImages();
         bool loadNewLevelImages();
         bool loadMedalImages(Glib::ustring sm, Glib::ustring lg);
         bool loadDefaultTileStyleImages();
@@ -554,7 +553,6 @@ class ImageCache
         PixMask* d_diplomacy[2][DIPLOMACY_TYPES];
         PixMask* d_cursor[CURSOR_TYPES];
         PixMask* d_prodshield[PRODUCTION_SHIELD_TYPES];
-        PixMask* d_movebonus[MOVE_BONUS_TYPES];
 	PixMask *d_newlevel_male;
 	PixMask *d_newlevelmask_male;
 	PixMask *d_newlevel_female;
@@ -876,11 +874,23 @@ class MoveBonusPixMaskCacheItem
 {
 public:
     static PixMask *generate(MoveBonusPixMaskCacheItem item);
+    static PixMask *getMoveBonusPic(Tileset *t, guint32 bonus, guint32 font_size, double ratio);
     int comp(const MoveBonusPixMaskCacheItem item) const;
     bool operator == (const MoveBonusPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const MoveBonusPixMaskCacheItem &c) const {return comp(c)<0;};
-    guint32 type; // 0=empty, 1=trees, 2=foothills, 3=hills+trees, 4=fly, 5=boat
+    guint32 bonus; // a movement bonus, a bitwise OR'd set of Tile::Type
+    guint32 tileset;
     guint32 font_size;
+    //! Generate a movement bonus where two Tile types are featured
+    static PixMask* generateTwo (Tileset *t, guint32 bonus);
+    //! Generate a movement bonus where three Tile types are featured
+    static PixMask* generateThree (Tileset *t, guint32 bonus);
+    //! Generate a movement bonus where four Tile types are featured
+    static PixMask* generateFour (Tileset *t, guint32 bonus);
+    //! Gather up the movebonus images and return the dimensions also.
+    static std::vector<PixMask *> getMoveBonusImages (Tileset *t, guint32 bonus,
+                                                      int &width, int &height,
+                                                      double wfrac);
 };
 
 //! Helper class for boat items in the ImageCache.

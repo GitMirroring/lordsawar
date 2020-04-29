@@ -78,6 +78,19 @@ Tileset::Tileset(guint32 id, Glib::ustring name)
   explosion = NULL;
   for (unsigned int i = 0; i < FOG_TYPES; i++)
     fogpic[i] = NULL;
+  d_all_movebonus_filename = "";
+  d_water_movebonus_filename = "";
+  d_forest_movebonus_filename = "";
+  d_hills_movebonus_filename = "";
+  d_mountains_movebonus_filename = "";
+  d_swamp_movebonus_filename = "";
+
+  d_all_movebonus = NULL;
+  d_water_movebonus = NULL;
+  d_forest_movebonus = NULL;
+  d_hills_movebonus = NULL;
+  d_mountains_movebonus = NULL;
+  d_swamp_movebonus = NULL;
 }
 
 Tileset::Tileset (const Tileset& t)
@@ -175,6 +188,43 @@ Tileset::Tileset (const Tileset& t)
             }
         }
     }
+
+  d_all_movebonus_filename = t.d_all_movebonus_filename;
+  d_water_movebonus_filename = t.d_water_movebonus_filename;
+  d_forest_movebonus_filename = t.d_forest_movebonus_filename;
+  d_hills_movebonus_filename = t.d_hills_movebonus_filename;
+  d_mountains_movebonus_filename = t.d_mountains_movebonus_filename;
+  d_swamp_movebonus_filename = t.d_swamp_movebonus_filename;
+
+  if (t.d_all_movebonus)
+    d_all_movebonus = t.d_all_movebonus->copy ();
+  else
+    d_all_movebonus = NULL;
+
+  if (t.d_water_movebonus)
+    d_water_movebonus = t.d_water_movebonus->copy ();
+  else
+    d_water_movebonus = NULL;
+
+  if (t.d_forest_movebonus)
+    d_forest_movebonus = t.d_forest_movebonus->copy ();
+  else
+    d_forest_movebonus = NULL;
+
+  if (t.d_hills_movebonus)
+    d_hills_movebonus = t.d_hills_movebonus->copy ();
+  else
+    d_hills_movebonus = NULL;
+
+  if (t.d_mountains_movebonus)
+    d_mountains_movebonus = t.d_mountains_movebonus->copy ();
+  else
+    d_mountains_movebonus = NULL;
+
+  if (t.d_swamp_movebonus)
+    d_swamp_movebonus = t.d_swamp_movebonus->copy ();
+  else
+    d_swamp_movebonus = NULL;
 }
 
 Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
@@ -200,6 +250,19 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   File::add_png_if_no_ext (d_fog);
   helper->getData(d_flags, "flags");
   File::add_png_if_no_ext (d_flags);
+  helper->getData(d_all_movebonus_filename, "movebonus_all");
+  File::add_png_if_no_ext (d_all_movebonus_filename);
+  helper->getData(d_water_movebonus_filename, "movebonus_water");
+  File::add_png_if_no_ext (d_water_movebonus_filename);
+  helper->getData(d_forest_movebonus_filename, "movebonus_forest");
+  File::add_png_if_no_ext (d_forest_movebonus_filename);
+  helper->getData(d_hills_movebonus_filename, "movebonus_hills");
+  File::add_png_if_no_ext (d_hills_movebonus_filename);
+  helper->getData(d_mountains_movebonus_filename, "movebonus_mountains");
+  File::add_png_if_no_ext (d_mountains_movebonus_filename);
+  helper->getData(d_swamp_movebonus_filename, "movebonus_swamp");
+  File::add_png_if_no_ext (d_swamp_movebonus_filename);
+
   helper->registerTag(Tile::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
   helper->registerTag(Tileset::d_road_smallmap_tag, sigc::mem_fun((*this), &Tileset::loadTile));
   helper->registerTag(Tileset::d_ruin_smallmap_tag, sigc::mem_fun((*this), &Tileset::loadTile));
@@ -226,6 +289,12 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   explosion = NULL;
   for (unsigned int i = 0; i < FOG_TYPES; i++)
     fogpic[i] = NULL;
+  d_all_movebonus = NULL;
+  d_water_movebonus = NULL;
+  d_forest_movebonus = NULL;
+  d_hills_movebonus = NULL;
+  d_mountains_movebonus = NULL;
+  d_swamp_movebonus = NULL;
 }
 
 Tileset::~Tileset()
@@ -346,6 +415,12 @@ bool Tileset::save(XML_Helper *helper) const
   retval &= helper->saveData("bridges", d_bridges);
   retval &= helper->saveData("fog", d_fog);
   retval &= helper->saveData("flags", d_flags);
+  retval &= helper->saveData("movebonus_all", d_all_movebonus_filename);
+  retval &= helper->saveData("movebonus_water", d_water_movebonus_filename);
+  retval &= helper->saveData("movebonus_forest", d_forest_movebonus_filename);
+  retval &= helper->saveData("movebonus_hills", d_hills_movebonus_filename);
+  retval &= helper->saveData("movebonus_mountains", d_mountains_movebonus_filename);
+  retval &= helper->saveData("movebonus_swamp", d_swamp_movebonus_filename);
   retval &= helper->openTag(d_road_smallmap_tag);
   retval &= helper->saveData("color", d_road_color);
   retval &= helper->closeTag();
@@ -460,6 +535,18 @@ bool Tileset::validate() const
   if (getFogFilename().empty () == true)
     return false;
   if (getFlagsFilename().empty () == true)
+    return false;
+  if (getAllMoveBonusFilename ().empty () == true)
+    return false;
+  if (getWaterMoveBonusFilename ().empty () == true)
+    return false;
+  if (getForestMoveBonusFilename ().empty () == true)
+    return false;
+  if (getHillsMoveBonusFilename ().empty () == true)
+    return false;
+  if (getMountainsMoveBonusFilename ().empty () == true)
+    return false;
+  if (getSwampMoveBonusFilename ().empty () == true)
     return false;
 
   return true;
@@ -600,6 +687,30 @@ void Tileset::uninstantiateImages()
           fogpic[i] = NULL;
 	}
     }
+
+  if (d_all_movebonus)
+    delete d_all_movebonus;
+  d_all_movebonus = NULL;
+
+  if (d_water_movebonus)
+    delete d_water_movebonus;
+  d_water_movebonus = NULL;
+
+  if (d_forest_movebonus)
+    delete d_forest_movebonus;
+  d_forest_movebonus = NULL;
+
+  if (d_hills_movebonus)
+    delete d_hills_movebonus;
+  d_hills_movebonus = NULL;
+
+  if (d_mountains_movebonus)
+    delete d_mountains_movebonus;
+  d_mountains_movebonus = NULL;
+
+  if (d_swamp_movebonus)
+    delete d_swamp_movebonus;
+  d_swamp_movebonus = NULL;
 }
 
 void Tileset::instantiateImages(Glib::ustring explosion_filename,
@@ -610,6 +721,12 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
 				Glib::ustring flags_filename,
 				Glib::ustring selector_filename,
 				Glib::ustring small_selector_filename,
+                                Glib::ustring all_movebonus_filename,
+                                Glib::ustring water_movebonus_filename,
+                                Glib::ustring forest_movebonus_filename,
+                                Glib::ustring hills_movebonus_filename,
+                                Glib::ustring mountains_movebonus_filename,
+                                Glib::ustring swamp_movebonus_filename,
                                 bool scale, bool &broken)
 {
   if (explosion_filename.empty() == false && !broken)
@@ -753,6 +870,25 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
       else
         broken = true;
     }
+
+  if (all_movebonus_filename.empty() == false && !broken)
+    d_all_movebonus = PixMask::create (all_movebonus_filename, broken);
+
+  if (water_movebonus_filename.empty() == false && !broken)
+    d_water_movebonus = PixMask::create (water_movebonus_filename, broken);
+
+  if (forest_movebonus_filename.empty() == false && !broken)
+    d_forest_movebonus = PixMask::create (forest_movebonus_filename, broken);
+
+  if (hills_movebonus_filename.empty() == false && !broken)
+    d_hills_movebonus = PixMask::create (hills_movebonus_filename, broken);
+
+  if (mountains_movebonus_filename.empty() == false && !broken)
+    d_mountains_movebonus = PixMask::create (mountains_movebonus_filename,
+                                             broken);
+
+  if (swamp_movebonus_filename.empty() == false && !broken)
+    d_swamp_movebonus = PixMask::create (swamp_movebonus_filename, broken);
 }
 
 void Tileset::instantiateImages(bool scale, bool &broken)
@@ -777,6 +913,12 @@ void Tileset::instantiateImages(bool scale, bool &broken)
   Glib::ustring flags_filename = "";
   Glib::ustring selector_filename = "";
   Glib::ustring small_selector_filename = "";
+  Glib::ustring all_movebonus_filename = "";
+  Glib::ustring water_movebonus_filename = "";
+  Glib::ustring forest_movebonus_filename = "";
+  Glib::ustring hills_movebonus_filename = "";
+  Glib::ustring mountains_movebonus_filename = "";
+  Glib::ustring swamp_movebonus_filename = "";
 
   if (getExplosionFilename().empty() == false && !broken)
     explosion_filename = t.getFile(getExplosionFilename(), broken);
@@ -795,11 +937,32 @@ void Tileset::instantiateImages(bool scale, bool &broken)
   if (getSmallSelectorFilename().empty() == false && !broken)
     small_selector_filename = 
       t.getFile(getSmallSelectorFilename(), broken);
+  if (getAllMoveBonusFilename ().empty () == false)
+    all_movebonus_filename = 
+      t.getFile(getAllMoveBonusFilename (), broken);
+  if (getWaterMoveBonusFilename ().empty () == false)
+    water_movebonus_filename = 
+      t.getFile(getWaterMoveBonusFilename (), broken);
+  if (getForestMoveBonusFilename ().empty () == false)
+    forest_movebonus_filename = 
+      t.getFile(getForestMoveBonusFilename (), broken);
+  if (getHillsMoveBonusFilename ().empty () == false)
+    hills_movebonus_filename = 
+      t.getFile(getHillsMoveBonusFilename (), broken);
+  if (getMountainsMoveBonusFilename ().empty () == false)
+    mountains_movebonus_filename = 
+      t.getFile(getMountainsMoveBonusFilename (), broken);
+  if (getSwampMoveBonusFilename ().empty () == false)
+    swamp_movebonus_filename = 
+      t.getFile(getSwampMoveBonusFilename (), broken);
   if (!broken)
     instantiateImages(explosion_filename, roads_filename, stones_filename,
                       bridges_filename, fog_filename, flags_filename,
-                      selector_filename, small_selector_filename, scale,
-                      broken);
+                      selector_filename, small_selector_filename, 
+                      all_movebonus_filename, water_movebonus_filename,
+                      forest_movebonus_filename, hills_movebonus_filename,
+                      mountains_movebonus_filename, swamp_movebonus_filename,
+                      scale, broken);
   if (explosion_filename.empty() == false)
     File::erase(explosion_filename);
   if (roads_filename.empty() == false)
@@ -816,6 +979,18 @@ void Tileset::instantiateImages(bool scale, bool &broken)
     File::erase(selector_filename);
   if (small_selector_filename.empty() == false)
     File::erase(small_selector_filename);
+  if (all_movebonus_filename.empty () == false)
+    File::erase(all_movebonus_filename);
+  if (water_movebonus_filename.empty () == false)
+    File::erase(water_movebonus_filename);
+  if (forest_movebonus_filename.empty () == false)
+    File::erase(forest_movebonus_filename);
+  if (hills_movebonus_filename.empty () == false)
+    File::erase(hills_movebonus_filename);
+  if (mountains_movebonus_filename.empty () == false)
+    File::erase(mountains_movebonus_filename);
+  if (swamp_movebonus_filename.empty () == false)
+    File::erase(swamp_movebonus_filename);
   t.Close();
   return;
 }
@@ -1356,6 +1531,18 @@ void Tileset::uninstantiateSameNamedImages (Glib::ustring name)
     clearFogImages ();
   if (getFlagsFilename() == name)
     clearFlagsImage ();
+  if (getAllMoveBonusFilename() == name)
+    clearAllMoveBonusImage ();
+  if (getWaterMoveBonusFilename() == name)
+    clearWaterMoveBonusImage ();
+  if (getForestMoveBonusFilename() == name)
+    clearForestMoveBonusImage ();
+  if (getHillsMoveBonusFilename() == name)
+    clearHillsMoveBonusImage ();
+  if (getMountainsMoveBonusFilename() == name)
+    clearMountainsMoveBonusImage ();
+  if (getSwampMoveBonusFilename() == name)
+    clearSwampMoveBonusImage ();
   std::vector<TileStyleSet*> sets;
   for (iterator i = begin (); i != end (); i++)
     {
@@ -1367,5 +1554,227 @@ void Tileset::uninstantiateSameNamedImages (Glib::ustring name)
     }
   for (auto s : sets)
     delete s;
+}
+
+bool Tileset::instantiateMoveBonusImages ()
+{
+  bool broken = false;
+  return broken;
+}
+
+void Tileset::clearAllMoveBonusImage(bool clear_name)
+{
+  if (clear_name)
+    setAllMoveBonusFilename ("");
+
+  PixMask *p = getAllMoveBonusImage ();
+  if (p)
+    delete p;
+  setAllMoveBonusImage (NULL);
+}
+
+void Tileset::clearWaterMoveBonusImage(bool clear_name)
+{
+  if (clear_name)
+    setWaterMoveBonusFilename ("");
+
+  PixMask *p = getWaterMoveBonusImage ();
+  if (p)
+    delete p;
+  setWaterMoveBonusImage (NULL);
+}
+
+void Tileset::clearForestMoveBonusImage(bool clear_name)
+{
+  if (clear_name)
+    setForestMoveBonusFilename ("");
+
+  PixMask *p = getForestMoveBonusImage ();
+  if (p)
+    delete p;
+  setForestMoveBonusImage (NULL);
+}
+
+void Tileset::clearHillsMoveBonusImage(bool clear_name)
+{
+  if (clear_name)
+    setHillsMoveBonusFilename ("");
+
+  PixMask *p = getHillsMoveBonusImage ();
+  if (p)
+    delete p;
+  setHillsMoveBonusImage (NULL);
+}
+
+void Tileset::clearMountainsMoveBonusImage(bool clear_name)
+{
+  if (clear_name)
+    setMountainsMoveBonusFilename ("");
+
+  PixMask *p = getMountainsMoveBonusImage ();
+  if (p)
+    delete p;
+  setMountainsMoveBonusImage (NULL);
+}
+
+void Tileset::clearSwampMoveBonusImage(bool clear_name)
+{
+  if (clear_name)
+    setSwampMoveBonusFilename ("");
+
+  PixMask *p = getSwampMoveBonusImage ();
+  if (p)
+    delete p;
+  setSwampMoveBonusImage (NULL);
+}
+
+bool Tileset::instantiateAllMoveBonusImage (TarFile *t)
+{
+  Glib::ustring imgname = getAllMoveBonusFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearAllMoveBonusImage (false);
+              setAllMoveBonusImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool Tileset::instantiateWaterMoveBonusImage (TarFile *t)
+{
+  Glib::ustring imgname = getWaterMoveBonusFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearWaterMoveBonusImage (false);
+              setWaterMoveBonusImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool Tileset::instantiateForestMoveBonusImage (TarFile *t)
+{
+  Glib::ustring imgname = getForestMoveBonusFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearForestMoveBonusImage (false);
+              setForestMoveBonusImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool Tileset::instantiateHillsMoveBonusImage (TarFile *t)
+{
+  Glib::ustring imgname = getHillsMoveBonusFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearHillsMoveBonusImage (false);
+              setHillsMoveBonusImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool Tileset::instantiateMountainsMoveBonusImage (TarFile *t)
+{
+  Glib::ustring imgname = getMountainsMoveBonusFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearMountainsMoveBonusImage (false);
+              setMountainsMoveBonusImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
+}
+
+bool Tileset::instantiateSwampMoveBonusImage (TarFile *t)
+{
+  Glib::ustring imgname = getSwampMoveBonusFilename();
+  if (imgname.empty() == false)
+    {
+      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
+      if (filename.empty () == false)
+        {
+          bool broken = false;
+          PixMask *p = PixMask::create (filename, broken);
+          File::erase (filename);
+          if (!broken)
+            {
+              clearSwampMoveBonusImage (false);
+              setSwampMoveBonusImage (p);
+            }
+          else
+            return false;
+        }
+      else
+        return false;
+    }
+  return true;
 }
 //End of file

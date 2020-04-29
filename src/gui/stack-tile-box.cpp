@@ -35,6 +35,7 @@
 #include "GameMap.h"
 #include "army.h"
 #include "shield.h"
+#include "tileset.h"
 #include "font-size.h"
 
 #define method(x) sigc::mem_fun(*this, &StackTileBox::x)
@@ -224,7 +225,7 @@ void StackTileBox::fill_in_group_info (StackTile *stile, Stack *s)
   guint32 bonus = s->calculateMoveBonus();
   ImageCache *gc = ImageCache::getInstance();
   terrain_image->property_pixbuf() =
-    gc->getMoveBonusPic(bonus, s->hasShip(),
+    gc->getMoveBonusPic(GameMap::getTileset()->getId(), bonus,
                         FontSize::getInstance ()->get_height ())->to_pixbuf();
   group_moves_label->set_markup(String::ucompose("<b>%1</b>", s->getMoves()));
   group_ungroup_toggle->set_sensitive(false);

@@ -14,6 +14,12 @@
     <d_bridges>bridges</d_bridges>
     <d_fog>fog</d_fog>
     <d_flags>flags</d_flags>
+    <d_movebonus_all>flight_movebonus</d_movebonus_all>
+    <d_movebonus_water>water_movebonus</d_movebonus_water>
+    <d_movebonus_forest>forest_movebonus</d_movebonus_forest>
+    <d_movebonus_hills>hills_movebonus</d_movebonus_hills>
+    <d_movebonus_mountains>mountains_movebonus</d_movebonus_mountains>
+    <d_movebonus_swamp>swamp_movebonus</d_movebonus_swamp>
     <road_smallmap>
 	<d_color>164 84 0</d_color>
     </road_smallmap>
@@ -23,12 +29,6 @@
     <temple_smallmap>
 	<d_color>255 255 255</d_color>
     </temple_smallmap>
-    <d_movebonus_all></d_movebonus_all>
-    <d_movebonus_water></d_movebonus_water>
-    <d_movebonus_forest></d_movebonus_forest>
-    <d_movebonus_hills></d_movebonus_hills>
-    <d_movebonus_mountains></d_movebonus_mountains>
-    <d_movebonus_swamp></d_movebonus_swamp>
     <tile>
         <_d_name>Grass</_d_name>
         <d_moves>2</d_moves>
