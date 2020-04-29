@@ -20,7 +20,7 @@
             <child>
               <object class="GtkToggleButton" id="army_button">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
+                <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
                 <child>
@@ -70,7 +70,7 @@
             <child>
               <object class="GtkButton" id="stack_button">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
+                <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
                 <child>
                   <object class="GtkImage" id="stack_image">
