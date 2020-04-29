@@ -906,7 +906,15 @@ void Armyset::loadBagPic(Glib::ustring image_filename, bool &broken)
       return;
     }
   if (!broken)
-    setBagPic(PixMask::create(image_filename, broken));
+    {
+      PixMask *p = PixMask::create(image_filename, broken);
+      if (p && !broken)
+        {
+          int s = getTileSize();
+          PixMask::scale (p, s, s);
+          setBagPic(p);
+        }
+    }
 }
 
 void Armyset::loadStandardPic(Glib::ustring image_filename, bool scale,

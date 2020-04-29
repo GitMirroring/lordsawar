@@ -2057,8 +2057,7 @@ PixMask *TilePixMaskCacheItem::generate(TilePixMaskCacheItem i)
       if (i.has_bag)
         {
           PixMask *pic = ImageCache::getInstance()->getBagPic();
-          Vector<int>bagsize = Vector<int>(pic->get_width(), pic->get_height());
-          pic->blit(pixmap, Vector<int>(uts,uts)-bagsize);
+          pic->blit(pixmap);
         }
 
       if (i.has_standard)
