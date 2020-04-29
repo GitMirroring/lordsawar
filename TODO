@@ -48,3 +48,5 @@ fix up the upgrader by painstakingly providing an upgrade path through each vers
   (starting at whenever we used tar files.)
 
 make a template that encompasses load/saving/editing of a masked image file.
+
+make an svg armyset, tileset, shieldset, cityset to test if it works.
