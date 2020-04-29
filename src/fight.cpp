@@ -242,11 +242,11 @@ void Fight::battle(bool intense)
       std::list<Stack*>::iterator it;
       for (it = d_attackers.begin(); it != d_attackers.end(); it++)
 	for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); sit++)
-          (*sit)->setHP(initial_hps[(*it)->getId()]);
+          (*sit)->setHP(initial_hps[(*sit)->getId()]);
 
       for (it = d_defenders.begin(); it != d_defenders.end(); it++)
 	for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); sit++)
-          (*sit)->setHP(initial_hps[(*it)->getId()]);
+          (*sit)->setHP(initial_hps[(*sit)->getId()]);
     }
 }
 
