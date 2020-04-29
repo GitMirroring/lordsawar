@@ -45,7 +45,7 @@
 		<d_awardable>false</d_awardable>
 		<d_defends_ruins>false</d_defends_ruins>
 		<d_move_bonus> Tile::FOREST Tile::HILLS</d_move_bonus>
-		<d_army_bonus> ArmyBase::CONFERS_MOVE_BONUS</d_army_bonus>
+		<d_army_bonus> ArmyBase::CONFER_MOVE_BONUS</d_army_bonus>
 		<d_max_moves>16</d_max_moves>
 		<d_gender>Hero::NONE</d_gender>
 		<d_strength>1</d_strength>
