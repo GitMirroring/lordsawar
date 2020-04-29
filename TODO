@@ -45,5 +45,6 @@ maybe improve the ai a bit by: disbanding stacks and creating a stronger type so
 stress test with seed 691 takes 1000+ turns to complete
 
 fix up the upgrader by painstakingly providing an upgrade path through each version of every file type.
+  (starting at whenever we used tar files.)
 
 make a template that encompasses load/saving/editing of a masked image file.
