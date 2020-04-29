@@ -932,6 +932,8 @@ void Driver::on_new_game_requested(GameParameters g, GamePreferencesDialog *gpd)
   if (gpd)
     {
       start_game_progress_tick.connect (sigc::mem_fun (gpd, &GamePreferencesDialog::tick_progress));
+      GameScenario::load_tick.connect
+        (sigc::mem_fun (gpd, &GamePreferencesDialog::tick_progress));
       start_game_progress_finish.connect (sigc::mem_fun (gpd, &GamePreferencesDialog::finish_progress));
     }
 

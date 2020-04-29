@@ -568,9 +568,9 @@ void GamePreferencesDialog::tick_progress ()
 {
   if (!progress_treeview)
     return;
-  if (row[progress_columns.perc] < 98)
+  if (row[progress_columns.perc] < 94)
     {
-      row[progress_columns.perc] = row[progress_columns.perc] + 3;
+      row[progress_columns.perc] = row[progress_columns.perc] + 7;
       while (g_main_context_iteration(NULL, FALSE)); //doEvents
     }
 }
