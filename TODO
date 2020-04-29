@@ -1,3 +1,4 @@
+upload to dl.sv.gnu.org.  cd /releases/lordsawar
 
  scp lordsawar-0.3.3.tar.gz benasselstine@dl.sv.nongnu.org:/releases/lordsawar/
 
@@ -11,11 +12,6 @@ it would be nice if ai path movement didn't always take the same path
 often, we can take the same number of moves to get to a different tile beside a city
 
 
-bug: showing neutral battles *Again*
-favour cheaper army units for production when we don't have much money
-			   
-
-upload to dl.sv.gnu.org.  cd /releases/lordsawar
 
 ---
 
@@ -38,6 +34,7 @@ figure out the mysterious 1.65 number in smallmap.cpp.
 saw a crash when switching to a newly made shieldset in the editor.  can't reproduce.  saw the same with a tileset.
 
 maybe improve the ai a bit by: disbanding stacks and creating a stronger type somewhere
+favour cheaper army units for production when we don't have much money
 
 stress test with seed 691 takes 1000+ turns to complete
 
@@ -50,3 +47,5 @@ make an svg armyset, tileset, shieldset, cityset to test if it works.
 
 the military advisor is decidedly medieval, might want to make it more neutral for scenarios with other genres.
   maybe move the text of it into the scenario editor.
+
+wl2 says "<hero name> has won the battle!" and then waits for a click
