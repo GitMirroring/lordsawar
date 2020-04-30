@@ -579,6 +579,7 @@ void GamePreferencesDialog::finish_progress ()
 {
   if (!progress_treeview)
     return;
+
   //finish off the progressbar
   while (row[progress_columns.perc] < 100)
     {
@@ -587,5 +588,7 @@ void GamePreferencesDialog::finish_progress ()
       Glib::usleep (2000);
     }
   row[progress_columns.perc] = 100;
-  //dialog->hide ();
+  progress_treeview->queue_draw ();
+  Glib::usleep (20000);
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
 }

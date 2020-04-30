@@ -651,6 +651,9 @@ void NewRandomMapDialog::on_accept_clicked()
       Glib::usleep (10000);
     }
   row[progress_columns.perc] = 100;
+  progress_treeview->queue_draw ();
+  Glib::usleep (20000);
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
 
   dialog_response = Gtk::RESPONSE_ACCEPT;
   dialog->hide();

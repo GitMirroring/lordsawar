@@ -64,6 +64,7 @@ void LoadProgressWindow::tick_progress ()
       row[progress_columns.perc] = row[progress_columns.perc] + 3;
       while (g_main_context_iteration(NULL, FALSE)); //doEvents
     }
+      while (g_main_context_iteration(NULL, FALSE)); //doEvents
 }
 
 void LoadProgressWindow::finish_progress ()
@@ -78,5 +79,8 @@ void LoadProgressWindow::finish_progress ()
       Glib::usleep (10000);
     }
   row[progress_columns.perc] = 100;
+  progress_treeview->queue_draw ();
+  Glib::usleep (20000);
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
   hide ();
 }

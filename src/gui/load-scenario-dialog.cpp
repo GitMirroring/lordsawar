@@ -300,5 +300,8 @@ void LoadScenarioDialog::finish_progress ()
       Glib::usleep (10000);
     }
   progressrow[progress_columns.perc] = 100;
+  progress_treeview->queue_draw ();
+  Glib::usleep (20000);
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
   dialog->hide ();
 }
