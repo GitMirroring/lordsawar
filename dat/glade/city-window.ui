@@ -440,7 +440,7 @@
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
-                                        <property name="label" translatable="yes">Combat Bonus</property>
+                                        <property name="label" translatable="yes">Bonus</property>
                                         <attributes>
                                           <attribute name="underline" value="True"/>
                                         </attributes>
