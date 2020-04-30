@@ -626,6 +626,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
+                                <property name="tooltip_text" translatable="yes">Burn the city to the ground</property>
                                 <property name="use_underline">True</property>
                               </object>
                               <packing>
@@ -640,6 +641,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
+                                <property name="tooltip_text" translatable="yes">Change the city name</property>
                                 <property name="use_underline">True</property>
                               </object>
                               <packing>
