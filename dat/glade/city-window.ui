@@ -320,7 +320,7 @@
                                     <property name="orientation">vertical</property>
                                     <property name="spacing">6</property>
                                     <child>
-                                      <object class="GtkLabel">
+                                      <object class="GtkLabel" id="unit_title_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
@@ -359,7 +359,7 @@
                                     <property name="orientation">vertical</property>
                                     <property name="spacing">6</property>
                                     <child>
-                                      <object class="GtkLabel">
+                                      <object class="GtkLabel" id="time_title_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
@@ -398,7 +398,7 @@
                                     <property name="orientation">vertical</property>
                                     <property name="spacing">6</property>
                                     <child>
-                                      <object class="GtkLabel">
+                                      <object class="GtkLabel" id="moves_title_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
@@ -437,7 +437,7 @@
                                     <property name="orientation">vertical</property>
                                     <property name="spacing">6</property>
                                     <child>
-                                      <object class="GtkLabel">
+                                      <object class="GtkLabel" id="strength_title_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>
@@ -476,7 +476,7 @@
                                     <property name="orientation">vertical</property>
                                     <property name="spacing">6</property>
                                     <child>
-                                      <object class="GtkLabel">
+                                      <object class="GtkLabel" id="cost_title_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">end</property>

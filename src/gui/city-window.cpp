@@ -73,6 +73,11 @@ CityWindow::CityWindow(Gtk::Window &parent, City *c, bool razing_possible,
     xml->get_widget("moves_label", moves_label);
     xml->get_widget("strength_label", strength_label);
     xml->get_widget("cost_label", cost_label);
+    xml->get_widget ("unit_title_label", unit_title_label);
+    xml->get_widget ("time_title_label", time_title_label);
+    xml->get_widget ("moves_title_label", moves_title_label);
+    xml->get_widget ("strength_title_label", strength_title_label);
+    xml->get_widget ("cost_title_label", cost_title_label);
     xml->get_widget("combat_bonus_label", combat_bonus_label);
     xml->get_widget("buy_button", buy_button);
     xml->get_widget("on_hold_button", on_hold_button);
@@ -263,6 +268,7 @@ void CityWindow::fill_in_production_info()
     Glib::ustring s1, s2, s3, s5;
     Glib::ustring s4 = _("Current:");
     
+    show_stat_titles (slot != -1);
     if (slot == -1)
     {
         pic = empty_pic;
@@ -486,4 +492,13 @@ bool CityWindow::on_raze_clicked (City *city, Gtk::Dialog *parent)
 	return true;
       }
   return false;
+}
+    
+void CityWindow::show_stat_titles (bool s)
+{
+  unit_title_label->property_visible () = s;
+  time_title_label->property_visible () = s;
+  moves_title_label->property_visible () = s;
+  strength_title_label->property_visible () = s;
+  cost_title_label->property_visible () = s;
 }
