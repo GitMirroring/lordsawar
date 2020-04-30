@@ -32,12 +32,16 @@
 
 HeroesDialog::HeroesDialog(Gtk::Window &parent, guint32 player_id, Glib::ustring player_name)
  : LwEditorDialog(parent, "heroes-dialog.ui"),
-    gender_column(_("Gender"), gender_renderer),
     name_column(_("Name"), name_renderer)
 {
   d_changed = false;
   d_player_id = player_id;
   xml->get_widget("treeview", treeview);
+  xml->get_widget("panel_box", panel_box);
+
+  int pw, ph;
+  parent.get_size (pw, ph);
+  dialog->set_size_request (ph * (16.0/9.0), ph);
 
   dialog->set_title (String::ucompose (_("Heroes of %1"), player_name));
 
@@ -45,29 +49,19 @@ HeroesDialog::HeroesDialog(Gtk::Window &parent, guint32 player_id, Glib::ustring
   hero_list = Gtk::ListStore::create(hero_columns);
   treeview->set_model(hero_list);
 
-  // the type column
-  hero_gender_list = Gtk::ListStore::create(hero_gender_columns);
-  Gtk::TreeModel::iterator i;
-  i = hero_gender_list->append();
-  (*i)[hero_gender_columns.gender] = Hero::genderToFriendlyName(Hero::MALE);
-  i = hero_gender_list->append();
-  (*i)[hero_gender_columns.gender] = Hero::genderToFriendlyName (Hero::FEMALE);
-
-  // gender column
-  gender_renderer.property_model() = hero_gender_list;
-  gender_renderer.property_text_column() = 0;
-  gender_renderer.property_has_entry() = false;
-  gender_renderer.property_editable() = true;
-
-  gender_renderer.signal_edited().connect(method(on_gender_edited));
-  gender_column.set_cell_data_func(gender_renderer, method(cell_data_gender));
-  treeview->append_column(gender_column);
-
   // name column
-  name_renderer.property_editable() = true;
-  name_renderer.signal_edited().connect (method(on_name_edited));
+  name_renderer.property_editable() = false;
   name_column.set_cell_data_func(name_renderer, method(cell_data_name));
   treeview->append_column(name_column);
+
+  xml->get_widget("name_entry", name_entry);
+
+  Gtk::Box *box;
+  xml->get_widget("gender_box", box);
+  gender_combobox = manage(new Gtk::ComboBoxText);
+  gender_combobox->append (Hero::genderToFriendlyName(Hero::MALE));
+  gender_combobox->append (Hero::genderToFriendlyName (Hero::FEMALE));
+  box->set_center_widget (*gender_combobox);
 
   fill_heroes ();
 
@@ -78,6 +72,7 @@ HeroesDialog::HeroesDialog(Gtk::Window &parent, guint32 player_id, Glib::ustring
   
   treeview->get_selection()->signal_changed().connect(method(on_hero_selected));
   treeview->set_cursor (Gtk::TreePath ("0"));
+  update_panel ();
 }
 
 bool HeroesDialog::run()
@@ -91,8 +86,6 @@ void HeroesDialog::on_add_pressed ()
 {
   Gtk::TreeIter i = hero_list->append();
   (*i)[hero_columns.name] = _("Unnamed Hero");
-  (*i)[hero_columns.gender] =
-    Hero::genderToFriendlyName(Hero::Gender(Hero::FEMALE));
   HeroProto *hero = new HeroProto;
   hero->setGender (Hero::FEMALE);
   hero->setName ((*i)[hero_columns.name]);
@@ -125,8 +118,6 @@ void HeroesDialog::fill_heroes ()
     {
       Gtk::TreeIter i = hero_list->append();
       (*i)[hero_columns.name] = h->getName ();
-      (*i)[hero_columns.gender] =
-        Hero::genderToFriendlyName(Hero::Gender(h->getGender ()));
       (*i)[hero_columns.hero] = h;
     }
 }
@@ -138,39 +129,12 @@ void HeroesDialog::cell_data_name(Gtk::CellRenderer *renderer,
     String::ucompose("%1", (*i)[hero_columns.name]);
 }
 
-void HeroesDialog::on_name_edited(const Glib::ustring &path,
-                                  const Glib::ustring &new_text)
-{
-  HeroProto *h = get_selected_hero ();
-  h->setName (String::utrim (new_text));
-  Gtk::TreeIter i = hero_list->get_iter(Gtk::TreePath(path));
-  (*i)[hero_columns.name] = h->getName ();
-  update_hero_templates ();
-}
-
-void HeroesDialog::cell_data_gender (Gtk::CellRenderer *renderer,
-                                     const Gtk::TreeIter& i)
-{
-  dynamic_cast<Gtk::CellRendererText*>(renderer)->property_text()
-    = (*i)[hero_columns.gender];
-}
-
-void HeroesDialog::on_gender_edited(const Glib::ustring &path,
-                                    const Glib::ustring &new_text)
-{
-  HeroProto *h = get_selected_hero ();
-  (*hero_list->get_iter(Gtk::TreePath(path)))[hero_columns.gender] = new_text;
-  Hero::Gender gender = Hero::friendlyNameToGender (new_text);
-  h->setGender (gender);
-  update_hero_templates ();
-}
-
 void HeroesDialog::update_buttons ()
 {
   remove_button->set_sensitive (get_selected_hero () != NULL);
 }
   
-HeroProto * HeroesDialog::get_selected_hero ()
+HeroProto* HeroesDialog::get_selected_hero ()
 {
   Gtk::TreeIter i = treeview->get_selection()->get_selected();
   if (i)
@@ -184,6 +148,7 @@ HeroProto * HeroesDialog::get_selected_hero ()
 
 void HeroesDialog::on_hero_selected ()
 {
+  update_panel ();
   update_buttons ();
 }
 
@@ -206,4 +171,75 @@ HeroesDialog::~HeroesDialog ()
       HeroProto *hero = (*i)[hero_columns.hero];
       delete hero;
     }
+}
+
+void HeroesDialog::on_name_changed ()
+{
+  HeroProto *hero = get_selected_hero ();
+  if (hero)
+    {
+      Glib::RefPtr<Gtk::TreeSelection> selection = treeview->get_selection();
+      Gtk::TreeModel::iterator iterrow = selection->get_selected();
+      if (iterrow) 
+        {
+          Gtk::TreeModel::Row row = *iterrow;
+          row[hero_columns.name] = String::utrim (name_entry->get_text());
+        }
+      hero->setName (String::utrim (name_entry->get_text ()));
+      update_hero_templates ();
+    }
+}
+
+void HeroesDialog::on_gender_changed ()
+{
+  HeroProto *hero = get_selected_hero ();
+  if (hero)
+    {
+      if (gender_combobox->get_active_row_number () == 0)
+        hero->setGender (Hero::MALE);
+      else
+        hero->setGender (Hero::FEMALE);
+      update_hero_templates ();
+    }
+}
+
+void HeroesDialog::update_panel ()
+{
+  disconnect_signals ();
+  HeroProto *hero = get_selected_hero ();
+  if (hero)
+    {
+      name_entry->set_text (hero->getName ());
+      switch (hero->getGender ())
+        {
+        case Hero::MALE:
+          gender_combobox->set_active (0);
+          break;
+        case Hero::FEMALE:
+          gender_combobox->set_active (1);
+          break;
+        }
+    }
+  else
+    {
+      name_entry->set_text ("");
+      gender_combobox->set_active (0);
+    }
+  panel_box->set_sensitive (hero != NULL);
+  connect_signals ();
+}
+
+void HeroesDialog::connect_signals ()
+{
+  connections.push_back
+    (gender_combobox->signal_changed().connect (method (on_gender_changed)));
+  connections.push_back
+    (name_entry->signal_changed().connect (method (on_name_changed)));
+}
+
+void HeroesDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
 }

@@ -39,34 +39,18 @@ class HeroesDialog: public LwEditorDialog
     class HeroesColumns: public Gtk::TreeModelColumnRecord {
     public:
 	HeroesColumns()
-	    { add(name); add(gender); add(hero); }
+	    { add(name); add(hero); }
 	
-	Gtk::TreeModelColumn<Glib::ustring> name, gender;
+	Gtk::TreeModelColumn<Glib::ustring> name;
 	Gtk::TreeModelColumn<HeroProto*> hero;
     };
     const HeroesColumns hero_columns;
     Glib::RefPtr<Gtk::ListStore> hero_list;
 
-    Gtk::CellRendererCombo gender_renderer;
-    Gtk::TreeViewColumn gender_column;
     Gtk::CellRendererText name_renderer;
     Gtk::TreeViewColumn name_column;
 
-    class HeroGenderColumns: public Gtk::TreeModelColumnRecord {
-    public:
-	HeroGenderColumns()
-	    { add(gender); }
-	
-	Gtk::TreeModelColumn<Glib::ustring> gender;
-    };
-    const HeroGenderColumns hero_gender_columns;
-    Glib::RefPtr<Gtk::ListStore> hero_gender_list;
-
-    void cell_data_gender(Gtk::CellRenderer *renderer, const Gtk::TreeIter &i);
-    void on_gender_edited(const Glib::ustring &path,
-                          const Glib::ustring &new_text);
     void cell_data_name(Gtk::CellRenderer *renderer, const Gtk::TreeIter& i);
-    void on_name_edited(const Glib::ustring &path, const Glib::ustring &new_text);
 
     bool d_changed;
     bool d_player_id;
@@ -74,6 +58,12 @@ class HeroesDialog: public LwEditorDialog
     Gtk::Button *add_button;
     Gtk::Button *remove_button;
 
+    Gtk::Entry *name_entry;
+    Gtk::ComboBoxText *gender_combobox;
+    Gtk::Box *panel_box;
+
+    void on_name_changed ();
+    void on_gender_changed ();
     void on_add_pressed();
     void on_remove_pressed();
 
@@ -83,6 +73,10 @@ class HeroesDialog: public LwEditorDialog
     HeroProto * get_selected_hero ();
     void on_hero_selected ();
     void update_hero_templates ();
+    void update_panel ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::vector<sigc::connection> connections;
 };
 
 #endif
