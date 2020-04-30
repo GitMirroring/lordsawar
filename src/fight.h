@@ -2,7 +2,7 @@
 // Copyright (C) 2001, 2002, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004 Bryan Duff
 // Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2011, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2011, 2014, 2020 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -168,6 +168,8 @@ class Fight
         std::map<guint32, guint32> getInitialHPs() { return initial_hps; }
 
 	static LocationBox calculateFightBox(Fight &fight);
+
+        Glib::ustring getStrongestLivingHeroName(std::vector<Army *> s) const;
     private:
 	//! Calculates one round of the fight.
         /** 

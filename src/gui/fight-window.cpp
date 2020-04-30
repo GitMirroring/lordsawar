@@ -49,9 +49,14 @@ FightWindow::FightWindow(Gtk::Window &parent, Fight &fight)
 
   xml->get_widget("window", window);
   window->set_transient_for(parent);
+  guint32 height = GameMap::getTileset()->getTileSize () * 3;
+  guint32 width = height * (16.0/9.0);
+  window->set_size_request (width, height);
 
   window->signal_key_release_event().connect_notify
     (method(on_key_release_event));
+
+  xml->get_widget("decision_label", decision_label);
 
   Gtk::Box *attacker_close_vbox;
   Gtk::Box *defender_close_vbox;
@@ -103,10 +108,22 @@ FightWindow::FightWindow(Gtk::Window &parent, Fight &fight)
   actions = fight.getCourseOfEvents();
   d_quick = false;
 
+  if (fight.getResult () == Fight::ATTACKER_WON)
+    {
+      Glib::ustring hero = fight.getStrongestLivingHeroName (attackers);
+      if (hero.empty () == true)
+        d_decision = _("Your armies have won the city!");
+      else
+        d_decision = String::ucompose (_("%1 has won the battle!"), hero);
+    }
+  else
+    d_decision = _("You have lost!");
+
   fast_round_speed = Configuration::s_displayFightRoundDelayFast; //ms
   normal_round_speed = Configuration::s_displayFightRoundDelaySlow; //ms
   Snd::getInstance()->disableBackground();
   Snd::getInstance()->play("battle", -1, true);
+
 }
 
 FightWindow::~FightWindow()
@@ -154,6 +171,8 @@ void FightWindow::add_army(Army *army, int initial_hp,
   // image
   guint32 fs = FontSize::getInstance()->get_height ();
   PixMask *armypic = ImageCache::getInstance()->getDialogArmyPic(army, fs);
+  armypic_width = armypic->get_width ();
+  armypic_height = armypic->get_height ();
   army_image->property_pixbuf() = armypic->to_pixbuf();
   int height = 3;
   SmallTile *water =
@@ -212,7 +231,10 @@ void FightWindow::add_army(Army *army, int initial_hp,
 bool FightWindow::do_round()
 {
   ImageCache *gc = ImageCache::getInstance();
-  Glib::RefPtr<Gdk::Pixbuf> expl = gc->getExplosionPic()->to_pixbuf();
+  PixMask *p = gc->getExplosionPic ()->copy ();
+  PixMask::scale (p, armypic_width, armypic_height);
+  Glib::RefPtr<Gdk::Pixbuf> expl = p->to_pixbuf();
+  delete p;
 
   // first we clear out any explosions
   for (army_items_type::iterator i = army_items.begin(), end = army_items.end(); 
@@ -222,7 +244,7 @@ bool FightWindow::do_round()
         continue;
 
       Glib::RefPtr<Gdk::Pixbuf> empty_pic
-        = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, expl->get_width(), expl->get_height());
+        = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, armypic_width, armypic_height);
       empty_pic->fill(0x00000000);
       i->image->property_pixbuf() = empty_pic;
       i->exploding = false;
@@ -245,8 +267,13 @@ bool FightWindow::do_round()
             double fraction = double(i->hp) / i->army->getStat(Army::HP);
             if (fraction == 0.0)
               {
-                i->water_image->hide();
-                i->image->property_pixbuf() = expl;
+                Glib::RefPtr<Gdk::Pixbuf> w = i->water_image->property_pixbuf ();
+                w->fill(0x00000000);
+                i->water_image->property_pixbuf () = w;
+                Glib::RefPtr<Gdk::Pixbuf> a = i->image->property_pixbuf();
+                //draw the explosion on the army
+                expl->copy_area (0, 0, armypic_width, armypic_height, a, 0 , 0);
+                i->image->property_pixbuf () = a;
                 i->exploding = true;
               }
 
@@ -260,6 +287,24 @@ bool FightWindow::do_round()
           return Timing::CONTINUE;
         }
     }
+
+  guint32 first_pause = 100000;
+  guint32 second_pause = 2000000;
+
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
+  if (d_quick || s_quick_all)
+    Glib::usleep (first_pause / 3);
+  else
+    Glib::usleep (first_pause);
+
+  decision_label->set_text (d_decision);
+
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
+  if (d_quick || s_quick_all)
+    Glib::usleep (second_pause / 3);
+  else
+    Glib::usleep (second_pause);
+
 
   window->hide();
   main_loop->quit();

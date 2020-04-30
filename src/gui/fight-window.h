@@ -1,5 +1,5 @@
 //  Copyright (C) 2007, 2008, Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ class FightWindow: public sigc::trackable
     
  private:
     Gtk::Window* window;
+    Gtk::Label *decision_label;
     static const int max_cols = 8;
 
     struct ArmyItem
@@ -83,6 +84,9 @@ class FightWindow: public sigc::trackable
     bool d_quick;
     int normal_round_speed;
     int fast_round_speed;
+    Glib::ustring d_decision;
+    guint32 armypic_height;
+    guint32 armypic_width;
 };
 
 #endif

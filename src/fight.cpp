@@ -2,7 +2,7 @@
 // Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2006 Andrea Paternesi
 // Copyright (C) 2004 Bryan Duff
-// Copyright (C) 2006, 2007, 2008, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2011, 2014, 2015, 2020 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -764,4 +764,23 @@ LocationBox Fight::calculateFightBox(Fight &fight)
       //this shouldn't be the case
       return LocationBox(s->getPos(), dest);
     }
+}
+
+Glib::ustring Fight::getStrongestLivingHeroName(std::vector<Army *> s) const
+{
+  Glib::ustring name = "";
+  guint32 highest_strength = 0;
+  for (auto a : s)
+    {
+      if (a->isHero() && a->getHP () > 0)
+        {
+          if (a->getStat(Army::STRENGTH) > highest_strength)
+
+            {
+              highest_strength = a->getStat(Army::STRENGTH);
+              name = a->getName ();
+            }
+        }
+    }
+  return name;
 }
