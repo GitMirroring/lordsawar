@@ -66,7 +66,7 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
         <d_bonus> The capabilities this item has.  The format of this field
                   is string based, and has strings of the form described in 
                   ItemProto::Bonus of ItemProto.h.  An example value is:
-                  ItemProto::ADD1STR |  ItemPRoto::ADD2GOLDPERCITY
+                  ItemProto::ADD1STR ItemProto::ADD2GOLDPERCITY
         </d_bonus>
         <d_uses_left> How many this item can be used.  Most items can't be
                       explicitly used.
@@ -357,6 +357,7 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
                         </d_name>
                         <d_gender >   the gender of the hero     
                                       Hero::MALE, Hero::FEMALE
+                          (yes, i would like to make this non-binary someday)
                         </d_gender>
                         <backpack>
                               <item>
@@ -379,8 +380,7 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
                                   </d_orig_plantable_owner>
                                   <d_id>        a unique Id of the item 
                                   </d_id>
-                                  <d_bonus>  type of the bonus for the item
-                                             See Item.h for a listing.
+                                  <d_bonus> see earlier description of ItemProto
                                   </d_bonus>
                               </item>
 
@@ -703,12 +703,17 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
     <map>
         <d_width>    the width of the map </d_width>
         <d_height >    the height of the map </d_height >
-        <d_tileset> name of the tileset used   </d_tileset>
+        <d_tileset> name of the tileset used
+          this is the basename of the file, minus the .lwt extension</d_tileset>
+        <d_cityset> name of the cityset used
+          this is the basename of the file, minus the .lwc extension</d_cityset>
+        <d_shieldset> name of the shieldset used
+          this is the basename of the file, minus the .lws extension
+        </d_shieldset>
         <d_types>
             First, there is a newline sign at the end of the string.
             Following this is a long long row of numbers indicating the type of
-            terrain. The saving goes [0,0],[1,0],[2,0],...[0,1],[1,1] etc., i.e.
-            first column 0, then column 1 etc.
+            terrain. The saving goes left to right row by row.
             The numbers for the terrain:
                 0   grass
                 1   water
@@ -716,13 +721,13 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
                 3   hills
                 4   mountains
                 5   swamp
-            each column ends with a newline
+            each row ends with a newline
         </d_types>
         <d_styles>
             an array of tilestyles.  Each tilestyle is stored as a 2 digit
             hexadecimal number.
             It is newline separated like the d_types tag.
-            (are we having fun yet? this tag is easily the worst one.)
+            (this tag is easily the worst.  the pits.)
         <d_styles>
 
         <itemstack>
@@ -908,7 +913,9 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
                 <d_y> the upper left corner of the map, y position </d_y>
             </location>
         </reward>
+
         ...more rewards...
+
     </rewardlist>
 
     <signpostlist>
@@ -919,7 +926,9 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             <d_x>the x position on the map<d_x>
             <d_y>the y position on the map<d_y>
         </signpost>
+
         ...more signposts...
+
     </signpostlist>
 
     <roadlist>
@@ -931,7 +940,9 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             <d_x>the x position on the map<d_x>
             <d_y>the y position on the map<d_y>
         </road>
+
         ...more road tiles...
+
     </roadlist>
     <portlist>
         the list of port tiles on the map
@@ -940,7 +951,9 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             <d_x>the x position on the map<d_x>
             <d_y>the y position on the map<d_y>
         </port>
+
         ...more port tiles...
+
     </portlist>
     <bridgelist>
         the list of bridge tiles on the map
@@ -952,7 +965,9 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             <d_x>the x position on the map<d_x>
             <d_y>the y position on the map<d_y>
         </bridge>
+
         ...more bridge tiles...
+
     </bridgelist>
     <stonelist>
         the list of standing stone tiles on the map
@@ -965,7 +980,9 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             <d_x>the x position on the map<d_x>
             <d_y>the y position on the map<d_y>
         </stone>
+
         ...more stone tiles...
+
     </stonelist>
     <questlist>
         the list of outstanding quests
@@ -1041,6 +1058,7 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             <d_to_pillage> the amount of gold to pillage</d_to_pillage>
             <d_pillaged> the amount pillaged so far</d_pillaged>
         </quest>
+
         ...more quests...
 
     </questlist>
@@ -1063,14 +1081,18 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
               this army layout is the same as the one in a city
           </army>
         </vectoredunit>
+
         ...more vectored units...
+
     </vectoredunitlist>
     <turnlist>
       a listing of every player's actions by turn
         <turn>
            <d_owner>Id of the player moving this turn</d_owner>
            <action/>
+
            ... more actions...
+
         </turn>
     </turnlist>
     <herotemplates>
@@ -1080,7 +1102,9 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
          <d_gender> Hero::MALE, Hero::FEMALE </d_gender>
          <d_owner> player id that this hero shows up for </d_owner>
       </herotemplate>
+
       ...more hero templates...
+
     </herotemplates>
     <scenario>
         <d_id> a guid </d_id>
@@ -1093,11 +1117,11 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
                      the beginning of the player's turn or at the 
                      beginning of the new round (e.g. refresh hp)
         </d_turnmode>
-        <d_view_enemies> see enemy stack's contents.  (boolean)
+        <d_view_enemies> see contents of enemy stacks  (boolean)
         </d_view_enemies>
-        <d_view_production> see enemy production. (boolean)
+        <d_view_production> see enemy production in cities (boolean)
         </d_view_enemies>
-        <d_quests> heroes can go on quests.
+        <d_quests> heroes can go on quests sometimes, or not.
            See QuestPolicy in game-parameters.h
         </d_quests>
         <d_hidden_map> fog of war. (boolean)
@@ -1139,7 +1163,8 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
     </scenario>
 </lordsawar>
 
-Shieldset files (.lws) hold images for shields, as well as the default colours of players.  It has the following structure:
+Shieldset files (.lws) hold images for shields and progress bars, as well as
+the default colours of players.  It has the following structure:
 
 <shieldset version="xxx">
     <d_id> A unique numeric id among all shieldsets on the system. 
@@ -1169,7 +1194,7 @@ Shieldset files (.lws) hold images for shields, as well as the default colours o
     Now come the list of shields that are potential seats in a scenario...
     <shield>
         <d_owner> The player id.  A unique numeric id that starts at zero.  
-                  The last one is the neutral player.  Maximum value is 9.
+                  The last one is the neutral player.  Maximum value is 8.
         </d_owner>
         <d_color> The colour for this player.  The shields, armies, flags, and
                   selectors are all coloured with this colour. 
@@ -1191,12 +1216,23 @@ Shieldset files (.lws) hold images for shields, as well as the default colours o
              <d_image> The basename of the image for the large white shield.
              </d_image>
         </shieldstyle>
+       <tartan>
+         tartans are the graphics relating to the progress bar
+           <d_left_image> basename of the image showing the left
+                                      side of the tartan</d_left_image>
+           <d_center_image> basename of the image showing the center repeating
+                                      portion of the tartan</d_center_image>
+           <d_right_image> basename of the image showing the right
+                                      side of the tartan</d_right_image>
+       </tartan>
     </shield>
+
     ...more shield objects...
     
 </shieldset>
 
-Cityset files (.lwc) hold images for buildings, as well as number of tiles that some buildings occupy on the map.
+Cityset files (.lwc) hold images for buildings, as well as the number of tiles
+that some buildings may occupy on the map.
 
 <cityset version="xxx">
     <d_id> A unique numeric id among all citysets on the system. can't be zero. </d_id>
@@ -1210,7 +1246,7 @@ Cityset files (.lwc) hold images for buildings, as well as number of tiles that 
     Now come the images.  When more than one object is represented in an 
     image file, it is on the same row.  the height must be a divisor of the 
     width.  When filenames are given, the .png extension is not included; nor
-    is a path.
+    is a path (e.g. a basename is provided).
 
     <d_cities> The basename of the image for the castles.  
                Must be an image holding 9 city images on the same row.  
@@ -1225,12 +1261,15 @@ Cityset files (.lwc) hold images for buildings, as well as number of tiles that 
     <d_ruins> The basename of the image for the ruins.  
               must be an image holding 3 ruin images on the same row.
     <d_ruins>
-    <d_temples> The basename of the image for a temple.<d_temples>
+    <d_temples> The basename of the image for temples.
+                must be an image holding 2 temple images on the same row.
+    <d_temples>
     <d_towers> The basename of the image for towers.  
                towers are what stacks go into after they've been in defend mode
                for a turn.  must be an image holding 8 tower images on the same
                row.  neutral towers do not exist.
     </d_towers>
+    <d_signpost>basename of a sign graphic</d_signpost>
 
 
     Now come the tile widths:
@@ -1263,15 +1302,30 @@ Armyset files (.lwa) hold images for army unit types, as well as their propertie
     Wach of these images come in two halves on a single row.  The white in the
     right half represents where the player's colour will be on the left half.
     <d_stackship> The basename of the image for when a stack is in a boat.
+      there are 8 of these on a row, followed by a second row of their
+      colour masks. one for each player.
     </d_stackship>
     <d_plantedstandard> The basename of the image for the hero's flag.
+      there are 8 of these on a row, followed by a second row of their
+      colour masks. one for each player.
     </d_plantedstandard>
     <d_bag> The basename of the image for what items on the map look like.
             This is the graphic for the bag of stuff.  
-            The bag image doesn't have two halves like the other images.
-            e.g. it is not coloured in the player's colour.  It is just a 
-            normal brownish looking bag of stuff.
     </d_bag>
+
+    Now come the selectors.  These selectors override what's in tileset.
+    We have one per player.
+    <d_white_small_selector> the basename of the white selector when only one
+      army unit is selected. 
+      there are as many of these as you wish on a row, followed by another row
+      of their colour masks.
+      each is a frame of animation.
+    </d_white_small_selector>
+    <d_white_large_selector> same as small, but for stacks with all army units
+      selected.
+    </d_white_large_selector>
+    ...
+    then green, yellow, dark_blue, orange, light_blue, red, and black.
 
     Now come the armies.  These are army Types, not instances of armies.
     <armyproto>
@@ -1350,7 +1404,7 @@ Armyset files (.lwa) hold images for army unit types, as well as their propertie
 
                         To give the army unit the ability to pass through 
                         forest and swamp, the values are bitwise OR'd like so:
-                            Tile::FOREST | Tile::SWAMP
+                            Tile::FOREST Tile::SWAMP
 
                         To give an army unit the gift of flight, the move bonus
                         is a bitwise OR of all of these flags. 
@@ -1400,10 +1454,22 @@ Armyset files (.lwa) hold images for army unit types, as well as their propertie
                        ArmyBase::FORTIFY
                             Provides a +1 strength to all army units in a 
                             fortified stack.
+                       ArmyBase::ADD2STRINFOREST
+                            Provides a +2 strength to army units in the woods.
+                       ArmyBase::ADD2STRINHILLS
+                            Provides a +2 strength to army units in the hills.
+                       ArmyBase::SUB2ENEMYSTACK
+                            Negates 2 strength points from an enemy Stack
+                            during a Fight.
+                       ArmyBase::CONFER_MOVE_BONUS
+                            The stack gets whatever movement bonus this army
+                            unit has. e.g. if the army unit moves well in the
+                            swamp with this bonus the whole stack the army
+                            unit is in will too.
 
                        When an army unit has more than one army bonus, it is 
                        bitwise OR'd like so:
-                            ArmyBase::ADD1STRINOPEN | ArmyBase::SUBALLHEROBONUS
+                            ArmyBase::ADD1STRINOPEN ArmyBase::SUBALLHEROBONUS
          </d_army_bonus>
          <d_max_moves>The army unit receives this many movement points at the 
                       beginning of a turn.  These movement points refer to the
@@ -1486,6 +1552,22 @@ Tileset files (.lwt) hold images for the terrain, as well as tile properties.
               on the top row.  The flags represent the number of army units in
               the stack.
     </d_flags>
+    <standing_stones> The basename of the image of the standing stone tiles.
+      There are a great many of these, as per Stone::Type in stone.h.
+    </standing_stones>
+
+    Now come the movement bonus images that show us what terrain a stack
+    moves particularly well on.  These aren't scaled or anything.
+    each contains a basename of an image file that can get chopped up
+    and reassembled with others, like for example if a stack moves well
+    in both hills and forest.
+
+   <d_movebonus_all></d_movebonus_all>
+   <d_movebonus_water> </d_movebonus_water>
+   <d_movebonus_forest> </d_movebonus_forest>
+   <d_movebonus_hills> </d_movebonus_hills>
+   <d_movebonus_mountains> </d_movebonus_mountains>
+   <d_movebonus_swamp> </d_movebonus_swamp>
 
     Now come a description of what some buildings look like on the smallmap...
     <road_smallmap>
@@ -1505,6 +1587,10 @@ Tileset files (.lwt) hold images for the terrain, as well as tile properties.
     There's one tile each for grass, water, forest, mountains, swamp and hills.
     <tile>
          <d_name> The name of the tile.  Shown in the editor. </d_name>
+         <d_moves> How many movement points it takes for a stack to to move
+           over this type of terrain when not flying or having a movement
+           bonus.
+         </d_moves>
          <d_type> The kind of terrain that this tile describes.  One of: 
               Tile::GRASS Tile::WATER Tile::FOREST Tile::HILLS
               Tile::MOUNTAIN Tile::SWAMP
