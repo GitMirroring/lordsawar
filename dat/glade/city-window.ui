@@ -622,7 +622,7 @@
                             </child>
                             <child>
                               <object class="GtkButton" id="raze_button">
-                                <property name="label" translatable="yes">Raze</property>
+                                <property name="label" translatable="yes">Raze...</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
@@ -636,7 +636,7 @@
                             </child>
                             <child>
                               <object class="GtkButton" id="rename_button">
-                                <property name="label" translatable="yes">Rename</property>
+                                <property name="label" translatable="yes">Rename...</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
