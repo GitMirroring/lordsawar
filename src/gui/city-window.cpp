@@ -297,10 +297,7 @@ void CityWindow::fill_in_production_info()
       pic = gc->getCircledArmyPic(as, a->getTypeId(), player, NULL, false,
                                   Shield::NEUTRAL, true,
                                   FontSize::getInstance ()->get_height ())->to_pixbuf();
-      Glib::ustring bonus = a->getArmyBonusDescription();
-      if (bonus == "")
-        bonus = "--";
-      combat_bonus_label->set_text(bonus);
+      combat_bonus_label->set_text(a->getArmyBonusDescription ());
     }
     
     current_image->property_pixbuf() = pic;
