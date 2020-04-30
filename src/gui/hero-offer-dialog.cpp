@@ -62,6 +62,9 @@ HeroOfferDialog::HeroOfferDialog(Gtk::Window &parent, Player *player, HeroProto 
     name_entry->set_text(hero->getName());
     name_entry->signal_changed().connect (method(on_name_changed));
 
+    xml->get_widget("close_button", close_button);
+    close_button->set_sensitive (gold > 0);
+
     xml->get_widget("accept_button", accept_button);
     Gtk::Label *label;
     xml->get_widget("label", label);

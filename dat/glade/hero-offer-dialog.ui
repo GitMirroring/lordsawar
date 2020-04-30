@@ -152,12 +152,12 @@
                     <property name="homogeneous">True</property>
                     <child>
                       <object class="GtkRadioButton" id="hero_male">
-                        <property name="label" translatable="yes">male</property>
+                        <property name="label" translatable="yes">Male</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="draw_indicator">True</property>
+                        <property name="draw_indicator">False</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -167,12 +167,12 @@
                     </child>
                     <child>
                       <object class="GtkRadioButton" id="hero_female">
-                        <property name="label" translatable="yes">female</property>
+                        <property name="label" translatable="yes">Female</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="draw_indicator">True</property>
+                        <property name="draw_indicator">False</property>
                         <property name="group">hero_male</property>
                       </object>
                       <packing>

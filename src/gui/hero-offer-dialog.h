@@ -48,6 +48,7 @@ class HeroOfferDialog: public LwDialog
     Gtk::RadioButton *female_radiobutton;
     Gtk::Entry *name_entry;
     Gtk::Button *accept_button;
+    Gtk::Button *close_button;
     
     HeroProto *hero;
     City *city;
