@@ -19,8 +19,8 @@ The scenario file is known as a "savegame" in this document.
 The tags are displayed here as they appear in the save game.  
 The text in between the tags are comments.  There are two kinds of tags:
 
-- tags to structure the savefile
-- data tags
+- tags to structure the savefile  (e.g. <player>)
+- data tags (e.g. <d_id>)
 
 The first kind of tags defines a structure for the savegames, which is 
 important when loading it. The latter tags actually store the data. As 
@@ -78,7 +78,7 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
         <d_active> the Id of the active player </d_active>
         <d_neutral> the Id of the neutral player </d_neutral>
         <player>
-            <d_id>      the Id of the player      	        </d_id>
+            <d_id>      the Id of the player  (we use 0 .. 8)   </d_id>
             <d_name>    the name of the player                  </d_name>
             <d_immortal> (boolean) player lives on after losing all cities</d_immortal>
             <d_color>   the hex value for the colour.  e.g. #FCFCFC
@@ -86,13 +86,25 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             <d_armyset> Id of the player's armyset
                         Lines up with <d_id> in army/file.lwa->file.lwa
                                                                 </d_armyset>
-            <d_gold>    the gold owned by the player            </d_gold>
+            <d_gold>    the gold pieces owned by the player     </d_gold>
             <d_dead>    true, if player is dead, false if not   </d_dead>
             <d_type>    the type of the player
                         0   human player
                         1   ai player of type AI_Fast
                         2   ai player of type AI_Dummy
                         4   ai player of type AI_Smart
+                        8   networked player
+
+                        whenever there's an enumeration like this, we can have a number
+                        or the string version, like so:
+
+                        Player::HUMAN
+                        Player::AI_FAST
+                        Player::AI_DUMMY
+                        Player::AI_SMART
+                        Player::NETWORKED
+
+                        "dummy" means neutral player.
             </d_type>
  
             <d_join>    if d_type=1 (boolean) the ai merges stacks together         </d_join>
@@ -106,6 +118,7 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
                             These Ids line up with order of armies in
                             the armyset.                </d_fight_order>
             <d_diplomatic_states>
+              a space separated list of numbers.
               If we're at peace (=1), war in the field (=2), or full war (=3).  
               One numeric value for each other player (excluding us).  Values 
               relate to the DiplomaticState enumeration in player.h.
@@ -119,15 +132,18 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
                                   rank.
             </d_diplomatic_title>
             <d_diplomatic_proposals>
+              A space separated list of numbers.
               If we're offering peace, war in the field, or full war.  One
               numeric value for each other player (excluding us).  Values 
               relate to the DiplomaticProposal enumeration in player.h
             </d_diplomatic_proposals>
             <d_diplomatic_scores>
+              A space separated list of numbers.
                How bad we feel about each other player.  One numeric value for
                every other player.  Lower is better.  (FIXME: confirm)
             </d_diplomatic_scores>
             <d_observable> Whether or not to show the movements of this player. 
+               Lines up with the checkbox in the preferences dialog.
             </d_observable>
             <history>
                 The only tag common to all history types is the tag "type".
@@ -277,7 +293,10 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
                         </d_type>
                         <d_armyset>  Id of the army's armyset   
                         </d_armyset>
-                        <d_hp>       how many hitpoints the army has 
+                        <d_hp>       how many hitpoints the army has. 
+                          normally 2. unless it's injured and it will be 1.
+                          zero means dead.
+                          hp gets refreshed at the start of a round.
                         </d_hp>
                         <d_moves>    how many movement points the 
                                      army has left                   
@@ -288,40 +307,76 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
                         <d_strength>  the strength of the army   
                         </d_strength>
                         <d_xp>        the experience points of the army </d_xp>
+                        <d_level> always 0 for non heroes.
+                          heroes use this value.
+                        </d_level>
                         <d_medals>   the value data tags are three boolean 
                                      values separated by spaces one foreach 
                                      medal type; 0 means no medal 1 means medal
+                           the first medal is given to army units that scores
+                           more than 90% of hits in a battle.
+                           the second medal is given to army units that are
+                           rarely hit.
+                           the third medal is given to army units that survive
+                            a number of battles.
                         </d_medals>
                         <d_numberbattles> how many battles this army has fought
                         </d_numberbattles> 
-                        <d_sight>  the view radius on hidden map 
+                        <d_sight>  the view radius on hidden map (in tiles)
+                          1 means 3x3 box centered on the stack.  2 means 5x5.
                         </d_sight>
 	                <d_expvalue>  how many xp this army is worth if killed  
                         </d_expvalue>
                         <d_ship> whether or not this army is in a ship
                         </d_ship>
-                        <d_hero> whether or not this army is a hero
-                        </d_hero>
                         <d_visited_temples>
                             a space separated list of temple Ids that the
                             army has been blessed at
                         </d_visited_temples>
+                        <d_upkeep> gp this army unit uses up per turn
+                        </d_upkeep>
+                        <d_move_bonus>
+                           a set of Tile::Type enumerations from Tile.h
+                           Possibly bitwise OR'd like so:
+                              Tile::FOREST | Tile::HILLS
+                        </d_move_bonus>
+                        <d_army_bonus>
+                          a set of combat bonuses from armybase.h
+                          Possibly bitwise OR'd like so:
+                              ArmyBase::ADD1STRINOPEN | ArmyBase::SUB2ENEMYSTACK
+                        </d_army_bonus>
+                        <d_max_moves_multiplier>
+                          our real max moves is actually max-moves times this.
+                          normally 1 but can be 2 when an item is affecting
+                          this player, its moves can be doubled.
+                        </d_max_moves_multiplier>
                     </army>
 
                     <hero>
                         <d_name>      the name of the hero     
                         </d_name>
-                        <d_gender >      the gender of the hero     
+                        <d_gender >   the gender of the hero     
+                                      Hero::MALE, Hero::FEMALE
                         </d_gender>
                         <backpack>
                               <item>
                                   <d_name> the name of the item              
                                   </d_name>
-                                  <d_plantable> can this item be planted>
+                                  <d_plantable> can this item be planted
                                   </d_plantable>
                                   <d_plantable_owner>  this id of player who
                                                        can plant this item
                                   </d_plantable_owner>
+                                  <d_planted>
+                                    boolean.  whether or not this item is
+                                    planted in the ground so that army units
+                                    can be vectored to it.  when in a hero's
+                                    backpack, this value will always be false.
+                                  </d_planted>
+                                  <d_orig_plantable_owner>
+                                     the id of the player who started with
+                                     this item (to determine what colour it is)
+                                  </d_orig_plantable_owner>
                                   <d_id>        a unique Id of the item 
                                   </d_id>
                                   <d_bonus>  type of the bonus for the item
@@ -666,15 +721,21 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
         <d_styles>
             an array of tilestyles.  Each tilestyle is stored as a 2 digit
             hexadecimal number.
-            It is space separated like the d_types tag.
+            It is newline separated like the d_types tag.
+            (are we having fun yet? this tag is easily the worst one.)
         <d_styles>
 
         <itemstack>
+
+           an itemstack is a bag on the ground.
+
            <d_x> the x location of the item </d_x>
            <d_y> the y location of the item </d_y>
            <item>
                See lordsawar.playerlist.player.stacklist.stack.hero.backpack 
                for a description of an "item".
+               special items can be "planted" to allow army units to be
+               vectored to this location.
            </item>
         </itemstack>
         ... more itemstacks ...
@@ -703,6 +764,7 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             <d_burnt>       true if the city has been razed
             </d_burnt>
             <d_defense>     defense level of the city
+              this value doesn't do anything. just for show.
             </d_defense>
             <d_capital>     true if this is a capital city
             </d_capital>
@@ -714,10 +776,15 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
               x comes first, then y.
               if the city is not vectoring, then the value is "-1, -1".
             </d_vectoring>
+            <d_build_production>
+              boolean. if true it allows new army units to be bought via
+              the buy button in the city window.
+            </d_build_production>
 
             Now up to 4 armies appear.  These aren't armies like they appear
-            in stacks.  These are army *templates* to be used to produce
-            new armies in cities. armyprodbase stands for Army Production Base.
+            in stacks.  These are army templates/prototypes to be used to
+            produce new armies in cities. armyprodbase stands for:
+            Army Production Base.
             <slot>
               <armyprodbase>
               </armyprodbase>
@@ -735,9 +802,12 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
         <temple>
             <d_id>     the Id of the temple        </d_id>
             <d_name>   the name of the temple      </d_name>
-            <d_type>   the type of the temple      </d_type>
+            <d_type>   the type of the temple 
+                      numeric.  0 or 1.
+                      only affects the picture     </d_type>
             <d_x>      x position of the temple    </d_x>
             <d_y>      y position of the temple    </d_y>
+            <d_description> temple blurb           </d_description>
         </temple>
 
         ...more temples...
@@ -748,26 +818,34 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
         <ruin>
             <d_id>         the Id of the ruin              </d_id>
             <d_name>       the name of the ruin            </d_name>
-            <d_type>       the type of the ruin            </d_type>
+            <d_type>       the type of the ruin
+               one of Ruin::RUIN, Ruin::STRONGHOLD, Ruin::SAGE
+               affects the image but also affects how it operates </d_type>
             <d_x>          x position of the ruin          </d_x>
             <d_y>          y position of the ruin          </d_y>
-            <d_searched>   has the uin been searched yet?  </d_searched>
+            <d_searched>   has the ruin been searched yet? </d_searched>
             <d_sage>       is this ruin a sage? (boolean)  </d_sage>
             <d_hidden>     is this ruin hidden? (boolean)  </d_hidden>
-            <d_owner>      player id of player who can see this ruin
+            <d_owner>      player id of player who can see this ruin.
                            this value is the neutral player's id if the
                            ruin is visible by all.
+            <d_description> ruin blurb                     </d_description>
             </d_owner>
             <reward>
               Look at lordsawar.rewardlist for a description of a reward.
             </reward>
-            <stack>
-                ....
-                The stack the hero will fight (if not a sage)
-                Here follows a complete description of the stack which guards
-                the ruin.
-                ....
-            </stack>
+            <keeper>
+              <d_name> the name of the monster encountered </d_name>
+              <stack>
+                  ....
+                  The stack the hero will fight (if not a sage)
+                  Here follows a complete description of the stack which guards
+                  the ruin.  This stack contains a single army unit.
+                  The name of the army unit is disregarded here in favour of
+                  lordsawar.ruinlist.ruin.keeper.d_name
+                  ....
+              </stack>
+            </keeper>
         </ruin>
 
         ...more ruins...
@@ -848,8 +926,8 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
         the list of road tiles on the map
         <road>
             <d_id>the id of the road tile</d_id>
-            <d_name>the name of the road (unused) <d_name>
-            <d_type>the style of road<d_type>
+            <d_type>the style of road
+               See Road::Type in road.h for a listing. <d_type>
             <d_x>the x position on the map<d_x>
             <d_y>the y position on the map<d_y>
         </road>
@@ -859,7 +937,6 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
         the list of port tiles on the map
         <port>
             <d_id>the id of the port tile</d_id>
-            <d_name>the name of the port (unused) <d_name>
             <d_x>the x position on the map<d_x>
             <d_y>the y position on the map<d_y>
         </port>
@@ -870,12 +947,26 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
         <bridge>
             <d_id>the id of the bridge tile</d_id>
             <d_name>the name of the bridge (unused) <d_name>
-            <d_type>the style of bridge <d_type>
+            <d_type>the style of bridge
+              See Bridge::Type in bridge.h a listing.  <d_type>
             <d_x>the x position on the map<d_x>
             <d_y>the y position on the map<d_y>
         </bridge>
         ...more bridge tiles...
     </bridgelist>
+    <stonelist>
+        the list of standing stone tiles on the map
+        <stone>
+            <d_id>the id of the stone</d_id>
+            <d_type>the style of stone configuration
+               See Stone::Type in stone.h for a listing.
+               there are a lot of configurations because it goes 
+               with underlying road types.  <d_type>
+            <d_x>the x position on the map<d_x>
+            <d_y>the y position on the map<d_y>
+        </stone>
+        ...more stone tiles...
+    </stonelist>
     <questlist>
         the list of outstanding quests
         <quest>
@@ -884,6 +975,7 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             The common section:
             <d_type> Quest type.  For example purposes, one quest per type
                      will follow.
+              See Quest::Type in Quest.h for a listing.
             </d_type>
             <d_hero> the id of the hero
             </d_hero>
@@ -896,20 +988,15 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             </d_player>
         </quest>
         <quest>
-            <d_type>1</d_type> (..go kill a hero..)
-            <d_hero></d_hero>
-            <d_hero_name></d_hero_name>
-            <d_pending></d_pending>
-            <d_player></d_player>
-
+            ...go kill a hero
+            <d_type>Quest::KILLHERO</d_type>
+            [common quest tags]
             <d_to_kill> id of hero to kill </d_to_kill>
         </quest>
         <quest>
-            <d_type>2</d_type> (..go kill some of a player's armies..)
-            <d_hero></d_hero>
-            <d_hero_name></d_hero_name>
-            <d_pending></d_pending>
-            <d_player></d_player>
+            ...go kill some of a player's armies
+            <d_type>Quest::KILLARMIES</d_type>
+            [common quest tags]
 
             <d_to_kill> kill this many armies </d_to_kill>
             <d_killed> this many killed so far </d_killed>
@@ -918,48 +1005,38 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             </d_victim_player>
         </quest>
         <quest>
-            <d_type>3</d_type> (..go sack a city..)
-            <d_hero></d_hero>
-            <d_hero_name></d_hero_name>
-            <d_pending></d_pending>
-            <d_player></d_player>
+            ...go sack a city
+            <d_type>Quest::CITYSACK</d_type>
+            [common quest tags]
 
             <d_city> the id of the city to sack </d_city>
         </quest>
         <quest>
-            <d_type>4</d_type> (..go raze a city..)
-            <d_hero></d_hero>
-            <d_hero_name></d_hero_name>
-            <d_pending></d_pending>
-            <d_player></d_player>
+            ...go raze a city
+            <d_type>Quest::CITYRAZE</d_type> 
+            [common quest tags]
 
             <d_city> the id of the city to raze </d_city>
         </quest>
         <quest>
-            <d_type>5</d_type> (..go occupy a city..)
-            <d_hero></d_hero>
-            <d_hero_name></d_hero_name>
-            <d_pending></d_pending>
-            <d_player></d_player>
+            ...go occupy a city
+            <d_type>Quest::CITYOCCUPY</d_type> 
+            [common quest tags]
 
             <d_city> the id of the city to occupy </d_city>
         </quest>
         <quest>
-            <d_type>6</d_type> (..go kill a particular kind of army..)
-            <d_hero></d_hero>
-            <d_hero_name></d_hero_name>
-            <d_pending></d_pending>
-            <d_player></d_player>
+            ...go kill a particular kind of army
+            <d_type>Quest::KILLARMYTYPE</d_type> 
+            [common quest tags]
 
             <d_type_to_kill> the army type id of the army to kill
             </d_type_to_kill>
         </quest>
         <quest>
-            <d_type>7</d_type> (..go pillage a certain amount of gold..)
-            <d_hero></d_hero>
-            <d_hero_name></d_hero_name>
-            <d_pending></d_pending>
-            <d_player></d_player>
+            ...go pillage a certain amount of gold
+            <d_type>Quest::PILLAGEGOLD</d_type>
+            [common quest tags]
 
             <d_to_pillage> the amount of gold to pillage</d_to_pillage>
             <d_pillaged> the amount pillaged so far</d_pillaged>
@@ -988,35 +1065,76 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
         </vectoredunit>
         ...more vectored units...
     </vectoredunitlist>
+    <turnlist>
+      a listing of every player's actions by turn
+        <turn>
+           <d_owner>Id of the player moving this turn</d_owner>
+           <action/>
+           ... more actions...
+        </turn>
+    </turnlist>
+    <herotemplates>
+      the heroes that can show up.
+      <herotemplate>
+         <d_name> the name of the hero </d_name>
+         <d_gender> Hero::MALE, Hero::FEMALE </d_gender>
+         <d_owner> player id that this hero shows up for </d_owner>
+      </herotemplate>
+      ...more hero templates...
+    </herotemplates>
     <scenario>
+        <d_id> a guid </d_id>
         <d_name> name of the scenario  </d_name>
-        <d_comment> more info about the scenario </d_comment>
-        <d_turn> the current turn number of the scenario  </d_turn>
+        <d_comment> scenario description </d_comment>
+        <d_copyright> name of copyright holder plus year <d_copyright>
+        <d_license> license info for this scenario <d_license>
+        <d_turn> the current turn number the game is on</d_turn>
         <d_turnmode> boolean value used to set the armies healing at 
                      the beginning of the player's turn or at the 
-                     beginning of the new round
+                     beginning of the new round (e.g. refresh hp)
         </d_turnmode>
         <d_view_enemies> see enemy stack's contents.  (boolean)
         </d_view_enemies>
         <d_view_production> see enemy production. (boolean)
         </d_view_enemies>
-        <d_quests> heroes can go on quests. (boolean)
+        <d_quests> heroes can go on quests.
+           See QuestPolicy in game-parameters.h
         </d_quests>
         <d_hidden_map> fog of war. (boolean)
         </d_hidden_map>
         <d_diplomacy> declare war before attacking. (boolean)
         </d_diplomacy>
-        <d_neutral_cities> a number between 0 and 2.
-            0 = Average
-            1 = Strong
-            2 = Active
+        <d_neutral_cities>
+            the disposition of neutral cities.
+            See NeutralCities in game-paramters.h
         </d_neutral_cities>
         <d_intense_combat> make fights more difficult. (boolean)
         </d_intense_combat>
-        <d_military_advisor> make battle advice available. (boolean)
+        <d_military_advisor> make battle prognositcation available. (boolean)
         </d_military_advisor>
-        <d_random_turns> switch-up player turns. (boolean)
+        <d_random_turns> switch-up player ordering every round. (boolean)
         </d_random_turns>
+        <d_cusp_of_war> makes computer players attack early </d_cusp_of_war>
+        <d_razing_cities> when to allow razing of cities
+          See RazingCities in game-parameters.h
+        </d_razing_cities>
+        <d_vectoring_mode> change how vectoring works
+          See VectoringMode in game-parameters.h
+        </d_vectoring_mode>
+        <d_build_production_mode>  
+          how often the buy button can be used in certain cities to make new
+          army units.
+          See BuildProductionMode in game-parameters.h
+        </d_build_production_mode>
+        <d_sacking mode> controls when to allow sacking
+          See SackingMode in game-parameters.h
+        </d_sacking mode>
+        <d_playmode>  if this is a hotseat game or a network game.
+          See GameScenario::PlayMode in GameScenario.h
+        </d_playmode>
+        <d_surrender_already_offered> a boolean.
+          true if the computer players have attempted to parley for peace.
+        </d_surrender_already_offered>
 
     </scenario>
 </lordsawar>
