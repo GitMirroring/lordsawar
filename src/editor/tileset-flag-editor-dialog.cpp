@@ -32,6 +32,7 @@
 #include "font-size.h"
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
+#include "TarFileMaskedImage.h"
 
 #define method(x) sigc::mem_fun(*this, &TilesetFlagEditorDialog::x)
 
@@ -50,15 +51,7 @@ TilesetFlagEditorDialog::TilesetFlagEditorDialog(Gtk::Window &parent, Tileset *t
   flag_imagebutton->signal_clicked().connect
     (method(on_flag_imagebutton_clicked));
 
-  Glib::ustring imgname = d_tileset->getFlagsFilename();
-  if (imgname.empty() == false)
-    {
-      bool broken = false;
-      Glib::ustring f = d_tileset->getFileFromConfigurationFile(imgname);
-      d_flags = PixMask::create (f, broken);
-    }
-  else
-    d_flags = NULL;
+  d_flags = new TarFileMaskedImage (*d_tileset->getFlags ());
   update_flag_panel();
 }
 
@@ -102,10 +95,9 @@ void TilesetFlagEditorDialog::on_shieldset_changed()
 bool TilesetFlagEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
 {
   bool broken = false;
-  d_flags = PixMask::create (d->get_filename (), broken);
-  if (!broken)
+  if (PixMask::checkFormat (d->get_filename ()))
     {
-      Glib::ustring imgname = d_tileset->getFlagsFilename();
+      Glib::ustring imgname = d_tileset->getFlags()->getName();
       Glib::ustring newname = "";
       bool success = false;
       if (imgname.empty() == true)
@@ -116,7 +108,7 @@ bool TilesetFlagEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
           d_tileset->replaceFileInCfgFile(imgname, d->get_filename(), newname);
       if (success)
         {
-          d_tileset->setFlagsFilename (newname);
+          d_tileset->getFlags ()->setName (newname);
           d_tileset->instantiateFlagImages();
           d_changed = true;
           update_flag_panel();
@@ -179,62 +171,42 @@ void TilesetFlagEditorDialog::clearFlag()
 
 bool TilesetFlagEditorDialog::loadFlag()
 {
-  std::vector<PixMask *> images;
-  std::vector<PixMask *> masks;
-  if (!d_flags)
-    return false;
-  bool success =
-    FlagPixMaskCacheItem::loadFlagImages(d_flags, d_tileset->getTileSize(),
-                                         images, masks, false);
-  if (success)
+  Glib::ustring n = shield_theme_combobox->get_active_text();
+  Shieldset *shieldset = Shieldsetlist::getInstance()->get(n, 0);
+
+  for (unsigned int i = 0; i < MAX_PLAYERS; i++)
     {
-      Glib::ustring n = shield_theme_combobox->get_active_text();
-      Shieldset *shieldset = Shieldsetlist::getInstance()->get(n, 0);
-
-      for (unsigned int i = 0; i < MAX_PLAYERS; i++)
-	{
-	  std::list<Glib::RefPtr<Gdk::Pixbuf> > *mylist =
-            new std::list<Glib::RefPtr<Gdk::Pixbuf> >();
-	  flags[i] = mylist;
-	}
-
-      for (std::vector<PixMask*>::iterator it = images.begin(),
-           mit = masks.begin(); it != images.end(); it++, mit++)
-	{
-	  for (Shieldset::iterator sit = shieldset->begin();
-               sit != shieldset->end(); sit++)
-	    {
-	      if ((*sit)->getOwner() == 8) //ignore neutral
-		continue;
-              PixMask *q =
-                ImageCache::applyMask(*it, *mit, (*sit)->getColor());
-              double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
-              int font_size = FontSize::getInstance()->get_height ();
-              double new_height = font_size * ratio;
-              int new_width =
-                ImageCache::calculate_width_from_adjusted_height
-                (q, new_height);
-              PixMask::scale (q, new_width, new_height);
-              flags[(*sit)->getOwner()]->push_back (q->to_pixbuf ());
-              frame[(*sit)->getOwner()] = flags[(*sit)->getOwner()]->begin();
-	    }
-	}
-
-      for (std::vector<PixMask*>::iterator it = images.begin();
-           it != images.end(); it++)
-	delete *it;
-      for (std::vector<PixMask*>::iterator it = masks.begin();
-           it != masks.end(); it++)
-	delete *it;
-
+      std::list<Glib::RefPtr<Gdk::Pixbuf> > *mylist =
+        new std::list<Glib::RefPtr<Gdk::Pixbuf> >();
+      flags[i] = mylist;
     }
 
-  return success;
+  for (guint32 i = 0; i < d_flags->getNumberOfFrames (); i++)
+    {
+      for (Shieldset::iterator sit = shieldset->begin();
+           sit != shieldset->end(); sit++)
+        {
+          if ((*sit)->getOwner() == 8) //ignore neutral
+            continue;
+          PixMask *q = d_flags->applyMask (i, (*sit)->getColor());
+          double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
+          int font_size = FontSize::getInstance()->get_height ();
+          double new_height = font_size * ratio;
+          int new_width =
+            ImageCache::calculate_width_from_adjusted_height
+            (q, new_height);
+          PixMask::scale (q, new_width, new_height);
+          flags[(*sit)->getOwner()]->push_back (q->to_pixbuf ());
+          frame[(*sit)->getOwner()] = flags[(*sit)->getOwner()]->begin();
+        }
+    }
+
+  return true;
 }
 
 void TilesetFlagEditorDialog::update_flag_panel()
 {
-  Glib::ustring imgname = d_tileset->getFlagsFilename();
+  Glib::ustring imgname = d_tileset->getFlags()->getName();
   if (imgname.empty() == false)
     {
       flag_imagebutton->set_label (imgname);
@@ -303,7 +275,7 @@ Gtk::FileChooserDialog* TilesetFlagEditorDialog::image_filechooser(bool clear)
 
 void TilesetFlagEditorDialog::on_flag_imagebutton_clicked ()
 {
-  Glib::ustring f = d_tileset->getFlagsFilename ();
+  Glib::ustring f = d_tileset->getFlags()->getName ();
   Glib::ustring filename = "";
   Gtk::FileChooserDialog *d = image_filechooser(f != "");
   if (f != "")
@@ -330,11 +302,7 @@ void TilesetFlagEditorDialog::on_flag_imagebutton_clicked ()
         {
           d_changed = true;
           d_tileset->uninstantiateSameNamedImages (f);
-          if (d_flags)
-            {
-              delete d_flags;
-              d_flags = NULL;
-            }
+          d_flags->clear ();
           clearFlag ();
           update_flag_panel();
         }
@@ -355,6 +323,5 @@ void TilesetFlagEditorDialog::on_flag_imagebutton_clicked ()
 
 TilesetFlagEditorDialog::~TilesetFlagEditorDialog ()
 {
-  if (d_flags)
-    delete d_flags;
+  delete d_flags;
 }

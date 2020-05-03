@@ -29,15 +29,13 @@ libeditutil_la_SOURCES = \
 
 libshieldsetwindow_la_SOURCES = \
 	shieldset-window.cpp shieldset-window.h \
-	shieldset-info-dialog.cpp shieldset-info-dialog.h \
-	masked-image-editor-dialog.cpp masked-image-editor-dialog.h
+	shieldset-info-dialog.cpp shieldset-info-dialog.h
 
 libarmysetwindow_la_SOURCES = \
 	armyset-window.cpp armyset-window.h  \
 	armyset-info-dialog.cpp armyset-info-dialog.h \
-	masked-image-editor-dialog.cpp masked-image-editor-dialog.h \
 	armyset-selector-editor-dialog.cpp armyset-selector-editor-dialog.h \
-	per-player-masked-image-editor-dialog.cpp per-player-masked-image-editor-dialog.h \
+	tar-file-masked-image-editor-dialog.cpp tar-file-masked-image-editor-dialog.h \
 	image-editor-dialog.cpp image-editor-dialog.h 
 
 libcitysetwindow_la_SOURCES = \

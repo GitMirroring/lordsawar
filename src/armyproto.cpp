@@ -27,6 +27,7 @@
 #include "gui/image-helpers.h"
 #include "Tile.h"
 #include "tarhelper.h"
+#include "TarFileMaskedImage.h"
 #include "File.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -35,21 +36,10 @@ Glib::ustring ArmyProto::d_tag = "armyproto";
 
 ArmyProto::ArmyProto(const ArmyProto& a)
     :ArmyProtoBase(a), d_id(a.d_id), d_defends_ruins(a.d_defends_ruins), 
-     d_awardable(a.d_awardable), d_image_name(a.d_image_name),
-     d_gender(a.d_gender)
+     d_awardable(a.d_awardable), d_gender(a.d_gender)
 {
   for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
-    {
-      d_image_name[c] = a.d_image_name[c];
-      if (a.d_image[c])
-        d_image[c] = a.d_image[c]->copy();
-      else
-        d_image[c] = NULL;
-      if (a.d_mask[c])
-        d_mask[c] = a.d_mask[c]->copy();
-      else
-        d_mask[c] = NULL;
-    }
+    d_mimage[c] = new TarFileMaskedImage(*a.d_mimage[c]);
 }
 
 ArmyProto::ArmyProto()
@@ -57,35 +47,24 @@ ArmyProto::ArmyProto()
     d_gender(Hero::NONE)
 {
   for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
-    {
-      d_image_name[c] = "";
-      d_image[c] = NULL;
-      d_mask[c] = NULL;
-    }
+    d_mimage[c] = new TarFileMaskedImage(TarFileMaskedImage::HORIZONTAL_MASK);
 }
 
 ArmyProto::ArmyProto(XML_Helper* helper)
   :ArmyProtoBase(helper), d_defends_ruins(false), d_awardable(false)
 {
+  for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
+    d_mimage[c] = new TarFileMaskedImage(TarFileMaskedImage::HORIZONTAL_MASK);
   helper->getData(d_id, "id");
-  helper->getData(d_image_name[Shield::WHITE], "image_white");
-  File::add_png_if_no_ext (d_image_name[Shield::WHITE]);
-  helper->getData(d_image_name[Shield::GREEN], "image_green");
-  File::add_png_if_no_ext (d_image_name[Shield::GREEN]);
-  helper->getData(d_image_name[Shield::YELLOW], "image_yellow");
-  File::add_png_if_no_ext (d_image_name[Shield::YELLOW]);
-  helper->getData(d_image_name[Shield::LIGHT_BLUE], "image_light_blue");
-  File::add_png_if_no_ext (d_image_name[Shield::LIGHT_BLUE]);
-  helper->getData(d_image_name[Shield::RED], "image_red");
-  File::add_png_if_no_ext (d_image_name[Shield::RED]);
-  helper->getData(d_image_name[Shield::DARK_BLUE], "image_dark_blue");
-  File::add_png_if_no_ext (d_image_name[Shield::DARK_BLUE]);
-  helper->getData(d_image_name[Shield::ORANGE], "image_orange");
-  File::add_png_if_no_ext (d_image_name[Shield::ORANGE]);
-  helper->getData(d_image_name[Shield::BLACK], "image_black");
-  File::add_png_if_no_ext (d_image_name[Shield::BLACK]);
-  helper->getData(d_image_name[Shield::NEUTRAL], "image_neutral");
-  File::add_png_if_no_ext (d_image_name[Shield::NEUTRAL]);
+  d_mimage[Shield::WHITE]->load_name (helper, "image_white");
+  d_mimage[Shield::GREEN]->load_name (helper, "image_green");
+  d_mimage[Shield::YELLOW]->load_name (helper, "image_yellow");
+  d_mimage[Shield::LIGHT_BLUE]->load_name (helper, "image_light_blue");
+  d_mimage[Shield::RED]->load_name (helper, "image_red");
+  d_mimage[Shield::DARK_BLUE]->load_name (helper, "image_dark_blue");
+  d_mimage[Shield::ORANGE]->load_name (helper, "image_orange");
+  d_mimage[Shield::BLACK]->load_name (helper, "image_black");
+  d_mimage[Shield::NEUTRAL]->load_name (helper, "image_neutral");
   helper->getData(d_defends_ruins,"defends_ruins");
   helper->getData(d_awardable,"awardable");
   Glib::ustring gender_str;
@@ -93,15 +72,12 @@ ArmyProto::ArmyProto(XML_Helper* helper)
     d_gender = Hero::NONE;
   else
     d_gender = Hero::genderFromString(gender_str);
-  for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
-    {
-      d_image[c] = NULL;
-      d_mask[c] = NULL;
-    }
 }
 
 ArmyProto::~ArmyProto()
 {
+  for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
+    delete d_mimage[c];
 }
 
 bool ArmyProto::save(XML_Helper* helper) const
@@ -123,17 +99,24 @@ bool ArmyProto::saveData(XML_Helper* helper) const
 
   retval &= helper->saveData("id", d_id);
   retval &= ArmyProtoBase::saveData(helper);
-  retval &= helper->saveData("image_white", d_image_name[Shield::WHITE]);
-  retval &= helper->saveData("image_green", d_image_name[Shield::GREEN]);
-  retval &= helper->saveData("image_yellow", d_image_name[Shield::YELLOW]);
+  retval &= helper->saveData("image_white",
+                             d_mimage[Shield::WHITE]->getName ());
+  retval &= helper->saveData("image_green",
+                             d_mimage[Shield::GREEN]->getName ());
+  retval &= helper->saveData("image_yellow",
+                             d_mimage[Shield::YELLOW]->getName ());
   retval &= helper->saveData("image_light_blue", 
-			     d_image_name[Shield::LIGHT_BLUE]);
-  retval &= helper->saveData("image_red", d_image_name[Shield::RED]);
+			     d_mimage[Shield::LIGHT_BLUE]->getName ());
+  retval &= helper->saveData("image_red",
+                             d_mimage[Shield::RED]->getName ());
   retval &= helper->saveData("image_dark_blue", 
-			     d_image_name[Shield::DARK_BLUE]);
-  retval &= helper->saveData("image_orange", d_image_name[Shield::ORANGE]);
-  retval &= helper->saveData("image_black", d_image_name[Shield::BLACK]);
-  retval &= helper->saveData("image_neutral", d_image_name[Shield::NEUTRAL]);
+			     d_mimage[Shield::DARK_BLUE]->getName ());
+  retval &= helper->saveData("image_orange",
+                             d_mimage[Shield::ORANGE]->getName ());
+  retval &= helper->saveData("image_black",
+                             d_mimage[Shield::BLACK]->getName ());
+  retval &= helper->saveData("image_neutral",
+                             d_mimage[Shield::NEUTRAL]->getName ());
   retval &= helper->saveData("awardable", d_awardable);
   retval &= helper->saveData("defends_ruins", d_defends_ruins);
   Glib::ustring gender_str = Hero::genderToString(Hero::Gender(d_gender));
@@ -142,64 +125,25 @@ bool ArmyProto::saveData(XML_Helper* helper) const
   return retval;
 }
 
-void ArmyProto::loadImage(int tilesize, Shield::Colour c, Glib::ustring image_filename, bool scale, bool &broken)
-{
-  Glib::ustring s;
-
-  if (image_filename == "")
-    {
-      broken = true;
-      return;
-    }
-  // load the army picture. This is done here to avoid confusion
-  // since the armies are used as prototypes as well as actual units in the
-  // game.
-  // The army image consists of two halves. On the left is the army image, 
-  // on the right the mask.
-  std::vector<PixMask*> half;
-  half = disassemble_row(image_filename, 2, broken);
-  if (!broken)
-    {
-      if (scale)
-        {
-          PixMask::scale(half[0], tilesize, tilesize);
-          PixMask::scale(half[1], tilesize, tilesize);
-        }
-
-      setImage(c, half[0]);
-      setMask(c, half[1]);
-    }
-
-  return;
-}
-
 void ArmyProto::instantiateImages(guint32 tilesize, Tar_Helper *t, bool scale,
                                   bool &broken)
 {
   broken = false;
+  Vector<int> dim = Vector<int>(tilesize,tilesize);
+
   for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
     {
-      Glib::ustring file = "";
-      if (getImageName(Shield::Colour(c)).empty() == false)
-	file = t->getFile(getImageName(Shield::Colour(c)), broken);
-      if (!broken && file.empty() == false)
-        loadImage(tilesize, Shield::Colour(c), file, scale, broken);
-      if (file.empty() == false)
-        File::erase(file);
+      broken = d_mimage[c]->load (t);
+      if (broken)
+        break;
+      d_mimage[c]->instantiateImages (scale ? dim : Vector<int>(-1,-1));
     }
 }
 
 void ArmyProto::uninstantiateImages()
 {
   for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
-    {
-      if (d_image[c] != NULL)
-        delete d_image[c];
-      if (d_mask[c] != NULL)
-        delete d_mask[c];
-      d_image[c] = NULL;
-      d_mask[c] = NULL;
-    }
+    d_mimage[c]->uninstantiateImages ();
 }
 
 ArmyProto * ArmyProto::createScout()
@@ -220,36 +164,18 @@ ArmyProto * ArmyProto::createBat()
   return basearmy;
 }
 
-void ArmyProto::clearImage (Shield::Colour col, bool clear_name)
-{
-  if (clear_name)
-    setImageName (col, "");
-
-  PixMask *p = getImage (col);
-  delete p;
-  setImage (col, NULL);
-
-  p = getMask (col);
-  delete p;
-  setMask (col, NULL);
-}
-
-bool ArmyProto::instantiateImage (Glib::ustring cfgfile, guint32 ts, 
-                                  Shield::Colour col)
+bool ArmyProto::instantiateImage (Glib::ustring cfgfile, Shield::Colour col)
 {
   bool broken = false;
   Tar_Helper t(cfgfile, std::ios::in, broken);
   if (broken)
     return broken;
-  Glib::ustring imgname = getImageName(col);
+  Glib::ustring imgname = getMaskedImage(col)->getName ();
   if (imgname.empty() == false)
     {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          clearImage (col, false);
-          loadImage (ts, col, filename, false, broken);
-        }
+      getMaskedImage (col)->clear (false);
+      getMaskedImage (col)->load (&t);
+      getMaskedImage (col)->instantiateImages();
     }
   return broken;
 }

@@ -51,6 +51,7 @@
 #include "font-size.h"
 #include "past-chooser.h"
 #include "timed-message-dialog.h"
+#include "TarFileMaskedImage.h"
 
 #define method(x) sigc::mem_fun(*this, &TileSetWindow::x)
 
@@ -1657,9 +1658,9 @@ void TileSetWindow::on_validate_tileset_activated()
   if (d_tileset->countTilesWithPattern(SmallTile::SUNKEN_RADIAL) > 1)
     msgs.push_back(_("Only one tile can have a sunken radial pattern."));
 
-  if (d_tileset->getLargeSelectorFilename().empty () == true)
+  if (d_tileset->getSelector(true)->getName().empty () == true)
     msgs.push_back(_("A large selector image is required."));
-  if (d_tileset->getSmallSelectorFilename().empty () == true)
+  if (d_tileset->getSelector(false)->getName().empty () == true)
     msgs.push_back(_("A small selector image is required."));
   if (d_tileset->getExplosionFilename().empty () == true)
     msgs.push_back(_("An explosion image is required."));
@@ -1671,7 +1672,7 @@ void TileSetWindow::on_validate_tileset_activated()
     msgs.push_back(_("A bridges image is required."));
   if (d_tileset->getFogFilename().empty () == true)
     msgs.push_back(_("A set of fog images are required."));
-  if (d_tileset->getFlagsFilename().empty () == true)
+  if (d_tileset->getFlags()->getName().empty () == true)
     msgs.push_back(_("A set of flag images are required."));
   if (d_tileset->getAllMoveBonusFilename ().empty () == true)
     msgs.push_back(_("An all (flight) movement bonus image is required."));

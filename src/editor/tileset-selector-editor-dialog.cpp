@@ -32,6 +32,7 @@
 #include "font-size.h"
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
+#include "TarFileMaskedImage.h"
 
 #define method(x) sigc::mem_fun(*this, &TilesetSelectorEditorDialog::x)
 
@@ -39,24 +40,9 @@ TilesetSelectorEditorDialog::TilesetSelectorEditorDialog(Gtk::Window &parent, Ti
  : LwEditorDialog(parent, "tileset-selector-editor-dialog.ui")
 {
   d_changed = false;
-  bool broken = false;
   d_tileset = tileset;
-  Glib::ustring imgname = d_tileset->getSmallSelectorFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring f = d_tileset->getFileFromConfigurationFile(imgname);
-      small_selector = PixMask::create (f, broken);
-    }
-  else
-    small_selector = NULL;
-  imgname = d_tileset->getLargeSelectorFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring f = d_tileset->getFileFromConfigurationFile(imgname);
-      large_selector = PixMask::create (f, broken);
-    }
-  else
-    large_selector = NULL;
+  small_selector = new TarFileMaskedImage (*d_tileset->getSelector(false));
+  large_selector = new TarFileMaskedImage (*d_tileset->getSelector(true));
 
   Gtk::Box *box;
   xml->get_widget("shieldset_box", box);
@@ -117,28 +103,10 @@ void TilesetSelectorEditorDialog::on_shieldset_changed()
   show_preview_selectors();
 }
 
-bool TilesetSelectorEditorDialog::load_selector_image (Glib::ustring filename)
-{
-  bool broken = false;
-  if (large_selector_radiobutton->get_active() == true)
-    {
-      if (large_selector)
-        delete large_selector;
-      large_selector = PixMask::create (filename, broken);
-    }
-  else if (small_selector_radiobutton->get_active() == true)
-    {
-      if (small_selector)
-        delete small_selector;
-      small_selector = PixMask::create (filename, broken);
-    }
-  return false;
-}
-
 bool TilesetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
 {
-  bool broken = load_selector_image (d->get_filename ());
-  if (!broken)
+  bool broken = false;
+  if (PixMask::checkFormat (d->get_filename ()))
     {
       Glib::ustring imgname = get_selector_filename ();
       Glib::ustring newname = "";
@@ -170,7 +138,7 @@ bool TilesetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
     }
   else
     {
-      TimedMessageDialog
+       TimedMessageDialog
         td(*d, String::ucompose(_("Couldn't make sense of the image:\n%1"),
                                 d->get_filename ()), 0);
       td.run_and_hide ();
@@ -214,65 +182,49 @@ void TilesetSelectorEditorDialog::clearSelector()
 
 bool TilesetSelectorEditorDialog::loadSelector()
 {
-  std::vector<PixMask *> images;
-  std::vector<PixMask *> masks;
-  PixMask *p = NULL;
+  TarFileMaskedImage *p = NULL;
   if (large_selector_radiobutton->get_active() == true)
     p = large_selector;
   else if (small_selector_radiobutton->get_active() == true)
     p = small_selector;
   if (!p)
     return false;
-  if (p->get_unscaled_height () == 0)
+  if (p->getImage () && p->getImage ()->get_unscaled_height () == 0)
     return false;
-  bool success =
-    SelectorPixMaskCacheItem::loadSelectors(p, d_tileset->getTileSize(),
-                                            images, masks, false);
-  if (success)
+
+  Glib::ustring n = shield_theme_combobox->get_active_text();
+  Shieldset *shieldset = Shieldsetlist::getInstance()->get(n, 0);
+
+  for (unsigned int i = 0; i < MAX_PLAYERS; i++)
     {
-      Glib::ustring n = shield_theme_combobox->get_active_text();
-      Shieldset *shieldset = Shieldsetlist::getInstance()->get(n, 0);
-
-      for (unsigned int i = 0; i < MAX_PLAYERS; i++)
-	{
-	  std::list<Glib::RefPtr<Gdk::Pixbuf> > *mylist =
-            new std::list<Glib::RefPtr<Gdk::Pixbuf> >();
-	  selectors[i] = mylist;
-	}
-
-      for (std::vector<PixMask*>::iterator it = images.begin(),
-           mit = masks.begin(); it != images.end(); it++, mit++)
-	{
-	  for (Shieldset::iterator sit = shieldset->begin();
-               sit != shieldset->end(); sit++)
-            {
-              if ((*sit)->getOwner() == 8) //ignore neutral
-                continue;
-              PixMask *q =
-                ImageCache::applyMask(*it, *mit, (*sit)->getColor());
-              double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
-              int font_size = FontSize::getInstance()->get_height ();
-              double new_height = font_size * ratio;
-              int new_width =
-                ImageCache::calculate_width_from_adjusted_height
-                (q, new_height);
-              PixMask::scale (q, new_width, new_height);
-              selectors[(*sit)->getOwner()]->push_back (q->to_pixbuf ());
-
-              frame[(*sit)->getOwner()] =
-                selectors[(*sit)->getOwner()]->begin();
-            }
-	}
-
-      for (std::vector<PixMask*>::iterator it = images.begin();
-           it != images.end(); it++)
-	delete *it;
-      for (std::vector<PixMask*>::iterator it = masks.begin();
-           it != masks.end(); it++)
-	delete *it;
+      std::list<Glib::RefPtr<Gdk::Pixbuf> > *mylist =
+        new std::list<Glib::RefPtr<Gdk::Pixbuf> >();
+      selectors[i] = mylist;
     }
 
-  return success;
+  for (guint32 i = 0; i < p->getNumberOfFrames (); i++)
+    {
+      for (Shieldset::iterator sit = shieldset->begin();
+           sit != shieldset->end(); sit++)
+        {
+          if ((*sit)->getOwner() == 8) //ignore neutral
+            continue;
+          PixMask *q = p->applyMask (i, (*sit)->getColor ());
+          double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
+          int font_size = FontSize::getInstance()->get_height ();
+          double new_height = font_size * ratio;
+          int new_width =
+            ImageCache::calculate_width_from_adjusted_height
+            (q, new_height);
+          PixMask::scale (q, new_width, new_height);
+          selectors[(*sit)->getOwner()]->push_back (q->to_pixbuf ());
+
+          frame[(*sit)->getOwner()] =
+            selectors[(*sit)->getOwner()]->begin();
+        }
+    }
+
+  return true;
 }
 
 void TilesetSelectorEditorDialog::on_heartbeat()
@@ -345,9 +297,9 @@ Gtk::FileChooserDialog* TilesetSelectorEditorDialog::image_filechooser(bool clea
 Glib::ustring TilesetSelectorEditorDialog::get_selector_filename ()
 {
   if (large_selector_radiobutton->get_active() == true)
-    return d_tileset->getLargeSelectorFilename ();
+    return d_tileset->getSelector(true)->getName ();
   else if (small_selector_radiobutton->get_active() == true)
-    return d_tileset->getSmallSelectorFilename ();
+    return d_tileset->getSelector(false)->getName ();
   return "";
 }
 
@@ -355,13 +307,13 @@ void TilesetSelectorEditorDialog::set_selector_filename (Glib::ustring f)
 {
   if (large_selector_radiobutton->get_active() == true)
     {
-      d_tileset->setLargeSelectorFilename (f);
+      d_tileset->getSelector(true)->setName (f);
       if (f.empty () == false)
         d_tileset->instantiateLargeSelectorImages();
     }
   else if (small_selector_radiobutton->get_active() == true)
     {
-      d_tileset->setSmallSelectorFilename (f);
+      d_tileset->getSelector(false)->setName (f);
       if (f.empty () == false)
         d_tileset->instantiateSmallSelectorImages();
     }
@@ -372,16 +324,12 @@ void TilesetSelectorEditorDialog::clear_selector_image ()
 {
   if (large_selector_radiobutton->get_active() == true)
     {
-      if (large_selector)
-        delete large_selector;
-      large_selector = NULL;
+      large_selector->clear ();
       d_tileset->clearLargeSelectorImage();
     }
   else if (small_selector_radiobutton->get_active() == true)
     {
-      if (small_selector)
-        delete small_selector;
-      small_selector = NULL;
+      small_selector->clear ();
       d_tileset->clearSmallSelectorImage();
     }
   return;

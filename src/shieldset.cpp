@@ -28,6 +28,7 @@
 #include "file-compat.h"
 #include "ucompose.hpp"
 #include "xmlhelper.h"
+#include "TarFileMaskedImage.h"
 
 Glib::ustring Shieldset::d_tag = "shieldset";
 Glib::ustring Shieldset::file_extension = SHIELDSET_EXT;
@@ -129,12 +130,12 @@ bool Shieldset::loadShield(Glib::ustring tag, XML_Helper* helper)
   if (tag == Tartan::d_tag)
     {
       Tartan * t = new Tartan(helper);
-      back()->setTartanImageName(Tartan::LEFT,
-                                 t->getTartanImageName(Tartan::LEFT));
-      back()->setTartanImageName(Tartan::CENTER,
-                                 t->getTartanImageName(Tartan::CENTER));
-      back()->setTartanImageName(Tartan::RIGHT,
-                                 t->getTartanImageName(Tartan::RIGHT));
+      back()->getTartanMaskedImage(Tartan::LEFT)->setName
+                                   (t->getTartanMaskedImage(Tartan::LEFT)->getName ());
+      back()->getTartanMaskedImage(Tartan::CENTER)->setName
+                                   (t->getTartanMaskedImage(Tartan::CENTER)->getName ());
+      back()->getTartanMaskedImage(Tartan::RIGHT)->setName
+                                   (t->getTartanMaskedImage(Tartan::RIGHT)->getName ());
       delete t;
       return true;
     }
@@ -240,23 +241,6 @@ bool Shieldset::save(XML_Helper *helper) const
   return retval;
 }
 
-void Shieldset::instantiateImages(bool scale, bool &broken)
-{
-  uninstantiateImages();
-  for (iterator it = begin(); it != end(); it++)
-    {
-      (*it)->instantiateImages(this, scale, broken);
-      if (broken)
-        break;
-    }
-}
-
-void Shieldset::uninstantiateImages()
-{
-  for (iterator it = begin(); it != end(); it++)
-    (*it)->uninstantiateImages();
-}
-
 bool Shieldset::validate() const
 {
   bool valid = true;
@@ -333,7 +317,7 @@ bool Shieldset::validateShieldImages(Shield::Colour c) const
 	    case ShieldStyle::MEDIUM: idx = 1; break;
 	    case ShieldStyle::LARGE: idx = 2; break;
 	    }
-	  if ((*i)->getImageName().empty() == false)
+	  if ((*i)->getMaskedImage()->getName ().empty() == false)
 	    player[idx]++;
 	}
     }
@@ -352,11 +336,11 @@ bool Shieldset::validateTartanImages(Shield::Colour c) const
     {
       if ((*it)->getOwner() != guint32(c))
         continue;
-      if ((*it)->getTartanImageName (Tartan::LEFT).empty () == false)
+      if ((*it)->getTartanMaskedImage(Tartan::LEFT)->getName ().empty () == false)
         player[0]++;
-      if ((*it)->getTartanImageName (Tartan::CENTER).empty () == false)
+      if ((*it)->getTartanMaskedImage (Tartan::CENTER)->getName ().empty () == false)
         player[1]++;
-      if ((*it)->getTartanImageName (Tartan::RIGHT).empty () == false)
+      if ((*it)->getTartanMaskedImage (Tartan::RIGHT)->getName ().empty () == false)
         player[2]++;
     }
   int count = player[0] + player[1] + player[2];
@@ -390,7 +374,7 @@ guint32 Shieldset::countEmptyImageNames() const
     {
       for (std::list<ShieldStyle*>::const_iterator j = (*i)->begin(); j != (*i)->end(); j++)
         {
-          if ((*j)->getImageName().empty() == true)
+          if ((*j)->getMaskedImage()->getName().empty() == true)
             count++;
         }
     }
@@ -449,7 +433,7 @@ void Shieldset::setSmallHeightsAndWidthsFromImages()
   for (iterator it = begin(); it != end(); it++)
     for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); i++)
       {
-        PixMask *image = (*i)->getImage();
+        PixMask *image = (*i)->getMaskedImage()->getImage ();
         if (image == NULL)
           continue;
         switch ((*i)->getType ())
@@ -482,7 +466,7 @@ void Shieldset::setMediumHeightsAndWidthsFromImages()
   for (iterator it = begin(); it != end(); it++)
     for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); i++)
       {
-        PixMask *image = (*i)->getImage();
+        PixMask *image = (*i)->getMaskedImage()->getImage ();
         if (image == NULL)
           continue;
         switch ((*i)->getType ())
@@ -515,7 +499,7 @@ void Shieldset::setLargeHeightsAndWidthsFromImages()
   for (iterator it = begin(); it != end(); it++)
     for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); i++)
       {
-        PixMask *image = (*i)->getImage();
+        PixMask *image = (*i)->getMaskedImage()->getImage ();
         if (image == NULL)
           continue;
         switch ((*i)->getType ())
@@ -539,62 +523,24 @@ void Shieldset::setLargeHeightsAndWidthsFromImages()
   return;
 }
 
-void Shieldset::lookupTartanImage(guint32 colour, Tartan::Type type,
-                                  PixMask **image, PixMask **mask)
+TarFileMaskedImage *Shieldset::lookupTartanImage(guint32 colour, Tartan::Type type)
 {
   for (const_iterator it = begin(); it != end(); it++)
-    {
-      for (Shield::const_iterator i = (*it)->begin(); i != (*it)->end(); i++)
-	{
-	  if ((*it)->getOwner() == colour)
-            {
-              switch (type)
-                {
-                case Tartan::LEFT:
-                  *image = (*it)->getImage(Tartan::LEFT);
-                  *mask = (*it)->getMask(Tartan::LEFT);
-                  break;
-                case Tartan::CENTER:
-                  *image = (*it)->getImage(Tartan::CENTER);
-                  *mask = (*it)->getMask(Tartan::CENTER);
-                  break;
-                case Tartan::RIGHT:
-                  *image = (*it)->getImage(Tartan::RIGHT);
-                  *mask = (*it)->getMask(Tartan::RIGHT);
-                  break;
-                }
-              break;
-            }
-	}
-    }
-  return;
+    if ((*it)->getOwner() == colour)
+      return (*it)->getTartanMaskedImage (type);
+  return NULL;
 }
 
-void Shieldset ::uninstantiateSameNamedImages (Glib::ustring name)
+void Shieldset::uninstantiateSameNamedImages (Glib::ustring name)
 {
   for (auto s : *this)
     {
       for (auto ss : *s)
-        if (ss->getImageName () == name)
-          {
-            ss->uninstantiateImages ();
-            ss->setImageName ("");
-          }
-      if (s->getTartanImageName (Tartan::LEFT) == name)
-        {
-          s->uninstantiateTartanImage (Tartan::LEFT);
-          s->setTartanImageName (Tartan::LEFT, "");
-        }
-      if (s->getTartanImageName (Tartan::CENTER) == name)
-        {
-          s->uninstantiateTartanImage (Tartan::CENTER);
-          s->setTartanImageName (Tartan::CENTER, "");
-        }
-      if (s->getTartanImageName (Tartan::RIGHT) == name)
-        {
-          s->uninstantiateTartanImage (Tartan::RIGHT);
-          s->setTartanImageName (Tartan::RIGHT, "");
-        }
+        if (ss->getMaskedImage()->getName () == name)
+          ss->getMaskedImage ()->clear ();
+      for (guint32 k = Tartan::LEFT; k <= Tartan::RIGHT; k++)
+        if (s->getTartanMaskedImage (Tartan::Type (k))->getName () == name)
+          s->getTartanMaskedImage (Tartan::Type (k))->clear ();
     }
 }
         
@@ -619,5 +565,74 @@ bool Shieldset::isMediumHeightAndWidthSet()
 bool Shieldset::isLargeHeightAndWidthSet()
 {
   return d_large_width && d_large_height;
+}
+
+void Shieldset::instantiateImages(bool scale, bool &broken)
+{
+  uninstantiateImages ();
+
+  broken = false;
+  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  if (broken)
+    return;
+
+  for (iterator i = begin(); i != end(); i++)
+    {
+      for (auto j : *(*i))
+        {
+          Vector<int> dim = Vector<int>(-1, -1);
+          if (scale)
+            {
+              switch (j->getType())
+                {
+                case ShieldStyle::SMALL:
+                  dim = Vector<int>(getSmallWidth(), getSmallHeight()); break;
+                case ShieldStyle::MEDIUM:
+                  dim = Vector<int>(getMediumWidth(), getMediumHeight()); break;
+                case ShieldStyle::LARGE:
+                  dim = Vector<int>(getLargeWidth(), getLargeHeight()); break;
+                }
+            }
+          TarFileMaskedImage *mim = j->getMaskedImage ();
+          if (mim->getName ().empty () == false)
+            {
+              mim->setTarFile (&t);
+              broken = mim->load ();
+              if (!broken)
+                mim->instantiateImages (dim);
+              else
+                break;
+            }
+        }
+      if (!broken)
+        {
+          for (guint32 k = Tartan::LEFT; k <= Tartan::RIGHT; k++)
+            {
+              TarFileMaskedImage *mim =
+                (*i)->getTartanMaskedImage (Tartan::Type (k));
+              if (mim->getName ().empty () == false)
+                {
+                  mim->setTarFile (&t);
+                  broken = mim->load ();
+                  if (!broken)
+                    mim->instantiateImages ();
+                  else
+                    break;
+                }
+            }
+        }
+    }
+  t.Close();
+}
+
+void Shieldset::uninstantiateImages()
+{
+  for (iterator i = begin(); i != end(); i++)
+    {
+      for (auto j : *(*i))
+        j->getMaskedImage ()->uninstantiateImages ();
+      for (guint32 k = Tartan::LEFT; k <= Tartan::RIGHT; k++)
+        (*i)->getTartanMaskedImage (Tartan::Type (k))->uninstantiateImages ();
+    }
 }
 //End of file

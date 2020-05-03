@@ -31,6 +31,7 @@
 
 class XML_Helper;
 class ShieldStyle;
+class TarFileMaskedImage;
 
 //! A list of Shield graphic objects in a shield theme.
 /**
@@ -173,8 +174,7 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
          * This gets the left tartan image and mask for a player denoted by
          * colour.
          */
-        void lookupTartanImage(guint32 colour, Tartan::Type type,
-                               PixMask **image, PixMask **mask);
+        TarFileMaskedImage *lookupTartanImage(guint32 colour, Tartan::Type type);
 
 	//! Check to see if this shieldset can be used in the game.
 	bool validate() const;

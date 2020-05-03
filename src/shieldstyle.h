@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 class XML_Helper;
 class Shieldset;
+class TarFileMaskedImage;
 
 //! A graphic of a shield.
 /**
@@ -80,36 +81,8 @@ class ShieldStyle : public sigc::trackable
         //! Get the size of this shield.
         guint32 getType() const {return d_type;}
 
-        //! Get the image of the shield.
-	PixMask* getImage() const {return d_image;}
-
-        //! Returns the mask of the shield.
-	PixMask* getMask() const {return d_mask;}
-
-	//! Returns the basename of the picture's filename.
-	Glib::ustring getImageName() const {return d_image_name;}
-
-
-        // Set Methods
-        
-        //! Set the basic image of the shield.
-        void setImage(PixMask* image) {d_image = image;};
-
-        //! Set the mask of the shield.
-        void setMask(PixMask* mask) {d_mask = mask;}
-
-	//! Set the basename of the shield picture's filename.
-	void setImageName(Glib::ustring name) {d_image_name = name;}
-
-
-	// Methods that operate on class data and modify the class.
-
-	//! Load the images for this shieldstyle from the given file.
-	void instantiateImages(Glib::ustring filename, Shieldset *s,
-                               bool scale, bool &broke);
-
-	//! Destroy the images associated with this shieldstyle.
-	void uninstantiateImages();
+	//! Returns the masked image for this shield.
+        TarFileMaskedImage *getMaskedImage () const {return d_mimage;}
 
 
 	// Methods that operate on class data but do not modify the class.
@@ -122,7 +95,8 @@ class ShieldStyle : public sigc::trackable
 	
 	//! Convert a ShieldStyle::Type enumerated value to a string.
 	static Glib::ustring shieldStyleTypeToString(const ShieldStyle::Type type);
-        //! Convret a ShieldStyle::Type to a suitable string for display.
+
+        //! Convert a ShieldStyle::Type to a suitable string for display.
         static Glib::ustring shieldStyleTypeToFriendlyName(const ShieldStyle::Type type);
 
 	//! Convert a ShieldStyle::Type string to an enumerated value.
@@ -137,23 +111,8 @@ class ShieldStyle : public sigc::trackable
 	 */
         guint32 d_type;
 
-	//! The unshaded image portion of the shield's picture.
-	PixMask* d_image;
-
-	//! The portion of the shield's image to shade in the player's colour.
-	/**
-	 * The mask appears to the right of the image in the shield's picture.
-	 * The colour that shades the mask is dictated by Player::d_colour.
-	 */
-	PixMask* d_mask;
-
-	//! The basename of the shield's picture file.
-	/**
-	 * Returns the filename that holds the image for this ShieldStyle.
-	 * The filename does not have a path, and the filename does
-	 * not have an extension (e.g. .png).
-	 */
-	Glib::ustring d_image_name;
+        //! The masked image object for this shield.
+        TarFileMaskedImage * d_mimage;
 };
 
 #endif // SHIELDSTYLE_H

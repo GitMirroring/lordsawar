@@ -23,6 +23,7 @@
 #include "ucompose.hpp"
 #include "shieldset.h"
 #include "tarhelper.h"
+#include "TarFileMaskedImage.h"
 
 Glib::ustring Shield::d_tag = "shield";
 
@@ -131,78 +132,6 @@ bool Shield::save(XML_Helper *helper) const
   return retval;
 }
 	
-void Shield::instantiateImages(Shieldset *s, bool scale, bool &broken)
-{
-  broken = false;
-  Tar_Helper t(s->getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return;
-  int count = 0;
-  for (iterator it = begin(); it != end(); it++)
-    {
-      Glib::ustring imgname = (*it)->getImageName();
-      if (imgname.empty() == false)
-        {
-          Tar_Helper::reopen (&t);
-          Glib::ustring pngfile = t.getFile(imgname, broken);
-          if (broken == false)
-            {
-              (*it)->instantiateImages(pngfile, s, scale, broken);
-              File::erase(pngfile);
-            }
-          else
-            {
-              t.Close();
-              return;
-            }
-        }
-      count++;
-    }
-  Glib::ustring l = "", c = "", r = "",
-    imgname = getTartanImageName(Tartan::LEFT);
-  if (imgname.empty () == false)
-    {
-      Tar_Helper::reopen (&t);
-      l = t.getFile(imgname, broken);
-      if (broken)
-        {
-          t.Close();
-          return;
-        }
-    }
-  imgname = getTartanImageName(Tartan::CENTER);
-  if (imgname.empty () == false)
-    {
-      Tar_Helper::reopen (&t);
-      c = t.getFile(imgname, broken);
-      if (broken)
-        {
-          t.Close();
-          return;
-        }
-    }
-  imgname = getTartanImageName(Tartan::RIGHT);
-  if (imgname.empty () == false)
-    {
-      Tar_Helper::reopen (&t);
-      r = t.getFile(imgname, broken);
-      if (broken)
-        {
-          t.Close();
-          return;
-        }
-    }
-  instantiateTartanImages (l, c, r, broken);
-  t.Close();
-}
-
-void Shield::uninstantiateImages()
-{
-  for (iterator it = begin(); it != end(); it++)
-    (*it)->uninstantiateImages();
-  uninstantiateTartanImages();
-}
-
 ShieldStyle *Shield::getFirstShieldstyle(ShieldStyle::Type type)
 {
   for (iterator i = begin(); i != end(); i++)

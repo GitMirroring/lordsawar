@@ -16,15 +16,16 @@
 //  02110-1301, USA.
 
 #pragma once
-#ifndef PER_PLAYER_MASKED_IMAGE_EDITOR_DIALOG_H
-#define PER_PLAYER_MASKED_IMAGE_EDITOR_DIALOG_H
+#ifndef TAR_FILE_MASKED_IMAGE_EDITOR_DIALOG_H
+#define TAR_FILE_MASKED_IMAGE_EDITOR_DIALOG_H
 
 #include <gtkmm.h>
 #include "shield.h"
 #include "lw-editor-dialog.h"
 
+class TarFileMaskedImage;
 
-//! per player masked picture editor
+//! Tar File Masked Picture Editor
 /**
  * This class doesn't actually edit the image, instead it shows the image
  * being edited in each player colour.  The user can pick a new file to be
@@ -33,17 +34,19 @@
  * The shieldset is required to define the mask colours.
  *
  * The underlying images have the top row as the image, and the bottom row as the mask.
- * There are 8 images, one for each player (not including neutral.)
+ * In the case of vertical mask images, there are 8 frames one for each player
+ * not including neutral.
+ * But for horizontal mask images, there's only 1 frame, drawn in all colours
+ * including neutral (9).
  *
- * This class could be named better.
  */
 class Shieldset;
-class PerPlayerMaskedImageEditorDialog: public LwEditorDialog
+class TarFileMaskedImageEditorDialog: public LwEditorDialog
 {
  public:
     static const int MAX_IMAGES_WIDTH;
-    PerPlayerMaskedImageEditorDialog(Gtk::Window &parent, Glib::ustring filename, std::vector<PixMask *>image, std::vector<PixMask *>mask, double ratio, Shieldset *shieldset = NULL);
-    ~PerPlayerMaskedImageEditorDialog();
+    TarFileMaskedImageEditorDialog(Gtk::Window &parent, TarFileMaskedImage *mi, double ratio, Shieldset *shieldset = NULL);
+    ~TarFileMaskedImageEditorDialog();
 
     void set_title(Glib::ustring t) {dialog->set_title(t);}
 
@@ -52,10 +55,9 @@ class PerPlayerMaskedImageEditorDialog: public LwEditorDialog
     void hide();
 
  private:
-    double d_ratio;
+    TarFileMaskedImage *d_mim;
     Glib::ustring d_target_filename;
-    std::vector<PixMask *>d_image;
-    std::vector<PixMask *>d_mask;
+    double d_ratio;
     Gtk::Button *imagebutton;
     Gtk::Image *image_white;
     Gtk::Image *image_green;
@@ -65,6 +67,7 @@ class PerPlayerMaskedImageEditorDialog: public LwEditorDialog
     Gtk::Image *image_dark_blue;
     Gtk::Image *image_orange;
     Gtk::Image *image_black;
+    Gtk::Image *image_neutral;
     Shieldset * d_shieldset;
     Gtk::ComboBoxText *shield_theme_combobox;
     Gtk::Button *clear_button;

@@ -24,6 +24,7 @@
 #include "shieldset.h"
 #include "tarhelper.h"
 #include "gui/image-helpers.h"
+#include "TarFileMaskedImage.h"
 
 Glib::ustring Tartan::d_tag = "tartan";
 
@@ -31,51 +32,38 @@ Glib::ustring Tartan::d_tag = "tartan";
 #define debug(x)
 
 Tartan::Tartan(XML_Helper* helper)
- : d_left_tartan_image(0), d_left_tartan_mask(0),
-    d_center_tartan_image(0), d_center_tartan_mask(0),
-    d_right_tartan_image(0), d_right_tartan_mask(0)
 {
-  helper->getData(d_left_tartan_name, "left_image");
-  File::add_png_if_no_ext (d_left_tartan_name);
-  helper->getData(d_center_tartan_name, "center_image");
-  File::add_png_if_no_ext (d_center_tartan_name);
-  helper->getData(d_right_tartan_name, "right_image");
-  File::add_png_if_no_ext (d_right_tartan_name);
+  d_left_mimage = new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+  d_center_mimage =
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+  d_right_mimage = new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+
+  d_left_mimage->load_name (helper, "left_image");
+  d_center_mimage->load_name (helper, "center_image");
+  d_right_mimage->load_name (helper, "right_image");
 }
 
 Tartan::Tartan(const Tartan& t)
-  :d_left_tartan_name(t.d_left_tartan_name),
-    d_center_tartan_name(t.d_center_tartan_name),
-    d_right_tartan_name(t.d_right_tartan_name),
-    d_left_tartan_image(0), d_left_tartan_mask(0),
-    d_center_tartan_image(0), d_center_tartan_mask(0),
-    d_right_tartan_image(0), d_right_tartan_mask(0)
 {
-  if (t.d_left_tartan_image)
-    d_left_tartan_image = t.d_left_tartan_image->copy();
-  if (t.d_left_tartan_mask)
-    d_left_tartan_mask = t.d_left_tartan_mask->copy();
-  if (t.d_center_tartan_image)
-    d_center_tartan_image = t.d_center_tartan_image->copy();
-  if (t.d_center_tartan_mask)
-    d_center_tartan_mask = t.d_center_tartan_mask->copy();
-  if (t.d_right_tartan_image)
-    d_right_tartan_image = t.d_right_tartan_image->copy();
-  if (t.d_right_tartan_mask)
-    d_right_tartan_mask = t.d_right_tartan_mask->copy();
+
+  d_left_mimage = new TarFileMaskedImage (*t.d_left_mimage);
+  d_center_mimage = new TarFileMaskedImage (*t.d_center_mimage);
+  d_right_mimage = new TarFileMaskedImage (*t.d_right_mimage);
 }
 
 Tartan::Tartan()
-  :d_left_tartan_name(""), d_center_tartan_name(""), d_right_tartan_name(""),
-    d_left_tartan_image(0), d_left_tartan_mask(0),
-    d_center_tartan_image(0), d_center_tartan_mask(0),
-    d_right_tartan_image(0), d_right_tartan_mask(0)
 {
+  d_left_mimage = new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+  d_center_mimage =
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+  d_right_mimage = new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
 }
 
 Tartan::~Tartan()
 {
-  uninstantiateTartanImages();
+  delete d_left_mimage;
+  delete d_center_mimage;
+  delete d_right_mimage;
 }
 
 bool Tartan::saveTartan(XML_Helper *helper) const
@@ -83,142 +71,22 @@ bool Tartan::saveTartan(XML_Helper *helper) const
   bool retval = true;
 
   retval &= helper->openTag(d_tag);
-  retval &= helper->saveData("left_image", d_left_tartan_name);
-  retval &= helper->saveData("center_image", d_center_tartan_name);
-  retval &= helper->saveData("right_image", d_right_tartan_name);
+  retval &= helper->saveData("left_image", d_left_mimage->getName ());
+  retval &= helper->saveData("center_image", d_center_mimage->getName ());
+  retval &= helper->saveData("right_image", d_right_mimage->getName ());
   retval &= helper->closeTag();
   return retval;
 }
 
-void Tartan::instantiateTartanImage(Tartan::Type type, Glib::ustring file, bool &broken)
-{
-  std::vector<PixMask* > half = disassemble_row(file, 2, broken);
-  if (!broken)
-    {
-      switch (type)
-        {
-        case Tartan::LEFT:
-          d_left_tartan_image = half[0];
-          d_left_tartan_mask = half[1];
-          break;
-        case Tartan::RIGHT:
-          d_right_tartan_image = half[0];
-          d_right_tartan_mask = half[1];
-          break;
-        case Tartan::CENTER:
-          d_center_tartan_image = half[0];
-          d_center_tartan_mask = half[1];
-          break;
-        }
-    }
-}
-
-void Tartan::instantiateTartanImages(Glib::ustring l, Glib::ustring c, Glib::ustring r, bool &broken)
-{
-  if (l.empty () == false)
-    instantiateTartanImage(Tartan::LEFT, l, broken);
-  if (!broken && c.empty () == false)
-    instantiateTartanImage(Tartan::CENTER, c, broken);
-  if (!broken && r.empty () == false)
-    instantiateTartanImage(Tartan::RIGHT, r, broken);
-}
-
-void Tartan::uninstantiateTartanImage(Tartan::Type type)
-{
-  switch (type)
-    {
-    case Tartan::LEFT:
-      if (d_left_tartan_image)
-        delete d_left_tartan_image;
-      d_left_tartan_image = NULL;
-      if (d_left_tartan_mask)
-        delete d_left_tartan_mask;
-      d_left_tartan_mask = NULL;
-      break;
-    case Tartan::RIGHT:
-      if (d_right_tartan_image)
-        delete d_right_tartan_image;
-      d_right_tartan_image = NULL;
-      if (d_right_tartan_mask)
-        delete d_right_tartan_mask;
-      d_right_tartan_mask = NULL;
-      break;
-    case Tartan::CENTER:
-      if (d_center_tartan_image)
-        delete d_center_tartan_image;
-      d_center_tartan_image = NULL;
-      if (d_center_tartan_mask)
-        delete d_center_tartan_mask;
-      d_center_tartan_mask = NULL;
-      break;
-    }
-}
-
-void Tartan::uninstantiateTartanImages()
-{
-  uninstantiateTartanImage (Tartan::LEFT);
-  uninstantiateTartanImage (Tartan::CENTER);
-  uninstantiateTartanImage (Tartan::RIGHT);
-}
-        
-PixMask *Tartan::getImage(Type t) const
+TarFileMaskedImage * Tartan::getTartanMaskedImage (Type t) const
 {
   switch (t)
     {
-    case Tartan::LEFT:
-      return d_left_tartan_image;
-    case Tartan::CENTER:
-      return d_center_tartan_image;
-    case Tartan::RIGHT:
-      return d_right_tartan_image;
+    case Tartan::LEFT: return d_left_mimage;
+    case Tartan::CENTER: return d_center_mimage;
+    case Tartan::RIGHT: return d_right_mimage;
     }
-  return d_left_tartan_image;
-}
-
-PixMask *Tartan::getMask(Type t) const
-{
-  switch (t)
-    {
-    case Tartan::LEFT:
-      return d_left_tartan_mask;
-    case Tartan::CENTER:
-      return d_center_tartan_mask;
-    case Tartan::RIGHT:
-      return d_right_tartan_mask;
-    }
-  return d_left_tartan_mask;
-}
-
-void Tartan::setImage(Type t, PixMask *i)
-{
-  switch (t)
-    {
-    case Tartan::LEFT:
-      d_left_tartan_image = i;
-      break;
-    case Tartan::CENTER:
-      d_center_tartan_image = i;
-      break;
-    case Tartan::RIGHT:
-      d_right_tartan_image = i;
-      break;
-    }
-}
-
-void Tartan::setMask(Type t, PixMask *i)
-{
-  switch (t)
-    {
-    case Tartan::LEFT:
-      d_left_tartan_mask = i;
-      break;
-    case Tartan::CENTER:
-      d_center_tartan_mask = i;
-      break;
-    case Tartan::RIGHT:
-      d_right_tartan_mask = i;
-      break;
-    }
+  return d_left_mimage;
 }
 
 Glib::ustring Tartan::tartanTypeToFriendlyName(const Tartan::Type type)
@@ -230,25 +98,4 @@ Glib::ustring Tartan::tartanTypeToFriendlyName(const Tartan::Type type)
       case Tartan::RIGHT: return _("Right");
     }
   return _("Left");
-}
-    
-Glib::ustring Tartan::getTartanImageName (Tartan::Type type) const
-{
-  switch (type)
-    {
-      case Tartan::LEFT: return d_left_tartan_name;
-      case Tartan::CENTER: return d_center_tartan_name;
-      case Tartan::RIGHT: return d_right_tartan_name;
-    }
-  return "";
-}
-
-void Tartan::setTartanImageName (Tartan::Type type, Glib::ustring name)
-{
-  switch (type)
-    {
-      case Tartan::LEFT: d_left_tartan_name = name; break;
-      case Tartan::CENTER: d_center_tartan_name = name; break;
-      case Tartan::RIGHT: d_right_tartan_name = name; break;
-    }
 }

@@ -31,6 +31,7 @@
 
 class XML_Helper;
 class Tar_Helper;
+class TarFileMaskedImage;
 
 //! An army prototype object.  Appears in an armyset file.
 class ArmyProto : public ArmyProtoBase
@@ -57,18 +58,6 @@ class ArmyProto : public ArmyProtoBase
         //! Sets the Type Id of the Army.
         void setId(guint32 id) {d_id = id;};
 
-	//! Sets the filename of the image.
-	void setImageName(Shield::Colour c,Glib::ustring name) {d_image_name[c] = name;}
-
-        //! Set the basic image of the Army.
-        void setImage(Shield::Colour c, PixMask* image) {d_image[c] = image;};
-
-        //! Set the image mask of the unit type (for player colours).
-        void setMask(Shield::Colour c, PixMask* mask) {d_mask[c] = mask;};
-
-        //! Clear the names, images and masks of the army.
-        void clearImage (Shield::Colour c, bool clear_name = true);
-
 	//! Sets whether or not this Army prototype can found in a ruin.
 	void setDefendsRuins(bool defends) {d_defends_ruins = defends; }
 
@@ -89,19 +78,9 @@ class ArmyProto : public ArmyProtoBase
         //! Returns the Type Id of this Army prototype.
         guint32 getId() const {return d_id;};
 
-	//! Returns the basename of the picture's filename
-	/**
-	 * Returns the filename that holds the image for this Army.
-	 * The filename does not have a path, and the filename does
-	 * not have an extension (e.g. .png).
-	 */
-	Glib::ustring getImageName(Shield::Colour c) const {return d_image_name[c];}
-
-        //! Get the image of the army prototype. 
-	PixMask* getImage(Shield::Colour c) const {return d_image[c];};
-
-        //! Returns the mask (read-only) for player colors.
-	PixMask* getMask(Shield::Colour c) const {return d_mask[c];}
+	//! Returns the army's masked image object
+        TarFileMaskedImage *getMaskedImage (Shield::Colour c) const
+          {return d_mimage[c];}
 
 	//! Gets whether or not this army type can found in a ruin.
 	bool getDefendsRuins() const {return d_defends_ruins; }
@@ -126,12 +105,8 @@ class ArmyProto : public ArmyProtoBase
 	void instantiateImages(guint32 tilesize, Tar_Helper *t, bool scale,
                                bool &broken);
 
-	//! Load the ArmyProto image in the given filename.
-	void loadImage(int tilesize, Shield::Colour c, Glib::ustring image_filename, bool scale, bool &broken);
-
         //! Instantiate the image for the given colour from the lwa file.
-        bool instantiateImage (Glib::ustring cfgfile, guint32 ts, 
-                               Shield::Colour col);
+        bool instantiateImage (Glib::ustring cfgfile, Shield::Colour col);
 
 	//! Destroy the images associated with this ArmyProto object.
 	void uninstantiateImages();
@@ -159,15 +134,6 @@ class ArmyProto : public ArmyProtoBase
         //! The Type Id of this Army prototype.
         guint32 d_id;
 
-	//! The picture of the Army prototype.
-	/**
-	 * There is an image for each player, plus the neutral player.
-	 */
-	PixMask* d_image[MAX_PLAYERS + 1];
-
-	//! The mask portion of the Army prototype picture.
-	PixMask* d_mask[MAX_PLAYERS + 1];
-        
 	//! Whether or not the Army prototype can defend a Ruin.
 	/**
 	 * Some Army unit can be the guardian of a Ruin.  Hero units fight
@@ -203,6 +169,9 @@ class ArmyProto : public ArmyProtoBase
 	 * Heroes have genders, and regular armies do not.
 	 */
 	Hero::Gender d_gender;
+
+        //! a set of masked images, one per player plus neutral.
+        TarFileMaskedImage * d_mimage[MAX_PLAYERS + 1];
 };
 
 #endif // ARMY_PROTO_H

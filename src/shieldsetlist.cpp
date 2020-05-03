@@ -27,6 +27,7 @@
 #include "ucompose.hpp"
 #include "tarhelper.h"
 #include "setlist.h"
+#include "TarFileMaskedImage.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -95,26 +96,22 @@ ShieldStyle *Shieldsetlist::getShield(guint32 shieldset, guint32 type, guint32 c
 void Shieldsetlist::instantiateImages(bool &broken)
 {
   broken = false;
-  for (iterator it = begin(); it != end(); it++)
-    {
-      if (!broken)
-        {
-          if ((*it)->validate () == true)
-            (*it)->instantiateImages(true, broken);
-        }
-    }
+  for (iterator it = begin (); it != end (); it++)
+    if (!broken)
+      if ((*it)->validate () == true)
+        (*it)->instantiateImages (true, broken);
 }
 
 void Shieldsetlist::uninstantiateImages()
 {
-  for (iterator it = begin(); it != end(); it++)
-    (*it)->uninstantiateImages();
+  for (iterator it = begin (); it != end (); it++)
+    (*it)->uninstantiateImages ();
 }
 
-void Shieldsetlist::getTartan(guint32 shieldset, guint32 colour, Tartan::Type type, PixMask **image, PixMask **mask) const
+TarFileMaskedImage *Shieldsetlist::getTartan(guint32 shieldset, guint32 colour, Tartan::Type type) const
 {
-  Shieldset *s = get(shieldset);
+  Shieldset *s = get (shieldset);
   if (!s)
-    return;
-  s->lookupTartanImage(colour, type, image, mask);
+    return NULL;
+  return s->lookupTartanImage (colour, type);
 }

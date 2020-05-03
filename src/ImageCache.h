@@ -71,6 +71,7 @@ class StatusPixMaskCacheItem;
 class GameButtonPixMaskCacheItem;
 class DialogPixMaskCacheItem;
 class MedalPixMaskCacheItem;
+class TarFileMaskedImage;
 
 //! Cache for generated army and map images.
 /** Soliton class for caching army and map images
@@ -454,7 +455,7 @@ class ImageCache
         PixMask* getMoveBonusPic(guint32 tileset_id, guint32 bonus, guint32 font_size);
         PixMask* getDefaultTileStyleImage(guint32 type);
         PixMask* getMedalImage(bool large, int type);
-        PixMask *getNewLevelImage(bool female, bool mask);
+        TarFileMaskedImage *getHeroNewLevelMaskedImage (bool female);
         PixMask* getSmallRuinedCityImage();
 	//! Return a small hero picture, either white (active==true) or black.
         PixMask* getSmallHeroImage(bool active);
@@ -485,9 +486,6 @@ class ImageCache
         PixMask *getCommentatorPic ();
 
         PixMask* getGameButtonImage(guint32 type);
-
-	static PixMask* applyMask(PixMask* image, PixMask* mask, const Player* p);
-	static PixMask* applyMask(PixMask* image, PixMask* mask, Gdk::RGBA colour);
 
 	static PixMask* greyOut(PixMask* image);
 
@@ -553,10 +551,7 @@ class ImageCache
         PixMask* d_diplomacy[2][DIPLOMACY_TYPES];
         PixMask* d_cursor[CURSOR_TYPES];
         PixMask* d_prodshield[PRODUCTION_SHIELD_TYPES];
-	PixMask *d_newlevel_male;
-	PixMask *d_newlevelmask_male;
-	PixMask *d_newlevel_female;
-	PixMask *d_newlevelmask_female;
+        TarFileMaskedImage* d_hero_newlevel[2];
         PixMask *d_default_tilestyles[DEFAULT_TILESTYLE_TYPES];
         PixMask* d_medal[2][MEDAL_TYPES];
 	PixMask* d_smallruinedcity;
@@ -590,8 +585,6 @@ class SelectorPixMaskCacheItem
 {
 public:
     static PixMask *generate(SelectorPixMaskCacheItem item);
-    static bool loadSelectorImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale);
-    static bool loadSelectors(PixMask *p, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale);
     int comp(const SelectorPixMaskCacheItem item) const;
     bool operator == (const SelectorPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const SelectorPixMaskCacheItem &c) const {return comp(c)<0;};
@@ -629,8 +622,6 @@ class FlagPixMaskCacheItem
 {
 public:
     static PixMask *generate(FlagPixMaskCacheItem item);
-    static bool loadFlagImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale);
-    static bool loadFlagImages(PixMask *p, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale);
     int comp(const FlagPixMaskCacheItem item) const;
     bool operator == (const FlagPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const FlagPixMaskCacheItem &c) const {return comp(c)<0;};

@@ -101,8 +101,7 @@
 [type: gettext/glade]dat/glade/editor/armyset-selector-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/tileset-flag-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/tileset-explosion-picture-editor-dialog.ui
-[type: gettext/glade]dat/glade/editor/masked-image-editor-dialog.ui
-[type: gettext/glade]dat/glade/editor/per-player-masked-image-editor-dialog.ui
+[type: gettext/glade]dat/glade/editor/tar-file-masked-image-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/image-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/tileset-window.ui
 [type: gettext/glade]dat/glade/editor/tilestyle-organizer-dialog.ui
@@ -228,6 +227,7 @@ src/tartan.cpp
 src/ScenarioMedia.cpp
 src/scenario-list.cpp
 src/scenario-details.cpp
+src/TarFileMaskedImage.cpp
 src/gui/image-helpers.cpp
 src/gui/city-window.cpp
 src/gui/preferences-dialog.cpp
@@ -313,8 +313,7 @@ src/editor/armyset-selector-editor-dialog.cpp
 src/editor/editor-quit-dialog.cpp
 src/editor/editor-splash-window.cpp
 src/editor/image-editor-dialog.cpp
-src/editor/masked-image-editor-dialog.cpp
-src/editor/per-player-masked-image-editor-dialog.cpp
+src/editor/tar-file-masked-image-editor-dialog.cpp
 src/editor/fight-order-editor-dialog.cpp
 src/editor/battle-calculator-dialog.cpp
 src/editor/media-dialog.cpp

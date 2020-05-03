@@ -27,6 +27,7 @@
 
 class XML_Helper;
 class TarFile;
+class TarFileMaskedImage;
 
 //! Scenario Media provides images/sounds/music for the scenario
 /**
@@ -56,6 +57,9 @@ class ScenarioMedia
 
         //Get methods
 
+        TarFileMaskedImage *getHeroNewLevelMaskedImage (bool female)
+          {return d_hero_newlevel[female ? 1 : 0];}
+
         Glib::ustring getNextTurnImageName() {return d_next_turn_name;}
         Glib::ustring getCityDefeatedImageName() {return d_city_defeated_name;}
         Glib::ustring getWinningImageName() {return d_winning_name;}
@@ -65,8 +69,6 @@ class ScenarioMedia
         Glib::ustring getRuinDefeatImageName() {return d_ruin_defeat_name;}
         Glib::ustring getParleyOfferedImageName() {return d_parley_offered_name;}
         Glib::ustring getParleyRefusedImageName() {return d_parley_refused_name;}
-        Glib::ustring getHeroNewLevelMaleImageName() {return d_hero_newlevel_male_name;}
-        Glib::ustring getHeroNewLevelFemaleImageName() {return d_hero_newlevel_female_name;}
         Glib::ustring getSmallMedalsImageName() {return d_small_medals_name;}
         Glib::ustring getBigMedalsImageName() {return d_big_medals_name;}
         Glib::ustring getCommentatorImageName() {return d_commentator_name;}
@@ -86,10 +88,6 @@ class ScenarioMedia
         PixMask *getRuinDefeatImage() {return d_ruin_defeat_image;}
         PixMask *getParleyOfferedImage() {return d_parley_offered_image;}
         PixMask *getParleyRefusedImage() {return d_parley_refused_image;}
-        PixMask *getHeroNewLevelMaleImage() {return d_hero_newlevel_male_image;}
-        PixMask *getHeroNewLevelMaleMask() {return d_hero_newlevel_male_mask;}
-        PixMask *getHeroNewLevelFemaleImage() {return d_hero_newlevel_female_image;}
-        PixMask *getHeroNewLevelFemaleMask() {return d_hero_newlevel_female_mask;}
         PixMask *getSmallMedalImage(guint32 i)
           {return d_small_medal_images.size () > i ? d_small_medal_images[i] : NULL;}
         PixMask *getBigMedalImage(guint32 i)
@@ -107,8 +105,6 @@ class ScenarioMedia
         void clearParleyRefusedImage(bool clear_name = true);
         void clearSmallMedalImage(bool clear_name = true);
         void clearBigMedalImage(bool clear_name = true);
-        void clearHeroNewLevelMaleImage (bool clear_name = true);
-        void clearHeroNewLevelFemaleImage (bool clear_name = true);
         void clearCommentatorImage (bool clear_name = true);
 
         bool instantiateNextTurnImage(TarFile *t);
@@ -140,8 +136,6 @@ class ScenarioMedia
         void setRuinDefeatImageName(Glib::ustring n) {d_ruin_defeat_name = n;}
         void setParleyOfferedImageName(Glib::ustring n) {d_parley_offered_name = n;}
         void setParleyRefusedImageName(Glib::ustring n) {d_parley_refused_name = n;}
-        void setHeroNewLevelMaleImageName(Glib::ustring n) {d_hero_newlevel_male_name = n;}
-        void setHeroNewLevelFemaleImageName(Glib::ustring n) {d_hero_newlevel_female_name = n;}
         void setSmallMedalsImageName(Glib::ustring n) {d_small_medals_name = n;}
         void setBigMedalsImageName(Glib::ustring n) {d_big_medals_name = n;}
         void setCommentatorImageName(Glib::ustring n) {d_commentator_name = n;}
@@ -155,13 +149,6 @@ class ScenarioMedia
         void setRuinDefeatImage(PixMask *i) {d_ruin_defeat_image = i;}
         void setParleyOfferedImage(PixMask *i) {d_parley_offered_image = i;}
         void setParleyRefusedImage(PixMask *i) {d_parley_refused_image = i;}
-        void setHeroNewLevelMaleImage(PixMask *i)
-          {d_hero_newlevel_male_image=i;}
-        void setHeroNewLevelMaleMask(PixMask *m) {d_hero_newlevel_male_mask=m;}
-        void setHeroNewLevelFemaleImage(PixMask *i)
-          {d_hero_newlevel_female_image=i;}
-        void setHeroNewLevelFemaleMask(PixMask *m)
-          {d_hero_newlevel_female_mask=m;}
         void setSmallMedalsImage(guint32 n, PixMask *i)
           { if (n < d_small_medal_images.size ()) d_small_medal_images[n] = i;}
         void setBigMedalsImage(guint32 n, PixMask *i)
@@ -224,6 +211,10 @@ class ScenarioMedia
 
         //data
         static ScenarioMedia* d_instance;
+
+        //! The image shown when the hero levels up.  0 is male, 1 is female
+        TarFileMaskedImage *d_hero_newlevel[2];
+
         Glib::ustring d_next_turn_name;
         Glib::ustring d_city_defeated_name;
         Glib::ustring d_winning_name;
@@ -233,8 +224,6 @@ class ScenarioMedia
         Glib::ustring d_ruin_defeat_name;
         Glib::ustring d_parley_offered_name;
         Glib::ustring d_parley_refused_name;
-        Glib::ustring d_hero_newlevel_male_name;
-        Glib::ustring d_hero_newlevel_female_name;
         Glib::ustring d_small_medals_name;
         Glib::ustring d_big_medals_name;
         Glib::ustring d_commentator_name;
@@ -257,16 +246,11 @@ class ScenarioMedia
         PixMask *d_ruin_defeat_image;
         PixMask *d_parley_offered_image;
         PixMask *d_parley_refused_image;
-        PixMask *d_hero_newlevel_male_image;
-        PixMask *d_hero_newlevel_male_mask;
-        PixMask *d_hero_newlevel_female_image;
-        PixMask *d_hero_newlevel_female_mask;
         std::vector<PixMask *> d_small_medal_images;
         std::vector<PixMask *> d_big_medal_images;
         PixMask *d_commentator_image;
 
         //helpers
-        void instantiateMaskedImage(Tar_Helper &t, Glib::ustring name, PixMask **image, PixMask **mask, bool &broken);
         void instantiateImage(Tar_Helper &t, Glib::ustring name, PixMask **image, bool &broken);
         void instantiateImageRow(Tar_Helper &t, Glib::ustring name, int num, std::vector<PixMask *>&images, bool &broken);
         void uninstantiateImages();

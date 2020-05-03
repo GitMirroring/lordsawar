@@ -53,6 +53,7 @@
 #include "ItemProto.h"
 #include "Itemlist.h"
 #include "armyprodbase.h"
+#include "TarFileMaskedImage.h"
 
 int max_vector_width;
       
@@ -990,10 +991,10 @@ copy_armyset_images (Armyset *armyset, Armyset *default_armyset, ArmyProto *army
   for (int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
       Glib::ustring f =
-        default_armyset->getFileFromConfigurationFile(default_army->getImageName(Shield::Colour(i)));
+        default_armyset->getFileFromConfigurationFile(default_army->getMaskedImage(Shield::Colour(i))->getName ());
       Glib::ustring outfile = "";
       armyset->addFileInCfgFile(f, outfile);
-      army->setImageName(Shield::Colour(i), outfile);
+      army->getMaskedImage(Shield::Colour(i))->setName (outfile);
     }
 }
 
@@ -1044,15 +1045,15 @@ copy_other_armyset_images (Armyset *default_armyset, Armyset *armyset)
   armyset->addFileInCfgFile(f, outfile);
   armyset->setBagImageName(outfile);
 
-  f = default_armyset->getFileFromConfigurationFile(default_armyset->getShipImageName());
+  f = default_armyset->getFileFromConfigurationFile(default_armyset->getShip()->getName ());
   outfile = "";
   armyset->addFileInCfgFile(f, outfile);
-  armyset->setShipImageName(outfile);
+  armyset->getShip()->setName(outfile);
 
-  f = default_armyset->getFileFromConfigurationFile(default_armyset->getStandardImageName());
+  f = default_armyset->getFileFromConfigurationFile(default_armyset->getStandard()->getName());
   outfile = "";
   armyset->addFileInCfgFile(f, outfile);
-  armyset->setStandardImageName(outfile);
+  armyset->getStandard()->setName(outfile);
 }
 
 static Armyset* 

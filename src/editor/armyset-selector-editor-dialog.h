@@ -26,6 +26,8 @@
 #include "lw-editor-dialog.h"
 #include "shield.h"
 
+class TarFileMaskedImage;
+
 //! Armyset selector editor.
 //! Shows and manages the large/small army unit selector animation, per side.
 class ArmysetSelectorEditorDialog: public LwEditorDialog
@@ -45,8 +47,8 @@ class ArmysetSelectorEditorDialog: public LwEditorDialog
     Gtk::ComboBoxText *shield_theme_combobox;
     Gtk::Grid *preview_table;
     Armyset *d_armyset;
-    PixMask *small_selector;
-    PixMask *large_selector;
+    TarFileMaskedImage *small_selector;
+    TarFileMaskedImage *large_selector;
     std::list<Glib::RefPtr<Gdk::Pixbuf> > selectors;
     sigc::connection heartbeat;
     std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator frame;
@@ -67,7 +69,6 @@ class ArmysetSelectorEditorDialog: public LwEditorDialog
     void fill_imagebutton ();
     Glib::ustring get_selector_filename ();
     void set_selector_filename (Glib::ustring f);
-    bool load_selector_image (Glib::ustring filename);
     void clear_selector_image ();
     Gtk::FileChooserDialog* image_filechooser(bool clear);
     Shield::Colour get_selected_colour ();

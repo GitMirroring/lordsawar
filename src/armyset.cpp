@@ -34,6 +34,7 @@
 #include "rnd.h"
 #include "player.h"
 #include "ImageCache.h"
+#include "TarFileMaskedImage.h"
 
 Glib::ustring Armyset::d_tag = "armyset";
 Glib::ustring Armyset::file_extension = ARMYSET_EXT;
@@ -46,22 +47,19 @@ Armyset::Armyset(guint32 id, Glib::ustring name)
  : Set(ARMYSET_EXT, id, name, DEFAULT_ARMY_TILE_SIZE), d_bag(0)
 {
   d_bag_name = "";
-  d_stackship_name = "";
-  d_standard_name = "";
+  d_stackship = new TarFileMaskedImage ();
+  d_standard = new TarFileMaskedImage ();
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
-      Shield::Colour c = Shield::Colour (i);
-      setLargeSelectorFilename (c, "");
-      setSmallSelectorFilename (c, "");
+      d_selector[0][i] = new TarFileMaskedImage ();
+      d_selector[1][i] = new TarFileMaskedImage ();
     }
 
-  clear_vectors ();
 }
 
 void Armyset::read_selector_name (XML_Helper *helper, Shield::Colour c, bool large)
 {
   Glib::ustring name = "";
-  Glib::ustring file = "";
   if (c == Shield::NEUTRAL)
     return;
   switch (c)
@@ -80,64 +78,28 @@ void Armyset::read_selector_name (XML_Helper *helper, Shield::Colour c, bool lar
     name += "_large_selector";
   else
     name += "_small_selector";
+  d_selector[large ? 1 : 0][c]->load_name (helper, name);
 
-  helper->getData(file, name);
-  File::add_png_if_no_ext (file);
-
-  if (large)
-    {
-      switch (c)
-        {
-        case Shield::WHITE: d_large_white_selector = file; break;
-        case Shield::GREEN: d_large_green_selector = file; break;
-        case Shield::YELLOW: d_large_yellow_selector = file; break;
-        case Shield::LIGHT_BLUE: d_large_light_blue_selector = file; break;
-        case Shield::ORANGE: d_large_orange_selector = file; break;
-        case Shield::DARK_BLUE: d_large_dark_blue_selector = file; break;
-        case Shield::RED: d_large_red_selector = file; break;
-        case Shield::BLACK: d_large_black_selector = file; break;
-        default: break;
-        }
-    }
-  else
-    {
-      switch (c)
-        {
-        case Shield::WHITE: d_small_white_selector = file; break;
-        case Shield::GREEN: d_small_green_selector = file; break;
-        case Shield::YELLOW: d_small_yellow_selector = file; break;
-        case Shield::LIGHT_BLUE: d_small_light_blue_selector = file; break;
-        case Shield::ORANGE: d_small_orange_selector = file; break;
-        case Shield::DARK_BLUE: d_small_dark_blue_selector = file; break;
-        case Shield::RED: d_small_red_selector = file; break;
-        case Shield::BLACK: d_small_black_selector = file; break;
-        default: break;
-        }
-    }
 }
 
 Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
  : Set(ARMYSET_EXT, helper), d_bag(0)
 {
   d_bag_name = "";
-  d_stackship_name = "";
-  d_standard_name = "";
+  d_stackship = new TarFileMaskedImage ();
+  d_standard = new TarFileMaskedImage ();
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
-      Shield::Colour c = Shield::Colour (i);
-      setLargeSelectorFilename (c, "");
-      setSmallSelectorFilename (c, "");
+      d_selector[0][i] = new TarFileMaskedImage ();
+      d_selector[1][i] = new TarFileMaskedImage ();
     }
 
-  clear_vectors ();
   setDirectory(directory);
   guint32 ts;
   helper->getData(ts, "tilesize");
   setTileSize(ts);
-  helper->getData(d_stackship_name, "stackship");
-  File::add_png_if_no_ext (d_stackship_name);
-  helper->getData(d_standard_name, "plantedstandard");
-  File::add_png_if_no_ext (d_standard_name);
+  d_stackship->load_name (helper, "stackship");
+  d_standard->load_name (helper, "plantedstandard");
   helper->getData(d_bag_name, "bag");
   File::add_png_if_no_ext (d_bag_name);
 
@@ -154,97 +116,18 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
 Armyset::Armyset(const Armyset& a)
  : std::list<ArmyProto*>(), sigc::trackable(a), Set(a), d_bag(0)
 {
-  for (guint32 i = 0; i < a.d_ship.size (); i++)
-    d_ship.push_back (a.d_ship[i]->copy ());
-
-  for (guint32 i = 0; i < a.d_shipmask.size (); i++)
-    d_shipmask.push_back (a.d_shipmask[i]->copy ());
-
-  for (guint32 i = 0; i < a.d_ship.size (); i++)
-    d_standard.push_back (a.d_standard[i]->copy ());
-
-  for (guint32 i = 0; i < a.d_standard_mask.size (); i++)
-    d_standard_mask.push_back (a.d_standard_mask[i]->copy ());
+  d_stackship = new TarFileMaskedImage (*a.d_stackship);
+  d_standard = new TarFileMaskedImage (*a.d_standard);
 
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
-      Shield::Colour c = Shield::Colour (i);
-      setSmallSelectorFilename (c, a.getSmallSelectorFilename (c));
-    }
-
-  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    {
-      Shield::Colour c = Shield::Colour (i);
-      setLargeSelectorFilename (c, a.getLargeSelectorFilename (c));
-    }
-        
-  clear_vectors ();
-
-  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    {
-      Shield::Colour c = Shield::Colour (i);
-      setNumberOfSelectorFrames (c, a.getNumberOfSelectorFrames (c));
-    }
-
-  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    {
-      Shield::Colour c = Shield::Colour (i);
-      setNumberOfSmallSelectorFrames (c, a.getNumberOfSmallSelectorFrames (c));
-    }
-
-  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    {
-      Shield::Colour c = Shield::Colour (i);
-      for (guint32 j = 0; j < getNumberOfSelectorFrames (c); j++)
-        {
-          if (a.getSelectorImage (c, j))
-            setSelectorImage (c, j, a.getSelectorImage (c, j)->copy ());
-          else
-            setSelectorImage (c, j, NULL);
-        }
-    }
-
-  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    {
-      Shield::Colour c = Shield::Colour (i);
-      for (guint32 j = 0; j < getNumberOfSmallSelectorFrames (c); j++)
-        {
-          if (a.getSmallSelectorImage (c, j))
-            setSmallSelectorImage (c, j, a.getSmallSelectorImage (c, j)->copy ());
-          else
-            setSmallSelectorImage (c, j, NULL);
-        }
-    }
-
-  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    {
-      Shield::Colour c = Shield::Colour (i);
-      for (guint32 j = 0; j < getNumberOfSelectorFrames (c); j++)
-        {
-          if (a.getSelectorMask (c, j))
-            setSelectorMask (c, j, a.getSelectorMask (c, j)->copy ());
-          else
-            setSelectorMask (c, j, NULL);
-        }
-    }
-
-  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    {
-      Shield::Colour c = Shield::Colour (i);
-      for (guint32 j = 0; j < getNumberOfSmallSelectorFrames (c); j++)
-        {
-          if (a.getSmallSelectorMask (c, j))
-            setSmallSelectorMask (c, j, a.getSmallSelectorMask (c, j)->copy ());
-          else
-            setSmallSelectorMask (c, j, NULL);
-        }
+      d_selector[0][i] = new TarFileMaskedImage (*a.d_selector[0][i]);
+      d_selector[1][i] = new TarFileMaskedImage (*a.d_selector[1][i]);
     }
 
   if (a.d_bag)
     d_bag = a.d_bag->copy();
 
-  d_standard_name = a.d_standard_name;
-  d_stackship_name = a.d_stackship_name;
   d_bag_name = a.d_bag_name;
 
   for (const_iterator i = a.begin(); i != a.end(); i++)
@@ -262,13 +145,13 @@ Armyset::~Armyset()
 
 bool Armyset::loadArmyProto(Glib::ustring tag, XML_Helper* helper)
 {
-    if (tag == ArmyProto::d_tag)
-      {
-        ArmyProto *a = new ArmyProto(helper);
-        a->setArmyset(getId());
-        push_back(a);
-      }
-    return true;
+  if (tag == ArmyProto::d_tag)
+    {
+      ArmyProto *a = new ArmyProto(helper);
+      a->setArmyset(getId());
+      push_back(a);
+    }
+  return true;
 }
 
 bool Armyset::save(Glib::ustring filename, Glib::ustring ext) const
@@ -308,38 +191,7 @@ void Armyset::write_selector_name (XML_Helper *helper, Shield::Colour c, bool la
     name += "_large_selector";
   else
     name += "_small_selector";
-  Glib::ustring filename = "";
-  if (large)
-    {
-      switch (c)
-        {
-        case Shield::WHITE: filename = d_large_white_selector; break;
-        case Shield::GREEN: filename = d_large_green_selector; break;
-        case Shield::YELLOW: filename = d_large_yellow_selector; break;
-        case Shield::LIGHT_BLUE: filename = d_large_light_blue_selector; break;
-        case Shield::ORANGE: filename = d_large_orange_selector; break;
-        case Shield::DARK_BLUE: filename = d_large_dark_blue_selector; break;
-        case Shield::RED: filename = d_large_red_selector; break;
-        case Shield::BLACK: filename = d_large_black_selector; break;
-        default: break;
-        }
-    }
-  else
-    {
-      switch (c)
-        {
-        case Shield::WHITE: filename = d_small_white_selector; break;
-        case Shield::GREEN: filename = d_small_green_selector; break;
-        case Shield::YELLOW: filename = d_small_yellow_selector; break;
-        case Shield::LIGHT_BLUE: filename = d_small_light_blue_selector; break;
-        case Shield::ORANGE: filename = d_small_orange_selector; break;
-        case Shield::DARK_BLUE: filename = d_small_dark_blue_selector; break;
-        case Shield::RED: filename = d_small_red_selector; break;
-        case Shield::BLACK: filename = d_small_black_selector; break;
-        default: break;
-        }
-    }
-  helper->saveData(name, filename);
+  helper->saveData(name, d_selector[large ? 1 : 0][c]->getName ());
 }
 
 bool Armyset::save(XML_Helper* helper) const
@@ -350,8 +202,8 @@ bool Armyset::save(XML_Helper* helper) const
 
     retval &= Set::save(helper);
     retval &= helper->saveData("tilesize", getUnscaledTileSize());
-    retval &= helper->saveData("stackship", d_stackship_name);
-    retval &= helper->saveData("plantedstandard", d_standard_name);
+    retval &= helper->saveData("stackship", d_stackship->getName ());
+    retval &= helper->saveData("plantedstandard", d_standard->getName ());
     retval &= helper->saveData("bag", d_bag_name);
 
     for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
@@ -412,6 +264,7 @@ ArmyProto * Armyset::lookupArmyByGender(Hero::Gender gender) const
     }
   return  NULL;
 }
+
 ArmyProto * Armyset::lookupArmyByStrengthAndTurns(guint32 str, guint32 turns) const
 {
   for (const_iterator it = begin(); it != end(); it++)
@@ -519,37 +372,33 @@ bool Armyset::validateAwardables()
     return false;
   return true;
 }
+
 bool Armyset::validateShip()
 {
-  if (getShipImageName() == "")
-    return false;
-  return true;
+  return d_stackship->getName () == "" ? false : true;
 }
 
 bool Armyset::validateBag()
 {
-  if (getBagImageName() == "")
-    return false;
-  return true;
+  return getBagImageName () == "" ? false : true;
 }
 
 bool Armyset::validateStandard()
 {
-  if (getStandardImageName() == "")
-    return false;
-  return true;
+  return d_standard->getName () == "" ? false : true;
 }
 
 bool Armyset::validateArmyUnitImage(ArmyProto *army, Shield::Colour &c)
 {
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
-    if (army->getImageName(Shield::Colour(i)) == "")
+    if (army->getMaskedImage(Shield::Colour(i))->getName () == "")
       {
 	c = Shield::Colour(i);
 	return false;
       }
   return true;
 }
+
 bool Armyset::validateArmyUnitImages()
 {
   Shield::Colour c;
@@ -567,6 +416,7 @@ bool Armyset::validateArmyUnitName(ArmyProto *army)
     return false;
   return true;
 }
+
 bool Armyset::validateArmyUnitNames()
 {
   for (iterator it = begin(); it != end(); it++)
@@ -576,6 +426,7 @@ bool Armyset::validateArmyUnitNames()
     }
   return true;
 }
+
 bool Armyset::validateArmyTypeIds()
 {
   std::list<guint32> ids = std::list<guint32>();
@@ -588,6 +439,7 @@ bool Armyset::validateArmyTypeIds()
     }
   return true;
 }
+
 bool Armyset::validate()
 {
   if (String::utrim (getName ()) == "")
@@ -713,31 +565,30 @@ void Armyset::instantiateImages(bool scale, bool &broken)
   for (iterator it = begin(); it != end(); ++it)
     (*it)->instantiateImages(getUnscaledTileSize(), &t, scale, broken);
 
-  Glib::ustring ship_filename = "";
-  Glib::ustring flag_filename = "";
+  Vector<int> scale_dim = Vector<int>(-1,-1);
+  if (scale)
+    scale_dim = Vector<int>(getUnscaledTileSize(),getUnscaledTileSize ());
+
+  broken = d_stackship->load (&t);
+  if (broken)
+    return;
+  d_stackship->instantiateImages (scale_dim);
+
+  broken = d_standard->load (&t);
+  if (broken)
+    return;
+  d_standard->instantiateImages (scale_dim);
+
   Glib::ustring bag_filename = "";
-  if (getShipImageName().empty() == false && !broken)
-    ship_filename = t.getFile(getShipImageName(), broken);
-  if (getStandardImageName().empty() == false && !broken)
-    flag_filename = t.getFile(getStandardImageName(), broken);
   if (getBagImageName().empty() == false && !broken)
     bag_filename = t.getFile(getBagImageName(), broken);
 
   if (!broken)
     {
-
-      if (ship_filename.empty() == false)
-        loadShipPic(ship_filename, scale, broken);
-      if (flag_filename.empty() == false)
-        loadStandardPic(flag_filename, scale, broken);
       if (bag_filename.empty() == false)
         loadBagPic(bag_filename, broken);
     }
 
-  if (ship_filename.empty() == false)
-    File::erase(ship_filename);
-  if (flag_filename.empty() == false)
-    File::erase(flag_filename);
   if (bag_filename.empty() == false)
     File::erase(bag_filename);
       
@@ -752,52 +603,20 @@ bool Armyset::loadSelectorPics (Tar_Helper *t)
   bool broken = false;
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
-      Shield::Colour c = Shield::Colour (i);
-      Glib::ustring filename = "";
-      if (getLargeSelectorFilename (c) != "")
-        filename = t->getFile (getLargeSelectorFilename (c), broken);
-      if (filename.empty () == false)
+      if (d_selector[0][i]->getName ().empty () == false)
         {
-          std::vector<PixMask* > images;
-          std::vector<PixMask* > masks;
-          bool success =
-            SelectorPixMaskCacheItem::loadSelectorImages (filename, 
-                                                          getUnscaledTileSize(), 
-                                                          images, masks, true);
-          if (success)
-            {
-              setNumberOfSelectorFrames(c, images.size());
-              for (unsigned int j = 0; j < images.size(); j++)
-                {
-                  setSelectorImage(c, j, images[j]);
-                  setSelectorMask(c, j, masks[j]);
-                }
-            }
-          File::erase(filename);
+          broken = d_selector[0][i]->load (t);
+          if (broken)
+            break;
+          d_selector[0][i]->instantiateImages ();
         }
-      if (!broken)
+
+      if (d_selector[1][i]->getName ().empty () == false)
         {
-          filename = "";
-          if (getSmallSelectorFilename (c) != "")
-            filename = t->getFile (getSmallSelectorFilename (c), broken);
-          if (filename.empty () == false)
-            {
-              std::vector<PixMask* > images;
-              std::vector<PixMask* > masks;
-              bool success =
-                SelectorPixMaskCacheItem::loadSelectorImages
-                (filename, getUnscaledTileSize(), images, masks, true);
-              if (success)
-                {
-                  setNumberOfSmallSelectorFrames(c, images.size());
-                  for (unsigned int j = 0; j < images.size(); j++)
-                    {
-                      setSmallSelectorImage(c, j, images[j]);
-                      setSmallSelectorMask(c, j, masks[j]);
-                    }
-                }
-              File::erase(filename);
-            }
+          broken = d_selector[1][i]->load (t);
+          if (broken)
+            break;
+          d_selector[1][i]->instantiateImages ();
         }
     }
   return broken;
@@ -808,94 +627,19 @@ void Armyset::uninstantiateImages()
   for (iterator it = begin(); it != end(); it++)
     (*it)->uninstantiateImages();
 
-  for (guint32 i = 0; i < d_standard.size(); i++)
-    delete d_standard[i];
-  d_standard.clear ();
-
-  for (guint32 i = 0; i < d_standard_mask.size(); i++)
-    delete d_standard_mask[i];
-  d_standard_mask.clear ();
+  d_stackship->uninstantiateImages ();
+  d_standard->uninstantiateImages ();
 
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
-      Shield::Colour c = Shield::Colour (i);
-      for (guint32 j = 0; j < getNumberOfSelectorFrames (c); j++)
-        {
-          PixMask *p = getSelectorImage (c, j);
-          if (p)
-            delete p;
-        }
+      d_selector[0][i]->uninstantiateImages ();
+      d_selector[1][i]->uninstantiateImages ();
     }
-
-  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    {
-      Shield::Colour c = Shield::Colour (i);
-      for (guint32 j = 0; j < getNumberOfSelectorFrames (c); j++)
-        {
-          PixMask *p = getSelectorMask (c, j);
-          if (p)
-            delete p;
-        }
-    }
-
-  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    {
-      Shield::Colour c = Shield::Colour (i);
-      for (guint32 j = 0; j < getNumberOfSmallSelectorFrames (c); j++)
-        {
-          PixMask *p = getSmallSelectorImage (c, j);
-          if (p)
-            delete p;
-        }
-    }
-
-  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    {
-      Shield::Colour c = Shield::Colour (i);
-      for (guint32 j = 0; j < getNumberOfSmallSelectorFrames (c); j++)
-        {
-          PixMask *p = getSmallSelectorMask (c, j);
-          if (p)
-            delete p;
-        }
-    }
-  clear_vectors ();
 
   if (d_bag)
     delete d_bag;
 
-  for (guint32 i = 0; i < d_ship.size(); i++)
-    delete d_ship[i];
-  d_ship.clear ();
-
-  for (guint32 i = 0; i < d_shipmask.size(); i++)
-    delete d_shipmask[i];
-  d_shipmask.clear ();
-
   d_bag = NULL;
-}
-
-void Armyset::loadShipPic(Glib::ustring image_filename, bool scale,
-                          bool &broken)
-{
-  PixMask *p = PixMask::create (image_filename, broken);
-  if (broken)
-    return;
-  std::vector<PixMask*> pics =
-    disassemble_row(p->to_pixbuf (), MAX_PLAYERS, true);
-  std::vector<PixMask*> masks =
-    disassemble_row(p->to_pixbuf (), MAX_PLAYERS, false);
-  delete p;
-  if (scale)
-    {
-      int s = getUnscaledTileSize();
-      for (guint32 i = 0; i < pics.size (); i++)
-        PixMask::scale(pics[i], s, s);
-      for (guint32 i = 0; i < masks.size (); i++)
-        PixMask::scale(masks[i], s, s);
-    }
-  setShipImages (pics);
-  setShipMasks (masks);
 }
 
 void Armyset::loadBagPic(Glib::ustring image_filename, bool &broken)
@@ -915,29 +659,6 @@ void Armyset::loadBagPic(Glib::ustring image_filename, bool &broken)
           setBagPic(p);
         }
     }
-}
-
-void Armyset::loadStandardPic(Glib::ustring image_filename, bool scale,
-                              bool &broken)
-{
-  PixMask *p = PixMask::create (image_filename, broken);
-  if (broken)
-    return;
-  std::vector<PixMask*> pics =
-    disassemble_row(p->to_pixbuf (), MAX_PLAYERS, true);
-  std::vector<PixMask*> masks =
-    disassemble_row(p->to_pixbuf (), MAX_PLAYERS, false);
-  delete p;
-  if (scale)
-    {
-      int s = getUnscaledTileSize();
-      for (guint32 i = 0; i < pics.size (); i++)
-        PixMask::scale(pics[i], s, s);
-      for (guint32 i = 0; i < masks.size (); i++)
-        PixMask::scale(masks[i], s, s);
-    }
-  setStandardPics (pics);
-  setStandardMasks (masks);
 }
 
 void Armyset::switchArmysetForRuinKeeper(Army *army, const Armyset *armyset)
@@ -1194,17 +915,17 @@ bool Armyset::calculate_preferred_tile_size(guint32 &ts) const
   guint32 tilesize = 0;
   std::map<guint32, guint32> sizecounts;
 
-  if (d_ship.empty () == false)
-    sizecounts[d_ship[0]->get_unscaled_width()]++;
-  if (d_standard.empty () == false)
-    sizecounts[d_standard[0]->get_unscaled_width()]++;
+  if (d_stackship->getName ().empty () == false)
+    sizecounts[d_stackship->getImage(0)->get_unscaled_width()]++;
+  if (d_standard->getName ().empty () == false)
+    sizecounts[d_standard->getImage(0)->get_unscaled_width()]++;
   if (d_bag)
     sizecounts[d_bag->get_unscaled_width()]++;
   for (const_iterator it = begin(); it != end(); it++)
     {
       ArmyProto *a = (*it);
-      if (a->getImage(Shield::NEUTRAL) != NULL)
-        sizecounts[a->getImage(Shield::NEUTRAL)->get_unscaled_width()]++;
+      if (a->getMaskedImage(Shield::NEUTRAL)->getImage () != NULL)
+        sizecounts[a->getMaskedImage(Shield::NEUTRAL)->getImage ()->get_unscaled_width()]++;
     }
 
   guint32 maxcount = 0;
@@ -1280,30 +1001,6 @@ ArmyProto *Armyset::lookupWeakestQuickestArmy() const
   return p;
 }
 
-void Armyset::clearStandardImage (bool clear_name)
-{
-  if (clear_name)
-    setStandardImageName ("");
-
-  std::vector<PixMask *>pics = getStandardPics ();
-  for (auto  p : pics)
-    {
-      if (p)
-        delete p;
-    }
-  pics.clear ();
-  setStandardPics (pics);
-
-  pics = getStandardMasks ();
-  for (auto p : pics)
-    {
-      if (p)
-        delete p;
-    }
-  pics.clear ();
-  setStandardMasks (pics);
-}
-
 void Armyset::clearBagImage (bool clear_name)
 {
   if (clear_name)
@@ -1313,30 +1010,6 @@ void Armyset::clearBagImage (bool clear_name)
   if (p)
     delete p;
   setBagPic (NULL);
-}
-
-void Armyset::clearShipImage (bool clear_name)
-{
-  if (clear_name)
-    setShipImageName ("");
-
-  std::vector<PixMask *>pics = getShipPics ();
-  for (auto  p : pics)
-    {
-      if (p)
-        delete p;
-    }
-  pics.clear ();
-  setShipImages (pics);
-
-  pics = getShipMasks ();
-  for (auto p : pics)
-    {
-      if (p)
-        delete p;
-    }
-  pics.clear ();
-  setShipMasks (pics);
 }
 
 bool Armyset::instantiateBagImage ()
@@ -1364,16 +1037,10 @@ bool Armyset::instantiateStandardImage ()
   Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
   if (broken)
     return broken;
-  Glib::ustring imgname = getStandardImageName();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          clearStandardImage (false);
-          loadStandardPic(filename, false, broken);
-        }
-    }
+  broken = d_standard->load (&t);
+  if (!broken)
+    d_standard->instantiateImages ();
+  t.Close ();
   return broken;
 }
 
@@ -1383,16 +1050,10 @@ bool Armyset::instantiateShipImage ()
   Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
   if (broken)
     return broken;
-  Glib::ustring imgname = getShipImageName();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          clearShipImage (false);
-          loadShipPic(filename, false, broken);
-        }
-    }
+  broken = d_stackship->load (&t);
+  if (!broken)
+    d_stackship->instantiateImages ();
+  t.Close ();
   return broken;
 }
 
@@ -1409,61 +1070,27 @@ void Armyset::uninstantiateSameNamedImages (Glib::ustring name)
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
       Shield::Colour c = Shield::Colour (i);
-      if (getLargeSelectorFilename (c) == name)
-        clearLargeSelectorImage (c);
-      if (getSmallSelectorFilename (c) == name)
-        clearSmallSelectorImage (c);
+      if (getSelector(true, c)->getName () == name)
+        getSelector(true, c)->clear ();
+      if (getSelector(false, c)->getName () == name)
+        getSelector(false, c)->clear ();
     }
+
   if (getBagImageName() == name)
     clearBagImage ();
-  if (getStandardImageName() == name)
-    clearStandardImage ();
-  if (getShipImageName() == name)
-    clearShipImage ();
+  if (d_standard->getName () == name)
+    d_standard->clear ();
+  if (d_stackship->getName () == name)
+    d_stackship->clear ();
+
   for (iterator i = begin (); i != end (); i++)
     {
       for (guint32 cc = Shield::WHITE; cc <= Shield::NEUTRAL; cc++)
         {
           Shield::Colour c = Shield::Colour (cc);
-          if ((*i)->getImageName (c) == name)
-            (*i)->clearImage (c);
+          if ((*i)->getMaskedImage(c)->getName () == name)
+            (*i)->getMaskedImage (c)-> clear ();
         }
-    }
-}
-
-void Armyset::clearSmallSelectorImage (Shield::Colour c, bool clear_name)
-{
-  if (clear_name)
-    setSmallSelectorFilename (c, "");
-
-  for (unsigned int i = 0; i < getNumberOfSmallSelectorFrames(c); i++)
-    {
-      PixMask *p = getSmallSelectorImage (c, i);
-      if (p)
-        delete p;
-      setSmallSelectorImage (c, i, NULL);
-      p = getSmallSelectorMask (c, i);
-      if (p)
-        delete p;
-      setSmallSelectorMask (c, i, NULL);
-    }
-}
-
-void Armyset::clearLargeSelectorImage (Shield::Colour c, bool clear_name)
-{
-  if (clear_name)
-    setLargeSelectorFilename (c, "");
-
-  for (unsigned int i = 0; i < getNumberOfSelectorFrames(c); i++)
-    {
-      PixMask *p = getSelectorImage (c, i);
-      if (p)
-        delete p;
-      setSelectorImage (c, i, NULL);
-      p = getSelectorMask (c, i);
-      if (p)
-        delete p;
-      setSelectorMask (c, i, NULL);
     }
 }
 
@@ -1477,34 +1104,15 @@ bool Armyset::instantiateSmallSelectorImages()
 
 bool Armyset::instantiateSmallSelectorImages(Shield::Colour c)
 {
-  clearSmallSelectorImage (c, false);
   bool broken = false;
+  d_selector[0][c]->clear (false);
   Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
   if (broken)
     return broken;
-  Glib::ustring imgname = getSmallSelectorFilename(c);
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          std::vector<PixMask* > images, masks;
-          bool success =
-            SelectorPixMaskCacheItem::loadSelectorImages
-            (filename, getUnscaledTileSize(), images, masks, false);
-          if (success)
-            {
-              setNumberOfSmallSelectorFrames(c, images.size());
-              for (unsigned int i = 0; i < images.size(); i++)
-                {
-                  setSmallSelectorImage(c, i, images[i]);
-                  setSmallSelectorMask(c, i, masks[i]);
-                }
-            }
-          else
-            broken = true;
-        }
-    }
+  broken = d_selector[0][c]->load (&t);
+  if (broken)
+    return broken;
+  d_selector[0][c]->instantiateImages ();
   return broken;
 }
 
@@ -1518,421 +1126,19 @@ bool Armyset::instantiateLargeSelectorImages()
 
 bool Armyset::instantiateLargeSelectorImages(Shield::Colour c)
 {
-  clearLargeSelectorImage (c, false);
   bool broken = false;
+  d_selector[1][c]->clear (false);
   Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
   if (broken)
     return broken;
-  Glib::ustring imgname = getLargeSelectorFilename(c);
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          std::vector<PixMask* > images, masks;
-          bool success =
-            SelectorPixMaskCacheItem::loadSelectorImages
-            (filename, getUnscaledTileSize(), images, masks, false);
-          if (success)
-            {
-              setNumberOfSelectorFrames(c, images.size());
-              for (unsigned int i = 0; i < images.size(); i++)
-                {
-                  setSelectorImage(c, i, images[i]);
-                  setSelectorMask(c, i, masks[i]);
-                }
-            }
-          else
-            broken = true;
-        }
-    }
+  broken = d_selector[1][c]->load (&t);
+  if (broken)
+    return broken;
+  d_selector[1][c]->instantiateImages ();
   return broken;
 }
 
-PixMask *Armyset::getSelectorImage(Shield::Colour c, guint32 i) const
+TarFileMaskedImage *Armyset::getSelector (bool large, Shield::Colour c) const
 {
-  switch (c)
-    {
-    case Shield::WHITE: return white_selector[i];
-    case Shield::GREEN: return green_selector[i];
-    case Shield::YELLOW: return yellow_selector[i];
-    case Shield::LIGHT_BLUE: return light_blue_selector[i];
-    case Shield::ORANGE: return orange_selector[i];
-    case Shield::DARK_BLUE: return dark_blue_selector[i];
-    case Shield::RED: return red_selector[i];
-    case Shield::BLACK: return black_selector[i];
-    default: return NULL;
-    }
-  return NULL;
-}
-
-PixMask *Armyset::getSelectorMask(Shield::Colour c, guint32 i) const
-{
-  switch (c)
-    {
-    case Shield::WHITE: return white_selectormask[i];
-    case Shield::GREEN: return green_selectormask[i];
-    case Shield::YELLOW: return yellow_selectormask[i];
-    case Shield::LIGHT_BLUE: return light_blue_selectormask[i];
-    case Shield::ORANGE: return orange_selectormask[i];
-    case Shield::DARK_BLUE: return dark_blue_selectormask[i];
-    case Shield::RED: return red_selectormask[i];
-    case Shield::BLACK: return black_selectormask[i];
-    default: return NULL;
-    }
-  return NULL;
-}
-
-PixMask *Armyset::getSmallSelectorImage(Shield::Colour c, guint32 i) const
-{
-  switch (c)
-    {
-    case Shield::WHITE: return white_smallselector[i];
-    case Shield::GREEN: return green_smallselector[i];
-    case Shield::YELLOW: return yellow_smallselector[i];
-    case Shield::LIGHT_BLUE: return light_blue_smallselector[i];
-    case Shield::ORANGE: return orange_smallselector[i];
-    case Shield::DARK_BLUE: return dark_blue_smallselector[i];
-    case Shield::RED: return red_smallselector[i];
-    case Shield::BLACK: return black_smallselector[i];
-    default: return NULL;
-    }
-  return NULL;
-}
-
-PixMask *Armyset::getSmallSelectorMask(Shield::Colour c, guint32 i) const
-{
-  switch (c)
-    {
-    case Shield::WHITE: return white_smallselectormask[i];
-    case Shield::GREEN: return green_smallselectormask[i];
-    case Shield::YELLOW: return yellow_smallselectormask[i];
-    case Shield::LIGHT_BLUE: return light_blue_smallselectormask[i];
-    case Shield::ORANGE: return orange_smallselectormask[i];
-    case Shield::DARK_BLUE: return dark_blue_smallselectormask[i];
-    case Shield::RED: return red_smallselectormask[i];
-    case Shield::BLACK: return black_smallselectormask[i];
-    default: return NULL;
-    }
-  return NULL;
-}
-
-void Armyset::setSmallSelectorImage(Shield::Colour c, guint32 i, PixMask *p)
-{
-  switch (c)
-    {
-    case Shield::WHITE: white_smallselector[i] = p; break;
-    case Shield::GREEN: green_smallselector[i] = p; break;
-    case Shield::YELLOW: yellow_smallselector[i] = p; break;
-    case Shield::LIGHT_BLUE: light_blue_smallselector[i] = p; break;
-    case Shield::ORANGE: orange_smallselector[i] = p; break;
-    case Shield::DARK_BLUE: dark_blue_smallselector[i] = p; break;
-    case Shield::RED: red_smallselector[i] = p; break;
-    case Shield::BLACK: black_smallselector[i] = p; break;
-    default: return;
-    }
-  return;
-}
-
-void Armyset::setSmallSelectorMask(Shield::Colour c, guint32 i, PixMask *p)
-{
-  switch (c)
-    {
-    case Shield::WHITE: white_smallselectormask[i] = p; break;
-    case Shield::GREEN: green_smallselectormask[i] = p; break;
-    case Shield::YELLOW: yellow_smallselectormask[i] = p; break;
-    case Shield::LIGHT_BLUE: light_blue_smallselectormask[i] = p; break;
-    case Shield::ORANGE: orange_smallselectormask[i] = p; break;
-    case Shield::DARK_BLUE: dark_blue_smallselectormask[i] = p; break;
-    case Shield::RED: red_smallselectormask[i] = p; break;
-    case Shield::BLACK: black_smallselectormask[i] = p; break;
-    default: return;
-    }
-  return;
-}
-
-void Armyset::setSelectorImage(Shield::Colour c, guint32 i, PixMask *p)
-{
-  switch (c)
-    {
-    case Shield::WHITE: white_selector[i] = p; break;
-    case Shield::GREEN: green_selector[i] = p; break;
-    case Shield::YELLOW: yellow_selector[i] = p; break;
-    case Shield::LIGHT_BLUE: light_blue_selector[i] = p; break;
-    case Shield::ORANGE: orange_selector[i] = p; break;
-    case Shield::DARK_BLUE: dark_blue_selector[i] = p; break;
-    case Shield::RED: red_selector[i] = p; break;
-    case Shield::BLACK: black_selector[i] = p; break;
-    default: return;
-    }
-  return;
-}
-
-void Armyset::setSelectorMask(Shield::Colour c, guint32 i, PixMask *p)
-{
-  switch (c)
-    {
-    case Shield::WHITE: white_selectormask[i] = p; break;
-    case Shield::GREEN: green_selectormask[i] = p; break;
-    case Shield::YELLOW: yellow_selectormask[i] = p; break;
-    case Shield::LIGHT_BLUE: light_blue_selectormask[i] = p; break;
-    case Shield::ORANGE: orange_selectormask[i] = p; break;
-    case Shield::DARK_BLUE: dark_blue_selectormask[i] = p; break;
-    case Shield::RED: red_selectormask[i] = p; break;
-    case Shield::BLACK: black_selectormask[i] = p; break;
-    default: return;
-    }
-  return;
-}
-
-guint32 Armyset::getNumberOfSelectorFrames(Shield::Colour c) const
-{
-  switch (c)
-    {
-    case Shield::WHITE: return number_of_white_selector_frames;
-    case Shield::GREEN: return number_of_green_selector_frames;
-    case Shield::YELLOW: return number_of_yellow_selector_frames;
-    case Shield::LIGHT_BLUE: return number_of_light_blue_selector_frames;
-    case Shield::ORANGE: return number_of_orange_selector_frames;
-    case Shield::DARK_BLUE: return number_of_dark_blue_selector_frames;
-    case Shield::RED: return number_of_red_selector_frames;
-    case Shield::BLACK: return number_of_black_selector_frames;
-    default: return 0;
-    }
-  return 0;
-}
-
-guint32 Armyset::getNumberOfSmallSelectorFrames(Shield::Colour c) const
-{
-  switch (c)
-    {
-    case Shield::WHITE: return number_of_white_small_selector_frames;
-    case Shield::GREEN: return number_of_green_small_selector_frames;
-    case Shield::YELLOW: return number_of_yellow_small_selector_frames;
-    case Shield::LIGHT_BLUE: return number_of_light_blue_small_selector_frames;
-    case Shield::ORANGE: return number_of_orange_small_selector_frames;
-    case Shield::DARK_BLUE: return number_of_dark_blue_small_selector_frames;
-    case Shield::RED: return number_of_red_small_selector_frames;
-    case Shield::BLACK: return number_of_black_small_selector_frames;
-    default: return 0;
-    }
-  return 0;
-}
-
-void Armyset::setNumberOfSelectorFrames (Shield::Colour c, guint32 num)
-{
-  switch (c)
-    {
-    case Shield::WHITE:
-      white_selector.reserve (num);
-      white_selectormask.reserve (num);
-      number_of_white_selector_frames = num;
-      break;
-    case Shield::GREEN:
-      green_selector.reserve (num);
-      green_selectormask.reserve (num);
-      number_of_green_selector_frames = num;
-      break;
-    case Shield::YELLOW:
-      yellow_selector.reserve (num);
-      yellow_selectormask.reserve (num);
-      number_of_yellow_selector_frames = num;
-      break;
-    case Shield::LIGHT_BLUE:
-      light_blue_selector.reserve (num);
-      light_blue_selectormask.reserve (num);
-      number_of_light_blue_selector_frames = num;
-      break;
-    case Shield::ORANGE:
-      orange_selector.reserve (num);
-      orange_selectormask.reserve (num);
-      number_of_orange_selector_frames = num;
-      break;
-    case Shield::DARK_BLUE:
-      dark_blue_selector.reserve (num);
-      dark_blue_selectormask.reserve (num);
-      number_of_dark_blue_selector_frames = num;
-      break;
-    case Shield::RED:
-      red_selector.reserve (num);
-      red_selectormask.reserve (num);
-      number_of_red_selector_frames = num;
-      break;
-    case Shield::BLACK:
-      black_selector.reserve (num);
-      black_selectormask.reserve (num);
-      number_of_black_selector_frames = num;
-      break;
-    default: return;
-    }
-  return;
-}
-
-void Armyset::setNumberOfSmallSelectorFrames (Shield::Colour c, guint32 num)
-{
-  switch (c)
-    {
-    case Shield::WHITE:
-      white_smallselector.reserve (num);
-      white_smallselectormask.reserve (num);
-      number_of_white_small_selector_frames = num;
-      break;
-    case Shield::GREEN:
-      green_smallselector.reserve (num);
-      green_smallselectormask.reserve (num);
-      number_of_green_small_selector_frames = num;
-      break;
-    case Shield::YELLOW:
-      yellow_smallselector.reserve (num);
-      yellow_smallselectormask.reserve (num);
-      number_of_yellow_small_selector_frames = num;
-      break;
-    case Shield::LIGHT_BLUE:
-      light_blue_smallselector.reserve (num);
-      light_blue_smallselectormask.reserve (num);
-      number_of_light_blue_small_selector_frames = num;
-      break;
-    case Shield::ORANGE:
-      orange_smallselector.reserve (num);
-      orange_smallselectormask.reserve (num);
-      number_of_orange_small_selector_frames = num;
-      break;
-    case Shield::DARK_BLUE:
-      dark_blue_smallselector.reserve (num);
-      dark_blue_smallselectormask.reserve (num);
-      number_of_dark_blue_small_selector_frames = num;
-      break;
-    case Shield::RED:
-      red_smallselector.reserve (num);
-      red_smallselectormask.reserve (num);
-      number_of_red_small_selector_frames = num;
-      break;
-    case Shield::BLACK:
-      black_smallselector.reserve (num);
-      black_smallselectormask.reserve (num);
-      number_of_black_small_selector_frames = num;
-      break;
-    default: return;
-    }
-  return;
-}
-
-Glib::ustring Armyset::getLargeSelectorFilename(Shield::Colour c) const
-{
-  switch (c)
-    {
-    case Shield::WHITE: return d_large_white_selector;
-    case Shield::GREEN: return d_large_green_selector;
-    case Shield::YELLOW: return d_large_yellow_selector;
-    case Shield::LIGHT_BLUE: return d_large_light_blue_selector;
-    case Shield::ORANGE: return d_large_orange_selector;
-    case Shield::DARK_BLUE: return d_large_dark_blue_selector;
-    case Shield::RED: return d_large_red_selector;
-    case Shield::BLACK: return d_large_black_selector;
-    default: return "";
-    }
-  return "";
-}
-
-Glib::ustring Armyset::getSmallSelectorFilename(Shield::Colour c) const
-{
-  switch (c)
-    {
-    case Shield::WHITE: return d_small_white_selector;
-    case Shield::GREEN: return d_small_green_selector;
-    case Shield::YELLOW: return d_small_yellow_selector;
-    case Shield::LIGHT_BLUE: return d_small_light_blue_selector;
-    case Shield::ORANGE: return d_small_orange_selector;
-    case Shield::DARK_BLUE: return d_small_dark_blue_selector;
-    case Shield::RED: return d_small_red_selector;
-    case Shield::BLACK: return d_small_black_selector;
-    default: return "";
-    }
-  return "";
-}
-
-void Armyset::setLargeSelectorFilename(Shield::Colour c, Glib::ustring f)
-{
-  switch (c)
-    {
-    case Shield::WHITE: d_large_white_selector = f; break;
-    case Shield::GREEN: d_large_green_selector = f; break;
-    case Shield::YELLOW: d_large_yellow_selector = f; break;
-    case Shield::LIGHT_BLUE: d_large_light_blue_selector = f; break;
-    case Shield::ORANGE: d_large_orange_selector = f; break;
-    case Shield::DARK_BLUE: d_large_dark_blue_selector = f; break;
-    case Shield::RED: d_large_red_selector = f; break;
-    case Shield::BLACK: d_large_black_selector = f; break;
-    default: return;
-    }
-  return;
-}
-
-void Armyset::setSmallSelectorFilename(Shield::Colour c, Glib::ustring f)
-{
-  switch (c)
-    {
-    case Shield::WHITE: d_small_white_selector = f; break;
-    case Shield::GREEN: d_small_green_selector = f; break;
-    case Shield::YELLOW: d_small_yellow_selector = f; break;
-    case Shield::LIGHT_BLUE: d_small_light_blue_selector = f; break;
-    case Shield::ORANGE: d_small_orange_selector = f; break;
-    case Shield::DARK_BLUE: d_small_dark_blue_selector = f; break;
-    case Shield::RED: d_small_red_selector = f; break;
-    case Shield::BLACK: d_small_black_selector = f; break;
-    default: return;
-    }
-  return;
-}
-
-void Armyset::clear_vectors()
-{
-  number_of_white_selector_frames = 0;
-  number_of_green_selector_frames = 0;
-  number_of_yellow_selector_frames = 0;
-  number_of_light_blue_selector_frames = 0;
-  number_of_orange_selector_frames = 0;
-  number_of_dark_blue_selector_frames = 0;
-  number_of_red_selector_frames = 0;
-  number_of_black_selector_frames = 0;
-  number_of_white_small_selector_frames = 0;
-  number_of_green_small_selector_frames = 0;
-  number_of_yellow_small_selector_frames = 0;
-  number_of_light_blue_small_selector_frames = 0;
-  number_of_orange_small_selector_frames = 0;
-  number_of_dark_blue_small_selector_frames = 0;
-  number_of_red_small_selector_frames = 0;
-  number_of_black_small_selector_frames = 0;
-  white_selector.clear ();
-  green_selector.clear ();
-  yellow_selector.clear ();
-  light_blue_selector.clear ();
-  orange_selector.clear ();
-  dark_blue_selector.clear ();
-  red_selector.clear ();
-  black_selector.clear ();
-  white_selectormask.clear ();
-  green_selectormask.clear ();
-  yellow_selectormask.clear ();
-  light_blue_selectormask.clear ();
-  orange_selectormask.clear ();
-  dark_blue_selectormask.clear ();
-  red_selectormask.clear ();
-  black_selectormask.clear ();
-  white_smallselector.clear ();
-  green_smallselector.clear ();
-  yellow_smallselector.clear ();
-  light_blue_smallselector.clear ();
-  orange_smallselector.clear ();
-  dark_blue_smallselector.clear ();
-  red_smallselector.clear ();
-  black_smallselector.clear ();
-  white_smallselectormask.clear ();
-  green_smallselectormask.clear ();
-  yellow_smallselectormask.clear ();
-  light_blue_smallselectormask.clear ();
-  orange_smallselectormask.clear ();
-  dark_blue_smallselectormask.clear ();
-  red_smallselectormask.clear ();
-  black_smallselectormask.clear ();
+  return d_selector[large ? 1 : 0][c];
 }

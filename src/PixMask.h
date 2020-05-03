@@ -44,6 +44,7 @@ class PixMask
      static PixMask* create(Glib::RefPtr<Gdk::Pixbuf> buf);
      static PixMask* create(Cairo::RefPtr<Cairo::Surface> pixmap,
 					 Cairo::RefPtr<Cairo::Surface> mask);
+     static bool checkFormat (Glib::ustring file);
      PixMask* copy();
 
      //! convert this pixmask to a pixbuf.

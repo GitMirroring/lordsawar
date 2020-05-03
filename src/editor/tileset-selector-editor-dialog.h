@@ -25,6 +25,8 @@
 #include "tileset.h"
 #include "lw-editor-dialog.h"
 
+class TarFileMaskedImage;
+
 //! Tileset selector editor.
 //! Shows and manages the large and small army unit selector animation.
 class TilesetSelectorEditorDialog: public LwEditorDialog
@@ -43,8 +45,8 @@ class TilesetSelectorEditorDialog: public LwEditorDialog
     Gtk::ComboBoxText *shield_theme_combobox;
     Gtk::Grid *preview_table;
     Tileset *d_tileset;
-    PixMask *small_selector;
-    PixMask *large_selector;
+    TarFileMaskedImage *small_selector;
+    TarFileMaskedImage *large_selector;
     std::map< guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >* > selectors;
     sigc::connection heartbeat;
     std::map<guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator> frame;
@@ -63,7 +65,6 @@ class TilesetSelectorEditorDialog: public LwEditorDialog
     void fill_imagebutton ();
     Glib::ustring get_selector_filename ();
     void set_selector_filename (Glib::ustring f);
-    bool load_selector_image (Glib::ustring filename);
     void clear_selector_image ();
     Gtk::FileChooserDialog* image_filechooser(bool clear);
 };

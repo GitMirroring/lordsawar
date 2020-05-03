@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <gtkmm.h>
 #include <sigc++/functors/mem_fun.h>
 
-#include "masked-image-editor-dialog.h"
+#include "tar-file-masked-image-editor-dialog.h"
 
 #include "gui/image-helpers.h"
 #include "ucompose.hpp"
@@ -33,14 +33,16 @@
 #include "font-size.h"
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
+#include "TarFileMaskedImage.h"
 
-#define method(x) sigc::mem_fun(*this, &MaskedImageEditorDialog::x)
+#define method(x) sigc::mem_fun(*this, &TarFileMaskedImageEditorDialog::x)
 
-const int MaskedImageEditorDialog::MAX_IMAGES_WIDTH = 1000;
+const int TarFileMaskedImageEditorDialog::MAX_IMAGES_WIDTH = 1000;
 
-MaskedImageEditorDialog::MaskedImageEditorDialog(Gtk::Window &parent, Glib::ustring filename, PixMask *image, PixMask *mask, double ratio, Shieldset *shieldset)
- : LwEditorDialog(parent, "masked-image-editor-dialog.ui")
+TarFileMaskedImageEditorDialog::TarFileMaskedImageEditorDialog(Gtk::Window &parent, TarFileMaskedImage *mi, double ratio, Shieldset *shieldset)
+ : LwEditorDialog(parent, "tar-file-masked-image-editor-dialog.ui")
 {
+  d_mim = mi;
   d_shieldset = shieldset;
   d_ratio = ratio;
   xml->get_widget("imagebutton", imagebutton);
@@ -60,40 +62,27 @@ MaskedImageEditorDialog::MaskedImageEditorDialog(Gtk::Window &parent, Glib::ustr
   xml->get_widget("shieldset_box", box);
   setup_shield_theme_combobox(box);
 
-  if (image)
-    d_image = image->copy ();
-  else
-    d_image = NULL;
-  if (mask)
-    d_mask = mask ->copy ();
-  else
-    d_mask = NULL;
-
-  d_target_filename = filename;
-  update_panel();
   d_target_filename = "";
+  update_panel();
+  image_neutral->property_visible () = 
+    d_mim->getMaskOrientation() == TarFileMaskedImage::HORIZONTAL_MASK;
 }
 
-MaskedImageEditorDialog::~MaskedImageEditorDialog()
+TarFileMaskedImageEditorDialog::~TarFileMaskedImageEditorDialog()
 {
-  if (d_image)
-    delete d_image;
-  if (d_mask)
-    delete d_mask;
 }
 
-bool MaskedImageEditorDialog::load_image ()
+bool TarFileMaskedImageEditorDialog::load_image ()
 {
-  bool broken = false;
-  std::vector<PixMask*> half = disassemble_row (d_target_filename, 2, broken);
-  if (broken)
-    return false;
-  d_image = half[0];
-  d_mask = half[1];
-  return true;
+  bool broken = d_mim->loadFromFile (d_target_filename);
+
+  if (!broken)
+    d_mim->instantiateImages ();
+
+  return broken;
 }
 
-int MaskedImageEditorDialog::run()
+int TarFileMaskedImageEditorDialog::run()
 {
   show_image();
   shield_theme_combobox->show_all ();
@@ -104,12 +93,12 @@ int MaskedImageEditorDialog::run()
   return response;
 }
 
-void MaskedImageEditorDialog::hide()
+void TarFileMaskedImageEditorDialog::hide()
 {
   dialog->hide();
 }
 
-void MaskedImageEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
+void TarFileMaskedImageEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
 {
   Glib::ustring selected_filename = d->get_filename();
   if (selected_filename.empty())
@@ -121,9 +110,10 @@ void MaskedImageEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
   show_image ();
 }
 
-void MaskedImageEditorDialog::update_panel()
+void TarFileMaskedImageEditorDialog::update_panel()
 {
-  Glib::ustring f = File::get_basename (d_target_filename, true);
+  Glib::ustring f = d_target_filename.empty () ?
+    d_mim->getName () :File::get_basename (d_target_filename, true);
   if (f.empty () == false)
     imagebutton->set_label (f);
   else
@@ -131,15 +121,12 @@ void MaskedImageEditorDialog::update_panel()
       imagebutton->set_label (_("No image set"));
       show_image ();
     }
-  if (d_image)
-    clear_button->set_visible (true);
-  else
-    clear_button->set_visible (false);
+  clear_button->set_visible (d_mim->getImage () == NULL);
 }
 
-void MaskedImageEditorDialog::show_image()
+void TarFileMaskedImageEditorDialog::show_image()
 {
-  if (d_image == NULL)
+  if (d_mim->getImage() == NULL)
     {
       image_white->clear();
       image_green->clear();
@@ -152,12 +139,13 @@ void MaskedImageEditorDialog::show_image()
       image_neutral->clear();
       return;
     }
-  Vector<int> dim = Vector<int>(d_image->get_width(), d_image->get_height());
-  if (dim.x * (MAX_PLAYERS + 1) > MAX_IMAGES_WIDTH)
+
+  Vector<int> dim = d_mim->getImageDimensions ();
+  if (dim.x * MAX_PLAYERS  > MAX_IMAGES_WIDTH)
     {
-      dim.x = MAX_IMAGES_WIDTH / (MAX_PLAYERS + 1);
-      dim.y = d_image->get_height() *
-        (double)((double)dim.x / (double)d_image->get_width());
+      dim.x = MAX_IMAGES_WIDTH / MAX_PLAYERS;
+      dim.y = d_mim->getImage ()->get_height() *
+        (double)((double)dim.x / (double)d_mim->getImage ()->get_width());
     }
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
@@ -172,7 +160,11 @@ void MaskedImageEditorDialog::show_image()
 	case Shield::DARK_BLUE: image = image_dark_blue; break;
 	case Shield::ORANGE: image = image_orange; break;
 	case Shield::BLACK: image = image_black; break;
-	case Shield::NEUTRAL: image = image_neutral; break;
+	case Shield::NEUTRAL: 
+          image = image_neutral;
+          if (d_mim->getMaskOrientation() == TarFileMaskedImage::VERTICAL_MASK)
+            continue;
+          break;
 	default : break;
 	}
 
@@ -182,7 +174,16 @@ void MaskedImageEditorDialog::show_image()
           d_shieldset = Shieldsetlist::getInstance()->get(n, 0);
         }
       Gdk::RGBA colour = d_shieldset->getColor(i);
-      PixMask *p = ImageCache::applyMask(d_image, d_mask, colour);
+      PixMask *p;
+      switch (d_mim->getMaskOrientation ())
+        {
+          case TarFileMaskedImage::HORIZONTAL_MASK:
+            p = d_mim->applyMask (colour);
+            break;
+          case TarFileMaskedImage::VERTICAL_MASK:
+            p = d_mim->applyMask (i, colour);
+            break;
+        }
       PixMask::scale (p, dim.x, dim.y); //idk if we need this
       if (d_ratio > 0)
         {
@@ -193,12 +194,12 @@ void MaskedImageEditorDialog::show_image()
           PixMask::scale (p, new_width, new_height);
         }
       image->property_pixbuf() = p->to_pixbuf();
-      image->show_all ();
+      image->property_visible () = true;
       delete p;
     }
 }
 
-Gtk::FileChooserDialog* MaskedImageEditorDialog::image_filechooser(bool clear)
+Gtk::FileChooserDialog* TarFileMaskedImageEditorDialog::image_filechooser(bool clear)
 {
   Gtk::FileChooserDialog *d =
     new Gtk::FileChooserDialog(*dialog, dialog->get_title ());
@@ -212,9 +213,9 @@ Gtk::FileChooserDialog* MaskedImageEditorDialog::image_filechooser(bool clear)
   return d;
 }
 
-void MaskedImageEditorDialog::on_imagebutton_clicked ()
+void TarFileMaskedImageEditorDialog::on_imagebutton_clicked ()
 {
-  Gtk::FileChooserDialog *d = image_filechooser(d_image != NULL);
+  Gtk::FileChooserDialog *d = image_filechooser(d_mim->getImage () == NULL);
   int response = d->run();
   if (response == Gtk::RESPONSE_ACCEPT && d->get_filename() != "")
     {
@@ -225,10 +226,7 @@ void MaskedImageEditorDialog::on_imagebutton_clicked ()
         }
       else
         {
-          bool broken = false;
-          PixMask *p = PixMask::create (d->get_filename (), broken);
-          if (p)
-            delete p;
+          bool broken = PixMask::checkFormat (d->get_filename ());
           if (broken)
             {
               TimedMessageDialog
@@ -245,13 +243,13 @@ void MaskedImageEditorDialog::on_imagebutton_clicked ()
             }
         }
     }
-  else if (response == Gtk::RESPONSE_REJECT && d_image != NULL)
+  else if (response == Gtk::RESPONSE_REJECT && d_mim->getImage () == NULL)
     clear_button->activate ();
   d->hide();
   delete d;
 }
 
-void MaskedImageEditorDialog::setup_shield_theme_combobox(Gtk::Box *box)
+void TarFileMaskedImageEditorDialog::setup_shield_theme_combobox(Gtk::Box *box)
 {
   // fill in shield themes combobox
   shield_theme_combobox = manage(new Gtk::ComboBoxText);
@@ -275,7 +273,7 @@ void MaskedImageEditorDialog::setup_shield_theme_combobox(Gtk::Box *box)
   box->set_center_widget (*shield_theme_combobox);
 }
 
-void MaskedImageEditorDialog::on_shieldset_changed()
+void TarFileMaskedImageEditorDialog::on_shieldset_changed()
 {
   show_image();
 }

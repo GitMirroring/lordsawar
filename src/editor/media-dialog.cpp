@@ -24,7 +24,7 @@
 #include "ucompose.hpp"
 #include "ScenarioMedia.h"
 #include "image-editor-dialog.h"
-#include "masked-image-editor-dialog.h"
+#include "tar-file-masked-image-editor-dialog.h"
 #include "File.h"
 #include "defs.h"
 #include "tarfile.h"
@@ -34,6 +34,7 @@
 #include "past-chooser.h"
 #include "ImageCache.h"
 #include "timed-message-dialog.h"
+#include "TarFileMaskedImage.h"
 
 #define method(x) sigc::mem_fun(*this, &MediaDialog::x)
 
@@ -129,9 +130,9 @@ void MediaDialog::fill_in_buttons()
   fill_image_button (d_ruin_success_button, sm->getRuinSuccessImageName());
   fill_image_button (d_ruin_defeat_button, sm->getRuinDefeatImageName());
   fill_image_button (d_hero_newlevel_male_button,
-                     sm->getHeroNewLevelMaleImageName());
+                     sm->getHeroNewLevelMaskedImage(false)->getName());
   fill_image_button (d_hero_newlevel_female_button,
-                     sm->getHeroNewLevelFemaleImageName());
+                     sm->getHeroNewLevelMaskedImage(true)->getName());
   fill_image_button (d_parley_offered_button, sm->getParleyOfferedImageName());
   fill_image_button (d_parley_refused_button, sm->getParleyRefusedImageName());
   fill_image_button (d_small_medals_button, sm->getSmallMedalsImageName());
@@ -215,12 +216,12 @@ void MediaDialog::on_image_button_activated(sigc::slot<Glib::ustring> getName, s
   d.hide();
 }
 
-void MediaDialog::on_masked_image_button_activated(sigc::slot<Glib::ustring> getName, PixMask *image, PixMask *mask, sigc::slot<void,Glib::ustring> setName, Shieldset *ss)
+void MediaDialog::on_masked_image_button_activated(sigc::slot<Glib::ustring> getName, TarFileMaskedImage *mim, sigc::slot<void,Glib::ustring> setName, Shieldset *ss)
 {
   TarFile *t = d_tarfile;
   Glib::ustring imgname = getName ();
 
-  MaskedImageEditorDialog d (*dialog, imgname, image, mask, 0, ss);
+  TarFileMaskedImageEditorDialog d (*dialog, mim, 0, ss);
   int response = d.run();
 
   if (response == Gtk::RESPONSE_ACCEPT && d.get_filename () != "")
@@ -464,31 +465,33 @@ void MediaDialog::on_ruin_defeat_button_activated()
 void MediaDialog::on_hero_newlevel_male_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
-  PixMask *im = ImageCache::getInstance ()->getNewLevelImage(false, false);
-  PixMask *ma = ImageCache::getInstance ()->getNewLevelImage(false, true);
+  TarFileMaskedImage *omim =
+    ImageCache::getInstance ()->getHeroNewLevelMaskedImage(false);
+  TarFileMaskedImage *mim = sm->getHeroNewLevelMaskedImage(false);
   on_masked_image_button_activated
-    (sigc::mem_fun (sm, &ScenarioMedia::getHeroNewLevelMaleImageName),
-     im, ma, sigc::mem_fun (sm, &ScenarioMedia::setHeroNewLevelMaleImageName),
+    (sigc::mem_fun (mim, &TarFileMaskedImage::getName),
+     omim, sigc::mem_fun (mim, &TarFileMaskedImage::setName),
      Shieldsetlist::getInstance()->get(Playerlist::getActiveplayer()->getId()));
-  if (sm->getHeroNewLevelMaleImageName ().empty () == false)
+  if (mim->getName ().empty () == false)
     sm->instantiateHeroNewLevelMaleImage (d_tarfile);
   else
-    sm->clearHeroNewLevelMaleImage ();
+    sm->getHeroNewLevelMaskedImage(false)->clear();
 }
 
 void MediaDialog::on_hero_newlevel_female_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
-  PixMask *im = ImageCache::getInstance ()->getNewLevelImage(true, false);
-  PixMask *ma = ImageCache::getInstance ()->getNewLevelImage(true, true);
+  TarFileMaskedImage *omim =
+    ImageCache::getInstance ()->getHeroNewLevelMaskedImage(true);
+  TarFileMaskedImage *mim = sm->getHeroNewLevelMaskedImage(true);
   on_masked_image_button_activated
-    (sigc::mem_fun (sm, &ScenarioMedia::getHeroNewLevelFemaleImageName),
-     im, ma, sigc::mem_fun (sm, &ScenarioMedia::setHeroNewLevelFemaleImageName),
+    (sigc::mem_fun (mim, &TarFileMaskedImage::getName),
+     omim, sigc::mem_fun (mim, &TarFileMaskedImage::setName),
      Shieldsetlist::getInstance()->get(Playerlist::getActiveplayer()->getId()));
-  if (sm->getHeroNewLevelFemaleImageName ().empty () == false)
+  if (mim->getName().empty () == false)
     sm->instantiateHeroNewLevelFemaleImage (d_tarfile);
   else
-    sm->clearHeroNewLevelFemaleImage ();
+    sm->getHeroNewLevelMaskedImage(true)->clear();
 }
 
 void MediaDialog::on_parley_offered_button_activated()

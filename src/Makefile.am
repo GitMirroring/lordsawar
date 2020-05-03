@@ -94,6 +94,7 @@ liblordsawar_la_SOURCES = action.cpp action.h AI_Analysis.cpp AI_Analysis.h \
 	turn-actionlist.cpp turn-actionlist.h \
 	ScenarioMedia.cpp ScenarioMedia.h \
 	tarfile.cpp tarfile.h \
+	TarFileMaskedImage.cpp TarFileMaskedImage.h \
 	snd.cpp snd.h \
 	scenario-list.cpp scenario-list.h \
 	scenario-details.cpp scenario-details.h \

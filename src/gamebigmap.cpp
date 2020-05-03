@@ -43,6 +43,7 @@
 #include "armysetlist.h"
 #include "armyset.h"
 #include "shield.h"
+#include "TarFileMaskedImage.h"
 
 #include "timing.h"
 
@@ -866,16 +867,16 @@ void GameBigMap::get_selector_frame_limits (Player *p, int &limitbig, int &limit
 {
   Tileset *t = GameMap::getTileset();
 
-  limitbig = (int)t->getNumberOfSelectorFrames();
-  limitsmall = (int)t->getNumberOfSmallSelectorFrames();
+  limitbig = (int)t->getSelector(true)->getNumberOfFrames();
+  limitsmall = (int)t->getSelector(false)->getNumberOfFrames();
 
   guint32 as = p->getArmyset ();
   Armyset *a = Armysetlist::getInstance()->get(as);
   Shield::Colour c = Shield::Colour (p->getId());
-  if (a->getNumberOfSelectorFrames (c))
-    limitbig = (int) a->getNumberOfSelectorFrames (c);
-  if (a->getNumberOfSmallSelectorFrames (c))
-    limitsmall = (int) a->getNumberOfSmallSelectorFrames (c);
+  if (a->getSelector(true,c)->getNumberOfFrames ())
+    limitbig = (int) a->getSelector(true,c)->getNumberOfFrames ();
+  if (a->getSelector (false,c)->getNumberOfFrames ())
+    limitsmall = (int) a->getSelector (false,c)->getNumberOfFrames ();
 }
 
 void GameBigMap::after_draw()

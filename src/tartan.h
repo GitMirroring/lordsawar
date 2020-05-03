@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 class XML_Helper;
 class Shieldset;
+class TarFileMaskedImage;
 
 //! A single set of shields for a player
 /**
@@ -74,26 +75,8 @@ class Tartan
 
 	// Get Methods
 
-        //! Get the filename of the tartan image, minus the path and suffix.
-        Glib::ustring getTartanImageName (Tartan::Type type) const;
-
-        //! Get the image of the tartan (the left half)
-        PixMask *getImage(Type t) const;
-
-        //! Get the mask of the tartan (the right half)
-        PixMask *getMask(Type t) const;
-
-
-	// Set Methods
-
-        //! Set the filenmame of the tartan image, minus the path and suffix.
-        void setTartanImageName (Tartan::Type type, Glib::ustring name);
-
-        //! Set the image of the tartan (the left half)
-        void setImage(Type t, PixMask *i);
-
-        //! Set the mask of the tartan (the right half)
-        void setMask (Type t, PixMask *i);
+        //! Get the masked image object of a section of the tartan.
+        TarFileMaskedImage * getTartanMaskedImage (Tartan::Type type) const;
 
 
 	// Methods that operate on class data and do not modify the class.
@@ -101,32 +84,14 @@ class Tartan
 	//! Save the shield to an opened shieldset configuration file.
 	bool saveTartan(XML_Helper *helper) const;
 
-
-	// Methods that operate on class data and modify the class.
-
-	//! Load the images associated with this tartan.
-	void instantiateTartanImages(Glib::ustring l, Glib::ustring c, Glib::ustring r, bool &broken);
-
-        void instantiateTartanImage(Tartan::Type type, Glib::ustring file, bool &broken);
-
-	//! Destroy the images associated with this tartan.
-	void uninstantiateTartanImages();
-        void uninstantiateTartanImage(Tartan::Type type);
-
         //! Convert the enum to a nice readable string
         static Glib::ustring tartanTypeToFriendlyName(const Tartan::Type type);
 
     protected:
 
-        Glib::ustring d_left_tartan_name;
-        Glib::ustring d_center_tartan_name;
-        Glib::ustring d_right_tartan_name;
-        PixMask *d_left_tartan_image;
-        PixMask *d_left_tartan_mask;
-        PixMask *d_center_tartan_image;
-        PixMask *d_center_tartan_mask;
-        PixMask *d_right_tartan_image;
-        PixMask *d_right_tartan_mask;
+        TarFileMaskedImage *d_left_mimage;
+        TarFileMaskedImage *d_center_mimage;
+        TarFileMaskedImage *d_right_mimage;
 };
 
 #endif // TARTAN_H

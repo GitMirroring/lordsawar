@@ -331,3 +331,12 @@ PixMask* PixMask::cropRightTwoThirds () const
   new_width, height, pic, 0, 0);
   return PixMask::create (pic);
 }
+     
+bool PixMask::checkFormat (Glib::ustring file)
+{
+  bool broken = false;
+  PixMask *p = PixMask::create (file, broken);
+  if (p)
+    delete p;
+  return !broken;
+}

@@ -28,6 +28,7 @@
 
 class XML_Helper;
 class Shieldset;
+class Tar_Helper;
 
 //! A single set of shields for a player
 /**
@@ -85,15 +86,6 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 
 	//! Get the first shieldstyle in the shield with the given type.
 	ShieldStyle *getFirstShieldstyle(ShieldStyle::Type type);
-
-
-	// Methods that operate on class data and modify the class.
-
-	//! Load the images associated with this shield.
-	void instantiateImages(Shieldset *s, bool scale, bool &broken);
-
-	//! Destroy the images associated with this shield.
-	void uninstantiateImages();
 
 
 	// Static Methods

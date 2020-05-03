@@ -26,6 +26,8 @@
 
 class TarFile;
 class Shieldset;
+class TarFileMaskedImage;
+
 class MediaDialog: public LwEditorDialog
 {
 public:
@@ -90,7 +92,7 @@ private:
     void fill_image_button(Gtk::Button *button, Glib::ustring name);
     void fill_sound_button(Gtk::Button *button, Glib::ustring name);
     void on_image_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<void,Glib::ustring> setName, int num_frames, std::vector<PixMask *> frames);
-    void on_masked_image_button_activated(sigc::slot<Glib::ustring> getName, PixMask *image, PixMask *mask, sigc::slot<void,Glib::ustring> setName, Shieldset *ss);
+    void on_masked_image_button_activated(sigc::slot<Glib::ustring> getName, TarFileMaskedImage *mim, sigc::slot<void,Glib::ustring> setName, Shieldset *ss);
     void on_sound_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<Glib::ustring> getDefaultFilename, sigc::slot<void, Glib::ustring> setName);
 };
 

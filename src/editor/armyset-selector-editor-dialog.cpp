@@ -32,6 +32,7 @@
 #include "font-size.h"
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
+#include "TarFileMaskedImage.h"
 
 #define method(x) sigc::mem_fun(*this, &ArmysetSelectorEditorDialog::x)
 
@@ -39,29 +40,16 @@ ArmysetSelectorEditorDialog::ArmysetSelectorEditorDialog(Gtk::Window &parent, Ar
  : LwEditorDialog(parent, "armyset-selector-editor-dialog.ui")
 {
   d_changed = false;
-  bool broken = false;
 
   Gtk::Box *box;
   xml->get_widget("owner_box", box);
   setup_owner_combobox(box);
 
   d_armyset = armyset;
-  Glib::ustring imgname = d_armyset->getSmallSelectorFilename(Shield::WHITE);
-  if (imgname.empty() == false)
-    {
-      Glib::ustring f = d_armyset->getFileFromConfigurationFile(imgname);
-      small_selector = PixMask::create (f, broken);
-    }
-  else
-    small_selector = NULL;
-  imgname = d_armyset->getLargeSelectorFilename(Shield::WHITE);
-  if (imgname.empty() == false)
-    {
-      Glib::ustring f = d_armyset->getFileFromConfigurationFile(imgname);
-      large_selector = PixMask::create (f, broken);
-    }
-  else
-    large_selector = NULL;
+  small_selector =
+    new TarFileMaskedImage (*d_armyset->getSelector (false, Shield::WHITE));
+  large_selector =
+    new TarFileMaskedImage (*d_armyset->getSelector (true, Shield::WHITE));
 
   xml->get_widget("shieldset_box", box);
   setup_shield_theme_combobox(box);
@@ -137,28 +125,10 @@ void ArmysetSelectorEditorDialog::on_shieldset_changed()
   show_preview_selectors();
 }
 
-bool ArmysetSelectorEditorDialog::load_selector_image (Glib::ustring filename)
-{
-  bool broken = false;
-  if (large_selector_radiobutton->get_active() == true)
-    {
-      if (large_selector)
-        delete large_selector;
-      large_selector = PixMask::create (filename, broken);
-    }
-  else if (small_selector_radiobutton->get_active() == true)
-    {
-      if (small_selector)
-        delete small_selector;
-      small_selector = PixMask::create (filename, broken);
-    }
-  return false;
-}
-
 bool ArmysetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
 {
-  bool broken = load_selector_image (d->get_filename ());
-  if (!broken)
+  bool broken = false;
+  if (PixMask::checkFormat (d->get_filename ()))
     {
       Glib::ustring imgname = get_selector_filename ();
       Glib::ustring newname = "";
@@ -190,7 +160,7 @@ bool ArmysetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
     }
   else
     {
-      TimedMessageDialog
+       TimedMessageDialog
         td(*d, String::ucompose(_("Couldn't make sense of the image:\n%1"),
                                 d->get_filename ()), 0);
       td.run_and_hide ();
@@ -227,61 +197,61 @@ void ArmysetSelectorEditorDialog::clearSelector()
 
 bool ArmysetSelectorEditorDialog::loadSelector()
 {
-  std::vector<PixMask *> images;
-  std::vector<PixMask *> masks;
-  PixMask *p = NULL;
+  TarFileMaskedImage *p = NULL;
+  //which one, go get it according to owner
+  Shield::Colour o =
+    Shield::Colour (owner_combobox->get_active_row_number ());
   if (large_selector_radiobutton->get_active() == true)
-    p = large_selector;
+    {
+      delete large_selector;
+      large_selector =
+        new TarFileMaskedImage (*d_armyset->getSelector (true, o));
+      p = large_selector;
+    }
   else if (small_selector_radiobutton->get_active() == true)
-    p = small_selector;
+    {
+      delete small_selector;
+      small_selector =
+        new TarFileMaskedImage (*d_armyset->getSelector (false, o));
+      p = small_selector;
+    }
   if (!p)
     return false;
-  if (p->get_unscaled_height () == 0)
+  if (p->getImage() && p->getImage ()->get_unscaled_height () == 0)
     return false;
-  bool success =
-    SelectorPixMaskCacheItem::loadSelectors(p, d_armyset->getTileSize(),
-                                            images, masks, false);
-  if (success)
+
+  if (p->getNumberOfFrames () == 0)
+    return false;
+
+  Glib::ustring n = shield_theme_combobox->get_active_text();
+  Shieldset *shieldset = Shieldsetlist::getInstance()->get(n, 0);
+
+  selectors = std::list<Glib::RefPtr<Gdk::Pixbuf> >();
+
+  Shieldset::iterator sit = shieldset->begin();
+  for (; sit != shieldset->end(); sit++)
+    if ((*sit)->getOwner () ==
+        (guint32) owner_combobox->get_active_row_number ())
+      break;
+  for (guint32 i = 0; i < p->getNumberOfFrames (); i++)
     {
-      Glib::ustring n = shield_theme_combobox->get_active_text();
-      Shieldset *shieldset = Shieldsetlist::getInstance()->get(n, 0);
+      guint32 owner = (*sit)->getOwner ();
+      if (owner == MAX_PLAYERS) //ignore neutral
+        continue;
+      PixMask *q = p->applyMask (i, (*sit)->getColor());
+      double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
+      int font_size = FontSize::getInstance()->get_height ();
+      double new_height = font_size * ratio;
+      int new_width =
+        ImageCache::calculate_width_from_adjusted_height
+        (q, new_height);
+      PixMask::scale (q, new_width, new_height);
+      selectors.push_back (q->to_pixbuf ());
 
-      selectors = std::list<Glib::RefPtr<Gdk::Pixbuf> >();
-
-      Shieldset::iterator sit = shieldset->begin();
-      for (; sit != shieldset->end(); sit++)
-        if ((*sit)->getOwner () ==
-            (guint32) owner_combobox->get_active_row_number ())
-          break;
-      for (std::vector<PixMask*>::iterator it = images.begin(),
-           mit = masks.begin(); it != images.end(); it++, mit++)
-        {
-          guint32 owner = (*sit)->getOwner ();
-          if (owner == MAX_PLAYERS) //ignore neutral
-            continue;
-          PixMask *q =
-            ImageCache::applyMask(*it, *mit, (*sit)->getColor());
-          double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
-          int font_size = FontSize::getInstance()->get_height ();
-          double new_height = font_size * ratio;
-          int new_width =
-            ImageCache::calculate_width_from_adjusted_height
-            (q, new_height);
-          PixMask::scale (q, new_width, new_height);
-          selectors.push_back (q->to_pixbuf ());
-
-          frame = selectors.begin();
-        }
-
-      for (std::vector<PixMask*>::iterator it = images.begin();
-           it != images.end(); it++)
-        delete *it;
-      for (std::vector<PixMask*>::iterator it = masks.begin();
-           it != masks.end(); it++)
-        delete *it;
+      frame = selectors.begin();
     }
 
-  return success;
+  return true;
 }
 
 void ArmysetSelectorEditorDialog::on_heartbeat()
@@ -333,9 +303,9 @@ Glib::ustring ArmysetSelectorEditorDialog::get_selector_filename ()
 {
   Shield::Colour c = get_selected_colour ();
   if (large_selector_radiobutton->get_active() == true)
-    return d_armyset->getLargeSelectorFilename (c);
+    return d_armyset->getSelector(true,c)->getName ();
   else if (small_selector_radiobutton->get_active() == true)
-    return d_armyset->getSmallSelectorFilename (c);
+    return d_armyset->getSelector(false, c)->getName ();
   return "";
 }
 
@@ -344,15 +314,19 @@ void ArmysetSelectorEditorDialog::set_selector_filename (Glib::ustring f)
   Shield::Colour c = get_selected_colour ();
   if (large_selector_radiobutton->get_active() == true)
     {
-      d_armyset->setLargeSelectorFilename (c, f);
+      d_armyset->getSelector(true, c)->setName (f);
       if (f.empty () == false)
         d_armyset->instantiateLargeSelectorImages(c);
+      delete large_selector;
+      large_selector = new TarFileMaskedImage (*d_armyset->getSelector(true, c));
     }
   else if (small_selector_radiobutton->get_active() == true)
     {
-      d_armyset->setSmallSelectorFilename (c, f);
+      d_armyset->getSelector(false,c)->setName (f);
       if (f.empty () == false)
         d_armyset->instantiateSmallSelectorImages(c);
+      delete small_selector;
+      small_selector = new TarFileMaskedImage (*d_armyset->getSelector(true, c));
     }
   return ;
 }
@@ -362,17 +336,13 @@ void ArmysetSelectorEditorDialog::clear_selector_image ()
   Shield::Colour c = get_selected_colour ();
   if (large_selector_radiobutton->get_active() == true)
     {
-      if (large_selector)
-        delete large_selector;
-      large_selector = NULL;
-      d_armyset->clearLargeSelectorImage(c);
+      large_selector->clear ();
+      d_armyset->getSelector(true,c)->clear ();
     }
   else if (small_selector_radiobutton->get_active() == true)
     {
-      if (small_selector)
-        delete small_selector;
-      small_selector = NULL;
-      d_armyset->clearSmallSelectorImage(c);
+      small_selector->clear ();
+      d_armyset->getSelector(false,c)->clear ();
     }
   return;
 }
@@ -432,6 +402,7 @@ ArmysetSelectorEditorDialog::~ArmysetSelectorEditorDialog()
 
 void ArmysetSelectorEditorDialog::on_owner_changed()
 {
+  update_selector_panel ();
   show_preview_selectors();
 }
 

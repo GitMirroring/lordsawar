@@ -34,6 +34,7 @@
 #include "Configuration.h"
 #include "file-compat.h"
 #include "ucompose.hpp"
+#include "TarFileMaskedImage.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -49,13 +50,14 @@ Glib::ustring Tileset::file_extension = TILESET_EXT;
 Tileset::Tileset(guint32 id, Glib::ustring name)
 	: Set(TILESET_EXT, id, name, DEFAULT_TILE_SIZE)
 {
-  d_large_selector = "";
-  d_small_selector = "";
+  d_selector[0] = new TarFileMaskedImage ();
+  d_selector[1] = new TarFileMaskedImage ();
+  d_flag = new TarFileMaskedImage ();
+
   d_fog = "";
   d_roads = "";
   d_standing_stones = "";
   d_bridges = "";
-  d_flags = "";
   d_road_color.set_rgba(164.0/255.0,84.0/255.0,0);
   d_ruin_color.set_rgba(1,1,1);
   d_temple_color.set_rgba(1,1,1);
@@ -65,16 +67,6 @@ Tileset::Tileset(guint32 id, Glib::ustring name)
     stonepic[i] = NULL;
   for (unsigned int i = 0; i < BRIDGE_TYPES; i++)
     bridgepic[i] = NULL;
-  for (unsigned int i = 0; i < FLAG_TYPES; i++)
-    flagpic[i] = NULL;
-  for (unsigned int i = 0; i < FLAG_TYPES; i++)
-    flagmask[i] = NULL;
-  number_of_selector_frames = 0;
-  selector.clear();
-  selectormask.clear();
-  number_of_small_selector_frames = 0;
-  smallselector.clear();
-  smallselectormask.clear();
   explosion = NULL;
   for (unsigned int i = 0; i < FOG_TYPES; i++)
     fogpic[i] = NULL;
@@ -96,14 +88,14 @@ Tileset::Tileset(guint32 id, Glib::ustring name)
 Tileset::Tileset (const Tileset& t)
   : sigc::trackable(t), std::vector<Tile*>(), Set(t)
 {
-  d_large_selector = t.d_large_selector;
-  d_small_selector = t.d_small_selector;
+  d_selector[0] = new TarFileMaskedImage (*t.d_selector[0]);
+  d_selector[1] = new TarFileMaskedImage (*t.d_selector[1]);
+  d_flag = new TarFileMaskedImage (*t.d_flag);
   d_explosion = t.d_explosion;
   d_fog = t.d_fog;
   d_roads = t.d_roads;
   d_standing_stones = t.d_standing_stones;
   d_bridges = t.d_bridges;
-  d_flags = t.d_flags;
   d_road_color = t.d_road_color;
   d_ruin_color = t.d_ruin_color;
   d_temple_color = t.d_temple_color;
@@ -128,39 +120,6 @@ Tileset::Tileset (const Tileset& t)
       else
         bridgepic[i] = NULL;
     }
-  for (unsigned int i = 0; i < FLAG_TYPES; i++)
-    {
-      if (t.flagpic[i])
-        flagpic[i] = t.flagpic[i]->copy();
-      else
-        flagpic[i] = NULL;
-    }
-  for (unsigned int i = 0; i < FLAG_TYPES; i++)
-    {
-      if (t.flagmask[i])
-        flagmask[i] = t.flagmask[i]->copy();
-      else
-        flagmask[i] = NULL;
-    }
-  number_of_selector_frames = t.number_of_selector_frames;
-  std::vector<PixMask*> s1 = std::vector<PixMask*>(number_of_selector_frames);
-  for (unsigned int i = 0; i < number_of_selector_frames; i++)
-    s1[i] = t.selector[i]->copy();
-  selector = s1;
-  std::vector<PixMask*> s2 = std::vector<PixMask*>(number_of_selector_frames);
-  for (unsigned int i = 0; i < number_of_selector_frames; i++)
-    s2[i] = t.selectormask[i]->copy();
-  selectormask = s2;
-
-  number_of_small_selector_frames = t.number_of_small_selector_frames;
-  std::vector<PixMask*> s3 = std::vector<PixMask*>(number_of_small_selector_frames);
-  for (unsigned int i = 0; i < number_of_small_selector_frames; i++)
-    s3[i] = t.smallselector[i]->copy();
-  smallselector = s3;
-  std::vector<PixMask*> s4 = std::vector<PixMask*>(number_of_small_selector_frames);
-  for (unsigned int i = 0; i < number_of_small_selector_frames; i++)
-    s4[i] = t.smallselectormask[i]->copy();
-  smallselectormask = s4;
 
   if (t.explosion != NULL)
     explosion = t.explosion->copy();
@@ -230,14 +189,15 @@ Tileset::Tileset (const Tileset& t)
 Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
 	:Set(TILESET_EXT, helper)
 {
+  d_selector[0] = new TarFileMaskedImage ();
+  d_selector[1] = new TarFileMaskedImage ();
+  d_flag = new TarFileMaskedImage ();
   setDirectory(directory);
   guint32 ts;
   helper->getData(ts, "tilesize");
   setTileSize(ts);
-  helper->getData(d_large_selector, "large_selector");
-  File::add_png_if_no_ext (d_large_selector);
-  helper->getData(d_small_selector, "small_selector");
-  File::add_png_if_no_ext (d_small_selector);
+  d_selector[1]->load_name (helper, "large_selector");
+  d_selector[0]->load_name (helper, "small_selector");
   helper->getData(d_explosion, "explosion");
   File::add_png_if_no_ext (d_explosion);
   helper->getData(d_roads, "roads");
@@ -248,8 +208,7 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   File::add_png_if_no_ext (d_bridges);
   helper->getData(d_fog, "fog");
   File::add_png_if_no_ext (d_fog);
-  helper->getData(d_flags, "flags");
-  File::add_png_if_no_ext (d_flags);
+  d_flag->load_name (helper, "flags");
   helper->getData(d_all_movebonus_filename, "movebonus_all");
   File::add_png_if_no_ext (d_all_movebonus_filename);
   helper->getData(d_water_movebonus_filename, "movebonus_water");
@@ -276,16 +235,6 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
     stonepic[i] = NULL;
   for (unsigned int i = 0; i < BRIDGE_TYPES; i++)
     bridgepic[i] = NULL;
-  for (unsigned int i = 0; i < FLAG_TYPES; i++)
-    flagpic[i] = NULL;
-  for (unsigned int i = 0; i < FLAG_TYPES; i++)
-    flagmask[i] = NULL;
-  number_of_selector_frames = 0;
-  selector.clear();
-  selectormask.clear();
-  number_of_small_selector_frames = 0;
-  smallselector.clear();
-  smallselectormask.clear();
   explosion = NULL;
   for (unsigned int i = 0; i < FOG_TYPES; i++)
     fogpic[i] = NULL;
@@ -302,6 +251,9 @@ Tileset::~Tileset()
   uninstantiateImages();
   for (unsigned int i=0; i < size(); i++)
     delete (*this)[i];
+  delete d_selector[0];
+  delete d_selector[1];
+  delete d_flag;
   clear();
   clean_tmp_dir();
 }
@@ -407,14 +359,14 @@ bool Tileset::save(XML_Helper *helper) const
   retval &= helper->openTag(d_tag);
   retval &= Set::save(helper);
   retval &= helper->saveData("tilesize", getUnscaledTileSize());
-  retval &= helper->saveData("large_selector", d_large_selector);
-  retval &= helper->saveData("small_selector", d_small_selector);
+  retval &= helper->saveData("large_selector", d_selector[1]->getName ());
+  retval &= helper->saveData("small_selector", d_selector[0]->getName ());
   retval &= helper->saveData("explosion", d_explosion);
   retval &= helper->saveData("roads", d_roads);
   retval &= helper->saveData("standing_stones", d_standing_stones);
   retval &= helper->saveData("bridges", d_bridges);
   retval &= helper->saveData("fog", d_fog);
-  retval &= helper->saveData("flags", d_flags);
+  retval &= helper->saveData("flags", d_flag->getName ());
   retval &= helper->saveData("movebonus_all", d_all_movebonus_filename);
   retval &= helper->saveData("movebonus_water", d_water_movebonus_filename);
   retval &= helper->saveData("movebonus_forest", d_forest_movebonus_filename);
@@ -520,9 +472,9 @@ bool Tileset::validate() const
     return false;
   if (getIndex(Tile::SWAMP) == -1)
     return false;
-  if (getLargeSelectorFilename().empty () == true)
+  if (d_selector[1]->getName().empty () == true)
     return false;
-  if (getSmallSelectorFilename().empty () == true)
+  if (d_selector[0]->getName().empty () == true)
     return false;
   if (getExplosionFilename().empty () == true)
     return false;
@@ -534,7 +486,7 @@ bool Tileset::validate() const
     return false;
   if (getFogFilename().empty () == true)
     return false;
-  if (getFlagsFilename().empty () == true)
+  if (d_flag->getName().empty () == true)
     return false;
   if (getAllMoveBonusFilename ().empty () == true)
     return false;
@@ -644,35 +596,9 @@ void Tileset::uninstantiateImages()
       bridgepic[i] = NULL;
     }
 
-  for (unsigned int i = 0; i < FLAG_TYPES; i++)
-    {
-      if (flagpic[i] != NULL)
-        delete flagpic[i];
-      if (flagmask[i] != NULL)
-        delete flagmask[i];
-      flagpic[i] = NULL;
-      flagmask[i] = NULL;
-    }
-
-  for (unsigned int i = 0; i < getNumberOfSelectorFrames(); i++)
-    {
-      if (selector[i] != NULL)
-        delete selector[i];
-      if (selectormask[i] != NULL)
-        delete selectormask[i];
-      selector[i] = NULL;
-      selectormask[i] = NULL;
-    }
-
-  for (unsigned int i = 0; i < getNumberOfSmallSelectorFrames(); i++)
-    {
-      if (smallselector[i] != NULL)
-        delete smallselector[i];
-      if (smallselectormask[i] != NULL)
-        delete smallselectormask[i];
-      smallselector[i] = NULL;
-      smallselectormask[i] = NULL;
-    }
+  d_selector[0]->uninstantiateImages ();
+  d_selector[1]->uninstantiateImages ();
+  d_flag->uninstantiateImages ();
 
   if (explosion != NULL)
     delete explosion;
@@ -718,9 +644,6 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
 				Glib::ustring stones_filename,
 				Glib::ustring bridges_filename,
 				Glib::ustring fog_filename,
-				Glib::ustring flags_filename,
-				Glib::ustring selector_filename,
-				Glib::ustring small_selector_filename,
                                 Glib::ustring all_movebonus_filename,
                                 Glib::ustring water_movebonus_filename,
                                 Glib::ustring forest_movebonus_filename,
@@ -809,68 +732,6 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
         }
     }
 
-  if (flags_filename.empty() == false && !broken)
-    {
-      std::vector<PixMask* > flagpics;
-      std::vector<PixMask* > maskpics;
-      bool success;
-      success =
-        FlagPixMaskCacheItem::loadFlagImages (flags_filename,
-                                              getUnscaledTileSize(),
-                                              flagpics, maskpics, scale);
-      if (success)
-        {
-          for (unsigned int i = 0; i < flagpics.size(); i++)
-            setFlagImage(i, flagpics[i]);
-          for (unsigned int i = 0; i < maskpics.size(); i++)
-            setFlagMask(i, maskpics[i]);
-        }
-      else
-        broken = true;
-    }
-
-  std::vector<PixMask* > images;
-  std::vector<PixMask* > masks;
-  if (selector_filename.empty() == false && !broken)
-    {
-      bool success =
-        SelectorPixMaskCacheItem::loadSelectorImages (selector_filename, 
-                                                      getUnscaledTileSize(), 
-                                                      images, masks, scale);
-      if (success)
-        {
-          setNumberOfSelectorFrames(images.size());
-          for (unsigned int i = 0; i < images.size(); i++)
-            {
-              setSelectorImage(i, images[i]);
-              setSelectorMask(i, masks[i]);
-            }
-        }
-      else
-        broken = true;
-    }
-
-  images.clear();
-  masks.clear();
-  if (small_selector_filename.empty() == false && !broken)
-    {
-      bool success =
-        SelectorPixMaskCacheItem::loadSelectorImages (small_selector_filename, 
-                                                      getUnscaledTileSize(),
-                                                      images, masks, scale);
-      if (success)
-        {
-          setNumberOfSmallSelectorFrames(images.size());
-          for (unsigned int i = 0; i < images.size(); i++)
-            {
-              setSmallSelectorImage(i, images[i]);
-              setSmallSelectorMask(i, masks[i]);
-            }
-        }
-      else
-        broken = true;
-    }
-
   if (all_movebonus_filename.empty() == false && !broken)
     d_all_movebonus = PixMask::create (all_movebonus_filename, broken);
 
@@ -894,6 +755,7 @@ void Tileset::instantiateImages(Glib::ustring explosion_filename,
 void Tileset::instantiateImages(bool scale, bool &broken)
 {
   int siz = getUnscaledTileSize();
+  Vector<int>scale_dim = Vector<int>(siz,siz);
   debug("Loading images for Tile Set " << getName());
   uninstantiateImages();
   broken = false;
@@ -905,14 +767,30 @@ void Tileset::instantiateImages(bool scale, bool &broken)
       if (!broken)
         (*it)->instantiateImages(siz, &t, scale, broken);
     }
+  if (broken)
+    return;
+
+
+  broken = d_selector[0]->load(&t);
+  if (broken)
+    return;
+  d_selector[0]->instantiateImages (scale_dim);
+
+  broken = d_selector[1]->load(&t);
+  if (broken)
+    return;
+  d_selector[1]->instantiateImages (scale_dim);
+
+  broken = d_flag->load(&t);
+  if (broken)
+    return;
+  d_flag->instantiateImages (scale_dim);
+
   Glib::ustring explosion_filename = "";
   Glib::ustring roads_filename = "";
   Glib::ustring stones_filename = "";
   Glib::ustring bridges_filename = "";
   Glib::ustring fog_filename = "";
-  Glib::ustring flags_filename = "";
-  Glib::ustring selector_filename = "";
-  Glib::ustring small_selector_filename = "";
   Glib::ustring all_movebonus_filename = "";
   Glib::ustring water_movebonus_filename = "";
   Glib::ustring forest_movebonus_filename = "";
@@ -930,13 +808,6 @@ void Tileset::instantiateImages(bool scale, bool &broken)
     bridges_filename = t.getFile(getBridgesFilename(), broken);
   if (getFogFilename().empty() == false && !broken)
     fog_filename = t.getFile(getFogFilename(), broken);
-  if (getFlagsFilename().empty() == false && !broken)
-    flags_filename = t.getFile(getFlagsFilename(), broken);
-  if (getLargeSelectorFilename().empty() == false && !broken)
-    selector_filename = t.getFile(getLargeSelectorFilename(), broken);
-  if (getSmallSelectorFilename().empty() == false && !broken)
-    small_selector_filename = 
-      t.getFile(getSmallSelectorFilename(), broken);
   if (getAllMoveBonusFilename ().empty () == false)
     all_movebonus_filename = 
       t.getFile(getAllMoveBonusFilename (), broken);
@@ -957,12 +828,10 @@ void Tileset::instantiateImages(bool scale, bool &broken)
       t.getFile(getSwampMoveBonusFilename (), broken);
   if (!broken)
     instantiateImages(explosion_filename, roads_filename, stones_filename,
-                      bridges_filename, fog_filename, flags_filename,
-                      selector_filename, small_selector_filename, 
-                      all_movebonus_filename, water_movebonus_filename,
-                      forest_movebonus_filename, hills_movebonus_filename,
-                      mountains_movebonus_filename, swamp_movebonus_filename,
-                      scale, broken);
+                      bridges_filename, fog_filename, all_movebonus_filename,
+                      water_movebonus_filename, forest_movebonus_filename,
+                      hills_movebonus_filename, mountains_movebonus_filename,
+                      swamp_movebonus_filename, scale, broken);
   if (explosion_filename.empty() == false)
     File::erase(explosion_filename);
   if (roads_filename.empty() == false)
@@ -973,12 +842,6 @@ void Tileset::instantiateImages(bool scale, bool &broken)
     File::erase(bridges_filename);
   if (fog_filename.empty() == false)
     File::erase(fog_filename);
-  if (flags_filename.empty() == false)
-    File::erase(flags_filename);
-  if (selector_filename.empty() == false)
-    File::erase(selector_filename);
-  if (small_selector_filename.empty() == false)
-    File::erase(small_selector_filename);
   if (all_movebonus_filename.empty () == false)
     File::erase(all_movebonus_filename);
   if (water_movebonus_filename.empty () == false)
@@ -1031,12 +894,12 @@ bool Tileset::calculate_preferred_tile_size(guint32 &ts) const
     sizecounts[roadpic[0]->get_unscaled_width()]++;
   if (bridgepic[0])
     sizecounts[bridgepic[0]->get_unscaled_width()]++;
-  if (flagpic[0])
-    sizecounts[flagpic[0]->get_unscaled_width()]++;
-  if (selector.empty() == false)
-    sizecounts[selector[0]->get_unscaled_width()]++;
-  if (smallselector.empty() == false)
-    sizecounts[smallselector[0]->get_unscaled_width()]++;
+  if (d_flag->getName ().empty () == false)
+    sizecounts[d_flag->getImage ()->get_unscaled_width()]++;
+  if (d_selector[0]->getName ().empty() == false)
+    sizecounts[d_selector[0]->getImage ()->get_unscaled_width()]++;
+  if (d_selector[1]->getName ().empty() == false)
+    sizecounts[d_selector[1]->getImage ()->get_unscaled_width()]++;
   if (fogpic[0])
     sizecounts[fogpic[0]->get_unscaled_width()]++;
   if (explosion)
@@ -1213,56 +1076,17 @@ void Tileset::clearBridgesImage (bool clear_name)
 
 void Tileset::clearFlagsImage (bool clear_name)
 {
-  if (clear_name)
-    setFlagsFilename ("");
-
-  for (unsigned int i = 0; i < FLAG_TYPES; i++)
-    {
-      PixMask *p = getFlagImage (i);
-      if (p)
-        delete p;
-      setFlagImage (i, NULL);
-      p = getFlagMask (i);
-      if (p)
-        delete p;
-      setFlagMask (i, NULL);
-    }
+  d_flag->clear (clear_name);
 }
 
 void Tileset::clearSmallSelectorImage (bool clear_name)
 {
-  if (clear_name)
-    setSmallSelectorFilename ("");
-
-  for (unsigned int i = 0; i < getNumberOfSmallSelectorFrames(); i++)
-    {
-      PixMask *p = getSmallSelectorImage (i);
-      if (p)
-        delete p;
-      setSmallSelectorImage (i, NULL);
-      p = getSmallSelectorMask (i);
-      if (p)
-        delete p;
-      setSmallSelectorMask (i, NULL);
-    }
+  d_selector[0]->clear (clear_name);
 }
 
 void Tileset::clearLargeSelectorImage (bool clear_name)
 {
-  if (clear_name)
-    setLargeSelectorFilename ("");
-
-  for (unsigned int i = 0; i < getNumberOfSelectorFrames(); i++)
-    {
-      PixMask *p = getSelectorImage (i);
-      if (p)
-        delete p;
-      setSelectorImage (i, NULL);
-      p = getSelectorMask (i);
-      if (p)
-        delete p;
-      setSelectorMask (i, NULL);
-    }
+  d_selector[1]->clear (clear_name);
 }
 
 void Tileset::clearExplosionImage (bool clear_name)
@@ -1371,29 +1195,10 @@ bool Tileset::instantiateFlagImages()
   Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
   if (broken)
     return broken;
-  Glib::ustring imgname = getFlagsFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          std::vector<PixMask* > flagpics, maskpics;
-          bool success =
-            FlagPixMaskCacheItem::loadFlagImages (filename,
-                                                  getUnscaledTileSize(),
-                                                  flagpics, maskpics,
-                                                  false);
-          if (success)
-            {
-              for (unsigned int i = 0; i < flagpics.size(); i++)
-                setFlagImage(i, flagpics[i]);
-              for (unsigned int i = 0; i < maskpics.size(); i++)
-                setFlagMask(i, maskpics[i]);
-            }
-          else
-            broken = true;
-        }
-    }
+  broken = d_flag->load (&t);
+  if (broken)
+    return broken;
+  d_flag->instantiateImages ();
   return broken;
 }
 
@@ -1404,29 +1209,10 @@ bool Tileset::instantiateSmallSelectorImages()
   Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
   if (broken)
     return broken;
-  Glib::ustring imgname = getSmallSelectorFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          std::vector<PixMask* > images, masks;
-          bool success =
-            SelectorPixMaskCacheItem::loadSelectorImages
-            (filename, getUnscaledTileSize(), images, masks, false);
-          if (success)
-            {
-              setNumberOfSmallSelectorFrames(images.size());
-              for (unsigned int i = 0; i < images.size(); i++)
-                {
-                  setSmallSelectorImage(i, images[i]);
-                  setSmallSelectorMask(i, masks[i]);
-                }
-            }
-          else
-            broken = true;
-        }
-    }
+  broken = d_selector[0]->load (&t);
+  if (broken)
+    return broken;
+  d_selector[0]->instantiateImages ();
   return broken;
 }
 
@@ -1437,29 +1223,10 @@ bool Tileset::instantiateLargeSelectorImages()
   Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
   if (broken)
     return broken;
-  Glib::ustring imgname = getLargeSelectorFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          std::vector<PixMask* > images, masks;
-          bool success =
-            SelectorPixMaskCacheItem::loadSelectorImages
-            (filename, getUnscaledTileSize(), images, masks, false);
-          if (success)
-            {
-              setNumberOfSelectorFrames(images.size());
-              for (unsigned int i = 0; i < images.size(); i++)
-                {
-                  setSelectorImage(i, images[i]);
-                  setSelectorMask(i, masks[i]);
-                }
-            }
-          else
-            broken = true;
-        }
-    }
+  broken = d_selector[1]->load (&t);
+  if (broken)
+    return broken;
+  d_selector[1]->instantiateImages ();
   return broken;
 }
 
@@ -1515,9 +1282,9 @@ guint32 Tileset::get_default_tile_size ()
 
 void Tileset::uninstantiateSameNamedImages (Glib::ustring name)
 {
-  if (getLargeSelectorFilename() == name)
+  if (d_selector[1]->getName () == name)
     clearLargeSelectorImage ();
-  if (getSmallSelectorFilename() == name)
+  if (d_selector[0]->getName () == name)
     clearSmallSelectorImage ();
   if (getExplosionFilename() == name)
     clearExplosionImage ();
@@ -1529,7 +1296,7 @@ void Tileset::uninstantiateSameNamedImages (Glib::ustring name)
     clearBridgesImage ();
   if (getFogFilename() == name)
     clearFogImages ();
-  if (getFlagsFilename() == name)
+  if (getFlags()->getName() == name)
     clearFlagsImage ();
   if (getAllMoveBonusFilename() == name)
     clearAllMoveBonusImage ();
@@ -1554,12 +1321,6 @@ void Tileset::uninstantiateSameNamedImages (Glib::ustring name)
     }
   for (auto s : sets)
     delete s;
-}
-
-bool Tileset::instantiateMoveBonusImages ()
-{
-  bool broken = false;
-  return broken;
 }
 
 void Tileset::clearAllMoveBonusImage(bool clear_name)

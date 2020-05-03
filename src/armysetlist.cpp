@@ -32,6 +32,7 @@
 #include "PixMask.h"
 #include "tarhelper.h"
 #include "setlist.h"
+#include "TarFileMaskedImage.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -117,17 +118,6 @@ ArmyProto* Armysetlist::lookupWeakestQuickestArmy(guint32 id) const
   return NULL;
 }
 
-std::vector<PixMask*> Armysetlist::getShipMasks (guint32 id)
-{
-  for (iterator it = begin(); it != end(); it++)
-    {
-      if ((*it)->getId() == id)
-	return (*it)->getShipMasks();
-    }
-  std::vector<PixMask*> empt;
-  return empt;
-}
-
 guint32 Armysetlist::getTileSize(guint32 id)
 {
   for (iterator it = begin(); it != end(); it++)
@@ -148,26 +138,12 @@ PixMask* Armysetlist::getBagPic (guint32 id)
   return NULL;
 }
 
-std::vector<PixMask*> Armysetlist::getStandardPics (guint32 id)
+TarFileMaskedImage *Armysetlist::getStandardPic (guint32 id)
 {
   for (iterator it = begin(); it != end(); it++)
-    {
-      if ((*it)->getId() == id)
-	return (*it)->getStandardPics();
-    }
-  std::vector<PixMask*> empt;
-  return empt;
-}
-
-std::vector<PixMask*> Armysetlist::getStandardMasks (guint32 id)
-{
-  for (iterator it = begin(); it != end(); it++)
-    {
-      if ((*it)->getId() == id)
-	return (*it)->getStandardMasks();
-    }
-  std::vector<PixMask*> empt;
-  return empt;
+    if ((*it)->getId() == id)
+      return (*it)->getStandard();
+  return NULL;
 }
 
 void Armysetlist::instantiateImages(bool &broken)
@@ -189,14 +165,11 @@ void Armysetlist::uninstantiateImages()
     (*it)->uninstantiateImages();
 }
 
-std::vector<PixMask*> Armysetlist::getShipPics (guint32 id)
+TarFileMaskedImage *Armysetlist::getShipPic (guint32 id)
 {
   for (iterator it = begin(); it != end(); it++)
-    {
-      if ((*it)->getId() == id)
-       return (*it)->getShipPics();
-    }
-  std::vector<PixMask*> empt;
-  return empt;
+    if ((*it)->getId() == id)
+      return (*it)->getShip();
+  return NULL;
 }
 

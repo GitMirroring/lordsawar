@@ -45,6 +45,7 @@
 #include "font-size.h"
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
+#include "TarFileMaskedImage.h"
 
 Glib::ustring no_shield_msg = N_("No image set");
 
@@ -651,14 +652,14 @@ void ShieldSetWindow::on_shield_selected()
 
 void ShieldSetWindow::show_tartan (Shield *s, Tartan::Type t, Gtk::Image *image)
 {
-  if (!s || s->getTartanImageName (t).empty () || s->getImage (t) == NULL ||
-      s->getMask (t) == NULL)
+  if (!s || s->getTartanMaskedImage (t)->getName ().empty () ||
+      s->getTartanMaskedImage (t)->getImage () == NULL ||
+      s->getTartanMaskedImage(t)->getMask () == NULL)
     {
       image->clear();
       return;
     }
-  PixMask *i =
-    ImageCache::applyMask(s->getImage (t), s->getMask (t), s->getColor());
+  PixMask *i = s->getTartanMaskedImage (t)->applyMask (s->getColor ());
   double ratio = DIALOG_TARTAN_PIC_FONTSIZE_MULTIPLE;
   double new_height = FontSize::getInstance()->get_height () * ratio;
   int new_width =
@@ -675,14 +676,14 @@ void ShieldSetWindow::show_tartan (Shield *s, Tartan::Type t, Gtk::Image *image)
 
 void ShieldSetWindow::show_shield(ShieldStyle *ss, Shield *s, Gtk::Image *image)
 {
-  if (!ss || !s || ss->getImageName().empty () || ss->getImage () == NULL ||
-      ss->getMask () == NULL)
+  if (!ss || !s || ss->getMaskedImage()->getName().empty () ||
+      ss->getMaskedImage ()->getImage () == NULL ||
+      ss->getMaskedImage ()->getMask () == NULL)
     {
       image->clear();
       return;
     }
-  PixMask *i =
-    ImageCache::applyMask(ss->getImage(), ss->getMask(), s->getColor());
+  PixMask *i = ss->getMaskedImage ()->applyMask (s->getColor ());
   double ratio = 1.0;
   switch (ss->getType ())
     {
@@ -716,45 +717,45 @@ void ShieldSetWindow::fill_shield_info(Shield*shield)
       player_colorbutton->set_rgba(shield->getColor());
       Glib::ustring s;
       ShieldStyle* ss = shield->getFirstShieldstyle(ShieldStyle::SMALL);
-      if (ss && ss->getImageName().empty() == false)
-	s = ss->getImageName();
+      if (ss && ss->getMaskedImage()->getName().empty() == false)
+	s = ss->getMaskedImage()->getName();
       else
 	s = no_shield_msg;
       show_shield(ss, shield, small_image);
       change_smallpic_button->set_label(s);
 
       ss = shield->getFirstShieldstyle(ShieldStyle::MEDIUM);
-      if (ss && ss->getImageName().empty() == false)
-	s = ss->getImageName();
+      if (ss && ss->getMaskedImage()->getName().empty() == false)
+	s = ss->getMaskedImage()->getName();
       else
 	s = no_shield_msg;
       change_mediumpic_button->set_label(s);
       show_shield(ss, shield, medium_image);
 
       ss = shield->getFirstShieldstyle(ShieldStyle::LARGE);
-      if (ss && ss->getImageName().empty() == false)
-	s = ss->getImageName();
+      if (ss && ss->getMaskedImage()->getName().empty() == false)
+	s = ss->getMaskedImage()->getName();
       else
 	s = no_shield_msg;
       change_largepic_button->set_label(s);
       show_shield(ss, shield, large_image);
 
-      if (shield->getTartanImageName(Tartan::LEFT).empty() == false)
-        s = shield->getTartanImageName(Tartan::LEFT);
+      if (shield->getTartanMaskedImage(Tartan::LEFT)->getName ().empty() == false)
+        s = shield->getTartanMaskedImage(Tartan::LEFT)->getName ();
       else
         s = no_tartan_msg;
       show_tartan (shield, Tartan::LEFT, left_tartan_image);
       change_left_tartan_button->set_label(s);
 
-      if (shield->getTartanImageName(Tartan::CENTER).empty() == false)
-        s = shield->getTartanImageName(Tartan::CENTER);
+      if (shield->getTartanMaskedImage(Tartan::CENTER)->getName ().empty() == false)
+        s = shield->getTartanMaskedImage(Tartan::CENTER)->getName ();
       else
         s = no_tartan_msg;
       show_tartan (shield, Tartan::CENTER, center_tartan_image);
       change_center_tartan_button->set_label(s);
 
-      if (shield->getTartanImageName(Tartan::RIGHT).empty() == false)
-        s = shield->getTartanImageName(Tartan::RIGHT);
+      if (shield->getTartanMaskedImage(Tartan::RIGHT)->getName ().empty() == false)
+        s = shield->getTartanMaskedImage(Tartan::RIGHT)->getName ();
       else
         s = no_tartan_msg;
       show_tartan (shield, Tartan::RIGHT, right_tartan_image);
@@ -873,7 +874,7 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
       Gtk::TreeModel::Row row = *iterrow;
       Shield *shield = row[shields_columns.shield];
       ShieldStyle *ss = shield->getFirstShieldstyle(type);
-      Glib::ustring f = ss->getImageName ();
+      Glib::ustring f = ss->getMaskedImage()->getName ();
       Gtk::FileChooserDialog *d = shield_filechooser (shield, type, f != "");
       int response = d->run();
       if (response == Gtk::RESPONSE_ACCEPT && d->get_filename() != "")
@@ -909,7 +910,7 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
           if (d_shieldset->removeFileInCfgFile(f))
             {
               d_shieldset->uninstantiateSameNamedImages
-                (ss->getImageName ());
+                (ss->getMaskedImage()->getName ());
               d_shieldset->setHeightsAndWidthsFromImages(ss);
               needs_saving = true;
             }
@@ -967,30 +968,32 @@ void ShieldSetWindow::update_window_title()
 
 void ShieldSetWindow::on_edit_copy_shields_activated()
 {
-  for (unsigned int j = ShieldStyle::SMALL; j <= ShieldStyle::LARGE; j++)
+  Shield *w = d_shieldset->lookupShieldByColour (Shield::WHITE);
+
+  for (guint32 i = Shield::WHITE + 1; i <= Shield::NEUTRAL; i++)
     {
-      d_shieldset->lookupShieldByTypeAndColour(Shield::WHITE, j)->uninstantiateImages();
-      d_shieldset->lookupShieldByColour(j)->uninstantiateTartanImages();
-    }
-  for (unsigned int i = Shield::WHITE+1; i <= Shield::NEUTRAL; i++)
-    {
-      for (unsigned int j = ShieldStyle::SMALL; j <= ShieldStyle::LARGE; j++)
+      Shield *s = d_shieldset->lookupShieldByColour (i);
+      for (auto ss : *s)
         {
-          d_shieldset->lookupShieldByTypeAndColour(j, i)->setImageName(d_shieldset->lookupShieldByTypeAndColour(j, Shield::WHITE)->getImageName());
-          d_shieldset->lookupShieldByTypeAndColour(j, i)->uninstantiateImages();
+          TarFileMaskedImage *mim = ss->getMaskedImage ();
+          ShieldStyle *wss =
+            d_shieldset->lookupShieldByTypeAndColour (ss->getType (),
+                                                      Shield::WHITE);
+          mim->setName (wss->getMaskedImage ()->getName ());
         }
-      for (int jj = Tartan::LEFT; jj <= Tartan::RIGHT; jj++)
+      for (guint32 k = Tartan::LEFT; k <= Tartan::RIGHT; k++)
         {
-          Tartan::Type j = Tartan::Type (jj);
-          d_shieldset->lookupShieldByColour(i)->setTartanImageName(j, d_shieldset->lookupShieldByColour(Shield::WHITE)->getTartanImageName(j));
-          d_shieldset->lookupShieldByColour(i)->uninstantiateTartanImage(j);
+          TarFileMaskedImage *mim = s->getTartanMaskedImage (Tartan::Type (k));
+          TarFileMaskedImage *wmim = w->getTartanMaskedImage (Tartan::Type (k));
+          mim->setName (wmim->getName ());
         }
     }
+
   needs_saving = true;
   bool broken = false;
-  d_shieldset->instantiateImages(false, broken);
-  update_shield_panel();
-  update_window_title();
+  d_shieldset->instantiateImages (false, broken);
+  update_shield_panel ();
+  update_window_title ();
 }
 
 void ShieldSetWindow::refresh_shields()
@@ -1043,17 +1046,16 @@ void ShieldSetWindow::process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialo
 {
   Glib::ustring newname = "";
   bool ret = false;
-  if (ss->getImageName() == "")
+  if (ss->getMaskedImage()->getName() == "")
     ret = d_shieldset->addFileInCfgFile(d->get_filename (), newname);
   else
-    ret = d_shieldset->replaceFileInCfgFile(ss->getImageName(),
+    ret = d_shieldset->replaceFileInCfgFile(ss->getMaskedImage()->getName(),
                                             d->get_filename(), newname);
   if (ret == true)
     {
-      bool broken = false;
-      ss->setImageName(newname);
-      ss->uninstantiateImages();
-      ss->instantiateImages(d->get_filename(), d_shieldset, false, broken);
+      ss->getMaskedImage ()->uninstantiateImages ();
+      ss->getMaskedImage ()->load (d_shieldset, newname);
+      ss->getMaskedImage ()->instantiateImages ();
       needs_saving = true;
       update_window_title();
     }
@@ -1079,7 +1081,7 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
       Gtk::TreeModel::Row row = *iterrow;
       Shield *shield = row[shields_columns.shield];
 
-      Glib::ustring f = shield->getTartanImageName(type);
+      Glib::ustring f = shield->getTartanMaskedImage(type)->getName ();
       Gtk::FileChooserDialog *d = tartan_filechooser (shield, type, f != "");
       int response = d->run();
       if (response == Gtk::RESPONSE_ACCEPT && d->get_filename() != "")
@@ -1111,11 +1113,11 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
         }
       else if (response == Gtk::RESPONSE_REJECT)
         {
-          Glib::ustring file = shield->getTartanImageName(type);
+          Glib::ustring file = shield->getTartanMaskedImage(type)->getName ();
           if (d_shieldset->removeFileInCfgFile(file))
             {
               d_shieldset->uninstantiateSameNamedImages
-                (shield->getTartanImageName (type));
+                (shield->getTartanMaskedImage(type)->getName ());
               needs_saving = true;
             }
           else
@@ -1137,7 +1139,7 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
 void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk::FileChooserDialog *d)
 {
   Glib::ustring newname = "";
-  Glib::ustring f = shield->getTartanImageName(type);
+  Glib::ustring f = shield->getTartanMaskedImage(type)->getName ();
   bool ret = false;
   if (f == "")
     ret = d_shieldset->addFileInCfgFile(d->get_filename(), newname);
@@ -1145,10 +1147,10 @@ void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk:
     ret = d_shieldset->replaceFileInCfgFile(f, d->get_filename(), newname);
   if (ret == true)
     {
-      bool broken = false;
-      shield->setTartanImageName (type, newname);
-      shield->uninstantiateTartanImage (type);
-      shield->instantiateTartanImage (type, d->get_filename (), broken);
+      TarFileMaskedImage *mim = shield->getTartanMaskedImage (type);
+      mim->uninstantiateImages ();
+      mim->load (d_shieldset, newname);
+      mim->instantiateImages ();
       needs_saving = true;
       update_window_title();
     }

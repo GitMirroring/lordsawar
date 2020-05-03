@@ -24,6 +24,7 @@
 #include <gtkmm.h>
 #include "tileset.h"
 #include "lw-editor-dialog.h"
+class TarFileMaskedImage;
 
 //! Tileset flag editor.
 //! Shows and manages the flags that appear on stacks
@@ -37,7 +38,7 @@ class TilesetFlagEditorDialog: public LwEditorDialog
 
  private:
     bool d_changed;
-    PixMask *d_flags;
+    TarFileMaskedImage *d_flags;
     Gtk::Button *flag_imagebutton;
     Gtk::ComboBoxText *shield_theme_combobox;
     Gtk::Grid *preview_table;

@@ -27,8 +27,7 @@
 #include "armyset-window.h"
 #include "builder-cache.h"
 #include "armyset-info-dialog.h"
-#include "masked-image-editor-dialog.h"
-#include "per-player-masked-image-editor-dialog.h"
+#include "tar-file-masked-image-editor-dialog.h"
 
 #include "defs.h"
 #include "Configuration.h"
@@ -49,6 +48,7 @@
 #include "GameMap.h"
 #include "font-size.h"
 #include "timed-message-dialog.h"
+#include "TarFileMaskedImage.h"
 
 #define method(x) sigc::mem_fun(*this, &ArmySetWindow::x)
 
@@ -693,11 +693,9 @@ void ArmySetWindow::on_save_armyset_activated()
 
 void ArmySetWindow::on_edit_ship_picture_activated()
 {
-  Glib::ustring imgname = d_armyset->getShipImageName();
-  PerPlayerMaskedImageEditorDialog d(*window, imgname,
-                            d_armyset->getShipPics (),
-                            d_armyset->getShipMasks (),
-                            EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
+  Glib::ustring imgname = d_armyset->getShip()->getName();
+  TarFileMaskedImageEditorDialog d(*window, d_armyset->getShip(),
+                                   EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
   d.set_title(_("Select a Ship image"));
   int response = d.run();
   if (response == Gtk::RESPONSE_ACCEPT && d.get_filename() != "")
@@ -712,7 +710,7 @@ void ArmySetWindow::on_edit_ship_picture_activated()
           d_armyset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          d_armyset->setShipImageName(newname);
+          d_armyset->getShip()->setName(newname);
           d_armyset->instantiateShipImage ();
           needs_saving = true;
           update_window_title();
@@ -745,11 +743,9 @@ void ArmySetWindow::on_edit_selector_picture_activated()
 
 void ArmySetWindow::on_edit_standard_picture_activated()
 {
-  Glib::ustring imgname = d_armyset->getStandardImageName();
-  PerPlayerMaskedImageEditorDialog d(*window, imgname,
-                                     d_armyset->getStandardPics (),
-                                     d_armyset->getStandardMasks (),
-                                     EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
+  Glib::ustring imgname = d_armyset->getStandard()->getName();
+  TarFileMaskedImageEditorDialog d(*window, d_armyset->getStandard(),
+                                   EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
   d.set_title(_("Select a Hero Flag image"));
   int response = d.run();
   if (response == Gtk::RESPONSE_ACCEPT && d.get_filename() != "")
@@ -763,7 +759,7 @@ void ArmySetWindow::on_edit_standard_picture_activated()
           d_armyset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          d_armyset->setStandardImageName(newname);
+          d_armyset->getStandard()->setName(newname);
           d_armyset->instantiateStandardImage ();
           needs_saving = true;
           update_window_title();
@@ -885,12 +881,11 @@ void ArmySetWindow::on_army_selected()
 
 void ArmySetWindow::fill_army_image(Gtk::Button *button, Gtk::Image *image, Shield::Colour c, ArmyProto *army)
 {
-  Glib::ustring imgname = army->getImageName(c);
+  Glib::ustring imgname = army->getMaskedImage(c)->getName();
   if (imgname.empty () == false)
     {
       Gdk::RGBA colour = Shieldsetlist::getInstance()->getColor(1, c);
-      PixMask *p =
-        ImageCache::applyMask(army->getImage(c), army->getMask(c), colour);
+      PixMask *p = army->getMaskedImage (c)->applyMask (colour);
       double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
       int font_size = FontSize::getInstance()->get_height ();
       double new_height = font_size * ratio;
@@ -1036,7 +1031,7 @@ void ArmySetWindow::on_description_changed()
 void ArmySetWindow::instantiateOthers (ArmyProto *a, Shield::Colour c,
                                        Glib::ustring filename)
 {
-  if (a->getImageName (c).empty () == true)
+  if (a->getMaskedImage (c)->getName ().empty () == true)
     return;
   //what a hassle.  an army can reuse the same file many times
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
@@ -1044,11 +1039,10 @@ void ArmySetWindow::instantiateOthers (ArmyProto *a, Shield::Colour c,
       Shield::Colour col = Shield::Colour(i);
       if (col == c)
         continue;
-      if (a->getImageName (c) == a->getImageName (col))
+      if (a->getMaskedImage (c)->getName () == a->getMaskedImage(col)->getName ())
         {
-          a->setImageName(col, filename);
-          a->instantiateImage (d_armyset->getConfigurationFile (),
-                               d_armyset->getTileSize (), col);
+          a->getMaskedImage(col)->setName (filename);
+          a->instantiateImage (d_armyset->getConfigurationFile (), col);
         }
     }
 }
@@ -1062,10 +1056,9 @@ void ArmySetWindow::on_image_changed(Shield::Colour c)
     {
       Gtk::TreeModel::Row row = *iterrow;
       ArmyProto *a = row[armies_columns.army];
-      Glib::ustring imgname = a->getImageName(c);
-      MaskedImageEditorDialog d(*window, imgname,
-                                a->getImage (c), a->getMask (c),
-                                EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
+      Glib::ustring imgname = a->getMaskedImage(c)->getName();
+      TarFileMaskedImageEditorDialog d(*window, a->getMaskedImage (c),
+                                       EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
       d.set_title(String::ucompose(_("Select a %1 Army image"),
                                    Shield::colourToFriendlyName(c)));
       int response = d.run();
@@ -1083,9 +1076,8 @@ void ArmySetWindow::on_image_changed(Shield::Colour c)
           if (success)
             {
               instantiateOthers (a, c, newname);
-              a->setImageName(c, newname);
-              a->instantiateImage (d_armyset->getConfigurationFile (),
-                                   d_armyset->getTileSize (), c);
+              a->getMaskedImage(c)->setName (newname);
+              a->instantiateImage (d_armyset->getConfigurationFile (), c);
               fill_army_images (a);
 
               if (inhibit_needs_saving == false)
@@ -1638,9 +1630,9 @@ void ArmySetWindow::on_make_same_clicked()
   ArmyProto *a = row[armies_columns.army];
   if (!a)
     return;
-  if (a->getImageName(Shield::WHITE).empty())
+  if (a->getMaskedImage(Shield::WHITE)->getName ().empty())
     return;
-  Glib::ustring in = a->getImageName(Shield::Colour(0));
+  Glib::ustring in = a->getMaskedImage(Shield::Colour(0))->getName ();
   Glib::ustring white_filename = d_armyset->getFileFromConfigurationFile(in);
   if (white_filename.empty () == true)
     return;
@@ -1679,7 +1671,7 @@ void ArmySetWindow::on_make_same_clicked()
   for (unsigned int i = Shield::GREEN; i <= Shield::NEUTRAL; i++)
     {
       Shield::Colour s = Shield::Colour(i);
-      Glib::ustring imgname = a->getImageName(s);
+      Glib::ustring imgname = a->getMaskedImage(s)->getName();
       Glib::ustring newname = "";
 
       bool success = false;
@@ -1691,16 +1683,13 @@ void ArmySetWindow::on_make_same_clicked()
           d_armyset->replaceFileInCfgFile(imgname, white_filename, newname);
       if (success)
         {
-          a->setImageName(s, newname);
+          a->getMaskedImage(s)->setName (newname);
           bool broken = false;
           Gdk::RGBA colour = Shieldsetlist::getInstance()->getColor(1, s);
-          broken =
-            a->instantiateImage (d_armyset->getConfigurationFile (),
-                                 d_armyset->getTileSize (), s);
+          broken = a->instantiateImage (d_armyset->getConfigurationFile (), s);
           if (!broken)
             {
-              PixMask *p =
-                ImageCache::applyMask(a->getImage(s), a->getMask(s), colour);
+              PixMask *p = a->getMaskedImage (s)->applyMask (colour);
               double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
               int font_size = FontSize::getInstance()->get_height ();
               double new_height = font_size * ratio;
@@ -1711,7 +1700,7 @@ void ArmySetWindow::on_make_same_clicked()
               delete p;
               Gtk::Button *button = lookup_button_by_colour (s);
               if (button)
-                button->set_label(a->getImageName (s));
+                button->set_label(a->getMaskedImage(s)->getName ());
             }
         }
       else

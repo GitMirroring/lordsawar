@@ -30,6 +30,7 @@
 #include "SmallTile.h"
 
 class XML_Helper;
+class TarFileMaskedImage;
 
 //! A list of Tile objects in a terrain theme.
 /** 
@@ -91,13 +92,11 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	// Get Methods
 
-	//! Returns the basename of the file containing big selector images.
-	Glib::ustring getLargeSelectorFilename() const
-          {return d_large_selector;}
+        //! Returns the frames of selector, either the large one or the small.
+        TarFileMaskedImage *getSelector(bool large) {return d_selector[large ? 1 : 0];}
 
-	//! Returns the basename of the file containing small selector images.
-	Glib::ustring getSmallSelectorFilename() const
-          {return d_small_selector;}
+        //! Returns the frames of the flag
+        TarFileMaskedImage *getFlags() {return d_flag;}
 
 	//! Returns the basename of the file containing the explosion image.
 	Glib::ustring getExplosionFilename() const {return d_explosion;}
@@ -113,9 +112,6 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	//! Returns the basename of the file containing the fog images.
 	Glib::ustring getFogFilename() const {return d_fog;}
-
-	//! Returns the basename of the file containing the flag images.
-	Glib::ustring getFlagsFilename() const {return d_flags;}
 
         //! Get the colour associated with the road on the smallmap.
 	Gdk::RGBA getRoadColor() const {return d_road_color;}
@@ -138,32 +134,8 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	//! Get a bridge image.  Pass in the index.
 	PixMask *getBridgeImage(guint32 i) {return bridgepic[i];}
 
-	//! Get a flag image.  Pass in the index.
-	PixMask *getFlagImage(guint32 i) {return flagpic[i];}
-
-	//! Get the flag mask.  Pass in the index.
-	PixMask *getFlagMask(guint32 i) {return flagmask[i];}
-
 	//! Get the fog image.  Passin the index.
 	PixMask *getFogImage(guint32 i) {return fogpic[i];}
-
-	//! Get the big selector image.  Pass in the index.
-	PixMask *getSelectorImage(guint32 i) {return selector[i];}
-
-	//! Get the big selector mask.  Pass in the index.
-	PixMask *getSelectorMask(guint32 i) {return selectormask[i];}
-
-	//! Get the small selector image.  Pass in the index.
-	PixMask *getSmallSelectorImage(guint32 i) {return smallselector[i];}
-
-	//! Get the small selector mask.  Pass in the index.
-	PixMask *getSmallSelectorMask(guint32 i) {return smallselectormask[i];}
-
-	//! Get the number of animation frames in the big selector image.
-	guint32 getNumberOfSelectorFrames() {return number_of_selector_frames;}
-
-	//! Get the number of animation frames in the small selector image.
-	guint32 getNumberOfSmallSelectorFrames() {return number_of_small_selector_frames;}
 
         //! Get the first tile that has a certain pattern on the small map.
         Tile *getFirstTile(SmallTile::Pattern pattern) const;
@@ -224,12 +196,6 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	// Set Methods
 
-	//! Sets the basename of the file containing the big selector images.
-	void setLargeSelectorFilename(Glib::ustring p){d_large_selector = p;}
-
-	//! Sets the basename of the file containing the small selector images.
-	void setSmallSelectorFilename(Glib::ustring p){d_small_selector = p;}
-
 	//! Sets the basename of the file containing the explosion image.
 	void setExplosionFilename(Glib::ustring p){d_explosion = p;}
 
@@ -244,9 +210,6 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	//! Sets the basename of the file containing the fog images.
 	void setFogFilename(Glib::ustring p){d_fog = p;}
-
-	//! Sets the basename of the file containing the flag images.
-	void setFlagsFilename(Glib::ustring p){d_flags = p;}
 
 	//! Sets the colour of the road on the smallmap.
 	void setRoadColor(Gdk::RGBA color) {d_road_color = color;}
@@ -269,31 +232,9 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	//! Sets a bridge image.
 	void setBridgeImage(guint32 i, PixMask *p) {bridgepic[i] = p;}
 
-	//! Sets a flag image.
-	void setFlagImage(guint32 i, PixMask *p) {flagpic[i] = p;}
-
-	//! Sets a flag mask.
-	void setFlagMask(guint32 i, PixMask *p) {flagmask[i] = p;}
-
 	//! Sets a fog image.
 	void setFogImage(guint32 i, PixMask *p) {fogpic[i] = p;}
 
-	//! Sets a big selector image.
-	void setSelectorImage(guint32 i, PixMask *p) {selector[i] = p;}
-
-	//! Sets a big selector mask.
-	void setSelectorMask(guint32 i, PixMask *p) {selectormask[i] = p;}
-
-	//! Sets a small selector image.
-	void setSmallSelectorImage(guint32 i, PixMask *p) {smallselector[i] = p;}
-	//! Sets a small selector mask.
-	void setSmallSelectorMask(guint32 i, PixMask *p) {smallselectormask[i] = p;}
-
-	//! Sets the number of animation frames in the big selector.
-	void setNumberOfSelectorFrames(guint32 s) {selector.reserve(s); selectormask.reserve(s); number_of_selector_frames = s;}
-
-	//! Sets the number of animation frames in the small selector.
-	void setNumberOfSmallSelectorFrames(guint32 s) {smallselector.reserve(s);smallselectormask.reserve(s); number_of_small_selector_frames = s;}
         //! Sets the basename of the file containing the fly movement bonus image.
         void setAllMoveBonusFilename (Glib::ustring f) 
           {d_all_movebonus_filename = f;}
@@ -366,7 +307,6 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         bool instantiateHillsMoveBonusImage (TarFile *d);
         bool instantiateMountainsMoveBonusImage (TarFile *d);
         bool instantiateSwampMoveBonusImage (TarFile *d);
-        bool instantiateMoveBonusImages ();
 
         //! clear the tileset and add the normal tiles to it.
         void populateWithDefaultTiles();
@@ -469,9 +409,6 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 			       Glib::ustring stones_filename,
 			       Glib::ustring bridges_filename,
 			       Glib::ustring fog_filename,
-			       Glib::ustring flags_filename,
-			       Glib::ustring selector_filename,
-			       Glib::ustring small_selector_filename,
                                Glib::ustring all_movebonus_filename,
                                Glib::ustring water_movebonus_filename,
                                Glib::ustring forest_movebonus_filename,
@@ -481,31 +418,11 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
                                bool scale, bool &broken);
         // DATA
 
-	//! The basename of the small selector image.
-	/**
-	 * The small selector is the graphic that appears on the bigmap when
-	 * a stack is selected that only has one army unit in it.
-	 *
-	 * The image contains many animation frames, and is masked.
-	 *
-	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of
-	 * tileset.
-	 */
-	Glib::ustring d_small_selector;
+        //! The object containing the small and large selector animation frames
+        TarFileMaskedImage *d_selector[2];
 
-	//! The basename of the large selector image.
-	/**
-	 * The large selector is the graphic that appears on the bigmap when
-	 * a stack is selected that only has more than one army unit in it.
-	 *
-	 * The image contains many animation frames, and is masked.
-	 *
-	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of
-	 * tileset.
-	 */
-	Glib::ustring d_large_selector;
+        //! The object containing the set of images that comprise the flags
+        TarFileMaskedImage *d_flag;
 
 	//! The basename of the explosion image.
 	/**
@@ -573,19 +490,6 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	 */
 	Glib::ustring d_bridges;
 
-	//! The basename of the flag image.
-	/**
-	 * The flag images appear on the bigmap beside a stack to indicate the
-	 * number of army units in the stack.
-	 *
-	 * The number of frames in the image corresponds to the maximum number
-	 * of army units in a stack.  See the FLAG_TYPES constant in defs.h.
-	 *
-	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of
-	 * tileset.
-	 */
-	Glib::ustring d_flags;
 
         typedef std::map<guint32, TileStyle*> TileStyleIdMap;
 	//! A map that provides a TileStyle when supplying a TileStyle id.
@@ -613,30 +517,6 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	//! The bridge images.
         PixMask* bridgepic[BRIDGE_TYPES];
 
-	//! The flag images.
-        PixMask* flagpic[FLAG_TYPES];
-
-	//! The flag masks.
-        PixMask* flagmask[FLAG_TYPES];
-
-	//! The number of animation frames in the big selector.
-	guint32 number_of_selector_frames;
-
-	//! The image frames in the big selector.
-	std::vector<PixMask* > selector;
-
-	//! The mask frames of the big selector.
-	std::vector<PixMask* > selectormask;
-
-	//! The number of animation frames in the small selector.
-	guint32 number_of_small_selector_frames;
-
-	//! The image frames of the small selector.
-	std::vector<PixMask* > smallselector;
-
-	//! The mask frames of the small selector.
-	std::vector<PixMask* > smallselectormask;
-
 	//! The exposion image.
 	PixMask* explosion;
 
@@ -650,11 +530,22 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         Glib::ustring d_mountains_movebonus_filename;
         Glib::ustring d_swamp_movebonus_filename;
 
+        //! The movement bonus graphic for moving quickly over all tile types.
         PixMask *d_all_movebonus;
+
+        //! The movement graphic for when a stack is in a boat.
         PixMask *d_water_movebonus;
+
+        //! The movement bonus graphic for moving quickly through woods.
         PixMask *d_forest_movebonus;
+
+        //! The movement bonus graphic for moving quickly through hills.
         PixMask *d_hills_movebonus;
+
+        //! The movement graphic for moving quickly (or at all) thru mountains.
         PixMask *d_mountains_movebonus;
+
+        //! The movement bonus graphic for moving quickly through marsh.
         PixMask *d_swamp_movebonus;
 };
 #endif // TILESET_H

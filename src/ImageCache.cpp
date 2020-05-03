@@ -40,6 +40,7 @@
 #include "FogMap.h"
 #include "shieldset.h"
 #include "ScenarioMedia.h"
+#include "TarFileMaskedImage.h"
 
 ImageCache* ImageCache::s_instance = 0;
 
@@ -94,6 +95,10 @@ ImageCache::ImageCache()
     dialogcache((sigc::ptr_fun(&DialogPixMaskCacheItem::generate))),
     medalcache((sigc::ptr_fun(&MedalPixMaskCacheItem::generate)))
 {
+    d_hero_newlevel[0] =
+      new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+    d_hero_newlevel[1] =
+      new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
     loadDiplomacyImages();
     loadCursorImages();
     loadProdShieldImages();
@@ -192,21 +197,20 @@ bool ImageCache::loadProdShieldImages()
 
 bool ImageCache::loadNewLevelImages()
 {
-  bool broken = false;
-  std::vector<PixMask*> half;
-  half = disassemble_row
-    (ScenarioMedia::getDefaultHeroNewLevelMaleImageFilename(), 2, broken);
-  if (broken)
-    return false;
-  d_newlevel_male = half[0];
-  d_newlevelmask_male = half[1];
-  half = disassemble_row
-    (ScenarioMedia::getDefaultHeroNewLevelFemaleImageFilename(), 2, broken);
-  if (broken)
-    return false;
-  d_newlevel_female = half[0];
-  d_newlevelmask_female = half[1];
-  return true;
+  Glib::ustring filename =
+    ScenarioMedia::getDefaultHeroNewLevelMaleImageFilename();
+  bool broken = d_hero_newlevel[0]->loadFromFile (filename);
+  if (!broken)
+    {
+      d_hero_newlevel[0]->instantiateImages ();
+
+      filename = ScenarioMedia::getDefaultHeroNewLevelFemaleImageFilename();
+      broken = d_hero_newlevel[1]->loadFromFile (filename);
+      if (!broken)
+        d_hero_newlevel[1]->instantiateImages ();
+    }
+
+  return broken;
 }
 
 bool ImageCache::loadDefaultTileStyleImages()
@@ -283,6 +287,8 @@ PixMask* ImageCache::loadMiscImage(Glib::ustring pngfile)
 
 ImageCache::~ImageCache()
 {
+  delete d_hero_newlevel[0];
+  delete d_hero_newlevel[1];
 
   for (unsigned int i = 0; i < DIPLOMACY_TYPES;i++)
     {
@@ -295,11 +301,6 @@ ImageCache::~ImageCache()
 
   for (unsigned int i = 0; i < PRODUCTION_SHIELD_TYPES; i++)
     delete d_prodshield[i];
-
-  delete d_newlevel_male;
-  delete d_newlevelmask_male;
-  delete d_newlevel_female;
-  delete d_newlevelmask_female;
 
   for (unsigned int i = 0; i < DEFAULT_TILESTYLE_TYPES; i++)
     delete d_default_tilestyles[i];
@@ -1278,38 +1279,13 @@ PixMask* ImageCache::getMedalImage(bool large, int type)
     }
 }
 
-PixMask *ImageCache::getNewLevelImage(bool female, bool mask)
+TarFileMaskedImage *ImageCache::getHeroNewLevelMaskedImage (bool female)
 {
-  if (female && mask)
-    {
-      if (ScenarioMedia::getInstance()->getHeroNewLevelFemaleMask())
-        return ScenarioMedia::getInstance()->getHeroNewLevelFemaleMask();
-      else
-        return d_newlevelmask_female;
-    }
-  else if (female && !mask)
-    {
-      if (ScenarioMedia::getInstance()->getHeroNewLevelFemaleImage())
-        return ScenarioMedia::getInstance()->getHeroNewLevelFemaleImage();
-      else
-        return d_newlevel_female;
-    }
-
-  if (!female && mask)
-    {
-      if (ScenarioMedia::getInstance()->getHeroNewLevelMaleMask())
-        return ScenarioMedia::getInstance()->getHeroNewLevelMaleMask();
-      else
-        return d_newlevelmask_male;
-    }
-  else if (!female && !mask)
-    {
-      if (ScenarioMedia::getInstance()->getHeroNewLevelMaleImage())
-        return ScenarioMedia::getInstance()->getHeroNewLevelMaleImage();
-      else
-        return d_newlevel_male;
-    }
-  return NULL;
+  TarFileMaskedImage *mim =
+    ScenarioMedia::getInstance()->getHeroNewLevelMaskedImage(female);
+  if (mim->getImage ())
+    return mim;
+  return d_hero_newlevel[female ? 1 : 0];
 }
 
 PixMask* ImageCache::getMedalPic(bool large, guint32 type,
@@ -1373,49 +1349,6 @@ PixMask* ImageCache::getSmallStrongholdUnexploredImage()
 PixMask* ImageCache::getSmallTempleImage()
 {
   return d_small_temple;
-}
-
-PixMask* ImageCache::applyMask(PixMask* image, PixMask* mask, const Player* p)
-{
-  return applyMask(image, mask, p->getColor());
-}
-
-PixMask* ImageCache::applyMask(PixMask* image, PixMask* mask, Gdk::RGBA colour)
-{
-  int width = image->get_width();
-  int height = image->get_height();
-  PixMask* result = PixMask::create(image->get_pixmap(), mask->get_pixmap());
-  if (!result)
-    return NULL;
-  if (mask->get_width() != width || (mask->get_height()) != height)
-    {
-      std::cerr <<"Warning: mask and original image do not match\n";
-      return NULL;
-    }
-  Glib::RefPtr<Gdk::Pixbuf> maskbuf = mask->to_pixbuf();
-
-  guint8 *data = maskbuf->get_pixels();
-  guint8 *copy = (guint8*)  malloc (height * width * 4 * sizeof(guint8));
-  memcpy(copy, data, height * width * 4 * sizeof(guint8));
-  for (int i = 0; i < width; i++)
-    for (int j = 0; j < height; j++)
-      {
-	const int base = (j * 4) + (i * height * 4);
-
-	if (copy[base+3] != 0)
-	  {
-	    copy[base+0] = colour.get_red() *copy[base+0];
-	    copy[base+1] = colour.get_green() * copy[base+1];
-	    copy[base+2] = colour.get_blue() * copy[base+2];
-	  }
-      }
-  Glib::RefPtr<Gdk::Pixbuf> colouredmask =
-    Gdk::Pixbuf::create_from_data(copy, Gdk::COLORSPACE_RGB, true, 8,
-				  width, height, width * 4);
-  result->draw_pixbuf(colouredmask, 0, 0, 0, 0, width, height);
-  free(copy);
-
-  return result;
 }
 
 PixMask* ImageCache::greyOut(PixMask* image)
@@ -1751,21 +1684,17 @@ PixMask *SelectorPixMaskCacheItem::generate(SelectorPixMaskCacheItem i)
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
   if (i.type == 0)
     {
-      if (as->getNumberOfSelectorFrames (c) > 0)
-        return ImageCache::applyMask(as->getSelectorImage(c, i.frame),
-                                     as->getSelectorMask(c, i.frame), p);
+      if (as->getSelector(true, c)->getNumberOfFrames () > 0)
+        return as->getSelector(true, c)->applyMask (i.frame, p);
       else
-        return ImageCache::applyMask(ts->getSelectorImage(i.frame),
-                                     ts->getSelectorMask(i.frame), p);
+        return ts->getSelector(true)->applyMask (i.frame, p);
     }
   else
     {
-      if (as->getNumberOfSmallSelectorFrames (c) > 0)
-        return ImageCache::applyMask(as->getSmallSelectorImage(c, i.frame),
-                                     as->getSmallSelectorMask(c, i.frame), p);
+      if (as->getSelector(false, c)->getNumberOfFrames () > 0)
+        return as->getSelector(false, c)->applyMask (i.frame, p);
       else
-        return ImageCache::applyMask(ts->getSmallSelectorImage(i.frame),
-                                     ts->getSmallSelectorMask(i.frame), p);
+        return ts->getSelector(false)->applyMask (i.frame, p);
     }
 }
 
@@ -1783,58 +1712,12 @@ int SelectorPixMaskCacheItem::comp(const SelectorPixMaskCacheItem item) const
     0;
 }
 
-bool SelectorPixMaskCacheItem::loadSelectorImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale)
-{
-  bool broken = false;
-  PixMask *p = PixMask::create (filename, broken);
-  if (!broken)
-    {
-      broken = loadSelectors(p, size, images, masks, scale);
-      delete p;
-    }
-  return broken;
-}
-
-bool SelectorPixMaskCacheItem::loadSelectors(PixMask *p, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale)
-{
-  bool broken = false;
-  int num_frames;
-  guint32 width = p->get_unscaled_width ();
-  num_frames = width / size;
-  images = disassemble_row(p->to_pixbuf (), num_frames, true);
-  if (broken)
-    return false;
-  if (scale)
-    {
-      for (int i = 0; i < num_frames; i++)
-        {
-          if (images[i]->get_width() != (int)size)
-            PixMask::scale(images[i], size, size);
-        }
-    }
-
-  masks = disassemble_row(p->to_pixbuf (), num_frames, false);
-  if (broken)
-    return false;
-  if (scale)
-    {
-      for (int i = 0; i < num_frames; i++)
-        {
-          if (masks[i]->get_width() != (int)size)
-            PixMask::scale(masks[i], size, size);
-        }
-    }
-
-  return true;
-}
-
 PixMask *FlagPixMaskCacheItem::generate(FlagPixMaskCacheItem i)
 {
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
   Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
   // size of stack starts at 1, but we need the index, which starts at 0
-  return ImageCache::applyMask (ts->getFlagImage(i.size-1),
-                                ts->getFlagMask(i.size-1), p);
+  return ts->getFlags ()->applyMask (i.size - 1, p);
 }
 
 int FlagPixMaskCacheItem::comp(const FlagPixMaskCacheItem item) const
@@ -1849,45 +1732,6 @@ int FlagPixMaskCacheItem::comp(const FlagPixMaskCacheItem item) const
     0;
 }
 
-bool FlagPixMaskCacheItem::loadFlagImages(Glib::ustring filename, guint32 size, std::vector<PixMask* > &images, std::vector<PixMask* > &masks, bool scale)
-{
-  bool broken = false;
-  PixMask *p = PixMask::create (filename, broken);
-  if (!broken)
-    {
-      broken = loadFlagImages (p, size, images, masks, scale);
-      delete p;
-    }
-  return broken;
-}
-
-bool FlagPixMaskCacheItem::loadFlagImages(PixMask *p, guint32 size,
-                                          std::vector<PixMask* > &images,
-                                          std::vector<PixMask* > &masks,
-                                          bool scale)
-{
-  images = disassemble_row(p->to_pixbuf (), FLAG_TYPES, true);
-  if (scale)
-    {
-      for (unsigned int i = 0; i < FLAG_TYPES; i++)
-        {
-          if (images[i]->get_width() != (int)size)
-            PixMask::scale(images[i], size, size);
-        }
-    }
-
-  masks = disassemble_row(p->to_pixbuf (), FLAG_TYPES, false);
-  if (scale)
-    {
-      for (unsigned int i = 0; i < FLAG_TYPES; i++)
-        {
-          if (masks[i]->get_width() !=(int) size)
-            PixMask::scale(masks[i], size, size);
-        }
-    }
-  return true;
-}
-
 PixMask *ArmyPixMaskCacheItem::generate(ArmyPixMaskCacheItem i)
 {
   PixMask *s;
@@ -1897,10 +1741,10 @@ PixMask *ArmyPixMaskCacheItem::generate(ArmyPixMaskCacheItem i)
   // copy the pixmap including player colors
   Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
   Shield::Colour c = Shield::Colour(i.player_id);
-  if (basearmy->getImage(c) == NULL || basearmy->getMask(c) == NULL)
+  if (basearmy->getMaskedImage(c)->getImage () == NULL ||
+      basearmy->getMaskedImage(c)->getMask () == NULL)
     return NULL;
-  PixMask *coloured = ImageCache::applyMask(basearmy->getImage(c),
-                                            basearmy->getMask(c), p);
+  PixMask *coloured = basearmy->getMaskedImage (c)->applyMask (p);
   if (i.greyed)
     {
       PixMask *greyed_out = ImageCache::greyOut(coloured);
@@ -2330,7 +2174,7 @@ PixMask *ShieldPixMaskCacheItem::generate(ShieldPixMaskCacheItem i)
                                                             i.type, i.colour);
   Gdk::RGBA colour =
     Shieldsetlist::getInstance()->getColor(i.shieldset, i.colour);
-  PixMask *p = ImageCache::applyMask(sh->getImage(), sh->getMask(), colour);
+  PixMask *p =sh->getMaskedImage ()->applyMask (colour);
   if (i.map)
     return p;
   //okay now we size things accordingly.
@@ -2654,18 +2498,17 @@ PixMask *ShipPixMaskCacheItem::generate(ShipPixMaskCacheItem i)
   // copy the pixmap including player colors
   if (i.player_id != MAX_PLAYERS)
     {
-      std::vector<PixMask*> pics = Armysetlist::getInstance()->getShipPics(i.armyset);
-      PixMask *pic = pics[i.player_id];
-      std::vector<PixMask*> masks= Armysetlist::getInstance()->getShipMasks(i.armyset);
-      PixMask *mask = masks[i.player_id];
-
-      return ImageCache::applyMask
-        (pic, mask, Playerlist::getInstance()->getPlayer(i.player_id));
+      TarFileMaskedImage * mim =
+        Armysetlist::getInstance()->getShipPic(i.armyset);
+      return mim->applyMask (i.player_id,
+                             Playerlist::getInstance()->getPlayer(i.player_id));
     }
   else //we can put a neutral ship in the water in the editor
     {
-      std::vector<PixMask*> pics = Armysetlist::getInstance()->getShipPics(i.armyset);
-      return pics[0]->copy ();
+      TarFileMaskedImage * mim =
+        Armysetlist::getInstance()->getShipPic(i.armyset);
+
+      return mim->getImage ()->copy ();
     }
 }
 
@@ -2683,21 +2526,18 @@ PixMask *PlantedStandardPixMaskCacheItem::generate(PlantedStandardPixMaskCacheIt
 {
   if (i.player_id != MAX_PLAYERS)
     {
-      std::vector<PixMask*> pics =
-        Armysetlist::getInstance()->getStandardPics(i.armyset);
-      PixMask *pic = pics[i.player_id];
-      std::vector<PixMask*> masks =
-        Armysetlist::getInstance()->getStandardMasks(i.armyset);
-      PixMask *mask = masks[i.player_id];
-      // copy the pixmap including player colors
-      return ImageCache::applyMask
-        (pic, mask, Playerlist::getInstance()->getPlayer(i.player_id));
+      TarFileMaskedImage *mim =
+        Armysetlist::getInstance()->getStandardPic (i.armyset);
+
+      return mim->applyMask (i.player_id,
+                             Playerlist::getInstance()->getPlayer(i.player_id));
     }
   else //we currently can't plant a neutral standard but just in case
     {
-      std::vector<PixMask*> pics =
-        Armysetlist::getInstance()->getStandardPics(i.armyset);
-      return pics[0]->copy ();
+      TarFileMaskedImage * mim =
+        Armysetlist::getInstance()->getStandardPic(i.armyset);
+
+      return mim->getImage ()->copy ();
     }
 }
 
@@ -2766,10 +2606,10 @@ int ExplosionPixMaskCacheItem::comp(const ExplosionPixMaskCacheItem item) const
 PixMask *NewLevelPixMaskCacheItem::generate(NewLevelPixMaskCacheItem i)
 {
   bool female = i.gender == Hero::FEMALE;
-  PixMask *p = ImageCache::applyMask
-    (ImageCache::getInstance()->getNewLevelImage(female, false),
-     ImageCache::getInstance()->getNewLevelImage(female, true),
-     Playerlist::getInstance()->getPlayer(i.player_id));
+  TarFileMaskedImage *mim = 
+    ImageCache::getInstance()->getHeroNewLevelMaskedImage (female);
+  PixMask *p =
+    mim->applyMask (Playerlist::getInstance()->getPlayer(i.player_id));
 
   double ratio = DIALOG_NEW_LEVEL_PIC_FONTSIZE_MULTIPLE;
   double new_height = i.font_size * ratio;
@@ -2846,29 +2686,25 @@ PixMask *TartanPixMaskCacheItem::generate(TartanPixMaskCacheItem i)
 
   Gdk::RGBA colour =
     Shieldsetlist::getInstance()->getColor(i.shieldset, i.player_id);
-  PixMask *image = NULL, *mask = NULL;
-  Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                          Tartan::LEFT, &image, &mask);
-  PixMask *left = ImageCache::applyMask(image, mask, colour);
+  TarFileMaskedImage *mim =
+    Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
+                                            Tartan::LEFT);
+  PixMask *left = mim->applyMask (colour);
   double ratio = DIALOG_TARTAN_PIC_FONTSIZE_MULTIPLE;
   double new_height = i.font_size * ratio;
   int new_width =
     ImageCache::calculate_width_from_adjusted_height (left, new_height);
   PixMask::scale (left, new_width, new_height);
 
-  image = NULL;
-  mask = NULL;
-  Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                          Tartan::CENTER, &image, &mask);
-  PixMask *center = ImageCache::applyMask(image, mask, colour);
+  mim = Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
+                                                Tartan::CENTER);
+  PixMask *center = mim->applyMask (colour);
   new_width =
     ImageCache::calculate_width_from_adjusted_height (center, new_height);
   PixMask::scale (center, new_width, new_height);
-  image = NULL;
-  mask = NULL;
-  Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                          Tartan::RIGHT, &image, &mask);
-  PixMask *right = ImageCache::applyMask(image, mask, colour);
+  mim =Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
+                                               Tartan::RIGHT);
+  PixMask *right = mim->applyMask (colour);
   new_width =
     ImageCache::calculate_width_from_adjusted_height (right, new_height);
   PixMask::scale (right, new_width, new_height);
@@ -2933,30 +2769,26 @@ PixMask *EmptyTartanPixMaskCacheItem::generate(EmptyTartanPixMaskCacheItem i)
   //the empty tartan pictures are the same as the regular tartan pictures
   //except they're not coloured in the player's colour.
 
-  PixMask *image = NULL, *mask = NULL;
-  Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                          Tartan::LEFT, &image, &mask);
-  PixMask *left = image->copy();
+  TarFileMaskedImage *mim =
+    Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
+                                            Tartan::LEFT);
+  PixMask *left = mim->getImage ()->copy();
   double ratio = DIALOG_TARTAN_PIC_FONTSIZE_MULTIPLE;
   double new_height = i.font_size * ratio;
   int new_width =
     ImageCache::calculate_width_from_adjusted_height (left, new_height);
   PixMask::scale (left, new_width, new_height);
 
-  image = NULL;
-  mask = NULL;
-  Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                          Tartan::CENTER, &image, &mask);
-  PixMask *center = image->copy();
+  mim = Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
+                                                Tartan::CENTER);
+  PixMask *center = mim->getImage ()->copy();
   new_width =
     ImageCache::calculate_width_from_adjusted_height (center, new_height);
   PixMask::scale (center, new_width, new_height);
 
-  image = NULL;
-  mask = NULL;
-  Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                          Tartan::RIGHT, &image, &mask);
-  PixMask *right = image->copy();
+  mim = Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
+                                                Tartan::RIGHT);
+  PixMask *right = mim->getImage ()->copy();
   new_width =
     ImageCache::calculate_width_from_adjusted_height (right, new_height);
   PixMask::scale (right, new_width, new_height);
