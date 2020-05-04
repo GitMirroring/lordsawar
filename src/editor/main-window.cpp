@@ -952,92 +952,107 @@ void MainWindow::on_load_map_activated()
     }
 }
 
-void MainWindow::on_save_map_activated()
+bool MainWindow::activate_save_map ()
 {
-    if (current_save_filename.empty())
-	on_save_map_as_activated();
-    else
+  if (current_save_filename.empty ())
+    return activate_save_map_as ();
+  else
     {
-	bool success = game_scenario->saveGame(current_save_filename, MAP_EXT);
-	if (!success)
-          {
-            TimedMessageDialog dialog(*window, _("Map was not saved!"), 0);
-            dialog.run_and_hide();
-            on_validate_activated();
-          }
-        else
-          {
-            game_scenario->moved(current_save_filename);
-            needs_saving = false;
-            update_window_title();
-          }
+      bool success = game_scenario->saveGame (current_save_filename, MAP_EXT);
+      if (!success)
+        {
+          TimedMessageDialog dialog (*window, _("Map was not saved!"), 0);
+          dialog.run_and_hide ();
+          on_validate_activated ();
+        }
+      else
+        {
+          game_scenario->moved (current_save_filename);
+          needs_saving = false;
+          update_window_title ();
+        }
+      return success;
     }
 }
 
-void MainWindow::on_save_map_as_activated()
+void MainWindow::on_save_map_activated()
 {
-    Gtk::FileChooserDialog chooser(*window, _("Choose a Name"),
-				   Gtk::FILE_CHOOSER_ACTION_SAVE);
-    Glib::RefPtr<Gtk::FileFilter> map_filter = Gtk::FileFilter::create();
-    map_filter->set_name(_("LordsAWar Maps (*.map)"));
-    map_filter->add_pattern("*" + MAP_EXT);
-    chooser.add_filter(map_filter);
-    chooser.set_current_folder(File::getUserMapDir());
+  activate_save_map ();
+}
 
-    chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    chooser.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_ACCEPT);
-    chooser.set_default_response(Gtk::RESPONSE_ACCEPT);
-    chooser.set_do_overwrite_confirmation();
-    
-    chooser.show_all();
-    int res = chooser.run();
-    
-    if (res == Gtk::RESPONSE_ACCEPT)
+bool MainWindow::activate_save_map_as ()
+{
+  Gtk::FileChooserDialog chooser (*window, _("Choose a Name"),
+                                  Gtk::FILE_CHOOSER_ACTION_SAVE);
+  Glib::RefPtr<Gtk::FileFilter> map_filter = Gtk::FileFilter::create ();
+  map_filter->set_name (_("LordsAWar Maps (*.map)"));
+  map_filter->add_pattern ("*" + MAP_EXT);
+  chooser.add_filter (map_filter);
+  chooser.set_current_folder (File::getUserMapDir ());
+
+  chooser.add_button (Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  chooser.add_button (Gtk::Stock::SAVE, Gtk::RESPONSE_ACCEPT);
+  chooser.set_default_response (Gtk::RESPONSE_ACCEPT);
+  chooser.set_do_overwrite_confirmation ();
+
+  chooser.show_all ();
+  int res = chooser.run ();
+
+  if (res == Gtk::RESPONSE_ACCEPT)
     {
-        Glib::ustring old_save_filename = current_save_filename;
-	current_save_filename = chooser.get_filename();
-	chooser.hide();
+      Glib::ustring old_save_filename = current_save_filename;
+      current_save_filename = chooser.get_filename ();
+      chooser.hide ();
 
-	bool success = game_scenario->saveGame(current_save_filename, MAP_EXT);
-	if (!success)
-          {
-            TimedMessageDialog dialog(*window, _("Map was not saved!"), 0);
-            dialog.run_and_hide();
-            on_validate_activated();
-            current_save_filename = old_save_filename;
-          }
-        else
-          {
-            game_scenario->moved(current_save_filename);
-            needs_saving = false;
-            update_window_title();
-          }
+      bool success = game_scenario->saveGame (current_save_filename, MAP_EXT);
+      if (!success)
+        {
+          TimedMessageDialog dialog (*window, _("Map was not saved!"), 0);
+          dialog.run_and_hide ();
+          on_validate_activated ();
+          current_save_filename = old_save_filename;
+        }
+      else
+        {
+          game_scenario->moved (current_save_filename);
+          needs_saving = false;
+          update_window_title ();
+        }
     }
+  return res == Gtk::RESPONSE_ACCEPT;
+}
+
+void MainWindow::on_save_map_as_activated ()
+{
+ activate_save_map_as ();
 }
 
 bool MainWindow::quit()
 {
   if (needs_saving)
     {
-      EditorQuitDialog d(*window);
-      int response = d.run_and_hide();
+      EditorQuitDialog d (*window);
+      int response = d.run_and_hide ();
       
       if (response == Gtk::RESPONSE_CANCEL) //we don't want to quit
 	return false;
 
       else if (response == Gtk::RESPONSE_ACCEPT) // save and quit
-	on_save_map_activated();
-      game_scenario->clean_tmp_dir();
-      File::erase (getDefaultMapFilename());
-      window->hide();
+        {
+          if (activate_save_map () == false)
+            return false;
+        }
+      game_scenario->clean_tmp_dir ();
+      File::erase (getDefaultMapFilename ());
+      window->hide ();
     }
   else
     {
-      game_scenario->clean_tmp_dir();
-      File::erase (getDefaultMapFilename());
-      window->hide();
+      game_scenario->clean_tmp_dir ();
+      File::erase (getDefaultMapFilename ());
+      window->hide ();
     }
-  editor_quit.emit();
+  editor_quit.emit ();
   return true;
 }
 
