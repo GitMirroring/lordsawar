@@ -53,3 +53,5 @@ it would be nice if copy white shields down in shieldset editor actually copied 
 
 two player colours, double up on all the masks
   allows for player black to have more red accents, etc.
+
+cancelling a quit save in the editor shouldn't quit
