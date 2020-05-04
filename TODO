@@ -41,8 +41,6 @@ stress test with seed 691 takes 1000+ turns to complete
 fix up the upgrader by painstakingly providing an upgrade path through each version of every file type.
   (starting at whenever we used tar files.)
 
-make a template that encompasses load/saving/editing of a masked image file.
-
 make an svg armyset, tileset, shieldset, cityset to test if it works.
 
 the military advisor is very medieval sounding , might want to make it more neutral for scenarios with other genres.
