@@ -58,6 +58,7 @@
 #include "cityset.h"
 #include "tileset.h"
 #include "font-size.h"
+#include "TarFileImage.h"
 
 EditorBigMap::EditorBigMap()
  : BigMap(false)
@@ -689,7 +690,7 @@ void EditorBigMap::display_moving_building(Vector<int> src, Vector<int> dest)
       pic = ImageCache::getInstance()->getRoadPic (GameMap::getRoad (src));
       break;
     case Maptile::STONE:
-      pic = GameMap::getTileset()->getStoneImage (GameMap::getStone (src)->getType());
+      pic = GameMap::getTileset()->getStone()->getImage (GameMap::getStone (src)->getType());
       scale = GameMap::getTileset()->get_scale ();
       break;
     case Maptile::PORT:
@@ -715,7 +716,7 @@ void EditorBigMap::display_moving_building(Vector<int> src, Vector<int> dest)
     {
       if (GameMap::getStone(src))
         {
-          PixMask *stone = GameMap::getTileset()->getStoneImage (GameMap::getStone (src)->getType());
+          PixMask *stone = GameMap::getTileset()->getStone()->getImage (GameMap::getStone (src)->getType());
           if (stone)
             {
               PixMask *p = stone->copy ();
@@ -920,15 +921,15 @@ void EditorBigMap::after_draw()
               Tileset *t = GameMap::getTileset();
               Stone *s = GameMap::getStone(*i);
               if (s)
-                pic = t->getStoneImage(s->getType());
+                pic = t->getStone()->getImage(s->getType());
               else
                 {
                   Road *r = GameMap::getRoad(*i);
                   if (r)
-                    pic = t->getStoneImage(Stone::getRandomType
-                                           (Road::Type(r->getType())));
+                    pic = t->getStone()->getImage(Stone::getRandomType
+                                                  (Road::Type(r->getType())));
                   else
-                    pic = t->getStoneImage
+                    pic = t->getStone()->getImage
                       (Stone::ROAD_ALL_DIRECTIONS_STONES_NW_NE_SW_SE);
                 }
               if (pic)

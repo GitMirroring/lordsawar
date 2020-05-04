@@ -35,6 +35,7 @@
 #include "file-compat.h"
 #include "ucompose.hpp"
 #include "TarFileMaskedImage.h"
+#include "TarFileImage.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -53,36 +54,22 @@ Tileset::Tileset(guint32 id, Glib::ustring name)
   d_selector[0] = new TarFileMaskedImage ();
   d_selector[1] = new TarFileMaskedImage ();
   d_flag = new TarFileMaskedImage ();
+  d_fog = new TarFileImage (FOG_TYPES);
+  d_road = new TarFileImage (ROAD_TYPES);
+  d_stone = new TarFileImage (STONE_TYPES);
+  d_bridge = new TarFileImage (BRIDGE_TYPES);
+  d_explosion = new TarFileImage (1);
 
-  d_fog = "";
-  d_roads = "";
-  d_standing_stones = "";
-  d_bridges = "";
   d_road_color.set_rgba(164.0/255.0,84.0/255.0,0);
   d_ruin_color.set_rgba(1,1,1);
   d_temple_color.set_rgba(1,1,1);
-  for (unsigned int i = 0; i < ROAD_TYPES; i++)
-    roadpic[i] = NULL;
-  for (unsigned int i = 0; i < STONE_TYPES; i++)
-    stonepic[i] = NULL;
-  for (unsigned int i = 0; i < BRIDGE_TYPES; i++)
-    bridgepic[i] = NULL;
-  explosion = NULL;
-  for (unsigned int i = 0; i < FOG_TYPES; i++)
-    fogpic[i] = NULL;
-  d_all_movebonus_filename = "";
-  d_water_movebonus_filename = "";
-  d_forest_movebonus_filename = "";
-  d_hills_movebonus_filename = "";
-  d_mountains_movebonus_filename = "";
-  d_swamp_movebonus_filename = "";
 
-  d_all_movebonus = NULL;
-  d_water_movebonus = NULL;
-  d_forest_movebonus = NULL;
-  d_hills_movebonus = NULL;
-  d_mountains_movebonus = NULL;
-  d_swamp_movebonus = NULL;
+  d_all_movebonus = new TarFileImage (1);
+  d_water_movebonus = new TarFileImage (1);
+  d_forest_movebonus = new TarFileImage (1);
+  d_hills_movebonus = new TarFileImage (1);
+  d_mountains_movebonus = new TarFileImage (1);
+  d_swamp_movebonus = new TarFileImage (1);
 }
 
 Tileset::Tileset (const Tileset& t)
@@ -91,48 +78,14 @@ Tileset::Tileset (const Tileset& t)
   d_selector[0] = new TarFileMaskedImage (*t.d_selector[0]);
   d_selector[1] = new TarFileMaskedImage (*t.d_selector[1]);
   d_flag = new TarFileMaskedImage (*t.d_flag);
-  d_explosion = t.d_explosion;
-  d_fog = t.d_fog;
-  d_roads = t.d_roads;
-  d_standing_stones = t.d_standing_stones;
-  d_bridges = t.d_bridges;
+  d_fog = new TarFileImage (*t.d_fog);
+  d_road = new TarFileImage (*t.d_road);
+  d_stone = new TarFileImage (*t.d_stone);
+  d_bridge = new TarFileImage (*t.d_bridge);
+  d_explosion = new TarFileImage (*t.d_explosion);
   d_road_color = t.d_road_color;
   d_ruin_color = t.d_ruin_color;
   d_temple_color = t.d_temple_color;
-  for (unsigned int i = 0; i < ROAD_TYPES; i++)
-    {
-      if (t.roadpic[i])
-        roadpic[i] = t.roadpic[i]->copy();
-      else
-        roadpic[i] = NULL;
-    }
-  for (unsigned int i = 0; i < STONE_TYPES; i++)
-    {
-      if (t.stonepic[i])
-        stonepic[i] = t.stonepic[i]->copy();
-      else
-        stonepic[i] = NULL;
-    }
-  for (unsigned int i = 0; i < BRIDGE_TYPES; i++)
-    {
-      if (t.bridgepic[i])
-        bridgepic[i] = t.bridgepic[i]->copy();
-      else
-        bridgepic[i] = NULL;
-    }
-
-  if (t.explosion != NULL)
-    explosion = t.explosion->copy();
-  else
-    explosion = NULL;
-
-  for (unsigned int i = 0; i < FOG_TYPES; i++)
-    {
-      if (t.fogpic[i] != NULL)
-        fogpic[i] = t.fogpic[i]->copy();
-      else
-        fogpic[i] = NULL;
-    }
 
   for (Tileset::const_iterator i = t.begin(); i != t.end(); ++i)
     push_back(new Tile(*(*i)));
@@ -148,42 +101,12 @@ Tileset::Tileset (const Tileset& t)
         }
     }
 
-  d_all_movebonus_filename = t.d_all_movebonus_filename;
-  d_water_movebonus_filename = t.d_water_movebonus_filename;
-  d_forest_movebonus_filename = t.d_forest_movebonus_filename;
-  d_hills_movebonus_filename = t.d_hills_movebonus_filename;
-  d_mountains_movebonus_filename = t.d_mountains_movebonus_filename;
-  d_swamp_movebonus_filename = t.d_swamp_movebonus_filename;
-
-  if (t.d_all_movebonus)
-    d_all_movebonus = t.d_all_movebonus->copy ();
-  else
-    d_all_movebonus = NULL;
-
-  if (t.d_water_movebonus)
-    d_water_movebonus = t.d_water_movebonus->copy ();
-  else
-    d_water_movebonus = NULL;
-
-  if (t.d_forest_movebonus)
-    d_forest_movebonus = t.d_forest_movebonus->copy ();
-  else
-    d_forest_movebonus = NULL;
-
-  if (t.d_hills_movebonus)
-    d_hills_movebonus = t.d_hills_movebonus->copy ();
-  else
-    d_hills_movebonus = NULL;
-
-  if (t.d_mountains_movebonus)
-    d_mountains_movebonus = t.d_mountains_movebonus->copy ();
-  else
-    d_mountains_movebonus = NULL;
-
-  if (t.d_swamp_movebonus)
-    d_swamp_movebonus = t.d_swamp_movebonus->copy ();
-  else
-    d_swamp_movebonus = NULL;
+  d_all_movebonus = new TarFileImage (*t.d_all_movebonus);
+  d_water_movebonus = new TarFileImage (*t.d_water_movebonus);
+  d_forest_movebonus = new TarFileImage (*t.d_forest_movebonus);
+  d_hills_movebonus = new TarFileImage (*t.d_hills_movebonus);
+  d_mountains_movebonus = new TarFileImage (*t.d_mountains_movebonus);
+  d_swamp_movebonus = new TarFileImage (*t.d_swamp_movebonus);
 }
 
 Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
@@ -192,35 +115,35 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   d_selector[0] = new TarFileMaskedImage ();
   d_selector[1] = new TarFileMaskedImage ();
   d_flag = new TarFileMaskedImage ();
+  d_fog = new TarFileImage (FOG_TYPES);
+  d_road = new TarFileImage (ROAD_TYPES);
+  d_stone = new TarFileImage (STONE_TYPES);
+  d_bridge = new TarFileImage (BRIDGE_TYPES);
+  d_explosion = new TarFileImage (1);
+  d_all_movebonus = new TarFileImage (1);
+  d_water_movebonus = new TarFileImage (1);
+  d_forest_movebonus = new TarFileImage (1);
+  d_hills_movebonus = new TarFileImage (1);
+  d_mountains_movebonus = new TarFileImage (1);
+  d_swamp_movebonus = new TarFileImage (1);
   setDirectory(directory);
   guint32 ts;
   helper->getData(ts, "tilesize");
   setTileSize(ts);
   d_selector[1]->load_name (helper, "large_selector");
   d_selector[0]->load_name (helper, "small_selector");
-  helper->getData(d_explosion, "explosion");
-  File::add_png_if_no_ext (d_explosion);
-  helper->getData(d_roads, "roads");
-  File::add_png_if_no_ext (d_roads);
-  helper->getData(d_standing_stones, "standing_stones");
-  File::add_png_if_no_ext (d_standing_stones);
-  helper->getData(d_bridges, "bridges");
-  File::add_png_if_no_ext (d_bridges);
-  helper->getData(d_fog, "fog");
-  File::add_png_if_no_ext (d_fog);
+  d_explosion->load_name (helper, "explosion");
+  d_road->load_name (helper, "roads");
+  d_stone->load_name (helper, "standing_stones");
+  d_bridge->load_name (helper, "bridges");
+  d_fog->load_name (helper, "fog");
   d_flag->load_name (helper, "flags");
-  helper->getData(d_all_movebonus_filename, "movebonus_all");
-  File::add_png_if_no_ext (d_all_movebonus_filename);
-  helper->getData(d_water_movebonus_filename, "movebonus_water");
-  File::add_png_if_no_ext (d_water_movebonus_filename);
-  helper->getData(d_forest_movebonus_filename, "movebonus_forest");
-  File::add_png_if_no_ext (d_forest_movebonus_filename);
-  helper->getData(d_hills_movebonus_filename, "movebonus_hills");
-  File::add_png_if_no_ext (d_hills_movebonus_filename);
-  helper->getData(d_mountains_movebonus_filename, "movebonus_mountains");
-  File::add_png_if_no_ext (d_mountains_movebonus_filename);
-  helper->getData(d_swamp_movebonus_filename, "movebonus_swamp");
-  File::add_png_if_no_ext (d_swamp_movebonus_filename);
+  d_all_movebonus->load_name (helper, "movebonus_all");
+  d_water_movebonus->load_name (helper, "movebonus_water");
+  d_forest_movebonus->load_name (helper, "movebonus_forest");
+  d_hills_movebonus->load_name (helper, "movebonus_hills");
+  d_mountains_movebonus->load_name (helper, "movebonus_mountains");
+  d_swamp_movebonus->load_name (helper, "movebonus_swamp");
 
   helper->registerTag(Tile::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
   helper->registerTag(Tileset::d_road_smallmap_tag, sigc::mem_fun((*this), &Tileset::loadTile));
@@ -229,21 +152,6 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   helper->registerTag(SmallTile::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
   helper->registerTag(TileStyle::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
   helper->registerTag(TileStyleSet::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
-  for (unsigned int i = 0; i < ROAD_TYPES; i++)
-    roadpic[i] = NULL;
-  for (unsigned int i = 0; i < STONE_TYPES; i++)
-    stonepic[i] = NULL;
-  for (unsigned int i = 0; i < BRIDGE_TYPES; i++)
-    bridgepic[i] = NULL;
-  explosion = NULL;
-  for (unsigned int i = 0; i < FOG_TYPES; i++)
-    fogpic[i] = NULL;
-  d_all_movebonus = NULL;
-  d_water_movebonus = NULL;
-  d_forest_movebonus = NULL;
-  d_hills_movebonus = NULL;
-  d_mountains_movebonus = NULL;
-  d_swamp_movebonus = NULL;
 }
 
 Tileset::~Tileset()
@@ -254,6 +162,17 @@ Tileset::~Tileset()
   delete d_selector[0];
   delete d_selector[1];
   delete d_flag;
+  delete d_explosion;
+  delete d_road;
+  delete d_stone;
+  delete d_bridge;
+  delete d_fog;
+  delete d_all_movebonus;
+  delete d_water_movebonus;
+  delete d_forest_movebonus;
+  delete d_hills_movebonus;
+  delete d_mountains_movebonus;
+  delete d_swamp_movebonus;
   clear();
   clean_tmp_dir();
 }
@@ -361,18 +280,18 @@ bool Tileset::save(XML_Helper *helper) const
   retval &= helper->saveData("tilesize", getUnscaledTileSize());
   retval &= helper->saveData("large_selector", d_selector[1]->getName ());
   retval &= helper->saveData("small_selector", d_selector[0]->getName ());
-  retval &= helper->saveData("explosion", d_explosion);
-  retval &= helper->saveData("roads", d_roads);
-  retval &= helper->saveData("standing_stones", d_standing_stones);
-  retval &= helper->saveData("bridges", d_bridges);
-  retval &= helper->saveData("fog", d_fog);
+  retval &= helper->saveData("explosion", d_explosion->getName ());
+  retval &= helper->saveData("roads", d_road->getName ());
+  retval &= helper->saveData("standing_stones", d_stone->getName ());
+  retval &= helper->saveData("bridges", d_bridge->getName ());
+  retval &= helper->saveData("fog", d_fog->getName ());
   retval &= helper->saveData("flags", d_flag->getName ());
-  retval &= helper->saveData("movebonus_all", d_all_movebonus_filename);
-  retval &= helper->saveData("movebonus_water", d_water_movebonus_filename);
-  retval &= helper->saveData("movebonus_forest", d_forest_movebonus_filename);
-  retval &= helper->saveData("movebonus_hills", d_hills_movebonus_filename);
-  retval &= helper->saveData("movebonus_mountains", d_mountains_movebonus_filename);
-  retval &= helper->saveData("movebonus_swamp", d_swamp_movebonus_filename);
+  retval &= helper->saveData("movebonus_all", d_all_movebonus->getName ());
+  retval &= helper->saveData("movebonus_water", d_water_movebonus->getName ());
+  retval &= helper->saveData("movebonus_forest", d_forest_movebonus->getName ());
+  retval &= helper->saveData("movebonus_hills", d_hills_movebonus->getName ());
+  retval &= helper->saveData("movebonus_mountains", d_mountains_movebonus->getName ());
+  retval &= helper->saveData("movebonus_swamp", d_swamp_movebonus->getName ());
   retval &= helper->openTag(d_road_smallmap_tag);
   retval &= helper->saveData("color", d_road_color);
   retval &= helper->closeTag();
@@ -476,29 +395,29 @@ bool Tileset::validate() const
     return false;
   if (d_selector[0]->getName().empty () == true)
     return false;
-  if (getExplosionFilename().empty () == true)
+  if (d_explosion->getName().empty () == true)
     return false;
-  if (getRoadsFilename().empty () == true)
+  if (d_road->getName().empty () == true)
     return false;
-  if (getStonesFilename().empty () == true)
+  if (d_stone->getName().empty () == true)
     return false;
-  if (getBridgesFilename().empty () == true)
+  if (d_bridge->getName().empty () == true)
     return false;
-  if (getFogFilename().empty () == true)
+  if (d_fog->getName().empty () == true)
     return false;
   if (d_flag->getName().empty () == true)
     return false;
-  if (getAllMoveBonusFilename ().empty () == true)
+  if (getAllMoveBonus()->getName ().empty () == true)
     return false;
-  if (getWaterMoveBonusFilename ().empty () == true)
+  if (getWaterMoveBonus()->getName ().empty () == true)
     return false;
-  if (getForestMoveBonusFilename ().empty () == true)
+  if (getForestMoveBonus()->getName ().empty () == true)
     return false;
-  if (getHillsMoveBonusFilename ().empty () == true)
+  if (getHillsMoveBonus()->getName ().empty () == true)
     return false;
-  if (getMountainsMoveBonusFilename ().empty () == true)
+  if (getMountainsMoveBonus()->getName ().empty () == true)
     return false;
-  if (getSwampMoveBonusFilename ().empty () == true)
+  if (getSwampMoveBonus()->getName ().empty () == true)
     return false;
 
   return true;
@@ -575,181 +494,20 @@ void Tileset::uninstantiateImages()
   for (iterator it = begin(); it != end(); it++)
     (*it)->uninstantiateImages();
 
-  for (unsigned int i = 0; i < ROAD_TYPES; i++)
-    {
-      if (roadpic[i] != NULL)
-        delete roadpic[i];
-      roadpic[i] = NULL;
-    }
-
-  for (unsigned int i = 0; i < STONE_TYPES; i++)
-    {
-      if (stonepic[i] != NULL)
-        delete stonepic[i];
-      stonepic[i] = NULL;
-    }
-
-  for (unsigned int i = 0; i < BRIDGE_TYPES; i++)
-    {
-      if (bridgepic[i] != NULL)
-        delete bridgepic[i];
-      bridgepic[i] = NULL;
-    }
-
   d_selector[0]->uninstantiateImages ();
   d_selector[1]->uninstantiateImages ();
   d_flag->uninstantiateImages ();
-
-  if (explosion != NULL)
-    delete explosion;
-      
-  explosion = NULL;
-
-  for (unsigned int i = 0; i < FOG_TYPES; i++)
-    {
-      if (fogpic[i] != NULL)
-	{
-	  delete fogpic[i];
-          fogpic[i] = NULL;
-	}
-    }
-
-  if (d_all_movebonus)
-    delete d_all_movebonus;
-  d_all_movebonus = NULL;
-
-  if (d_water_movebonus)
-    delete d_water_movebonus;
-  d_water_movebonus = NULL;
-
-  if (d_forest_movebonus)
-    delete d_forest_movebonus;
-  d_forest_movebonus = NULL;
-
-  if (d_hills_movebonus)
-    delete d_hills_movebonus;
-  d_hills_movebonus = NULL;
-
-  if (d_mountains_movebonus)
-    delete d_mountains_movebonus;
-  d_mountains_movebonus = NULL;
-
-  if (d_swamp_movebonus)
-    delete d_swamp_movebonus;
-  d_swamp_movebonus = NULL;
-}
-
-void Tileset::instantiateImages(Glib::ustring explosion_filename,
-				Glib::ustring roads_filename,
-				Glib::ustring stones_filename,
-				Glib::ustring bridges_filename,
-				Glib::ustring fog_filename,
-                                Glib::ustring all_movebonus_filename,
-                                Glib::ustring water_movebonus_filename,
-                                Glib::ustring forest_movebonus_filename,
-                                Glib::ustring hills_movebonus_filename,
-                                Glib::ustring mountains_movebonus_filename,
-                                Glib::ustring swamp_movebonus_filename,
-                                bool scale, bool &broken)
-{
-  if (explosion_filename.empty() == false && !broken)
-    setExplosionImage (PixMask::create(explosion_filename, broken));
-
-  if (roads_filename.empty() == false && !broken)
-    {
-      std::vector<PixMask* > roadpics;
-      roadpics = disassemble_row(roads_filename, ROAD_TYPES, broken);
-      if (!broken)
-        {
-          for (unsigned int i = 0; i < ROAD_TYPES ; i++)
-            {
-              if (scale)
-                {
-                  if (roadpics[i]->get_width() != (int)getUnscaledTileSize())
-                    PixMask::scale(roadpics[i], getUnscaledTileSize(),
-                                   getUnscaledTileSize());
-                }
-              setRoadImage(i, roadpics[i]);
-            }
-        }
-
-    }
-
-  if (stones_filename.empty() == false && !broken)
-    {
-      std::vector<PixMask* > stonepics;
-      stonepics = disassemble_row(stones_filename, STONE_TYPES, broken);
-      if (!broken)
-        {
-          for (unsigned int i = 0; i < STONE_TYPES ; i++)
-            {
-              if (scale)
-                {
-                  if (stonepics[i]->get_width() != (int)getUnscaledTileSize())
-                    PixMask::scale(stonepics[i], getUnscaledTileSize(),
-                                   getUnscaledTileSize());
-                }
-              setStoneImage(i, stonepics[i]);
-            }
-        }
-    }
-
-  if (bridges_filename.empty() == false && !broken)
-    {
-      std::vector<PixMask* > bridgepics;
-      bridgepics = disassemble_row(bridges_filename, BRIDGE_TYPES, broken);
-      if (!broken)
-        {
-          for (unsigned int i = 0; i < BRIDGE_TYPES ; i++)
-            {
-              if (scale)
-                {
-                  if (bridgepics[i]->get_width() != (int)getUnscaledTileSize())
-                    PixMask::scale(bridgepics[i], getUnscaledTileSize(),
-                                   getUnscaledTileSize());
-                }
-              setBridgeImage(i, bridgepics[i]);
-            }
-        }
-    }
-
-  if (fog_filename.empty() == false && !broken)
-    {
-      std::vector<PixMask* > fogpics;
-      fogpics = disassemble_row(fog_filename, FOG_TYPES, broken);
-      if (!broken)
-        {
-          for (unsigned int i = 0; i < FOG_TYPES ; i++)
-            {
-              if (scale)
-                {
-                  if (fogpics[i]->get_width() != (int)getUnscaledTileSize())
-                    PixMask::scale(fogpics[i], getUnscaledTileSize(),
-                                   getUnscaledTileSize());
-                }
-              setFogImage(i, fogpics[i]);
-            }
-        }
-    }
-
-  if (all_movebonus_filename.empty() == false && !broken)
-    d_all_movebonus = PixMask::create (all_movebonus_filename, broken);
-
-  if (water_movebonus_filename.empty() == false && !broken)
-    d_water_movebonus = PixMask::create (water_movebonus_filename, broken);
-
-  if (forest_movebonus_filename.empty() == false && !broken)
-    d_forest_movebonus = PixMask::create (forest_movebonus_filename, broken);
-
-  if (hills_movebonus_filename.empty() == false && !broken)
-    d_hills_movebonus = PixMask::create (hills_movebonus_filename, broken);
-
-  if (mountains_movebonus_filename.empty() == false && !broken)
-    d_mountains_movebonus = PixMask::create (mountains_movebonus_filename,
-                                             broken);
-
-  if (swamp_movebonus_filename.empty() == false && !broken)
-    d_swamp_movebonus = PixMask::create (swamp_movebonus_filename, broken);
+  d_bridge->uninstantiateImages ();
+  d_road->uninstantiateImages ();
+  d_fog->uninstantiateImages ();
+  d_explosion->uninstantiateImages ();
+  d_stone->uninstantiateImages ();
+  d_all_movebonus->uninstantiateImages ();
+  d_water_movebonus->uninstantiateImages ();
+  d_forest_movebonus->uninstantiateImages ();
+  d_hills_movebonus->uninstantiateImages ();
+  d_mountains_movebonus->uninstantiateImages ();
+  d_swamp_movebonus->uninstantiateImages ();
 }
 
 void Tileset::instantiateImages(bool scale, bool &broken)
@@ -786,74 +544,61 @@ void Tileset::instantiateImages(bool scale, bool &broken)
     return;
   d_flag->instantiateImages (scale_dim);
 
-  Glib::ustring explosion_filename = "";
-  Glib::ustring roads_filename = "";
-  Glib::ustring stones_filename = "";
-  Glib::ustring bridges_filename = "";
-  Glib::ustring fog_filename = "";
-  Glib::ustring all_movebonus_filename = "";
-  Glib::ustring water_movebonus_filename = "";
-  Glib::ustring forest_movebonus_filename = "";
-  Glib::ustring hills_movebonus_filename = "";
-  Glib::ustring mountains_movebonus_filename = "";
-  Glib::ustring swamp_movebonus_filename = "";
+  broken = d_all_movebonus->load(&t);
+  if (broken)
+    return;
+  d_all_movebonus->instantiateImages ();
 
-  if (getExplosionFilename().empty() == false && !broken)
-    explosion_filename = t.getFile(getExplosionFilename(), broken);
-  if (getRoadsFilename().empty() == false && !broken)
-    roads_filename = t.getFile(getRoadsFilename(), broken);
-  if (getStonesFilename().empty() == false && !broken)
-    stones_filename = t.getFile(getStonesFilename(), broken);
-  if (getBridgesFilename().empty() == false && !broken)
-    bridges_filename = t.getFile(getBridgesFilename(), broken);
-  if (getFogFilename().empty() == false && !broken)
-    fog_filename = t.getFile(getFogFilename(), broken);
-  if (getAllMoveBonusFilename ().empty () == false)
-    all_movebonus_filename = 
-      t.getFile(getAllMoveBonusFilename (), broken);
-  if (getWaterMoveBonusFilename ().empty () == false)
-    water_movebonus_filename = 
-      t.getFile(getWaterMoveBonusFilename (), broken);
-  if (getForestMoveBonusFilename ().empty () == false)
-    forest_movebonus_filename = 
-      t.getFile(getForestMoveBonusFilename (), broken);
-  if (getHillsMoveBonusFilename ().empty () == false)
-    hills_movebonus_filename = 
-      t.getFile(getHillsMoveBonusFilename (), broken);
-  if (getMountainsMoveBonusFilename ().empty () == false)
-    mountains_movebonus_filename = 
-      t.getFile(getMountainsMoveBonusFilename (), broken);
-  if (getSwampMoveBonusFilename ().empty () == false)
-    swamp_movebonus_filename = 
-      t.getFile(getSwampMoveBonusFilename (), broken);
-  if (!broken)
-    instantiateImages(explosion_filename, roads_filename, stones_filename,
-                      bridges_filename, fog_filename, all_movebonus_filename,
-                      water_movebonus_filename, forest_movebonus_filename,
-                      hills_movebonus_filename, mountains_movebonus_filename,
-                      swamp_movebonus_filename, scale, broken);
-  if (explosion_filename.empty() == false)
-    File::erase(explosion_filename);
-  if (roads_filename.empty() == false)
-    File::erase(roads_filename);
-  if (stones_filename.empty() == false)
-    File::erase(stones_filename);
-  if (bridges_filename.empty() == false)
-    File::erase(bridges_filename);
-  if (fog_filename.empty() == false)
-    File::erase(fog_filename);
-  if (all_movebonus_filename.empty () == false)
-    File::erase(all_movebonus_filename);
-  if (water_movebonus_filename.empty () == false)
-    File::erase(water_movebonus_filename);
-  if (forest_movebonus_filename.empty () == false)
-    File::erase(forest_movebonus_filename);
-  if (hills_movebonus_filename.empty () == false)
-    File::erase(hills_movebonus_filename);
-  if (mountains_movebonus_filename.empty () == false)
-    File::erase(mountains_movebonus_filename);
-  if (swamp_movebonus_filename.empty () == false)
-    File::erase(swamp_movebonus_filename);
+  broken = d_water_movebonus->load(&t);
+  if (broken)
+    return;
+  d_water_movebonus->instantiateImages ();
+
+  broken = d_forest_movebonus->load(&t);
+  if (broken)
+    return;
+  d_forest_movebonus->instantiateImages ();
+
+  broken = d_hills_movebonus->load(&t);
+  if (broken)
+    return;
+  d_hills_movebonus->instantiateImages ();
+
+  broken = d_mountains_movebonus->load(&t);
+  if (broken)
+    return;
+  d_mountains_movebonus->instantiateImages ();
+
+  broken = d_swamp_movebonus->load(&t);
+  if (broken)
+    return;
+  d_swamp_movebonus->instantiateImages ();
+
+  broken = d_explosion->load(&t);
+  if (broken)
+    return;
+  d_explosion->instantiateImages ();
+
+  broken = d_road->load(&t);
+  if (broken)
+    return;
+  d_road->instantiateImages ();
+
+  broken = d_stone->load(&t);
+  if (broken)
+    return;
+  d_stone->instantiateImages ();
+
+  broken = d_bridge->load(&t);
+  if (broken)
+    return;
+  d_bridge->instantiateImages ();
+
+  broken = d_fog->load(&t);
+  if (broken)
+    return;
+  d_fog->instantiateImages ();
+
   t.Close();
   return;
 }
@@ -890,20 +635,20 @@ bool Tileset::calculate_preferred_tile_size(guint32 &ts) const
   guint32 tilesize = 0;
   std::map<guint32, guint32> sizecounts;
 
-  if (roadpic[0])
-    sizecounts[roadpic[0]->get_unscaled_width()]++;
-  if (bridgepic[0])
-    sizecounts[bridgepic[0]->get_unscaled_width()]++;
+  if (d_road->getImage ())
+    sizecounts[d_road->getImage ()->get_unscaled_width()]++;
+  if (d_bridge->getImage ())
+    sizecounts[d_bridge->getImage ()->get_unscaled_width()]++;
   if (d_flag->getName ().empty () == false)
     sizecounts[d_flag->getImage ()->get_unscaled_width()]++;
   if (d_selector[0]->getName ().empty() == false)
     sizecounts[d_selector[0]->getImage ()->get_unscaled_width()]++;
   if (d_selector[1]->getName ().empty() == false)
     sizecounts[d_selector[1]->getImage ()->get_unscaled_width()]++;
-  if (fogpic[0])
-    sizecounts[fogpic[0]->get_unscaled_width()]++;
-  if (explosion)
-    sizecounts[explosion->get_unscaled_width()]++;
+  if (d_fog->getImage ())
+    sizecounts[d_fog->getImage ()->get_unscaled_width()]++;
+  if (d_explosion->getImage ())
+    sizecounts[d_explosion->getImage ()->get_unscaled_width()]++;
   for (const_iterator it = begin(); it != end(); it++)
     {
       Tile *tile = *it;
@@ -1032,246 +777,6 @@ int Tileset::countTilesWithPattern(SmallTile::Pattern pattern) const
   return radial_count;
 }
 
-void Tileset::clearRoadsImage (bool clear_name)
-{
-  if (clear_name)
-    setRoadsFilename ("");
-
-  for (unsigned int i = 0; i < ROAD_TYPES; i++)
-    {
-      PixMask *p = getRoadImage (i);
-      if (p)
-        delete p;
-      setRoadImage (i, NULL);
-    }
-}
-
-void Tileset::clearStonesImage (bool clear_name)
-{
-  if (clear_name)
-    setStonesFilename ("");
-
-  for (unsigned int i = 0; i < STONE_TYPES; i++)
-    {
-      PixMask *p = getStoneImage (i);
-      if (p)
-        delete p;
-      setStoneImage (i, NULL);
-    }
-}
-
-void Tileset::clearBridgesImage (bool clear_name)
-{
-  if (clear_name)
-    setBridgesFilename ("");
-
-  for (unsigned int i = 0; i < BRIDGE_TYPES; i++)
-    {
-      PixMask *p = getBridgeImage (i);
-      if (p)
-        delete p;
-      setBridgeImage (i, NULL);
-    }
-}
-
-void Tileset::clearFlagsImage (bool clear_name)
-{
-  d_flag->clear (clear_name);
-}
-
-void Tileset::clearSmallSelectorImage (bool clear_name)
-{
-  d_selector[0]->clear (clear_name);
-}
-
-void Tileset::clearLargeSelectorImage (bool clear_name)
-{
-  d_selector[1]->clear (clear_name);
-}
-
-void Tileset::clearExplosionImage (bool clear_name)
-{
-  if (clear_name)
-    setExplosionFilename ("");
-  PixMask *p = getExplosionImage ();
-  if (p)
-    delete p;
-  setExplosionImage (NULL);
-}
-
-void Tileset::clearFogImages (bool clear_name)
-{
-  if (clear_name)
-    setFogFilename ("");
-
-  for (unsigned int i = 0; i < FOG_TYPES; i++)
-    {
-      PixMask *p = getFogImage (i);
-      if (p)
-        delete p;
-      setFogImage (i, NULL);
-    }
-}
-
-bool Tileset::instantiateRoadImages()
-{
-  clearRoadsImage (false);
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  Glib::ustring imgname = getRoadsFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          std::vector<PixMask* > roadpics;
-          roadpics = disassemble_row(filename, ROAD_TYPES, broken);
-          if (!broken)
-            {
-              for (unsigned int i = 0; i < ROAD_TYPES ; i++)
-                setRoadImage(i, roadpics[i]);
-            }
-        }
-    }
-  return broken;
-}
-
-bool Tileset::instantiateStoneImages()
-{
-  clearStonesImage (false);
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  Glib::ustring imgname = getStonesFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          std::vector<PixMask* > stonepics;
-          stonepics = disassemble_row(filename, STONE_TYPES, broken);
-          if (!broken)
-            {
-              for (unsigned int i = 0; i < STONE_TYPES ; i++)
-                setStoneImage(i, stonepics[i]);
-            }
-        }
-    }
-  return broken;
-}
-
-bool Tileset::instantiateBridgeImages()
-{
-  clearBridgesImage (false);
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  Glib::ustring imgname = getBridgesFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          std::vector<PixMask* > bridgepics;
-          bridgepics = disassemble_row(filename, BRIDGE_TYPES, broken);
-          if (!broken)
-            {
-              for (unsigned int i = 0; i < BRIDGE_TYPES ; i++)
-                setBridgeImage(i, bridgepics[i]);
-            }
-        }
-    }
-  return broken;
-}
-
-bool Tileset::instantiateFlagImages()
-{
-  clearFlagsImage (false);
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  broken = d_flag->load (&t);
-  if (broken)
-    return broken;
-  d_flag->instantiateImages ();
-  return broken;
-}
-
-bool Tileset::instantiateSmallSelectorImages()
-{
-  clearSmallSelectorImage (false);
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  broken = d_selector[0]->load (&t);
-  if (broken)
-    return broken;
-  d_selector[0]->instantiateImages ();
-  return broken;
-}
-
-bool Tileset::instantiateLargeSelectorImages()
-{
-  clearLargeSelectorImage (false);
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  broken = d_selector[1]->load (&t);
-  if (broken)
-    return broken;
-  d_selector[1]->instantiateImages ();
-  return broken;
-}
-
-bool Tileset::instantiateExplosionImage()
-{
-  clearExplosionImage (false);
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  Glib::ustring imgname = getExplosionFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        setExplosionImage (PixMask::create(filename, broken));
-    }
-  return broken;
-}
-
-bool Tileset::instantiateFogImages()
-{
-  clearFogImages (false);
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  Glib::ustring imgname = getFogFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          std::vector<PixMask* > fogpics;
-          fogpics = disassemble_row(filename, FOG_TYPES, broken);
-          if (!broken)
-            {
-              for (unsigned int i = 0; i < FOG_TYPES ; i++)
-                setFogImage(i, fogpics[i]);
-            }
-        }
-    }
-  return broken;
-}
-
 guint32 Tileset::get_default_tile_size ()
 {
   Tileset *t = new Tileset (1, "");
@@ -1283,33 +788,33 @@ guint32 Tileset::get_default_tile_size ()
 void Tileset::uninstantiateSameNamedImages (Glib::ustring name)
 {
   if (d_selector[1]->getName () == name)
-    clearLargeSelectorImage ();
+    d_selector[1]->clear ();
   if (d_selector[0]->getName () == name)
-    clearSmallSelectorImage ();
-  if (getExplosionFilename() == name)
-    clearExplosionImage ();
-  if (getRoadsFilename() == name)
-    clearRoadsImage ();
-  if (getStonesFilename() == name)
-    clearStonesImage ();
-  if (getBridgesFilename() == name)
-    clearBridgesImage ();
-  if (getFogFilename() == name)
-    clearFogImages ();
-  if (getFlags()->getName() == name)
-    clearFlagsImage ();
-  if (getAllMoveBonusFilename() == name)
-    clearAllMoveBonusImage ();
-  if (getWaterMoveBonusFilename() == name)
-    clearWaterMoveBonusImage ();
-  if (getForestMoveBonusFilename() == name)
-    clearForestMoveBonusImage ();
-  if (getHillsMoveBonusFilename() == name)
-    clearHillsMoveBonusImage ();
-  if (getMountainsMoveBonusFilename() == name)
-    clearMountainsMoveBonusImage ();
-  if (getSwampMoveBonusFilename() == name)
-    clearSwampMoveBonusImage ();
+    d_selector[0]->clear ();
+  if (d_explosion->getName () == name)
+    d_explosion->clear ();
+  if (d_road->getName () == name)
+    d_road->clear ();
+  if (d_stone->getName () == name)
+    d_stone->clear ();
+  if (d_bridge->getName () == name)
+    d_bridge->clear ();
+  if (d_fog->getName () == name)
+    d_fog->clear ();
+  if (d_flag->getName () == name)
+    d_flag->clear ();
+  if (getAllMoveBonus ()->getName () == name)
+    d_all_movebonus->clear ();
+  if (getWaterMoveBonus ()->getName () == name)
+    d_water_movebonus->clear ();
+  if (getForestMoveBonus ()->getName () == name)
+    d_forest_movebonus->clear ();
+  if (getHillsMoveBonus()->getName () == name)
+    d_hills_movebonus->clear ();
+  if (getMountainsMoveBonus ()->getName () == name)
+    d_mountains_movebonus->clear ();
+  if (getSwampMoveBonus ()->getName () == name)
+    d_swamp_movebonus->clear ();
   std::vector<TileStyleSet*> sets;
   for (iterator i = begin (); i != end (); i++)
     {
@@ -1321,221 +826,5 @@ void Tileset::uninstantiateSameNamedImages (Glib::ustring name)
     }
   for (auto s : sets)
     delete s;
-}
-
-void Tileset::clearAllMoveBonusImage(bool clear_name)
-{
-  if (clear_name)
-    setAllMoveBonusFilename ("");
-
-  PixMask *p = getAllMoveBonusImage ();
-  if (p)
-    delete p;
-  setAllMoveBonusImage (NULL);
-}
-
-void Tileset::clearWaterMoveBonusImage(bool clear_name)
-{
-  if (clear_name)
-    setWaterMoveBonusFilename ("");
-
-  PixMask *p = getWaterMoveBonusImage ();
-  if (p)
-    delete p;
-  setWaterMoveBonusImage (NULL);
-}
-
-void Tileset::clearForestMoveBonusImage(bool clear_name)
-{
-  if (clear_name)
-    setForestMoveBonusFilename ("");
-
-  PixMask *p = getForestMoveBonusImage ();
-  if (p)
-    delete p;
-  setForestMoveBonusImage (NULL);
-}
-
-void Tileset::clearHillsMoveBonusImage(bool clear_name)
-{
-  if (clear_name)
-    setHillsMoveBonusFilename ("");
-
-  PixMask *p = getHillsMoveBonusImage ();
-  if (p)
-    delete p;
-  setHillsMoveBonusImage (NULL);
-}
-
-void Tileset::clearMountainsMoveBonusImage(bool clear_name)
-{
-  if (clear_name)
-    setMountainsMoveBonusFilename ("");
-
-  PixMask *p = getMountainsMoveBonusImage ();
-  if (p)
-    delete p;
-  setMountainsMoveBonusImage (NULL);
-}
-
-void Tileset::clearSwampMoveBonusImage(bool clear_name)
-{
-  if (clear_name)
-    setSwampMoveBonusFilename ("");
-
-  PixMask *p = getSwampMoveBonusImage ();
-  if (p)
-    delete p;
-  setSwampMoveBonusImage (NULL);
-}
-
-bool Tileset::instantiateAllMoveBonusImage (TarFile *t)
-{
-  Glib::ustring imgname = getAllMoveBonusFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
-      if (filename.empty () == false)
-        {
-          bool broken = false;
-          PixMask *p = PixMask::create (filename, broken);
-          File::erase (filename);
-          if (!broken)
-            {
-              clearAllMoveBonusImage (false);
-              setAllMoveBonusImage (p);
-            }
-          else
-            return false;
-        }
-      else
-        return false;
-    }
-  return true;
-}
-
-bool Tileset::instantiateWaterMoveBonusImage (TarFile *t)
-{
-  Glib::ustring imgname = getWaterMoveBonusFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
-      if (filename.empty () == false)
-        {
-          bool broken = false;
-          PixMask *p = PixMask::create (filename, broken);
-          File::erase (filename);
-          if (!broken)
-            {
-              clearWaterMoveBonusImage (false);
-              setWaterMoveBonusImage (p);
-            }
-          else
-            return false;
-        }
-      else
-        return false;
-    }
-  return true;
-}
-
-bool Tileset::instantiateForestMoveBonusImage (TarFile *t)
-{
-  Glib::ustring imgname = getForestMoveBonusFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
-      if (filename.empty () == false)
-        {
-          bool broken = false;
-          PixMask *p = PixMask::create (filename, broken);
-          File::erase (filename);
-          if (!broken)
-            {
-              clearForestMoveBonusImage (false);
-              setForestMoveBonusImage (p);
-            }
-          else
-            return false;
-        }
-      else
-        return false;
-    }
-  return true;
-}
-
-bool Tileset::instantiateHillsMoveBonusImage (TarFile *t)
-{
-  Glib::ustring imgname = getHillsMoveBonusFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
-      if (filename.empty () == false)
-        {
-          bool broken = false;
-          PixMask *p = PixMask::create (filename, broken);
-          File::erase (filename);
-          if (!broken)
-            {
-              clearHillsMoveBonusImage (false);
-              setHillsMoveBonusImage (p);
-            }
-          else
-            return false;
-        }
-      else
-        return false;
-    }
-  return true;
-}
-
-bool Tileset::instantiateMountainsMoveBonusImage (TarFile *t)
-{
-  Glib::ustring imgname = getMountainsMoveBonusFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
-      if (filename.empty () == false)
-        {
-          bool broken = false;
-          PixMask *p = PixMask::create (filename, broken);
-          File::erase (filename);
-          if (!broken)
-            {
-              clearMountainsMoveBonusImage (false);
-              setMountainsMoveBonusImage (p);
-            }
-          else
-            return false;
-        }
-      else
-        return false;
-    }
-  return true;
-}
-
-bool Tileset::instantiateSwampMoveBonusImage (TarFile *t)
-{
-  Glib::ustring imgname = getSwampMoveBonusFilename();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t->getFileFromConfigurationFile(imgname);
-      if (filename.empty () == false)
-        {
-          bool broken = false;
-          PixMask *p = PixMask::create (filename, broken);
-          File::erase (filename);
-          if (!broken)
-            {
-              clearSwampMoveBonusImage (false);
-              setSwampMoveBonusImage (p);
-            }
-          else
-            return false;
-        }
-      else
-        return false;
-    }
-  return true;
 }
 //End of file

@@ -29,8 +29,8 @@
 #include "armyproto.h"
 #include "armyset.h"
 #include "setlist.h"
-
 class Tar_Helper;
+class TarFileImage;
 
 //! A list of all Armyset objects available to the game.
 /** 
@@ -79,7 +79,7 @@ class Armysetlist : public SetList<Armyset>, public sigc::trackable
         TarFileMaskedImage * getStandardPic (guint32 id);
 
 	//! Get the bag of items picture for the given Armyset.
-	PixMask* getBagPic (guint32 id);
+	TarFileImage* getBag (guint32 id);
 
 	//! Get the planted standard mask for the given Armyset.
         std::vector<PixMask*> getStandardMasks (guint32 id);

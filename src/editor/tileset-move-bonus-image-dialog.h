@@ -23,6 +23,7 @@
 #include "lw-editor-dialog.h"
 class Tileset;
 class PixMask;
+class TarFileImage;
 
 class TilesetMoveBonusImageDialog: public LwEditorDialog
 {
@@ -60,17 +61,10 @@ class TilesetMoveBonusImageDialog: public LwEditorDialog
     Gtk::Image *hills_mountains_swamp_image;
     Gtk::Image *forest_hills_mountains_swamp_image;
 
-    void on_water_clicked();
-    void on_forest_clicked();
-    void on_hills_clicked();
-    void on_mountains_clicked();
-    void on_swamp_clicked();
-    void on_all_clicked();
-
     void update_button_names ();
     void update_preview ();
 
-    void on_image_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<void,Glib::ustring> setName, PixMask *im);
+    void on_image_button_clicked (TarFileImage *im);
 };
 
 #endif

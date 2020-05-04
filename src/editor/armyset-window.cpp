@@ -49,6 +49,7 @@
 #include "font-size.h"
 #include "timed-message-dialog.h"
 #include "TarFileMaskedImage.h"
+#include "TarFileImage.h"
 
 #define method(x) sigc::mem_fun(*this, &ArmySetWindow::x)
 
@@ -782,11 +783,8 @@ void ArmySetWindow::on_edit_standard_picture_activated()
 
 void ArmySetWindow::on_edit_bag_picture_activated()
 {
-  Glib::ustring imgname = d_armyset->getBagImageName();
-  std::vector<PixMask *> frames;
-  if (imgname.empty () == false)
-    frames.push_back (d_armyset->getBagPic ());
-  ImageEditorDialog d(*window, imgname, 1, frames,
+  Glib::ustring imgname = d_armyset->getBag()->getName();
+  ImageEditorDialog d(*window, d_armyset->getBag (),
                       EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE * 0.5);
   d.set_title(_("Select a Bag image"));
   int response = d.run();
@@ -801,8 +799,8 @@ void ArmySetWindow::on_edit_bag_picture_activated()
           d_armyset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          d_armyset->setBagImageName(newname);
-          d_armyset->instantiateBagImage ();
+          d_armyset->getBag ()->setName(newname);
+          d_armyset->getBag ()->instantiateImages();
           needs_saving = true;
           update_window_title();
         }

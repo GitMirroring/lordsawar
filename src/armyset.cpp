@@ -35,6 +35,7 @@
 #include "player.h"
 #include "ImageCache.h"
 #include "TarFileMaskedImage.h"
+#include "TarFileImage.h"
 
 Glib::ustring Armyset::d_tag = "armyset";
 Glib::ustring Armyset::file_extension = ARMYSET_EXT;
@@ -44,11 +45,11 @@ Glib::ustring Armyset::file_extension = ARMYSET_EXT;
 
 #define DEFAULT_ARMY_TILE_SIZE 40
 Armyset::Armyset(guint32 id, Glib::ustring name)
- : Set(ARMYSET_EXT, id, name, DEFAULT_ARMY_TILE_SIZE), d_bag(0)
+ : Set(ARMYSET_EXT, id, name, DEFAULT_ARMY_TILE_SIZE)
 {
-  d_bag_name = "";
   d_stackship = new TarFileMaskedImage ();
   d_standard = new TarFileMaskedImage ();
+  d_bag = new TarFileImage (1);
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
       d_selector[0][i] = new TarFileMaskedImage ();
@@ -83,11 +84,11 @@ void Armyset::read_selector_name (XML_Helper *helper, Shield::Colour c, bool lar
 }
 
 Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
- : Set(ARMYSET_EXT, helper), d_bag(0)
+ : Set(ARMYSET_EXT, helper)
 {
-  d_bag_name = "";
   d_stackship = new TarFileMaskedImage ();
   d_standard = new TarFileMaskedImage ();
+  d_bag = new TarFileImage (1);
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
       d_selector[0][i] = new TarFileMaskedImage ();
@@ -100,8 +101,7 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
   setTileSize(ts);
   d_stackship->load_name (helper, "stackship");
   d_standard->load_name (helper, "plantedstandard");
-  helper->getData(d_bag_name, "bag");
-  File::add_png_if_no_ext (d_bag_name);
+  d_bag->load_name (helper, "bag");
 
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     read_selector_name (helper, Shield::Colour(i), true);
@@ -114,21 +114,17 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
 }
 
 Armyset::Armyset(const Armyset& a)
- : std::list<ArmyProto*>(), sigc::trackable(a), Set(a), d_bag(0)
+ : std::list<ArmyProto*>(), sigc::trackable(a), Set(a)
 {
   d_stackship = new TarFileMaskedImage (*a.d_stackship);
   d_standard = new TarFileMaskedImage (*a.d_standard);
+  d_bag = new TarFileImage (*a.d_bag);
 
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
       d_selector[0][i] = new TarFileMaskedImage (*a.d_selector[0][i]);
       d_selector[1][i] = new TarFileMaskedImage (*a.d_selector[1][i]);
     }
-
-  if (a.d_bag)
-    d_bag = a.d_bag->copy();
-
-  d_bag_name = a.d_bag_name;
 
   for (const_iterator i = a.begin(); i != a.end(); i++)
     push_back(new ArmyProto(*(*i)));
@@ -139,6 +135,9 @@ Armyset::~Armyset()
   uninstantiateImages();
   for (iterator it = begin(); it != end(); it++)
     delete *it;
+  delete d_stackship;
+  delete d_standard;
+  delete d_bag;
   clear();
   clean_tmp_dir();
 }
@@ -204,7 +203,7 @@ bool Armyset::save(XML_Helper* helper) const
     retval &= helper->saveData("tilesize", getUnscaledTileSize());
     retval &= helper->saveData("stackship", d_stackship->getName ());
     retval &= helper->saveData("plantedstandard", d_standard->getName ());
-    retval &= helper->saveData("bag", d_bag_name);
+    retval &= helper->saveData("bag", d_bag->getName ());
 
     for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
       write_selector_name (helper, Shield::Colour(i), true);
@@ -380,7 +379,7 @@ bool Armyset::validateShip()
 
 bool Armyset::validateBag()
 {
-  return getBagImageName () == "" ? false : true;
+  return d_bag->getName () == "" ? false : true;
 }
 
 bool Armyset::validateStandard()
@@ -579,19 +578,11 @@ void Armyset::instantiateImages(bool scale, bool &broken)
     return;
   d_standard->instantiateImages (scale_dim);
 
-  Glib::ustring bag_filename = "";
-  if (getBagImageName().empty() == false && !broken)
-    bag_filename = t.getFile(getBagImageName(), broken);
+  broken = d_bag->load (&t);
+  if (broken)
+    return;
+  d_bag->instantiateImages (scale_dim);
 
-  if (!broken)
-    {
-      if (bag_filename.empty() == false)
-        loadBagPic(bag_filename, broken);
-    }
-
-  if (bag_filename.empty() == false)
-    File::erase(bag_filename);
-      
   bool ret = loadSelectorPics (&t);
   if (ret == false)
     broken = false;
@@ -636,29 +627,7 @@ void Armyset::uninstantiateImages()
       d_selector[1][i]->uninstantiateImages ();
     }
 
-  if (d_bag)
-    delete d_bag;
-
-  d_bag = NULL;
-}
-
-void Armyset::loadBagPic(Glib::ustring image_filename, bool &broken)
-{
-  if (image_filename.empty() == true)
-    {
-      broken = true;
-      return;
-    }
-  if (!broken)
-    {
-      PixMask *p = PixMask::create(image_filename, broken);
-      if (p && !broken)
-        {
-          int s = getTileSize();
-          PixMask::scale (p, s, s);
-          setBagPic(p);
-        }
-    }
+  d_bag->uninstantiateImages ();
 }
 
 void Armyset::switchArmysetForRuinKeeper(Army *army, const Armyset *armyset)
@@ -919,8 +888,8 @@ bool Armyset::calculate_preferred_tile_size(guint32 &ts) const
     sizecounts[d_stackship->getImage(0)->get_unscaled_width()]++;
   if (d_standard->getName ().empty () == false)
     sizecounts[d_standard->getImage(0)->get_unscaled_width()]++;
-  if (d_bag)
-    sizecounts[d_bag->get_unscaled_width()]++;
+  if (d_bag->getImage ())
+    sizecounts[d_bag->getImage ()->get_unscaled_width()]++;
   for (const_iterator it = begin(); it != end(); it++)
     {
       ArmyProto *a = (*it);
@@ -1001,36 +970,6 @@ ArmyProto *Armyset::lookupWeakestQuickestArmy() const
   return p;
 }
 
-void Armyset::clearBagImage (bool clear_name)
-{
-  if (clear_name)
-    setBagImageName ("");
-
-  PixMask *p = getBagPic ();
-  if (p)
-    delete p;
-  setBagPic (NULL);
-}
-
-bool Armyset::instantiateBagImage ()
-{
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  Glib::ustring imgname = getBagImageName();
-  if (imgname.empty() == false)
-    {
-      Glib::ustring filename = t.getFile(imgname, broken);
-      if (!broken)
-        {
-          clearBagImage (false);
-          loadBagPic(filename, broken);
-        }
-    }
-  return broken;
-}
-
 bool Armyset::instantiateStandardImage ()
 {
   bool broken = false;
@@ -1076,8 +1015,8 @@ void Armyset::uninstantiateSameNamedImages (Glib::ustring name)
         getSelector(false, c)->clear ();
     }
 
-  if (getBagImageName() == name)
-    clearBagImage ();
+  if (d_bag->getName () == name)
+    d_bag->clear ();
   if (d_standard->getName () == name)
     d_standard->clear ();
   if (d_stackship->getName () == name)

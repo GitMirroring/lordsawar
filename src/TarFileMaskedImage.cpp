@@ -23,7 +23,6 @@
 #include "tarfile.h"
 #include "gui/image-helpers.h"
 #include "File.h"
-#include "ImageCache.h"
 #include "player.h"
 
 TarFileMaskedImage::TarFileMaskedImage (MaskOrientation o)
@@ -214,7 +213,7 @@ void TarFileMaskedImage::load_name (XML_Helper *helper, Glib::ustring data_tag)
   File::add_png_if_no_ext (n);
   setName (n);
 }
-  
+
 PixMask *TarFileMaskedImage::applyMask (Gdk::RGBA colour) const
 {
   return applyMask(getImage (), getMask (), colour);

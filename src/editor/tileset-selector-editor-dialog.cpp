@@ -307,15 +307,19 @@ void TilesetSelectorEditorDialog::set_selector_filename (Glib::ustring f)
 {
   if (large_selector_radiobutton->get_active() == true)
     {
-      d_tileset->getSelector(true)->setName (f);
       if (f.empty () == false)
-        d_tileset->instantiateLargeSelectorImages();
+        {
+          d_tileset->getSelector (true)->load(d_tileset, f);
+          d_tileset->getSelector (true)->instantiateImages();
+        }
     }
   else if (small_selector_radiobutton->get_active() == true)
     {
-      d_tileset->getSelector(false)->setName (f);
       if (f.empty () == false)
-        d_tileset->instantiateSmallSelectorImages();
+        {
+          d_tileset->getSelector (false)->load(d_tileset, f);
+          d_tileset->getSelector (false)->instantiateImages();
+        }
     }
   return ;
 }
@@ -325,12 +329,12 @@ void TilesetSelectorEditorDialog::clear_selector_image ()
   if (large_selector_radiobutton->get_active() == true)
     {
       large_selector->clear ();
-      d_tileset->clearLargeSelectorImage();
+      d_tileset->getSelector(true)->clear();
     }
   else if (small_selector_radiobutton->get_active() == true)
     {
       small_selector->clear ();
-      d_tileset->clearSmallSelectorImage();
+      d_tileset->getSelector(false)->clear();
     }
   return;
 }

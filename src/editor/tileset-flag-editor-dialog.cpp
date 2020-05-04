@@ -108,8 +108,8 @@ bool TilesetFlagEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
           d_tileset->replaceFileInCfgFile(imgname, d->get_filename(), newname);
       if (success)
         {
-          d_tileset->getFlags ()->setName (newname);
-          d_tileset->instantiateFlagImages();
+          d_tileset->getFlags ()->load (d_tileset, newname);
+          d_tileset->getFlags ()->instantiateImages ();
           d_changed = true;
           update_flag_panel();
         }

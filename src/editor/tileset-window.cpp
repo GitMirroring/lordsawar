@@ -52,6 +52,7 @@
 #include "past-chooser.h"
 #include "timed-message-dialog.h"
 #include "TarFileMaskedImage.h"
+#include "TarFileImage.h"
 
 #define method(x) sigc::mem_fun(*this, &TileSetWindow::x)
 
@@ -1348,12 +1349,8 @@ void TileSetWindow::on_preview_tile_activated()
 
 void TileSetWindow::on_roads_picture_activated()
 {
-  Glib::ustring imgname = d_tileset->getRoadsFilename();
-  std::vector<PixMask *> frames;
-  for (guint32 i = 0; i < ROAD_TYPES; i++)
-    if (d_tileset->getRoadImage (i))
-      frames.push_back (d_tileset->getRoadImage (i));
-  ImageEditorDialog d(*window, imgname, ROAD_TYPES, frames,
+  Glib::ustring imgname = d_tileset->getRoad()->getName();
+  ImageEditorDialog d(*window, d_tileset->getRoad (),
                       EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
   d.set_title(_("Select a roads image"));
   int response = d.run();
@@ -1369,8 +1366,8 @@ void TileSetWindow::on_roads_picture_activated()
           d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          d_tileset->setRoadsFilename (newname);
-          d_tileset->instantiateRoadImages ();
+          d_tileset->getRoad()->load (d_tileset, newname);
+          d_tileset->getRoad()->instantiateImages ();
           dirty ();
         }
       else
@@ -1390,12 +1387,8 @@ void TileSetWindow::on_roads_picture_activated()
 
 void TileSetWindow::on_stones_picture_activated()
 {
-  Glib::ustring imgname = d_tileset->getStonesFilename();
-  std::vector<PixMask *> frames;
-  for (guint32 i = 0; i < STONE_TYPES; i++)
-    if (d_tileset->getStoneImage (i))
-      frames.push_back (d_tileset->getStoneImage (i));
-  ImageEditorDialog d(*window, imgname, STONE_TYPES, frames,
+  Glib::ustring imgname = d_tileset->getStone()->getName();
+  ImageEditorDialog d(*window, d_tileset->getStone (),
                       EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
   d.set_title(_("Select a standing stones image"));
   int response = d.run();
@@ -1411,8 +1404,8 @@ void TileSetWindow::on_stones_picture_activated()
           d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          d_tileset->setStonesFilename (newname);
-          d_tileset->instantiateStoneImages ();
+          d_tileset->getStone()->load (d_tileset, newname);
+          d_tileset->getStone()->instantiateImages ();
           dirty ();
         }
       else
@@ -1432,12 +1425,8 @@ void TileSetWindow::on_stones_picture_activated()
 
 void TileSetWindow::on_bridges_picture_activated()
 {
-  Glib::ustring imgname = d_tileset->getBridgesFilename();
-  std::vector<PixMask *> frames;
-  for (guint32 i = 0; i < BRIDGE_TYPES; i++)
-    if (d_tileset->getBridgeImage (i))
-      frames.push_back (d_tileset->getBridgeImage (i));
-  ImageEditorDialog d(*window, imgname, BRIDGE_TYPES, frames,
+  Glib::ustring imgname = d_tileset->getBridge()->getName();
+  ImageEditorDialog d(*window, d_tileset->getBridge (),
                       EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
   d.set_title(_("Select a bridges image"));
   int response = d.run();
@@ -1453,8 +1442,8 @@ void TileSetWindow::on_bridges_picture_activated()
           d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          d_tileset->setBridgesFilename (newname);
-          d_tileset->instantiateBridgeImages ();
+          d_tileset->getBridge ()->load (d_tileset, newname);
+          d_tileset->getBridge ()->instantiateImages ();
           dirty ();
         }
       else
@@ -1474,12 +1463,8 @@ void TileSetWindow::on_bridges_picture_activated()
 
 void TileSetWindow::on_fog_picture_activated()
 {
-  Glib::ustring imgname = d_tileset->getFogFilename();
-  std::vector<PixMask *> frames;
-  for (guint32 i = 0; i < FOG_TYPES; i++)
-    if (d_tileset->getFogImage (i))
-      frames.push_back (d_tileset->getFogImage (i));
-  ImageEditorDialog d(*window, imgname, FOG_TYPES, frames,
+  Glib::ustring imgname = d_tileset->getFog()->getName();
+  ImageEditorDialog d(*window, d_tileset->getFog (),
                       EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
   d.set_title(_("Select a fog image"));
   int response = d.run();
@@ -1494,8 +1479,8 @@ void TileSetWindow::on_fog_picture_activated()
           d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          d_tileset->setFogFilename (newname);
-          d_tileset->instantiateFogImages ();
+          d_tileset->getFog ()->load(d_tileset, newname);
+          d_tileset->getFog ()->instantiateImages ();
           dirty ();
         }
       else
@@ -1662,29 +1647,29 @@ void TileSetWindow::on_validate_tileset_activated()
     msgs.push_back(_("A large selector image is required."));
   if (d_tileset->getSelector(false)->getName().empty () == true)
     msgs.push_back(_("A small selector image is required."));
-  if (d_tileset->getExplosionFilename().empty () == true)
+  if (d_tileset->getExplosion()->getName().empty () == true)
     msgs.push_back(_("An explosion image is required."));
-  if (d_tileset->getRoadsFilename().empty () == true)
+  if (d_tileset->getRoad()->getName().empty () == true)
     msgs.push_back(_("A roads image is required."));
-  if (d_tileset->getStonesFilename().empty () == true)
+  if (d_tileset->getStone()->getName().empty () == true)
     msgs.push_back(_("A standing stones image is required."));
-  if (d_tileset->getBridgesFilename().empty () == true)
+  if (d_tileset->getBridge()->getName ().empty () == true)
     msgs.push_back(_("A bridges image is required."));
-  if (d_tileset->getFogFilename().empty () == true)
+  if (d_tileset->getFog()->getName ().empty () == true)
     msgs.push_back(_("A set of fog images are required."));
   if (d_tileset->getFlags()->getName().empty () == true)
     msgs.push_back(_("A set of flag images are required."));
-  if (d_tileset->getAllMoveBonusFilename ().empty () == true)
+  if (d_tileset->getAllMoveBonus ()->getName ().empty () == true)
     msgs.push_back(_("An all (flight) movement bonus image is required."));
-  if (d_tileset->getWaterMoveBonusFilename ().empty () == true)
+  if (d_tileset->getWaterMoveBonus ()->getName ().empty () == true)
     msgs.push_back(_("A water movement bonus image is required."));
-  if (d_tileset->getForestMoveBonusFilename ().empty () == true)
+  if (d_tileset->getForestMoveBonus ()->getName ().empty () == true)
     msgs.push_back(_("A forest movement bonus image is required."));
-  if (d_tileset->getHillsMoveBonusFilename ().empty () == true)
+  if (d_tileset->getHillsMoveBonus ()->getName ().empty () == true)
     msgs.push_back(_("A hills movement bonus image is required."));
-  if (d_tileset->getMountainsMoveBonusFilename ().empty () == true)
+  if (d_tileset->getMountainsMoveBonus ()->getName ().empty () == true)
     msgs.push_back(_("A mountains movement bonus image is required."));
-  if (d_tileset->getSwampMoveBonusFilename ().empty () == true)
+  if (d_tileset->getSwampMoveBonus ()->getName ().empty () == true)
     msgs.push_back(_("A swamp movement bonus image is required."));
 
   if (isValidName () == false)

@@ -29,6 +29,7 @@
 #include "hero.h"
 
 class TarFileMaskedImage;
+class TarFileImage;
 
 //! A collection of Army prototype objects.
 /**
@@ -77,6 +78,7 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 	 * @param name  The name of the Armyset.  Analagous to Armyset::d_name.
 	 */
 	Armyset(guint32 id, Glib::ustring name);
+
 	//! Loading constructor.
 	/**
 	 * Load armyset XML entities from armyset configuration files.
@@ -110,16 +112,7 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         bool instantiateShipImage ();
 
 	//! Get the image of the bag.
-	PixMask* getBagPic() const {return d_bag;}
-
-	//! Set the image of the bag.
-	void setBagPic(PixMask* s) {d_bag = s;};
-
-        //! Clear the bag name and pic 
-        void clearBagImage (bool clear_name = true);
-
-        //! Instantiate the bag image by loading it from the lwa file.
-        bool instantiateBagImage ();
+	TarFileImage* getBag() const {return d_bag;}
 
         //! Instantiate the standard image by loading it from the lwa file.
         bool instantiateStandardImage ();
@@ -129,12 +122,6 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 
 	//! Get the picture for stacks as they appear in the water.
         TarFileMaskedImage *getShip() const {return d_stackship; }
-
-	//! Set the name of the file holding the image of the bag.
-	void setBagImageName(Glib::ustring n) {d_bag_name = n;};
-
-	//! Get the name of the file holding the image of the bag.
-	Glib::ustring getBagImageName() {return d_bag_name;};
 
         //! Find the type id with the highest value and return it.
         guint32 getMaxId() const;
@@ -194,7 +181,6 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 	void uninstantiateImages();
         void uninstantiateSameNamedImages (Glib::ustring name);
 
-	void loadBagPic(Glib::ustring image_filename, bool &broken);
         bool loadSelectorPics (Tar_Helper *t);
 
 	static void switchArmyset(Army *army, const Armyset *armyset);
@@ -220,11 +206,8 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         void read_selector_name (XML_Helper *helper, Shield::Colour c, bool large);
         void write_selector_name (XML_Helper *helper, Shield::Colour c, bool large) const;
         
-        //! the basename, archive member of the bag image in the tar file.
-        Glib::ustring d_bag_name;
-
 	//! The picture of an item when it's lying on the ground.
-	PixMask *d_bag;
+        TarFileImage *d_bag;
 
 	//! The picture of the stack when it's in a boat. one frame per player.
         TarFileMaskedImage *d_stackship;

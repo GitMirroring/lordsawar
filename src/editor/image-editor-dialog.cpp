@@ -31,15 +31,16 @@
 #include "ImageCache.h"
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
+#include "TarFileImage.h"
 
 #define method(x) sigc::mem_fun(*this, &ImageEditorDialog::x)
 
-ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, Glib::ustring bname, int no_frames, std::vector<PixMask *> f, double ratio)
+ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, double ratio)
  : LwEditorDialog(parent, "image-editor-dialog.ui")
 {
   d_ratio = ratio;
   d_active_frame = 0;
-  d_num_frames = no_frames;
+  d_num_frames = im->getNumberOfFrames ();
   d_target_filename = "";
 
   xml->get_widget("imagebutton", imagebutton);
@@ -47,26 +48,26 @@ ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, Glib::ustring bname, i
 
   xml->get_widget("image", image);
   xml->get_widget("clear_button", clear_button);
-  update_imagebutton_label (bname);
+  update_imagebutton_label (im->getName ());
 
-  if (f.empty () == false)
+  if (im->getName ().empty () == false)
     clear_button->set_visible (true);
 
-  for (guint32 i = 0; i < f.size (); i++)
+  for (guint32 i = 0; i < d_num_frames; i++)
     {
       if (d_ratio > 0)
         {
           int font_size = FontSize::getInstance ()->get_height ();
           double new_height = font_size * d_ratio;
           int new_width =
-            ImageCache::calculate_width_from_adjusted_height (f[i],
+            ImageCache::calculate_width_from_adjusted_height (im->getImage (i),
                                                               new_height);
-          PixMask *ff = f[i]->copy ();
+          PixMask *ff = im->getImage (i)->copy ();
           PixMask::scale (ff, new_width, new_height);
           frames.push_back(ff);
         }
       else
-        frames.push_back(f[i]->copy ());
+        frames.push_back(im->getImage (i)->copy ());
     }
 }
 
@@ -96,7 +97,7 @@ bool ImageEditorDialog::load_frames (Glib::ustring filename)
       clear_button->set_visible (true);
       if (d_ratio > 0)
         {
-          for (int i = 0; i < d_num_frames; i++)
+          for (guint32 i = 0; i < d_num_frames; i++)
             {
               int font_size = FontSize::getInstance ()->get_height ();
               double new_height = font_size * d_ratio;

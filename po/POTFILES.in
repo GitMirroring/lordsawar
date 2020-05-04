@@ -228,6 +228,7 @@ src/ScenarioMedia.cpp
 src/scenario-list.cpp
 src/scenario-details.cpp
 src/TarFileMaskedImage.cpp
+src/TarFileImage.cpp
 src/gui/image-helpers.cpp
 src/gui/city-window.cpp
 src/gui/preferences-dialog.cpp

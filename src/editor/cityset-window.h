@@ -27,6 +27,8 @@
 
 #include "cityset.h"
 
+class TarFileImage;
+
 //! Cityset Editor.  Edit an cityset.
 class CitySetWindow: public sigc::trackable
 {
@@ -90,14 +92,8 @@ class CitySetWindow: public sigc::trackable
     void on_ruin_tile_width_text_changed();
     void on_temple_tile_width_changed();
     void on_temple_tile_width_text_changed();
-    void on_change_citypics_clicked();
-    void on_change_razedcitypics_clicked();
-    void on_change_portpic_clicked();
-    void on_change_signpostpic_clicked();
-    void on_change_ruinpics_clicked();
-    void on_change_templepic_clicked();
-    void on_change_towerpics_clicked();
-    Glib::ustring change_image (Glib::ustring m, Glib::ustring i, int num, std::vector<PixMask *> frames, bool &cleared, int tile_width);
+    void on_change_clicked(Glib::ustring msg, TarFileImage *im, sigc::slot<guint32> getTileWidth);
+    Glib::ustring change_image (Glib::ustring m, TarFileImage *im, bool &cleared, guint32 tile_width);
     void update_window_title();
     void show_add_file_error(Gtk::Dialog &d, Glib::ustring file);
     void show_remove_file_error(Gtk::Dialog &d, Glib::ustring file);
@@ -111,6 +107,12 @@ class CitySetWindow: public sigc::trackable
     bool check_save_valid (bool existing);
     bool check_name_valid (bool existing);
     bool isValidName ();
+
+    void disconnect_signals ();
+    void connect_signals ();
+    std::vector<sigc::connection> connections;
+    guint32 getDefaultImageTileWidth ();
+
 };
 
 #endif

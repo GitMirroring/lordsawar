@@ -30,6 +30,7 @@
 #include "image-editor-dialog.h"
 #include "timed-message-dialog.h"
 #include "font-size.h"
+#include "TarFileImage.h"
 
 #define method(x) sigc::mem_fun(*this, &TilesetMoveBonusImageDialog::x)
 
@@ -39,23 +40,30 @@ TilesetMoveBonusImageDialog::TilesetMoveBonusImageDialog(Gtk::Window &parent, Ti
   d_tileset = tileset;
 
   xml->get_widget("all_imagechooser_button", all_imagechooser_button);
-  all_imagechooser_button->signal_clicked ().connect (method (on_all_clicked));
+  all_imagechooser_button->signal_clicked ().connect
+    (sigc::bind (method (on_image_button_clicked),
+                 d_tileset->getAllMoveBonus ()));
   xml->get_widget("water_imagechooser_button", water_imagechooser_button);
   water_imagechooser_button->signal_clicked ().connect
-    (method (on_water_clicked));
+    (sigc::bind (method (on_image_button_clicked),
+                 d_tileset->getWaterMoveBonus ()));
   xml->get_widget("forest_imagechooser_button", forest_imagechooser_button);
   forest_imagechooser_button->signal_clicked ().connect
-    (method (on_forest_clicked));
+    (sigc::bind (method (on_image_button_clicked),
+                 d_tileset->getForestMoveBonus ()));
   xml->get_widget("hills_imagechooser_button", hills_imagechooser_button);
   hills_imagechooser_button->signal_clicked ().connect
-    (method (on_hills_clicked));
+    (sigc::bind (method (on_image_button_clicked),
+                 d_tileset->getHillsMoveBonus ()));
   xml->get_widget("mountains_imagechooser_button",
                   mountains_imagechooser_button);
   mountains_imagechooser_button->signal_clicked ().connect
-    (method (on_mountains_clicked));
+    (sigc::bind (method (on_image_button_clicked),
+                 d_tileset->getMountainsMoveBonus ()));
   xml->get_widget("swamp_imagechooser_button", swamp_imagechooser_button);
   swamp_imagechooser_button->signal_clicked ().connect
-    (method (on_swamp_clicked));
+    (sigc::bind (method (on_image_button_clicked),
+                 d_tileset->getSwampMoveBonus ()));
 
   xml->get_widget("notebook", notebook);
 
@@ -81,84 +89,6 @@ TilesetMoveBonusImageDialog::TilesetMoveBonusImageDialog(Gtk::Window &parent, Ti
   update_preview ();
 }
 
-void TilesetMoveBonusImageDialog::on_water_clicked ()
-{
-  PixMask *i = d_tileset->getWaterMoveBonusImage ();
-  on_image_button_activated
-    (sigc::mem_fun (d_tileset, &Tileset::getWaterMoveBonusFilename),
-     sigc::mem_fun (d_tileset, &Tileset::setWaterMoveBonusFilename), i);
-  if (d_tileset->getWaterMoveBonusFilename().empty () == false)
-    d_tileset->instantiateWaterMoveBonusImage (d_tileset);
-  else
-    d_tileset->clearWaterMoveBonusImage();
-  update_preview ();
-}
-
-void TilesetMoveBonusImageDialog::on_forest_clicked ()
-{
-  PixMask *i = d_tileset->getForestMoveBonusImage ();
-  on_image_button_activated
-    (sigc::mem_fun (d_tileset, &Tileset::getForestMoveBonusFilename),
-     sigc::mem_fun (d_tileset, &Tileset::setForestMoveBonusFilename), i);
-  if (d_tileset->getForestMoveBonusFilename().empty () == false)
-    d_tileset->instantiateForestMoveBonusImage (d_tileset);
-  else
-    d_tileset->clearForestMoveBonusImage();
-  update_preview ();
-}
-
-void TilesetMoveBonusImageDialog::on_hills_clicked ()
-{
-  PixMask *i = d_tileset->getHillsMoveBonusImage ();
-  on_image_button_activated
-    (sigc::mem_fun (d_tileset, &Tileset::getHillsMoveBonusFilename),
-     sigc::mem_fun (d_tileset, &Tileset::setHillsMoveBonusFilename), i);
-  if (d_tileset->getHillsMoveBonusFilename().empty () == false)
-    d_tileset->instantiateHillsMoveBonusImage (d_tileset);
-  else
-    d_tileset->clearHillsMoveBonusImage();
-  update_preview ();
-}
-
-void TilesetMoveBonusImageDialog::on_mountains_clicked ()
-{
-  PixMask *i = d_tileset->getMountainsMoveBonusImage ();
-  on_image_button_activated
-    (sigc::mem_fun (d_tileset, &Tileset::getMountainsMoveBonusFilename),
-     sigc::mem_fun (d_tileset, &Tileset::setMountainsMoveBonusFilename), i);
-  if (d_tileset->getMountainsMoveBonusFilename().empty () == false)
-    d_tileset->instantiateMountainsMoveBonusImage (d_tileset);
-  else
-    d_tileset->clearMountainsMoveBonusImage();
-  update_preview ();
-}
-
-void TilesetMoveBonusImageDialog::on_swamp_clicked ()
-{
-  PixMask *i = d_tileset->getSwampMoveBonusImage ();
-  on_image_button_activated
-    (sigc::mem_fun (d_tileset, &Tileset::getSwampMoveBonusFilename),
-     sigc::mem_fun (d_tileset, &Tileset::setSwampMoveBonusFilename), i);
-  if (d_tileset->getSwampMoveBonusFilename().empty () == false)
-    d_tileset->instantiateSwampMoveBonusImage (d_tileset);
-  else
-    d_tileset->clearSwampMoveBonusImage();
-  update_preview ();
-}
-
-void TilesetMoveBonusImageDialog::on_all_clicked ()
-{
-  PixMask *i = d_tileset->getAllMoveBonusImage ();
-  on_image_button_activated
-    (sigc::mem_fun (d_tileset, &Tileset::getAllMoveBonusFilename),
-     sigc::mem_fun (d_tileset, &Tileset::setAllMoveBonusFilename), i);
-  if (d_tileset->getAllMoveBonusFilename().empty () == false)
-    d_tileset->instantiateAllMoveBonusImage (d_tileset);
-  else
-    d_tileset->clearAllMoveBonusImage();
-  update_preview ();
-}
-
 TilesetMoveBonusImageDialog::~TilesetMoveBonusImageDialog ()
 {
   notebook->property_show_tabs () = false;
@@ -168,37 +98,37 @@ void TilesetMoveBonusImageDialog::update_button_names ()
 {
   Glib::ustring no_img_set = _("No image set");
 
-  Glib::ustring image = d_tileset->getAllMoveBonusFilename ();
+  Glib::ustring image = d_tileset->getAllMoveBonus()->getName ();
   if (image.empty () == false)
     all_imagechooser_button->set_label (image);
   else
     all_imagechooser_button->set_label (no_img_set);
 
-  image = d_tileset->getWaterMoveBonusFilename ();
+  image = d_tileset->getWaterMoveBonus()->getName ();
   if (image.empty () == false)
     water_imagechooser_button->set_label (image);
   else
     water_imagechooser_button->set_label (no_img_set);
 
-  image = d_tileset->getForestMoveBonusFilename ();
+  image = d_tileset->getForestMoveBonus()->getName ();
   if (image.empty () == false)
     forest_imagechooser_button->set_label (image);
   else
     forest_imagechooser_button->set_label (no_img_set);
 
-  image = d_tileset->getHillsMoveBonusFilename ();
+  image = d_tileset->getHillsMoveBonus()->getName ();
   if (image.empty () == false)
     hills_imagechooser_button->set_label (image);
   else
     hills_imagechooser_button->set_label (no_img_set);
 
-  image = d_tileset->getMountainsMoveBonusFilename ();
+  image = d_tileset->getMountainsMoveBonus()->getName ();
   if (image.empty () == false)
     mountains_imagechooser_button->set_label (image);
   else
     mountains_imagechooser_button->set_label (no_img_set);
 
-  image = d_tileset->getSwampMoveBonusFilename ();
+  image = d_tileset->getSwampMoveBonus()->getName ();
   if (image.empty () == false)
     swamp_imagechooser_button->set_label (image);
   else
@@ -298,15 +228,11 @@ void TilesetMoveBonusImageDialog::update_preview ()
   delete p;
 }
 
-void TilesetMoveBonusImageDialog::on_image_button_activated(sigc::slot<Glib::ustring> getName,
-                                                            sigc::slot<void,Glib::ustring> setName, PixMask *im)
+void TilesetMoveBonusImageDialog::on_image_button_clicked (TarFileImage *im)
 {
   TarFile *t = d_tileset;
-  Glib::ustring imgname = getName ();
-  std::vector<PixMask*> frames;
-  if (im)
-    frames.push_back (im);
-  ImageEditorDialog d (*dialog, imgname, 1, frames, 0);
+  Glib::ustring imgname = im->getName ();
+  ImageEditorDialog d (*dialog, im, 0);
   int response = d.run();
 
   if (response == Gtk::RESPONSE_ACCEPT)
@@ -315,14 +241,15 @@ void TilesetMoveBonusImageDialog::on_image_button_activated(sigc::slot<Glib::ust
         {
           Glib::ustring newname = "";
           bool success = false;
-          if (getName() == "")
+          if (im->getName() == "")
             success = t->addFileInCfgFile(d.get_filename (), newname);
           else
             success = t->replaceFileInCfgFile(imgname, d.get_filename (),
                                               newname);
           if (success)
             {
-              setName(newname);
+              im->load (d_tileset, newname);
+              im->instantiateImages ();
               d_changed = true;
               update_button_names ();
             }
@@ -344,7 +271,7 @@ void TilesetMoveBonusImageDialog::on_image_button_activated(sigc::slot<Glib::ust
         {
           if (t->removeFileInCfgFile(imgname))
             {
-              setName ("");
+              im->clear();
               d_changed = true;
               update_button_names ();
             }

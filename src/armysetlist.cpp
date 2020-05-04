@@ -33,6 +33,7 @@
 #include "tarhelper.h"
 #include "setlist.h"
 #include "TarFileMaskedImage.h"
+#include "TarFileImage.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -128,12 +129,12 @@ guint32 Armysetlist::getTileSize(guint32 id)
   return 0;
 }
 
-PixMask* Armysetlist::getBagPic (guint32 id)
+TarFileImage* Armysetlist::getBag (guint32 id)
 {
   for (iterator it = begin(); it != end(); it++)
     {
       if ((*it)->getId() == id)
-	return (*it)->getBagPic();
+	return (*it)->getBag();
     }
   return NULL;
 }

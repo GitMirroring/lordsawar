@@ -33,6 +33,7 @@
 #include "font-size.h"
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
+#include "TarFileImage.h"
 
 #define method(x) sigc::mem_fun(*this, &TilesetExplosionPictureEditorDialog::x)
 
@@ -53,7 +54,7 @@ TilesetExplosionPictureEditorDialog::TilesetExplosionPictureEditorDialog(Gtk::Wi
 
   xml->get_widget("scene_image", scene_image);
 
-  Glib::ustring imgname = d_tileset->getExplosionFilename();
+  Glib::ustring imgname = d_tileset->getExplosion()->getName();
   if (imgname.empty() == false)
     {
       bool broken = false;
@@ -80,7 +81,7 @@ bool TilesetExplosionPictureEditorDialog::on_image_chosen(Gtk::FileChooserDialog
   d_explosion = PixMask::create (d->get_filename (), broken);
   if (!broken)
     {
-      Glib::ustring imgname = d_tileset->getExplosionFilename();
+      Glib::ustring imgname = d_tileset->getExplosion()->getName();
       Glib::ustring newname = "";
       bool success = false;
       if (imgname.empty() == true)
@@ -91,8 +92,8 @@ bool TilesetExplosionPictureEditorDialog::on_image_chosen(Gtk::FileChooserDialog
           d_tileset->replaceFileInCfgFile(imgname, d->get_filename(), newname);
       if (success)
         {
-          d_tileset->setExplosionFilename (newname);
-          d_tileset->instantiateExplosionImage();
+          d_tileset->getExplosion ()->load (d_tileset, newname);
+          d_tileset->getExplosion ()->instantiateImages ();
           d_changed = true;
           update_panel ();
         }
@@ -131,7 +132,7 @@ void TilesetExplosionPictureEditorDialog::on_small_toggled()
 
 void TilesetExplosionPictureEditorDialog::update_panel()
 {
-  Glib::ustring imgname = d_tileset->getExplosionFilename();
+  Glib::ustring imgname = d_tileset->getExplosion ()->getName();
   if (imgname.empty() == false)
     {
       explosion_imagebutton->set_label (imgname);
@@ -244,7 +245,7 @@ Gtk::FileChooserDialog* TilesetExplosionPictureEditorDialog::image_filechooser(b
 
 void TilesetExplosionPictureEditorDialog::on_explosion_imagebutton_clicked ()
 {
-  Glib::ustring f = d_tileset->getExplosionFilename ();
+  Glib::ustring f = d_tileset->getExplosion()->getName ();
   Glib::ustring filename = "";
   Gtk::FileChooserDialog *d = image_filechooser(f != "");
   if (f != "")

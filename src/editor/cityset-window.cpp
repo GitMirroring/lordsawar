@@ -43,6 +43,7 @@
 #include "GameMap.h"
 #include "editor-save-changes-dialog.h"
 #include "timed-message-dialog.h"
+#include "TarFileImage.h"
 
 #define method(x) sigc::mem_fun(*this, &CitySetWindow::x)
 
@@ -101,24 +102,12 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
       (sigc::hide(sigc::hide(method(on_temple_tile_width_text_changed))));
 
     xml->get_widget("change_citypics_button", change_citypics_button);
-    change_citypics_button->signal_clicked().connect
-      (method(on_change_citypics_clicked));
     xml->get_widget("change_razedcitypics_button", change_razedcitypics_button);
-    change_razedcitypics_button->signal_clicked().connect
-      (method(on_change_razedcitypics_clicked));
     xml->get_widget("change_portpic_button", change_portpic_button);
-    change_portpic_button->signal_clicked().connect(method(on_change_portpic_clicked));
     xml->get_widget("change_signpostpic_button", change_signpostpic_button);
-    change_signpostpic_button->signal_clicked().connect
-      (method(on_change_signpostpic_clicked));
     xml->get_widget("change_ruinpics_button", change_ruinpics_button);
-    change_ruinpics_button->signal_clicked().connect(method(on_change_ruinpics_clicked));
     xml->get_widget("change_templepic_button", change_templepic_button);
-    change_templepic_button->signal_clicked().connect
-      (method(on_change_templepic_clicked));
     xml->get_widget("change_towerpics_button", change_towerpics_button);
-    change_towerpics_button->signal_clicked().connect
-      (method(on_change_towerpics_clicked));
     xml->get_widget ("notebook", notebook);
 
     if (load_filename != "")
@@ -133,55 +122,101 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
       }
 }
 
+void CitySetWindow::connect_signals ()
+{
+  connections.push_back
+    (change_citypics_button->signal_clicked().connect
+     (sigc::bind(method(on_change_clicked), _("Select a Cities image"),
+                 d_cityset->getCity (),
+                 sigc::mem_fun (d_cityset, &Cityset::getCityTileWidth))));
+  connections.push_back
+    (change_razedcitypics_button->signal_clicked().connect
+     (sigc::bind(method(on_change_clicked), _("Select a Razed Cities image"),
+                 d_cityset->getRazedCity (),
+                 sigc::mem_fun (d_cityset, &Cityset::getCityTileWidth))));
+  connections.push_back
+    (change_portpic_button->signal_clicked().connect
+     (sigc::bind (method(on_change_clicked), _("Select a Port image"),
+                  d_cityset->getPort (),
+                  method (getDefaultImageTileWidth))));
+  connections.push_back
+    (change_signpostpic_button->signal_clicked().connect
+     (sigc::bind (method(on_change_clicked), _("Select a Signpost image"),
+                  d_cityset->getSignpost (),
+                  method (getDefaultImageTileWidth))));
+  connections.push_back
+    (change_ruinpics_button->signal_clicked().connect
+     (sigc::bind (method(on_change_clicked), _("Select a Ruin image"),
+                  d_cityset->getRuin (),
+                 sigc::mem_fun (d_cityset, &Cityset::getRuinTileWidth))));
+  connections.push_back
+    (change_templepic_button->signal_clicked().connect
+     (sigc::bind (method(on_change_clicked), _("Select a Temple image"),
+                  d_cityset->getTemple (),
+                 sigc::mem_fun (d_cityset, &Cityset::getTempleTileWidth))));
+  connections.push_back
+    (change_towerpics_button->signal_clicked().connect
+     (sigc::bind (method(on_change_clicked), _("Select a Tower image"),
+                  d_cityset->getTower (),
+                  method (getDefaultImageTileWidth))));
+}
+
+void CitySetWindow::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+}
+
 void
 CitySetWindow::update_cityset_panel()
 {
   cityset_alignment->set_sensitive(d_cityset != NULL);
   Glib::ustring no_image = _("No image set");
-  Glib::ustring s;
-  if (d_cityset && d_cityset->getCitiesFilename().empty() == false)
-    s = d_cityset->getCitiesFilename();
-  else
-    s = no_image;
+  Glib::ustring s = no_image;
+  if (d_cityset && d_cityset->getCity ()->getName ().empty() == false)
+    s = d_cityset->getCity ()->getName ();
   change_citypics_button->set_label(s);
-  if (d_cityset && d_cityset->getRazedCitiesFilename().empty() == false)
-    s = d_cityset->getRazedCitiesFilename();
-  else
-    s = no_image;
+
+  s = no_image;
+  if (d_cityset && d_cityset->getRazedCity ()->getName ().empty() == false)
+    s = d_cityset->getRazedCity ()->getName ();
   change_razedcitypics_button->set_label(s);
-  if (d_cityset && d_cityset->getPortFilename().empty() == false)
-    s = d_cityset->getPortFilename();
-  else
-    s = no_image;
+
+  s = no_image;
+  if (d_cityset && d_cityset->getPort()->getName().empty() == false)
+    s = d_cityset->getPort()->getName();
   change_portpic_button->set_label(s);
-  if (d_cityset && d_cityset->getSignpostFilename().empty() == false)
-    s = d_cityset->getSignpostFilename();
-  else
-    s = no_image;
+
+  s = no_image;
+  if (d_cityset && d_cityset->getSignpost ()->getName().empty() == false)
+    s = d_cityset->getSignpost ()->getName();
   change_signpostpic_button->set_label(s);
-  if (d_cityset && d_cityset->getRuinsFilename().empty() == false)
-    s = d_cityset->getRuinsFilename();
-  else
-    s = no_image;
+
+  s = no_image;
+  if (d_cityset && d_cityset->getRuin()->getName ().empty() == false)
+    s = d_cityset->getRuin()->getName ();
   change_ruinpics_button->set_label(s);
-  if (d_cityset && d_cityset->getTemplesFilename().empty() == false)
-    s = d_cityset->getTemplesFilename();
-  else
-    s = no_image;
+
+  s = no_image;
+  if (d_cityset && d_cityset->getTemple()->getName ().empty() == false)
+    s = d_cityset->getTemple()->getName ();
   change_templepic_button->set_label(s);
-  if (d_cityset && d_cityset->getTowersFilename().empty() == false)
-    s = d_cityset->getTowersFilename();
-  else
-    s = no_image;
+
+  s = no_image;
+  if (d_cityset && d_cityset->getTower()->getName().empty() == false)
+    s = d_cityset->getTower()->getName();
   change_towerpics_button->set_label(s);
+
   if (d_cityset)
     city_tile_width_spinbutton->set_value(d_cityset->getCityTileWidth());
   else
     city_tile_width_spinbutton->set_value(2);
+
   if (d_cityset)
     ruin_tile_width_spinbutton->set_value(d_cityset->getRuinTileWidth());
   else
     ruin_tile_width_spinbutton->set_value(1);
+
   if (d_cityset)
     temple_tile_width_spinbutton->set_value(d_cityset->getTempleTileWidth());
   else
@@ -194,6 +229,7 @@ bool CitySetWindow::make_new_cityset ()
   if (check_discard (msg) == false)
     return false;
   current_save_filename = "";
+  disconnect_signals ();
   if (d_cityset)
     delete d_cityset;
 
@@ -204,6 +240,7 @@ bool CitySetWindow::make_new_cityset ()
 
   d_cityset = new Cityset (Citysetlist::getNextAvailableId (1), name);
   d_cityset->setNewTemporaryFile ();
+  connect_signals ();
 
   update_cityset_panel();
   needs_saving = true;
@@ -235,22 +272,22 @@ void CitySetWindow::on_validate_cityset_activated()
           msgs.push_back(s);
         }
     }
-  if (d_cityset->validateCitiesFilename() == false)
+  if (d_cityset->getCity ()->getName ().empty () == true)
     msgs.push_back(_("The cities picture is not set."));
-  if (d_cityset->validateRazedCitiesFilename() == false)
+  if (d_cityset->getRazedCity ()->getName ().empty () == true)
     msgs.push_back(_("The razed cities picture is not set."));
-  if (d_cityset->validatePortFilename() == false)
+  if (d_cityset->getPort ()->getName ().empty () == true)
     msgs.push_back(_("The port picture is not set."));
-  if (d_cityset->validateSignpostFilename() == false)
+  if (d_cityset->getSignpost ()->getName ().empty () == true)
     msgs.push_back(_("The signpost picture is not set."));
-  if (d_cityset->validateRuinsFilename() == false)
+  if (d_cityset->getRuin ()->getName ().empty () == true)
     msgs.push_back(_("The ruins picture is not set."));
-  if (d_cityset->validateTemplesFilename() == false)
+  if (d_cityset->getTemple ()->getName ().empty () == true)
     msgs.push_back(_("The temple picture is not set."));
-  if (d_cityset->validateTowersFilename() == false)
+  if (d_cityset->getTower ()->getName(). empty() == true)
     msgs.push_back(_("The towers picture is not set."));
   if (d_cityset->validateCityTileWidth() == false)
-    msgs.push_back(_("The tile width for temples must be over zero."));
+    msgs.push_back(_("The tile width for cities must be over zero."));
   if (d_cityset->validateRuinTileWidth() == false)
     msgs.push_back(_("The tile width for ruins must be over zero."));
   if (d_cityset->validateTempleTileWidth() == false)
@@ -469,9 +506,11 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
       dialog.run_and_hide();
       return false;
     }
+  disconnect_signals ();
   if (d_cityset)
     delete d_cityset;
   d_cityset = cityset;
+  connect_signals ();
   d_cityset->setLoadTemporaryFile ();
 
   bool broken = false;
@@ -584,175 +623,33 @@ void CitySetWindow::on_temple_tile_width_changed()
   update_window_title();
 }
 
-void CitySetWindow::on_change_citypics_clicked()
+void CitySetWindow::on_change_clicked(Glib::ustring msg, TarFileImage *im, sigc::slot<guint32> getTileWidth)
 {
   bool cleared = false;
-  std::vector<PixMask *> frames;
-  for (guint32 i = 0; i < MAX_PLAYERS + 1; i++)
-    if (d_cityset->getCityImage (i))
-      frames.push_back (d_cityset->getCityImage (i));
-  Glib::ustring imgname = d_cityset->getCitiesFilename();
-  Glib::ustring f =
-    change_image(_("Select a Cities image"), imgname, MAX_PLAYERS + 1,
-                 frames, cleared, d_cityset->getCityTileWidth ());
+  Glib::ustring f = change_image(msg, im, cleared, getTileWidth ());
   if (cleared)
-    d_cityset->uninstantiateSameNamedImages (imgname);
+    {
+      d_cityset->uninstantiateSameNamedImages (im->getName ());
+      im->clear ();
+    }
   else
     {
       if (f != "")
         {
-          d_cityset->setCitiesFilename (f);
-          d_cityset->instantiateCityImages();
+          im->load (d_cityset, f);
+          im->instantiateImages ();
         }
     }
   update_cityset_panel();
 }
 
-void CitySetWindow::on_change_razedcitypics_clicked()
-{
-  bool cleared = false;
-  std::vector<PixMask *> frames;
-  for (guint32 i = 0; i < MAX_PLAYERS; i++)
-    if (d_cityset->getRazedCityImage (i))
-      frames.push_back (d_cityset->getRazedCityImage (i));
-  Glib::ustring imgname = d_cityset->getRazedCitiesFilename();
-  Glib::ustring f = 
-    change_image(_("Select a Razed Cities image"), imgname, MAX_PLAYERS,
-                 frames, cleared, d_cityset->getCityTileWidth ());
-  if (cleared)
-    d_cityset->uninstantiateSameNamedImages (imgname);
-  else
-    {
-      if (f != "")
-        {
-          d_cityset->setRazedCitiesFilename (f);
-          d_cityset->instantiateRazedCityImages();
-        }
-    }
-  update_cityset_panel();
-}
-
-void CitySetWindow::on_change_portpic_clicked()
-{
-  bool cleared = false;
-  std::vector<PixMask *> frames;
-  if (d_cityset->getPortImage ())
-    frames.push_back (d_cityset->getPortImage ());
-  Glib::ustring imgname = d_cityset->getPortFilename();
-  Glib::ustring f = change_image(_("Select a Port image"), imgname, 1, frames,
-                                 cleared, 1);
-  if (cleared)
-    d_cityset->uninstantiateSameNamedImages (imgname);
-  else
-    {
-      if (f != "")
-        {
-          d_cityset->setPortFilename (f);
-          d_cityset->instantiatePortImage();
-        }
-    }
-  update_cityset_panel();
-}
-
-void CitySetWindow::on_change_signpostpic_clicked()
-{
-  bool cleared = false;
-  std::vector<PixMask *> frames;
-  if (d_cityset->getSignpostImage ())
-    frames.push_back (d_cityset->getSignpostImage ());
-  Glib::ustring imgname = d_cityset->getSignpostFilename();
-  Glib::ustring f =
-    change_image(_("Select a Signpost image"), imgname, 1, frames, cleared, 1);
-  if (cleared)
-    d_cityset->uninstantiateSameNamedImages (imgname);
-  else
-    {
-      if (f != "")
-        {
-          d_cityset->setSignpostFilename (f);
-          d_cityset->instantiateSignpostImage();
-        }
-    }
-  update_cityset_panel();
-}
-
-void CitySetWindow::on_change_ruinpics_clicked()
-{
-  bool cleared = false;
-  std::vector<PixMask *> frames;
-  for (guint32 i = 0; i < RUIN_TYPES; i++)
-    if (d_cityset->getRuinImage (i))
-      frames.push_back (d_cityset->getRuinImage (i));
-  Glib::ustring imgname = d_cityset->getRuinsFilename();
-  Glib::ustring f =
-    change_image(_("Select a Ruins image"), imgname, RUIN_TYPES, frames,
-                 cleared, d_cityset->getRuinTileWidth ());
-  if (cleared)
-    d_cityset->uninstantiateSameNamedImages (imgname);
-  else
-    {
-      if (f != "")
-        {
-          d_cityset->setRuinsFilename (f);
-          d_cityset->instantiateRuinImages();
-        }
-    }
-  update_cityset_panel();
-}
-
-void CitySetWindow::on_change_templepic_clicked()
-{
-  bool cleared = false;
-  std::vector<PixMask *> frames;
-  for (guint32 i = 0; i < TEMPLE_TYPES; i++)
-    if (d_cityset->getTempleImage (i))
-      frames.push_back (d_cityset->getTempleImage (i));
-  Glib::ustring imgname = d_cityset->getTemplesFilename();
-  Glib::ustring f =
-    change_image(_("Select a Temples image"), imgname, TEMPLE_TYPES, frames,
-                 cleared, d_cityset->getTempleTileWidth ());
-  if (cleared)
-    d_cityset->uninstantiateSameNamedImages (imgname);
-  else
-    {
-      if (f != "")
-        {
-          d_cityset->setTemplesFilename (f);
-          d_cityset->instantiateTempleImages();
-        }
-    }
-  update_cityset_panel();
-}
-
-void CitySetWindow::on_change_towerpics_clicked()
-{
-  bool cleared = false;
-  std::vector<PixMask *> frames;
-  for (guint32 i = 0; i < MAX_PLAYERS; i++)
-    if (d_cityset->getTowerImage (i))
-      frames.push_back (d_cityset->getTowerImage (i));
-  Glib::ustring imgname = d_cityset->getTowersFilename();
-  Glib::ustring f =
-    change_image(_("Select a Towers image"), imgname, MAX_PLAYERS, frames,
-                 cleared, 1);
-  if (cleared)
-    d_cityset->uninstantiateSameNamedImages (imgname);
-  else
-    {
-      if (f != "")
-        {
-          d_cityset->setTowersFilename (f);
-          d_cityset->instantiateTowerImages();
-        }
-    }
-  update_cityset_panel();
-}
-
-Glib::ustring CitySetWindow::change_image(Glib::ustring msg, Glib::ustring imgname, int num, std::vector<PixMask *> frames, bool &cleared, int tw)
+Glib::ustring CitySetWindow::change_image(Glib::ustring msg, TarFileImage *im,
+                                          bool &cleared, guint32 tw)
 {
   Glib::ustring newfile = "";
+  Glib::ustring imgname = im->getName ();
 
-  ImageEditorDialog d(*window, imgname, num, frames,
+  ImageEditorDialog d(*window, im,
                       EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE * (double)tw);
   d.set_title(msg);
   int response = d.run();
@@ -997,6 +894,11 @@ bool CitySetWindow::isValidName ()
   return false;
 }
 
+guint32 CitySetWindow::getDefaultImageTileWidth ()
+{
+  return 1;
+}
+
 /*
  some test cases
   1. create a new cityset from scratch, save invalid set, close, load it
@@ -1020,5 +922,3 @@ bool CitySetWindow::isValidName ()
  19. try saving a cityset we don't have permission to save
  20. try quit-saving a cityset we don't have permission to save
 */
-
-

@@ -24,6 +24,7 @@
 #include "PixMask.h"
 #include "lw-editor-dialog.h"
 
+class TarFileImage;
 
 //! general picture editor.
 /**
@@ -34,7 +35,7 @@
 class ImageEditorDialog: public LwEditorDialog
 {
  public:
-    ImageEditorDialog(Gtk::Window &parent, Glib::ustring bname, int num_frames, std::vector<PixMask*> f, double ratio);
+    ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, double ratio);
     ~ImageEditorDialog();
 
     Glib::ustring get_filename() {return d_target_filename;}
@@ -45,8 +46,8 @@ class ImageEditorDialog: public LwEditorDialog
 
  private:
     double d_ratio;
-    int d_num_frames;
-    int d_active_frame;
+    guint32 d_num_frames;
+    guint32 d_active_frame;
     Glib::ustring d_target_filename;
     std::vector<PixMask*> frames;
 

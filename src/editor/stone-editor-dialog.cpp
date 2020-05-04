@@ -33,6 +33,7 @@
 #include "ucompose.hpp"
 #include "defs.h"
 #include "font-size.h"
+#include "TarFileImage.h"
 
 #define EDITOR_STONE_TILE_RATIO 4.3
 
@@ -105,13 +106,13 @@ StoneEditorDialog::fill_pixbuf (int i)
   //go get the road if we're doing that
   if (d_road)
     {
-      PixMask *r = ts->getRoadImage(d_road->getType());
+      PixMask *r = ts->getRoad()->getImage(d_road->getType());
       if (r)
         r->blit (p->get_pixmap(), Vector<int>(0, 0));
     }
 
   //finally, do the stone
-  PixMask *stone = ts->getStoneImage(types[i]);
+  PixMask *stone = ts->getStone()->getImage(types[i]);
   if (stone)
     stone->blit (p->get_pixmap(), Vector<int>(0, 0));
 

@@ -72,6 +72,7 @@ class GameButtonPixMaskCacheItem;
 class DialogPixMaskCacheItem;
 class MedalPixMaskCacheItem;
 class TarFileMaskedImage;
+class TarFileImage;
 
 //! Cache for generated army and map images.
 /** Soliton class for caching army and map images
@@ -475,15 +476,16 @@ class ImageCache
         PixMask* getDialogPic(guint32 type, guint32 font_size);
         PixMask* getWaypointImage(guint32 type);
 
-        PixMask* getNextTurnPic ();
-        PixMask* getCityDefeatedPic ();
-        PixMask* getWinningPic();
-        PixMask* getHeroPic (Hero::Gender gender);
-        PixMask* getRuinSuccessPic();
-        PixMask* getRuinDefeatPic();
-        PixMask *getParleyOfferedPic();
-        PixMask *getParleyRefusedPic();
-        PixMask *getCommentatorPic ();
+        TarFileImage* getNextTurnImage ();
+        TarFileImage* getCityDefeatedImage ();
+        TarFileImage* getWinningImage();
+        TarFileImage* getHeroOfferedImage (Hero::Gender gender);
+        TarFileImage* getRuinSuccessImage();
+        TarFileImage* getRuinDefeatImage();
+        TarFileImage *getParleyOfferedImage();
+        TarFileImage *getParleyRefusedImage();
+        TarFileImage *getMedalImage (bool large);
+        TarFileImage *getCommentatorImage ();
 
         PixMask* getGameButtonImage(guint32 type);
 
@@ -506,7 +508,6 @@ class ImageCache
         bool loadCursorImages();
         bool loadProdShieldImages();
         bool loadNewLevelImages();
-        bool loadMedalImages(Glib::ustring sm, Glib::ustring lg);
         bool loadDefaultTileStyleImages();
         bool loadWaypointImages();
         bool loadGameButtonImages();
@@ -553,7 +554,6 @@ class ImageCache
         PixMask* d_prodshield[PRODUCTION_SHIELD_TYPES];
         TarFileMaskedImage* d_hero_newlevel[2];
         PixMask *d_default_tilestyles[DEFAULT_TILESTYLE_TYPES];
-        PixMask* d_medal[2][MEDAL_TYPES];
 	PixMask* d_smallruinedcity;
 	PixMask* d_smallhero;
 	PixMask* d_smallbag;
@@ -564,16 +564,16 @@ class ImageCache
 	PixMask* d_small_temple;
         PixMask *d_waypoint[NUM_WAYPOINTS];
         PixMask *d_gamebuttons[NUM_GAME_BUTTON_IMAGES];
-        PixMask *d_nextturn;
-        PixMask *d_citydefeated;
-        PixMask *d_winning;
-        PixMask *d_malehero;
-        PixMask *d_femalehero;
-        PixMask *d_ruinsuccess;
-        PixMask *d_ruindefeat;
-        PixMask *d_parleyoffered;
-        PixMask *d_parleyrefused;
-        PixMask *d_commentator;
+        TarFileImage *d_next_turn;
+        TarFileImage *d_city_defeated;
+        TarFileImage *d_winning;
+        TarFileImage *d_hero[2];
+        TarFileImage *d_ruin_success;
+        TarFileImage *d_ruin_defeat;
+        TarFileImage *d_parley_offered;
+        TarFileImage *d_parley_refused;
+        TarFileImage *d_medal[2];
+        TarFileImage *d_commentator;
 };
 
 //! Helper class for selector box items in the ImageCache.

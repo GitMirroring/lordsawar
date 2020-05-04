@@ -41,6 +41,7 @@
 #include "shieldset.h"
 #include "ScenarioMedia.h"
 #include "TarFileMaskedImage.h"
+#include "TarFileImage.h"
 
 ImageCache* ImageCache::s_instance = 0;
 
@@ -99,11 +100,10 @@ ImageCache::ImageCache()
       new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
     d_hero_newlevel[1] =
       new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+
     loadDiplomacyImages();
     loadCursorImages();
     loadProdShieldImages();
-    loadMedalImages(ScenarioMedia::getDefaultSmallMedalsImageFilename(),
-                    ScenarioMedia::getDefaultBigMedalsImageFilename());
     d_smallruinedcity = loadMiscImage("smallruinedcity.png");
     d_smallhero = loadMiscImage("hero.png");
     d_smallbag = loadMiscImage("bag.png");
@@ -117,16 +117,66 @@ ImageCache::ImageCache()
     loadDefaultTileStyleImages();
     loadWaypointImages(); //only for game.  not for editors.
     loadGameButtonImages(); //only for game.  not for editors.
-    d_nextturn = NULL;
-    d_citydefeated = NULL;
-    d_winning = NULL;
-    d_malehero = NULL;
-    d_femalehero = NULL;
-    d_ruinsuccess = NULL;
-    d_ruindefeat = NULL;
-    d_parleyoffered = NULL;
-    d_parleyrefused = NULL;
-    d_commentator = NULL;
+
+    d_next_turn = new TarFileImage (1);
+    d_next_turn->loadFromFile
+      (ScenarioMedia::getDefaultNextTurnImageFilename ());
+    d_next_turn->instantiateImages ();
+
+    d_city_defeated = new TarFileImage (1);
+    d_city_defeated->loadFromFile
+      (ScenarioMedia::getDefaultCityDefeatedImageFilename ());
+    d_city_defeated->instantiateImages ();
+
+    d_winning = new TarFileImage (1);
+    d_winning->loadFromFile
+      (ScenarioMedia::getDefaultWinningImageFilename ());
+    d_winning->instantiateImages ();
+
+    d_hero[0] = new TarFileImage (1);
+    d_hero[0]->loadFromFile
+      (ScenarioMedia::getDefaultMaleHeroImageFilename ());
+    d_hero[0]->instantiateImages ();
+
+    d_hero[1] = new TarFileImage (1);
+    d_hero[1]->loadFromFile
+      (ScenarioMedia::getDefaultFemaleHeroImageFilename ());
+    d_hero[1]->instantiateImages ();
+
+    d_ruin_success = new TarFileImage (1);
+    d_ruin_success->loadFromFile
+      (ScenarioMedia::getDefaultRuinSuccessImageFilename ());
+    d_ruin_success->instantiateImages ();
+
+    d_ruin_defeat = new TarFileImage (1);
+    d_ruin_defeat->loadFromFile
+      (ScenarioMedia::getDefaultRuinDefeatImageFilename ());
+    d_ruin_defeat->instantiateImages ();
+
+    d_parley_offered = new TarFileImage (1);
+    d_parley_offered->loadFromFile
+      (ScenarioMedia::getDefaultParleyOfferedImageFilename ());
+    d_parley_offered->instantiateImages ();
+
+    d_parley_refused = new TarFileImage (1);
+    d_parley_refused->loadFromFile
+      (ScenarioMedia::getDefaultParleyRefusedImageFilename ());
+    d_parley_refused->instantiateImages ();
+
+    d_medal[0] = new TarFileImage (MEDAL_TYPES);
+    d_medal[0]->loadFromFile
+      (ScenarioMedia::getDefaultSmallMedalsImageFilename ());
+    d_medal[0]->instantiateImages ();
+
+    d_medal[1] = new TarFileImage (MEDAL_TYPES);
+    d_medal[1]->loadFromFile
+      (ScenarioMedia::getDefaultBigMedalsImageFilename ());
+    d_medal[1]->instantiateImages ();
+
+    d_commentator = new TarFileImage (1);
+    d_commentator->loadFromFile
+      (ScenarioMedia::getDefaultCommentatorImageFilename ());
+    d_commentator->instantiateImages ();
 }
 
 bool ImageCache::loadDiplomacyImages()
@@ -226,29 +276,6 @@ bool ImageCache::loadDefaultTileStyleImages()
   return true;
 }
 
-bool ImageCache::loadMedalImages(Glib::ustring sm, Glib::ustring lg)
-{
-  bool broken = false;
-  //load the medal icons
-  int ts = 40;
-  std::vector<PixMask*> medal;
-  medal = disassemble_row(sm, MEDAL_TYPES, broken);
-  if (broken)
-    return false;
-  for (unsigned int i = 0; i < MEDAL_TYPES; i++)
-    {
-      if (medal[i]->get_width() != ts)
-        PixMask::scale(medal[i], ts, ts);
-      d_medal[0][i] = medal[i];
-    }
-  medal = disassemble_row(lg, MEDAL_TYPES, broken);
-  if (broken)
-    return false;
-  for (unsigned int i = 0; i < MEDAL_TYPES; i++)
-    d_medal[1][i] = medal[i];
-  return true;
-}
-
 bool ImageCache::loadWaypointImages()
 {
   bool broken = false;
@@ -305,12 +332,6 @@ ImageCache::~ImageCache()
   for (unsigned int i = 0; i < DEFAULT_TILESTYLE_TYPES; i++)
     delete d_default_tilestyles[i];
 
-  for (unsigned int i = 0; i < MEDAL_TYPES; i++)
-    {
-      delete d_medal[0][i];
-      delete d_medal[1][i];
-    }
-
   delete d_smallruinedcity;
   delete d_smallhero;
   delete d_smallbag;
@@ -326,26 +347,18 @@ ImageCache::~ImageCache()
   for (unsigned int i = 0; i < NUM_GAME_BUTTON_IMAGES; i++)
     delete d_gamebuttons[i];
 
-  if (d_nextturn)
-    delete d_nextturn;
-  if (d_citydefeated)
-    delete d_citydefeated;
-  if (d_winning)
-    delete d_winning;
-  if (d_malehero)
-    delete d_malehero;
-  if (d_femalehero)
-    delete d_femalehero;
-  if (d_ruinsuccess)
-    delete d_ruinsuccess;
-  if (d_ruindefeat)
-    delete d_ruindefeat;
-  if (d_parleyoffered)
-    delete d_parleyoffered;
-  if (d_parleyrefused)
-    delete d_parleyrefused;
-  if (d_commentator)
-    delete d_commentator;
+  delete d_next_turn;
+  delete d_city_defeated;
+  delete d_winning;
+  delete d_hero[0];
+  delete d_hero[1];
+  delete d_ruin_success;
+  delete d_ruin_defeat;
+  delete d_parley_offered;
+  delete d_parley_refused;
+  delete d_medal[0];
+  delete d_medal[1];
+  delete d_commentator;
   reset();
 }
 
@@ -1263,20 +1276,11 @@ PixMask *ImageCache::getProdShieldImage(guint32 type)
 
 PixMask* ImageCache::getMedalImage(bool large, int type)
 {
-  if (large)
-    {
-      if (ScenarioMedia::getInstance()->getBigMedalsImageName() != "")
-        return ScenarioMedia::getInstance()->getBigMedalImage(type);
-      else
-        return d_medal[1][type];
-    }
+  ScenarioMedia *sm = ScenarioMedia::getInstance ();
+  if (sm->getMedalImage (large)->getName() != "")
+    return sm->getMedalImage(large)->getImage (type);
   else
-    {
-      if (ScenarioMedia::getInstance()->getSmallMedalsImageName() != "")
-        return ScenarioMedia::getInstance()->getSmallMedalImage(type);
-      else
-        return d_medal[0][type];
-    }
+    return getMedalImage (large)->getImage (type);
 }
 
 TarFileMaskedImage *ImageCache::getHeroNewLevelMaskedImage (bool female)
@@ -1477,172 +1481,102 @@ PixMask* ImageCache::circled(PixMask* image, Gdk::RGBA colour, bool coloured, do
   return result;
 }
 
-PixMask* ImageCache::getNextTurnPic ()
+TarFileImage* ImageCache::getNextTurnImage ()
 {
-  PixMask *i = ScenarioMedia::getInstance()->getNextTurnImage();
-  if (i)
-    return i;
-  if (!d_nextturn)
-    {
-      bool broken = false;
-      i = PixMask::create(ScenarioMedia::getDefaultNextTurnImageFilename(),
-                          broken);
-      if (!broken)
-        d_nextturn = i;
-    }
-  return d_nextturn;
+  TarFileImage *im = ScenarioMedia::getInstance()->getNextTurnImage();
+  if (im->getImage ())
+    return im;
+  return d_next_turn;
 }
 
-PixMask* ImageCache::getCityDefeatedPic ()
+TarFileImage* ImageCache::getCityDefeatedImage ()
 {
-  PixMask *i = ScenarioMedia::getInstance()->getCityDefeatedImage();
-  if (i)
-    return i;
-  if (!d_citydefeated)
-    {
-      bool broken = false;
-      i = PixMask::create(ScenarioMedia::getDefaultCityDefeatedImageFilename(),
-                          broken);
-      if (!broken)
-        d_citydefeated = i;
-    }
-  return d_citydefeated;
+  TarFileImage *im = ScenarioMedia::getInstance()->getCityDefeatedImage();
+  if (im->getImage ())
+    return im;
+  return d_city_defeated;
 }
 
-PixMask * ImageCache::getWinningPic ()
+TarFileImage * ImageCache::getWinningImage ()
 {
-  PixMask *i = ScenarioMedia::getInstance()->getWinningImage();
-  if (i)
-    return i;
-  if (!d_winning)
-    {
-      bool broken = false;
-      i = PixMask::create(ScenarioMedia::getDefaultWinningImageFilename(),
-                          broken);
-      if (!broken)
-        d_winning = i;
-    }
+  TarFileImage *im = ScenarioMedia::getInstance()->getWinningImage();
+  if (im->getImage ())
+    return im;
   return d_winning;
 }
 
-PixMask * ImageCache::getHeroPic (Hero::Gender gender)
+TarFileImage* ImageCache::getHeroOfferedImage (Hero::Gender gender)
 {
   switch (gender)
     {
     case Hero::NONE:
     case Hero::MALE:
         {
-          PixMask *i = ScenarioMedia::getInstance()->getMaleHeroImage();
-          if (i)
-            return i;
-          if (!d_malehero)
-            {
-              bool broken = false;
-              i = PixMask::create
-                (ScenarioMedia::getDefaultMaleHeroImageFilename(), broken);
-              if (!broken)
-                d_malehero = i;
-            }
-          return d_malehero;
+          TarFileImage *im =
+            ScenarioMedia::getInstance()->getHeroOfferedImage(false);
+          if (im->getImage ())
+            return im;
+          return d_hero[0];
         }
       break;
     case Hero::FEMALE:
         {
-          PixMask *i = ScenarioMedia::getInstance()->getFemaleHeroImage();
-          if (i)
-            return i;
-          if (!d_femalehero)
-            {
-              bool broken = false;
-              i = PixMask::create
-                (ScenarioMedia::getDefaultFemaleHeroImageFilename(), broken);
-              if (!broken)
-                d_femalehero = i;
-            }
-          return d_femalehero;
+          TarFileImage *im =
+            ScenarioMedia::getInstance()->getHeroOfferedImage(true);
+          if (im->getImage ())
+            return im;
+          return d_hero[1];
         }
       break;
     }
   return NULL;
 }
 
-PixMask *ImageCache::getRuinSuccessPic()
+TarFileImage *ImageCache::getRuinSuccessImage()
 {
-  PixMask *i = ScenarioMedia::getInstance()->getRuinSuccessImage();
-  if (i)
-    return i;
-  if (!d_ruinsuccess)
-    {
-      bool broken = false;
-      i = PixMask::create(ScenarioMedia::getDefaultRuinSuccessImageFilename(),
-                          broken);
-      if (!broken)
-        d_ruinsuccess = i;
-    }
-  return d_ruinsuccess;
+  TarFileImage *im = ScenarioMedia::getInstance()->getRuinSuccessImage();
+  if (im->getImage ())
+    return im;
+  return d_ruin_success;
 }
 
-PixMask *ImageCache::getRuinDefeatPic()
+TarFileImage *ImageCache::getRuinDefeatImage()
 {
-  PixMask *i = ScenarioMedia::getInstance()->getRuinDefeatImage();
-  if (i)
-    return i;
-  if (!d_ruindefeat)
-    {
-      bool broken = false;
-      i = PixMask::create(ScenarioMedia::getDefaultRuinDefeatImageFilename(),
-                          broken);
-      if (!broken)
-        d_ruindefeat = i;
-    }
-  return d_ruindefeat;
+  TarFileImage *im = ScenarioMedia::getInstance()->getRuinDefeatImage();
+  if (im->getImage ())
+    return im;
+  return d_ruin_defeat;
 }
 
-PixMask* ImageCache::getParleyOfferedPic ()
+TarFileImage * ImageCache::getParleyOfferedImage ()
 {
-  PixMask *i = ScenarioMedia::getInstance()->getParleyOfferedImage();
-  if (i)
-    return i;
-  if (!d_parleyoffered)
-    {
-      bool broken = false;
-      i = PixMask::create(ScenarioMedia::getDefaultParleyOfferedImageFilename(),
-                          broken);
-      if (!broken)
-        d_parleyoffered = i;
-    }
-  return d_parleyoffered;
+  TarFileImage *im = ScenarioMedia::getInstance()->getParleyOfferedImage();
+  if (im->getImage ())
+    return im;
+  return d_parley_offered;
 }
 
-PixMask* ImageCache::getParleyRefusedPic ()
+TarFileImage* ImageCache::getParleyRefusedImage ()
 {
-  PixMask *i = ScenarioMedia::getInstance()->getParleyRefusedImage();
-  if (i)
-    return i;
-  if (!d_parleyrefused)
-    {
-      bool broken = false;
-      i = PixMask::create(ScenarioMedia::getDefaultParleyRefusedImageFilename(),
-                          broken);
-      if (!broken)
-        d_parleyrefused = i;
-    }
-  return d_parleyrefused;
+  TarFileImage *im = ScenarioMedia::getInstance()->getParleyRefusedImage();
+  if (im->getImage ())
+    return im;
+  return d_parley_refused;
 }
 
-PixMask* ImageCache::getCommentatorPic ()
+TarFileImage* ImageCache::getMedalImage (bool large)
 {
-  PixMask *i = ScenarioMedia::getInstance()->getCommentatorImage();
-  if (i)
-    return i;
-  if (!d_commentator)
-    {
-      bool broken = false;
-      i = PixMask::create(ScenarioMedia::getDefaultCommentatorImageFilename(),
-                          broken);
-      if (!broken)
-        d_commentator = i;
-    }
+  TarFileImage *im = ScenarioMedia::getInstance()->getMedalImage(large);
+  if (im->getImage ())
+    return im;
+  return d_medal[large ? 1 : 0];
+}
+
+TarFileImage* ImageCache::getCommentatorImage ()
+{
+  TarFileImage *im = ScenarioMedia::getInstance()->getCommentatorImage();
+  if (im->getImage ())
+    return im;
   return d_commentator;
 }
 
@@ -1845,7 +1779,7 @@ PixMask *TilePixMaskCacheItem::generate(TilePixMaskCacheItem i)
   Tileset *t = Tilesetlist::getInstance()->get(i.tileset);
   guint32 uts = t->getUnscaledTileSize();
   if (i.fog_type_id == FogMap::ALL)
-    s = t->getFogImage(i.fog_type_id - 1)->copy();
+    s = t->getFog()->getImage(i.fog_type_id - 1)->copy();
   else
     {
       TileStyle *tilestyle = t->getTileStyle(i.tile_style_id);
@@ -1875,7 +1809,7 @@ PixMask *TilePixMaskCacheItem::generate(TilePixMaskCacheItem i)
           if (i.stone_type != -1)
             {
               Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
-              PixMask *p = ts->getStoneImage(i.stone_type);
+              PixMask *p = ts->getStone()->getImage(i.stone_type);
               if (p)
                 p->blit(i.building_tile, uts, pixmap);
             }
@@ -1883,7 +1817,7 @@ PixMask *TilePixMaskCacheItem::generate(TilePixMaskCacheItem i)
         case Maptile::STONE:
             {
               Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
-              PixMask *p = ts->getStoneImage(i.stone_type);
+              PixMask *p = ts->getStone()->getImage(i.stone_type);
               if (p)
                 p->blit(i.building_tile, uts, pixmap);
             }
@@ -1939,7 +1873,7 @@ PixMask *TilePixMaskCacheItem::generate(TilePixMaskCacheItem i)
         }
 
       if (i.fog_type_id)
-        t->getFogImage(i.fog_type_id - 1)->blit(pixmap);
+        t->getFog()->getImage(i.fog_type_id - 1)->blit(pixmap);
     }
   int ts = t->getTileSize();
   if (s->get_width () != ts)
@@ -1998,9 +1932,9 @@ PixMask *CityPixMaskCacheItem::generate(CityPixMaskCacheItem i)
   Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
   Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
   if (i.type == -1)
-    return cs->getRazedCityImage(p->getId())->copy();
+    return cs->getRazedCity()->getImage(p->getId())->copy();
   else
-    return cs->getCityImage(p->getId())->copy();
+    return cs->getCity()->getImage(p->getId())->copy();
 }
 
 int CityPixMaskCacheItem::comp(const CityPixMaskCacheItem item) const
@@ -2018,7 +1952,7 @@ int CityPixMaskCacheItem::comp(const CityPixMaskCacheItem item) const
 PixMask *TowerPixMaskCacheItem::generate(TowerPixMaskCacheItem i)
 {
   Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
-  return cs->getTowerImage(i.player_id)->copy();
+  return cs->getTower()->getImage(i.player_id)->copy();
 }
 
 int TowerPixMaskCacheItem::comp(const TowerPixMaskCacheItem item) const
@@ -2034,7 +1968,7 @@ int TowerPixMaskCacheItem::comp(const TowerPixMaskCacheItem item) const
 PixMask *TemplePixMaskCacheItem::generate(TemplePixMaskCacheItem i)
 {
   Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
-  return cs->getTempleImage(i.type)->copy();
+  return cs->getTemple()->getImage(i.type)->copy();
 }
 
 int TemplePixMaskCacheItem::comp(const TemplePixMaskCacheItem item) const
@@ -2050,7 +1984,7 @@ int TemplePixMaskCacheItem::comp(const TemplePixMaskCacheItem item) const
 PixMask *RuinPixMaskCacheItem::generate(RuinPixMaskCacheItem i)
 {
   Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
-  return cs->getRuinImage(i.type)->copy();
+  return cs->getRuin()->getImage(i.type)->copy();
 }
 
 int RuinPixMaskCacheItem::comp(const RuinPixMaskCacheItem item) const
@@ -2101,7 +2035,7 @@ int DiplomacyPixMaskCacheItem::comp(const DiplomacyPixMaskCacheItem item) const
 PixMask *RoadPixMaskCacheItem::generate(RoadPixMaskCacheItem i)
 {
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
-  return ts->getRoadImage(i.type)->copy();
+  return ts->getRoad()->getImage(i.type)->copy();
 }
 
 int RoadPixMaskCacheItem::comp(const RoadPixMaskCacheItem item) const
@@ -2117,7 +2051,7 @@ int RoadPixMaskCacheItem::comp(const RoadPixMaskCacheItem item) const
 PixMask *FogPixMaskCacheItem::generate(FogPixMaskCacheItem i)
 {
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
-  return ts->getFogImage(i.type - 1)->copy();
+  return ts->getFog()->getImage(i.type - 1)->copy();
 }
 
 int FogPixMaskCacheItem::comp(const FogPixMaskCacheItem item) const
@@ -2133,7 +2067,7 @@ int FogPixMaskCacheItem::comp(const FogPixMaskCacheItem item) const
 PixMask *BridgePixMaskCacheItem::generate(BridgePixMaskCacheItem i)
 {
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
-  return ts->getBridgeImage(i.type)->copy();
+  return ts->getBridge()->getImage(i.type)->copy();
 }
 
 int BridgePixMaskCacheItem::comp(const BridgePixMaskCacheItem item) const
@@ -2261,25 +2195,25 @@ std::vector<PixMask *> MoveBonusPixMaskCacheItem::getMoveBonusImages (Tileset *t
 
   if ((bonus & Tile::FOREST) == Tile::FOREST)
     {
-      PixMask *p = t->getForestMoveBonusImage ();
+      PixMask *p = t->getForestMoveBonus()->getImage ();
       if (p)
         im.push_back (p);
     }
   if ((bonus & Tile::HILLS) == Tile::HILLS)
     {
-      PixMask *p = t->getHillsMoveBonusImage ();
+      PixMask *p = t->getHillsMoveBonus()->getImage ();
       if (p)
         im.push_back (p);
     }
   if ((bonus & Tile::MOUNTAIN) == Tile::MOUNTAIN)
     {
-      PixMask *p = t->getMountainsMoveBonusImage ();
+      PixMask *p = t->getMountainsMoveBonus()->getImage ();
       if (p)
         im.push_back (p);
     }
   if ((bonus & Tile::SWAMP) == Tile::SWAMP)
     {
-      PixMask *p = t->getSwampMoveBonusImage ();
+      PixMask *p = t->getSwampMoveBonus()->getImage ();
       if (p)
         im.push_back (p);
     }
@@ -2411,13 +2345,13 @@ PixMask *MoveBonusPixMaskCacheItem::getMoveBonusPic(Tileset *t, guint32 bonus, g
   PixMask *p = NULL;
   if (all)
     {
-      if (t->getAllMoveBonusImage ())
-        p = t->getAllMoveBonusImage()->copy();
+      if (t->getAllMoveBonus()->getImage ())
+        p = t->getAllMoveBonus()->getImage()->copy();
     }
   else if (water)
     {
-      if (t->getWaterMoveBonusImage ())
-        p = t->getWaterMoveBonusImage()->copy();
+      if (t->getWaterMoveBonus()->getImage ())
+        p = t->getWaterMoveBonus()->getImage()->copy();
     }
   else if (forest || hills || mountains || swamp)
     {
@@ -2427,23 +2361,23 @@ PixMask *MoveBonusPixMaskCacheItem::getMoveBonusPic(Tileset *t, guint32 bonus, g
         case 1:
           if (forest)
             {
-              if (t->getForestMoveBonusImage ())
-                p = t->getForestMoveBonusImage()->copy();
+              if (t->getForestMoveBonus()->getImage ())
+                p = t->getForestMoveBonus()->getImage()->copy();
             }
           else if (hills)
             {
-              if (t->getHillsMoveBonusImage())
-                p = t->getHillsMoveBonusImage()->copy();
+              if (t->getHillsMoveBonus()->getImage())
+                p = t->getHillsMoveBonus()->getImage()->copy();
             }
           else if (mountains)
             {
-              if (t->getMountainsMoveBonusImage())
-                p = t->getMountainsMoveBonusImage()->copy();
+              if (t->getMountainsMoveBonus()->getImage())
+                p = t->getMountainsMoveBonus()->getImage()->copy();
             }
           else if (swamp)
             {
-              if (t->getSwampMoveBonusImage())
-                p = t->getSwampMoveBonusImage()->copy();
+              if (t->getSwampMoveBonus()->getImage())
+                p = t->getSwampMoveBonus()->getImage()->copy();
             }
           break;
         case 2:
@@ -2553,7 +2487,8 @@ int PlantedStandardPixMaskCacheItem::comp(const PlantedStandardPixMaskCacheItem 
 
 PixMask *PortPixMaskCacheItem::generate(PortPixMaskCacheItem i)
 {
-  return Citysetlist::getInstance()->get(i.cityset)->getPortImage()->copy();
+  return
+    Citysetlist::getInstance()->get(i.cityset)->getPort()->getImage()->copy();
 }
 
 int PortPixMaskCacheItem::comp(const PortPixMaskCacheItem item) const
@@ -2566,7 +2501,7 @@ int PortPixMaskCacheItem::comp(const PortPixMaskCacheItem item) const
 
 PixMask *SignpostPixMaskCacheItem::generate(SignpostPixMaskCacheItem i)
 {
-  return Citysetlist::getInstance()->get(i.cityset)->getSignpostImage()->copy();
+  return Citysetlist::getInstance()->get(i.cityset)->getSignpost ()->getImage()->copy();
 }
 
 int SignpostPixMaskCacheItem::comp(const SignpostPixMaskCacheItem item) const
@@ -2579,7 +2514,7 @@ int SignpostPixMaskCacheItem::comp(const SignpostPixMaskCacheItem item) const
 
 PixMask *BagPixMaskCacheItem::generate(BagPixMaskCacheItem i)
 {
-  return Armysetlist::getInstance()->getBagPic(i.armyset)->copy();
+  return Armysetlist::getInstance()->getBag(i.armyset)->getImage ()->copy();
 }
 
 int BagPixMaskCacheItem::comp(const BagPixMaskCacheItem item) const
@@ -2592,7 +2527,7 @@ int BagPixMaskCacheItem::comp(const BagPixMaskCacheItem item) const
 
 PixMask *ExplosionPixMaskCacheItem::generate(ExplosionPixMaskCacheItem i)
 {
-  return Tilesetlist::getInstance()->get(i.tileset)->getExplosionImage()->copy();
+  return Tilesetlist::getInstance()->get(i.tileset)->getExplosion()->getImage()->copy();
 }
 
 int ExplosionPixMaskCacheItem::comp(const ExplosionPixMaskCacheItem item) const
@@ -2920,46 +2855,47 @@ PixMask *DialogPixMaskCacheItem::generate(DialogPixMaskCacheItem i)
 {
   PixMask *p = NULL;
   double ratio = 1;
+  ImageCache *ic = ImageCache::getInstance ();
   switch (i.type)
     {
     case ImageCache::DIALOG_NEXT_TURN:
-      p = ImageCache::getInstance ()->getNextTurnPic ()->copy ();
+      p = ic->getNextTurnImage ()->getImage ()->copy ();
       ratio = DIALOG_NEXT_TURN_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_NEW_HERO_MALE:
-      p = ImageCache::getInstance ()->getHeroPic (Hero::MALE)->copy ();
+      p = ic->getHeroOfferedImage(Hero::MALE)->getImage ()->copy ();
       ratio = DIALOG_NEW_HERO_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_NEW_HERO_FEMALE:
-      p = ImageCache::getInstance ()->getHeroPic (Hero::FEMALE)->copy ();
+      p = ic->getHeroOfferedImage(Hero::FEMALE)->getImage ()->copy ();
       ratio = DIALOG_NEW_HERO_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_CONQUERED_CITY:
-      p = ImageCache::getInstance ()->getCityDefeatedPic ()->copy ();
+      p = ic->getCityDefeatedImage ()->getImage ()->copy ();
       ratio = DIALOG_CONQUERED_CITY_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_WINNING:
-      p = ImageCache::getInstance ()->getWinningPic()->copy ();
+      p = ic->getWinningImage()->getImage ()->copy ();
       ratio = DIALOG_WINNING_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_RUIN_SUCCESS:
-      p = ImageCache::getInstance ()->getRuinSuccessPic()->copy ();
+      p = ic->getRuinSuccessImage()->getImage ()->copy ();
       ratio = DIALOG_RUIN_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_RUIN_DEFEAT:
-      p = ImageCache::getInstance ()->getRuinDefeatPic()->copy ();
+      p = ic->getRuinDefeatImage()->getImage ()->copy ();
       ratio = DIALOG_RUIN_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_PARLEY_OFFERED:
-      p = ImageCache::getInstance ()->getParleyOfferedPic()->copy ();
+      p = ic->getParleyOfferedImage()->getImage ()->copy ();
       ratio = DIALOG_PARLEY_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_PARLEY_REFUSED:
-      p = ImageCache::getInstance ()->getParleyRefusedPic()->copy ();
+      p = ic->getParleyRefusedImage()->getImage ()->copy ();
       ratio = DIALOG_PARLEY_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_COMMENTATOR:
-      p = ImageCache::getInstance ()->getCommentatorPic()->copy ();
+      p = ic->getCommentatorImage()->getImage ()->copy ();
       ratio = DIALOG_COMMENTATOR_PIC_FONT_SIZE_MULTIPLE;
       break;
     }

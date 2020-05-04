@@ -49,6 +49,7 @@
 #include "MapBackpack.h"
 #include "GameScenarioOptions.h"
 #include "tileset.h"
+#include "TarFileImage.h"
 
 #include <iostream>
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -609,7 +610,7 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
 	  break;
 	}
     }
-  if (GameMap::getTileset()->getStonesFilename().empty() == true)
+  if (GameMap::getTileset()->getStone()->getName().empty() == true)
     stone_type = -1;
   PixMask *pixmask = 
     gc->getTilePic(tile_style_id, fog_type_id, has_bag, has_standard, 

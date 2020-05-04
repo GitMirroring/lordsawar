@@ -28,6 +28,7 @@
 class XML_Helper;
 class TarFile;
 class TarFileMaskedImage;
+class TarFileImage;
 
 //! Scenario Media provides images/sounds/music for the scenario
 /**
@@ -59,19 +60,19 @@ class ScenarioMedia
 
         TarFileMaskedImage *getHeroNewLevelMaskedImage (bool female)
           {return d_hero_newlevel[female ? 1 : 0];}
+        TarFileImage *getNextTurnImage () {return d_next_turn;}
+        TarFileImage *getCityDefeatedImage () {return d_city_defeated;}
+        TarFileImage *getWinningImage () {return d_winning;}
+        TarFileImage *getHeroOfferedImage (bool female)
+          {return female ? d_hero[1] : d_hero[0];}
+        TarFileImage *getRuinSuccessImage () {return d_ruin_success;}
+        TarFileImage *getRuinDefeatImage () {return d_ruin_defeat;}
+        TarFileImage *getParleyOfferedImage () {return d_parley_offered;}
+        TarFileImage *getParleyRefusedImage () {return d_parley_refused;}
+        TarFileImage *getMedalImage(bool large)
+          {return large ? d_medal[1] : d_medal[0];}
+        TarFileImage *getCommentatorImage () {return d_commentator;}
 
-        Glib::ustring getNextTurnImageName() {return d_next_turn_name;}
-        Glib::ustring getCityDefeatedImageName() {return d_city_defeated_name;}
-        Glib::ustring getWinningImageName() {return d_winning_name;}
-        Glib::ustring getMaleHeroImageName() {return d_male_hero_name;}
-        Glib::ustring getFemaleHeroImageName() {return d_female_hero_name;}
-        Glib::ustring getRuinSuccessImageName() {return d_ruin_success_name;}
-        Glib::ustring getRuinDefeatImageName() {return d_ruin_defeat_name;}
-        Glib::ustring getParleyOfferedImageName() {return d_parley_offered_name;}
-        Glib::ustring getParleyRefusedImageName() {return d_parley_refused_name;}
-        Glib::ustring getSmallMedalsImageName() {return d_small_medals_name;}
-        Glib::ustring getBigMedalsImageName() {return d_big_medals_name;}
-        Glib::ustring getCommentatorImageName() {return d_commentator_name;}
         Glib::ustring getBlessSoundName() {return d_bless_name;}
         Glib::ustring getHeroSoundName() {return d_hero_name;}
         Glib::ustring getBattleSoundName() {return d_battle_name;}
@@ -79,81 +80,10 @@ class ScenarioMedia
         Glib::ustring getVictorySoundName() {return d_victory_name;}
         Glib::ustring getBackSoundName() {return d_back_name;}
 
-        PixMask *getNextTurnImage() {return d_next_turn_image;}
-        PixMask *getCityDefeatedImage() {return d_city_defeated_image;}
-        PixMask *getWinningImage() {return d_winning_image;}
-        PixMask *getMaleHeroImage() {return d_male_hero_image;}
-        PixMask *getFemaleHeroImage() {return d_female_hero_image;}
-        PixMask *getRuinSuccessImage() {return d_ruin_success_image;}
-        PixMask *getRuinDefeatImage() {return d_ruin_defeat_image;}
-        PixMask *getParleyOfferedImage() {return d_parley_offered_image;}
-        PixMask *getParleyRefusedImage() {return d_parley_refused_image;}
-        PixMask *getSmallMedalImage(guint32 i)
-          {return d_small_medal_images.size () > i ? d_small_medal_images[i] : NULL;}
-        PixMask *getBigMedalImage(guint32 i)
-          {return d_big_medal_images.size () > i ? d_big_medal_images[i] : NULL;}
-        PixMask *getCommentatorImage() {return d_commentator_image;}
-
-        void clearNextTurnImage(bool clear_name = true);
-        void clearCityDefeatedImage(bool clear_name = true);
-        void clearWinningImage(bool clear_name = true);
-        void clearMaleHeroImage(bool clear_name = true);
-        void clearFemaleHeroImage(bool clear_name = true);
-        void clearRuinSuccessImage(bool clear_name = true);
-        void clearRuinDefeatImage(bool clear_name = true);
-        void clearParleyOfferedImage(bool clear_name = true);
-        void clearParleyRefusedImage(bool clear_name = true);
-        void clearSmallMedalImage(bool clear_name = true);
-        void clearBigMedalImage(bool clear_name = true);
-        void clearCommentatorImage (bool clear_name = true);
-
-        bool instantiateNextTurnImage(TarFile *t);
-        bool instantiateCityDefeatedImage(TarFile *t);
-        bool instantiateWinningImage(TarFile *t);
-        bool instantiateMaleHeroImage(TarFile *t);
-        bool instantiateFemaleHeroImage(TarFile *t);
-        bool instantiateRuinSuccessImage(TarFile *t);
-        bool instantiateRuinDefeatImage(TarFile *t);
-        bool instantiateParleyOfferedImage(TarFile *t);
-        bool instantiateParleyRefusedImage(TarFile *t);
-        bool instantiateSmallMedalImage(TarFile *t);
-        bool instantiateBigMedalImage(TarFile *t);
-        bool instantiateHeroNewLevelMaleImage (TarFile *t);
-        bool instantiateHeroNewLevelFemaleImage (TarFile *t);
-        bool instantiateCommentatorImage (TarFile *t);
-
         MusicItem* getSoundEffect(Glib::ustring n);
         std::vector<Glib::ustring> getBackgroundMusic() const {return d_bgMap;}
         std::map<Glib::ustring, MusicItem*> getSounds() const {return d_musicMap;}
         //Set methods
-
-        void setNextTurnImageName(Glib::ustring n) {d_next_turn_name = n;}
-        void setCityDefeatedImageName(Glib::ustring n) {d_city_defeated_name=n;}
-        void setWinningImageName(Glib::ustring n) {d_winning_name = n;}
-        void setMaleHeroImageName(Glib::ustring n) {d_male_hero_name = n;}
-        void setFemaleHeroImageName(Glib::ustring n) {d_female_hero_name = n;}
-        void setRuinSuccessImageName(Glib::ustring n) {d_ruin_success_name = n;}
-        void setRuinDefeatImageName(Glib::ustring n) {d_ruin_defeat_name = n;}
-        void setParleyOfferedImageName(Glib::ustring n) {d_parley_offered_name = n;}
-        void setParleyRefusedImageName(Glib::ustring n) {d_parley_refused_name = n;}
-        void setSmallMedalsImageName(Glib::ustring n) {d_small_medals_name = n;}
-        void setBigMedalsImageName(Glib::ustring n) {d_big_medals_name = n;}
-        void setCommentatorImageName(Glib::ustring n) {d_commentator_name = n;}
-
-        void setNextTurnImage(PixMask *i) {d_next_turn_image = i;}
-        void setCityDefeatedImage(PixMask *i) {d_city_defeated_image = i;}
-        void setWinningImage(PixMask *i) {d_winning_image = i;}
-        void setMaleHeroImage(PixMask *i) {d_male_hero_image = i;}
-        void setFemaleHeroImage(PixMask *i) {d_female_hero_image = i;}
-        void setRuinSuccessImage(PixMask *i) {d_ruin_success_image = i;}
-        void setRuinDefeatImage(PixMask *i) {d_ruin_defeat_image = i;}
-        void setParleyOfferedImage(PixMask *i) {d_parley_offered_image = i;}
-        void setParleyRefusedImage(PixMask *i) {d_parley_refused_image = i;}
-        void setSmallMedalsImage(guint32 n, PixMask *i)
-          { if (n < d_small_medal_images.size ()) d_small_medal_images[n] = i;}
-        void setBigMedalsImage(guint32 n, PixMask *i)
-          {if (n < d_big_medal_images.size ()) d_big_medal_images[n] = i;}
-        void setCommentatorImage (PixMask *i) {d_commentator_image = i;}
 
         void setBlessSoundName(Glib::ustring n) {d_bless_name = n;}
         void setHeroSoundName(Glib::ustring n) {d_hero_name = n;}
@@ -215,18 +145,17 @@ class ScenarioMedia
         //! The image shown when the hero levels up.  0 is male, 1 is female
         TarFileMaskedImage *d_hero_newlevel[2];
 
-        Glib::ustring d_next_turn_name;
-        Glib::ustring d_city_defeated_name;
-        Glib::ustring d_winning_name;
-        Glib::ustring d_male_hero_name;
-        Glib::ustring d_female_hero_name;
-        Glib::ustring d_ruin_success_name;
-        Glib::ustring d_ruin_defeat_name;
-        Glib::ustring d_parley_offered_name;
-        Glib::ustring d_parley_refused_name;
-        Glib::ustring d_small_medals_name;
-        Glib::ustring d_big_medals_name;
-        Glib::ustring d_commentator_name;
+        TarFileImage *d_next_turn;
+        TarFileImage *d_city_defeated;
+        TarFileImage *d_winning;
+        TarFileImage *d_hero[2]; //male is 0, female is 1
+        TarFileImage *d_ruin_success;
+        TarFileImage *d_ruin_defeat;
+        TarFileImage *d_parley_offered;
+        TarFileImage *d_parley_refused;
+        TarFileImage *d_medal[2]; //small is 0, big is 1
+        TarFileImage *d_commentator;
+
         Glib::ustring d_bless_name;
         Glib::ustring d_hero_name;
         Glib::ustring d_battle_name;
@@ -237,25 +166,11 @@ class ScenarioMedia
         std::map<Glib::ustring, MusicItem*> d_musicMap;
         std::vector<Glib::ustring> d_bgMap;
 
-        PixMask *d_next_turn_image;
-        PixMask *d_city_defeated_image;
-        PixMask *d_winning_image;
-        PixMask *d_male_hero_image;
-        PixMask *d_female_hero_image;
-        PixMask *d_ruin_success_image;
-        PixMask *d_ruin_defeat_image;
-        PixMask *d_parley_offered_image;
-        PixMask *d_parley_refused_image;
-        std::vector<PixMask *> d_small_medal_images;
-        std::vector<PixMask *> d_big_medal_images;
-        PixMask *d_commentator_image;
-
         //helpers
-        void instantiateImage(Tar_Helper &t, Glib::ustring name, PixMask **image, bool &broken);
-        void instantiateImageRow(Tar_Helper &t, Glib::ustring name, int num, std::vector<PixMask *>&images, bool &broken);
         void uninstantiateImages();
         bool anyValueSet() const;
         void copySound(Tar_Helper &t, Glib::ustring name, Glib::ustring piece, bool &broken);
+        std::vector<TarFileImage*> getTarFileImages();
 };
 
 #endif //SCENARIO_MEDIA_H

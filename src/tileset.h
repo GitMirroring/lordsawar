@@ -31,6 +31,7 @@
 
 class XML_Helper;
 class TarFileMaskedImage;
+class TarFileImage;
 
 //! A list of Tile objects in a terrain theme.
 /** 
@@ -44,7 +45,12 @@ class TarFileMaskedImage;
  * (Tileset::d_basename).
  *
  * Tileset objects reside on disk in the tilesets/ directory, each of which is
- * it's own .lwt file.
+ * it's own .lwt file, which is a tar file.
+ *
+ * There are several images held in a tileset object, and all of them are
+ * TarFileImage or TarFileMaskedImage objects, except for TileStyleSets which
+ * are specially handled.  Images are referred to by basename, which are 
+ * archive members
  */
 class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 {
@@ -98,20 +104,20 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         //! Returns the frames of the flag
         TarFileMaskedImage *getFlags() {return d_flag;}
 
-	//! Returns the basename of the file containing the explosion image.
-	Glib::ustring getExplosionFilename() const {return d_explosion;}
+        //! Returns the explosion image
+        TarFileImage *getExplosion() {return d_explosion;}
 
-	//! Returns the basename of the file containing the road images.
-	Glib::ustring getRoadsFilename() const {return d_roads;}
+        //! Returns the road images
+        TarFileImage *getRoad() {return d_road;}
 
-	//! Returns the basename of the file containing the stone images.
-	Glib::ustring getStonesFilename() const {return d_standing_stones;}
+        //! Returns the standing stone images
+        TarFileImage *getStone() {return d_stone;}
 
-	//! Returns the basename of the file containing the bridge images.
-	Glib::ustring getBridgesFilename() const {return d_bridges;}
+        //! Returns the bridge images
+        TarFileImage *getBridge() {return d_bridge;}
 
-	//! Returns the basename of the file containing the fog images.
-	Glib::ustring getFogFilename() const {return d_fog;}
+        //! Returns the fog images
+        TarFileImage *getFog() {return d_fog;}
 
         //! Get the colour associated with the road on the smallmap.
 	Gdk::RGBA getRoadColor() const {return d_road_color;}
@@ -122,94 +128,41 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         //! Get the colour associated with ruins on the smallmap.
 	Gdk::RGBA getRuinColor() const {return d_ruin_color;}
 
-	//! Get the explosion image.
-	PixMask *getExplosionImage() {return explosion;}
-
-	//! Get a road image.  Pass in the index.
-	PixMask *getRoadImage(guint32 i) {return roadpic[i];}
-
-	//! Get a standing stone image.  Pass in the index.
-	PixMask *getStoneImage(guint32 i) {return stonepic[i];}
-
-	//! Get a bridge image.  Pass in the index.
-	PixMask *getBridgeImage(guint32 i) {return bridgepic[i];}
-
-	//! Get the fog image.  Passin the index.
-	PixMask *getFogImage(guint32 i) {return fogpic[i];}
-
         //! Get the first tile that has a certain pattern on the small map.
         Tile *getFirstTile(SmallTile::Pattern pattern) const;
 
         int countTilesWithPattern(SmallTile::Pattern pattern) const;
 
-        //! Return the basename of the file containing the flight movement bonus image.
+        //! Return the object containing the flight movement bonus image.
         /**
          * We name it 'All' because it means all of the movement bonuses are on at
          * the same time.
-         * This doesn't get all of the move bonus filenames, it gets a single file
+         * This doesn't get all of the move bonus images, it gets a single one
          * representing a movement bonus over all tile types.
          */
-        Glib::ustring getAllMoveBonusFilename () const
-          {return d_all_movebonus_filename;}
+        TarFileImage *getAllMoveBonus() const {return d_all_movebonus;}
 
-        //! Return the basename of the file containing the water movement bonus image.
+        //! Return the object containing the water movement bonus image.
         /**
          * Shown when a stack is in a boat.
          */
-        Glib::ustring getWaterMoveBonusFilename () const
-          {return d_water_movebonus_filename;}
+        TarFileImage *getWaterMoveBonus() const {return d_water_movebonus;}
 
-        //! Return the basename of the file containing the forest movement bonus image.
-        Glib::ustring getForestMoveBonusFilename () const
-          {return d_forest_movebonus_filename;}
+        //! Return the object containing the forest movement bonus image.
+        TarFileImage *getForestMoveBonus() const {return d_forest_movebonus;}
 
-        //! Return the basename of the file containing the hills movement bonus image.
-        Glib::ustring getHillsMoveBonusFilename () const
-          {return d_hills_movebonus_filename;}
+        //! Return the object containing the hills movement bonus image.
+        TarFileImage *getHillsMoveBonus() const {return d_hills_movebonus;}
 
-        //! Return the basename of the file containing the mountains movement bonus image.
-        Glib::ustring getMountainsMoveBonusFilename () const
-          {return d_mountains_movebonus_filename;}
+        //! Return the object containing the mountains movement bonus image.
+        TarFileImage *getMountainsMoveBonus() const
+          {return d_mountains_movebonus;}
 
-        //! Return the basename of the file containing the swamp movement bonus image.
-        Glib::ustring getSwampMoveBonusFilename () const
-          {return d_swamp_movebonus_filename;}
-
-        //! Returns the image for the flying movement bonus.
-        PixMask *getAllMoveBonusImage () {return d_all_movebonus;}
-
-        //! Returns the image for the water movement bonus.
-        PixMask *getWaterMoveBonusImage () {return d_water_movebonus;}
-
-        //! Returns the image for the forest movement bonus.
-        PixMask *getForestMoveBonusImage () {return d_forest_movebonus;}
-
-        //! Returns the image for the hills movement bonus.
-        PixMask *getHillsMoveBonusImage () {return d_hills_movebonus;}
-
-        //! Returns the image for the mountains movement bonus.
-        PixMask *getMountainsMoveBonusImage () {return d_mountains_movebonus;}
-
-        //! Returns the image for the swamp movement bonus.
-        PixMask *getSwampMoveBonusImage () {return d_swamp_movebonus;}
+        //! Return the object containing the swamp movement bonus image.
+        TarFileImage *getSwampMoveBonus() const {return d_swamp_movebonus;}
 
 
 	// Set Methods
-
-	//! Sets the basename of the file containing the explosion image.
-	void setExplosionFilename(Glib::ustring p){d_explosion = p;}
-
-	//! Sets the basename of the file containing the road images.
-	void setRoadsFilename(Glib::ustring p){d_roads = p;}
-
-	//! Sets the basename of the file containing the standing stone images.
-	void setStonesFilename(Glib::ustring p){d_standing_stones = p;}
-
-	//! Sets the basename of the file containing the bridge images.
-	void setBridgesFilename(Glib::ustring p){d_bridges = p;}
-
-	//! Sets the basename of the file containing the fog images.
-	void setFogFilename(Glib::ustring p){d_fog = p;}
 
 	//! Sets the colour of the road on the smallmap.
 	void setRoadColor(Gdk::RGBA color) {d_road_color = color;}
@@ -219,94 +172,6 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	//! Sets the colour of the temples on the smallmap.
 	void setTempleColor(Gdk::RGBA color) {d_temple_color = color;}
-
-	//! Sets the explosion image.
-	void setExplosionImage(PixMask *p) {explosion = p;}
-
-	//! Sets a road image.
-	void setRoadImage(guint32 i, PixMask *p) {roadpic[i] = p;}
-
-	//! Sets a stpone image.
-	void setStoneImage(guint32 i, PixMask *p) {stonepic[i] = p;}
-
-	//! Sets a bridge image.
-	void setBridgeImage(guint32 i, PixMask *p) {bridgepic[i] = p;}
-
-	//! Sets a fog image.
-	void setFogImage(guint32 i, PixMask *p) {fogpic[i] = p;}
-
-        //! Sets the basename of the file containing the fly movement bonus image.
-        void setAllMoveBonusFilename (Glib::ustring f) 
-          {d_all_movebonus_filename = f;}
-
-        //! Sets the basename of the file containing the water movement bonus image.
-        void setWaterMoveBonusFilename (Glib::ustring f) 
-          {d_water_movebonus_filename = f;}
-
-        //! Sets the basename of the file containing the forest movement bonus image.
-        void setForestMoveBonusFilename (Glib::ustring f) 
-          {d_forest_movebonus_filename = f;}
-
-        //! Sets the basename of the file containing the hills movement bonus image.
-        void setHillsMoveBonusFilename (Glib::ustring f) 
-          {d_hills_movebonus_filename = f;}
-
-        //! Sets the basename of the file containing the mountains movement bonus image.
-        void setMountainsMoveBonusFilename (Glib::ustring f) 
-          {d_mountains_movebonus_filename = f;}
-
-        //! Sets the basename of the file containing the swamp movement bonus image.
-        void setSwampMoveBonusFilename (Glib::ustring f) 
-          {d_swamp_movebonus_filename = f;}
-
-        void clearAllMoveBonusImage(bool clear_name = true);
-        void clearWaterMoveBonusImage(bool clear_name = true);
-        void clearForestMoveBonusImage(bool clear_name = true);
-        void clearHillsMoveBonusImage(bool clear_name = true);
-        void clearMountainsMoveBonusImage(bool clear_name = true);
-        void clearSwampMoveBonusImage(bool clear_name = true);
-
-        //! Sets the image for the flying movement bonus.
-        void setAllMoveBonusImage (PixMask *i) {d_all_movebonus = i;}
-
-        //! Sets the image for the water movement bonus.
-        void setWaterMoveBonusImage (PixMask *i) {d_water_movebonus = i;}
-
-        //! Sets the image for the forest movement bonus.
-        void setForestMoveBonusImage (PixMask *i) {d_forest_movebonus = i;}
-
-        //! Sets the image for the hills movement bonus.
-        void setHillsMoveBonusImage (PixMask *i) {d_hills_movebonus = i;}
-
-        //! Sets the image for the mountains movement bonus.
-        void setMountainsMoveBonusImage (PixMask *i) {d_mountains_movebonus = i;}
-
-        //! Sets the image for the swamp movement bonus.
-        void setSwampMoveBonusImage (PixMask *i) {d_swamp_movebonus = i;}
-
-        void clearRoadsImage (bool clear_name = true);
-        void clearStonesImage (bool clear_name = true);
-        void clearBridgesImage (bool clear_name = true);
-        void clearFlagsImage (bool clear_name = true);
-        void clearSmallSelectorImage (bool clear_name = true);
-        void clearLargeSelectorImage (bool clear_name = true);
-        void clearExplosionImage (bool clear_name = true);
-        void clearFogImages (bool clear_name = true);
-        bool instantiateRoadImages();
-        bool instantiateStoneImages();
-        bool instantiateFlagImages();
-        bool instantiateBridgeImages();
-        bool instantiateSmallSelectorImages();
-        bool instantiateLargeSelectorImages();
-        bool instantiateExplosionImage();
-        bool instantiateFogImages();
-
-        bool instantiateAllMoveBonusImage (TarFile *d);
-        bool instantiateWaterMoveBonusImage (TarFile *d);
-        bool instantiateForestMoveBonusImage (TarFile *d);
-        bool instantiateHillsMoveBonusImage (TarFile *d);
-        bool instantiateMountainsMoveBonusImage (TarFile *d);
-        bool instantiateSwampMoveBonusImage (TarFile *d);
 
         //! clear the tileset and add the normal tiles to it.
         void populateWithDefaultTiles();
@@ -403,19 +268,6 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         //! Callback to load Tile objects into the Tileset.
         bool loadTile(Glib::ustring, XML_Helper* helper);
 
-	//! Load the various images from the given filenames.
-	void instantiateImages(Glib::ustring explosion_filename,
-			       Glib::ustring roads_filename,
-			       Glib::ustring stones_filename,
-			       Glib::ustring bridges_filename,
-			       Glib::ustring fog_filename,
-                               Glib::ustring all_movebonus_filename,
-                               Glib::ustring water_movebonus_filename,
-                               Glib::ustring forest_movebonus_filename,
-                               Glib::ustring hills_movebonus_filename,
-                               Glib::ustring mountains_movebonus_filename,
-                               Glib::ustring swamp_movebonus_filename,
-                               bool scale, bool &broken);
         // DATA
 
         //! The object containing the small and large selector animation frames
@@ -424,31 +276,25 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         //! The object containing the set of images that comprise the flags
         TarFileMaskedImage *d_flag;
 
-	//! The basename of the explosion image.
+	//! The explosion image
 	/**
 	 * The explosion image appears on the bigmap when stacks are fighting,
 	 * and it also appears in the fight window when an army unit dies.
 	 *
-	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of
-	 * tileset.
 	 */
-	Glib::ustring d_explosion;
+        TarFileImage *d_explosion;
 
-	//! The basename of the fog image.
+	//! The fog images.
 	/**
 	 * The fog images appear on the bigmap when playing with a hidden map.
 	 *
 	 * The number and order of frames in the image correlates to the
 	 * FogMap::ShadeType enumeration.
 	 *
-	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of
-	 * tileset.
 	 */
-	Glib::ustring d_fog;
+        TarFileImage *d_fog;
 
-	//! The basename of the road image.
+	//! The road images.
 	/**
 	 * The road images appear on the bigmap overlaid on top of all kinds
 	 * of tiles except for water.
@@ -456,13 +302,10 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	 * The number and order of frames in the image correlates to the
 	 * Road::Type enumeration.
 	 *
-	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of
-	 * tileset.
 	 */
-	Glib::ustring d_roads;
+        TarFileImage *d_road;
 
-	//! The basename of the standing stone image.
+	//! The standing stone images.
 	/**
 	 * The stone images appear on the bigmap overlaid on top of grass
          * tiles without buildings except for roads.
@@ -470,13 +313,10 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	 * The number and order of frames in the image correlates to the
 	 * Stone::Type enumeration.
 	 *
-	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of
-	 * tileset.
 	 */
-	Glib::ustring d_standing_stones;
+        TarFileImage *d_stone;
 
-	//! The basename of the bridge image.
+	//! The bridge images.
 	/**
 	 * The bridge images appear on the bigmap overlaid on top of certain
 	 * water tiles.
@@ -484,11 +324,8 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	 * The number and order of frames in the image correlates to the
 	 * Bridge::Type enumeration.
 	 *
-	 * This basename does not contain any slashes, and it does not contain
-	 * a file extension.  It refers to a png file in the directory of
-	 * tileset.
 	 */
-	Glib::ustring d_bridges;
+        TarFileImage *d_bridge;
 
 
         typedef std::map<guint32, TileStyle*> TileStyleIdMap;
@@ -508,45 +345,23 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	//! The colour of temples on the smallmap.
 	Gdk::RGBA d_temple_color;
 
-	//! The road images.
-        PixMask* roadpic[ROAD_TYPES];
-
-	//! The standing stone images.
-        PixMask* stonepic[STONE_TYPES];
-
-	//! The bridge images.
-        PixMask* bridgepic[BRIDGE_TYPES];
-
-	//! The exposion image.
-	PixMask* explosion;
-
-	//! The fog images.
-	PixMask*fogpic[FOG_TYPES];
-
-        Glib::ustring d_all_movebonus_filename;
-        Glib::ustring d_water_movebonus_filename;
-        Glib::ustring d_forest_movebonus_filename;
-        Glib::ustring d_hills_movebonus_filename;
-        Glib::ustring d_mountains_movebonus_filename;
-        Glib::ustring d_swamp_movebonus_filename;
-
         //! The movement bonus graphic for moving quickly over all tile types.
-        PixMask *d_all_movebonus;
+        TarFileImage *d_all_movebonus;
 
         //! The movement graphic for when a stack is in a boat.
-        PixMask *d_water_movebonus;
+        TarFileImage *d_water_movebonus;
 
         //! The movement bonus graphic for moving quickly through woods.
-        PixMask *d_forest_movebonus;
+        TarFileImage *d_forest_movebonus;
 
         //! The movement bonus graphic for moving quickly through hills.
-        PixMask *d_hills_movebonus;
+        TarFileImage *d_hills_movebonus;
 
         //! The movement graphic for moving quickly (or at all) thru mountains.
-        PixMask *d_mountains_movebonus;
+        TarFileImage *d_mountains_movebonus;
 
         //! The movement bonus graphic for moving quickly through marsh.
-        PixMask *d_swamp_movebonus;
+        TarFileImage *d_swamp_movebonus;
 };
 #endif // TILESET_H
 

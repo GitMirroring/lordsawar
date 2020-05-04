@@ -54,6 +54,7 @@
 #include "Itemlist.h"
 #include "armyprodbase.h"
 #include "TarFileMaskedImage.h"
+#include "TarFileImage.h"
 
 int max_vector_width;
       
@@ -1040,10 +1041,10 @@ static void
 copy_other_armyset_images (Armyset *default_armyset, Armyset *armyset)
 {
   Glib::ustring f =
-    default_armyset->getFileFromConfigurationFile(default_armyset->getBagImageName());
+    default_armyset->getFileFromConfigurationFile(default_armyset->getBag()->getName());
   Glib::ustring outfile = "";
   armyset->addFileInCfgFile(f, outfile);
-  armyset->setBagImageName(outfile);
+  armyset->getBag ()->setName(outfile);
 
   f = default_armyset->getFileFromConfigurationFile(default_armyset->getShip()->getName ());
   outfile = "";
