@@ -21,12 +21,11 @@
 
 #include <gtkmm.h>
 #include <vector>
-#include "PixMask.h"
 #include "tarhelper.h"
 #include "snd.h"
+#include "File.h"
 
 class XML_Helper;
-class TarFile;
 class TarFileMaskedImage;
 class TarFileImage;
 
@@ -107,26 +106,46 @@ class ScenarioMedia
 
 	// Static Methods
 
-        static Glib::ustring getDefaultNextTurnImageFilename();
-        static Glib::ustring getDefaultCityDefeatedImageFilename();
-        static Glib::ustring getDefaultWinningImageFilename();
-        static Glib::ustring getDefaultMaleHeroImageFilename();
-        static Glib::ustring getDefaultFemaleHeroImageFilename();
-        static Glib::ustring getDefaultRuinSuccessImageFilename();
-        static Glib::ustring getDefaultRuinDefeatImageFilename();
-        static Glib::ustring getDefaultParleyOfferedImageFilename();
-        static Glib::ustring getDefaultParleyRefusedImageFilename();
-        static Glib::ustring getDefaultHeroNewLevelMaleImageFilename();
-        static Glib::ustring getDefaultHeroNewLevelFemaleImageFilename();
-        static Glib::ustring getDefaultSmallMedalsImageFilename();
-        static Glib::ustring getDefaultBigMedalsImageFilename();
-        static Glib::ustring getDefaultCommentatorImageFilename();
-        static Glib::ustring getDefaultBlessSoundFilename();
-        static Glib::ustring getDefaultHeroSoundFilename();
-        static Glib::ustring getDefaultBattleSoundFilename();
-        static Glib::ustring getDefaultDefeatSoundFilename();
-        static Glib::ustring getDefaultVictorySoundFilename();
-        static Glib::ustring getDefaultBackSoundFilename();
+        static Glib::ustring getDefaultNextTurnImageFilename ()
+          {return File::getVariousFile ("ship.png"); }
+        static Glib::ustring getDefaultCityDefeatedImageFilename ()
+          {return File::getVariousFile ("city_occupied.png");}
+        static Glib::ustring getDefaultWinningImageFilename ()
+          {return File::getVariousFile ("win.png");}
+        static Glib::ustring getDefaultMaleHeroImageFilename ()
+          {return File::getVariousFile ("recruit_male.png");}
+        static Glib::ustring getDefaultFemaleHeroImageFilename ()
+          {return File::getVariousFile ("recruit_female.png");}
+        static Glib::ustring getDefaultRuinSuccessImageFilename ()
+          {return File::getVariousFile ("ruin_2.png");}
+        static Glib::ustring getDefaultRuinDefeatImageFilename ()
+          {return File::getVariousFile ("ruin_1.png");}
+        static Glib::ustring getDefaultParleyOfferedImageFilename ()
+          {return File::getVariousFile ("parley_offered.png");}
+        static Glib::ustring getDefaultParleyRefusedImageFilename ()
+          {return File::getVariousFile ("parley_refused.png");}
+        static Glib::ustring getDefaultHeroNewLevelMaleImageFilename ()
+          {return File::getVariousFile ("hero-newlevel-male.png");}
+        static Glib::ustring getDefaultHeroNewLevelFemaleImageFilename ()
+          {return File::getVariousFile ("hero-newlevel-female.png");}
+        static Glib::ustring getDefaultSmallMedalsImageFilename ()
+          {return File::getVariousFile ("medals_mask.png");}
+        static Glib::ustring getDefaultBigMedalsImageFilename ()
+          {return File::getVariousFile ("bigmedals.png");}
+        static Glib::ustring getDefaultCommentatorImageFilename ()
+          {return File::getVariousFile ("commentator.png");}
+        static Glib::ustring getDefaultBlessSoundFilename()
+          {return Snd::getInstance ()->getFile ("bless");}
+        static Glib::ustring getDefaultHeroSoundFilename()
+          {return Snd::getInstance ()->getFile ("hero");}
+        static Glib::ustring getDefaultBattleSoundFilename ()
+          {return Snd::getInstance ()->getFile ("battle");}
+        static Glib::ustring getDefaultDefeatSoundFilename ()
+          {return Snd::getInstance ()->getFile ("defeat");}
+        static Glib::ustring getDefaultVictorySoundFilename ()
+          {return Snd::getInstance ()->getFile ("victory");}
+        static Glib::ustring getDefaultBackSoundFilename ()
+          {return Snd::getInstance ()->getFile ("back");}
     protected:
 
 	//! Creates a new ScenarioMedia object from scratch.
