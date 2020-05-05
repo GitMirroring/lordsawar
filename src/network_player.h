@@ -129,7 +129,6 @@ class NetworkPlayer : public Player
 	void decodeActionPillage(const Action_Pillage *action);
 	void decodeActionSack(const Action_Sack *action);
 	void decodeActionRaze(const Action_Raze *action);
-	void decodeActionUpgrade(const Action_Upgrade *action);
 	void decodeActionBuy(const Action_Buy *action);
 	void decodeActionProduction(const Action_Production *action);
 	void decodeActionReward(const Action_Reward *action);
@@ -151,7 +150,6 @@ class NetworkPlayer : public Player
 	void decodeActionEndTurn(const Action_EndTurn *action);
 	void decodeActionConquerCity(const Action_ConquerCity *action);
 	void decodeActionRecruitHero(const Action_RecruitHero *action);
-	void decodeActionRenamePlayer(const Action_RenamePlayer *action);
 	void decodeActionCityTooPoorToProduce(const Action_CityTooPoorToProduce *action);
 	void decodeActionInitTurn(const Action_InitTurn*action);
 	void decodeActionLoot(const Action_Loot*action);

@@ -1,6 +1,6 @@
 // Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -121,8 +121,6 @@ Action* Action::handle_load(XML_Helper* helper)
           return (new Action_Sack(helper));
       case CITY_RAZE:
           return (new Action_Raze(helper));
-      case CITY_UPGRADE:
-          return (new Action_Upgrade(helper));
       case CITY_BUY:
           return (new Action_Buy(helper));
       case CITY_PROD:
@@ -165,8 +163,6 @@ Action* Action::handle_load(XML_Helper* helper)
           return (new Action_ConquerCity(helper));
       case RECRUIT_HERO:
           return (new Action_RecruitHero(helper));
-      case PLAYER_RENAME:
-          return (new Action_RenamePlayer(helper));
       case CITY_DESTITUTE:
           return (new Action_CityTooPoorToProduce(helper));
       case INIT_TURN:
@@ -227,8 +223,6 @@ Action* Action::copy(const Action* a)
             return (new Action_Sack(*dynamic_cast<const Action_Sack*>(a)));
         case CITY_RAZE:
             return (new Action_Raze(*dynamic_cast<const Action_Raze*>(a)));
-        case CITY_UPGRADE:
-            return (new Action_Upgrade(*dynamic_cast<const Action_Upgrade*>(a)));
         case CITY_BUY:
             return (new Action_Buy(*dynamic_cast<const Action_Buy*>(a)));
         case CITY_PROD:
@@ -285,10 +279,6 @@ Action* Action::copy(const Action* a)
             return 
               (new Action_RecruitHero
                 (*dynamic_cast<const Action_RecruitHero*>(a)));
-        case PLAYER_RENAME:
-            return 
-              (new Action_RenamePlayer
-                (*dynamic_cast<const Action_RenamePlayer*>(a)));
         case CITY_DESTITUTE:
             return 
               (new Action_CityTooPoorToProduce
@@ -376,13 +366,6 @@ Action_Move::Action_Move(XML_Helper* helper)
     helper->getData(d_had_ship, "had_ship");
 }
 
-Glib::ustring Action_Move::dump() const
-{
-  return String::ucompose("Stack %1 moved to %2,%3 w/ %4 mp left, ship=%5 (was %6)\n",
-                          d_stack, d_dest.x, d_dest.y, d_moves_left,
-                          d_has_ship, d_had_ship);
-}
-
 bool Action_Move::doSave(XML_Helper* helper) const
 {
     bool retval = true;
@@ -438,19 +421,6 @@ Action_Split::Action_Split(XML_Helper* helper)
     si.str(s);
     for (unsigned int i = 0; i < MAX_STACK_SIZE; i++)
         si >>d_armies_moved[i];
-}
-
-Glib::ustring Action_Split::dump() const
-{
-  Glib::ustring s = 
-    String::ucompose("Stack %1 split with new stack %2.\n", d_orig, d_added);
-  s += "moved these armies:";
-
-  for (unsigned int i = 0; i < MAX_STACK_SIZE; i++)
-    s += String::ucompose("%1 ", d_armies_moved[i]);
-  s += "\n";
-
-  return s;
 }
 
 bool Action_Split::doSave(XML_Helper* helper) const
@@ -683,11 +653,10 @@ bool Action_Fight::loadItem(XML_Helper* helper)
 Action_Join::Action_Join(Stack* o, Stack* j)
     :Action(Action::STACK_JOIN), d_orig_id(o->getId()), d_joining_id(j->getId())
 {
-    if ((o->empty()) || (j->empty())
-        || (o->size() + j->size() > MAX_STACK_SIZE))
+  if ((o->empty()) || (j->empty()) || (o->size() + j->size() > MAX_STACK_SIZE))
     {
       std::cerr << String::ucompose("Action_Join: wrong stack size.  expected %1, but got %2.", o->size(), j->size()) << std::endl;
-        return;
+      return;
     }
 }
 
@@ -701,12 +670,6 @@ Action_Join::Action_Join(XML_Helper* helper)
 {
     helper->getData(d_orig_id, "receiver");
     helper->getData(d_joining_id, "joining");
-}
-
-Glib::ustring Action_Join::dump() const
-{
-  return String::ucompose("Stack %1 joined stack %2\n", d_joining_id, 
-                          d_orig_id);
 }
 
 bool Action_Join::doSave(XML_Helper* helper) const
@@ -743,19 +706,6 @@ Action_Ruin::Action_Ruin(XML_Helper* helper)
     helper->getData(d_searched, "searched");
 }
 
-Glib::ustring Action_Ruin::dump() const
-{
-  Glib::ustring s = String::ucompose("Ruin %1 searched by stack %2.", 
-                                     d_ruin, d_stack);
-  s + "  ";
-  if (d_searched)
-    s += "Ruin has been searched.\n";
-  else
-    s += "Ruin has not been searched.\n";
-
-  return s;
-}
-
 bool Action_Ruin::doSave(XML_Helper* helper) const
 {
     bool retval = true;
@@ -787,12 +737,6 @@ Action_Temple::Action_Temple(XML_Helper* helper)
     helper->getData(d_stack, "stack");
 }
 
-Glib::ustring Action_Temple::dump() const
-{
-  return 
-    String::ucompose("Stack %1 visited temple %2.\n", d_stack, d_temple);
-}
-
 bool Action_Temple::doSave(XML_Helper* helper) const
 {
     bool retval = true;
@@ -822,11 +766,6 @@ Action_Occupy::Action_Occupy(XML_Helper* helper)
     helper->getData(d_city, "city");
 }
 
-Glib::ustring Action_Occupy::dump() const
-{
-  return String::ucompose("City %1 occupied.\n", d_city);
-}
-
 bool Action_Occupy::doSave(XML_Helper* helper) const
 {
     return helper->saveData("city", d_city);
@@ -849,11 +788,6 @@ Action_Pillage::Action_Pillage(XML_Helper* helper)
     :Action(helper)
 {
     helper->getData(d_city, "city");
-}
-
-Glib::ustring Action_Pillage::dump() const
-{
-  return String::ucompose("City %1 pillaged.\n", d_city);
 }
 
 bool Action_Pillage::doSave(XML_Helper* helper) const
@@ -880,11 +814,6 @@ Action_Sack::Action_Sack(XML_Helper* helper)
     helper->getData(d_city, "city");
 }
 
-Glib::ustring Action_Sack::dump() const
-{
-  return String::ucompose("City %1 sacked.\n", d_city);
-}
-
 bool Action_Sack::doSave(XML_Helper* helper) const
 {
     return helper->saveData("city", d_city);
@@ -909,41 +838,7 @@ Action_Raze::Action_Raze(XML_Helper* helper)
     helper->getData(d_city, "city");
 }
 
-Glib::ustring Action_Raze::dump() const
-{
-  return String::ucompose("City %1 razed.\n", d_city);
-}
-
 bool Action_Raze::doSave(XML_Helper* helper) const
-{
-    return helper->saveData("city", d_city);
-}
-
-//-----------------------------------------------------------------------------
-//Action_Upgrade
-
-Action_Upgrade::Action_Upgrade(City *c)
-    :Action(Action::CITY_UPGRADE), d_city(c->getId())
-{
-}
-
-Action_Upgrade::Action_Upgrade(const Action_Upgrade &action)
-: Action(action), d_city(action.d_city)
-{
-}
-
-Action_Upgrade::Action_Upgrade(XML_Helper* helper)
-    :Action(helper)
-{
-    helper->getData(d_city, "city");
-}
-
-Glib::ustring Action_Upgrade::dump() const
-{
-  return String::ucompose("Defense of city %1 upgraded.\n", d_city);
-}
-
-bool Action_Upgrade::doSave(XML_Helper* helper) const
 {
     return helper->saveData("city", d_city);
 }
@@ -967,12 +862,6 @@ Action_Buy::Action_Buy(XML_Helper* helper)
     helper->getData(d_city, "city");
     helper->getData(d_slot, "slot");
     helper->getData(d_prod, "production");
-}
-
-Glib::ustring Action_Buy::dump() const
-{
-  return String::ucompose("Production %1 bought in city %2 slot: %3.\n",
-                          d_prod, d_city, d_slot);
 }
 
 bool Action_Buy::doSave(XML_Helper* helper) const
@@ -1004,12 +893,6 @@ Action_Production::Action_Production(XML_Helper* helper)
 {
     helper->getData(d_city, "city");
     helper->getData(d_prod, "production");
-}
-
-Glib::ustring Action_Production::dump() const
-{
-  return String::ucompose("Production in city %1 changed to %2.\n",
-                          d_city, d_prod);
 }
 
 bool Action_Production::doSave(XML_Helper* helper) const
@@ -1182,11 +1065,6 @@ Action_Quest::Action_Quest(XML_Helper* helper)
   helper->getData(d_victim_player, "victim_player");
 }
 
-Glib::ustring Action_Quest::dump() const
-{
-  return String::ucompose("Hero %1 has got quest of type %2 with data %3 to fulfill\n", d_hero, d_questtype, d_data);
-}
-
 bool Action_Quest::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -1228,12 +1106,6 @@ Action_Equip::Action_Equip(XML_Helper* helper)
   d_pos.y = i;
 }
 
-Glib::ustring Action_Equip::dump() const
-{
-  return String::ucompose("Hero %1 moved item %2 to slot %3 at tile %4,%5.\n",
-                          d_hero, d_item, d_slot, d_pos.x, d_pos.y);
-}
-
 bool Action_Equip::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -1269,11 +1141,6 @@ Action_Level::Action_Level(XML_Helper* helper)
   helper->getData(d_stat, "stat");
 }
 
-Glib::ustring Action_Level::dump() const
-{
-  return String::ucompose("Army unit %1 advanced level and increased stat type %2", d_army, d_stat);
-}
-
 bool Action_Level::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -1303,11 +1170,6 @@ Action_Disband::Action_Disband(XML_Helper* helper)
   helper->getData(d_stack, "stack");
 }
 
-Glib::ustring Action_Disband::dump() const
-{
-  return String::ucompose("Stack %1 disbanded.\n", d_stack);
-}
-
 bool Action_Disband::doSave(XML_Helper* helper) const
 {
   return helper->saveData("stack", d_stack);
@@ -1331,11 +1193,6 @@ Action_ModifySignpost::Action_ModifySignpost(XML_Helper* helper)
 {
   helper->getData(d_signpost, "signpost");
   helper->getData(d_message, "message");
-}
-
-Glib::ustring Action_ModifySignpost::dump() const
-{
-  return String::ucompose("Signpost %1 modified to read %2.\n", d_signpost, d_message);
 }
 
 bool Action_ModifySignpost::doSave(XML_Helper* helper) const
@@ -1368,11 +1225,6 @@ Action_RenameCity::Action_RenameCity(XML_Helper* helper)
   helper->getData(d_name, "name");
 }
 
-Glib::ustring Action_RenameCity::dump() const
-{
-  return String::ucompose("City %1 renamed to %2.\n", d_city, d_name);
-}
-
 bool Action_RenameCity::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -1402,12 +1254,6 @@ Action_Vector::Action_Vector(XML_Helper* helper)
   helper->getData(d_city, "city");
   helper->getData(d_dest.x, "x");
   helper->getData(d_dest.y, "y");
-}
-
-Glib::ustring Action_Vector::dump() const
-{
-  return String::ucompose("Vectoring new army units from city %1 to %2,%3.\n",
-                          d_city, d_dest.x, d_dest.y);
 }
 
 bool Action_Vector::doSave(XML_Helper* helper) const
@@ -1451,16 +1297,6 @@ Action_FightOrder::Action_FightOrder(XML_Helper* helper)
     }
 }
 
-Glib::ustring Action_FightOrder::dump() const
-{
-  Glib::ustring s = "Changed fight order to: ";
-  for (std::list<guint32>::const_iterator it = d_order.begin(); 
-       it != d_order.end(); ++it)
-    s += String::ucompose("%1 ", (*it));
-  s += "\n";
-  return s;
-}
-
 bool Action_FightOrder::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -1476,33 +1312,6 @@ bool Action_FightOrder::doSave(XML_Helper* helper) const
 
 //-----------------------------------------------------------------------------
 //Action_Resign
-
-Action_Resign::Action_Resign()
-:Action(Action::RESIGN)
-{
-}
-
-Action_Resign::Action_Resign(const Action_Resign &action)
-: Action(action)
-{
-}
-
-Action_Resign::Action_Resign(XML_Helper* helper)
-:Action(helper)
-{
-}
-
-Glib::ustring Action_Resign::dump() const
-{
-  return "This player resigns.\n";
-}
-
-bool Action_Resign::doSave(XML_Helper* helper) const
-{
-  if (helper)
-    return true;
-  return false;
-}
 
 //-----------------------------------------------------------------------------
 //Action_Plant
@@ -1522,11 +1331,6 @@ Action_Plant::Action_Plant(XML_Helper* helper)
 {
   helper->getData(d_hero, "hero");
   helper->getData(d_item, "item");
-}
-
-Glib::ustring Action_Plant::dump() const
-{
-  return String::ucompose("Hero %1 plants item %2.\n", d_hero, d_item);
 }
 
 bool Action_Plant::doSave(XML_Helper* helper) const
@@ -1589,18 +1393,6 @@ Action_Produce::~Action_Produce()
 {
   if (d_army)
     delete d_army;
-}
-
-Glib::ustring Action_Produce::dump() const
-{
-  Glib::ustring s = String::ucompose("Army id %1 of type %2 shows up at city %3 ", d_army_id, d_army->getTypeId(), d_city);
-  if (d_vectored)
-    s += String::ucompose("but it is vectored to another city at %1,%2.", d_dest.x, d_dest.y);
-  else
-    s += String::ucompose("at position %1,%2 in stack %3.", d_dest.x, d_dest.y, d_stack_id);
-  s+= "\n";
-
-  return s;
 }
 
 bool Action_Produce::doSave(XML_Helper* helper) const
@@ -1673,11 +1465,6 @@ Action_ProduceVectored::~Action_ProduceVectored()
     delete d_army;
 }
 
-Glib::ustring Action_ProduceVectored::dump() const
-{
-  return String::ucompose("Vectored army of type %1 shows up at %2,%3 from %4,%5, as army id %6 in stack id %7.\n", d_army->getTypeId(), d_dest.x, d_dest.y, d_src.x, d_src.y, d_target_army_id, d_target_stack_id);
-}
-
 bool Action_ProduceVectored::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -1718,19 +1505,6 @@ Action_DiplomacyState::Action_DiplomacyState(XML_Helper* helper)
   d_diplomatic_state = Player::DiplomaticState(diplomatic_state);
 }
 
-Glib::ustring Action_DiplomacyState::dump() const
-{
-  Glib::ustring s = "declaring ";
-  switch (d_diplomatic_state)
-    {
-    case Player::AT_WAR: s+= "war"; break;
-    case Player::AT_WAR_IN_FIELD: s += "war in the field"; break;
-    case Player::AT_PEACE: s += "peace"; break;
-    }
-  s += String::ucompose(" with player %1.\n", d_opponent_id);
-  return s;
-}
-
 bool Action_DiplomacyState::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -1767,20 +1541,6 @@ Action_DiplomacyProposal::Action_DiplomacyProposal(XML_Helper* helper)
   d_diplomatic_proposal = Player::DiplomaticProposal(diplomatic_proposal);
 }
 
-Glib::ustring Action_DiplomacyProposal::dump() const
-{
-  Glib::ustring s = "proposing ";
-  switch (d_diplomatic_proposal)
-    {
-    case Player::NO_PROPOSAL: s +="nothing"; break;
-    case Player::PROPOSE_WAR: s +="war"; break;
-    case Player::PROPOSE_WAR_IN_FIELD: s +="war in the field"; break;
-    case Player::PROPOSE_PEACE: s +="peace"; break;
-    }
-  s += String::ucompose(" with player %1.\n", d_opponent_id);
-  return s;
-}
-
 bool Action_DiplomacyProposal::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -1811,14 +1571,6 @@ Action_DiplomacyScore::Action_DiplomacyScore(XML_Helper* helper)
   helper->getData(d_amount, "amount");
 }
 
-Glib::ustring Action_DiplomacyScore::dump() const
-{
-  if (d_amount > 0)
-    return String::ucompose("Adding %1 to player %2.\n", d_amount, d_opponent_id);
-  else
-    return String::ucompose("Subtracting %1 from player %2.\n", d_amount, d_opponent_id);
-}
-
 bool Action_DiplomacyScore::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -1832,32 +1584,6 @@ bool Action_DiplomacyScore::doSave(XML_Helper* helper) const
 //-----------------------------------------------------------------------------
 //Action_EndTurn
 
-Action_EndTurn::Action_EndTurn()
-:Action(Action::END_TURN)
-{
-}
-
-Action_EndTurn::Action_EndTurn(const Action_EndTurn &action)
-: Action(action)
-{
-}
-
-Action_EndTurn::Action_EndTurn(XML_Helper* helper)
-:Action(helper)
-{
-}
-
-Glib::ustring Action_EndTurn::dump() const
-{
-  return "ending turn\n";
-}
-
-bool Action_EndTurn::doSave(XML_Helper* helper) const
-{
-  if (helper)
-    return true;
-  return false;
-}
 
 //-----------------------------------------------------------------------------
 //Action_ConquerCity
@@ -1876,11 +1602,6 @@ Action_ConquerCity::Action_ConquerCity(XML_Helper* helper)
   :Action(helper)
 {
     helper->getData(d_city, "city");
-}
-
-Glib::ustring Action_ConquerCity::dump() const
-{
-  return String::ucompose("City %1 occupied.\n", d_city);
 }
 
 bool Action_ConquerCity::doSave(XML_Helper* helper) const
@@ -1936,11 +1657,6 @@ bool Action_RecruitHero::load(Glib::ustring tag, XML_Helper *helper)
     return false;
 }
 
-Glib::ustring Action_RecruitHero::dump() const
-{
-  return String::ucompose("Hero %1 recruited with %2 allies.\n", d_hero->getName(), d_allies);
-}
-
 bool Action_RecruitHero::doSave(XML_Helper* helper) const
 {
     bool retval = true;
@@ -1952,35 +1668,6 @@ bool Action_RecruitHero::doSave(XML_Helper* helper) const
     retval &= d_hero->save(helper);
 
     return retval;
-}
-
-//-----------------------------------------------------------------------------
-//Action_RenamePlayer
-
-Action_RenamePlayer::Action_RenamePlayer(Glib::ustring name)
-  :Action(Action::PLAYER_RENAME), d_name(name)
-{
-}
-
-Action_RenamePlayer::Action_RenamePlayer(const Action_RenamePlayer &action)
-:Action(action), d_name(action.d_name)
-{
-}
-
-Action_RenamePlayer::Action_RenamePlayer(XML_Helper* helper)
-  :Action(helper)
-{
-    helper->getData(d_name, "name");
-}
-
-Glib::ustring Action_RenamePlayer::dump() const
-{
-  return String::ucompose("Player changes name to %1.\n", d_name);
-}
-
-bool Action_RenamePlayer::doSave(XML_Helper* helper) const
-{
-    return helper->saveData("name", d_name);
 }
 
 //-----------------------------------------------------------------------------
@@ -2002,12 +1689,6 @@ Action_CityTooPoorToProduce::Action_CityTooPoorToProduce(XML_Helper* helper)
 {
     helper->getData(d_city, "city");
     helper->getData(d_army_type, "army_type");
-}
-
-Glib::ustring Action_CityTooPoorToProduce::dump() const
-{
-  return String::ucompose("City %1 is too poor to produce army type %2.\n",
-                          d_city, d_army_type);
 }
 
 bool Action_CityTooPoorToProduce::doSave(XML_Helper* helper) const
@@ -2037,11 +1718,6 @@ Action_InitTurn::Action_InitTurn(XML_Helper* helper)
 :Action(helper)
 {
   helper->getData(d_order, "order");
-}
-
-Glib::ustring Action_InitTurn::dump() const
-{
-  return String::ucompose("Initializing turn!  order is %1.\n", d_order);
 }
 
 bool Action_InitTurn::doSave(XML_Helper* helper) const
@@ -2076,14 +1752,6 @@ Action_Loot::Action_Loot(XML_Helper* helper)
     helper->getData(d_looted_player_id, "looted_player_id");
     helper->getData(d_gold_added, "gold_added");
     helper->getData(d_gold_removed, "gold_removed");
-}
-
-Glib::ustring Action_Loot::dump() const
-{
-  return 
-    String::ucompose("Player %1 took %2 gp from player %3 who lost %4 in total.\n",
-                     d_looting_player_id, d_gold_added, d_looted_player_id, 
-                     d_gold_removed);
 }
 
 bool Action_Loot::doSave(XML_Helper* helper) const
@@ -2139,11 +1807,6 @@ Action_UseItem::Action_UseItem(XML_Helper* helper)
   helper->getData(d_city, "city");
 }
 
-Glib::ustring Action_UseItem::dump() const
-{
-  return String::ucompose("Hero %1 uses item %2 and targets player id %3 friendly city %4, enemy city %5, neutral city %6, city %7.\n", d_hero, d_item, d_victim_player, d_friendly_city, d_enemy_city, d_neutral_city, d_city);
-}
-
 bool Action_UseItem::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -2196,16 +1859,6 @@ Action_ReorderArmies::Action_ReorderArmies(XML_Helper* helper)
     }
 }
 
-Glib::ustring Action_ReorderArmies::dump() const
-{
-  Glib::ustring s = String::ucompose("Stack %1 belonging to player id %2 has a new order: ", d_stack_id, d_player_id);
-  for (std::list<guint32>::const_iterator i = d_army_ids.begin(); 
-       i != d_army_ids.end(); i++)
-    s += String::ucompose("%1 ", (*i));
-  s += "\n";
-  return s;
-}
-
 bool Action_ReorderArmies::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -2239,12 +1892,6 @@ Action_ResetStacks::Action_ResetStacks(XML_Helper* helper)
   helper->getData(d_player_id, "player_id");
 }
 
-Glib::ustring Action_ResetStacks::dump() const
-{
-  return String::ucompose("Stacks for player id %1 are being recharged.\n",
-                          d_player_id);
-}
-
 bool Action_ResetStacks::doSave(XML_Helper* helper) const
 {
   return helper->saveData("player_id", d_player_id);
@@ -2266,11 +1913,6 @@ Action_ResetRuins::Action_ResetRuins(const Action_ResetRuins &action)
 Action_ResetRuins::Action_ResetRuins(XML_Helper* helper)
 :Action(helper)
 {
-}
-
-Glib::ustring Action_ResetRuins::dump() const
-{
-  return "Ruins are being recharged.\n";
 }
 
 bool Action_ResetRuins::doSave(XML_Helper* helper) const
@@ -2301,11 +1943,6 @@ Action_CollectTaxesAndPayUpkeep::Action_CollectTaxesAndPayUpkeep(XML_Helper* hel
   helper->getData(d_to_gold, "to_gold");
 }
 
-Glib::ustring Action_CollectTaxesAndPayUpkeep::dump() const
-{
-  return String::ucompose("went from %1 to %2 gp after collecting taxes from cities and paying the troops.\n", d_from_gold, d_to_gold);
-}
-
 bool Action_CollectTaxesAndPayUpkeep::doSave(XML_Helper* helper) const
 {
   bool retval = true;
@@ -2316,33 +1953,6 @@ bool Action_CollectTaxesAndPayUpkeep::doSave(XML_Helper* helper) const
 
 //-----------------------------------------------------------------------------
 // Action_Kill
-
-Action_Kill::Action_Kill()
-:Action(Action::KILL_PLAYER)
-{
-}
-
-Action_Kill::Action_Kill(const Action_Kill &action)
-: Action(action)
-{
-}
-
-Action_Kill::Action_Kill(XML_Helper* helper)
-:Action(helper)
-{
-}
-
-Glib::ustring Action_Kill::dump() const
-{
-  return "player is vanquished.\n";
-}
-
-bool Action_Kill::doSave(XML_Helper* helper) const
-{
-  if (helper)
-    return true;
-  return false;
-}
 
 //-----------------------------------------------------------------------------
 // Action_DefendStack
@@ -2361,11 +1971,6 @@ Action_DefendStack::Action_DefendStack(XML_Helper* helper)
 :Action(helper)
 {
   helper->getData(d_stack_id, "stack_id");
-}
-
-Glib::ustring Action_DefendStack::dump() const
-{
-  return String::ucompose("Stack %1 is going into defend mode.\n", d_stack_id);
 }
 
 bool Action_DefendStack::doSave(XML_Helper* helper) const
@@ -2392,11 +1997,6 @@ Action_UndefendStack::Action_UndefendStack(XML_Helper* helper)
   helper->getData(d_stack_id, "stack_id");
 }
 
-Glib::ustring Action_UndefendStack::dump() const
-{
-  return String::ucompose("Stack %1 is going out of defend mode.\n", d_stack_id);
-}
-
 bool Action_UndefendStack::doSave(XML_Helper* helper) const
 {
   return helper->saveData("stack_id", d_stack_id);
@@ -2419,11 +2019,6 @@ Action_ParkStack::Action_ParkStack(XML_Helper* helper)
 :Action(helper)
 {
   helper->getData(d_stack_id, "stack_id");
-}
-
-Glib::ustring Action_ParkStack::dump() const
-{
-  return String::ucompose("Stack %1 is going into parked mode.\n", d_stack_id);
 }
 
 bool Action_ParkStack::doSave(XML_Helper* helper) const
@@ -2450,11 +2045,6 @@ Action_UnparkStack::Action_UnparkStack(XML_Helper* helper)
   helper->getData(d_stack_id, "stack_id");
 }
 
-Glib::ustring Action_UnparkStack::dump() const
-{
-  return String::ucompose("Stack %1 is going out of parked mode.\n", d_stack_id);
-}
-
 bool Action_UnparkStack::doSave(XML_Helper* helper) const
 {
   return helper->saveData("stack_id", d_stack_id);
@@ -2477,11 +2067,6 @@ Action_SelectStack::Action_SelectStack(XML_Helper* helper)
 :Action(helper)
 {
   helper->getData(d_stack_id, "stack_id");
-}
-
-Glib::ustring Action_SelectStack::dump() const
-{
-  return String::ucompose("Stack %1 is selected.\n", d_stack_id);
 }
 
 bool Action_SelectStack::doSave(XML_Helper* helper) const
@@ -2507,11 +2092,6 @@ Action_DeselectStack::Action_DeselectStack(XML_Helper* helper)
 {
 }
 
-Glib::ustring Action_DeselectStack::dump() const
-{
-  return "Deselecting stack.\n";
-}
-
 bool Action_DeselectStack::doSave(XML_Helper* helper) const
 {
   if (helper)
@@ -2533,7 +2113,6 @@ Glib::ustring Action::actionTypeToString(Action::Type type)
     case Action::CITY_PILLAGE: return "Action::CITY_PILLAGE";
     case Action::CITY_SACK: return "Action::CITY_SACK";
     case Action::CITY_RAZE: return "Action::CITY_RAZE";
-    case Action::CITY_UPGRADE: return "Action::CITY_UPGRADE";
     case Action::CITY_BUY: return "Action::CITY_BUY";
     case Action::CITY_PROD: return "Action::CITY_PROD";
     case Action::REWARD: return "Action::REWARD" ;
@@ -2555,7 +2134,6 @@ Glib::ustring Action::actionTypeToString(Action::Type type)
     case Action::END_TURN: return "Action::END_TURN";
     case Action::CITY_CONQUER: return "Action::CITY_CONQUER";
     case Action::RECRUIT_HERO: return "Action::RECRUIT_HERO";
-    case Action::PLAYER_RENAME: return "Action::PLAYER_RENAME";
     case Action::CITY_DESTITUTE: return "Action::CITY_DESTITUTE";
     case Action::INIT_TURN: return "Action::INIT_TURN";
     case Action::CITY_LOOT: return "Action::CITY_LOOT";
@@ -2590,7 +2168,6 @@ Action::Type Action::actionTypeFromString(Glib::ustring str)
   else if (str == "Action::CITY_PILLAGE") return Action::CITY_PILLAGE;
   else if (str == "Action::CITY_SACK") return Action::CITY_SACK;
   else if (str == "Action::CITY_RAZE") return Action::CITY_RAZE;
-  else if (str == "Action::CITY_UPGRADE") return Action::CITY_UPGRADE;
   else if (str == "Action::CITY_BUY") return Action::CITY_BUY;
   else if (str == "Action::CITY_PROD") return Action::CITY_PROD;
   else if (str == "Action::REWARD" ) return Action::REWARD; 
@@ -2612,7 +2189,6 @@ Action::Type Action::actionTypeFromString(Glib::ustring str)
   else if (str == "Action::END_TURN") return Action::END_TURN;
   else if (str == "Action::CITY_CONQUER") return Action::CITY_CONQUER;
   else if (str == "Action::RECRUIT_HERO") return Action::RECRUIT_HERO;
-  else if (str == "Action::PLAYER_RENAME") return Action::PLAYER_RENAME;
   else if (str == "Action::CITY_DESTITUTE") return Action::CITY_DESTITUTE;
   else if (str == "Action::INIT_TURN") return Action::INIT_TURN;
   else if (str == "Action::CITY_LOOT") return Action::CITY_LOOT;

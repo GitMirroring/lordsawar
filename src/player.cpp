@@ -2107,18 +2107,6 @@ bool Player::cityRename(City *c, Glib::ustring name)
   return true;
 }
 
-void Player::doRename(Glib::ustring name)
-{
-  setName(name);
-}
-
-void Player::rename(Glib::ustring name)
-{
-  doRename(name);
-  addAction(new Action_RenamePlayer(name));
-  return;
-}
-
 void Player::doVectorFromCity(City * c, Vector<int> dest)
 {
   c->setVectoring(dest);

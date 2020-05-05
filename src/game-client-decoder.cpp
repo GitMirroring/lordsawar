@@ -57,9 +57,7 @@ int GameClientDecoder::decodeActions(std::list<NetworkAction*> actions)
     }
 
     np->decodeAction(action->getAction());
-    if (action->getAction()->getType() == Action::PLAYER_RENAME)
-      remote_player_named.emit(action->getOwner());
-    else if (action->getAction()->getType() == Action::END_TURN)
+    if (action->getAction()->getType() == Action::END_TURN)
       remote_player_moved.emit((*actions.back()).getOwner());
     else if (action->getAction()->getType() == Action::INIT_TURN)
       remote_player_starts_move.emit((*actions.back()).getOwner());

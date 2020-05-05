@@ -483,12 +483,6 @@ void Driver::on_hosted_player_stood_up(Player *player)
   player_replaced.emit(Playerlist::getInstance()->getPlayer(id));
 }
 
-void Driver::on_hosted_player_changed_name(Player *player, Glib::ustring name)
-{
-  GameServer *game_server = GameServer::getInstance();
-  game_server->name_change(player, name);
-}
-
 void Driver::on_hosted_player_changed_type(Player *player, int type)
 {
   GameServer *game_server = GameServer::getInstance();
@@ -517,12 +511,6 @@ void Driver::on_client_player_stood_up(Player *player)
 {
   GameClient *game_client = GameClient::getInstance();
   game_client->stand_up(player);
-}
-
-void Driver::on_client_player_changed_name(Player *player, Glib::ustring name)
-{
-  GameClient *game_client = GameClient::getInstance();
-  game_client->change_name(player, name);
 }
 
 void Driver::on_client_player_changed_type(Player *player, int type)
@@ -773,8 +761,6 @@ void Driver::on_load_hosted_network_game_requested(GameScenario *game_scenario,
     (sigc::mem_fun(GameServer::getInstance(), &GameServer::sendKillPlayer));
   game_lobby_dialog->player_sat_down.connect (method(on_hosted_player_sat_down));
   game_lobby_dialog->player_stood_up.connect (method(on_hosted_player_stood_up));
-  game_lobby_dialog->player_changed_name.connect
-    (method(on_hosted_player_changed_name));
   game_lobby_dialog->player_changed_type.connect
     (method(on_hosted_player_changed_type));
   game_lobby_dialog->message_sent.connect (method(on_hosted_player_chat));
@@ -903,7 +889,6 @@ void Driver::on_game_scenario_received(Glib::ustring path, Profile *p)
 					      GameClient::getInstance(), false);
   game_lobby_dialog->player_sat_down.connect (method(on_client_player_sat_down));
   game_lobby_dialog->player_stood_up.connect (method(on_client_player_stood_up));
-  game_lobby_dialog->player_changed_name.connect (method(on_client_player_changed_name));
   game_lobby_dialog->player_changed_type.connect (method(on_client_player_changed_type));
   game_lobby_dialog->message_sent.connect (method(on_client_player_chat));
   game_lobby_dialog->start_network_game.connect (method(start_network_game_requested));

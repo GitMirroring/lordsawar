@@ -47,7 +47,6 @@ class GameLobbyDialog: public LwDialog
   sigc::signal<void, Player*> player_sat_down;
   sigc::signal<void, Player*> player_stood_up;
   sigc::signal<void, Glib::ustring> message_sent;
-  sigc::signal<void, Player*, Glib::ustring> player_changed_name;
   sigc::signal<void, Player*, int> player_changed_type;
   sigc::signal<void, GameScenario *, NextTurnNetworked*> start_network_game;
   sigc::signal<void> game_may_begin;
@@ -166,9 +165,7 @@ class GameLobbyDialog: public LwDialog
     void on_remote_participant_departs(Glib::ustring nickname);
     void on_player_stands(Player *p);
     void on_player_sits(Player *p, Glib::ustring nickname);
-    void on_player_changes_name(Player *p, Glib::ustring name);
     void on_player_changes_type(Player *p, int type);
-    void on_remote_player_changes_name(Player *p);
     void on_player_died(Player *p);
     void on_play_clicked();
     void on_cancel_clicked();

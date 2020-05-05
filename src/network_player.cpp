@@ -245,8 +245,6 @@ void NetworkPlayer::decodeAction(const Action *a)
       return decodeActionSack(dynamic_cast<const Action_Sack*>(a));
     case Action::CITY_RAZE:
       return decodeActionRaze(dynamic_cast<const Action_Raze*>(a));
-    case Action::CITY_UPGRADE:
-      return decodeActionUpgrade (dynamic_cast<const Action_Upgrade*>(a));
     case Action::CITY_BUY:
       return decodeActionBuy(dynamic_cast<const Action_Buy*>(a));
     case Action::CITY_PROD:
@@ -300,9 +298,6 @@ void NetworkPlayer::decodeAction(const Action *a)
     case Action::RECRUIT_HERO:
       return decodeActionRecruitHero
         (dynamic_cast<const Action_RecruitHero*>(a));
-    case Action::PLAYER_RENAME:
-      return decodeActionRenamePlayer
-        (dynamic_cast<const Action_RenamePlayer*>(a));
     case Action::CITY_DESTITUTE:
       return decodeActionCityTooPoorToProduce
 	(dynamic_cast<const Action_CityTooPoorToProduce*>(a));
@@ -598,13 +593,6 @@ void NetworkPlayer::decodeActionRaze(const Action_Raze *action)
   doCityRaze(Citylist::getInstance()->getById(action->getCityId()));
 }
 
-void NetworkPlayer::decodeActionUpgrade(const Action_Upgrade *action)
-{
-  (void) action;
-  // doesn't exist, not handled
-  assert(false);
-}
-
 void NetworkPlayer::decodeActionBuy(const Action_Buy *action)
 {
   City *city = Citylist::getInstance()->getById(action->getCityId());
@@ -860,12 +848,6 @@ void NetworkPlayer::decodeActionRecruitHero(const Action_RecruitHero *action)
   if (stacks->size())
     supdatingStack.emit(stacks->front()); // make sure we get a redraw
   delete stacks;
-}
-
-void NetworkPlayer::decodeActionRenamePlayer(const Action_RenamePlayer *action)
-{
-  (void) action;
-  doRename(action->getName());
 }
 
 void NetworkPlayer::decodeActionCityTooPoorToProduce(const Action_CityTooPoorToProduce *action)

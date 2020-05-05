@@ -131,12 +131,6 @@ void GameClient::sat_down(Player *player, Glib::ustring nickname)
   player_sits.emit(player, nickname);
 }
 
-void GameClient::name_changed (Player *player, Glib::ustring name)
-{
-  if (player)
-    player_changes_name.emit(player, name);
-}
-
 void GameClient::type_changed (Player *player, int type)
 {
   if (!player)
@@ -277,8 +271,6 @@ bool GameClient::onGotMessage(int type, Glib::ustring payload)
                     stood_up(Playerlist::getInstance()->getPlayer(id), data);
                     break;
                   case LOBBY_MESSAGE_TYPE_CHANGE_NAME:
-                    name_changed(Playerlist::getInstance()->getPlayer(id),
-                                 data);
                     break;
                   case LOBBY_MESSAGE_TYPE_CHANGE_TYPE:
                     type_changed(Playerlist::getInstance()->getPlayer(id),
@@ -406,14 +398,6 @@ void GameClient::sit_or_stand (Player *player, bool sit)
       new_p->setConnected(false);
     }
 
-}
-
-void GameClient::change_name (Player *player, Glib::ustring name)
-{
-  Glib::ustring payload =
-    String::ucompose("%1 %2 %3 %4", player->getId(),
-                     LOBBY_MESSAGE_TYPE_CHANGE_NAME, 0, name);
-  network_connection->send(MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
 }
 
 void GameClient::change_type (Player *player, int type)

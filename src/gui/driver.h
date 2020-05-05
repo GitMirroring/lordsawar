@@ -90,7 +90,6 @@ class Driver: public sigc::trackable
     void on_hosted_player_changed_type(Player *player, int type);
     void on_client_player_sat_down(Player *player);
     void on_client_player_stood_up(Player *player);
-    void on_client_player_changed_name(Player *player, Glib::ustring name);
     void on_client_player_changed_type(Player *player, int type);
     void on_server_went_away();
     void on_server_went_away_text();

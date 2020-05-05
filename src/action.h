@@ -1,6 +1,6 @@
 // Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,9 @@
 #include "fight.h"
 #include "army.h"
 #include "player.h"
+#include "ucompose.hpp"
+#include "armyprodbase.h"
+#include "heroproto.h"
 
 class Quest;
 class Stack;
@@ -74,8 +77,9 @@ class Action
                 CITY_PILLAGE = 8,
 		/** A stack has defeated a city and razed it. */
                 CITY_RAZE = 9,
-		/** A player has improved the defenses of a city. (Not used) */
-                CITY_UPGRADE = 10,
+
+                /* = 10 is not used */
+
 		/** A player has purchased a new Army unit to be produced 
 		 * in a city. */
                 CITY_BUY = 11,
@@ -122,24 +126,66 @@ class Action
 		/** The player's diplomatic score with respect to another
 		 * player has changed. */
 		DIPLOMATIC_SCORE = 29,
+                /** The player has ended their turn.
+                 */
                 END_TURN = 30,
+                /** A player has taken over a city.
+                 */
                 CITY_CONQUER = 31,
+                /** A player has agreed to take on a hero who has offered
+                 * their service.
+                 */
                 RECRUIT_HERO = 32,
-                PLAYER_RENAME = 33,
+
+                /* = 33 is not used */
+
+                /** A city's production has been turned off because the player
+                 * lacks gold.
+                 */
 		CITY_DESTITUTE = 34,
+                /** A player has started their turn.
+                 */
 		INIT_TURN = 35,
+                /** A player has looted a city.
+                 */
 		CITY_LOOT = 36,
+                /** A hero uses one of their items.
+                 */
                 USE_ITEM = 37,
+                /** The armies in a stack have been reordered.
+                 */
                 STACK_ORDER = 38,
+                /** A player's stacks have their movement points and hit points
+                 * refreshed.
+                 */
                 STACKS_RESET = 39,
+                /** Keepers in ruins have their hit points refreshed.
+                 */
                 RUINS_RESET = 40,
+                /** A player gets their income from cities and pays their army
+                 * units.
+                 */
                 COLLECT_TAXES_AND_PAY_UPKEEP = 41,
+                /** A player has been defeated.
+                 */
                 KILL_PLAYER = 42,
+                /** A stack goes into defend mode.
+                 */
                 STACK_DEFEND = 43,
+                /** A stack goes out of defend mode.
+                 */
                 STACK_UNDEFEND = 44,
+                /** A stack goes into parked mode.
+                 */
                 STACK_PARK = 45,
+                /** A stack goes out of parked mode.
+                 */
                 STACK_UNPARK = 46,
+                /** A player selected a stack.
+                 */
                 STACK_SELECT = 47,
+                /** A player unselected/deselected a stack.
+                 */
                 STACK_DESELECT = 48
         };
 	static Glib::ustring actionTypeToString(Action::Type type);
@@ -211,7 +257,13 @@ class Action_Move : public Action
         ~Action_Move() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose
+              ("Stack %1 moved to %2,%3 w/ %4 mp left, ship=%5 (was %6)\n",
+               d_stack, d_dest.x, d_dest.y, d_moves_left, d_has_ship,
+               d_had_ship);
+          }
 
 	//! Save this move action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -265,7 +317,19 @@ class Action_Split : public Action
         ~Action_Split() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            Glib::ustring s =
+              String::ucompose("Stack %1 split with new stack %2.\n", d_orig,
+                               d_added);
+            s += "moved these armies:";
+
+            for (unsigned int i = 0; i < MAX_STACK_SIZE; i++)
+              s += String::ucompose("%1 ", d_armies_moved[i]);
+            s += "\n";
+
+            return s;
+          }
 
 	//! Save this split action to an opened saved-game file.
         bool doSave (XML_Helper* helper) const;
@@ -300,7 +364,10 @@ class Action_Disband: public Action
         ~Action_Disband() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Stack %1 disbanded.\n", d_stack);
+          }
 
 	//! Save this disband action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -386,7 +453,11 @@ class Action_Join : public Action
         ~Action_Join() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Stack %1 joined stack %2\n",
+                                    d_joining_id, d_orig_id);
+          }
 
 	//! Save this stack join action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -421,7 +492,18 @@ class Action_Ruin : public Action
         ~Action_Ruin() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            Glib::ustring s = String::ucompose("Ruin %1 searched by stack %2.",
+                                               d_ruin, d_stack);
+            s + "  ";
+            if (d_searched)
+              s += "Ruin has been searched.\n";
+            else
+              s += "Ruin has not been searched.\n";
+
+            return s;
+          }
 
 	//! Save this ruin search attempted action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -461,7 +543,11 @@ class Action_Temple : public Action
         ~Action_Temple() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Stack %1 visited temple %2.\n", d_stack,
+                                    d_temple);
+          }
 
 	//! Save this temple search attempted action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -497,7 +583,10 @@ class Action_Occupy : public Action
         ~Action_Occupy() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("City %1 occupied.\n", d_city);
+          }
 
 	//! Save this city occupied action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -530,7 +619,10 @@ class Action_Pillage : public Action
         ~Action_Pillage() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("City %1 pillaged.\n", d_city);
+          }
 
 	//! Save this city pillaged action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -563,7 +655,10 @@ class Action_Sack : public Action
         ~Action_Sack() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("City %1 sacked.\n", d_city);
+          }
 
 	//! Save this city sacked action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -595,44 +690,12 @@ class Action_Raze : public Action
         ~Action_Raze() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("City %1 razed.\n", d_city);
+          }
 
 	//! Save this city razed action to an opened saved-game file.
-        virtual bool doSave(XML_Helper* helper) const;
-
-	guint32 getCityId() const {return d_city;};
-
-        private:
-        guint32 d_city;
-};
-
-//-----------------------------------------------------------------------------
-
-//! A temporary record of what happened when a City's defenses were increased.
-/**
- * The purpose of the Action_Upgrade class is to record when a Player has
- * improved the City's defenses.  This action is not currently used by 
- * LordsAWar.
- */
-class Action_Upgrade : public Action
-{
-    public:
-	//! Make a new city upgraded action.
-	/**
-         * Populate the action with the City that has been upgraded.
-         */
-        Action_Upgrade(City *c);
-	//! Copy constructor
-	Action_Upgrade(const Action_Upgrade &action);
-	//! Load a new city upgraded action from an opened saved-game file.
-        Action_Upgrade(XML_Helper* helper);
-	//! Destroy a city upgraded action.
-        ~Action_Upgrade() {};
-
-	//! Return some debug information about this action.
-        Glib::ustring dump() const;
-
-	//! Save this city upgraded action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
 
 	guint32 getCityId() const {return d_city;};
@@ -673,7 +736,12 @@ class Action_Buy : public Action
         ~Action_Buy() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return
+              String::ucompose ("Production %1 bought in city %2 slot: %3.\n",
+                                d_prod, d_city, d_slot);
+          }
 
 	//! Save this city buy production action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -714,7 +782,11 @@ class Action_Production : public Action
         ~Action_Production() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose ("Production in city %1 changed to %2.\n",
+                                     d_city, d_prod);
+          }
 
 	//! Save this city change production action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -787,7 +859,12 @@ class Action_Quest : public Action
         ~Action_Quest() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose
+              ("Hero %1 has got quest of type %2 with data %3 to fulfill\n",
+               d_hero, d_questtype, d_data);
+          }
 
 	//! Save this hero quest assigned action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -838,7 +915,12 @@ class Action_Equip : public Action
         ~Action_Equip() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose
+              ("Hero %1 moved item %2 to slot %3 at tile %4,%5.\n",
+               d_hero, d_item, d_slot, d_pos.x, d_pos.y);
+          }
 
 	//! Save this item equipped action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -882,7 +964,12 @@ class Action_Level : public Action
         ~Action_Level() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose
+              ("Army unit %1 advanced level and increased stat type %2",
+               d_army, d_stat);
+          }
 
 	//! Save this level advancement action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -920,7 +1007,11 @@ class Action_ModifySignpost: public Action
         ~Action_ModifySignpost() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Signpost %1 modified to read %2.\n",
+                                    d_signpost, d_message);
+          }
 
 	//! Save this change signpost action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -957,7 +1048,10 @@ class Action_RenameCity: public Action
         ~Action_RenameCity() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("City %1 renamed to %2.\n", d_city, d_name);
+          }
 
 	//! Save this city rename action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -996,7 +1090,12 @@ class Action_Vector: public Action
         ~Action_Vector() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose
+              ("Vectoring new army units from city %1 to %2,%3.\n",
+               d_city, d_dest.x, d_dest.y);
+          }
 
 	//! Save this city vector action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1032,7 +1131,15 @@ class Action_FightOrder: public Action
         ~Action_FightOrder() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            Glib::ustring s = "Changed fight order to: ";
+            for (std::list<guint32>::const_iterator it = d_order.begin(); 
+                 it != d_order.end(); ++it)
+              s += String::ucompose("%1 ", (*it));
+            s += "\n";
+            return s;
+          }
 
 	//! Save this fight order action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1055,19 +1162,24 @@ class Action_Resign: public Action
 {
     public:
 	//! Make a new player resignation action.
-        Action_Resign();
+        Action_Resign() : Action(Action::RESIGN) {}
 	//! Copy constructor
-	Action_Resign(const Action_Resign &action);
+	Action_Resign(const Action_Resign &action) : Action (action) {}
 	//! Load a new player resignation action from an opened saved-game file.
-        Action_Resign(XML_Helper* helper);
+        Action_Resign(XML_Helper* helper) : Action(helper) {}
 	//! Destroy a player resignation action.
         ~Action_Resign() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const { return "This player resigns.\n"; }
 
 	//! Save this player resignation action to an opened saved-game file.
-        virtual bool doSave(XML_Helper* helper) const;
+        virtual bool doSave(XML_Helper* helper) const
+          {
+            if (helper)
+              return true;
+            return false;
+          }
 };
 
 //-----------------------------------------------------------------------------
@@ -1094,7 +1206,11 @@ class Action_Plant: public Action
         ~Action_Plant() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose ("Hero %1 plants item %2.\n",
+                                     d_hero, d_item);
+          }
 
 	//! Save this item planted action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1144,7 +1260,20 @@ class Action_Produce: public Action
         ~Action_Produce();
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            Glib::ustring s =
+              String::ucompose ("Army id %1 of type %2 shows up at city %3 ",
+                                d_army_id, d_army->getTypeId(), d_city);
+            if (d_vectored)
+              s += String::ucompose("but it is vectored to another city at %1,%2.",
+                                    d_dest.x, d_dest.y);
+            else
+              s += String::ucompose("at position %1,%2 in stack %3.", d_dest.x,
+                                    d_dest.y, d_stack_id);
+            s+= "\n";
+            return s;
+          }
 
 	//! Save this unit produced action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1210,7 +1339,13 @@ class Action_ProduceVectored: public Action
         ~Action_ProduceVectored();
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose
+              ("Vectored army of type %1 shows up at %2,%3 from %4,%5, as army id %6 in stack id %7.\n",
+               d_army->getTypeId(), d_dest.x, d_dest.y, d_src.x, d_src.y,
+               d_target_army_id, d_target_stack_id);
+          }
 
 	//! Save this vector arrival action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1266,7 +1401,18 @@ class Action_DiplomacyState: public Action
         ~Action_DiplomacyState() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            Glib::ustring s = "declaring ";
+            switch (d_diplomatic_state)
+              {
+              case Player::AT_WAR: s+= "war"; break;
+              case Player::AT_WAR_IN_FIELD: s += "war in the field"; break;
+              case Player::AT_PEACE: s += "peace"; break;
+              }
+            s += String::ucompose(" with player %1.\n", d_opponent_id);
+            return s;
+          }
 
 	//! Save this diplomatic state action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1309,7 +1455,19 @@ class Action_DiplomacyProposal: public Action
         ~Action_DiplomacyProposal() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            Glib::ustring s = "proposing ";
+            switch (d_diplomatic_proposal)
+              {
+              case Player::NO_PROPOSAL: s +="nothing"; break;
+              case Player::PROPOSE_WAR: s +="war"; break;
+              case Player::PROPOSE_WAR_IN_FIELD: s +="war in the field"; break;
+              case Player::PROPOSE_PEACE: s +="peace"; break;
+              }
+            s += String::ucompose(" with player %1.\n", d_opponent_id);
+            return s;
+          }
 
 	//! Save this diplomatic proposal action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1354,7 +1512,15 @@ class Action_DiplomacyScore: public Action
         ~Action_DiplomacyScore() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            if (d_amount > 0)
+              return String::ucompose("Adding %1 to player %2.\n",
+                                      d_amount, d_opponent_id);
+            else
+              return String::ucompose("Subtracting %1 from player %2.\n",
+                                      d_amount, d_opponent_id);
+          }
 
 	//! Save this diplomatic score action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1376,19 +1542,24 @@ class Action_EndTurn: public Action
 {
     public:
 	//! Make a new end turn action.
-        Action_EndTurn();
+        Action_EndTurn() :Action(Action::END_TURN) {}
 	//! Copy constructor
-	Action_EndTurn(const Action_EndTurn &action);
+	Action_EndTurn(const Action_EndTurn &action) : Action(action) {}
 	//! Load a new end turn action from an opened saved-game file.
-        Action_EndTurn(XML_Helper* helper);
+        Action_EndTurn(XML_Helper* helper) :Action(helper) {}
 	//! Destroy a end turn action.
         ~Action_EndTurn() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const { return "ending turn\n";}
 
 	//! Save this action to an opened saved-game file.
-        virtual bool doSave(XML_Helper* helper) const;
+        virtual bool doSave(XML_Helper* helper) const
+          {
+            if (helper)
+              return true;
+            return false;
+          }
 };
 
 //-----------------------------------------------------------------------------
@@ -1409,7 +1580,10 @@ class Action_ConquerCity : public Action
         ~Action_ConquerCity() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("City %1 occupied.\n", d_city);
+          }
 
 	//! Save this city occupied action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1435,7 +1609,11 @@ class Action_RecruitHero : public Action
         ~Action_RecruitHero();
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Hero %1 recruited with %2 allies.\n",
+                                    d_hero->getName(), d_allies);
+          }
 
 	//! Save this city occupied action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1455,33 +1633,6 @@ class Action_RecruitHero : public Action
 
 //-----------------------------------------------------------------------------
 
-//! A temporary record representing the renaming of the player.
-class Action_RenamePlayer: public Action
-{
-    public:
-	//! Make a new rename player action
-        Action_RenamePlayer(Glib::ustring name);
-	//! Copy constructor
-	Action_RenamePlayer(const Action_RenamePlayer &action);
-	//! Load a new rename player action from an opened saved-game file.
-        Action_RenamePlayer(XML_Helper* helper);
-	//! Destroy a rename player action.
-        ~Action_RenamePlayer() {};
-
-	//! Return some debug information about this action.
-        Glib::ustring dump() const;
-
-	//! Save this city occupied action to an opened saved-game file.
-        virtual bool doSave(XML_Helper* helper) const;
-
-	Glib::ustring getName() const {return d_name;};
-
-        private:
-	Glib::ustring d_name;
-};
-
-//-----------------------------------------------------------------------------
-
 //! A temporary record representing a unit production failure due to bankruptcy.
 class Action_CityTooPoorToProduce: public Action
 {
@@ -1496,7 +1647,12 @@ class Action_CityTooPoorToProduce: public Action
         ~Action_CityTooPoorToProduce() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return
+              String::ucompose("City %1 is too poor to produce army type %2.\n",
+                               d_city, d_army_type);
+          }
 
 	//! Save this city occupied action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1525,7 +1681,11 @@ class Action_InitTurn: public Action
         ~Action_InitTurn() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Initializing turn!  order is %1.\n",
+                                    d_order);
+          }
 
 	//! Save this action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1562,7 +1722,12 @@ class Action_Loot : public Action
         ~Action_Loot() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Player %1 took %2 gp from player %3 who lost %4 in total.\n",
+                                    d_looting_player_id, d_gold_added,
+                                    d_looted_player_id, d_gold_removed);
+          }
 
 	//! Save this city looting action to an opened saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1599,7 +1764,13 @@ class Action_UseItem: public Action
         ~Action_UseItem() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose
+              ("Hero %1 uses item %2 and targets player id %3 friendly city %4, enemy city %5, neutral city %6, city %7.\n",
+               d_hero, d_item, d_victim_player, d_friendly_city, d_enemy_city,
+               d_neutral_city, d_city);
+          }
 
 	//! Save this use item action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1645,7 +1816,17 @@ class Action_ReorderArmies: public Action
         ~Action_ReorderArmies() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            Glib::ustring s =
+              String::ucompose("Stack %1 belonging to player id %2 has a new order: ",
+                               d_stack_id, d_player_id);
+            for (std::list<guint32>::const_iterator i = d_army_ids.begin(); 
+                 i != d_army_ids.end(); i++)
+              s += String::ucompose("%1 ", (*i));
+            s += "\n";
+            return s;
+          }
 
 	//! Save this reorder armies action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1680,7 +1861,11 @@ class Action_ResetStacks: public Action
         ~Action_ResetStacks() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose
+              ("Stacks for player id %1 are being recharged.\n", d_player_id);
+          }
 
 	//! Save this reset stacks action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1711,7 +1896,7 @@ class Action_ResetRuins: public Action
         ~Action_ResetRuins() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const {return "Ruins are being recharged.\n";}
 
 	//! Save this reset ruins action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1738,7 +1923,11 @@ class Action_CollectTaxesAndPayUpkeep: public Action
         ~Action_CollectTaxesAndPayUpkeep() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("went from %1 to %2 gp after collecting taxes from cities and paying the troops.\n",
+                                    d_from_gold, d_to_gold);
+          }
 
         int getFromGold () const {return d_from_gold;}
         int getToGold () const {return d_to_gold;}
@@ -1761,19 +1950,24 @@ class Action_Kill: public Action
 {
     public:
 	//! Make a kill action.
-        Action_Kill();
+        Action_Kill() : Action(Action::KILL_PLAYER) {}
 	//! Copy constructor
-	Action_Kill(const Action_Kill &action);
+	Action_Kill(const Action_Kill &action) : Action(action) {}
 	//! Load a new kill action from a saved-game file.
-        Action_Kill(XML_Helper* helper);
+        Action_Kill(XML_Helper* helper) : Action(helper) {}
 	//! Destroy a kill action.
         ~Action_Kill() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const { return "player is vanquished.\n";}
 
 	//! Save this kill action to a saved-game file.
-        virtual bool doSave(XML_Helper* helper) const;
+        virtual bool doSave(XML_Helper* helper) const
+          {
+            if (helper)
+              return true;
+            return false;
+          }
 };
 
 //-----------------------------------------------------------------------------
@@ -1799,7 +1993,11 @@ class Action_DefendStack: public Action
         ~Action_DefendStack() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Stack %1 is going into defend mode.\n",
+                                    d_stack_id);
+          }
 
 	//! Save this defend stack action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1833,7 +2031,11 @@ class Action_UndefendStack: public Action
         ~Action_UndefendStack() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Stack %1 is going out of defend mode.\n",
+                                    d_stack_id);
+          }
 
 	//! Save this undefend stack action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1866,7 +2068,11 @@ class Action_ParkStack: public Action
         ~Action_ParkStack() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Stack %1 is going into parked mode.\n",
+                                    d_stack_id);
+          }
 
 	//! Save this park stack action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1900,7 +2106,11 @@ class Action_UnparkStack: public Action
         ~Action_UnparkStack() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Stack %1 is going out of parked mode.\n",
+                                    d_stack_id);
+          }
 
 	//! Save this unpark stack action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1931,7 +2141,10 @@ class Action_SelectStack: public Action
         ~Action_SelectStack() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const
+          {
+            return String::ucompose("Stack %1 is selected.\n", d_stack_id);
+          }
 
 	//! Save this select stack action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;
@@ -1961,7 +2174,7 @@ class Action_DeselectStack: public Action
         ~Action_DeselectStack() {};
 
 	//! Return some debug information about this action.
-        Glib::ustring dump() const;
+        Glib::ustring dump() const { return "Deselecting stack.\n";}
 
 	//! Save this deslect stack action to a saved-game file.
         virtual bool doSave(XML_Helper* helper) const;

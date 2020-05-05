@@ -54,7 +54,6 @@ public:
 
   void sit_down (Player *player);
   void stand_up (Player *player);
-  void name_change (Player *player, Glib::ustring name);
   void type_change (Player *player, int type);
   void chat(Glib::ustring message);
   void sendTurnOrder();
@@ -94,8 +93,6 @@ private:
   void notifySit(Player *player, Glib::ustring nickname);
   void stand(void *conn, Player *player, Glib::ustring nickname);
   void notifyStand(Player *player, Glib::ustring nickname);
-  void change_name(void *conn, Player *player, Glib::ustring name);
-  void notifyNameChange(Player *player, Glib::ustring name);
   void change_type(void *conn, Player *player, int type);
   void notifyTypeChange(Player *player, int type);
   void gotRemoteActions(void *conn, const Glib::ustring &payload);

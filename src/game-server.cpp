@@ -317,8 +317,6 @@ bool GameServer::onGotMessage(void *conn, int type, Glib::ustring payload)
                     stand(conn, Playerlist::getInstance()->getPlayer(id), data);
                     break;
                   case LOBBY_MESSAGE_TYPE_CHANGE_NAME:
-                    change_name(conn, 
-                                Playerlist::getInstance()->getPlayer(id), data);
                     break;
                   case LOBBY_MESSAGE_TYPE_CHANGE_TYPE:
                     change_type(conn, 
@@ -529,19 +527,6 @@ void GameServer::notifyTypeChange(Player *player, int type)
     network_server->send(i->conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
 }
 
-void GameServer::notifyNameChange(Player *player, Glib::ustring name)
-{
-  if (!player)
-    return;
-  Glib::ustring payload = 
-    String::ucompose("%1 %2 %3 %4", player->getId(), 
-                     LOBBY_MESSAGE_TYPE_CHANGE_NAME, 1, name);
-  player_changes_name.emit(player, name);
-
-  for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
-}
-
 Participant *GameServer::findParticipantByPlayerId(guint32 id)
 {
   for (auto &i: participants)
@@ -673,20 +658,6 @@ void GameServer::sit(void *conn, Player *player, Glib::ustring nickname)
     dynamic_cast<NetworkPlayer*>(player)->setConnected(true);
 
   notifySit(player, nickname);
-}
-
-void GameServer::change_name(void *conn, Player *player, Glib::ustring name)
-{
-  std::cout << "CHANGE NAME: " << conn << " " << player << " " << name << std::endl;
-
-  if (!player || !conn)
-    return;
-  Participant *part = findParticipantByConn(conn);
-  if (!part) 
-    return;
-
-  update_player_name (part->players, player->getId(), name);
-  name_change(player, name);
 }
 
 void GameServer::change_type(void *conn, Player *player, int type)
@@ -1025,15 +996,6 @@ void GameServer::stand_up (Player *player)
       notifyStand(player, d_nickname);
     }
   notifyTypeChange(player, GameParameters::Player::NETWORKED);
-}
-
-void GameServer::name_change (Player *player, Glib::ustring name)
-{
-  if (!player)
-    return;
-  player->rename(name);
-  update_player_name (players_seated_locally, player->getId(), name);
-  notifyNameChange(player, name);
 }
 
 void GameServer::type_change (Player *player, int type)

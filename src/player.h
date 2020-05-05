@@ -1099,9 +1099,6 @@ class Player: public sigc::trackable
         bool giveReward (Stack *stack, Reward *reward, StackReflist *stacks,
                          bool quest);
 
-	//! Give the player a new name.
-	void rename (Glib::ustring name);
-
         //! have a hero show up, or not.
         bool maybeRecruitHero ();
 
@@ -1658,7 +1655,6 @@ class Player: public sigc::trackable
         void doConquerCity(City *city);
 	void doLootCity(Player *looted, guint32 added, guint32 subtracted);
         Hero* doRecruitHero(HeroProto* hero, City *city, int cost, int alliesCount, const ArmyProto *ally, StackReflist *stacks);
-        void doRename(Glib::ustring name);
 	void doKill();
         void doStackDefend(Stack *stack);
         void doStackUndefend(Stack *stack);

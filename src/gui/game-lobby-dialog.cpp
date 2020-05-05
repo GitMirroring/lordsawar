@@ -130,9 +130,7 @@ void GameLobbyDialog::initDialog(GameScenario *gamescenario,
       (method(on_remote_participant_departs)));
     connections.push_back(game_station->player_sits.connect (method(on_player_sits)));
     connections.push_back(game_station->player_stands.connect (sigc::hide(method(on_player_stands))));
-    connections.push_back(game_station->player_changes_name.connect (method(on_player_changes_name)));
     connections.push_back(game_station->player_changes_type.connect (method(on_player_changes_type)));
-    connections.push_back(game_station->remote_player_named.connect (method(on_remote_player_changes_name)));
     connections.push_back(game_station->chat_message_received.connect (sigc::hide<0>(method(on_chatted))));
     connections.push_back(game_station->playerlist_reorder_received.connect (method(on_reorder_playerlist)));
     connections.push_back(game_station->round_begins.connect (method(on_reorder_playerlist)));
@@ -412,9 +410,6 @@ void GameLobbyDialog::on_name_edited(const Glib::ustring &path,
   name_renderer.set_sensitive(false);
   player = pl->getPlayer((*iter)[player_columns.player_id]);
   d_player_id_of_name_change_request = player->getId();
-
-  //here's where we send the message saying that the name has changed.
-  player_changed_name.emit(player, new_name);
 }
 
 void GameLobbyDialog::cell_data_sitting(Gtk::CellRenderer *renderer,
@@ -479,29 +474,6 @@ void GameLobbyDialog::on_remote_participant_departs(Glib::ustring nickname)
 	  people_list->erase(row);
 	  return;
 	}
-    }
-}
-
-void GameLobbyDialog::on_player_changes_name(Player *p, Glib::ustring name)
-{
-  if (!p)
-    return;
-  if (p->getId() == d_player_id_of_name_change_request)
-    {
-      name_renderer.set_sensitive(true);
-      d_player_id_of_name_change_request = MAX_PLAYERS + 1;
-    }
-  //look for the row that has the right player id, and change the name
-  Gtk::TreeModel::Children kids = player_list->children();
-  for (Gtk::TreeModel::Children::iterator i = kids.begin(); 
-       i != kids.end(); i++)
-    {
-      Gtk::TreeModel::Row row = *i;
-      if (row[player_columns.player_id] == p->getId())
-        {
-          p->setName(name);
-          row[player_columns.name] = name;
-        }
     }
 }
 
@@ -639,21 +611,6 @@ void GameLobbyDialog::on_remote_player_ends_turn()
     }
   update_turn_indicator();
   update_scenario_details();
-}
-
-void GameLobbyDialog::on_remote_player_changes_name(Player *p)
-{
-  Gtk::TreeModel::Children kids = player_list->children();
-  for (Gtk::TreeModel::Children::iterator i = kids.begin(); 
-       i != kids.end(); i++)
-    {
-      Gtk::TreeModel::Row row = *i;
-      if (row[player_columns.player_id] == p->getId())
-	{
-	  row[player_columns.name] = p->getName();
-	  return;
-	}
-    }
 }
 
 Player* GameLobbyDialog::get_selected_player(Glib::ustring &nick, bool &sitting)
