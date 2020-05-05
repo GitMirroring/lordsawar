@@ -226,8 +226,12 @@ void TarFileMaskedImageEditorDialog::on_imagebutton_clicked ()
         }
       else
         {
-          bool broken = PixMask::checkFormat (d->get_filename ());
-          if (broken)
+          if (PixMask::checkFormat (d->get_filename ()))
+            {
+              PastChooser::getInstance()->set_dir(d);
+              on_image_chosen (d);
+            }
+          else
             {
               TimedMessageDialog
                 td(*d,
@@ -235,11 +239,6 @@ void TarFileMaskedImageEditorDialog::on_imagebutton_clicked ()
                                     d->get_filename ()), 0);
               td.run_and_hide ();
               d_target_filename = "";
-            }
-          else
-            {
-              PastChooser::getInstance()->set_dir(d);
-              on_image_chosen (d);
             }
         }
     }
