@@ -1,7 +1,7 @@
 Descriptions of Cities in LordsAWar!
 ------------------------------------
 
-Copyright (C) 2014 Ben Asselstine
+Copyright (C) 2014, 2020 Ben Asselstine
 
 Contents:
 
@@ -9,6 +9,7 @@ Contents:
 2. How city descriptions relate to changes in the LordsAWar! codebase
 3. Sentence Structure of City Descriptions in Warlords 2
 4. Sample of Existing Random City Descriptions in Warlords 2
+5. A Way Forward
 
 1. Introduction
 ---------------
@@ -23,7 +24,7 @@ They add to the charm of the game, and elements of history, and of a story can b
 
 In the randomly generated maps, the city descriptions are assembled programmatically.  Partly randomly, and partly due to the characteristics of the city or nearby terrain features.
 
-This approach of assembling sentences works okay for english, but not so much for other languages.
+This approach of assembling sentences works okay for english, but not so much for other languages which LordsAWar! strives to support.
 
 2. How city descriptions relate to changes in the LordsAWar! codebase
 ---------------------------------------------------------------------
@@ -35,7 +36,7 @@ Currently in LordsAWar! cities do not have descriptions, because of the way it l
 4. The scenario editor also needs the ability to randomize the city description.
 5. CreateScenario needs to be modified to randomize the city descriptions too.
 6. Need to add a backwards compatibility path for scenarios without city descriptions.
-7. Modify 2ndpunic and dol scenarios.
+7. Modify Duel and Dol scenarios.
 8. Change the City object from a Location to a NamedLocation.
 
 
@@ -64,7 +65,7 @@ little
 dangerous
 tough
 wealthy
-well defeneded
+well defended
 good sized
 magnificent
 dark
@@ -411,3 +412,55 @@ Selilom is a lively village, rumoured to have its mighty scrolls
 defence 2, income 15
 Chelonon is a friendly encampement, made of carved rocks
 
+
+5. A Way Forward
+----------------
+
+A. Unwind the combinations and let the translators translate
+
+Well it's a combinatorial thing, maybe we just have to unwind it into all the parts.
+How many combinations is that?
+
+Combinations for type 1:
+16 * 7 * 9 * 8 * 9 = 72576
+
+That's too many to unwind.  What if we combine the adjectives with the nouns.
+
+Let's say we have 23, which is down from 16 * 7 = 112.
+
+Then combine <near> <nearadj> and <nearnoun>.
+
+We can make as many as we want here, but our main limiting factor is how many
+our translators will willingly translate.
+
+If we make it also 23, the total number of city descriptions is 529.
+
+We put these into some sort of data file that gets integrated into our
+lordsawar.pot file, and then every version we add in 500 more to slowly build
+up the city description database.  They accrue and the .pot file gets more
+and more difficult for new translators to work with.  It becomes a barrier to
+entry if we get up to 70,000.
+
+And if we do it with just 500 descriptions, they get old fast.
+Arguably they get old pretty fast with 72,000 descriptions too.
+
+B. Unwind the combinations and auto translate
+
+We avoid the .pot file entirely, and we have a huge data file and look up the
+translation strings ourselves.  Yuck.
+
+C. Assemble City Descriptions programatically then auto translate on the fly
+
+Requires internet connection.  API breakage will be a problem.  Yuck.
+
+D. Assemble City Descriptions programatically, and
+   Let translators translate the parts
+
+This is exactly what we're trying to avoid because it yields such bad results
+in other languages.  Yuck.
+
+E. No randomly generated descriptions
+
+Just do manual descriptions.
+Leave the city descriptions in our built-in maps so that translators don't
+have to translate them.
