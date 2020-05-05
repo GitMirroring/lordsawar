@@ -24,6 +24,7 @@
 #include "gui/image-helpers.h"
 #include "File.h"
 #include "player.h"
+#include "ucompose.hpp"
 
 TarFileMaskedImage::TarFileMaskedImage (MaskOrientation o)
  : orientation (o), tarfile (NULL), name (""), file_on_disk (""),
@@ -270,4 +271,36 @@ PixMask* TarFileMaskedImage::applyMask(PixMask* im, PixMask* ma, Gdk::RGBA colou
   free(copy);
 
   return result;
+}
+
+bool TarFileMaskedImage::copy (TarFile *t, TarFileMaskedImage *dest)
+{
+  bool success = false;
+  Glib::ustring newname;
+  if (getName ().empty () == true)
+    return false;
+  Glib::ustring filename = t->getFileFromConfigurationFile (getName ());
+  /*
+   * we have to copy the file out of the way because there are
+   * intermediate Close operations on the tarfile which deletes it.
+   */
+  Glib::ustring tmp_dir = File::get_tmp_file ();
+  File::create_dir (tmp_dir);
+  Glib::ustring bname = getName ();
+  Glib::ustring destfile = String::ucompose ("%1/%2", tmp_dir, bname);
+  File::copy (filename, destfile);
+
+  if (dest->getName ().empty () == true)
+    success = t->addFileInCfgFile (destfile, newname);
+  else
+    success = t->replaceFileInCfgFile (dest->getName (), destfile, newname);
+
+  if (success)
+    {
+      dest->load (t, newname);
+      dest->instantiateImages ();
+    }
+  File::erase (destfile);
+  File::erase_dir (tmp_dir);
+  return success;
 }

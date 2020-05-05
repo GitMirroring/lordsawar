@@ -969,7 +969,6 @@ void ShieldSetWindow::update_window_title()
 void ShieldSetWindow::on_edit_copy_shields_activated()
 {
   Shield *w = d_shieldset->lookupShieldByColour (Shield::WHITE);
-
   for (guint32 i = Shield::WHITE + 1; i <= Shield::NEUTRAL; i++)
     {
       Shield *s = d_shieldset->lookupShieldByColour (i);
@@ -979,16 +978,14 @@ void ShieldSetWindow::on_edit_copy_shields_activated()
           ShieldStyle *wss =
             d_shieldset->lookupShieldByTypeAndColour (ss->getType (),
                                                       Shield::WHITE);
-          mim->setName (wss->getMaskedImage ()->getName ());
+          wss->getMaskedImage ()->copy (d_shieldset, mim);
         }
       for (guint32 k = Tartan::LEFT; k <= Tartan::RIGHT; k++)
         {
           TarFileMaskedImage *mim = s->getTartanMaskedImage (Tartan::Type (k));
-          TarFileMaskedImage *wmim = w->getTartanMaskedImage (Tartan::Type (k));
-          mim->setName (wmim->getName ());
+          w->getTartanMaskedImage (Tartan::Type (k))->copy (d_shieldset, mim);
         }
     }
-
   needs_saving = true;
   bool broken = false;
   d_shieldset->instantiateImages (false, broken);

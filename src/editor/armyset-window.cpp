@@ -1628,87 +1628,12 @@ void ArmySetWindow::on_make_same_clicked()
   ArmyProto *a = row[armies_columns.army];
   if (!a)
     return;
-  if (a->getMaskedImage(Shield::WHITE)->getName ().empty())
-    return;
-  Glib::ustring in = a->getMaskedImage(Shield::Colour(0))->getName ();
-  Glib::ustring white_filename = d_armyset->getFileFromConfigurationFile(in);
-  if (white_filename.empty () == true)
-    return;
+  TarFileMaskedImage *wmim = a->getMaskedImage(Shield::Colour(0));
 
-
-  //we have to save the white army image elsewhere
-  //because it gets blown away in its temporary directory otherwise.
-  Glib::ustring tmp_dir = File::get_tmp_file();
-  File::create_dir (tmp_dir);
-  Glib::ustring wbname = File::get_basename (white_filename, true);
-  Glib::ustring wdestfile = String::ucompose ("%1/%2", tmp_dir, wbname);
-
-  File::copy (white_filename, wdestfile);
-  white_filename = wdestfile;
-
-  //get the image for white and then transfer it to the rest.
-  green_image_button->set_label(white_image_button->get_label());
-  yellow_image_button->set_label(white_image_button->get_label());
-  light_blue_image_button->set_label(white_image_button->get_label());
-  red_image_button->set_label(white_image_button->get_label());
-  dark_blue_image_button->set_label(white_image_button->get_label());
-  orange_image_button->set_label(white_image_button->get_label());
-  black_image_button->set_label(white_image_button->get_label());
-  neutral_image_button->set_label(white_image_button->get_label());
-
-  Gtk::Image *images[MAX_PLAYERS+1];
-  images[0] = NULL;
-  images[1] = green_image;
-  images[2] = yellow_image;
-  images[3] = light_blue_image;
-  images[4] = red_image;
-  images[5] = dark_blue_image;
-  images[6] = orange_image;
-  images[7] = black_image;
-  images[8] = neutral_image;
   for (unsigned int i = Shield::GREEN; i <= Shield::NEUTRAL; i++)
-    {
-      Shield::Colour s = Shield::Colour(i);
-      Glib::ustring imgname = a->getMaskedImage(s)->getName();
-      Glib::ustring newname = "";
+    wmim->copy (d_armyset, a->getMaskedImage (Shield::Colour (i)));
 
-      bool success = false;
-      if (imgname.empty () == true)
-        success =
-          d_armyset->addFileInCfgFile(white_filename, newname);
-      else
-        success =
-          d_armyset->replaceFileInCfgFile(imgname, white_filename, newname);
-      if (success)
-        {
-          a->getMaskedImage(s)->setName (newname);
-          bool broken = false;
-          Gdk::RGBA colour = Shieldsetlist::getInstance()->getColor(1, s);
-          broken = a->instantiateImage (d_armyset->getConfigurationFile (), s);
-          if (!broken)
-            {
-              PixMask *p = a->getMaskedImage (s)->applyMask (colour);
-              double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
-              int font_size = FontSize::getInstance()->get_height ();
-              double new_height = font_size * ratio;
-              int new_width =
-                ImageCache::calculate_width_from_adjusted_height (p, new_height);
-              PixMask::scale (p, new_width, new_height);
-              images[i]->property_pixbuf() = p->to_pixbuf();
-              delete p;
-              Gtk::Button *button = lookup_button_by_colour (s);
-              if (button)
-                button->set_label(a->getMaskedImage(s)->getName ());
-            }
-        }
-      else
-        {
-          show_add_file_error(d_armyset, *window, white_filename);
-          break;
-        }
-    }
-  File::erase (white_filename);
-  File::erase_dir (tmp_dir);
+  fill_army_images (a);
 }
 
 void ArmySetWindow::show_add_file_error(Armyset *a, Gtk::Window &d, Glib::ustring file)

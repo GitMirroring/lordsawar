@@ -158,6 +158,8 @@ public:
   //! Destroy just the backing image
   void dropBackingImage ();
 
+  //! copy this to DEST in T
+  bool copy (TarFile *t, TarFileMaskedImage *dest);
 private:
 
   //! The orientation of the masked image
