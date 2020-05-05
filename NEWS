@@ -1,8 +1,9 @@
 LordsAWar! version 0.3.3, a clone of the turn-based strategy game Warlords II, has been released with the following changes: 
 
-* added a new temple type that looks like a stone henge.
-* in scenario builder, players can be given different army sets.
-* army sets can have a different ship picture, and army unit selector for each player.
-* tile sets can now hold movement bonus graphics.
+* Added a new temple type that looks like a stone henge.
+* Players can be given different army sets in the Scenario Builder.
+* Army sets can have a different ship picture, and army unit selector for each player.
+* Added movement bonus graphics for swamp and mountains.  Tile sets now hold these graphics.
+* Cities can now have descriptions.
 
 Please consider donating to the LordsAWar project! See the donate button here: http://lordsawar.nongnu.org
