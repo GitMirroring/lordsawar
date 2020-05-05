@@ -135,13 +135,11 @@ class MainWindow: public sigc::trackable
     
     void on_new_map_activated();
     void on_load_map_activated();
-    void on_save_map_activated();
+    bool activate_save_map ();
     void on_import_map_activated();
     void on_validate_activated();
-    void on_save_map_as_activated();
-
     bool activate_save_map_as ();
-    bool activate_save_map ();
+
 
     void on_quit_activated();
     bool quit();

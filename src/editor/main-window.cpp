@@ -222,9 +222,11 @@ MainWindow::MainWindow(Glib::ustring load_filename)
     xml->get_widget("load_map_menuitem", load_map_menuitem);
     load_map_menuitem->signal_activate().connect (method(on_load_map_activated));
     xml->get_widget("save_map_menuitem", save_map_menuitem);
-    save_map_menuitem->signal_activate().connect (method(on_save_map_activated));
+    save_map_menuitem->signal_activate().connect
+      (sigc::hide_return(method(activate_save_map)));
     xml->get_widget("save_map_as_menuitem", save_map_as_menuitem);
-    save_map_as_menuitem->signal_activate().connect (method(on_save_map_as_activated));
+    save_map_as_menuitem->signal_activate().connect
+      (sigc::hide_return(method(activate_save_map_as)));
     xml->get_widget("import_map_from_sav_menuitem", import_map_from_sav_menuitem);
     import_map_from_sav_menuitem->signal_activate().connect
       (method(on_import_map_activated));
@@ -975,11 +977,6 @@ bool MainWindow::activate_save_map ()
     }
 }
 
-void MainWindow::on_save_map_activated()
-{
-  activate_save_map ();
-}
-
 bool MainWindow::activate_save_map_as ()
 {
   Gtk::FileChooserDialog chooser (*window, _("Choose a Name"),
@@ -1020,11 +1017,6 @@ bool MainWindow::activate_save_map_as ()
         }
     }
   return res == Gtk::RESPONSE_ACCEPT;
-}
-
-void MainWindow::on_save_map_as_activated ()
-{
- activate_save_map_as ();
 }
 
 bool MainWindow::quit()
