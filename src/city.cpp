@@ -47,7 +47,7 @@ Glib::ustring City::d_tag = "city";
 
 City::City(Vector<int> pos, guint32 width, Glib::ustring name, guint32 gold, 
 	   guint32 numslots)
-    :Ownable((Player *)0), Location(pos, width), Renamable(name),
+    :Ownable((Player *)0), NamedLocation(pos, width, name, ""),
     ProdSlotlist(numslots), d_gold(gold), d_defense_level(1), d_burnt(false), 
     d_vectoring(false), d_vector(Vector<int>(-1,-1)), 
     d_capital(false), d_capital_owner(0), d_build_production (true)
@@ -63,7 +63,7 @@ City::City(Vector<int> pos, guint32 width, Glib::ustring name, guint32 gold,
 }
 
 City::City(XML_Helper* helper, guint32 width)
-    :Ownable(helper), Location(helper, width), Renamable(helper),
+    :Ownable(helper), NamedLocation(helper, width),
     ProdSlotlist(helper)
 {
     //initialize the city
@@ -105,7 +105,7 @@ City::City(XML_Helper* helper, guint32 width)
 }
 
 City::City(const City& c)
-    :Ownable(c), Location(c), Renamable(c), ProdSlotlist(c),
+    :Ownable(c), NamedLocation(c), ProdSlotlist(c),
     d_gold(c.d_gold), d_defense_level(c.d_defense_level), d_burnt(c.d_burnt),
     d_vectoring(c.d_vectoring),d_vector(c.d_vector), d_capital(c.d_capital), 
     d_capital_owner(c.d_capital_owner), d_build_production(c.d_build_production)
@@ -113,7 +113,7 @@ City::City(const City& c)
 }
 
 City::City(const City& c, Vector<int> pos)
-    :Ownable(c), Location(c, pos), Renamable(c), ProdSlotlist(c),
+    :Ownable(c), NamedLocation(c, pos), ProdSlotlist(c),
     d_gold(c.d_gold), d_defense_level(c.d_defense_level), d_burnt(c.d_burnt),
     d_vectoring(c.d_vectoring),d_vector(c.d_vector), d_capital(c.d_capital), 
     d_capital_owner(c.d_capital_owner), d_build_production(c.d_build_production)
@@ -133,6 +133,7 @@ bool City::save(XML_Helper* helper) const
     retval &= helper->saveData("x", getPos().x);
     retval &= helper->saveData("y", getPos().y);
     retval &= helper->saveData("name", getName(false));
+    retval &= helper->saveData("description", getDescription());
     retval &= helper->saveData("owner", d_owner->getId());
     retval &= helper->saveData("defense", d_defense_level);
     retval &= helper->saveData("gold", d_gold);

@@ -89,6 +89,10 @@ CityEditorDialog::CityEditorDialog(Gtk::Window &parent, City *cit, CreateScenari
   xml->get_widget("player_alignment", alignment);
   alignment->add(*player_combobox);
 
+  xml->get_widget("description_textview", description_textview);
+  description_textview->get_buffer()->set_text(city->getDescription());
+  description_textview->get_buffer()->signal_changed().connect
+    (method(on_description_changed));
 
   // setup the army list
   army_list = Gtk::ListStore::create(army_columns);
@@ -492,4 +496,11 @@ void CityEditorDialog::on_income_text_changed ()
 void CityEditorDialog::on_build_production_changed ()
 {
   city->setBuildProduction(build_production_switch->get_active ());
+}
+
+void CityEditorDialog::on_description_changed ()
+{
+  Glib::ustring desc =
+    String::utrim (description_textview->get_buffer ()->get_text ());
+  city->setDescription (desc);
 }

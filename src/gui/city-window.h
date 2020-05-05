@@ -58,6 +58,7 @@ class CityWindow: public LwDialog
     Gtk::Label *capital_city_label;
     Gtk::Label *defense_label;
     Gtk::Label *income_label;
+    Gtk::Label *description_label;
     Gtk::Label *unit_label;
     Gtk::Label *time_label;
     Gtk::Label *moves_label;

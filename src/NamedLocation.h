@@ -21,7 +21,7 @@
 
 #include "vector.h"
 #include "Location.h"
-#include "Namable.h"
+#include "Renamable.h"
 
 class XML_Helper;
 
@@ -31,7 +31,7 @@ class XML_Helper;
  * It also has a description.
  */
 
-class NamedLocation: public Location, public Namable
+class NamedLocation: public Location, public Renamable
 {
  public:
      //! Default constructor.

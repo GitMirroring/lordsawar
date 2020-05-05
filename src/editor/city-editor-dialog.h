@@ -46,6 +46,7 @@ class CityEditorDialog: public LwEditorDialog
     Gtk::SpinButton *income_spinbutton;
     Gtk::Switch *burned_switch;
     Gtk::Switch *build_production_switch;
+    Gtk::TextView *description_textview;
 
     Gtk::TreeView *army_treeview;
 
@@ -104,6 +105,7 @@ class CityEditorDialog: public LwEditorDialog
     void on_income_changed ();
     void on_income_text_changed ();
     void on_build_production_changed ();
+    void on_description_changed ();
 
     void update_armies ();
 

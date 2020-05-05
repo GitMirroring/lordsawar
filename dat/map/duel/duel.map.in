@@ -1449,6 +1449,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>54</d_x>
 			<d_y>8</d_y>
 			<d_name>Borealis</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -1488,6 +1489,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>95</d_x>
 			<d_y>87</d_y>
 			<d_name>Transvaal</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -1527,6 +1529,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>6</d_x>
 			<d_y>9</d_y>
 			<d_name>Garden of Eden</d_name>
+                        <d_description></d_description>
 			<d_owner>0</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
@@ -1567,6 +1570,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>63</d_x>
 			<d_y>19</d_y>
 			<d_name>Balkanlands</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -1606,6 +1610,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>46</d_x>
 			<d_y>19</d_y>
 			<d_name>Missionaria</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -1645,6 +1650,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>86</d_x>
 			<d_y>13</d_y>
 			<d_name>New Delphi</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
@@ -1684,6 +1690,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>99</d_x>
 			<d_y>30</d_y>
 			<d_name>New Sparta</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
@@ -1723,6 +1730,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>25</d_x>
 			<d_y>36</d_y>
 			<d_name>New Beirut</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -1762,6 +1770,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>63</d_x>
 			<d_y>134</d_y>
 			<d_name>New Kenya</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -1801,6 +1810,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>14</d_x>
 			<d_y>87</d_y>
 			<d_name>Silicone Valley</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -1840,6 +1850,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>103</d_x>
 			<d_y>144</d_y>
 			<d_name>Great Pyramid</d_name>
+                        <d_description></d_description>
 			<d_owner>6</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
@@ -1880,6 +1891,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>65</d_x>
 			<d_y>38</d_y>
 			<d_name>New Tokyo</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -1919,6 +1931,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>91</d_x>
 			<d_y>47</d_y>
 			<d_name>Roman Rome</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -1958,6 +1971,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>44</d_x>
 			<d_y>38</d_y>
 			<d_name>NW Passage</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -1997,6 +2011,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>103</d_x>
 			<d_y>9</d_y>
 			<d_name>Mount Olympus</d_name>
+                        <d_description></d_description>
 			<d_owner>2</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
@@ -2037,6 +2052,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>10</d_x>
 			<d_y>30</d_y>
 			<d_name>Noah&apos;s Port</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
@@ -2076,6 +2092,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>23</d_x>
 			<d_y>13</d_y>
 			<d_name>New Jerusalem</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
@@ -2115,6 +2132,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>76</d_x>
 			<d_y>26</d_y>
 			<d_name>New Berlin</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -2154,6 +2172,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>33</d_x>
 			<d_y>26</d_y>
 			<d_name>New Minneapolis</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -2193,6 +2212,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>28</d_x>
 			<d_y>63</d_y>
 			<d_name>Pearl Harbor</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -2232,6 +2252,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>14</d_x>
 			<d_y>66</d_y>
 			<d_name>S and G</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -2271,6 +2292,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>18</d_x>
 			<d_y>47</d_y>
 			<d_name>Espana Nueva</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -2310,6 +2332,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>64</d_x>
 			<d_y>65</d_y>
 			<d_name>Paradise NE</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
@@ -2349,6 +2372,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>95</d_x>
 			<d_y>66</d_y>
 			<d_name>Sub-Sahara</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -2388,6 +2412,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>45</d_x>
 			<d_y>65</d_y>
 			<d_name>Paradise NW</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
@@ -2427,6 +2452,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>54</d_x>
 			<d_y>73</d_y>
 			<d_name>Switzerlandia</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>99</d_gold>
@@ -2466,6 +2492,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>81</d_x>
 			<d_y>63</d_y>
 			<d_name>New London</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -2505,6 +2532,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>55</d_x>
 			<d_y>80</d_y>
 			<d_name>Shangri-La</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>99</d_gold>
@@ -2544,6 +2572,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>28</d_x>
 			<d_y>90</d_y>
 			<d_name>West Indies</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -2583,6 +2612,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>6</d_x>
 			<d_y>76</d_y>
 			<d_name>Sunset City</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -2622,6 +2652,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>103</d_x>
 			<d_y>77</d_y>
 			<d_name>Sunrise City</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -2661,6 +2692,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>84</d_x>
 			<d_y>36</d_y>
 			<d_name>New Athens</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -2700,6 +2732,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>64</d_x>
 			<d_y>88</d_y>
 			<d_name>Paradise SE</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
@@ -2739,6 +2772,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>6</d_x>
 			<d_y>144</d_y>
 			<d_name>New SSG GHQ</d_name>
+                        <d_description></d_description>
 			<d_owner>3</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
@@ -2779,6 +2813,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>25</d_x>
 			<d_y>117</d_y>
 			<d_name>New Sydney</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -2818,6 +2853,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>91</d_x>
 			<d_y>106</d_y>
 			<d_name>Braziland</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -2857,6 +2893,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>18</d_x>
 			<d_y>106</d_y>
 			<d_name>Mayo Clinic</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -2896,6 +2933,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>81</d_x>
 			<d_y>90</d_y>
 			<d_name>New Singapore</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -2935,6 +2973,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>45</d_x>
 			<d_y>88</d_y>
 			<d_name>Paradise SW</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>64</d_gold>
@@ -2974,6 +3013,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>99</d_x>
 			<d_y>123</d_y>
 			<d_name>Chichen Itza</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
@@ -3013,6 +3053,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>33</d_x>
 			<d_y>127</d_y>
 			<d_name>New Cambridge</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -3052,6 +3093,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>76</d_x>
 			<d_y>127</d_y>
 			<d_name>????</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -3091,6 +3133,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>10</d_x>
 			<d_y>123</d_y>
 			<d_name>Silicon Valley</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
@@ -3130,6 +3173,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>44</d_x>
 			<d_y>115</d_y>
 			<d_name>Atlantic City</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -3169,6 +3213,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>65</d_x>
 			<d_y>115</d_y>
 			<d_name>Atlantis</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -3208,6 +3253,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>55</d_x>
 			<d_y>145</d_y>
 			<d_name>Australis</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -3247,6 +3293,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>46</d_x>
 			<d_y>134</d_y>
 			<d_name>Point</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>24</d_gold>
@@ -3286,6 +3333,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>84</d_x>
 			<d_y>117</d_y>
 			<d_name>New Cairo</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>36</d_gold>
@@ -3325,6 +3373,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>23</d_x>
 			<d_y>140</d_y>
 			<d_name>pppl.gov</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>
@@ -3364,6 +3413,7 @@ b3b8b4b6b9b3b3b9b7b2b3babab9b6b1b7c2a6a5a5a6c3b5b5b8b8c2a6a5a6a5c4b1b4bab6c2a6a6
 			<d_x>86</d_x>
 			<d_y>140</d_y>
 			<d_name>Luxor</d_name>
+                        <d_description></d_description>
 			<d_owner>8</d_owner>
 			<d_defense>1</d_defense>
 			<d_gold>48</d_gold>

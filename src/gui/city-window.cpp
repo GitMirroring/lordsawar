@@ -68,6 +68,7 @@ CityWindow::CityWindow(Gtk::Window &parent, City *c, bool razing_possible,
     xml->get_widget("capital_city_label", capital_city_label);
     xml->get_widget("defense_label", defense_label);
     xml->get_widget("income_label", income_label);
+    xml->get_widget("description_label", description_label);
     xml->get_widget("unit_label", unit_label);
     xml->get_widget("time_label", time_label);
     xml->get_widget("moves_label", moves_label);
@@ -156,6 +157,7 @@ void CityWindow::fill_in_city_info()
 
     defense_label->set_text (String::ucompose("%1", city->getDefenseLevel()));
     income_label->set_text (String::ucompose("%1", city->getGold()));
+    description_label->set_text (city->getDescription ());
     switch (GameScenarioOptions::s_build_production_mode)
       {
       case GameParameters::BUILD_PRODUCTION_ALWAYS:

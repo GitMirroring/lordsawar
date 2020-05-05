@@ -21,22 +21,22 @@
 
 NamedLocation::NamedLocation(Vector<int> pos, guint32 size, Glib::ustring name,
 			     Glib::ustring desc)
-  :Location(pos, size), Namable(name), d_description(desc)
+  :Location(pos, size), Renamable(name), d_description(desc)
 {
 }
 
 NamedLocation::NamedLocation(const NamedLocation& object)
-  :Location(object), Namable(object), d_description(object.d_description)
+  :Location(object), Renamable(object), d_description(object.d_description)
 {
 }
 
 NamedLocation::NamedLocation(const NamedLocation& object, Vector<int> pos)
-  :Location(object, pos), Namable(object), d_description(object.d_description)
+  :Location(object, pos), Renamable(object), d_description(object.d_description)
 {
 }
 
 NamedLocation::NamedLocation(XML_Helper* helper, guint32 size)
-  :Location(helper, size), Namable(helper)
+  :Location(helper, size), Renamable(helper)
 {
   helper->getData(d_description, "description");
 }

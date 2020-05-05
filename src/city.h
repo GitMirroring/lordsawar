@@ -26,7 +26,7 @@
 
 #include <list>
 #include <vector>
-#include "Location.h"
+#include "NamedLocation.h"
 #include "Ownable.h"
 #include "Renamable.h"
 #include "prodslotlist.h"
@@ -59,8 +59,7 @@ class ArmyProdBase;
  * city.  Conquering another player's capital city doesn't give any bonus
  * except for bragging rights.
  */
-class City : public Ownable, public Location, public Renamable, 
-    public ProdSlotlist
+class City : public Ownable, public NamedLocation, public ProdSlotlist
 {
     public:
 
