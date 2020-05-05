@@ -217,7 +217,7 @@ void TarFileMaskedImage::load_name (XML_Helper *helper, Glib::ustring data_tag)
 
 PixMask *TarFileMaskedImage::applyMask (Gdk::RGBA colour) const
 {
-  return applyMask(getImage (), getMask (), colour);
+  return applyMask(frames[0].first, frames[0].second, colour);
 }
 
 PixMask *TarFileMaskedImage::applyMask (Player *p) const
@@ -227,7 +227,7 @@ PixMask *TarFileMaskedImage::applyMask (Player *p) const
 
 PixMask *TarFileMaskedImage::applyMask (guint32 i, Gdk::RGBA colour) const
 {
-  return applyMask(getImage (i), getMask (i), colour);
+  return applyMask(frames[i].first, frames[i].second, colour);
 }
 
 PixMask *TarFileMaskedImage::applyMask (guint32 i, Player *p) const

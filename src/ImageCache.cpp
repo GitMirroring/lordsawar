@@ -1675,9 +1675,6 @@ PixMask *ArmyPixMaskCacheItem::generate(ArmyPixMaskCacheItem i)
   // copy the pixmap including player colors
   Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
   Shield::Colour c = Shield::Colour(i.player_id);
-  if (basearmy->getMaskedImage(c)->getImage () == NULL ||
-      basearmy->getMaskedImage(c)->getMask () == NULL)
-    return NULL;
   PixMask *coloured = basearmy->getMaskedImage (c)->applyMask (p);
   if (i.greyed)
     {

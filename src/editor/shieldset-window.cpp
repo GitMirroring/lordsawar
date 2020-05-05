@@ -652,9 +652,7 @@ void ShieldSetWindow::on_shield_selected()
 
 void ShieldSetWindow::show_tartan (Shield *s, Tartan::Type t, Gtk::Image *image)
 {
-  if (!s || s->getTartanMaskedImage (t)->getName ().empty () ||
-      s->getTartanMaskedImage (t)->getImage () == NULL ||
-      s->getTartanMaskedImage(t)->getMask () == NULL)
+  if (!s || s->getTartanMaskedImage (t)->getName ().empty ())
     {
       image->clear();
       return;
@@ -676,9 +674,7 @@ void ShieldSetWindow::show_tartan (Shield *s, Tartan::Type t, Gtk::Image *image)
 
 void ShieldSetWindow::show_shield(ShieldStyle *ss, Shield *s, Gtk::Image *image)
 {
-  if (!ss || !s || ss->getMaskedImage()->getName().empty () ||
-      ss->getMaskedImage ()->getImage () == NULL ||
-      ss->getMaskedImage ()->getMask () == NULL)
+  if (!ss || !s || ss->getMaskedImage()->getName().empty ())
     {
       image->clear();
       return;

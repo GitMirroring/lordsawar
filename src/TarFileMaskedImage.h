@@ -79,14 +79,8 @@ public:
   //! Return an image by index
   PixMask *getImage (guint32 i) const {return i < frames.size () ? frames[i].first : NULL;}
 
-  //! Return a mask by index
-  PixMask *getMask (guint32 i) const {return i < frames.size () ? frames[i].second : NULL;}
-
   //! Return the first image
   PixMask *getImage () const {return frames.empty () ? NULL :frames[0].first;}
-
-  //! Return the first mask
-  PixMask *getMask () const {return frames.empty () ? NULL :frames[0].second;}
 
   //! Apply the mask onto the image in the player's colour
   /**
@@ -201,6 +195,10 @@ private:
   //! Process a vertically masked image
   void instantiateHorizontal ();
 
+  //! Overlay the mask on the image in the given colour.
+  /**
+   * @return a new pixmask that must be deleted.
+   */
   PixMask* applyMask(PixMask* image, PixMask* mask, Gdk::RGBA colour) const;
 };
 
