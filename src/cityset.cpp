@@ -213,13 +213,8 @@ bool Cityset::save(XML_Helper *helper) const
 
 void Cityset::uninstantiateImages()
 {
-  d_port->uninstantiateImages ();
-  d_sign->uninstantiateImages ();
-  d_temple->uninstantiateImages ();
-  d_ruin->uninstantiateImages ();
-  d_tower->uninstantiateImages ();
-  d_city->uninstantiateImages ();
-  d_rcity->uninstantiateImages ();
+  for (auto i : getImages ())
+    i->uninstantiateImages ();
 }
 
 void Cityset::instantiateImages(bool scale, bool &broken)
@@ -435,21 +430,21 @@ guint32 Cityset::get_default_tile_size ()
   return ts;
 }
 
+std::vector<TarFileImage*> Cityset::getImages ()
+{
+  std::vector<TarFileImage*> i;
+  i.push_back (d_city);
+  i.push_back (d_rcity);
+  i.push_back (d_port);
+  i.push_back (d_sign);
+  i.push_back (d_ruin);
+  i.push_back (d_temple);
+  i.push_back (d_tower);
+  return i;
+}
+
 void Cityset::uninstantiateSameNamedImages (Glib::ustring name)
 {
-  if (d_city->getName () == name)
-    d_city->clear ();
-  if (d_rcity->getName () == name)
-    d_rcity->clear ();
-  if (d_port->getName () == name)
-    d_port->clear ();
-  if (d_sign->getName () == name)
-    d_sign->clear ();
-  if (d_ruin->getName () == name)
-    d_ruin->clear ();
-  if (d_temple->getName () == name)
-    d_temple->clear ();
-  if (d_tower->getName () == name)
-    d_tower->clear ();
+  TarFileImage::uninstantiate (name, getImages ());
 }
 // End of file

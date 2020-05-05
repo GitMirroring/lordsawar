@@ -96,6 +96,7 @@ class ScenarioMedia
 
         void instantiateImages(Tar_Helper &t, bool &broken);
         void copySounds(Tar_Helper &t, bool &broken);
+        void uninstantiateSameNamedImages (Glib::ustring name);
 
 	// Methods that operate on class data and do not modify the class.
 
@@ -170,7 +171,8 @@ class ScenarioMedia
         void uninstantiateImages();
         bool anyValueSet() const;
         void copySound(Tar_Helper &t, Glib::ustring name, Glib::ustring piece, bool &broken);
-        std::vector<TarFileImage*> getTarFileImages();
+        std::vector<TarFileImage*> getImages();
+        std::vector<TarFileMaskedImage*> getMaskedImages();
 };
 
 #endif //SCENARIO_MEDIA_H

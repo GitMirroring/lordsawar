@@ -269,6 +269,8 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 	 * configuration file.
 	 */
 	guint32 d_large_width;
+
+        std::vector<TarFileMaskedImage*> getMaskedImages ();
 };
 
 #endif // SHIELDSET_H

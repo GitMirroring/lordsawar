@@ -314,17 +314,21 @@ void ArmysetSelectorEditorDialog::set_selector_filename (Glib::ustring f)
   Shield::Colour c = get_selected_colour ();
   if (large_selector_radiobutton->get_active() == true)
     {
-      d_armyset->getSelector(true, c)->setName (f);
       if (f.empty () == false)
-        d_armyset->instantiateLargeSelectorImages(c);
+        {
+          d_armyset->getSelector(true,c)->load (d_armyset, f);
+          d_armyset->getSelector(true,c)->instantiateImages ();
+        }
       delete large_selector;
       large_selector = new TarFileMaskedImage (*d_armyset->getSelector(true, c));
     }
   else if (small_selector_radiobutton->get_active() == true)
     {
-      d_armyset->getSelector(false,c)->setName (f);
       if (f.empty () == false)
-        d_armyset->instantiateSmallSelectorImages(c);
+        {
+          d_armyset->getSelector(false,c)->load (d_armyset, f);
+          d_armyset->getSelector(false,c)->instantiateImages ();
+        }
       delete small_selector;
       small_selector = new TarFileMaskedImage (*d_armyset->getSelector(true, c));
     }

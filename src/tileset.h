@@ -362,6 +362,9 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
         //! The movement bonus graphic for moving quickly through marsh.
         TarFileImage *d_swamp_movebonus;
+
+        std::vector<TarFileImage*> getImages ();
+        std::vector<TarFileMaskedImage*> getMaskedImages ();
 };
 #endif // TILESET_H
 

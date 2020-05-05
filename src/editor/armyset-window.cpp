@@ -711,8 +711,7 @@ void ArmySetWindow::on_edit_ship_picture_activated()
           d_armyset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          d_armyset->getShip()->setName(newname);
-          d_armyset->instantiateShipImage ();
+          d_armyset->getShip ()->load (d_armyset, newname);
           needs_saving = true;
           update_window_title();
         }
@@ -760,8 +759,7 @@ void ArmySetWindow::on_edit_standard_picture_activated()
           d_armyset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          d_armyset->getStandard()->setName(newname);
-          d_armyset->instantiateStandardImage ();
+          d_armyset->getStandard()->load (d_armyset, newname);
           needs_saving = true;
           update_window_title();
         }

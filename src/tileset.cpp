@@ -494,20 +494,11 @@ void Tileset::uninstantiateImages()
   for (iterator it = begin(); it != end(); it++)
     (*it)->uninstantiateImages();
 
-  d_selector[0]->uninstantiateImages ();
-  d_selector[1]->uninstantiateImages ();
-  d_flag->uninstantiateImages ();
-  d_bridge->uninstantiateImages ();
-  d_road->uninstantiateImages ();
-  d_fog->uninstantiateImages ();
-  d_explosion->uninstantiateImages ();
-  d_stone->uninstantiateImages ();
-  d_all_movebonus->uninstantiateImages ();
-  d_water_movebonus->uninstantiateImages ();
-  d_forest_movebonus->uninstantiateImages ();
-  d_hills_movebonus->uninstantiateImages ();
-  d_mountains_movebonus->uninstantiateImages ();
-  d_swamp_movebonus->uninstantiateImages ();
+  for (auto i : getImages ())
+    i->uninstantiateImages ();
+
+  for (auto i : getMaskedImages ())
+    i->uninstantiateImages ();
 }
 
 void Tileset::instantiateImages(bool scale, bool &broken)
@@ -785,45 +776,41 @@ guint32 Tileset::get_default_tile_size ()
   return ts;
 }
 
+std::vector<TarFileImage*> Tileset::getImages ()
+{
+  std::vector<TarFileImage*> i;
+  i.push_back (d_explosion);
+  i.push_back (d_road);
+  i.push_back (d_stone);
+  i.push_back (d_bridge);
+  i.push_back (d_fog);
+  i.push_back (d_all_movebonus);
+  i.push_back (d_water_movebonus);
+  i.push_back (d_forest_movebonus);
+  i.push_back (d_hills_movebonus);
+  i.push_back (d_mountains_movebonus);
+  i.push_back (d_swamp_movebonus);
+  return i;
+}
+
+std::vector<TarFileMaskedImage*> Tileset::getMaskedImages ()
+{
+  std::vector<TarFileMaskedImage*> i;
+  i.push_back (d_selector[0]);
+  i.push_back (d_selector[1]);
+  i.push_back (d_flag);
+  return i;
+}
+
 void Tileset::uninstantiateSameNamedImages (Glib::ustring name)
 {
-  if (d_selector[1]->getName () == name)
-    d_selector[1]->clear ();
-  if (d_selector[0]->getName () == name)
-    d_selector[0]->clear ();
-  if (d_explosion->getName () == name)
-    d_explosion->clear ();
-  if (d_road->getName () == name)
-    d_road->clear ();
-  if (d_stone->getName () == name)
-    d_stone->clear ();
-  if (d_bridge->getName () == name)
-    d_bridge->clear ();
-  if (d_fog->getName () == name)
-    d_fog->clear ();
-  if (d_flag->getName () == name)
-    d_flag->clear ();
-  if (getAllMoveBonus ()->getName () == name)
-    d_all_movebonus->clear ();
-  if (getWaterMoveBonus ()->getName () == name)
-    d_water_movebonus->clear ();
-  if (getForestMoveBonus ()->getName () == name)
-    d_forest_movebonus->clear ();
-  if (getHillsMoveBonus()->getName () == name)
-    d_hills_movebonus->clear ();
-  if (getMountainsMoveBonus ()->getName () == name)
-    d_mountains_movebonus->clear ();
-  if (getSwampMoveBonus ()->getName () == name)
-    d_swamp_movebonus->clear ();
+  TarFileMaskedImage::uninstantiate (name, getMaskedImages ());
+  TarFileImage::uninstantiate (name, getImages ());
   std::vector<TileStyleSet*> sets;
   for (iterator i = begin (); i != end (); i++)
-    {
-      for (auto tst : *(*i))
-        {
-          if (tst->getName () == name)
-            sets.push_back (tst);
-        }
-    }
+    for (auto tst : *(*i))
+      if (tst->getName () == name)
+        sets.push_back (tst);
   for (auto s : sets)
     delete s;
 }

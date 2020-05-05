@@ -142,6 +142,8 @@ class Cityset : public sigc::trackable, public Set
 	guint32 d_city_tile_width;
 	guint32 d_temple_tile_width;
 	guint32 d_ruin_tile_width;
+
+        std::vector<TarFileImage*> getImages ();
 };
 
 #endif // CITYSET_H

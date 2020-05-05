@@ -178,3 +178,10 @@ void TarFileImage::load_name (XML_Helper *helper, Glib::ustring data_tag)
   File::add_png_if_no_ext (n);
   setName (n);
 }
+
+void TarFileImage::uninstantiate (Glib::ustring name, std::vector<TarFileImage*> images)
+{
+  for (auto i : images)
+    if (i->getName () == name)
+      i->clear ();
+}

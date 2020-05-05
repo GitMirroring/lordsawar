@@ -206,7 +206,7 @@ void MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
         {
           if (t->removeFileInCfgFile(imgname))
             {
-              im->clear();
+              ScenarioMedia::getInstance()->uninstantiateSameNamedImages (imgname);
               d_needs_saving = true;
               fill_in_buttons();
             }
@@ -226,25 +226,26 @@ void MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
   d.hide();
 }
 
-void MediaDialog::on_masked_image_button_activated(sigc::slot<Glib::ustring> getName, TarFileMaskedImage *mim, sigc::slot<void,Glib::ustring> setName, Shieldset *ss)
+void MediaDialog::on_masked_image_button_activated(TarFileMaskedImage *omim, TarFileMaskedImage *mim, Shieldset *ss)
 {
   TarFile *t = d_tarfile;
-  Glib::ustring imgname = getName ();
+  Glib::ustring imgname = mim->getName ();
 
-  TarFileMaskedImageEditorDialog d (*dialog, mim, 0, ss);
+  TarFileMaskedImageEditorDialog d (*dialog, omim, 0, ss);
   int response = d.run();
 
   if (response == Gtk::RESPONSE_ACCEPT && d.get_filename () != "")
     {
       Glib::ustring newname = "";
       bool success = false;
-      if (getName() == "")
+      if (mim->getName() == "")
         success = t->addFileInCfgFile(d.get_filename (), newname);
       else
         success = t->replaceFileInCfgFile(imgname, d.get_filename (), newname);
       if (success)
         {
-          setName(newname);
+          mim->load (t, newname);
+          mim->instantiateImages ();
           d_needs_saving = true;
           fill_in_buttons();
         }
@@ -266,7 +267,7 @@ void MediaDialog::on_masked_image_button_activated(sigc::slot<Glib::ustring> get
         {
           if (t->removeFileInCfgFile(imgname))
             {
-              setName ("");
+              ScenarioMedia::getInstance()->uninstantiateSameNamedImages (imgname);
               d_needs_saving = true;
               fill_in_buttons();
             }
@@ -436,17 +437,9 @@ void MediaDialog::on_hero_newlevel_male_button_activated()
   TarFileMaskedImage *omim =
     ImageCache::getInstance ()->getHeroNewLevelMaskedImage(false);
   TarFileMaskedImage *mim = sm->getHeroNewLevelMaskedImage(false);
-  on_masked_image_button_activated
-    (sigc::mem_fun (mim, &TarFileMaskedImage::getName),
-     omim, sigc::mem_fun (mim, &TarFileMaskedImage::setName),
-     Shieldsetlist::getInstance()->get(Playerlist::getActiveplayer()->getId()));
-  if (mim->getName ().empty () == false)
-    {
-      mim->load (d_tarfile, mim->getName ());
-      mim->instantiateImages ();
-    }
-  else
-    sm->getHeroNewLevelMaskedImage(false)->clear();
+  guint32 pid = Playerlist::getActiveplayer()->getId();
+  on_masked_image_button_activated (omim, mim,
+                                    Shieldsetlist::getInstance()->get(pid));
 }
 
 void MediaDialog::on_hero_newlevel_female_button_activated()
@@ -455,17 +448,9 @@ void MediaDialog::on_hero_newlevel_female_button_activated()
   TarFileMaskedImage *omim =
     ImageCache::getInstance ()->getHeroNewLevelMaskedImage(true);
   TarFileMaskedImage *mim = sm->getHeroNewLevelMaskedImage(true);
-  on_masked_image_button_activated
-    (sigc::mem_fun (mim, &TarFileMaskedImage::getName),
-     omim, sigc::mem_fun (mim, &TarFileMaskedImage::setName),
-     Shieldsetlist::getInstance()->get(Playerlist::getActiveplayer()->getId()));
-  if (mim->getName().empty () == false)
-    {
-      mim->load (d_tarfile, mim->getName ());
-      mim->instantiateImages ();
-    }
-  else
-    sm->getHeroNewLevelMaskedImage(true)->clear();
+  guint32 pid = Playerlist::getActiveplayer()->getId();
+  on_masked_image_button_activated (omim, mim,
+                                    Shieldsetlist::getInstance()->get(pid));
 }
 
 void MediaDialog::on_parley_offered_button_activated()

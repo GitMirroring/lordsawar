@@ -304,3 +304,10 @@ bool TarFileMaskedImage::copy (TarFile *t, TarFileMaskedImage *dest)
   File::erase_dir (tmp_dir);
   return success;
 }
+
+void TarFileMaskedImage::uninstantiate (Glib::ustring name, std::vector<TarFileMaskedImage*> images)
+{
+  for (auto i : images)
+    if (i->getName () == name)
+      i->clear ();
+}

@@ -194,7 +194,7 @@ ScenarioMedia::~ScenarioMedia()
 
 void ScenarioMedia::uninstantiateImages()
 {
-  for (auto i : getTarFileImages ())
+  for (auto i : getImages ())
     i->uninstantiateImages ();
   d_hero_newlevel[0]->uninstantiateImages ();
   d_hero_newlevel[1]->uninstantiateImages ();
@@ -237,7 +237,7 @@ void ScenarioMedia::copySounds(Tar_Helper &t, bool &broken)
     }
 }
 
-std::vector<TarFileImage*> ScenarioMedia::getTarFileImages()
+std::vector<TarFileImage*> ScenarioMedia::getImages()
 {
   std::vector<TarFileImage*> i;
   i.push_back (d_next_turn);
@@ -255,37 +255,32 @@ std::vector<TarFileImage*> ScenarioMedia::getTarFileImages()
   return i;
 }
 
+std::vector<TarFileMaskedImage*> ScenarioMedia::getMaskedImages ()
+{
+  std::vector<TarFileMaskedImage*> i;
+  i.push_back (d_hero_newlevel[0]);
+  i.push_back (d_hero_newlevel[1]);
+  return i;
+}
+
 void ScenarioMedia::instantiateImages(Tar_Helper &t, bool &broken)
 {
-  for (auto i : getTarFileImages ())
-    {
-      if (i->getName ().empty () == false)
-        {
-          broken = i->load (&t);
-          if (broken)
-            break;
-          i->instantiateImages ();
-        }
-    }
-
-  if (!broken)
-    {
-      if (d_hero_newlevel[0]->getName().empty () == false)
-        {
-          broken = d_hero_newlevel[0]->load (&t);
-          if (!broken)
-            d_hero_newlevel[0]->instantiateImages ();
-        }
-    }
-  if (!broken)
-    {
-      if (d_hero_newlevel[1]->getName().empty () == false)
-        {
-          broken = d_hero_newlevel[1]->load (&t);
-          if (!broken)
-            d_hero_newlevel[1]->instantiateImages ();
-        }
-    }
+  for (auto i : getImages ())
+    if (i->getName ().empty () == false)
+      {
+        broken = i->load (&t);
+        if (broken)
+          break;
+        i->instantiateImages ();
+      }
+  for (auto i : getMaskedImages ())
+    if (i->getName ().empty () == false)
+      {
+        broken = i->load (&t);
+        if (broken)
+          break;
+        i->instantiateImages ();
+      }
 }
 
 MusicItem* ScenarioMedia::getSoundEffect(Glib::ustring n)
@@ -295,14 +290,14 @@ MusicItem* ScenarioMedia::getSoundEffect(Glib::ustring n)
 
 void ScenarioMedia::getFilenames(std::list<Glib::ustring> &files)
 {
-  for (auto i : getTarFileImages ())
+  for (auto i : getImages ())
     if (i->getName ().empty () == false)
       files.push_back (i->getName ());
 
-  if (d_hero_newlevel[0]->getName() != "")
-    files.push_back (d_hero_newlevel[0]->getName ());
-  if (d_hero_newlevel[1]->getName() != "")
-    files.push_back (d_hero_newlevel[1]->getName ());
+  for (auto i : getMaskedImages ())
+    if (i->getName ().empty () == false)
+      files.push_back (i->getName ());
+
   if (getBlessSoundName() != "")
     files.push_back (getBlessSoundName() + ".ogg");
   if (getHeroSoundName() != "")
@@ -315,6 +310,12 @@ void ScenarioMedia::getFilenames(std::list<Glib::ustring> &files)
     files.push_back (getVictorySoundName() + ".ogg");
   if (getBackSoundName() != "")
     files.push_back (getBackSoundName() + ".ogg");
+}
+
+void ScenarioMedia::uninstantiateSameNamedImages (Glib::ustring name)
+{
+  TarFileImage::uninstantiate (name, getImages ());
+  TarFileMaskedImage::uninstantiate (name, getMaskedImages ());
 }
 
 Glib::ustring ScenarioMedia::getDefaultNextTurnImageFilename()

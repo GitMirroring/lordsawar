@@ -970,32 +970,6 @@ ArmyProto *Armyset::lookupWeakestQuickestArmy() const
   return p;
 }
 
-bool Armyset::instantiateStandardImage ()
-{
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  broken = d_standard->load (&t);
-  if (!broken)
-    d_standard->instantiateImages ();
-  t.Close ();
-  return broken;
-}
-
-bool Armyset::instantiateShipImage ()
-{
-  bool broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  broken = d_stackship->load (&t);
-  if (!broken)
-    d_stackship->instantiateImages ();
-  t.Close ();
-  return broken;
-}
-
 guint32 Armyset::get_default_tile_size ()
 {
   Armyset *a = new Armyset (1, "");
@@ -1004,80 +978,31 @@ guint32 Armyset::get_default_tile_size ()
   return ts;
 }
 
+std::vector<TarFileImage*> Armyset::getImages ()
+{
+  std::vector<TarFileImage*> i;
+  i.push_back (d_bag);
+  return i;
+}
+
+std::vector<TarFileMaskedImage*> Armyset::getMaskedImages ()
+{
+  std::vector<TarFileMaskedImage*> i;
+  for (guint32 c = Shield::WHITE; c < Shield::NEUTRAL; c++)
+    {
+      i.push_back (getSelector(true, Shield::Colour (c)));
+      i.push_back (getSelector(false, Shield::Colour (c)));
+    }
+  i.push_back (d_standard);
+  i.push_back (d_stackship);
+  for (iterator j = begin (); j != end (); j++)
+    for (guint32 c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
+      i.push_back ((*j)->getMaskedImage(Shield::Colour (c)));
+  return i;
+}
+
 void Armyset::uninstantiateSameNamedImages (Glib::ustring name)
 {
-  for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    {
-      Shield::Colour c = Shield::Colour (i);
-      if (getSelector(true, c)->getName () == name)
-        getSelector(true, c)->clear ();
-      if (getSelector(false, c)->getName () == name)
-        getSelector(false, c)->clear ();
-    }
-
-  if (d_bag->getName () == name)
-    d_bag->clear ();
-  if (d_standard->getName () == name)
-    d_standard->clear ();
-  if (d_stackship->getName () == name)
-    d_stackship->clear ();
-
-  for (iterator i = begin (); i != end (); i++)
-    {
-      for (guint32 cc = Shield::WHITE; cc <= Shield::NEUTRAL; cc++)
-        {
-          Shield::Colour c = Shield::Colour (cc);
-          if ((*i)->getMaskedImage(c)->getName () == name)
-            (*i)->getMaskedImage (c)-> clear ();
-        }
-    }
-}
-
-bool Armyset::instantiateSmallSelectorImages()
-{
-  for (int i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    if (instantiateSmallSelectorImages(Shield::Colour (i)) == false)
-      return false;
-  return true;
-}
-
-bool Armyset::instantiateSmallSelectorImages(Shield::Colour c)
-{
-  bool broken = false;
-  d_selector[0][c]->clear (false);
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  broken = d_selector[0][c]->load (&t);
-  if (broken)
-    return broken;
-  d_selector[0][c]->instantiateImages ();
-  return broken;
-}
-
-bool Armyset::instantiateLargeSelectorImages()
-{
-  for (int i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    if (instantiateLargeSelectorImages(Shield::Colour (i)) == false)
-      return false;
-  return true;
-}
-
-bool Armyset::instantiateLargeSelectorImages(Shield::Colour c)
-{
-  bool broken = false;
-  d_selector[1][c]->clear (false);
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
-  if (broken)
-    return broken;
-  broken = d_selector[1][c]->load (&t);
-  if (broken)
-    return broken;
-  d_selector[1][c]->instantiateImages ();
-  return broken;
-}
-
-TarFileMaskedImage *Armyset::getSelector (bool large, Shield::Colour c) const
-{
-  return d_selector[large ? 1 : 0][c];
+  TarFileImage::uninstantiate (name, getImages ());
+  TarFileMaskedImage::uninstantiate (name, getMaskedImages ());
 }

@@ -117,6 +117,9 @@ public:
   //! Destroy just the backing image
   void dropBackingImage ();
 
+  //! Uninstantiate all images named NAME in images
+  static void uninstantiate (Glib::ustring name, std::vector<TarFileImage*> images);
+
 private:
 
   //! The opened tar file

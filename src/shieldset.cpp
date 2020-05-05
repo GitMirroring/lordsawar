@@ -531,17 +531,22 @@ TarFileMaskedImage *Shieldset::lookupTartanImage(guint32 colour, Tartan::Type ty
   return NULL;
 }
 
-void Shieldset::uninstantiateSameNamedImages (Glib::ustring name)
+std::vector<TarFileMaskedImage*> Shieldset::getMaskedImages ()
 {
+  std::vector<TarFileMaskedImage*> i;
   for (auto s : *this)
     {
       for (auto ss : *s)
-        if (ss->getMaskedImage()->getName () == name)
-          ss->getMaskedImage ()->clear ();
+        i.push_back (ss->getMaskedImage ());
       for (guint32 k = Tartan::LEFT; k <= Tartan::RIGHT; k++)
-        if (s->getTartanMaskedImage (Tartan::Type (k))->getName () == name)
-          s->getTartanMaskedImage (Tartan::Type (k))->clear ();
+        i.push_back (s->getTartanMaskedImage (Tartan::Type (k)));
     }
+  return i;
+}
+
+void Shieldset::uninstantiateSameNamedImages (Glib::ustring name)
+{
+  TarFileMaskedImage::uninstantiate (name, getMaskedImages ());
 }
         
 bool Shieldset::isAnyHeightAndWidthSet()

@@ -103,19 +103,8 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         
         bool save(Glib::ustring filename, Glib::ustring ext) const;
 
-        bool instantiateSmallSelectorImages ();
-        bool instantiateSmallSelectorImages(Shield::Colour c);
-        bool instantiateLargeSelectorImages ();
-        bool instantiateLargeSelectorImages(Shield::Colour c);
-
-        //! Instantiate the ship image by loading it from the lwa file.
-        bool instantiateShipImage ();
-
 	//! Get the image of the bag.
 	TarFileImage* getBag() const {return d_bag;}
-
-        //! Instantiate the standard image by loading it from the lwa file.
-        bool instantiateStandardImage ();
 
 	//! Get the picture for the hero's flag.
         TarFileMaskedImage *getStandard () const {return d_standard;}
@@ -127,7 +116,8 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         guint32 getMaxId() const;
 
         //! Returns the selector TarFileMaskedImage object
-        TarFileMaskedImage *getSelector(bool large, Shield::Colour c) const;
+        TarFileMaskedImage *getSelector(bool large, Shield::Colour c) const
+          {return d_selector[large ? 1 : 0][c];}
 
 	//! Find an army with a type in this armyset.
 	/**
@@ -217,6 +207,10 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 
         //! The selector animation, 0 = small, 1 = large, one for each player.
         TarFileMaskedImage *d_selector[2][MAX_PLAYERS];
+
+        std::vector<TarFileImage*> getImages ();
+        std::vector<TarFileMaskedImage*> getMaskedImages ();
+
 };
 
 bool weakest_quickest (const ArmyProto* first, const ArmyProto* second);
