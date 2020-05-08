@@ -45,6 +45,6 @@ the military advisor is very medieval sounding , might want to make it more neut
   maybe move the text of it into the scenario editor.
   this business of making it more neutral is probably a bad idea because my users expect a medieval tone.
 
-make stackReinforce in AI_Allocation work.  also look at searchRuin
-
 switch from gstreamermm to gstreamer
+
+are ai players limited by gold? do they just keep making more armies despite having 0gp treasury?
