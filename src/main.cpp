@@ -134,37 +134,23 @@ int main(int argc, char* argv[])
 	      kit.turn_filename = argv[i-1];
 	    }
 	  else if (parameter == "--test" || parameter == "-t")
-	    {
-	      kit.start_test_scenario = true;
-	    }
+	    kit.start_test_scenario = true;
 	  else if (parameter == "--net-test")
-	    {
-	      kit.start_net_test_scenario = true;
-	    }
+	    kit.start_net_test_scenario = true;
           else if (parameter == "--speedy")
-            {
-	      kit.speedy = true;
-            }
+	    kit.speedy = true;
           else if (parameter == "--own-all-on-round-two")
-            {
-	      kit.own_all_on_round_two= true;
-            }
+	    kit.own_all_on_round_two= true;
 	  else if (parameter == "--stress-test" || parameter == "-s")
-	    {
-	      kit.start_stress_test = true;
-	    }
+	    kit.start_stress_test = true;
+          else if (parameter == "--view-stress-test")
+	    kit.view_stress_test = true;
 	  else if (parameter == "--robots" || parameter == "-r")
-	    {
-	      kit.start_robots = -1;
-	    }
+	    kit.start_robots = -1;
 	  else if (parameter == "--host" || parameter == "-H")
-	    {
-	      kit.start_headless_server = true;
-	    }
+	    kit.start_headless_server = true;
           else if (parameter == "--editor")
-            {
-	      kit.start_editor = true;
-            }
+	    kit.start_editor = true;
 	  else if (parameter == "--help" || parameter == "-h")
 	    {
               std::cout << Glib::get_prgname() << " [OPTION]... [FILE]" << std::endl << std::endl;

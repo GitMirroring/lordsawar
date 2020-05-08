@@ -293,7 +293,7 @@ bool FightWindow::do_round()
 
   while (g_main_context_iteration(NULL, FALSE)); //doEvents
   if (d_quick || s_quick_all)
-    Glib::usleep (first_pause / 3);
+    Glib::usleep (first_pause / 100);
   else
     Glib::usleep (first_pause);
 
@@ -301,7 +301,7 @@ bool FightWindow::do_round()
 
   while (g_main_context_iteration(NULL, FALSE)); //doEvents
   if (d_quick || s_quick_all)
-    Glib::usleep (second_pause / 3);
+    Glib::usleep (second_pause / 100);
   else
     Glib::usleep (second_pause);
 

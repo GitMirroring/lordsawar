@@ -1795,7 +1795,7 @@ void GameWindow::on_fight_started(LocationBox box, Fight &fight)
   FightWindow d(*window, fight);
 
   while (g_main_context_iteration(NULL, FALSE)); //doEvents
-  Glib::usleep (TIMER_BIGMAP_EXPLOSION_DELAY);
+  Glib::usleep (Configuration::s_displayFightRoundDelaySlow);
   d.run(&d_quick_fights);
   d.hide();
   game->get_bigmap().setFighting(LocationBox(Vector<int>(-1,-1)));

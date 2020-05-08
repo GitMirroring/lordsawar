@@ -38,6 +38,7 @@ class Main: public sigc::trackable
     void stop_main_loop();
 
     bool start_stress_test;
+    bool view_stress_test;
     bool start_editor;
     int start_robots;
     bool start_test_scenario;

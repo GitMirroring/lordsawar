@@ -76,6 +76,8 @@
 #include "smallmap.h"
 #include "ScenarioMedia.h"
 #include "load-progress-window.h"
+#include "smallmap.h"
+#include "fight-window.h"
 
 #define method(x) sigc::mem_fun(*this, &Driver::x)
 
@@ -89,7 +91,7 @@ Driver::Driver(bool start_editor, Glib::ustring load_filename)
     if (Main::instance().start_stress_test) 
       {
 	Snd::deleteInstance();
-	stress_test();
+	stress_test(Main::instance().view_stress_test);
 	exit(0);
       }
     if (Main::instance().start_robots != 0) 
@@ -1086,7 +1088,8 @@ void Driver::on_game_ended()
   HeroTemplates::deleteInstance();
   ScenarioMedia::deleteInstance();
 
-  splash_window->show();
+  if (splash_window)
+    splash_window->show();
 }
 
 void Driver::on_game_ended_and_start_new()
@@ -1149,7 +1152,7 @@ void Driver::stressTestNextRound()
   printf ("starting round %d!\n", count);
 }
 
-void Driver::stress_test()
+void Driver::stress_test(bool gui)
 {
   // quick load a test scenario
   GameParameters g;
@@ -1211,6 +1214,16 @@ void Driver::stress_test()
   path = NewRandomMapDialog::create_and_dump_scenario("random.map", g, NULL);
   g.map_path = path;
 
+  if (gui)
+    {
+      Configuration::s_displaySpeedDelay = 0;
+      SmallMap::s_quick = true;
+      Configuration::s_displayFightRoundDelayFast = 0;
+      Configuration::s_displayFightRoundDelaySlow = 0;
+      FightWindow::s_quick_all = true;
+      on_load_requested(path);
+      return;
+    }
   GameScenario* game_scenario = new GameScenario(g.map_path, broken);
 
   if (broken)

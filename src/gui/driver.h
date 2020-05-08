@@ -97,7 +97,7 @@ class Driver: public sigc::trackable
 
     GameScenario *new_game(GameParameters g);
     GameScenario *load_game(Glib::ustring file_path, Gtk::Window *w = NULL);
-    void stress_test();
+    void stress_test(bool gui);
     void stressTestNextRound();
 
     void lordsawaromatic(Glib::ustring host, unsigned short port, Player::Type type, int num_players);
