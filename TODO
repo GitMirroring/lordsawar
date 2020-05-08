@@ -36,8 +36,6 @@ saw a crash when switching to a newly made shieldset in the editor.  can't repro
 maybe improve the ai a bit by: disbanding stacks and creating a stronger type somewhere
 favour cheaper army units for production when we don't have much money
 
-stress test with seed 691 takes 1000+ turns to complete
-
 fix up the upgrader by painstakingly providing an upgrade path through each version of every file type.
   (starting at whenever we used tar files.)
 
@@ -46,3 +44,7 @@ make an svg armyset, tileset, shieldset, cityset to test if it works.
 the military advisor is very medieval sounding , might want to make it more neutral for scenarios with other genres.
   maybe move the text of it into the scenario editor.
   this business of making it more neutral is probably a bad idea because my users expect a medieval tone.
+
+make stackReinforce in AI_Allocation work.  also look at searchRuin
+
+switch from gstreamermm to gstreamer
