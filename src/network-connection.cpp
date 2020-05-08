@@ -115,11 +115,12 @@ bool NetworkConnection::on_got_input(Glib::IOCondition cond)
 }
 
 NetworkConnection::NetworkConnection(const Glib::RefPtr<Gio::SocketConnection> &c)
- : payload(NULL), d_host(""), d_port(0), d_stop(false),
+ : client (Gio::SocketClient::create()), payload(NULL), payload_left (0),
+    payload_size (0), header {0}, header_left (0), header_size (0), d_host(""),
+    d_port(0), d_stop(false), d_bail (false),
     d_cancellable(Gio::Cancellable::create())
 {
   //okay, i've been asked to create a SERVER side network connection.
-  client = Gio::SocketClient::create();
   client->set_protocol(Gio::SOCKET_PROTOCOL_TCP);
   if (c)
     {
@@ -130,10 +131,11 @@ NetworkConnection::NetworkConnection(const Glib::RefPtr<Gio::SocketConnection> &
 }
 
 NetworkConnection::NetworkConnection()
- : payload(NULL), d_host(""), d_port(0), d_stop(false),
+ : client (Gio::SocketClient::create()), payload(NULL), payload_left (0),
+    payload_size (0), header {0}, header_left (0), header_size (0), d_host(""),
+    d_port(0), d_stop(false), d_bail (false),
     d_cancellable(Gio::Cancellable::create())
 {
-  client = Gio::SocketClient::create();
   client->set_protocol(Gio::SOCKET_PROTOCOL_TCP);
 }
 

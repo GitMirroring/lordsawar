@@ -75,9 +75,6 @@ public:
   //! Return the dimensions of the images in the backing image
   Vector<int> getImageDimensions () const  {return dimension;}
 
-  //! Set the basename of the image (archive member in the tar file)
-  void setImageName (Glib::ustring n) {name = n;}
-
   //! Set the name of the archive member in the tar file that holds the image
   void setName (Glib::ustring n) {name = n;}
 
@@ -88,21 +85,46 @@ public:
   void load_name (XML_Helper *helper, Glib::ustring data_tag);
 
   //! Load an image from a tar file, with bname already provided
+  /**
+   * @param t        the unopened tar file (shieldset file, etc.)
+   * @param bname    the archive member of the image
+   * @return         true if something went wrong
+   */
   bool load (TarFile *t, Glib::ustring bname);
 
   //! Load an image from the tar file, with bname already set by setName
+  /**
+   * @return         true if something went wrong
+   */
   bool load ();
 
   //! Load an image from the tar file t, already provided bname
+  /**
+   * @param t        the opened tar file
+   * @return         true if something went wrong
+   */
   bool load (Tar_Helper *t);
 
   //! Load an image named bname from the tar file t
+  /**
+   * @param t        the opened tar file
+   * @param bname    archive member of the image
+   * @return         true if something went wrong
+   */
   bool load (Tar_Helper *t, Glib::ustring bname);
 
   //! Load an image named bname from the tar file
+  /**
+   * @param bname    archive member of the image
+   * @return         true if something went wrong
+   */
   bool load (Glib::ustring bname);
 
   //! Load an image named filename from disk
+  /**
+   * @param filename file on disk of the image
+   * @return         true if something went wrong
+   */
   bool loadFromFile (Glib::ustring filename);
 
   //! Process the backing image into a set of images

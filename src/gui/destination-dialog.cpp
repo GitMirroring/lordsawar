@@ -222,7 +222,6 @@ void DestinationDialog::fill_in_vectoring_info()
 {
   ImageCache *gc = ImageCache::getInstance();
   std::list<VectoredUnit*> vectored;
-  std::list<VectoredUnit*>::const_iterator it;
   VectoredUnitlist *vul = VectoredUnitlist::getInstance();
   dialog->set_title(city->getName());
 
@@ -281,7 +280,8 @@ void DestinationDialog::fill_in_vectoring_info()
   current_label->set_markup("<i>" + s4 + "</i>");
 
   //show the units that have been vectored from this city
-  for (it = vectored.begin(); it != vectored.end(); it++)
+  for (std::list<VectoredUnit*>::const_iterator it = vectored.begin();
+       it != vectored.end(); ++it)
     {
       int armytype = (*it)->getArmy()->getTypeId();
       if ((*it)->getDuration() == 2)
@@ -305,7 +305,8 @@ void DestinationDialog::fill_in_vectoring_info()
   vul->getVectoredUnitsGoingTo(city, vectored);
   int count = 0;
   Gtk::Image *image = next_turn_1_image;
-  for (it = vectored.begin(); it != vectored.end(); it++)
+  for (std::list<VectoredUnit*>::const_iterator it = vectored.begin();
+       it != vectored.end(); ++it)
     {
       if ((*it)->getDuration() != 1)
         continue;
@@ -325,7 +326,8 @@ void DestinationDialog::fill_in_vectoring_info()
       count++;
     }
   count = 0;
-  for (it = vectored.begin(); it != vectored.end(); it++)
+  for (std::list<VectoredUnit*>::const_iterator it = vectored.begin();
+       it != vectored.end(); ++it)
     {
       if ((*it)->getDuration() != 2)
         continue;

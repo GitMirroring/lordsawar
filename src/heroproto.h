@@ -31,7 +31,7 @@ class HeroProto : public ArmyProto, public OwnerId
     public:
 
 	//! The xml tag of this object in a saved-game file.
-	static Glib::ustring d_tag; 
+	static Glib::ustring d_heroproto_tag; 
 
 	//! Copy constructor.
         HeroProto(const HeroProto& heroproto);

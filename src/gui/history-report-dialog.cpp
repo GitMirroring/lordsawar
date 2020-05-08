@@ -77,9 +77,9 @@ HistoryReportDialog::HistoryReportDialog(Gtk::Window &parent, Player *p, History
   xml->get_widget("gold_alignment", gold_alignment);
   xml->get_widget("winner_alignment", winner_alignment);
 
-  Playerlist::iterator pit = Playerlist::getInstance()->begin();
   Gdk::RGBA colour;
-  for (; pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
 	continue;
@@ -117,13 +117,12 @@ HistoryReportDialog::HistoryReportDialog(Gtk::Window &parent, Player *p, History
 
 HistoryReportDialog::~HistoryReportDialog()
 {
-  std::vector<std::list<NetworkHistory *> >::iterator it;
-  it = past_eventlists.begin();
-  for (; it != past_eventlists.end(); it++)
+  for (std::vector<std::list<NetworkHistory *> >::iterator it = past_eventlists.begin();
+       it != past_eventlists.end(); ++it)
     {
       std::list<NetworkHistory*> hist = (*it);
-      std::list<NetworkHistory*>::iterator hit = hist.begin();
-      for (; hit != hist.end(); hit++)
+      for (std::list<NetworkHistory*>::iterator hit = hist.begin();
+           hit != hist.end(); ++hit)
 	delete (*hit);
     }
   history_notebook->property_show_tabs () = false;
@@ -137,16 +136,16 @@ void HistoryReportDialog::generatePastEventlists()
 
   //keep a set of pointers to remember how far we are into each player's history
   std::list<History*> *hist[MAX_PLAYERS];
-  Playerlist::iterator pit = Playerlist::getInstance()->begin();
-  for (; pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
 	continue;
       hist[(*pit)->getId()] = (*pit)->getHistorylist();
     }
   std::list<History*>::iterator hit[MAX_PLAYERS];
-  pit = Playerlist::getInstance()->begin();
-  for (; pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
 	continue;
@@ -157,8 +156,8 @@ void HistoryReportDialog::generatePastEventlists()
   while (1)
     {
       //now we see what cities we took this turn
-      pit = Playerlist::getInstance()->begin();
-      for (; pit != Playerlist::getInstance()->end(); ++pit)
+      for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+           pit != Playerlist::getInstance()->end(); ++pit)
 	{
 	  if (*pit == Playerlist::getInstance()->getNeutral())
 	    continue;
@@ -168,12 +167,12 @@ void HistoryReportDialog::generatePastEventlists()
 	    continue;
 	  for (; hit[id] != hist[id]->end(); ++hit[id])
 	    {
-	      if ((*hit[id])->getType() == History::START_TURN)
+	      if ((*(hit[id]))->getType() == History::START_TURN)
 		{
 		  hit[id]++;
 		  break;
 		}
-	      switch ((*hit[id])->getType())
+	      switch ((*(hit[id]))->getType())
 		{
 		case History::FOUND_SAGE: 
 		case History::HERO_EMERGES:
@@ -190,7 +189,7 @@ void HistoryReportDialog::generatePastEventlists()
 		case History::DIPLOMATIC_PEACE:
 		case History::HERO_RUIN_EXPLORED:
 		case History::USE_ITEM:
-		  elist->push_back(new NetworkHistory(*hit[id], (*pit)->getId()));
+		  elist->push_back(new NetworkHistory(*(hit[id]), (*pit)->getId()));
 		  break;
 		case History::START_TURN:
 		case History::GOLD_TOTAL:
@@ -225,16 +224,16 @@ void HistoryReportDialog::generatePastCitylists()
 
   //keep a set of pointers to remember how far we are into each player's history
   std::list<History*> *hist[MAX_PLAYERS];
-  Playerlist::iterator pit = Playerlist::getInstance()->begin();
-  for (; pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
 	continue;
       hist[(*pit)->getId()] = (*pit)->getHistorylist();
     }
   std::list<History*>::iterator hit[MAX_PLAYERS];
-  pit = Playerlist::getInstance()->begin();
-  for (; pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
 	continue;
@@ -251,9 +250,9 @@ void HistoryReportDialog::generatePastCitylists()
       (*it)->setOwner(Playerlist::getInstance()->getNeutral());
       //is the city burned to begin with?
       bool no_city_history = true;
-      pit = Playerlist::getInstance()->begin();
       guint32 age;
-      for (; pit != Playerlist::getInstance()->end(); ++pit)
+      for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+           pit != Playerlist::getInstance()->end(); ++pit)
 	if ((*pit)->conqueredCity(*it, age) == true)
 	  no_city_history = false;
       if ((*it)->isBurnt() == true && no_city_history)
@@ -266,8 +265,8 @@ void HistoryReportDialog::generatePastCitylists()
   while (1)
     {
       //now we see what cities we took this turn
-      pit = Playerlist::getInstance()->begin();
-      for (; pit != Playerlist::getInstance()->end(); ++pit)
+      for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+           pit != Playerlist::getInstance()->end(); ++pit)
 	{
 	  if (*pit == Playerlist::getInstance()->getNeutral())
 	    continue;
@@ -287,8 +286,8 @@ void HistoryReportDialog::generatePastCitylists()
 		  guint32 city_id;
 		  city_id = dynamic_cast<History_CityWon*>(*hit[id])->getCityId();
 		  //find city with this city id in clist
-		  LocationList<City*>::iterator cit = clist->begin();
-		  for (; cit != clist->end(); ++cit)
+		  for (LocationList<City*>::iterator cit = clist->begin();
+                       cit != clist->end(); ++cit)
 		    if ((*cit)->getId() == city_id)
 		      {
 			(*cit)->setOwner(*pit);
@@ -300,8 +299,8 @@ void HistoryReportDialog::generatePastCitylists()
 		  guint32 city_id;
 		  city_id = dynamic_cast<History_CityRazed*>(*hit[id])->getCityId();
 		  //find city with this city id in clist
-		  LocationList<City*>::iterator cit = clist->begin();
-		  for (; cit != clist->end(); ++cit)
+		  for (LocationList<City*>::iterator cit = clist->begin();
+                       cit != clist->end(); ++cit)
 		    if ((*cit)->getId() == city_id)
 		      {
 			//change the owner to neutral 
@@ -398,20 +397,20 @@ void HistoryReportDialog::fill_in_turn_info(guint32 turn)
   for (unsigned int i = 0; i < kids.size(); i++)
     events_list_box->remove(*kids[i]);
 
-  if (turn <= past_eventlists.size() - 1)
+  if (turn < past_eventlists.size())
     {
       std::list<NetworkHistory*> hist = past_eventlists[turn];
-      std::list<NetworkHistory*>::iterator hit = hist.begin();
-      for (; hit != hist.end(); hit++)
+      for (std::list<NetworkHistory*>::iterator hit = hist.begin();
+           hit != hist.end(); ++hit)
 	addHistoryEvent(*hit);
     }
 
   //update the gold chart
   //on turn # you had # gold pieces
   std::list<guint32> goldlist = *past_goldcounts.begin();
-  std::list<guint32>::iterator it = goldlist.begin();
   count=1;
-  for (; it != goldlist.end(); it++, count++)
+  for (std::list<guint32>::iterator it = goldlist.begin();
+       it != goldlist.end(); ++it, count++)
     {
       if (count == turn)
 	{
@@ -430,9 +429,9 @@ void HistoryReportDialog::fill_in_turn_info(guint32 turn)
 
   //update the city chart
   std::list<guint32> citylist = *past_citycounts.begin();
-  it = citylist.begin();
   count = 0;
-  for (; it != citylist.end(); it++, count++)
+  for (std::list<guint32>::iterator it = citylist.begin();
+       it != citylist.end(); ++it, count++)
     {
       if (count == turn)
 	{
@@ -451,9 +450,9 @@ void HistoryReportDialog::fill_in_turn_info(guint32 turn)
 
   //update the ruin chart
   std::list<guint32> ruinlist = *past_ruincounts.begin();
-  it = ruinlist.begin();
   count = 0;
-  for (; it != ruinlist.end(); it++, count++)
+  for (std::list<guint32>::iterator it = ruinlist.begin ();
+       it != ruinlist.end(); ++it, count++)
     {
       if (count == turn)
 	{
@@ -472,12 +471,12 @@ void HistoryReportDialog::fill_in_turn_info(guint32 turn)
 
   //on turn # you were coming #
   std::list<guint32> scores;
-  std::list<std::list<guint32> >::iterator rit = past_rankcounts.begin();
-  for (; rit != past_rankcounts.end(); rit++)
+  for (std::list<std::list<guint32> >::iterator rit = past_rankcounts.begin();
+       rit != past_rankcounts.end(); ++rit)
     {
-      it = (*rit).begin();
       count=1;
-      for (; it != (*rit).end(); it++, count++)
+      for (std::list<guint32>::iterator it = (*rit).begin();
+           it != (*rit).end(); ++it, count++)
 	{
 	  if (count == turn)
 	    {
@@ -675,16 +674,15 @@ void HistoryReportDialog::addHistoryEvent(NetworkHistory *event)
 void HistoryReportDialog::generatePastWinningCounts()
 {
   //go through the history list looking for score events, per player
-  Playerlist::iterator pit = Playerlist::getInstance()->begin();
-  pit = Playerlist::getInstance()->begin();
-  for (; pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
 	continue;
       std::list<History*> *hist = (*pit)->getHistorylist();
-      std::list<History*>::iterator hit = hist->begin();
       std::list<guint32> line;
-      for (; hit != hist->end(); hit++)
+      for (std::list<History*>::iterator hit = hist->begin();
+           hit != hist->end(); ++hit)
 	{
 	  if ((*hit)->getType() == History::SCORE)
 	    {
@@ -703,9 +701,8 @@ void HistoryReportDialog::generatePastWinningCounts()
 void HistoryReportDialog::generatePastCityCounts()
 {
   // go through the past city list
-  Playerlist::iterator pit = Playerlist::getInstance()->begin();
-  pit = Playerlist::getInstance()->begin();
-  for (; pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
 	continue;
@@ -716,8 +713,8 @@ void HistoryReportDialog::generatePastCityCounts()
       for (unsigned int i = 0; i < past_citylists.size(); i++)
 	{
 	  guint32 total_cities = 0;
-	  LocationList<City*>::iterator it = past_citylists[i]->begin();
-	  for (; it != past_citylists[i]->end(); it++)
+	  for (LocationList<City*>::iterator it = past_citylists[i]->begin();
+               it != past_citylists[i]->end(); ++it)
 	    {
 	      if ((*it)->getOwner() == *pit)
 		total_cities++;
@@ -737,16 +734,15 @@ void HistoryReportDialog::generatePastCityCounts()
 void HistoryReportDialog::generatePastGoldCounts()
 {
   //go through the history list looking for gold events, per player
-  Playerlist::iterator pit = Playerlist::getInstance()->begin();
-  pit = Playerlist::getInstance()->begin();
-  for (; pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
 	continue;
       std::list<History*> *hist = (*pit)->getHistorylist();
-      std::list<History*>::iterator hit = hist->begin();
       std::list<guint32> line;
-      for (; hit != hist->end(); hit++)
+      for (std::list<History*>::iterator hit = hist->begin();
+           hit != hist->end(); ++hit)
 	{
 	  if ((*hit)->getType() == History::GOLD_TOTAL)
 	    {
@@ -766,9 +762,8 @@ void HistoryReportDialog::generatePastRuinCounts()
 {
   //how many ruins did the players search at each turn?
 
-  Playerlist::iterator pit = Playerlist::getInstance()->begin();
-  pit = Playerlist::getInstance()->begin();
-  for (; pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
         continue;
@@ -776,8 +771,8 @@ void HistoryReportDialog::generatePastRuinCounts()
       for (unsigned int i = 0; i < past_citylists.size(); i++)
         {
           guint32 total_ruins = 0;
-          LocationList<Ruin*>::iterator it = past_ruinlists[i]->begin();
-          for (; it != past_ruinlists[i]->end(); it++)
+          for (LocationList<Ruin*>::iterator it = past_ruinlists[i]->begin();
+               it != past_ruinlists[i]->end(); ++it)
             {
               Ruin *ruin = *it;
               if (ruin->isHidden() == true && ruin->getOwner() != *pit)
@@ -809,16 +804,16 @@ void HistoryReportDialog::generatePastRuinlists()
 
   //keep a set of pointers to remember how far we are into each player's history
   std::list<History*> *hist[MAX_PLAYERS];
-  Playerlist::iterator pit = Playerlist::getInstance()->begin();
-  for (; pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
 	continue;
       hist[(*pit)->getId()] = (*pit)->getHistorylist();
     }
   std::list<History*>::iterator hit[MAX_PLAYERS];
-  pit = Playerlist::getInstance()->begin();
-  for (; pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
 	continue;
@@ -835,8 +830,8 @@ void HistoryReportDialog::generatePastRuinlists()
     {
       //is the ruin searched to begin with?
       bool no_ruin_history = true;
-      pit = Playerlist::getInstance()->begin();
-      for (; pit != Playerlist::getInstance()->end(); ++pit)
+      for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+           pit != Playerlist::getInstance()->end(); ++pit)
 	if ((*pit)->searchedRuin(*it) == true)
 	  no_ruin_history = false;
       if ((*it)->isSearched() == true && no_ruin_history)
@@ -853,8 +848,8 @@ void HistoryReportDialog::generatePastRuinlists()
   while (1)
     {
       //now we see what ruins we took this turn
-      pit = Playerlist::getInstance()->begin();
-      for (; pit != Playerlist::getInstance()->end(); ++pit)
+      for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+           pit != Playerlist::getInstance()->end(); ++pit)
 	{
 	  if (*pit == Playerlist::getInstance()->getNeutral())
 	    continue;
@@ -862,11 +857,11 @@ void HistoryReportDialog::generatePastRuinlists()
 	  guint32 id = (*pit)->getId();
 	  if (hit[id] == hist[id]->end())
 	    continue;
-	  for (; hit[id] != hist[id]->end(); hit[id]++)
+	  for (; hit[id] != hist[id]->end(); ++(hit[id]))
 	    {
 	      if ((*hit[id])->getType() == History::START_TURN)
 		{
-		  hit[id]++;
+		  ++(hit[id]);
 		  break;
 		}
               //when a ruin becomes visible all of a sudden, we mark it as visible
@@ -876,8 +871,8 @@ void HistoryReportDialog::generatePastRuinlists()
 		  ruin_id = 
                     dynamic_cast<History_HeroRewardRuin*>(*hit[id])->getRuinId();
 		  //find ruin with this ruin id in rlist
-		  LocationList<Ruin*>::iterator rit = rlist->begin();
-		  for (; rit != rlist->end(); ++rit)
+		  for (LocationList<Ruin*>::iterator rit = rlist->begin();
+                       rit != rlist->end(); ++rit)
 		    if ((*rit)->getId() == ruin_id)
 		      {
                         (*rit)->setOwner(*pit);
@@ -890,8 +885,8 @@ void HistoryReportDialog::generatePastRuinlists()
 		  ruin_id = 
                     dynamic_cast<History_HeroRuinExplored*>(*hit[id])->getRuinId();
 		  //find ruin with this ruin id in rlist
-		  LocationList<Ruin*>::iterator rit = rlist->begin();
-		  for (; rit != rlist->end(); ++rit)
+		  for (LocationList<Ruin*>::iterator rit = rlist->begin();
+                       rit != rlist->end(); ++rit)
 		    if ((*rit)->getId() == ruin_id)
 		      {
 			(*rit)->setSearched(true);

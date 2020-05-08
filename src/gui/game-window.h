@@ -111,6 +111,8 @@ class GameWindow: public sigc::trackable
 
     void on_player_replaced(Player *p);
  private:
+
+
     Gtk::Window* window;
     Gtk::Window* map_tip;	// tooltip appears over the map
     Gtk::Window* stack_tip;// tooltip appears over the map

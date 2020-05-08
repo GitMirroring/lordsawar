@@ -49,7 +49,7 @@ guint32 TriumphsDialog::tally(Player *p, Triumphs::TriumphType type)
   if (p == d_player)
     {
       // add up what the other players did to us
-      for (Playerlist::iterator it = pl->begin(); it != pl->end(); it++)
+      for (Playerlist::iterator it = pl->begin(); it != pl->end(); ++it)
 	{
 	  if ((*it) == Playerlist::getInstance()->getNeutral())
 	    continue;

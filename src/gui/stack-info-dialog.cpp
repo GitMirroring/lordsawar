@@ -41,10 +41,9 @@
 #define method(x) sigc::mem_fun(*this, &StackInfoDialog::x)
 
 StackInfoDialog::StackInfoDialog(Gtk::Window &parent, Vector<int> pos)
- : LwDialog(parent, "stack-info-dialog.ui")
+ : LwDialog(parent, "stack-info-dialog.ui"), tile (pos)
 {
   army_info_tip = NULL;
-  tile = pos;
   currently_selected_stack = NULL;
 
   xml->get_widget("stack_table", stack_table);
@@ -76,7 +75,7 @@ void StackInfoDialog::addStack(Stack *s, guint32 &idx)
   guint32 colour_id = 0;
   if (colour_id == s->getOwner()->getId())
     colour_id = Shield::get_next_shield(colour_id);
-  for (Stack::iterator it = s->begin(); it != s->end(); it++)
+  for (Stack::iterator it = s->begin(); it != s->end(); ++it)
     {
       guint32 str = fight.getModifiedStrengthBonus(*it);
       addArmy(first, s, *it, str, idx, colour_id);
@@ -214,7 +213,7 @@ void StackInfoDialog::fill_stack_info()
   stks = stile->getFriendlyStacks(Playerlist::getActiveplayer());
   if (currently_selected_stack == NULL)
     currently_selected_stack = stks.front();
-  for (std::vector<Stack *>::iterator i = stks.begin(); i != stks.end(); i++)
+  for (std::vector<Stack *>::iterator i = stks.begin(); i != stks.end(); ++i)
     addStack(*i, idx);
   stack_table->show_all();
 }

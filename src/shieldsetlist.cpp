@@ -60,7 +60,7 @@ Shieldsetlist::Shieldsetlist()
 Shieldsetlist::~Shieldsetlist()
 {
   uninstantiateImages();
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     delete *it;
   clear();
 }
@@ -68,7 +68,7 @@ Shieldsetlist::~Shieldsetlist()
 std::list<Glib::ustring> Shieldsetlist::getValidNames() const
 {
   std::list<Glib::ustring> names;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->validate() == true)
         names.push_back((*it)->getName());
@@ -96,7 +96,7 @@ ShieldStyle *Shieldsetlist::getShield(guint32 shieldset, guint32 type, guint32 c
 void Shieldsetlist::instantiateImages(bool &broken)
 {
   broken = false;
-  for (iterator it = begin (); it != end (); it++)
+  for (iterator it = begin (); it != end (); ++it)
     if (!broken)
       if ((*it)->validate () == true)
         (*it)->instantiateImages (true, broken);
@@ -104,7 +104,7 @@ void Shieldsetlist::instantiateImages(bool &broken)
 
 void Shieldsetlist::uninstantiateImages()
 {
-  for (iterator it = begin (); it != end (); it++)
+  for (iterator it = begin (); it != end (); ++it)
     (*it)->uninstantiateImages ();
 }
 

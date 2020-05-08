@@ -40,7 +40,7 @@ Shield::Shield(const Shield& s)
 : std::list<ShieldStyle*>(), Tartan(s), sigc::trackable(s), d_owner(s.d_owner),
     d_color(s.d_color)
 {
-  for (const_iterator it = s.begin(); it != s.end(); it++)
+  for (const_iterator it = s.begin(); it != s.end(); ++it)
     push_back(new ShieldStyle(*(*it)));
 }
 
@@ -53,7 +53,7 @@ Shield::Shield(Shield::Colour owner, Gdk::RGBA color)
 
 Shield::~Shield()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
       delete *it;
 }
 
@@ -125,7 +125,7 @@ bool Shield::save(XML_Helper *helper) const
   retval &= helper->openTag(d_tag);
   retval &= helper->saveData("owner", d_owner);
   retval &= helper->saveData("color", d_color);
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     (*it)->save(helper);
   retval &= saveTartan(helper);
   retval &= helper->closeTag();
@@ -134,7 +134,7 @@ bool Shield::save(XML_Helper *helper) const
 	
 ShieldStyle *Shield::getFirstShieldstyle(ShieldStyle::Type type)
 {
-  for (iterator i = begin(); i != end(); i++)
+  for (iterator i = begin(); i != end(); ++i)
     {
       if (ShieldStyle::Type((*i)->getType()) == type)
 	return *i;

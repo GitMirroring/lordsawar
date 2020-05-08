@@ -283,8 +283,10 @@ class MapGenerator
          * @param allowed       which Tile::Types the building can be on
          * @return              true if placed, false if not
          */
-        bool canPlaceBuilding(Vector<int> pos, guint32 width, std::vector<Tile::Type> allowed);
-        bool canPutBuildingTile(Vector<int> pos, guint32 width, std::vector<Tile::Type> allowed);
+        bool canPlaceBuilding(Vector<int> pos, guint32 width,
+                              const std::vector<Tile::Type> &allowed);
+        bool canPutBuildingTile(Vector<int> pos, guint32 width,
+                                const std::vector<Tile::Type> &allowed);
 
         /** Normalizes the terrain
           * 

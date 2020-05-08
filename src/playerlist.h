@@ -180,7 +180,7 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	guint32 turnHumansInto(Player::Type type, int num_players = -1);
 
 	//! Reorder the list according to the given order.
-	void reorder(std::list<guint32> order);
+	void reorder(const std::list<guint32> &order);
 
 	//! Perform the surrender of all computer players.
 	void surrender();

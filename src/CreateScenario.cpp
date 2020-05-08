@@ -284,8 +284,8 @@ bool CreateScenario::create(const GameParameters &g)
   // fog it up
   if (GameScenario::s_hidden_map)
     {
-      Playerlist::iterator pit = Playerlist::getInstance()->begin();
-      for (; pit != Playerlist::getInstance()->end(); pit++)
+      for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
+           pit != Playerlist::getInstance()->end(); ++pit)
         (*pit)->getFogMap()->fill(FogMap::CLOSED);
     }
 
@@ -421,7 +421,7 @@ void CreateScenario::createCapitalCity(Player *player, City *city)
 bool CreateScenario::tooNearToOtherCapitalCities(City *c, std::list<City*> capitals, guint32 distance)
 {
   for (std::list<City*>::iterator it = capitals.begin(); it != capitals.end(); 
-       it++)
+       ++it)
     {
       int d = dist(c->getPos(), (*it)->getPos());
       if ((guint32) d < distance)
@@ -529,7 +529,7 @@ bool CreateScenario::setupRuins(bool strongholds_invisible, int sage_factor,
     //ruins.
 
     for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
-        it != Ruinlist::getInstance()->end(); it++)
+        it != Ruinlist::getInstance()->end(); ++it)
     {
         // set a random ruin type
         if (Rnd::rand() % stronghold_factor == 0) //one in six ruins is a stronghold

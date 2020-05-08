@@ -22,10 +22,10 @@
 #include "MapBackpack.h"
 #include "ImageCache.h"
 
-ItemMap::ItemMap(std::list<Stack*> item_laden_stacks, std::list<MapBackpack*> bags_of_stuff)
+ItemMap::ItemMap(const std::list<Stack*> &item_laden_stacks,
+                 const std::list<MapBackpack*> &bags_of_stuff)
+ : bags (bags_of_stuff), stacks (item_laden_stacks)
 {
-  stacks = item_laden_stacks;
-  bags = bags_of_stuff;
 }
 
 void ItemMap::draw_bag(Vector<int> pos)
@@ -40,14 +40,14 @@ void ItemMap::draw_bag(Vector<int> pos)
 void ItemMap::draw_bags()
 {
   for (std::list<MapBackpack*>::iterator it = bags.begin(); it != bags.end();
-       it++)
+       ++it)
     draw_bag((*it)->getPos());
 }
 
 void ItemMap::draw_heroes()
 {
   for (std::list<Stack*>::iterator it = stacks.begin(); it != stacks.end();
-       it++)
+       ++it)
     draw_hero((*it)->getPos(), true);
 }
 

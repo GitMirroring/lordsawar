@@ -210,16 +210,13 @@ class Stack : public ::UniquelyIdentified, public Movable, public Ownable, publi
 	void join(Stack *join);
 
 	//! Return a new stack that holds the given armies from this stack.
-	Stack *splitArmies(std::list<Army*> armies);
+	Stack *splitArmies(const std::list<Army*> &armies);
 
 	//! Return a new stack that holds the given armies from this stack.
-	Stack *splitArmies(std::list<guint32> armies);
+	Stack *splitArmies(const std::list<guint32> &armies);
 
 	// Return a new stack holds the given army from this stack.
 	Stack *splitArmy(Army *army);
-
-	//! Return a new stack that holds armies that have some mp.
-	Stack *splitArmiesWithMovement(guint32 mp = 1);
 
         //! Drown the non-flying units over water.  sets hitpoints to zero.
         bool killArmyUnitsInBoats();
@@ -241,7 +238,7 @@ class Stack : public ::UniquelyIdentified, public Movable, public Ownable, publi
 	bool clearPath();
 
         //! Sort the armies in this stack in the order shown by ids.
-        void sortByIds(std::list<guint32> ids);
+        void sortByIds(const std::list<guint32> &ids);
 
         //! Puts the stack into or out of a ship, depending on the tile at dest.
         /*

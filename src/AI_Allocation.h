@@ -142,7 +142,6 @@ class AI_Allocation
         int visitTemples(bool get_quests);
 
         int pickupItems();
-        int oldPickupItems();
 
         int visitRuins();
 
@@ -152,7 +151,6 @@ class AI_Allocation
         AI_Analysis *d_analysis;
         StackReflist *d_stacks;
         const Threatlist *d_threats;
-        bool *abort_turn;
 };
 
 #endif // AI_ALLOCATION_H

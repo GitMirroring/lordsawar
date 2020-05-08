@@ -151,6 +151,9 @@ class ScenarioMedia
 	//! Creates a new ScenarioMedia object from scratch.
         ScenarioMedia();
 
+        //! Creates a ScenarioMedia object from another one.
+        ScenarioMedia(const ScenarioMedia &sm);
+
 	//! Creates a new ScenarioMedia object from an opened save-file.
         ScenarioMedia(XML_Helper *helper);
 
@@ -163,17 +166,14 @@ class ScenarioMedia
         static ScenarioMedia* d_instance;
 
         //! The image shown when the hero levels up.  0 is male, 1 is female
-        TarFileMaskedImage *d_hero_newlevel[2];
 
         TarFileImage *d_next_turn;
         TarFileImage *d_city_defeated;
         TarFileImage *d_winning;
-        TarFileImage *d_hero[2]; //male is 0, female is 1
         TarFileImage *d_ruin_success;
         TarFileImage *d_ruin_defeat;
         TarFileImage *d_parley_offered;
         TarFileImage *d_parley_refused;
-        TarFileImage *d_medal[2]; //small is 0, big is 1
         TarFileImage *d_commentator;
 
         Glib::ustring d_bless_name;
@@ -182,6 +182,10 @@ class ScenarioMedia
         Glib::ustring d_defeat_name;
         Glib::ustring d_victory_name;
         Glib::ustring d_back_name;
+
+        TarFileMaskedImage *d_hero_newlevel[2];
+        TarFileImage *d_hero[2]; //male is 0, female is 1
+        TarFileImage *d_medal[2]; //small is 0, big is 1
 
         std::map<Glib::ustring, MusicItem*> d_musicMap;
         std::vector<Glib::ustring> d_bgMap;

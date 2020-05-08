@@ -1237,8 +1237,8 @@ void MainWindow::remove_tile_style_buttons()
     terrain_tile_style_grid->get_children();
   if (!children.empty()) 
     {
-      Glib::ListHandle<Gtk::Widget*>::iterator child = children.begin();
-      for (; child != children.end(); child++)
+      for (Glib::ListHandle<Gtk::Widget*>::iterator child = children.begin();
+           child != children.end(); ++child)
 	terrain_tile_style_grid->remove(**child);
     }
   tile_style_items.clear();
@@ -1269,7 +1269,7 @@ void MainWindow::setup_tile_style_buttons(Tile::Type terrain)
   tile_style_items.push_back(auto_item);
 
   int r = 0, c = 1, max_rows = 4;
-  for (Tile::iterator it = tile->begin(); it != tile->end(); it++)
+  for (Tile::iterator it = tile->begin(); it != tile->end(); ++it)
     {
       TileStyleSet *tilestyleset = *it;
       //loop through tile style sets
@@ -1762,14 +1762,14 @@ void MainWindow::randomize_city(City *c)
 void MainWindow::on_random_all_cities_activated()
 {
   Citylist *cl = Citylist::getInstance();
-  for (Citylist::iterator it = cl->begin(); it != cl->end(); it++)
+  for (Citylist::iterator it = cl->begin(); it != cl->end(); ++it)
     randomize_city(*it);
 }
 
 void MainWindow::on_random_unnamed_cities_activated()
 {
   Citylist *cl = Citylist::getInstance();
-  for (Citylist::iterator it = cl->begin(); it != cl->end(); it++)
+  for (Citylist::iterator it = cl->begin(); it != cl->end(); ++it)
     if ((*it)->isUnnamed() == true)
       randomize_city(*it);
 }
@@ -1790,14 +1790,14 @@ void MainWindow::randomize_ruin(Ruin *r)
 void MainWindow::on_random_all_ruins_activated()
 {
   Ruinlist *rl = Ruinlist::getInstance();
-  for (Ruinlist::iterator it = rl->begin(); it != rl->end(); it++)
+  for (Ruinlist::iterator it = rl->begin(); it != rl->end(); ++it)
     randomize_ruin(*it);
 }
 
 void MainWindow::on_random_unnamed_ruins_activated()
 {
   Ruinlist *rl = Ruinlist::getInstance();
-  for (Ruinlist::iterator it = rl->begin(); it != rl->end(); it++)
+  for (Ruinlist::iterator it = rl->begin(); it != rl->end(); ++it)
     if ((*it)->isUnnamed() == true)
       randomize_ruin(*it);
 }
@@ -1805,7 +1805,7 @@ void MainWindow::on_random_unnamed_ruins_activated()
 void MainWindow::on_random_all_temples_activated()
 {
   Templelist *tl = Templelist::getInstance();
-  for (Templelist::iterator it = tl->begin(); it != tl->end(); it++)
+  for (Templelist::iterator it = tl->begin(); it != tl->end(); ++it)
     {
       Glib::ustring name = d_create_scenario_names->popRandomTempleName();
       if (name != "")
@@ -1823,7 +1823,7 @@ void MainWindow::on_random_all_temples_activated()
 void MainWindow::on_random_unnamed_temples_activated()
 {
   Templelist *tl = Templelist::getInstance();
-  for (Templelist::iterator it = tl->begin(); it != tl->end(); it++)
+  for (Templelist::iterator it = tl->begin(); it != tl->end(); ++it)
     {
       if ((*it)->isUnnamed() == true)
 	{
@@ -1861,14 +1861,14 @@ void MainWindow::randomize_signpost(Signpost *signpost)
 void MainWindow::on_random_all_signs_activated()
 {
   Signpostlist *sl = Signpostlist::getInstance();
-  for (Signpostlist::iterator it = sl->begin(); it != sl->end(); it++)
+  for (Signpostlist::iterator it = sl->begin(); it != sl->end(); ++it)
     randomize_signpost(*it);
 }
 
 void MainWindow::on_random_unnamed_signs_activated()
 {
   Signpostlist *sl = Signpostlist::getInstance();
-  for (Signpostlist::iterator it = sl->begin(); it != sl->end(); it++)
+  for (Signpostlist::iterator it = sl->begin(); it != sl->end(); ++it)
     if ((*it)->getName() == DEFAULT_SIGNPOST)
       randomize_signpost(*it);
 }
@@ -1906,7 +1906,7 @@ void MainWindow::on_validate_activated()
 void MainWindow::clear_save_file_of_scenario_specific_data()
 {
   Playerlist *plist = Playerlist::getInstance();
-  for (Playerlist::iterator i = plist->begin(); i != plist->end(); i++)
+  for (Playerlist::iterator i = plist->begin(); i != plist->end(); ++i)
     {
       (*i)->clearActionlist();
       (*i)->clearHistorylist();
@@ -2020,14 +2020,14 @@ void MainWindow::on_player_toggled(PlayerItem item)
 void MainWindow::fill_players()
 {
   for (std::list<PlayerItem>::iterator it = player_buttons.begin();
-       it != player_buttons.end(); it++)
+       it != player_buttons.end(); ++it)
     players_hbox->remove(dynamic_cast<Gtk::Widget&>(*(*it).button));
   player_buttons.clear();
   Playerlist *pl = Playerlist::getInstance();
   bool sensitive = players_hbox->get_sensitive();
   if (!sensitive)
     players_hbox->set_sensitive(true);
-  for (Playerlist::iterator it = pl->begin(); it != pl->end(); it++)
+  for (Playerlist::iterator it = pl->begin(); it != pl->end(); ++it)
     {
       Gtk::ToggleButton *toggle = new Gtk::ToggleButton();
       toggle->foreach(sigc::mem_fun(toggle, &Gtk::Container::remove));

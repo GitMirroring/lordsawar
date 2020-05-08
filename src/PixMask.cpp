@@ -24,18 +24,16 @@
 #include "ucompose.hpp"
 
 
-PixMask::PixMask(Glib::RefPtr<Gdk::Pixbuf> pixbuf)
-     : width(0), height(0), unscaled_width(0), unscaled_height(0)
+PixMask::PixMask(Glib::RefPtr<Gdk::Pixbuf> p)
+ : pixmap (Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, p->get_width(),
+                                        p->get_height())),
+  mask (Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, p->get_width(),
+                                     p->get_height())),
+  gc (Cairo::Context::create(pixmap)), width(p->get_width ()),
+    height(p->get_height ()), unscaled_width(width), unscaled_height(height)
 {
-  pixmap = Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, pixbuf->get_width(), pixbuf->get_height());
-  gc = Cairo::Context::create(pixmap);
-  Gdk::Cairo::set_source_pixbuf(gc, pixbuf, 0, 0);
+  Gdk::Cairo::set_source_pixbuf(gc, p, 0, 0);
   gc->paint();
-  mask = Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, pixbuf->get_width(), pixbuf->get_height());
-  unscaled_width = pixbuf->get_width();
-  unscaled_height = pixbuf->get_height();
-  width = unscaled_width;
-  height = unscaled_height;
 }
 
 PixMask::~PixMask()

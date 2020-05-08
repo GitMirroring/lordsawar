@@ -30,7 +30,7 @@ class FileDetails
 {
 public:
   FileDetails(guint32 k, Glib::ustring f, Glib::ustring t, bool ta) 
-    {type = k; file_extension = f; tag = t; tar = ta;};
+    : type (k), file_extension (f), tag (t), tar (ta) {}
   guint32 type;
   Glib::ustring file_extension;
   Glib::ustring tag;
@@ -124,7 +124,7 @@ class UpgradeDetails
 {
 public:
   UpgradeDetails(Glib::ustring f, Glib::ustring t, FileCompat::Slot s) 
-    {from_version = f; to_version = t; slot = s;};
+    : from_version (f), to_version (t), slot (s) {}
   Glib::ustring from_version;
   Glib::ustring to_version;
   FileCompat::Slot slot;

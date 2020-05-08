@@ -111,8 +111,6 @@ class LocationBox : public Immovable
      */
     bool isVisible(Player *player) const;
 
-    bool isCompletelyObscuredByFog(Player *player) const;
-
     //! Returns whether or not the Location contains the given point?
     bool contains(Vector<int> pos) const;
 

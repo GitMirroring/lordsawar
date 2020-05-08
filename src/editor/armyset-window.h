@@ -210,7 +210,6 @@ class ArmySetWindow: public sigc::trackable
     bool check_save_valid (bool existing);
     bool check_name_valid (bool existing);
     bool isValidName ();
-    Gtk::Button *lookup_button_by_colour (Shield::Colour s);
     void fill_army_images (ArmyProto *army);
     void sync_armies ();
     void instantiateOthers (ArmyProto *a, Shield::Colour c, Glib::ustring f);

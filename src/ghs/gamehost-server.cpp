@@ -518,7 +518,7 @@ void GamehostServer::cleanup_old_profiles_awaiting_maps(int stale)
   Glib::TimeVal now;
   now.assign_current_time();
   for (std::list<HostGameRequest*>::iterator i = host_game_requests.begin();
-       i != host_game_requests.end(); i++)
+       i != host_game_requests.end(); ++i)
     {
       if ((*i)->created_on.as_double() + stale < now.as_double())
         {
@@ -532,7 +532,7 @@ void GamehostServer::cleanup_old_profiles_awaiting_maps(int stale)
 Profile *GamehostServer::remove_from_profiles_awaiting_maps(Glib::ustring scenario_id)
 {
   for (std::list<HostGameRequest*>::iterator i = host_game_requests.begin();
-       i != host_game_requests.end(); i++)
+       i != host_game_requests.end(); ++i)
     {
       if ((*i)->scenario_id == scenario_id)
         {
@@ -551,7 +551,7 @@ bool GamehostServer::is_member(Glib::ustring profile_id)
     return true;
   Glib::ustring id = String::utrim(profile_id);
   for (std::list<Glib::ustring>::iterator i = members.begin(); i != members.end();
-       i++)
+       ++i)
     {
       if (id == *i)
         return true;

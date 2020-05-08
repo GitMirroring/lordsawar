@@ -38,9 +38,8 @@ ArmyProdBase::ArmyProdBase(const ArmyProdBase& a)
 }
 
 ArmyProdBase::ArmyProdBase(const ArmyProto& a)
-    :ArmyProtoBase(a)
+    :ArmyProtoBase(a), d_type_id (a.getId())
 {
-  d_type_id = a.getId();
 }
 
 ArmyProdBase::ArmyProdBase(XML_Helper* helper)

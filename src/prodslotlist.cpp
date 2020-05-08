@@ -73,7 +73,7 @@ ProdSlotlist::ProdSlotlist(const ProdSlotlist& c)
     d_duration(c.d_duration)
 {
   for (std::vector<ProdSlot*>::const_iterator it = c.begin(); 
-       it != c.end(); it++)
+       it != c.end(); ++it)
     push_back(new ProdSlot(*(*it)));
 }
 

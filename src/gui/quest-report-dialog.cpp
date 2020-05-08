@@ -29,10 +29,9 @@
 
 #define method(x) sigc::mem_fun(*this, &QuestReportDialog::x)
 
-QuestReportDialog::QuestReportDialog(Gtk::Window &parent, std::vector<Quest *>q, Hero *hero)
- : LwDialog(parent, "quest-report-dialog.ui")
+QuestReportDialog::QuestReportDialog(Gtk::Window &parent, const std::vector<Quest *>&q, Hero *hero)
+ : LwDialog(parent, "quest-report-dialog.ui"), quests (q)
 {
-  quests = q;
 
   xml->get_widget("map_image", map_image);
   questmap = NULL;
@@ -53,7 +52,7 @@ QuestReportDialog::QuestReportDialog(Gtk::Window &parent, std::vector<Quest *>q,
   heroes_treeview->get_selection()->signal_changed().connect
     (method(on_hero_changed));
   for (std::vector<Quest*>::iterator it = quests.begin(); it != quests.end();
-       it++)
+       ++it)
     {
       add_questing_hero (*it, (*it)->getHero());
       if ((*it)->getHero() == hero || count == 0)

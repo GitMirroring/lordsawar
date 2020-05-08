@@ -33,11 +33,9 @@
 #define debug(x)
 
 QuestPillageGold::QuestPillageGold(QuestsManager& q_mgr, guint32 hero)
-  : Quest(q_mgr, hero, Quest::PILLAGEGOLD), d_pillaged(0)
+  : Quest(q_mgr, hero, Quest::PILLAGEGOLD), 
+    d_to_pillage (850 + (Rnd::rand() % 630)), d_pillaged(0)
 {
-  //pick an amount of gold to sack and pillage
-  d_to_pillage = 850 + (Rnd::rand() % 630);
-
   initDescription();
 }
 
@@ -45,15 +43,14 @@ QuestPillageGold::QuestPillageGold(QuestsManager& q_mgr, XML_Helper* helper)
   : Quest(q_mgr, helper)
 {
   helper->getData(d_to_pillage, "to_pillage");
-  helper->getData(d_pillaged,  "pillaged");
+  helper->getData(d_pillaged, "pillaged");
 
   initDescription();
 }
 
 QuestPillageGold::QuestPillageGold(QuestsManager& q_mgr, guint32 hero, guint32 gold)
-  : Quest(q_mgr, hero, Quest::PILLAGEGOLD), d_pillaged(0)
+  : Quest(q_mgr, hero, Quest::PILLAGEGOLD), d_to_pillage (gold), d_pillaged(0)
 {
-  d_to_pillage = gold;
   initDescription();
 }
 

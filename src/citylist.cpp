@@ -82,7 +82,7 @@ int Citylist::countCities() const
 {
     int cities = 0;
     
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
     {
         if ((*it)->isBurnt())
           continue;
@@ -96,7 +96,7 @@ int Citylist::countCities(Player* player) const
 {
     int cities = 0;
     
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
     {
         if ((*it)->isBurnt())
           continue;
@@ -109,7 +109,7 @@ int Citylist::countCities(Player* player) const
 void Citylist::collectTaxes(Player* p) const
 {
   // Collect the taxes
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     if ((*it)->getOwner() == p && (*it)->isBurnt() == false)
       p->addGold((*it)->getGold());
 
@@ -119,7 +119,7 @@ void Citylist::collectTaxes(Player* p) const
 guint32 Citylist::calculateUpcomingUpkeep(Player *p) const
 {
   guint32 total = 0;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     if ((*it)->getOwner() == p && (*it)->isBurnt() == false)
       {
 	if ((*it)->getDuration() == 1)
@@ -151,7 +151,7 @@ void Citylist::nextTurn(Player* p)
 	int diff = cost_of_new_armies - p->getGold();
 	//then we have to turn off enough production to make up for diff
 	//gold pieces.
-	for (iterator it = begin(); it != end(); it++)
+	for (iterator it = begin(); it != end(); ++it)
 	  {
 	    if ((*it)->isBurnt() == true)
 	      continue;
@@ -170,7 +170,7 @@ void Citylist::nextTurn(Player* p)
       }
 
     // This iteration adds the city production to the player    
-    for (iterator it = begin(); it != end(); it++)
+    for (iterator it = begin(); it != end(); ++it)
       {
         if ((*it)->getOwner() == p)
             (*it)->nextTurn();
@@ -424,7 +424,7 @@ bool Citylist::save(XML_Helper* helper) const
 
     retval &= helper->openTag(Citylist::d_tag);
 
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
         (*it)->save(helper);
     
     retval &= helper->closeTag();
@@ -446,7 +446,7 @@ bool Citylist::load(Glib::ustring tag, XML_Helper* helper)
 
 void Citylist::changeOwnership(Player *old_owner, Player *new_owner)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if ((*it)->getOwner() == old_owner)
       {
         stopVectoringTo(*it);
@@ -462,7 +462,7 @@ void Citylist::changeOwnership(Player *old_owner, Player *new_owner)
 
 void Citylist::stopVectoringTo(City *c)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isBurnt() == true)
 	continue;
@@ -476,7 +476,7 @@ void Citylist::stopVectoringTo(City *c)
 
 bool Citylist::isVectoringTarget(City *target) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getOwner() != target->getOwner())
 	continue;
@@ -489,7 +489,7 @@ bool Citylist::isVectoringTarget(City *target) const
 std::list<City*> Citylist::getCitiesVectoringTo(Vector<int> target) const
 {
   std::list<City*> cities;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if (target == (*it)->getVectoring())
 	cities.push_back((*it));
@@ -500,7 +500,7 @@ std::list<City*> Citylist::getCitiesVectoringTo(Vector<int> target) const
 std::list<City*> Citylist::getCitiesVectoringTo(City *target) const
 {
   std::list<City*> cities;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getOwner() != target->getOwner())
 	continue;
@@ -520,7 +520,7 @@ City* Citylist::getNearestCityPast(const Vector<int>& pos, int dist) const
 guint32 Citylist::countCitiesVectoringTo(const City *dest) const
 {
   guint32 count = 0;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       City *c = *it;
       if (c->getOwner() != dest->getOwner())
@@ -535,7 +535,7 @@ guint32 Citylist::countCitiesVectoringTo(const City *dest) const
 std::list<City*> Citylist::getNearestFriendlyCities(Player *player, Vector<int> pos) const
 {
   std::list<City*> cities;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       City *c = *it;
       if (c->getOwner() != player)
@@ -551,7 +551,7 @@ std::list<City*> Citylist::getNearestFriendlyCities(Player *player, Vector<int> 
   if (pos == Vector<int>(-1,-1))
     pos = player->getFirstCity()->getPos();
 
-  for (std::list<City*>::iterator it = cities.begin(); it != cities.end(); it++)
+  for (std::list<City*>::iterator it = cities.begin(); it != cities.end(); ++it)
     distances.push_back(dist((*it)->getNearestPos(pos), pos));
 
   bool sorted = false;
@@ -563,13 +563,13 @@ std::list<City*> Citylist::getNearestFriendlyCities(Player *player, Vector<int> 
       // setup
       std::list<int>::iterator dit = distances.begin();
       std::list<int>::iterator dnextit = distances.begin();
-      dnextit++;
+      ++dnextit;
 
       std::list<City*>::iterator it = cities.begin();
       std::list<City*>::iterator nextit = it;
-      nextit++;
+      ++nextit;
 
-      for (; nextit != cities.end(); it++, nextit++, dit++, dnextit++)
+      for (; nextit != cities.end(); ++it, ++nextit, ++dit, ++dnextit)
         if ((*dit) > (*dnextit))
           {
             // exchange the items in both lists
@@ -591,7 +591,7 @@ std::list<City*> Citylist::getNearestFriendlyCities(Player *player, Vector<int> 
 
 City *Citylist::getCapitalCity(Player *player) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       City *c = *it;
       if (c->isCapital() && c->getCapitalOwner() &&
@@ -604,7 +604,7 @@ City *Citylist::getCapitalCity(Player *player) const
 City *Citylist::getRandomCityForHero(Player *player) const
 {
   std::vector<City*> cities;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     if (!(*it)->isBurnt() && (*it)->getOwner() == player)
       cities.push_back((*it));
   if (cities.empty())
@@ -615,7 +615,7 @@ City *Citylist::getRandomCityForHero(Player *player) const
 guint32 Citylist::countUnamedCities () const
 {
   guint32 count = 0;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     if ((*it)->getName () == DEFAULT_CITY_NAME)
       count++;
   return count;

@@ -90,7 +90,7 @@ QuestsManager::~QuestsManager()
     delete q;
 
   for (std::map<guint32,Quest*>::iterator it = d_quests.begin();
-       it != d_quests.end(); it++)
+       it != d_quests.end(); ++it)
     delete (*it).second;
   cleanup();
 }
@@ -267,7 +267,7 @@ std::vector<Quest*> QuestsManager::getPlayerQuests(const Player *player) const
   // for every hero check any pending quests
   const Stacklist* sl = player->getStacklist();
   std::list<Hero*> heroes = sl->getHeroes();
-  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); it++)
+  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); ++it)
     {
       guint32 heroId = (*it)->getId();
 
@@ -308,14 +308,14 @@ bool QuestsManager::save(XML_Helper* helper) const
   retval &= helper->openTag(QuestsManager::d_tag);
 
   for (std::map<guint32,Quest*>::const_iterator it = d_quests.begin();
-       it != d_quests.end(); it++)
+       it != d_quests.end(); ++it)
     {
       if ((*it).second == NULL)
 	continue;
       retval &= ((*it).second)->save(helper);
     }
   for (std::list<Quest *>::const_iterator it = d_inactive_quests.begin();
-       it != d_inactive_quests.end(); it++)
+       it != d_inactive_quests.end(); ++it)
     retval &= (*it)->save(helper);
 
   debug("Quests saved\n");
@@ -418,7 +418,7 @@ std::vector<Quest*> QuestsManager::getActiveQuests ()
 {
   std::vector<Quest*> quests;
   for (std::map<guint32,Quest*>::iterator it = d_quests.begin();
-       it != d_quests.end(); it++)
+       it != d_quests.end(); ++it)
     {
       if ((*it).second == NULL)
 	continue;
@@ -467,14 +467,14 @@ void QuestsManager::cityAction(City *c, Stack *s,
       else
 	{
           //XXX XXX XXX why do we have to check for null here?
-	  for (Stack::iterator sit = s->begin(); sit != s->end(); sit++)
+	  for (Stack::iterator sit = s->begin(); sit != s->end(); ++sit)
 	    {
               if (q->isPendingDeletion())
 		break;
 	      if ((*sit)->getId() == q->getHeroId())
 		q->cityAction(c, action, true, gold);
 	    }
-	  for (Stack::iterator sit = s->begin(); sit != s->end(); sit++)
+	  for (Stack::iterator sit = s->begin(); sit != s->end(); ++sit)
 	    {
               if (q->isPendingDeletion())
 		break;
@@ -514,7 +514,7 @@ void QuestsManager::nextTurn(Player *p)
   d_completed_quests.clear ();
   // go through our inactive list and remove quests belonging to us
   for (std::list<Quest*>::iterator it = d_inactive_quests.begin();
-       it != d_inactive_quests.end(); it++)
+       it != d_inactive_quests.end(); ++it)
     {
       if ((*it)->getOwner() == p)
 	{

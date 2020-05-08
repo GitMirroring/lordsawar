@@ -19,7 +19,7 @@
 #include "Item.h"
 #include "xmlhelper.h"
 
-Glib::ustring MapBackpack::d_tag = "itemstack";
+Glib::ustring MapBackpack::d_mapbackpack_tag = "itemstack";
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -45,7 +45,7 @@ bool MapBackpack::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(MapBackpack::d_tag);
+  retval &= helper->openTag(MapBackpack::d_mapbackpack_tag);
   retval &= helper->saveData("x", getPos().x);
   retval &= helper->saveData("y", getPos().y);
   retval &= Backpack::saveData(helper);
@@ -56,7 +56,7 @@ bool MapBackpack::save(XML_Helper* helper) const
 
 Item *MapBackpack::getFirstPlantedItem()
 {
-  for (MapBackpack::iterator it = begin(); it != end(); it++)
+  for (MapBackpack::iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getPlanted() == true)
 	return *it;
@@ -66,7 +66,7 @@ Item *MapBackpack::getFirstPlantedItem()
 
 Item *MapBackpack::getPlantedItem(Player *player)
 {
-  for (MapBackpack::iterator it = begin(); it != end(); it++)
+  for (MapBackpack::iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getPlanted() == true &&
 	  (*it)->getPlantableOwner() == player)

@@ -35,12 +35,12 @@ void ArmyMap::draw_stacks()
 {
   // Draw stacks as tiny shields
   for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-       pit != Playerlist::getInstance()->end(); pit++)
+       pit != Playerlist::getInstance()->end(); ++pit)
     {
       Stacklist* mylist = (*pit)->getStacklist();
       //Gdk::RGBA cross_color = (*pit)->getColor();
 
-      for (Stacklist::iterator it= mylist->begin(); it != mylist->end(); it++)
+      for (Stacklist::iterator it= mylist->begin(); it != mylist->end(); ++it)
         {
           Vector<int> pos = (*it)->getPos();
 

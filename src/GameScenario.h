@@ -120,7 +120,7 @@ class GameScenario: public GameScenarioOptions, public TarFile
           */
         bool saveGame(Glib::ustring filename, Glib::ustring extension = SAVE_EXT) const;
         bool dump (Glib::ustring filename, Glib::ustring extension = SAVE_EXT) const;
-        bool loadWithHelper(XML_Helper &helper, Glib::ustring dir);
+        bool loadWithHelper(XML_Helper &helper);
         bool saveWithHelper(XML_Helper &helper) const;
 
 	guint32 getPlayMode() const {return d_playmode;};

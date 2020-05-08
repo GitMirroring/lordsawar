@@ -1,4 +1,4 @@
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 Glib::ustring TileStyle::d_tag = "tilestyle";
 
 TileStyle::TileStyle()
-  : d_image(0)
+  : d_image(0), d_type (LONE), d_id (0)
 {
 }
         
@@ -44,7 +44,7 @@ TileStyle::TileStyle(const TileStyle& t)
 }
 
 TileStyle::TileStyle(guint32 id, TileStyle::Type type)
-        : d_image(0), d_type(type), d_id(id)
+ : d_image(0), d_type(type), d_id(id)
 {
 }
 
@@ -121,29 +121,6 @@ Glib::ustring TileStyle::getTypeName(Type type)
     default:
       return "Unknown";
     }
-}
-
-TileStyle::Type TileStyle::typeNameToType(Glib::ustring name)
-{
-  if (name == "Lone") return LONE;
-  else if (name == "Outer Top-Left") return OUTERTOPLEFT;
-  else if (name == "Outer Top-Centre") return OUTERTOPCENTER;
-  else if (name == "Outer Top-Right") return OUTERTOPRIGHT;
-  else if (name == "Outer Bottom-Left") return OUTERBOTTOMLEFT;
-  else if (name == "Outer Bottom-Centre") return OUTERBOTTOMCENTER;
-  else if (name == "Outer Bottom-Right") return OUTERBOTTOMRIGHT;
-  else if (name == "Outer Middle-Left") return OUTERMIDDLELEFT;
-  else if (name == "Outer Middle-Centre") return INNERMIDDLECENTER;
-  else if (name == "Outer Middle-Right") return OUTERMIDDLERIGHT;
-  else if (name == "Inner Top-Left") return INNERTOPLEFT;
-  else if (name == "Inner Top-Right") return INNERTOPRIGHT;
-  else if (name == "Inner Bottom-Left") return INNERBOTTOMLEFT;
-  else if (name == "Inner Bottom-Right") return INNERBOTTOMRIGHT;
-  else if (name == "Top-Left To Bottom-Right Diagonal") return TOPLEFTTOBOTTOMRIGHTDIAGONAL;
-  else if (name == "Bottom-Left to Top-Right Diagonal") return BOTTOMLEFTTOTOPRIGHTDIAGONAL;
-  else if (name == "Other") return OTHER;
-  else if (name == "Unknown") return UNKNOWN;
-  else return UNKNOWN;
 }
 
 guint32 TileStyle::calculateHexDigits(guint32 id)

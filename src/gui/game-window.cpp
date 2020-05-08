@@ -131,16 +131,16 @@ double GameWindow::minimum_zoom_scale = 0.4;
 double GameWindow::maximum_zoom_scale = 3.0;
 
 GameWindow::GameWindow()
+ : map_tip (NULL),
+    stack_tip (NULL),
+    city_info_tip (NULL),
+    stack_info_tip (NULL),
+    game (NULL),
+    game_button_box (NULL),
+     game_winner (NULL),
+    last_box (Gtk::Allocation(0,0,1,1)),
+    unmaximized_box (Gtk::Allocation(0,0,1,1))
 {
-  game_winner = NULL;
-  stack_info_tip = NULL;
-  city_info_tip = NULL;
-  map_tip = NULL;
-  stack_tip = NULL;
-  game = NULL;
-  game_button_box = NULL;
-  last_box = Gtk::Allocation(0,0,1,1);
-  unmaximized_box = Gtk::Allocation(0,0,1,1);
 
   Glib::RefPtr<Gtk::Builder> xml = BuilderCache::get("game-window.ui");
 
@@ -316,8 +316,8 @@ GameWindow::GameWindow()
 
 GameWindow::~GameWindow()
 {
-  std::list<sigc::connection>::iterator it = connections.begin();
-  for (; it != connections.end(); it++) 
+  for (std::list<sigc::connection>::iterator it = connections.begin();
+       it != connections.end(); ++it) 
     (*it).disconnect();
   connections.clear();
   for (unsigned int i = 0; i < MAX_PLAYERS; i++)
@@ -458,8 +458,8 @@ void GameWindow::setup_menuitem(Gtk::MenuItem *item,
 void GameWindow::setup_signals(GameScenario *game_scenario)
 {
   // get rid of the connections that might be still around from last time
-  std::list<sigc::connection>::iterator it = connections.begin();
-  for (; it != connections.end(); it++) 
+  for (std::list<sigc::connection>::iterator it = connections.begin();
+       it != connections.end(); ++it) 
     (*it).disconnect();
   connections.clear();
 
@@ -2287,7 +2287,8 @@ void GameWindow::on_city_sacked(City *city, int gold, std::list<guint32> sacked_
   int i = 0;
   Gtk::Label *sack_label = NULL;
   Gtk::Image *sack_image = NULL;
-  for (std::list<guint32>::iterator it = sacked_types.begin(); it != sacked_types.end(); it++)
+  for (std::list<guint32>::iterator it = sacked_types.begin();
+       it != sacked_types.end(); ++it)
     {
       switch (i)
 	{

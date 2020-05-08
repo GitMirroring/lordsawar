@@ -499,6 +499,7 @@ class ImageCache
         static void add_underline (PixMask **p, Gdk::RGBA color, guint32 font_size);
     private:
         ImageCache();
+        ImageCache(const ImageCache &c);
         ~ImageCache();
 
         //! Checks if the cache has exceeded the maximum size and reduce it.
@@ -584,8 +585,8 @@ class ImageCache
 class SelectorPixMaskCacheItem
 {
 public:
-    static PixMask *generate(SelectorPixMaskCacheItem item);
-    int comp(const SelectorPixMaskCacheItem item) const;
+    static PixMask *generate(const SelectorPixMaskCacheItem &item);
+    int comp(const SelectorPixMaskCacheItem &item) const;
     bool operator == (const SelectorPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const SelectorPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 tileset;
@@ -601,8 +602,8 @@ public:
 class ArmyPixMaskCacheItem
 {
 public:
-    static PixMask *generate(ArmyPixMaskCacheItem item);
-    int comp(const ArmyPixMaskCacheItem item) const;
+    static PixMask *generate(const ArmyPixMaskCacheItem &item);
+    int comp(const ArmyPixMaskCacheItem &item) const;
     bool operator == (const ArmyPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const ArmyPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 armyset;
@@ -621,8 +622,8 @@ public:
 class FlagPixMaskCacheItem
 {
 public:
-    static PixMask *generate(FlagPixMaskCacheItem item);
-    int comp(const FlagPixMaskCacheItem item) const;
+    static PixMask *generate(const FlagPixMaskCacheItem & item);
+    int comp(const FlagPixMaskCacheItem &item) const;
     bool operator == (const FlagPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const FlagPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 tileset;
@@ -638,8 +639,8 @@ public:
 class CircledArmyPixMaskCacheItem
 {
 public:
-    static PixMask *generate(CircledArmyPixMaskCacheItem item);
-    int comp(const CircledArmyPixMaskCacheItem item) const;
+    static PixMask *generate(const CircledArmyPixMaskCacheItem &item);
+    int comp(const CircledArmyPixMaskCacheItem &item) const;
     bool operator == (const CircledArmyPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const CircledArmyPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 armyset;
@@ -660,8 +661,8 @@ public:
 class TilePixMaskCacheItem
 {
 public:
-    static PixMask *generate(TilePixMaskCacheItem item);
-    int comp(const TilePixMaskCacheItem item) const;
+    static PixMask *generate(const TilePixMaskCacheItem &item);
+    int comp(const TilePixMaskCacheItem &item) const;
     bool operator == (const TilePixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const TilePixMaskCacheItem &c) const {return comp(c)<0;};
   int tile_style_id;
@@ -693,8 +694,8 @@ public:
 class CityPixMaskCacheItem
 {
 public:
-    static PixMask *generate(CityPixMaskCacheItem item);
-    int comp(const CityPixMaskCacheItem item) const;
+    static PixMask *generate(const CityPixMaskCacheItem &item);
+    int comp(const CityPixMaskCacheItem &item) const;
     bool operator == (const CityPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const CityPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 cityset;
@@ -709,8 +710,8 @@ public:
 class TowerPixMaskCacheItem
 {
 public:
-    static PixMask *generate(TowerPixMaskCacheItem item);
-    int comp(const TowerPixMaskCacheItem item) const;
+    static PixMask *generate(const TowerPixMaskCacheItem &item);
+    int comp(const TowerPixMaskCacheItem &item) const;
     bool operator == (const TowerPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const TowerPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 cityset;
@@ -724,8 +725,8 @@ public:
 class TemplePixMaskCacheItem
 {
 public:
-    static PixMask *generate(TemplePixMaskCacheItem item);
-    int comp(const TemplePixMaskCacheItem item) const;
+    static PixMask *generate(const TemplePixMaskCacheItem &item);
+    int comp(const TemplePixMaskCacheItem &item) const;
     bool operator == (const TemplePixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const TemplePixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 cityset;
@@ -739,8 +740,8 @@ public:
 class RuinPixMaskCacheItem
 {
 public:
-    static PixMask *generate(RuinPixMaskCacheItem item);
-    int comp(const RuinPixMaskCacheItem item) const;
+    static PixMask *generate(const RuinPixMaskCacheItem &item);
+    int comp(const RuinPixMaskCacheItem &item) const;
     bool operator == (const RuinPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const RuinPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 cityset;
@@ -754,8 +755,8 @@ public:
 class DiplomacyPixMaskCacheItem
 {
 public:
-    static PixMask *generate(DiplomacyPixMaskCacheItem item);
-    int comp(const DiplomacyPixMaskCacheItem item) const;
+    static PixMask *generate(const DiplomacyPixMaskCacheItem &item);
+    int comp(const DiplomacyPixMaskCacheItem &item) const;
     bool operator == (const DiplomacyPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const DiplomacyPixMaskCacheItem &c) const {return comp(c)<0;};
     int type;
@@ -770,8 +771,8 @@ public:
 class RoadPixMaskCacheItem
 {
 public:
-    static PixMask *generate(RoadPixMaskCacheItem item);
-    int comp(const RoadPixMaskCacheItem item) const;
+    static PixMask *generate(const RoadPixMaskCacheItem &item);
+    int comp(const RoadPixMaskCacheItem &item) const;
     bool operator == (const RoadPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const RoadPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 tileset;
@@ -786,8 +787,8 @@ public:
 class FogPixMaskCacheItem
 {
 public:
-    static PixMask *generate(FogPixMaskCacheItem item);
-    int comp(const FogPixMaskCacheItem item) const;
+    static PixMask *generate(const FogPixMaskCacheItem &item);
+    int comp(const FogPixMaskCacheItem &item) const;
     bool operator == (const FogPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const FogPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 tileset;
@@ -801,8 +802,8 @@ public:
 class BridgePixMaskCacheItem
 {
 public:
-    static PixMask *generate(BridgePixMaskCacheItem item);
-    int comp(const BridgePixMaskCacheItem item) const;
+    static PixMask *generate(const BridgePixMaskCacheItem &item);
+    int comp(const BridgePixMaskCacheItem &item) const;
     bool operator == (const BridgePixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const BridgePixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 tileset;
@@ -816,8 +817,8 @@ public:
 class CursorPixMaskCacheItem
 {
 public:
-    static PixMask *generate(CursorPixMaskCacheItem item);
-    int comp(const CursorPixMaskCacheItem item) const;
+    static PixMask *generate(const CursorPixMaskCacheItem &item);
+    int comp(const CursorPixMaskCacheItem &item) const;
     bool operator == (const CursorPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const CursorPixMaskCacheItem &c) const {return comp(c)<0;};
     int type;
@@ -831,8 +832,8 @@ public:
 class ShieldPixMaskCacheItem
 {
 public:
-    static PixMask *generate(ShieldPixMaskCacheItem item);
-    int comp(const ShieldPixMaskCacheItem item) const;
+    static PixMask *generate(const ShieldPixMaskCacheItem &item);
+    int comp(const ShieldPixMaskCacheItem &item) const;
     bool operator == (const ShieldPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const ShieldPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 shieldset;
@@ -849,8 +850,8 @@ public:
 class ProdShieldPixMaskCacheItem
 {
 public:
-    static PixMask *generate(ProdShieldPixMaskCacheItem item);
-    int comp(const ProdShieldPixMaskCacheItem item) const;
+    static PixMask *generate(const ProdShieldPixMaskCacheItem &item);
+    int comp(const ProdShieldPixMaskCacheItem &item) const;
     bool operator == (const ProdShieldPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const ProdShieldPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 type;
@@ -864,9 +865,9 @@ public:
 class MoveBonusPixMaskCacheItem
 {
 public:
-    static PixMask *generate(MoveBonusPixMaskCacheItem item);
+    static PixMask *generate(const MoveBonusPixMaskCacheItem &item);
     static PixMask *getMoveBonusPic(Tileset *t, guint32 bonus, guint32 font_size, double ratio);
-    int comp(const MoveBonusPixMaskCacheItem item) const;
+    int comp(const MoveBonusPixMaskCacheItem &item) const;
     bool operator == (const MoveBonusPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const MoveBonusPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 bonus; // a movement bonus, a bitwise OR'd set of Tile::Type
@@ -892,8 +893,8 @@ public:
 class ShipPixMaskCacheItem
 {
 public:
-    static PixMask *generate(ShipPixMaskCacheItem item);
-    int comp(const ShipPixMaskCacheItem item) const;
+    static PixMask *generate(const ShipPixMaskCacheItem &item);
+    int comp(const ShipPixMaskCacheItem &item) const;
     bool operator == (const ShipPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const ShipPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 player_id;
@@ -907,8 +908,8 @@ public:
 class PlantedStandardPixMaskCacheItem
 {
 public:
-    static PixMask *generate(PlantedStandardPixMaskCacheItem item);
-    int comp(const PlantedStandardPixMaskCacheItem item) const;
+    static PixMask *generate(const PlantedStandardPixMaskCacheItem &item);
+    int comp(const PlantedStandardPixMaskCacheItem &item) const;
     bool operator == (const PlantedStandardPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const PlantedStandardPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 player_id;
@@ -922,8 +923,8 @@ public:
 class PortPixMaskCacheItem
 {
 public:
-    static PixMask *generate(PortPixMaskCacheItem item);
-    int comp(const PortPixMaskCacheItem item) const;
+    static PixMask *generate(const PortPixMaskCacheItem &item);
+    int comp(const PortPixMaskCacheItem &item) const;
     bool operator == (const PortPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const PortPixMaskCacheItem &c) const {return comp(c)<0;};
   guint32 cityset;
@@ -936,8 +937,8 @@ public:
 class SignpostPixMaskCacheItem
 {
 public:
-    static PixMask *generate(SignpostPixMaskCacheItem item);
-    int comp(const SignpostPixMaskCacheItem item) const;
+    static PixMask *generate(const SignpostPixMaskCacheItem &item);
+    int comp(const SignpostPixMaskCacheItem &item) const;
     bool operator == (const SignpostPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const SignpostPixMaskCacheItem &c) const {return comp(c)<0;};
   guint32 cityset;
@@ -951,8 +952,8 @@ public:
 class BagPixMaskCacheItem
 {
 public:
-    static PixMask *generate(BagPixMaskCacheItem item);
-    int comp(const BagPixMaskCacheItem item) const;
+    static PixMask *generate(const BagPixMaskCacheItem &item);
+    int comp(const BagPixMaskCacheItem &item) const;
     bool operator == (const BagPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const BagPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 armyset;
@@ -966,8 +967,8 @@ public:
 class ExplosionPixMaskCacheItem
 {
 public:
-    static PixMask *generate(ExplosionPixMaskCacheItem item);
-    int comp(const ExplosionPixMaskCacheItem item) const;
+    static PixMask *generate(const ExplosionPixMaskCacheItem &item);
+    int comp(const ExplosionPixMaskCacheItem &item) const;
     bool operator == (const ExplosionPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const ExplosionPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 tileset;
@@ -981,8 +982,8 @@ public:
 class NewLevelPixMaskCacheItem
 {
 public:
-    static PixMask *generate(NewLevelPixMaskCacheItem item);
-    int comp(const NewLevelPixMaskCacheItem item) const;
+    static PixMask *generate(const NewLevelPixMaskCacheItem &item);
+    int comp(const NewLevelPixMaskCacheItem &item) const;
     bool operator == (const NewLevelPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const NewLevelPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 player_id;
@@ -997,8 +998,8 @@ public:
 class DefaultTileStylePixMaskCacheItem
 {
 public:
-    static PixMask *generate(DefaultTileStylePixMaskCacheItem item);
-    int comp(const DefaultTileStylePixMaskCacheItem item) const;
+    static PixMask *generate(const DefaultTileStylePixMaskCacheItem &item);
+    int comp(const DefaultTileStylePixMaskCacheItem &item) const;
     bool operator == (const DefaultTileStylePixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const DefaultTileStylePixMaskCacheItem &c) const {return comp(c)<0;};
 public:
@@ -1014,9 +1015,9 @@ public:
 class TartanPixMaskCacheItem
 {
 public:
-    static PixMask *generate(TartanPixMaskCacheItem item);
+    static PixMask *generate(const TartanPixMaskCacheItem &item);
     static void calculateWidth(guint32 iwidth, PixMask *left, PixMask *center, PixMask *right, guint32 &width, guint32 &centers, bool &include_right);
-    int comp(const TartanPixMaskCacheItem item) const;
+    int comp(const TartanPixMaskCacheItem &item) const;
     bool operator == (const TartanPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const TartanPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 width;
@@ -1033,8 +1034,8 @@ public:
 class EmptyTartanPixMaskCacheItem
 {
 public:
-    static PixMask *generate(EmptyTartanPixMaskCacheItem item);
-    int comp(const EmptyTartanPixMaskCacheItem item) const;
+    static PixMask *generate(const EmptyTartanPixMaskCacheItem &item);
+    int comp(const EmptyTartanPixMaskCacheItem &item) const;
     bool operator == (const EmptyTartanPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const EmptyTartanPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 width;
@@ -1050,8 +1051,8 @@ public:
 class StatusPixMaskCacheItem
 {
 public:
-    static PixMask *generate(StatusPixMaskCacheItem item);
-    int comp(const StatusPixMaskCacheItem item) const;
+    static PixMask *generate(const StatusPixMaskCacheItem &item);
+    int comp(const StatusPixMaskCacheItem &item) const;
     bool operator == (const StatusPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const StatusPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 type;
@@ -1065,8 +1066,8 @@ public:
 class GameButtonPixMaskCacheItem
 {
 public:
-    static PixMask *generate(GameButtonPixMaskCacheItem item);
-    int comp(const GameButtonPixMaskCacheItem item) const;
+    static PixMask *generate(const GameButtonPixMaskCacheItem &item);
+    int comp(const GameButtonPixMaskCacheItem &item) const;
     bool operator == (const GameButtonPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const GameButtonPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 type;
@@ -1080,8 +1081,8 @@ public:
 class DialogPixMaskCacheItem
 {
 public:
-    static PixMask *generate(DialogPixMaskCacheItem item);
-    int comp(const DialogPixMaskCacheItem item) const;
+    static PixMask *generate(const DialogPixMaskCacheItem &item);
+    int comp(const DialogPixMaskCacheItem &item) const;
     bool operator == (const DialogPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const DialogPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 type;
@@ -1091,13 +1092,13 @@ public:
 //! Helper class for the medal images in the ImageCache.
 /**
  * These images include the tiny medals that get awarded to armies,
- * and then the large ones that appear on dialogs..
+ * and then the large ones that appear on dialogs.
  */
 class MedalPixMaskCacheItem
 {
 public:
-    static PixMask *generate(MedalPixMaskCacheItem item);
-    int comp(const MedalPixMaskCacheItem item) const;
+    static PixMask *generate(const MedalPixMaskCacheItem &item);
+    int comp(const MedalPixMaskCacheItem &item) const;
     bool operator == (const MedalPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const MedalPixMaskCacheItem &c) const {return comp(c)<0;};
     bool large;

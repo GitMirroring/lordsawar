@@ -45,12 +45,12 @@ int getVictimArmytype(Player *p, std::list<Vector<int> >&targets)
       if (pit == p)
 	continue;
       sl = pit->getStacklist();
-      for (sit = sl->begin(); sit != sl->end(); sit++)
+      for (sit = sl->begin(); sit != sl->end(); ++sit)
 	{
 	  //is this stack not in a city?  no?  it's a target.
 	  if (GameMap::getCity((*sit)->getPos()) == NULL)
 	    targets.push_back((*sit)->getPos());
-	  for (it = (*sit)->begin(); it != (*sit)->end(); it++)
+	  for (it = (*sit)->begin(); it != (*sit)->end(); ++it)
 	    {
 	      if ((*it)->getAwardable())
                 specials.push_back((*it));
@@ -66,13 +66,9 @@ int getVictimArmytype(Player *p, std::list<Vector<int> >&targets)
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 QuestEnemyArmytype::QuestEnemyArmytype(QuestsManager& q_mgr, guint32 hero)
-  : Quest(q_mgr, hero, Quest::KILLARMYTYPE)
+  : Quest(q_mgr, hero, Quest::KILLARMYTYPE),
+  d_type_to_kill (getVictimArmytype (getHero ()->getOwner (), d_targets))
 {
-  Player *p = getHero()->getOwner();
-
-  // pick a victim
-  d_type_to_kill = getVictimArmytype (p, d_targets);
-
   initDescription();
 }
 
@@ -86,11 +82,8 @@ QuestEnemyArmytype::QuestEnemyArmytype(QuestsManager& q_mgr, XML_Helper* helper)
 
 QuestEnemyArmytype::QuestEnemyArmytype(QuestsManager& q_mgr, guint32 hero,
 				       guint32 type_to_kill)
-  : Quest(q_mgr, hero, Quest::KILLARMYTYPE)
+  : Quest(q_mgr, hero, Quest::KILLARMYTYPE), d_type_to_kill (type_to_kill)
 {
-  // pick a victim
-  d_type_to_kill = type_to_kill;
-
   initDescription();
 }
 

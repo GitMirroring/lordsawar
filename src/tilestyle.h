@@ -333,9 +333,6 @@ ooooooo
 	//! Get the name of the TileStyle::Type in string form.
 	static Glib::ustring getTypeName(Type type);
 
-	//! Return the style type enumeration given the type name.
-	static TileStyle::Type typeNameToType(Glib::ustring name);
-
         //! Return how many digits the hex number should be for an id this big.
         /**
          * It returns 2, 3, 4 or 5.  e.g. 0x12345

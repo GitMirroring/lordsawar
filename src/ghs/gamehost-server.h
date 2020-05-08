@@ -56,11 +56,12 @@ public:
   void reload();
 
   //get functions
-  Glib::ustring getHostname() const {return hostname;};
+  Glib::ustring getHostname() const {return hostname;}
 
   //set functions
-  void setHostname(Glib::ustring h) {hostname = h;};
-  void setMembers(std::list<Glib::ustring> profile_ids) {members = profile_ids;};
+  void setHostname(Glib::ustring h) {hostname = h;}
+  void setMembers(const std::list<Glib::ustring> &profile_ids)
+    {members = profile_ids;}
 
   // signals
   sigc::signal<void, int> port_in_use;

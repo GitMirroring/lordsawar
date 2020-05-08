@@ -19,12 +19,10 @@
 #include <cairomm/context.h>
 #include "font-size.h"
 
-BarChart::BarChart(std::list<unsigned int> bars, std::list<Gdk::RGBA> colours,
-		   unsigned int max_value)
+BarChart::BarChart(const std::list<unsigned int> &bars,
+                   const std::list<Gdk::RGBA> &colours, unsigned int max_value)
+ : d_bars (bars), d_colours (colours), d_max_value (max_value)
 {
-  d_bars = bars;
-  d_colours = colours;
-  d_max_value = max_value;
 }
 
 bool BarChart::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
@@ -62,10 +60,10 @@ bool BarChart::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
     cr->set_line_width((double)lw);
 
     unsigned int max = 0;
-    std::list<unsigned int>::iterator bit = d_bars.begin();
     if (d_max_value == 0)
       {
-	for (; bit != d_bars.end(); bit++)
+	for (std::list<unsigned int>::iterator bit = d_bars.begin();
+             bit != d_bars.end(); ++bit)
 	  {
 	    if (*bit > max)
 	      max = *bit;
@@ -106,10 +104,10 @@ bool BarChart::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
     unsigned int hoffs = 15;
     unsigned int d = ((height-voffs-lw-h)/d_colours.size())-lw;
     cr->move_to(0, 0);
-    bit = d_bars.begin();
     std::list<Gdk::RGBA>::iterator cit = d_colours.begin();
     unsigned int i = 0;
-    for (; bit != d_bars.end(), cit != d_colours.end(); bit++, cit++, i+=(lw+d))
+    for (std::list<unsigned int>::iterator bit = d_bars.begin();
+         bit != d_bars.end(), cit != d_colours.end(); ++bit, ++cit, i+=(lw+d))
       {
 	cr->move_to(hoffs, i + lw + voffs);
 	double red = (*cit).get_red();

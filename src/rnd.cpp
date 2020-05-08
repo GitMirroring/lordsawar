@@ -30,6 +30,12 @@ Rnd::Rnd()
 {
   rnd = new Glib::Rand();
 }
+
+Rnd::Rnd (const Rnd &k)
+{
+  rnd = new Glib::Rand ();
+  rnd->set_seed (k.rnd->get_int ());
+}
   
 guint32 Rnd::rand()
 {

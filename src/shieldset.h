@@ -113,7 +113,6 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 	//! Return the total number of shields in this shieldset.
         guint32 getSize() const {return size();}
 
-        bool isAnyHeightAndWidthSet();
         bool isSmallHeightAndWidthSet();
         bool isMediumHeightAndWidthSet();
         bool isLargeHeightAndWidthSet();

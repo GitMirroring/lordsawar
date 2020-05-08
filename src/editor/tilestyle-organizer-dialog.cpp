@@ -110,7 +110,7 @@ void TileStyleOrganizerDialog::on_category_drag_data_get(const Glib::RefPtr<Gdk:
   std::list<TileStyle*> st = get_selected_category_tilestyles();
   if (st.empty() == true)
     return;
-  for (std::list<TileStyle*>::iterator i = st.begin(); i != st.end(); i++)
+  for (std::list<TileStyle*>::iterator i = st.begin(); i != st.end(); ++i)
     s += String::ucompose("0x%1 ", TileStyle::idToString((*i)->getId()));
   data.set(data.get_target(), 8, (const guchar*)s.c_str(), strlen(s.c_str()));
 }
@@ -122,7 +122,7 @@ void TileStyleOrganizerDialog::on_unsorted_drag_data_get(const Glib::RefPtr<Gdk:
   std::list<TileStyle*> st = get_selected_unsorted_tilestyles();
   if (st.empty() == true)
     return;
-  for (std::list<TileStyle*>::iterator i = st.begin(); i != st.end(); i++)
+  for (std::list<TileStyle*>::iterator i = st.begin(); i != st.end(); ++i)
     s += String::ucompose("0x%1 ", TileStyle::idToString((*i)->getId()));
   data.set(data.get_target(), 8, (const guchar*)s.c_str(), strlen(s.c_str()));
 }
@@ -148,7 +148,7 @@ std::list<TileStyle*> TileStyleOrganizerDialog::get_selected_category_tilestyles
   paths selected = category_iconview->get_selected_items();
   if (!selected.empty())
     {
-      for (paths::iterator i = selected.begin(); i != selected.end(); i++)
+      for (paths::iterator i = selected.begin(); i != selected.end(); ++i)
         {
           Gtk::TreeModel::iterator iter = category_list->get_iter(*i);
           Gtk::TreeModel::Row row = *iter;
@@ -165,7 +165,7 @@ std::list<TileStyle*> TileStyleOrganizerDialog::get_selected_unsorted_tilestyles
   paths selected = unsorted_iconview->get_selected_items();
   if (!selected.empty())
     {
-      for (paths::iterator i = selected.begin(); i != selected.end(); i++)
+      for (paths::iterator i = selected.begin(); i != selected.end(); ++i)
         {
           Gtk::TreeModel::iterator iter = unsorted_list->get_iter(*i);
           Gtk::TreeModel::Row row = *iter;
@@ -249,7 +249,7 @@ void TileStyleOrganizerDialog::fill_category(guint32 type)
   list->clear();
   std::list<TileStyle*> styles = d_tile->getTileStyles(TileStyle::Type(type));
   for (std::list<TileStyle*>::iterator i = styles.begin(); i != styles.end();
-       i++)
+       ++i)
     add_tilestyle(list, *i);
 }
 

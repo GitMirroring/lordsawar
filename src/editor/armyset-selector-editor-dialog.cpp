@@ -188,8 +188,8 @@ void ArmysetSelectorEditorDialog::clearSelector()
     heartbeat.disconnect();
 
        
-  std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator lit = selectors.begin();
-  for (; lit != selectors.end(); lit++)
+  for (std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator lit = selectors.begin();
+       lit != selectors.end(); ++lit)
     (*lit).clear();
   selectors.clear();
   preview_table->foreach(sigc::mem_fun(preview_table, &Gtk::Container::remove));
@@ -228,17 +228,21 @@ bool ArmysetSelectorEditorDialog::loadSelector()
 
   selectors = std::list<Glib::RefPtr<Gdk::Pixbuf> >();
 
-  Shieldset::iterator sit = shieldset->begin();
-  for (; sit != shieldset->end(); sit++)
+  Shield *selected_shield = NULL;
+  for (Shieldset::iterator sit = shieldset->begin();
+       sit != shieldset->end(); ++sit)
     if ((*sit)->getOwner () ==
         (guint32) owner_combobox->get_active_row_number ())
-      break;
+      {
+        selected_shield = *sit;
+        break;
+      }
   for (guint32 i = 0; i < p->getNumberOfFrames (); i++)
     {
-      guint32 owner = (*sit)->getOwner ();
+      guint32 owner = selected_shield->getOwner ();
       if (owner == MAX_PLAYERS) //ignore neutral
         continue;
-      PixMask *q = p->applyMask (i, (*sit)->getColor());
+      PixMask *q = p->applyMask (i, selected_shield->getColor());
       double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
       int font_size = FontSize::getInstance()->get_height ();
       double new_height = font_size * ratio;
@@ -261,7 +265,7 @@ void ArmysetSelectorEditorDialog::on_heartbeat()
   preview_table->insert_column (0);
 
   preview_table->attach(*manage(new Gtk::Image(*frame)), 0, 0, 1, 1);
-  frame++;
+  ++frame;
   if (frame == selectors.end())
     frame = selectors.begin();
 
@@ -333,22 +337,6 @@ void ArmysetSelectorEditorDialog::set_selector_filename (Glib::ustring f)
       small_selector = new TarFileMaskedImage (*d_armyset->getSelector(true, c));
     }
   return ;
-}
-
-void ArmysetSelectorEditorDialog::clear_selector_image ()
-{
-  Shield::Colour c = get_selected_colour ();
-  if (large_selector_radiobutton->get_active() == true)
-    {
-      large_selector->clear ();
-      d_armyset->getSelector(true,c)->clear ();
-    }
-  else if (small_selector_radiobutton->get_active() == true)
-    {
-      small_selector->clear ();
-      d_armyset->getSelector(false,c)->clear ();
-    }
-  return;
 }
 
 void ArmysetSelectorEditorDialog::on_selector_imagebutton_clicked ()

@@ -54,8 +54,9 @@ void GamelistClient::deleteInstance()
 }
 
 GamelistClient::GamelistClient()
+ : network_connection (NULL), d_host (""), d_port (0), d_connected (false),
+    d_profile_id (""), d_recently_played_game_list (NULL)
 {
-  network_connection = NULL;
 }
 
 void GamelistClient::start(Glib::ustring host, guint32 port, Profile *p)

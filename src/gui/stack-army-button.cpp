@@ -36,22 +36,19 @@
 
 StackArmyButton * StackArmyButton::create()
 {
-  Glib::ustring file = "stack-army-button-large-screen.ui";
-  Glib::RefPtr<Gtk::Builder> xml = BuilderCache::get(file);
+  Glib::RefPtr<Gtk::Builder> xml =
+    BuilderCache::get("stack-army-button-large-screen.ui");
 
   StackArmyButton *box;
   xml->get_widget_derived("box", box);
-  box->d_stack = NULL;
-  box->d_army = NULL;
-  box->d_circle_colour_id = 0;
   box->army_button->set_active(false);
   return box;
 }
 
 StackArmyButton::StackArmyButton(BaseObjectType* baseObject, const Glib::RefPtr<Gtk::Builder> &xml)
-  : Gtk::Box(baseObject)
+  : Gtk::Box(baseObject), d_stack (NULL), d_army (NULL), d_circle_colour_id (0),
+    army_info_tip (NULL)
 {
-  army_info_tip = NULL;
   xml->get_widget("army_button", army_button);
   xml->get_widget("army_image", army_image);
   xml->get_widget("army_label", army_label);

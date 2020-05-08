@@ -18,9 +18,11 @@
 #include "tarfile.h"
 #include "tarhelper.h"
 
-TarFile::TarFile(Glib::ustring name, Glib::ustring ext)
-  : d_dir(""), d_basename(name), d_extension(ext), d_tmp_filename("")
+TarFile::TarFile(Glib::ustring dir, Glib::ustring name, Glib::ustring ext)
+  : d_dir(dir), d_basename(name), d_extension(ext), d_tmp_filename("")
 {
+  if (d_dir.empty () == false)
+    d_dir = File::add_slash_if_necessary (d_dir);
 }
 
 TarFile::TarFile(const TarFile &s)
@@ -160,7 +162,7 @@ bool TarFile::saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring
             {
               std::list<Glib::ustring> files = orig.getFilenames(ext);
               for (std::list<Glib::ustring>::iterator it = files.begin(); 
-                   it != files.end(); it++)
+                   it != files.end(); ++it)
                 {
                   Glib::ustring file = orig.getFile(*it, broken);
                   if (broken == false)
@@ -176,7 +178,7 @@ bool TarFile::saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring
             }
           orig.Close();
           for (std::list<Glib::ustring>::iterator it = delfiles.begin();
-               it != delfiles.end(); it++)
+               it != delfiles.end(); ++it)
             File::erase(*it);
         }
       else
@@ -226,9 +228,4 @@ void TarFile::setLoadTemporaryFile ()
   Glib::ustring f = File::get_tmp_file ();
   File::copy (getConfigurationFile (), f);
   d_tmp_filename = f;
-}
-
-bool TarFile::isTemporaryFile () const
-{
-  return d_tmp_filename != "";
 }

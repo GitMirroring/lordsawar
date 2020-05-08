@@ -41,8 +41,8 @@ FightOrderDialog::FightOrderDialog(Gtk::Window &parent, Player *theplayer)
   armies_treeview->append_column("", armies_columns.name);
 
   std::list<guint32> fight_order = theplayer->getFightOrder();
-  std::list<guint32>::iterator it = fight_order.begin();
-  for (; it != fight_order.end(); it++)
+  for (std::list<guint32>::iterator it = fight_order.begin();
+       it != fight_order.end(); ++it)
     addArmyType(*it);
   armies_treeview->set_reorderable(true);
   xml->get_widget("reverse_button", reverse_button);

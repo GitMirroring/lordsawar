@@ -44,20 +44,20 @@ Backpack::Backpack(XML_Helper* helper)
 Backpack::Backpack(const Backpack& backpack)
  : std::list<Item*>()
 {
-  for (const_iterator it = backpack.begin(); it != backpack.end(); it++)
+  for (const_iterator it = backpack.begin(); it != backpack.end(); ++it)
     push_back(new Item(**it));
 }
 
 Backpack::~Backpack()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     delete (*it);
 }
 
 bool Backpack::saveData(XML_Helper* helper) const
 {
   bool retval = true;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     retval &= (*it)->save(helper);
   return true;
 }
@@ -91,7 +91,7 @@ bool Backpack::loadItem(Glib::ustring tag, XML_Helper* helper)
 guint32 Backpack::countStrengthBonuses()
 {
   guint32 bonus = 0;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getBonus(Item::ADD1STR))
 	bonus += 1;
@@ -106,7 +106,7 @@ guint32 Backpack::countStrengthBonuses()
 guint32 Backpack::countStackStrengthBonuses()
 {
   guint32 bonus = 0;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getBonus(Item::ADD1STACK))
 	bonus += 1;
@@ -121,7 +121,7 @@ guint32 Backpack::countStackStrengthBonuses()
 guint32 Backpack::countGoldBonuses()
 {
   guint32 bonus = 0;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getBonus(Item::ADD2GOLDPERCITY))
 	bonus += 2;
@@ -138,7 +138,7 @@ guint32 Backpack::countGoldBonuses()
 guint32 Backpack::countMovementDoublers()
 {
   guint32 bonus = 0;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if ((*it)->getBonus(Item::DOUBLEMOVESTACK))
       bonus++;
   return bonus;
@@ -147,7 +147,7 @@ guint32 Backpack::countMovementDoublers()
 guint32 Backpack::countStackFlightGivers()
 {
   guint32 bonus = 0;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if ((*it)->getBonus(Item::FLYSTACK))
       bonus++;
   return bonus;
@@ -156,7 +156,7 @@ guint32 Backpack::countStackFlightGivers()
 guint32 Backpack::countPlantableItems()
 {
   guint32 count = 0;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if ((*it)->isPlantable())
       count++;
   return count;
@@ -164,7 +164,7 @@ guint32 Backpack::countPlantableItems()
 
 Item *Backpack::getPlantableItem(Player *player)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if ((*it)->isPlantable() && (*it)->getPlantableOwner() == player)
       return *it;
   return NULL;
@@ -172,7 +172,7 @@ Item *Backpack::getPlantableItem(Player *player)
 	
 Item *Backpack::getItemById(guint32 id)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if ((*it)->getId() == id)
       return *it;
   return NULL;
@@ -181,7 +181,7 @@ Item *Backpack::getItemById(guint32 id)
 bool Backpack::addToBackpack(Item* item, int position)
 {
   iterator it = begin();
-  for (; position > 0; position--, it++);
+  for (; position > 0; position--, ++it);
   insert(it, item);
   return true;
 }
@@ -195,7 +195,7 @@ bool Backpack::addToBackpack(Item* item)
 
 bool Backpack::removeFromBackpack(Item* item)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if ((*it) == item)
       {
 	//FIXME: delete the item?
@@ -214,13 +214,13 @@ void Backpack::removeAllFromBackpack()
 	
 void Backpack::add(Backpack *backpack)
 {
-  for (Backpack::iterator it = backpack->begin(); it != backpack->end(); it++)
+  for (Backpack::iterator it = backpack->begin(); it != backpack->end(); ++it)
     addToBackpack(new Item(**it));
 }
 
 bool Backpack::hasUsableItem() const
 {
-  for (Backpack::const_iterator it = begin(); it != end(); it++)
+  for (Backpack::const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isUsable())
         return true;
@@ -230,7 +230,7 @@ bool Backpack::hasUsableItem() const
 
 void Backpack::getUsableItems(std::list<Item*> &items) const
 {
-  for (Backpack::const_iterator it = begin(); it != end(); it++)
+  for (Backpack::const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isUsable())
         items.push_back(*it);

@@ -24,8 +24,8 @@
 #include "builder-cache.h"
 
 LwDialog::LwDialog(Gtk::Window &parent, Glib::ustring file)
+  : xml (BuilderCache::get (file))
 {
-  xml = BuilderCache::get(file);
   xml->get_widget("dialog", dialog);
   dialog->set_transient_for(parent);
   dialog->property_gravity() = Gdk::GRAVITY_STATIC;

@@ -45,7 +45,7 @@ SmallMap::SmallMap(bool headless)
       sleep_interval = TIMER_SMALLMAP_REFRESH;
 }
 
-void SmallMap::set_view(LwRectangle new_view)
+void SmallMap::set_view(const LwRectangle &new_view)
 {
     if (view != new_view)
     {
@@ -210,19 +210,6 @@ void SmallMap::slide_view(LwRectangle new_view)
 	}
       sliding = false;
     }
-}
-
-void SmallMap::move_map_in_dir(Vector<int> dir)
-{
-  LwRectangle new_view = view;
-  new_view.pos += dir;
-  if (new_view.pos.x + new_view.w >= GameMap::getWidth() ||
-      new_view.pos.y + new_view.h >= GameMap::getHeight() ||
-      new_view.pos.x < 0 || new_view.pos.y < 0)
-    new_view.pos -= dir;
-
-  set_view(new_view);
-  view_changed.emit(view);
 }
 
 void SmallMap::center_view ()

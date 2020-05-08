@@ -87,7 +87,7 @@ void AI_Diplomacy::makeFriendsAndEnemies()
 void AI_Diplomacy::makeRequiredEnemies()
 {
   for (std::list<Player *>::iterator it = new_enemies.begin();
-       it != new_enemies.end(); it++)
+       it != new_enemies.end(); ++it)
     d_owner->proposeDiplomacy (Player::PROPOSE_WAR , *it);
 }
 

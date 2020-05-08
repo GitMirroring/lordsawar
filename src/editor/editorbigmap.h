@@ -105,7 +105,6 @@ class EditorBigMap: public BigMap
     void change_map_under_cursor();
     std::vector<Vector<int> > get_cursor_tiles();
     LwRectangle get_cursor_rectangle();
-    std::vector<Vector<int> > get_screen_tiles();
     void bring_up_details();
     void display_moving_building(Vector<int> src, Vector<int> dest);
     void blit (PixMask *src, Cairo::RefPtr<Cairo::Surface> dest, Vector<int> pos, double scale);

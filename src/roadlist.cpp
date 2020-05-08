@@ -68,7 +68,7 @@ bool Roadlist::save(XML_Helper* helper) const
 
     retval &= helper->openTag(Roadlist::d_tag);
 
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
     retval &= helper->closeTag();

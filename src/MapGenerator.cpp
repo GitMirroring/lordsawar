@@ -60,18 +60,15 @@
 #define debug(x)
 #define offmap(bx,by) (by<0)||(by>=d_height)||(bx<0)||(bx>=d_width)
 
-//-------------------------------------------------------------------
-
 MapGenerator::MapGenerator()
-    //set reasonable default values
-    :d_terrain(0), d_building(0), d_pswamp(2), d_pwater(25), d_pforest(3),
+ :d_terrain(0), d_building(0), d_width (MAP_SIZE_NORMAL_WIDTH),
+    d_height (MAP_SIZE_NORMAL_HEIGHT), d_pswamp(2), d_pwater(25), d_pforest(3),
     d_phills(5), d_pmountains(5), d_nocities(11), d_notemples(9), d_noruins(20),
     d_nosignposts(30), d_nostones (40), d_stone_road_chance (ROAD_STONE_CHANCE),
     cityset(NULL)
-
 {
-    d_xdir[0]=0;d_xdir[1]=-1;d_xdir[2]=-1;d_xdir[3]=-1;d_xdir[4]=0;d_xdir[5]=1;d_xdir[6]=1;d_xdir[7]=1;
-    d_ydir[0]=-1;d_ydir[1]=-1;d_ydir[2]=0;d_ydir[3]=1;d_ydir[4]=1;d_ydir[5]=1;d_ydir[6]=0;d_ydir[7]=-1;
+  d_xdir[0]=0;d_xdir[1]=-1;d_xdir[2]=-1;d_xdir[3]=-1;d_xdir[4]=0;d_xdir[5]=1;d_xdir[6]=1;d_xdir[7]=1;
+  d_ydir[0]=-1;d_ydir[1]=-1;d_ydir[2]=0;d_ydir[3]=1;d_ydir[4]=1;d_ydir[5]=1;d_ydir[6]=0;d_ydir[7]=-1;
 }
 
 MapGenerator::~MapGenerator()
@@ -485,7 +482,7 @@ void MapGenerator::makeBridges()
   bridges = findBridgePlaces();
   int bridges_laid = 0;
   for (std::vector<std::pair<int, Vector<int> > >::iterator it = bridges.begin();
-       it != bridges.end(); it++)
+       it != bridges.end(); ++it)
     {
       Vector<int> pos = (*it).second + Vector<int>(1,1);
       Vector<int> edge1;
@@ -1236,7 +1233,7 @@ bool MapGenerator::seekPlain(int& x, int& y)
     return false;
 }
 
-bool MapGenerator::canPlaceBuilding(Vector<int> pos, guint32 width, std::vector<Tile::Type> allowed)
+bool MapGenerator::canPlaceBuilding(Vector<int> pos, guint32 width, const std::vector<Tile::Type> &allowed)
 {
   for (unsigned int i = 0; i < width; i++)
     for (unsigned int j = 0; j < width; j++)
@@ -1246,7 +1243,7 @@ bool MapGenerator::canPlaceBuilding(Vector<int> pos, guint32 width, std::vector<
   return true;
 }
 
-bool MapGenerator::canPutBuildingTile(Vector<int> pos, guint32 width, std::vector<Tile::Type> allowed)
+bool MapGenerator::canPutBuildingTile(Vector<int> pos, guint32 width, const std::vector<Tile::Type> &allowed)
 {
   int found = false;
   for (auto t : allowed)
@@ -1543,8 +1540,8 @@ bool MapGenerator::makeAccessible(RoadPathCalculator *pc_land, RoadPathCalculato
     {
       Path::reverse_iterator it = p->rbegin();
       Path::reverse_iterator nextit = it;
-      nextit++;
-      for ( ; nextit != p->rend(); it++, nextit++)
+      ++nextit;
+      for ( ; nextit != p->rend(); ++it, ++nextit)
 	{
 	  int x = (*it).x;
 	  int y = (*it).y;

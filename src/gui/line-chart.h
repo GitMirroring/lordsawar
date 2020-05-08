@@ -29,7 +29,9 @@
 class LineChart: public Gtk::Image
 {
 public:
-    LineChart(std::list<std::list<unsigned int> > lines, std::list<Gdk::RGBA> colours, unsigned int max_height_value, Glib::ustring x_axis_description, Glib::ustring y_axis_description);
+    LineChart(const std::list<std::list<unsigned int> > &lines,
+              const std::list<Gdk::RGBA> &colours, unsigned int max_height_value,
+              Glib::ustring x_axis_description, Glib::ustring y_axis_description);
     virtual ~LineChart() {};
 
     void set_x_indicator(int x);

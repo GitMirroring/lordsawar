@@ -48,14 +48,13 @@ Shieldset::Shieldset(const Shieldset& s)
     d_medium_height(s.d_medium_height), d_medium_width(s.d_medium_width),
     d_large_height(s.d_large_height), d_large_width(s.d_large_width)
 {
-  for (const_iterator it = s.begin(); it != s.end(); it++)
+  for (const_iterator it = s.begin(); it != s.end(); ++it)
     push_back(new Shield(*(*it)));
 }
 
 Shieldset::Shieldset(XML_Helper *helper, Glib::ustring directory)
- : Set(SHIELDSET_EXT, helper)
+ : Set(SHIELDSET_EXT, helper, directory)
 {
-  setDirectory(directory);
   setTileSize(0);
   helper->getData(d_small_width, "small_width");
   helper->getData(d_small_height, "small_height");
@@ -67,24 +66,24 @@ Shieldset::Shieldset(XML_Helper *helper, Glib::ustring directory)
 		      sigc::mem_fun((*this), &Shieldset::loadShield));
   helper->registerTag(ShieldStyle::d_tag, sigc::mem_fun((*this), 
 							&Shieldset::loadShield));
-  helper->registerTag(Tartan::d_tag, sigc::mem_fun((*this),
-                                                   &Shieldset::loadShield));
+  helper->registerTag(Tartan::d_tartan_tag, sigc::mem_fun((*this),
+                                                          &Shieldset::loadShield));
   clear();
 }
 
 Shieldset::~Shieldset()
 {
   uninstantiateImages();
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     delete *it;
   clean_tmp_dir();
 }
 
 ShieldStyle * Shieldset::lookupShieldByTypeAndColour(guint32 type, guint32 colour) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
-      for (Shield::const_iterator i = (*it)->begin(); i != (*it)->end(); i++)
+      for (Shield::const_iterator i = (*it)->begin(); i != (*it)->end(); ++i)
 	{
 	  if ((*i)->getType() == type && (*it)->getOwner() == colour)
 	    return *i;
@@ -95,7 +94,7 @@ ShieldStyle * Shieldset::lookupShieldByTypeAndColour(guint32 type, guint32 colou
 
 Shield * Shieldset::lookupShieldByColour (guint32 colour) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getOwner() == colour)
         return *it;
@@ -105,7 +104,7 @@ Shield * Shieldset::lookupShieldByColour (guint32 colour) const
 
 Gdk::RGBA Shieldset::getColor(guint32 owner) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getOwner() == owner)
 	return (*it)->getColor();
@@ -127,7 +126,7 @@ bool Shieldset::loadShield(Glib::ustring tag, XML_Helper* helper)
       (*back()).push_back(sh);
       return true;
     }
-  if (tag == Tartan::d_tag)
+  if (tag == Tartan::d_tartan_tag)
     {
       Tartan * t = new Tartan(helper);
       back()->getTartanMaskedImage(Tartan::LEFT)->setName
@@ -147,11 +146,9 @@ class ShieldsetLoader
 {
 public:
     ShieldsetLoader(Glib::ustring filename, bool &broken, bool &unsupported)
+      : dir (File::get_dirname(filename)), file (File::get_basename(filename)),
+      shieldset (NULL), unsupported_version (false)
       {
-        unsupported_version = false;
-	shieldset = NULL;
-	dir = File::get_dirname(filename);
-        file = File::get_basename(filename);
 	if (File::nameEndsWith(filename, Shieldset::file_extension) == false)
 	  filename += Shieldset::file_extension;
         Tar_Helper t(filename, std::ios::in, broken);
@@ -235,7 +232,7 @@ bool Shieldset::save(XML_Helper *helper) const
   retval &= helper->saveData("medium_height", d_medium_height);
   retval &= helper->saveData("large_width", d_large_width);
   retval &= helper->saveData("large_height", d_large_height);
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     retval &= (*it)->save(helper);
   retval &= helper->closeTag();
   return retval;
@@ -272,9 +269,9 @@ bool Shieldset::validateNumberOfShields() const
   int players[MAX_PLAYERS + 1][3];
   memset(players, 0, sizeof(players));
   //need at least 3 complete player shields, one of which must be neutral.
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
-      for (Shield::const_iterator i = (*it)->begin(); i != (*it)->end(); i++)
+      for (Shield::const_iterator i = (*it)->begin(); i != (*it)->end(); ++i)
 	{
 	  int idx = 0;
 	  switch ((*i)->getType())
@@ -304,11 +301,11 @@ bool Shieldset::validateShieldImages(Shield::Colour c) const
   //if we have a shield, it should have all 3 sizes.
   int player[3];
   memset(player, 0, sizeof(player));
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getOwner() != guint32(c))
 	continue;
-      for (Shield::const_iterator i = (*it)->begin(); i != (*it)->end(); i++)
+      for (Shield::const_iterator i = (*it)->begin(); i != (*it)->end(); ++i)
 	{
 	  int idx = 0;
 	  switch ((*i)->getType())
@@ -332,7 +329,7 @@ bool Shieldset::validateTartanImages(Shield::Colour c) const
   //if we have a shield, it should have all 3 portions of a tartan.
   int player[3];
   memset(player, 0, sizeof(player));
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getOwner() != guint32(c))
         continue;
@@ -358,7 +355,7 @@ void Shieldset::reload(bool &broken)
     {
       //steal the values from d.shieldset and then don't delete it.
       uninstantiateImages();
-      for (iterator it = begin(); it != end(); it++)
+      for (iterator it = begin(); it != end(); ++it)
         delete *it;
       Glib::ustring basename = getBaseName();
       *this = *d.shieldset;
@@ -370,9 +367,9 @@ void Shieldset::reload(bool &broken)
 guint32 Shieldset::countEmptyImageNames() const
 {
   guint32 count = 0;
-  for (Shieldset::const_iterator i = begin(); i != end(); i++)
+  for (Shieldset::const_iterator i = begin(); i != end(); ++i)
     {
-      for (std::list<ShieldStyle*>::const_iterator j = (*i)->begin(); j != (*i)->end(); j++)
+      for (std::list<ShieldStyle*>::const_iterator j = (*i)->begin(); j != (*i)->end(); ++j)
         {
           if ((*j)->getMaskedImage()->getName().empty() == true)
             count++;
@@ -430,8 +427,8 @@ void Shieldset::setSmallHeightsAndWidthsFromImages()
   d_small_height = 0;
   std::map<Vector<int>, guint32> small_sizecounts;
 
-  for (iterator it = begin(); it != end(); it++)
-    for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); i++)
+  for (iterator it = begin(); it != end(); ++it)
+    for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); ++i)
       {
         PixMask *image = (*i)->getMaskedImage()->getImage ();
         if (image == NULL)
@@ -463,8 +460,8 @@ void Shieldset::setMediumHeightsAndWidthsFromImages()
   d_medium_height = 0;
   std::map<Vector<int>, guint32> medium_sizecounts;
 
-  for (iterator it = begin(); it != end(); it++)
-    for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); i++)
+  for (iterator it = begin(); it != end(); ++it)
+    for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); ++i)
       {
         PixMask *image = (*i)->getMaskedImage()->getImage ();
         if (image == NULL)
@@ -496,8 +493,8 @@ void Shieldset::setLargeHeightsAndWidthsFromImages()
   d_large_height = 0;
   std::map<Vector<int>, guint32> large_sizecounts;
 
-  for (iterator it = begin(); it != end(); it++)
-    for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); i++)
+  for (iterator it = begin(); it != end(); ++it)
+    for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); ++i)
       {
         PixMask *image = (*i)->getMaskedImage()->getImage ();
         if (image == NULL)
@@ -525,7 +522,7 @@ void Shieldset::setLargeHeightsAndWidthsFromImages()
 
 TarFileMaskedImage *Shieldset::lookupTartanImage(guint32 colour, Tartan::Type type)
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     if ((*it)->getOwner() == colour)
       return (*it)->getTartanMaskedImage (type);
   return NULL;
@@ -549,14 +546,6 @@ void Shieldset::uninstantiateSameNamedImages (Glib::ustring name)
   TarFileMaskedImage::uninstantiate (name, getMaskedImages ());
 }
         
-bool Shieldset::isAnyHeightAndWidthSet()
-{
-  return
-    isSmallHeightAndWidthSet () ||
-    isMediumHeightAndWidthSet () ||
-    isLargeHeightAndWidthSet ();
-}
-
 bool Shieldset::isSmallHeightAndWidthSet()
 {
   return d_small_width && d_small_height;
@@ -581,7 +570,7 @@ void Shieldset::instantiateImages(bool scale, bool &broken)
   if (broken)
     return;
 
-  for (iterator i = begin(); i != end(); i++)
+  for (iterator i = begin(); i != end(); ++i)
     {
       for (auto j : *(*i))
         {
@@ -632,7 +621,7 @@ void Shieldset::instantiateImages(bool scale, bool &broken)
 
 void Shieldset::uninstantiateImages()
 {
-  for (iterator i = begin(); i != end(); i++)
+  for (iterator i = begin(); i != end(); ++i)
     {
       for (auto j : *(*i))
         j->getMaskedImage ()->uninstantiateImages ();

@@ -52,28 +52,22 @@
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
+	
 GameBigMap::GameBigMap(bool headless, bool intense_combat,
                        bool see_opponents_production,
                        bool see_opponents_stacks, bool military_advisor)
- :BigMap(headless)
+ :BigMap(headless), d_intense_combat (intense_combat),
+    d_see_opponents_production (see_opponents_production),
+    d_see_opponents_stacks (see_opponents_stacks),
+    d_military_advisor (military_advisor), current_tile (Vector<int>(0,0)),
+    prev_mouse_pos (Vector<int>(0,0)), mouse_state (NONE),
+    shift_key_is_down (false), control_key_is_down (false),
+    d_cursor (ImageCache::POINTER), path_calculator (NULL)
 {
-  path_calculator = NULL;
-  d_intense_combat = intense_combat;
-  d_see_opponents_production = see_opponents_production;
-  d_see_opponents_stacks = see_opponents_stacks;
-  d_military_advisor = military_advisor;
-
-  current_tile.x = current_tile.y = 0;
-  mouse_state = NONE;
-
-  prev_mouse_pos = Vector<int>(0, 0);
-
   if (!d_headless)
     selection_timeout_handler = Timing::instance().register_timer
       (sigc::mem_fun(*this, &GameBigMap::on_selection_timeout),
        TIMER_BIGMAP_SELECTOR);
-  shift_key_is_down = false;
-  control_key_is_down = false;
 }
 
 GameBigMap::~GameBigMap()
@@ -900,9 +894,9 @@ void GameBigMap::after_draw()
       //if we're dragging, we don't draw the last waypoint circle
       if (stack->getPath()->size() > 0 && 
 	  (mouse_state == DRAGGING_STACK || mouse_state == DRAGGING_ENDPOINT))
-	end--;
+	--end;
       for (Path::iterator it = stack->getPath()->begin();
-	   it != end; it++)
+	   it != end; ++it)
 	{
 	  pos = tile_to_buffer_pos(*it);
 
@@ -923,7 +917,7 @@ void GameBigMap::after_draw()
 	  || d_cursor == ImageCache::GOTO_ARROW)
 	{
 	  Path::iterator it = stack->getPath()->end();
-	  it--;
+	  --it;
 	  //this is where the ghosted army unit picture goes.
 	  PixMask *armypic = gc->getArmyPic(*stack->begin(), true)->copy();
           armypic->scale (armypic, tilesize, tilesize);

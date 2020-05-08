@@ -53,7 +53,7 @@ HeroLevelsDialog::HeroLevelsDialog(Gtk::Window &parent, std::list<Hero*> heroes)
  : LwDialog(parent, "hero-levels-dialog.ui")
 {
   init ((*heroes.front()).getOwner());
-  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); it++)
+  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); ++it)
     addHero(*it);
 }
 
@@ -62,7 +62,7 @@ HeroLevelsDialog::HeroLevelsDialog(Gtk::Window &parent, Player *theplayer)
 {
   init (theplayer);
   std::list<Hero*> heroes = theplayer->getHeroes();
-  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); it++)
+  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); ++it)
     addHero(*it);
 }
 

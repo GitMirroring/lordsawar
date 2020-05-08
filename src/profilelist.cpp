@@ -111,7 +111,7 @@ Profilelist::Profilelist(XML_Helper* helper)
 
 Profilelist::~Profilelist()
 {
-  for (Profilelist::iterator it = begin(); it != end(); it++)
+  for (Profilelist::iterator it = begin(); it != end(); ++it)
     delete *it;
 }
 
@@ -122,7 +122,7 @@ bool Profilelist::save(XML_Helper* helper) const
   retval &= helper->begin(LORDSAWAR_PROFILES_VERSION);
   retval &= helper->openTag(Profilelist::d_tag);
 
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     (*it)->save(helper);
 
   retval &= helper->closeTag();
@@ -149,7 +149,7 @@ Profile *Profilelist::findLastPlayedProfileForUser(Glib::ustring user) const
 {
   Profile *p = NULL;
   Glib::TimeVal latest = Glib::TimeVal(0,0);
-  for (Profilelist::const_iterator i = begin(); i != end(); i++)
+  for (Profilelist::const_iterator i = begin(); i != end(); ++i)
     {
       if ((*i)->getUserName() == user)
         {
@@ -165,7 +165,7 @@ Profile *Profilelist::findLastPlayedProfileForUser(Glib::ustring user) const
         
 Profile *Profilelist::findProfileById(Glib::ustring id) const
 {
-  for (Profilelist::const_iterator i = begin(); i != end(); i++)
+  for (Profilelist::const_iterator i = begin(); i != end(); ++i)
     {
       if ((*i)->getId() == id)
         return *i;

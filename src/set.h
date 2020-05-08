@@ -28,7 +28,7 @@ class Set: public TarFile
 {
 public:
     Set(Glib::ustring file_extension, guint32 id, Glib::ustring name, guint32 ts);
-    Set(Glib::ustring file_extension, XML_Helper* helper);
+    Set(Glib::ustring file_extension, XML_Helper* helper, Glib::ustring dir);
     ~Set() {};
     Set(const Set &s);
 

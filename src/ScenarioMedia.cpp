@@ -76,6 +76,34 @@ ScenarioMedia::ScenarioMedia()
   d_commentator = new TarFileImage (1);
 }
 
+ScenarioMedia::ScenarioMedia(const ScenarioMedia &m)
+ : d_next_turn (new TarFileImage (*m.d_next_turn)),
+    d_city_defeated (new TarFileImage (*m.d_city_defeated)),
+    d_winning (new TarFileImage (*m.d_winning)),
+    d_ruin_success (new TarFileImage (*m.d_ruin_success)),
+    d_ruin_defeat (new TarFileImage (*m.d_ruin_defeat)),
+    d_parley_offered (new TarFileImage (*m.d_parley_offered)),
+    d_parley_refused (new TarFileImage (*m.d_parley_refused)),
+    d_commentator (new TarFileImage (*m.d_commentator)),
+    d_bless_name (m.d_bless_name), d_hero_name (m.d_hero_name),
+    d_battle_name (m.d_battle_name), d_defeat_name (m.d_defeat_name),
+    d_victory_name (m.d_victory_name),
+    d_musicMap (std::map<Glib::ustring, MusicItem*>()),
+    d_bgMap (std::vector<Glib::ustring>())
+{
+  d_hero_newlevel[0] = new TarFileMaskedImage (*m.d_hero_newlevel[0]);
+  d_hero_newlevel[1] = new TarFileMaskedImage (*m.d_hero_newlevel[1]);
+  d_hero[0] = new TarFileImage (*m.d_hero[0]);
+  d_hero[1] = new TarFileImage (*m.d_hero[1]);
+  d_medal[0] = new TarFileImage (*m.d_medal[0]);
+  d_medal[1] = new TarFileImage (*m.d_medal[1]);
+
+  for (std::map<Glib::ustring, MusicItem*>::const_iterator
+       i = m.d_musicMap.begin (); i != m.d_musicMap.end (); ++i)
+    d_musicMap[(*i).first] = new MusicItem (*(*i).second);
+  d_bgMap = m.d_bgMap;
+}
+
 ScenarioMedia::ScenarioMedia(XML_Helper *helper)
  : d_bless_name(""), d_hero_name(""), d_battle_name(""), d_defeat_name(""),
     d_victory_name(""), d_back_name ("")
@@ -188,16 +216,18 @@ ScenarioMedia::~ScenarioMedia()
           delete m;
         }
     }
-  delete d_hero_newlevel[0];
-  delete d_hero_newlevel[1];
+  for (auto i : getMaskedImages ())
+    delete i;
+  for (auto i : getImages ())
+    delete i;
 }
 
 void ScenarioMedia::uninstantiateImages()
 {
   for (auto i : getImages ())
     i->uninstantiateImages ();
-  d_hero_newlevel[0]->uninstantiateImages ();
-  d_hero_newlevel[1]->uninstantiateImages ();
+  for (auto i : getMaskedImages ())
+    i->uninstantiateImages ();
 }
 
 void ScenarioMedia::copySound(Tar_Helper &t, Glib::ustring name, Glib::ustring piece, bool &broken)

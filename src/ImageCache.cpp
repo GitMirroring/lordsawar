@@ -62,6 +62,68 @@ void ImageCache::deleteInstance()
   s_instance = NULL;
 }
 
+ImageCache::ImageCache(const ImageCache &c)
+ : d_cachesize(c.d_cachesize), selectorcache(c.selectorcache),
+    armycache(c.armycache), flagcache(c.flagcache),
+    circledarmycache(c.circledarmycache), tilecache(c.tilecache),
+    citycache(c.citycache), towercache(c.towercache),
+    templecache(c.templecache), ruincache(c.ruincache),
+    diplomacycache(c.diplomacycache), roadcache(c.roadcache),
+    fogcache(c.fogcache), bridgecache(c.bridgecache),
+    cursorcache(c.cursorcache), shieldcache(c.shieldcache),
+    prodshieldcache(c.prodshieldcache), movebonuscache(c.movebonuscache),
+    shipcache(c.shipcache), plantedstandardcache(c.plantedstandardcache),
+    portcache(c.portcache), signpostcache(c.signpostcache),
+    bagcache(c.bagcache), explosioncache(c.explosioncache),
+    newlevelcache(c.newlevelcache),
+    defaulttilestylecache(c.defaulttilestylecache), tartancache(c.tartancache),
+    emptytartancache(c.emptytartancache), statuscache(c.statuscache),
+    gamebuttoncache(c.gamebuttoncache), dialogcache(c.dialogcache),
+    medalcache(c.medalcache)
+{
+  for (guint32 i = 0; i < 2; i++)
+    for (guint32 j = 0; j < DIPLOMACY_TYPES; j++)
+      d_diplomacy[i][j] = c.d_diplomacy[i][j]->copy ();
+  for (guint32 i = 0; i < CURSOR_TYPES; i++)
+    d_cursor[i] = c.d_cursor[i]->copy ();
+  for (guint32 i = 0; i < PRODUCTION_SHIELD_TYPES; i++)
+    d_prodshield[i] = c.d_prodshield[i]->copy ();
+
+  d_hero_newlevel[0] = new TarFileMaskedImage (*c.d_hero_newlevel[0]);
+  d_hero_newlevel[1] = new TarFileMaskedImage (*c.d_hero_newlevel[1]);
+
+  for (guint32 i = 0; i < DEFAULT_TILESTYLE_TYPES; i++)
+    d_default_tilestyles[i] = c.d_default_tilestyles[i]->copy ();
+
+  d_smallruinedcity = c.d_smallruinedcity->copy ();
+  d_smallhero = c.d_smallhero->copy ();
+  d_smallbag = c.d_smallbag->copy ();
+  d_smallinactivehero = c.d_smallinactivehero->copy ();
+  d_small_ruin_unexplored = c.d_small_ruin_unexplored->copy ();
+  d_small_stronghold_unexplored = c.d_small_stronghold_unexplored->copy ();
+  d_small_ruin_unexplored = c.d_small_ruin_unexplored->copy ();
+  d_small_ruin_explored = c.d_small_ruin_explored->copy ();
+  d_small_temple = c.d_small_temple->copy ();
+
+  for (guint32 i = 0; i < NUM_WAYPOINTS; i++)
+    d_waypoint[i] = c.d_waypoint[i]->copy ();
+  for (guint32 i = 0; i < NUM_GAME_BUTTON_IMAGES; i++)
+    d_gamebuttons[i] = c.d_gamebuttons[i]->copy ();
+
+  d_next_turn = new TarFileImage (*c.d_next_turn);
+  d_city_defeated = new TarFileImage (*c.d_city_defeated);
+  d_winning = new TarFileImage (*c.d_winning);
+  d_hero[0] = new TarFileImage (*c.d_hero[0]);
+  d_hero[1] = new TarFileImage (*c.d_hero[1]);
+  d_ruin_success = new TarFileImage (*c.d_ruin_success);
+  d_ruin_defeat = new TarFileImage (*c.d_ruin_defeat);
+  d_parley_offered = new TarFileImage (*c.d_parley_offered);
+  d_parley_refused = new TarFileImage (*c.d_parley_refused);
+  d_medal[0] = new TarFileImage (*c.d_medal[0]);
+  d_medal[1] = new TarFileImage (*c.d_medal[1]);
+  d_commentator = new TarFileImage (*c.d_commentator);
+}
+
 ImageCache::ImageCache()
  : d_cachesize(0),
     selectorcache((sigc::ptr_fun(&SelectorPixMaskCacheItem::generate))),
@@ -1606,7 +1668,7 @@ int ImageCache::calculate_width_from_adjusted_height (PixMask *p, double new_hei
   return p->get_width () * (new_height / p->get_height ());
 }
 
-PixMask *SelectorPixMaskCacheItem::generate(SelectorPixMaskCacheItem i)
+PixMask *SelectorPixMaskCacheItem::generate(const SelectorPixMaskCacheItem &i)
 {
   // armyset selectors override the tileset ones
   // we can't have a neutral selector, but just in case we change it to white
@@ -1632,7 +1694,7 @@ PixMask *SelectorPixMaskCacheItem::generate(SelectorPixMaskCacheItem i)
     }
 }
 
-int SelectorPixMaskCacheItem::comp(const SelectorPixMaskCacheItem item) const
+int SelectorPixMaskCacheItem::comp(const SelectorPixMaskCacheItem &item) const
 {
   return
     (tileset < item.tileset) ? -1 :
@@ -1646,7 +1708,7 @@ int SelectorPixMaskCacheItem::comp(const SelectorPixMaskCacheItem item) const
     0;
 }
 
-PixMask *FlagPixMaskCacheItem::generate(FlagPixMaskCacheItem i)
+PixMask *FlagPixMaskCacheItem::generate(const FlagPixMaskCacheItem &i)
 {
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
   Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
@@ -1654,7 +1716,7 @@ PixMask *FlagPixMaskCacheItem::generate(FlagPixMaskCacheItem i)
   return ts->getFlags ()->applyMask (i.size - 1, p);
 }
 
-int FlagPixMaskCacheItem::comp(const FlagPixMaskCacheItem item) const
+int FlagPixMaskCacheItem::comp(const FlagPixMaskCacheItem &item) const
 {
   return
     (tileset < item.tileset) ? -1 :
@@ -1666,7 +1728,7 @@ int FlagPixMaskCacheItem::comp(const FlagPixMaskCacheItem item) const
     0;
 }
 
-PixMask *ArmyPixMaskCacheItem::generate(ArmyPixMaskCacheItem i)
+PixMask *ArmyPixMaskCacheItem::generate(const ArmyPixMaskCacheItem &i)
 {
   PixMask *s;
   const ArmyProto * basearmy =
@@ -1698,7 +1760,7 @@ PixMask *ArmyPixMaskCacheItem::generate(ArmyPixMaskCacheItem i)
   return s;
 }
 
-int ArmyPixMaskCacheItem::comp(const ArmyPixMaskCacheItem item) const
+int ArmyPixMaskCacheItem::comp(const ArmyPixMaskCacheItem &item) const
 {
   return
     (armyset < item.armyset) ? -1 :
@@ -1718,7 +1780,7 @@ int ArmyPixMaskCacheItem::comp(const ArmyPixMaskCacheItem item) const
     0;
 }
 
-PixMask *CircledArmyPixMaskCacheItem::generate(CircledArmyPixMaskCacheItem i)
+PixMask *CircledArmyPixMaskCacheItem::generate(const CircledArmyPixMaskCacheItem &i)
 {
   PixMask *s;
   if (i.show_army)
@@ -1748,7 +1810,7 @@ PixMask *CircledArmyPixMaskCacheItem::generate(CircledArmyPixMaskCacheItem i)
   return s;
 }
 
-int CircledArmyPixMaskCacheItem::comp(const CircledArmyPixMaskCacheItem item) const
+int CircledArmyPixMaskCacheItem::comp(const CircledArmyPixMaskCacheItem &item) const
 {
   return
     (armyset < item.armyset) ? -1 :
@@ -1770,7 +1832,7 @@ int CircledArmyPixMaskCacheItem::comp(const CircledArmyPixMaskCacheItem item) co
     0;
 }
 
-PixMask *TilePixMaskCacheItem::generate(TilePixMaskCacheItem i)
+PixMask *TilePixMaskCacheItem::generate(const TilePixMaskCacheItem &i)
 {
   PixMask *s;
   Tileset *t = Tilesetlist::getInstance()->get(i.tileset);
@@ -1878,7 +1940,7 @@ PixMask *TilePixMaskCacheItem::generate(TilePixMaskCacheItem i)
   return s;
 }
 
-int TilePixMaskCacheItem::comp(const TilePixMaskCacheItem item) const
+int TilePixMaskCacheItem::comp(const TilePixMaskCacheItem &item) const
 {
   return
     (tile_style_id < item.tile_style_id) ? -1 :
@@ -1924,7 +1986,7 @@ int TilePixMaskCacheItem::comp(const TilePixMaskCacheItem item) const
     0;
 }
 
-PixMask *CityPixMaskCacheItem::generate(CityPixMaskCacheItem i)
+PixMask *CityPixMaskCacheItem::generate(const CityPixMaskCacheItem &i)
 {
   Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
   Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
@@ -1934,7 +1996,7 @@ PixMask *CityPixMaskCacheItem::generate(CityPixMaskCacheItem i)
     return cs->getCity()->getImage(p->getId())->copy();
 }
 
-int CityPixMaskCacheItem::comp(const CityPixMaskCacheItem item) const
+int CityPixMaskCacheItem::comp(const CityPixMaskCacheItem &item) const
 {
   return
     (cityset < item.cityset) ? -1 :
@@ -1946,13 +2008,13 @@ int CityPixMaskCacheItem::comp(const CityPixMaskCacheItem item) const
     0;
 }
 
-PixMask *TowerPixMaskCacheItem::generate(TowerPixMaskCacheItem i)
+PixMask *TowerPixMaskCacheItem::generate(const TowerPixMaskCacheItem &i)
 {
   Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
   return cs->getTower()->getImage(i.player_id)->copy();
 }
 
-int TowerPixMaskCacheItem::comp(const TowerPixMaskCacheItem item) const
+int TowerPixMaskCacheItem::comp(const TowerPixMaskCacheItem &item) const
 {
   return
     (cityset < item.cityset) ? -1 :
@@ -1962,13 +2024,13 @@ int TowerPixMaskCacheItem::comp(const TowerPixMaskCacheItem item) const
     0;
 }
 
-PixMask *TemplePixMaskCacheItem::generate(TemplePixMaskCacheItem i)
+PixMask *TemplePixMaskCacheItem::generate(const TemplePixMaskCacheItem &i)
 {
   Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
   return cs->getTemple()->getImage(i.type)->copy();
 }
 
-int TemplePixMaskCacheItem::comp(const TemplePixMaskCacheItem item) const
+int TemplePixMaskCacheItem::comp(const TemplePixMaskCacheItem &item) const
 {
   return
     (cityset < item.cityset) ? -1 :
@@ -1978,13 +2040,13 @@ int TemplePixMaskCacheItem::comp(const TemplePixMaskCacheItem item) const
     0;
 }
 
-PixMask *RuinPixMaskCacheItem::generate(RuinPixMaskCacheItem i)
+PixMask *RuinPixMaskCacheItem::generate(const RuinPixMaskCacheItem &i)
 {
   Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
   return cs->getRuin()->getImage(i.type)->copy();
 }
 
-int RuinPixMaskCacheItem::comp(const RuinPixMaskCacheItem item) const
+int RuinPixMaskCacheItem::comp(const RuinPixMaskCacheItem &item) const
 {
   return
     (cityset < item.cityset) ? -1 :
@@ -1994,7 +2056,7 @@ int RuinPixMaskCacheItem::comp(const RuinPixMaskCacheItem item) const
     0;
 }
 
-PixMask *DiplomacyPixMaskCacheItem::generate(DiplomacyPixMaskCacheItem i)
+PixMask *DiplomacyPixMaskCacheItem::generate(const DiplomacyPixMaskCacheItem &i)
 {
   PixMask *p =
     ImageCache::getInstance()->getDiplomacyImage
@@ -2017,7 +2079,7 @@ PixMask *DiplomacyPixMaskCacheItem::generate(DiplomacyPixMaskCacheItem i)
   return p;
 }
 
-int DiplomacyPixMaskCacheItem::comp(const DiplomacyPixMaskCacheItem item) const
+int DiplomacyPixMaskCacheItem::comp(const DiplomacyPixMaskCacheItem &item) const
 {
   return
     (type < item.type) ? -1 :
@@ -2029,13 +2091,13 @@ int DiplomacyPixMaskCacheItem::comp(const DiplomacyPixMaskCacheItem item) const
     0;
 }
 
-PixMask *RoadPixMaskCacheItem::generate(RoadPixMaskCacheItem i)
+PixMask *RoadPixMaskCacheItem::generate(const RoadPixMaskCacheItem &i)
 {
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
   return ts->getRoad()->getImage(i.type)->copy();
 }
 
-int RoadPixMaskCacheItem::comp(const RoadPixMaskCacheItem item) const
+int RoadPixMaskCacheItem::comp(const RoadPixMaskCacheItem &item) const
 {
   return
     (tileset < item.tileset) ? -1 :
@@ -2045,13 +2107,13 @@ int RoadPixMaskCacheItem::comp(const RoadPixMaskCacheItem item) const
     0;
 }
 
-PixMask *FogPixMaskCacheItem::generate(FogPixMaskCacheItem i)
+PixMask *FogPixMaskCacheItem::generate(const FogPixMaskCacheItem &i)
 {
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
   return ts->getFog()->getImage(i.type - 1)->copy();
 }
 
-int FogPixMaskCacheItem::comp(const FogPixMaskCacheItem item) const
+int FogPixMaskCacheItem::comp(const FogPixMaskCacheItem &item) const
 {
   return
     (tileset < item.tileset) ? -1 :
@@ -2061,13 +2123,13 @@ int FogPixMaskCacheItem::comp(const FogPixMaskCacheItem item) const
     0;
 }
 
-PixMask *BridgePixMaskCacheItem::generate(BridgePixMaskCacheItem i)
+PixMask *BridgePixMaskCacheItem::generate(const BridgePixMaskCacheItem &i)
 {
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
   return ts->getBridge()->getImage(i.type)->copy();
 }
 
-int BridgePixMaskCacheItem::comp(const BridgePixMaskCacheItem item) const
+int BridgePixMaskCacheItem::comp(const BridgePixMaskCacheItem &item) const
 {
   return
     (tileset < item.tileset) ? -1 :
@@ -2077,7 +2139,7 @@ int BridgePixMaskCacheItem::comp(const BridgePixMaskCacheItem item) const
     0;
 }
 
-PixMask *CursorPixMaskCacheItem::generate(CursorPixMaskCacheItem i)
+PixMask *CursorPixMaskCacheItem::generate(const CursorPixMaskCacheItem &i)
 {
   PixMask *p =
     ImageCache::getInstance()->getCursorImage(i.type)->copy();
@@ -2089,7 +2151,7 @@ PixMask *CursorPixMaskCacheItem::generate(CursorPixMaskCacheItem i)
   return p;
 }
 
-int CursorPixMaskCacheItem::comp(const CursorPixMaskCacheItem item) const
+int CursorPixMaskCacheItem::comp(const CursorPixMaskCacheItem &item) const
 {
   return
     (type < item.type) ? -1 :
@@ -2099,12 +2161,18 @@ int CursorPixMaskCacheItem::comp(const CursorPixMaskCacheItem item) const
     0;
 }
 
-PixMask *ShieldPixMaskCacheItem::generate(ShieldPixMaskCacheItem i)
+PixMask *ShieldPixMaskCacheItem::generate(const ShieldPixMaskCacheItem &i)
 {
   ShieldStyle *sh = Shieldsetlist::getInstance()->getShield(i.shieldset,
                                                             i.type, i.colour);
   Gdk::RGBA colour =
     Shieldsetlist::getInstance()->getColor(i.shieldset, i.colour);
+  if (sh->getMaskedImage ()->getNumberOfFrames () == 0)
+    {
+      bool broken = false;
+    Shieldsetlist::getInstance()->get (i.shieldset)->instantiateImages (true, broken);
+    printf ("broken is %d\n", broken);
+    }
   PixMask *p =sh->getMaskedImage ()->applyMask (colour);
   if (i.map)
     return p;
@@ -2129,7 +2197,7 @@ PixMask *ShieldPixMaskCacheItem::generate(ShieldPixMaskCacheItem i)
   return p;
 }
 
-int ShieldPixMaskCacheItem::comp(const ShieldPixMaskCacheItem item) const
+int ShieldPixMaskCacheItem::comp(const ShieldPixMaskCacheItem &item) const
 {
   return
     (shieldset < item.shieldset) ? -1 :
@@ -2143,7 +2211,7 @@ int ShieldPixMaskCacheItem::comp(const ShieldPixMaskCacheItem item) const
     0;
 }
 
-PixMask *ProdShieldPixMaskCacheItem::generate(ProdShieldPixMaskCacheItem i)
+PixMask *ProdShieldPixMaskCacheItem::generate(const ProdShieldPixMaskCacheItem &i)
 {
   switch (i.type)
     {
@@ -2175,7 +2243,7 @@ PixMask *ProdShieldPixMaskCacheItem::generate(ProdShieldPixMaskCacheItem i)
   return NULL;
 }
 
-int ProdShieldPixMaskCacheItem::comp(const ProdShieldPixMaskCacheItem item) const
+int ProdShieldPixMaskCacheItem::comp(const ProdShieldPixMaskCacheItem &item) const
 {
   return
     (type < item.type) ? -1 :
@@ -2405,14 +2473,14 @@ PixMask *MoveBonusPixMaskCacheItem::getMoveBonusPic(Tileset *t, guint32 bonus, g
   return p;
 }
 
-PixMask *MoveBonusPixMaskCacheItem::generate(MoveBonusPixMaskCacheItem i)
+PixMask *MoveBonusPixMaskCacheItem::generate(const MoveBonusPixMaskCacheItem &i)
 {
   Tileset *t = Tilesetlist::getInstance()->get(i.tileset);
   return MoveBonusPixMaskCacheItem::getMoveBonusPic
     (t, i.bonus, i.font_size, DIALOG_MOVE_BONUS_PIC_FONTSIZE_MULTIPLE);
 }
 
-int MoveBonusPixMaskCacheItem::comp(const MoveBonusPixMaskCacheItem item) const
+int MoveBonusPixMaskCacheItem::comp(const MoveBonusPixMaskCacheItem &item) const
 {
   return
     (bonus < item.bonus) ? -1 :
@@ -2424,7 +2492,7 @@ int MoveBonusPixMaskCacheItem::comp(const MoveBonusPixMaskCacheItem item) const
     0;
 }
 
-PixMask *ShipPixMaskCacheItem::generate(ShipPixMaskCacheItem i)
+PixMask *ShipPixMaskCacheItem::generate(const ShipPixMaskCacheItem &i)
 {
   // copy the pixmap including player colors
   if (i.player_id != MAX_PLAYERS)
@@ -2443,7 +2511,7 @@ PixMask *ShipPixMaskCacheItem::generate(ShipPixMaskCacheItem i)
     }
 }
 
-int ShipPixMaskCacheItem::comp(const ShipPixMaskCacheItem item) const
+int ShipPixMaskCacheItem::comp(const ShipPixMaskCacheItem &item) const
 {
   return
     (player_id < item.player_id) ? -1 :
@@ -2453,7 +2521,7 @@ int ShipPixMaskCacheItem::comp(const ShipPixMaskCacheItem item) const
     0;
 }
 
-PixMask *PlantedStandardPixMaskCacheItem::generate(PlantedStandardPixMaskCacheItem i)
+PixMask *PlantedStandardPixMaskCacheItem::generate(const PlantedStandardPixMaskCacheItem &i)
 {
   if (i.player_id != MAX_PLAYERS)
     {
@@ -2472,7 +2540,7 @@ PixMask *PlantedStandardPixMaskCacheItem::generate(PlantedStandardPixMaskCacheIt
     }
 }
 
-int PlantedStandardPixMaskCacheItem::comp(const PlantedStandardPixMaskCacheItem item) const
+int PlantedStandardPixMaskCacheItem::comp(const PlantedStandardPixMaskCacheItem &item) const
 {
   return
     (player_id < item.player_id) ? -1 :
@@ -2482,13 +2550,13 @@ int PlantedStandardPixMaskCacheItem::comp(const PlantedStandardPixMaskCacheItem 
     0;
 }
 
-PixMask *PortPixMaskCacheItem::generate(PortPixMaskCacheItem i)
+PixMask *PortPixMaskCacheItem::generate(const PortPixMaskCacheItem &i)
 {
   return
     Citysetlist::getInstance()->get(i.cityset)->getPort()->getImage()->copy();
 }
 
-int PortPixMaskCacheItem::comp(const PortPixMaskCacheItem item) const
+int PortPixMaskCacheItem::comp(const PortPixMaskCacheItem &item) const
 {
   return
     (cityset < item.cityset) ? -1 :
@@ -2496,12 +2564,12 @@ int PortPixMaskCacheItem::comp(const PortPixMaskCacheItem item) const
     0;
 }
 
-PixMask *SignpostPixMaskCacheItem::generate(SignpostPixMaskCacheItem i)
+PixMask *SignpostPixMaskCacheItem::generate(const SignpostPixMaskCacheItem &i)
 {
   return Citysetlist::getInstance()->get(i.cityset)->getSignpost ()->getImage()->copy();
 }
 
-int SignpostPixMaskCacheItem::comp(const SignpostPixMaskCacheItem item) const
+int SignpostPixMaskCacheItem::comp(const SignpostPixMaskCacheItem &item) const
 {
   return
     (cityset < item.cityset) ? -1 :
@@ -2509,12 +2577,12 @@ int SignpostPixMaskCacheItem::comp(const SignpostPixMaskCacheItem item) const
     0;
 }
 
-PixMask *BagPixMaskCacheItem::generate(BagPixMaskCacheItem i)
+PixMask *BagPixMaskCacheItem::generate(const BagPixMaskCacheItem &i)
 {
   return Armysetlist::getInstance()->getBag(i.armyset)->getImage ()->copy();
 }
 
-int BagPixMaskCacheItem::comp(const BagPixMaskCacheItem item) const
+int BagPixMaskCacheItem::comp(const BagPixMaskCacheItem &item) const
 {
   return
     (armyset < item.armyset) ? -1 :
@@ -2522,12 +2590,12 @@ int BagPixMaskCacheItem::comp(const BagPixMaskCacheItem item) const
     0;
 }
 
-PixMask *ExplosionPixMaskCacheItem::generate(ExplosionPixMaskCacheItem i)
+PixMask *ExplosionPixMaskCacheItem::generate(const ExplosionPixMaskCacheItem &i)
 {
   return Tilesetlist::getInstance()->get(i.tileset)->getExplosion()->getImage()->copy();
 }
 
-int ExplosionPixMaskCacheItem::comp(const ExplosionPixMaskCacheItem item) const
+int ExplosionPixMaskCacheItem::comp(const ExplosionPixMaskCacheItem &item) const
 {
   return
     (tileset < item.tileset) ? -1 :
@@ -2535,7 +2603,7 @@ int ExplosionPixMaskCacheItem::comp(const ExplosionPixMaskCacheItem item) const
     0;
 }
 
-PixMask *NewLevelPixMaskCacheItem::generate(NewLevelPixMaskCacheItem i)
+PixMask *NewLevelPixMaskCacheItem::generate(const NewLevelPixMaskCacheItem &i)
 {
   bool female = i.gender == Hero::FEMALE;
   TarFileMaskedImage *mim = 
@@ -2551,7 +2619,7 @@ PixMask *NewLevelPixMaskCacheItem::generate(NewLevelPixMaskCacheItem i)
   return p;
 }
 
-int NewLevelPixMaskCacheItem::comp(const NewLevelPixMaskCacheItem item) const
+int NewLevelPixMaskCacheItem::comp(const NewLevelPixMaskCacheItem &item) const
 {
   return
     (player_id < item.player_id) ? -1 :
@@ -2563,7 +2631,7 @@ int NewLevelPixMaskCacheItem::comp(const NewLevelPixMaskCacheItem item) const
     0;
 }
 
-PixMask *DefaultTileStylePixMaskCacheItem::generate(DefaultTileStylePixMaskCacheItem i)
+PixMask *DefaultTileStylePixMaskCacheItem::generate(const DefaultTileStylePixMaskCacheItem &i)
 {
   PixMask *t =
     ImageCache::getInstance()->getDefaultTileStyleImage(i.tilestyle_type);
@@ -2572,7 +2640,7 @@ PixMask *DefaultTileStylePixMaskCacheItem::generate(DefaultTileStylePixMaskCache
   return s;
 }
 
-int DefaultTileStylePixMaskCacheItem::comp(const DefaultTileStylePixMaskCacheItem item) const
+int DefaultTileStylePixMaskCacheItem::comp(const DefaultTileStylePixMaskCacheItem &item) const
 {
   return
     (tilestyle_type < item.tilestyle_type) ? -1 :
@@ -2608,7 +2676,7 @@ void TartanPixMaskCacheItem::calculateWidth(guint32 iwidth, PixMask *left, PixMa
     }
 }
 
-PixMask *TartanPixMaskCacheItem::generate(TartanPixMaskCacheItem i)
+PixMask *TartanPixMaskCacheItem::generate(const TartanPixMaskCacheItem &i)
 {
   //okay, here's where we fashion the new image.
   //we take the leftmost tartan image for this player
@@ -2676,7 +2744,7 @@ PixMask *TartanPixMaskCacheItem::generate(TartanPixMaskCacheItem i)
   return tartan;
 }
 
-int TartanPixMaskCacheItem::comp(const TartanPixMaskCacheItem item) const
+int TartanPixMaskCacheItem::comp(const TartanPixMaskCacheItem &item) const
 {
   return
     (player_id < item.player_id) ? -1 :
@@ -2690,7 +2758,7 @@ int TartanPixMaskCacheItem::comp(const TartanPixMaskCacheItem item) const
     0;
 }
 
-PixMask *EmptyTartanPixMaskCacheItem::generate(EmptyTartanPixMaskCacheItem i)
+PixMask *EmptyTartanPixMaskCacheItem::generate(const EmptyTartanPixMaskCacheItem &i)
 {
   //okay, here's where we fashion the new image.
   //we take the leftmost tartan image for this player
@@ -2761,7 +2829,7 @@ PixMask *EmptyTartanPixMaskCacheItem::generate(EmptyTartanPixMaskCacheItem i)
   return tartan;
 }
 
-int EmptyTartanPixMaskCacheItem::comp(const EmptyTartanPixMaskCacheItem item) const
+int EmptyTartanPixMaskCacheItem::comp(const EmptyTartanPixMaskCacheItem &item) const
 {
   return
     (player_id < item.player_id) ? -1 :
@@ -2775,7 +2843,7 @@ int EmptyTartanPixMaskCacheItem::comp(const EmptyTartanPixMaskCacheItem item) co
     0;
 }
 
-PixMask *StatusPixMaskCacheItem::generate(StatusPixMaskCacheItem i)
+PixMask *StatusPixMaskCacheItem::generate(const StatusPixMaskCacheItem &i)
 {
   Glib::ustring file = "";
   switch (i.type)
@@ -2812,7 +2880,7 @@ PixMask *StatusPixMaskCacheItem::generate(StatusPixMaskCacheItem i)
   return p;
 }
 
-int StatusPixMaskCacheItem::comp(const StatusPixMaskCacheItem item) const
+int StatusPixMaskCacheItem::comp(const StatusPixMaskCacheItem &item) const
 {
   return
     (type < item.type) ? -1 :
@@ -2822,7 +2890,7 @@ int StatusPixMaskCacheItem::comp(const StatusPixMaskCacheItem item) const
     0;
 }
 
-PixMask *GameButtonPixMaskCacheItem::generate(GameButtonPixMaskCacheItem i)
+PixMask *GameButtonPixMaskCacheItem::generate(const GameButtonPixMaskCacheItem &i)
 {
   PixMask *p =
     ImageCache::getInstance ()->getGameButtonImage (i.type)->copy ();
@@ -2838,7 +2906,7 @@ PixMask *GameButtonPixMaskCacheItem::generate(GameButtonPixMaskCacheItem i)
   return p;
 }
 
-int GameButtonPixMaskCacheItem::comp(const GameButtonPixMaskCacheItem item) const
+int GameButtonPixMaskCacheItem::comp(const GameButtonPixMaskCacheItem &item) const
 {
   return
     (type < item.type) ? -1 :
@@ -2848,7 +2916,7 @@ int GameButtonPixMaskCacheItem::comp(const GameButtonPixMaskCacheItem item) cons
     0;
 }
 
-PixMask *DialogPixMaskCacheItem::generate(DialogPixMaskCacheItem i)
+PixMask *DialogPixMaskCacheItem::generate(const DialogPixMaskCacheItem &i)
 {
   PixMask *p = NULL;
   double ratio = 1;
@@ -2906,7 +2974,7 @@ PixMask *DialogPixMaskCacheItem::generate(DialogPixMaskCacheItem i)
   return p;
 }
 
-int DialogPixMaskCacheItem::comp(const DialogPixMaskCacheItem item) const
+int DialogPixMaskCacheItem::comp(const DialogPixMaskCacheItem &item) const
 {
   return
     (type < item.type) ? -1 :
@@ -2916,8 +2984,7 @@ int DialogPixMaskCacheItem::comp(const DialogPixMaskCacheItem item) const
     0;
 }
 
-
-PixMask *MedalPixMaskCacheItem::generate(MedalPixMaskCacheItem i)
+PixMask *MedalPixMaskCacheItem::generate(const MedalPixMaskCacheItem &i)
 {
   PixMask *p =
     ImageCache::getInstance ()->getMedalImage (i.large, i.type)->copy ();
@@ -2936,7 +3003,7 @@ PixMask *MedalPixMaskCacheItem::generate(MedalPixMaskCacheItem i)
   return p;
 }
 
-int MedalPixMaskCacheItem::comp(const MedalPixMaskCacheItem item) const
+int MedalPixMaskCacheItem::comp(const MedalPixMaskCacheItem &item) const
 {
   return
     (large < item.large) ? -1 :

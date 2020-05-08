@@ -1,7 +1,7 @@
 // Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -73,18 +73,6 @@ class AI_Fast : public RealPlayer
 
         //! Saves data, the method is for saving additional data.
         bool save(XML_Helper* helper) const;
-
-        //! Sets whether the ai joins close armies to make them stronger
-        void setJoin(bool join) {d_join = join;};
-
-        //! Returns the current behaviour regarding joining armies
-        bool getJoin() const {return d_join;};
-
-        //! Set maniac/normal mode
-        void setManiac(bool maniac) {d_maniac = maniac;};
-
-        //! Returns the current behaviour
-        bool getManiac() const {return d_maniac;};
 
 	virtual void abortTurn();
         virtual bool startTurn();

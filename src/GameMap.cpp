@@ -234,7 +234,7 @@ GameMap::GameMap(XML_Helper* helper)
     processStyles(styles, chars_per_style);
 
     //add some callbacks for item loading
-    helper->registerTag(MapBackpack::d_tag, sigc::mem_fun(this, &GameMap::loadItems));
+    helper->registerTag(MapBackpack::d_mapbackpack_tag, sigc::mem_fun(this, &GameMap::loadItems));
 }
 
 GameMap::~GameMap()
@@ -343,7 +343,7 @@ bool GameMap::save(XML_Helper* helper) const
 
 bool GameMap::loadItems(Glib::ustring tag, XML_Helper* helper)
 {
-    if (tag == MapBackpack::d_tag)
+    if (tag == MapBackpack::d_mapbackpack_tag)
       {
         MapBackpack* backpack = new MapBackpack(helper);
         Vector<int> pos = backpack->getPos();
@@ -1111,7 +1111,7 @@ std::vector<Stack*> GameMap::getEnemyStacks(std::list<Vector<int> > positions)
 {
   std::vector<Stack*> enemy_stacks;
   std::list<Vector<int> >::iterator it = positions.begin();
-  for (; it != positions.end(); it++)
+  for (; it != positions.end(); ++it)
     {
       Stack *enemy = getEnemyStack(*it);
       if (enemy)
@@ -1201,7 +1201,7 @@ void GameMap::clearStackPositions()
   for (auto i :*Playerlist::getInstance())
     {
       Stacklist *sl = i->getStacklist();
-      for (Stacklist::iterator s = sl->begin(); s != sl->end(); s++)
+      for (Stacklist::iterator s = sl->begin(); s != sl->end(); ++s)
         {
           StackTile *st = getStacks((*s)->getPos());
           st->clear();
@@ -1213,7 +1213,7 @@ void GameMap::updateStackPositions()
   for (auto i: *Playerlist::getInstance())
     {
       Stacklist *sl = i->getStacklist();
-      for (Stacklist::iterator s = sl->begin(); s != sl->end(); s++)
+      for (Stacklist::iterator s = sl->begin(); s != sl->end(); ++s)
         getStacks((*s)->getPos())->add(*s);
     }
 }
@@ -1256,13 +1256,6 @@ void GameMap::switchTileset(Tileset *tileset)
   applyTileStyles (0, 0, s_width, s_height,  false);
 }
 
-void GameMap::reloadTileset()
-{
-  Tileset *tileset = GameMap::getTileset();
-  if (tileset)
-    Tilesetlist::getInstance()->reload(tileset->getId());
-}
-
 void GameMap::reloadShieldset()
 {
   Shieldset *shieldset = GameMap::getShieldset();
@@ -1283,8 +1276,8 @@ void GameMap::switchShieldset(Shieldset *shieldset)
 Vector<int> GameMap::findNearestAreaForBuilding(Maptile::Building building_type, Vector<int> pos, guint32 width)
 {
   std::list<Vector<int> > points = getNearbyPoints(pos, -1);
-  std::list<Vector<int> >::iterator it = points.begin();
-  for (;it != points.end(); it++)
+  for (std::list<Vector<int> >::iterator it = points.begin();
+       it != points.end(); ++it)
     {
       if (canPutBuilding (building_type, width, *it, true))
         return *it;
@@ -1372,7 +1365,7 @@ void GameMap::switchArmysets(Player *p, Armyset *armyset)
           if (s == NULL)
             continue;
           s->removeArmiesWithoutArmyType(armyset->getId());
-          for (Stack::iterator j = s->begin(); j != s->end(); j++)
+          for (Stack::iterator j = s->begin(); j != s->end(); ++j)
             Armyset::switchArmysetForRuinKeeper(*j, armyset);
           k->rename();
         }
@@ -1395,7 +1388,7 @@ void GameMap::switchArmysets(Player *p, Armyset *armyset)
 
   //change the armies in the stacklist
   Stacklist *sl = p->getStacklist();
-  for (Stacklist::iterator j = sl->begin(); j != sl->end(); j++)
+  for (Stacklist::iterator j = sl->begin(); j != sl->end(); ++j)
     {
       Stack *s = (*j);
       s->removeArmiesWithoutArmyType(armyset->getId());
@@ -1404,10 +1397,10 @@ void GameMap::switchArmysets(Player *p, Armyset *armyset)
           GameMap::getInstance()->getStacks(s->getPos())->leaving(s);
           j=sl->flErase(j);//this doesn't remove the stack from the map of id->stack pointer in stacklist. XXX XXX XXX
           if (sl->size() > 0)
-            j--;
+            --j;
           continue;
         }
-      for (Stack::iterator k = s->begin(); k != s->end(); k++)
+      for (Stack::iterator k = s->begin(); k != s->end(); ++k)
         Armyset::switchArmyset(*k,armyset);
     }
 
@@ -1428,7 +1421,7 @@ void GameMap::switchArmysets(Armyset *armyset)
       if (s == NULL)
         continue;
       s->removeArmiesWithoutArmyType(armyset->getId());
-      for (Stack::iterator j = s->begin(); j != s->end(); j++)
+      for (Stack::iterator j = s->begin(); j != s->end(); ++j)
 	Armyset::switchArmysetForRuinKeeper(*j, armyset);
       k->rename();
     }
@@ -1448,7 +1441,7 @@ void GameMap::switchArmysets(Armyset *armyset)
 
       //change the armies in the stacklist
       Stacklist *sl = i->getStacklist();
-      for (Stacklist::iterator j = sl->begin(); j != sl->end(); j++)
+      for (Stacklist::iterator j = sl->begin(); j != sl->end(); ++j)
 	{
 	  Stack *s = (*j);
           s->removeArmiesWithoutArmyType(armyset->getId());
@@ -1457,10 +1450,10 @@ void GameMap::switchArmysets(Armyset *armyset)
               GameMap::getInstance()->getStacks(s->getPos())->leaving(s);
               j=sl->flErase(j);//this doesn't remove the stack from the map of id->stack pointer in stacklist. XXX XXX XXX
               if (sl->size() > 0)
-                j--;
+                --j;
               continue;
             }
-          for (Stack::iterator k = s->begin(); k != s->end(); k++)
+          for (Stack::iterator k = s->begin(); k != s->end(); ++k)
             Armyset::switchArmyset(*k,armyset);
 	}
 
@@ -1468,11 +1461,6 @@ void GameMap::switchArmysets(Armyset *armyset)
       i->setArmyset(armyset->getId());
       //where else are armyset ids hanging around?
     }
-}
-
-void GameMap::reloadArmyset(Armyset *armyset)
-{
-  Armysetlist::getInstance()->reload(armyset->getId());
 }
 
 bool GameMap::canDropBag (Vector<int> pos)
@@ -2137,19 +2125,6 @@ bool GameMap::putNewRuin(Vector<int> tile)
   return putRuin(r);
 }
 
-bool GameMap::putNewStone(Vector<int> tile)
-{
-  // check if we can place the stone
-  bool stone_placeable =
-    canPutBuilding (Maptile::STONE, 1, tile);
-
-  if (!stone_placeable)
-    return false;
-
-  Stone *t = new Stone(tile, 1);
-  return putStone(t);
-}
-
 bool GameMap::putNewTemple(Vector<int> tile)
 {
   Cityset *cs = GameMap::getCityset();
@@ -2201,9 +2176,9 @@ bool GameMap::putCity(City *c, bool keep_owner)
 void GameMap::updateShips(Vector<int> pos)
 {
   std::vector<Stack*> stks = getStacks(pos)->getStacks();
-  for (std::vector<Stack *>::iterator it = stks.begin(); it != stks.end(); it++)
+  for (std::vector<Stack *>::iterator it = stks.begin(); it != stks.end(); ++it)
     {
-      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); sit++)
+      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); ++sit)
 	{
 	  if (((*sit)->getStat(Army::MOVE_BONUS) & Tile::WATER) == 0 &&
 	      getTerrainType(pos) == Tile::WATER)
@@ -2223,9 +2198,9 @@ void GameMap::updateShips(Vector<int> pos)
 void GameMap::updateTowers (Vector<int> pos)
 {
   std::vector<Stack*> stks = getStacks(pos)->getStacks();
-  for (std::vector<Stack *>::iterator it = stks.begin(); it != stks.end(); it++)
+  for (std::vector<Stack *>::iterator it = stks.begin(); it != stks.end(); ++it)
     {
-      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); sit++)
+      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); ++sit)
 	{
           if (((*sit)->getFortified ()) && !can_defend(*it))
             (*sit)->setFortified (false);
@@ -2288,7 +2263,7 @@ std::vector<Stack*> GameMap::getNearbyStacks(Vector<int> pos, int dist, bool fri
   std::vector<Stack*> stks;
   std::vector<Stack *> stacks;
   for (std::list<Vector<int> >::iterator it = points.begin();
-       it != points.end(); it++)
+       it != points.end(); ++it)
     {
       if (friendly)
         stks = GameMap::getFriendlyStacks(*it);
@@ -2619,7 +2594,7 @@ bool GameMap::can_plant_flag(Stack *stack)
   if (stack->hasHero())
     {
       //does the hero have the player's standard?
-      for (Stack::iterator it = stack->begin(); it != stack->end(); it++)
+      for (Stack::iterator it = stack->begin(); it != stack->end(); ++it)
         {
           if ((*it)->isHero())
             {
@@ -2671,7 +2646,7 @@ bool GameMap::burnBridge(Vector<int> pos)
         GameMap::getFriendlyStacks(src, Playerlist::getActiveplayer());
       stacks.insert(std::end(stacks), std::begin(s), std::end(s));
       for (std::vector<Stack*>::iterator i = stacks.begin();
-           i != stacks.end(); i++)
+           i != stacks.end(); ++i)
         {
           (*i)->setDefending(false);
           (*i)->setParked(false);
@@ -2680,7 +2655,7 @@ bool GameMap::burnBridge(Vector<int> pos)
         }
       std::list<Vector<int> > r =
         Bridgelist::getInstance()->getRoadEntryPoints(bridge);
-      for (std::list<Vector<int> >::iterator i = r.begin(); i != r.end(); i++)
+      for (std::list<Vector<int> >::iterator i = r.begin(); i != r.end(); ++i)
         {
           Road *rd = GameMap::getInstance()->getRoad(*i);
           if (rd)

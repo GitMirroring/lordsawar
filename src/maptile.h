@@ -176,12 +176,6 @@ class Maptile: public Movable
 	 */
         bool isCityTerrain();
 
-        //! Whether or not this map tile is considered to be a road.
-        /**
-         * includes roads and bridges.
-         */
-        bool isRoadTerrain();
-
         //! Whether or not there is a building on this tile that belongs on land.
         bool hasLandBuilding() const;
 

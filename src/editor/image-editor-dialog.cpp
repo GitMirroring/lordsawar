@@ -36,12 +36,10 @@
 #define method(x) sigc::mem_fun(*this, &ImageEditorDialog::x)
 
 ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, double ratio)
- : LwEditorDialog(parent, "image-editor-dialog.ui")
+ : LwEditorDialog(parent, "image-editor-dialog.ui"), d_ratio (ratio),
+    d_num_frames (im->getNumberOfFrames ()), d_active_frame (0),
+    d_target_filename ("")
 {
-  d_ratio = ratio;
-  d_active_frame = 0;
-  d_num_frames = im->getNumberOfFrames ();
-  d_target_filename = "";
 
   xml->get_widget("imagebutton", imagebutton);
   imagebutton->signal_clicked().connect (method(on_imagebutton_clicked));

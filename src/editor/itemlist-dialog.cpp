@@ -62,10 +62,9 @@ ItemlistDialog::ItemlistDialog(Gtk::Window &parent)
   items_treeview->append_column("", items_columns.name);
   items_treeview->set_headers_visible(false);
 
-  Itemlist::iterator iter = d_itemlist->begin();
-  for (;iter != d_itemlist->end(); iter++)
+  for (Itemlist::iterator iter = d_itemlist->begin();
+       iter != d_itemlist->end(); ++iter)
     addItemProto((*iter).second);
-
 
   d_item = NULL;
   guint32 max = d_itemlist->size();

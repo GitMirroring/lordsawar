@@ -80,17 +80,11 @@
 #define method(x) sigc::mem_fun(*this, &Driver::x)
 
 Driver::Driver(bool start_editor, Glib::ustring load_filename)
+ : game_window (NULL), game_lobby_dialog (NULL), quick_help_window (NULL),
+    splash_window (NULL), download_window (NULL), editor_window (NULL),
+    d_load_filename (load_filename), robot_player_type (Player::AI_SMART),
+    number_of_robots (MAX_PLAYERS), game_scenario_downloaded ("")
 {
-    game_window = NULL;
-    game_lobby_dialog = NULL;
-    quick_help_window = NULL;
-    splash_window = NULL;
-    download_window = NULL;
-    editor_window = NULL;
-    game_scenario_downloaded = "";
-
-    d_load_filename = load_filename;
-
     //here are the command-line options that don't bring up the splash screen:
     if (Main::instance().start_stress_test) 
       {
@@ -197,8 +191,7 @@ void Driver::serve (GameScenario *game_scenario)
   Configuration::s_autosave_policy = Configuration::NO_SAVING;
   Game *game = new Game(game_scenario, next_turn, true);
   game->game_over.connect (sigc::bind (sigc::mem_fun (this, &Driver::on_game_over_for_headless_server), game_scenario));
-  if (game)
-    game_server->player_sits.connect(sigc::hide(sigc::hide(method(on_client_sits_down_in_headless_server_game))));
+  game_server->player_sits.connect(sigc::hide(sigc::hide(method(on_client_sits_down_in_headless_server_game))));
 }
 
 void Driver::on_client_sits_down_in_headless_server_game()
@@ -941,8 +934,8 @@ void Driver::on_new_game_requested(GameParameters g, GamePreferencesDialog *gpd)
 	  (*splash_window->get_window(), 
 	   _("Invalid map file.\n" 
 	     "Please validate it in the scenario editor."), 0);
-	std::list<Glib::ustring>::iterator it = e.begin();
-	for (; it != e.end(); it++)
+	for (std::list<Glib::ustring>::iterator it = e.begin();
+             it != e.end(); ++it)
 	  {
 	    printf ("error: %s\n", (*it).c_str());
 	  }
@@ -1287,7 +1280,7 @@ void Driver::on_game_scenario_received_for_robots(Glib::ustring path)
   Playerlist *pl = Playerlist::getInstance();
 
   unsigned int count = 0;
-  for (Playerlist::iterator it = pl->begin(); it != pl->end(); it++)
+  for (Playerlist::iterator it = pl->begin(); it != pl->end(); ++it)
     {
       if ((*it) == Playerlist::getInstance()->getNeutral())
         continue;
@@ -1324,7 +1317,7 @@ void Driver::on_game_scenario_received_for_robots(Glib::ustring path)
 
   pl->turnHumansInto(robot_player_type, number_of_robots);
 
-  for (Playerlist::iterator it = pl->begin(); it != pl->end(); it++)
+  for (Playerlist::iterator it = pl->begin(); it != pl->end(); ++it)
     if (Player::Type((*it)->getType()) == robot_player_type)
       GameClient::getInstance()->listenForLocalEvents(*it);
 

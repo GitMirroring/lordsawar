@@ -52,7 +52,7 @@ class GameScenarioOptions: public sigc::trackable
 
         static unsigned int s_round;
 
-	static int calculate_difficulty_rating(const GameParameters g);
+	static int calculate_difficulty_rating(const GameParameters &g);
 
     private:
 };

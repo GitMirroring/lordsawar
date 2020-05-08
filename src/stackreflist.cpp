@@ -25,7 +25,7 @@ StackReflist::StackReflist()
 
 StackReflist::StackReflist(Stacklist *sl, bool skip_parked_stacks)
 {
-  for (Stacklist::iterator it = sl->begin(); it != sl->end(); it++)
+  for (Stacklist::iterator it = sl->begin(); it != sl->end(); ++it)
     {
       if (skip_parked_stacks == true && (*it)->getParked() == true)
         continue;
@@ -35,7 +35,7 @@ StackReflist::StackReflist(Stacklist *sl, bool skip_parked_stacks)
 
 StackReflist::StackReflist(std::list<Stack*> s, bool skip_parked_stacks)
 {
-  for (std::list<Stack*>::iterator it = s.begin(); it != s.end(); it++)
+  for (std::list<Stack*>::iterator it = s.begin(); it != s.end(); ++it)
     {
       if (skip_parked_stacks == true && (*it)->getParked() == true)
         continue;
@@ -106,14 +106,14 @@ StackReflist::iterator StackReflist::eraseStack(StackReflist::iterator it, guint
 guint32 StackReflist::countArmies() const
 {
   guint32 count = 0;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     count += (*it)->size();
   return count;
 }
 
 void StackReflist::changeOwnership(Player *new_player)
 {
-  for (IdMap::iterator it = d_id.begin(); it != d_id.end(); it++)
+  for (IdMap::iterator it = d_id.begin(); it != d_id.end(); ++it)
     {
       guint32 id = (*it).first;
       Stack *new_stack = new_player->getStacklist()->getStackById(id);
@@ -124,7 +124,7 @@ void StackReflist::changeOwnership(Player *new_player)
 
 bool StackReflist::getIdOfStack(Stack *stack, guint32 &id)
 {
-  for (IdMap::iterator it = d_id.begin(); it != d_id.end(); it++)
+  for (IdMap::iterator it = d_id.begin(); it != d_id.end(); ++it)
     {
       if ((*it).second == stack)
         {

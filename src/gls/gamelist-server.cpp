@@ -55,8 +55,8 @@ void GamelistServer::deleteInstance()
 }
 
 GamelistServer::GamelistServer()
+  : datafile (File::getSaveFile(RECENTLY_ADVERTISED_LIST))
 {
-  datafile = File::getSaveFile(RECENTLY_ADVERTISED_LIST);
   Timing::instance().timer_registered.connect
     (sigc::mem_fun(*this, &GamelistServer::on_timer_registered));
   Gamelist::getInstance()->loadFromFile(datafile);

@@ -67,32 +67,23 @@ Armysetlist::Armysetlist()
 
 void Armysetlist::on_armyset_added(Armyset *armyset)
 {
-  for (Armyset::iterator ait = armyset->begin(); ait != armyset->end(); ait++)
+  for (Armyset::iterator ait = armyset->begin(); ait != armyset->end(); ++ait)
     d_armies[armyset->getId()][(*ait)->getId()] = (*ait);
 }
 
 void Armysetlist::on_armyset_reloaded(Armyset *armyset)
 {
   d_armies[armyset->getId()].clear();
-  for (Armyset::iterator ait = armyset->begin(); ait != armyset->end(); ait++)
+  for (Armyset::iterator ait = armyset->begin(); ait != armyset->end(); ++ait)
     d_armies[armyset->getId()][(*ait)->getId()] = (*ait);
 }
 
 Armysetlist::~Armysetlist()
 {
   uninstantiateImages();
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     delete *it;
   clear();
-  // remove all army entries
-  /*
-  for (ArmyPrototypeMap::iterator it = d_armies.begin(); 
-       it != d_armies.end(); it++)
-    {
-      while (!(*it).second.empty())
-        delete (*((*it).second).begin()).second;
-    }
-    */
 }
 
 ArmyProto* Armysetlist::getArmy(guint32 id, guint32 type_id) const
@@ -121,7 +112,7 @@ ArmyProto* Armysetlist::lookupWeakestQuickestArmy(guint32 id) const
 
 guint32 Armysetlist::getTileSize(guint32 id)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getId() == id)
 	return (*it)->getTileSize();
@@ -131,7 +122,7 @@ guint32 Armysetlist::getTileSize(guint32 id)
 
 TarFileImage* Armysetlist::getBag (guint32 id)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getId() == id)
 	return (*it)->getBag();
@@ -141,7 +132,7 @@ TarFileImage* Armysetlist::getBag (guint32 id)
 
 TarFileMaskedImage *Armysetlist::getStandardPic (guint32 id)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if ((*it)->getId() == id)
       return (*it)->getStandard();
   return NULL;
@@ -150,7 +141,7 @@ TarFileMaskedImage *Armysetlist::getStandardPic (guint32 id)
 void Armysetlist::instantiateImages(bool &broken)
 {
   broken = false;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if (!broken)
         {
@@ -162,13 +153,13 @@ void Armysetlist::instantiateImages(bool &broken)
 
 void Armysetlist::uninstantiateImages()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->uninstantiateImages();
 }
 
 TarFileMaskedImage *Armysetlist::getShipPic (guint32 id)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if ((*it)->getId() == id)
       return (*it)->getShip();
   return NULL;

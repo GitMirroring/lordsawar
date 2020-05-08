@@ -37,14 +37,10 @@
 #define debug(x)
 
 QuestCitySack::QuestCitySack (QuestsManager& mgr, guint32 hero) 
-  : Quest(mgr, hero, Quest::CITYSACK)
+  : Quest(mgr, hero, Quest::CITYSACK),
+    d_city (chooseToSack (getHero()->getOwner())->getId ())
 {
-  // find us a victim
-  City* c = chooseToSack(getHero()->getOwner());
-  assert(c);      // should never fail because isFeasible is checked first
-
-  d_city = c->getId();
-  d_targets.push_back(c->getPos());
+  d_targets.push_back(getCity ()->getPos());
   debug("city_id = " << d_city);
   initDescription();
 }
@@ -59,9 +55,8 @@ QuestCitySack::QuestCitySack (QuestsManager& q_mgr, XML_Helper* helper)
 }
 
 QuestCitySack::QuestCitySack (QuestsManager& mgr, guint32 hero, guint32 target) 
-  : Quest(mgr, hero, Quest::CITYSACK)
+  : Quest(mgr, hero, Quest::CITYSACK), d_city (target)
 {
-  d_city = target;
   d_targets.push_back(getCity()->getPos());
   initDescription();
 }

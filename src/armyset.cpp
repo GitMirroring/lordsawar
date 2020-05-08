@@ -84,7 +84,7 @@ void Armyset::read_selector_name (XML_Helper *helper, Shield::Colour c, bool lar
 }
 
 Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
- : Set(ARMYSET_EXT, helper)
+ : Set(ARMYSET_EXT, helper, directory)
 {
   d_stackship = new TarFileMaskedImage ();
   d_standard = new TarFileMaskedImage ();
@@ -95,7 +95,6 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
       d_selector[1][i] = new TarFileMaskedImage ();
     }
 
-  setDirectory(directory);
   guint32 ts;
   helper->getData(ts, "tilesize");
   setTileSize(ts);
@@ -126,14 +125,14 @@ Armyset::Armyset(const Armyset& a)
       d_selector[1][i] = new TarFileMaskedImage (*a.d_selector[1][i]);
     }
 
-  for (const_iterator i = a.begin(); i != a.end(); i++)
+  for (const_iterator i = a.begin(); i != a.end(); ++i)
     push_back(new ArmyProto(*(*i)));
 }
 
 Armyset::~Armyset()
 {
   uninstantiateImages();
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     delete *it;
   delete d_stackship;
   delete d_standard;
@@ -211,7 +210,7 @@ bool Armyset::save(XML_Helper* helper) const
     for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
       write_selector_name (helper, Shield::Colour(i), false);
 
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
       (*it)->save(helper);
     
     retval &= helper->closeTag();
@@ -221,7 +220,7 @@ bool Armyset::save(XML_Helper* helper) const
 
 ArmyProto * Armyset::lookupSimilarArmy(ArmyProto *army) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getGender() == army->getGender() &&
 	  (*it)->getStrength() == army->getStrength() &&
@@ -233,7 +232,7 @@ ArmyProto * Armyset::lookupSimilarArmy(ArmyProto *army) const
 	  (*it)->getDefendsRuins() == army->getDefendsRuins())
 	return *it;
     }
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getGender() == army->getGender() &&
 	  (*it)->getStrength() == army->getStrength() &&
@@ -243,7 +242,7 @@ ArmyProto * Armyset::lookupSimilarArmy(ArmyProto *army) const
 	  (*it)->getMaxMoves() == army->getMaxMoves())
 	return *it;
     }
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getGender() == army->getGender() &&
 	  (*it)->getStrength() == army->getStrength() &&
@@ -256,7 +255,7 @@ ArmyProto * Armyset::lookupSimilarArmy(ArmyProto *army) const
 
 ArmyProto * Armyset::lookupArmyByGender(Hero::Gender gender) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getGender() == gender)
 	return *it;
@@ -266,7 +265,7 @@ ArmyProto * Armyset::lookupArmyByGender(Hero::Gender gender) const
 
 ArmyProto * Armyset::lookupArmyByStrengthAndTurns(guint32 str, guint32 turns) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if (str && turns)
 	{
@@ -289,7 +288,7 @@ ArmyProto * Armyset::lookupArmyByStrengthAndTurns(guint32 str, guint32 turns) co
 
 ArmyProto * Armyset::lookupArmyByName(Glib::ustring name) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getName().uppercase() == name.uppercase())
 	return *it;
@@ -299,7 +298,7 @@ ArmyProto * Armyset::lookupArmyByName(Glib::ustring name) const
 	
 ArmyProto * Armyset::lookupArmyByType(guint32 army_type_id) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getId() == army_type_id)
 	return *it;
@@ -311,7 +310,7 @@ bool Armyset::validateHero()
 {
   bool found = false;
   //do we have a hero?
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isHero() == true)
         {
@@ -327,7 +326,7 @@ bool Armyset::validateHero()
 bool Armyset::validatePurchasables()
 {
   bool found = false;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getNewProductionCost() > 0 )
 	{
@@ -343,7 +342,7 @@ bool Armyset::validatePurchasables()
 bool Armyset::validateRuinDefenders()
 {
   bool found = false;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getDefendsRuins() == true)
 	{
@@ -359,7 +358,7 @@ bool Armyset::validateRuinDefenders()
 bool Armyset::validateAwardables()
 {
   bool found = false;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getAwardable() == true)
 	{
@@ -401,7 +400,7 @@ bool Armyset::validateArmyUnitImage(ArmyProto *army, Shield::Colour &c)
 bool Armyset::validateArmyUnitImages()
 {
   Shield::Colour c;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if (validateArmyUnitImage(*it, c) == false)
 	return false;
@@ -418,7 +417,7 @@ bool Armyset::validateArmyUnitName(ArmyProto *army)
 
 bool Armyset::validateArmyUnitNames()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if (validateArmyUnitName(*it) == false)
 	return false;
@@ -429,7 +428,7 @@ bool Armyset::validateArmyUnitNames()
 bool Armyset::validateArmyTypeIds()
 {
   std::list<guint32> ids = std::list<guint32>();
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if (std::find(ids.begin(), ids.end(), (*it)->getId()) == ids.end())
         ids.push_back((*it)->getId());
@@ -492,11 +491,10 @@ class ArmysetLoader
 {
 public:
     ArmysetLoader(Glib::ustring filename, bool &broken, bool &unsupported)
+      : dir (File::get_dirname (filename)),
+      file (File::get_basename (filename)), armyset (NULL),
+      unsupported_version (false)
       {
-        unsupported_version = false;
-	armyset = NULL;
-	dir = File::get_dirname(filename);
-        file = File::get_basename(filename);
 	if (File::nameEndsWith(filename, Armyset::file_extension) == false)
 	  filename += Armyset::file_extension;
         Tar_Helper t(filename, std::ios::in, broken);
@@ -615,7 +613,7 @@ bool Armyset::loadSelectorPics (Tar_Helper *t)
 
 void Armyset::uninstantiateImages()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->uninstantiateImages();
 
   d_stackship->uninstantiateImages ();
@@ -831,7 +829,7 @@ const ArmyProto * Armyset::getRandomRuinKeeper() const
 {
   // list all the army types that can be a sentinel.
   std::vector<const ArmyProto*> occupants;
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     {
       const ArmyProto *a = *i;
       if (a->getDefendsRuins())
@@ -848,7 +846,7 @@ const ArmyProto *Armyset::getRandomAwardableAlly() const
 {
   // list all the army types that can be given out as a reward.
   std::vector<const ArmyProto*> allies;
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     {
       const ArmyProto *a = *i;
       if (a->getAwardable() == true)
@@ -869,10 +867,10 @@ void Armyset::reload(bool &broken)
   if (!broken && d.armyset && d.armyset->validate())
     {
       uninstantiateImages();
-      for (iterator it = begin(); it != end(); it++)
+      for (iterator it = begin(); it != end(); ++it)
         delete *it;
       clear();
-      for (iterator it = d.armyset->begin(); it != d.armyset->end(); it++)
+      for (iterator it = d.armyset->begin(); it != d.armyset->end(); ++it)
         push_back(new ArmyProto(*(*it)));
       *this = *d.armyset;
       instantiateImages(true, broken);
@@ -890,7 +888,7 @@ bool Armyset::calculate_preferred_tile_size(guint32 &ts) const
     sizecounts[d_standard->getImage(0)->get_unscaled_width()]++;
   if (d_bag->getImage ())
     sizecounts[d_bag->getImage ()->get_unscaled_width()]++;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       ArmyProto *a = (*it);
       if (a->getMaskedImage(Shield::NEUTRAL)->getImage () != NULL)
@@ -899,7 +897,7 @@ bool Armyset::calculate_preferred_tile_size(guint32 &ts) const
 
   guint32 maxcount = 0;
   for (std::map<guint32, guint32>::iterator it = sizecounts.begin(); 
-       it != sizecounts.end(); it++)
+       it != sizecounts.end(); ++it)
     {
       if ((*it).second > maxcount)
         {
@@ -943,7 +941,7 @@ Armyset * Armyset::copy(const Armyset *armyset)
 guint32 Armyset::getMaxId() const
 {
   guint32 max = 0;
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     if ((*i)->getId() > max)
       max = (*i)->getId();
   return max;
@@ -995,7 +993,7 @@ std::vector<TarFileMaskedImage*> Armyset::getMaskedImages ()
     }
   i.push_back (d_standard);
   i.push_back (d_stackship);
-  for (iterator j = begin (); j != end (); j++)
+  for (iterator j = begin (); j != end (); ++j)
     for (guint32 c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
       i.push_back ((*j)->getMaskedImage(Shield::Colour (c)));
   return i;

@@ -1,7 +1,7 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2004 Ulf Lorenz
 // Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -59,8 +59,6 @@ class MapRenderer
 	void render_tile(Vector<int> draw, Vector<int> tile,
 			 Cairo::RefPtr<Cairo::Surface> surface);
 
-	//! Save all of the map tiles as one big image (bmp file).
-	bool saveAsBitmap(Glib::ustring filename);
     private:
         //Data
 	Cairo::RefPtr<Cairo::Surface> d_surface;

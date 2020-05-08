@@ -20,18 +20,15 @@
 #include <cairomm/context.h>
 #include "font-size.h"
 
-LineChart::LineChart(std::list<std::list<unsigned int> > lines, 
-		     std::list<Gdk::RGBA> colours, 
+LineChart::LineChart(const std::list<std::list<unsigned int> > &lines, 
+		     const std::list<Gdk::RGBA> &colours, 
 		     unsigned int max_height_value,
 		     Glib::ustring x_axis_description,
 		     Glib::ustring y_axis_description)
+ : d_lines (lines), d_colours (colours), d_max_height_value (max_height_value),
+    d_x_indicator (-1), d_x_axis_description (x_axis_description),
+    d_y_axis_description (y_axis_description)
 {
-  d_lines = lines;
-  d_colours = colours;
-  d_max_height_value = max_height_value;
-  d_x_axis_description = x_axis_description;
-  d_y_axis_description = y_axis_description;
-  d_x_indicator = -1;
 }
 
 bool LineChart::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
@@ -62,8 +59,8 @@ bool LineChart::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
     cr->set_line_width(1.0);
     //loop through the outer list, and operate on the inner lists
     unsigned int max_turn = 0;
-    std::list<std::list<unsigned int> >::iterator line = d_lines.begin();
-    for (; line!= d_lines.end(); line++)
+    for (std::list<std::list<unsigned int> >::iterator line = d_lines.begin();
+         line!= d_lines.end(); ++line)
       {
 	if ((*line).size() > max_turn)
 	  max_turn = (*line).size();
@@ -71,11 +68,11 @@ bool LineChart::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
 
     if (d_max_height_value == 0)
       {
-	line = d_lines.begin();
-	for (; line!= d_lines.end(); line++)
+        for (std::list<std::list<unsigned int> >::iterator line = d_lines.begin();
+             line!= d_lines.end(); ++line)
 	  {
-	    std::list<unsigned int>::iterator it = (*line).begin();
-	    for (; it != (*line).end(); it++)
+	    for (std::list<unsigned int>::iterator it = (*line).begin();
+                 it != (*line).end(); ++it)
 	      {
 		if (*it > d_max_height_value)
 		  d_max_height_value = *it;
@@ -97,18 +94,18 @@ bool LineChart::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
       hoffs = w + (hoffs / 4);
 
     std::list<Gdk::RGBA>::iterator cit = d_colours.begin();
-    line = d_lines.begin();
-    for (; line!= d_lines.end(), cit != d_colours.end(); line++, cit++)
+    for (std::list<std::list<unsigned int> >::iterator line = d_lines.begin();
+         line!= d_lines.end(), cit != d_colours.end(); ++line, ++cit)
       {
 	//okay, here's my line and it's colour,
 	double red = (*cit).get_red();
 	double green = (*cit).get_green();
 	double blue = (*cit).get_blue();
 	cr->set_source_rgb(red, green, blue);
-	std::list<unsigned int>::iterator it = (*line).begin();
 	unsigned int turn = 1;
 	cr->move_to(origin_x + hoffs, origin_y - voffs);
-	for (; it != (*line).end(); it++, turn++)
+	for (std::list<unsigned int>::iterator it = (*line).begin();
+             it != (*line).end(); ++it, turn++)
 	  {
 	    cr->line_to((((float)turn / (float)max_turn) * 
 			 (width - (hoffs * 2))) + hoffs,

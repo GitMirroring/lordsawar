@@ -42,6 +42,7 @@ class NameList : public std::vector<Glib::ustring>, public sigc::trackable
 	 * makes a new NameList object from what it finds.
 	 */
         NameList(Glib::ustring filename, Glib::ustring item_tag);
+        NameList (const NameList &l);
 
         //! Destructor.
         ~NameList() {};

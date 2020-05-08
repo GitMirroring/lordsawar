@@ -911,26 +911,11 @@ class GameMap: public sigc::trackable
          */
         void reloadShieldset();
 
-        /** Load the current Tileset again.
-         * Throw away the state of the current Tileset, and load it up from
-         * the tileset file.  Includes loading images.
-         */
-        void reloadTileset();
-
         /** Load the current Cityset again.
          * Throw away the state of the current Cityset, and load it up from
          * the cityset file.  Includes loading images.
          */
         void reloadCityset();
-
-        /** Load the given Armyset again.
-         *
-         * @param armyset A pointer to the armyset to reload.
-         *
-         * Throw away the state of the given Armyset, and load it up from
-         * the armyet file.  Includes loading images.
-         */
-        void reloadArmyset(Armyset *armyset);
 
         /** Move a building from one place to another on the map.
          *
@@ -1169,7 +1154,6 @@ class GameMap: public sigc::trackable
 
 	static Stone* getStone(Vector<int> pos);
 	bool putStone(Stone *t);
-        bool putNewStone(Vector<int> tile);
 	bool removeStone(Vector<int> pos);
 
         /** Add a given Road tile to the map.

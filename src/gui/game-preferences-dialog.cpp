@@ -77,10 +77,10 @@ void GamePreferencesDialog::init(Glib::ustring filename)
   for (unsigned int i = 0; i < MAX_PLAYERS; i++)
     add_player(GameParameters::Player::EASY, "");
 
-  //disable all names, and types
-  std::list<Gtk::ComboBoxText*>::iterator c = player_types.begin();
   std::list<Gtk::Entry *>::iterator e = player_names.begin();
-  for (; c != player_types.end(); c++, e++)
+  //disable all names, and types
+  for (std::list<Gtk::ComboBoxText*>::iterator c = player_types.begin();
+       c != player_types.end(); ++c, ++e)
     {
       (*c)->set_sensitive(true);
       (*c)->set_active(GameParameters::Player::OFF);
@@ -94,10 +94,10 @@ void GamePreferencesDialog::init(Glib::ustring filename)
        i = load_map_parameters.players.begin(), 
        end = load_map_parameters.players.end(); i != end; ++i) 
     {
-      c = player_types.begin();
+      std::list<Gtk::ComboBoxText*>::iterator c = player_types.begin();
       e = player_names.begin();
       //zip to correct combobox, entry
-      for (b = 0; b < (*i).id; b++, c++, e++) ;
+      for (b = 0; b < (*i).id; b++, ++c, ++e) ;
       (*c)->set_sensitive(true);
       (*c)->set_active((*i).type);
       (*e)->set_sensitive(true);
@@ -134,9 +134,8 @@ void GamePreferencesDialog::init(Glib::ustring filename)
 }
 
 GamePreferencesDialog::GamePreferencesDialog(Gtk::Window &parent, Glib::ustring filename, GameScenario::PlayMode play_mode)
- : LwDialog (parent, "game-preferences-dialog.ui")
+ : LwDialog (parent, "game-preferences-dialog.ui"), mode (play_mode)
 {
-  mode = play_mode;
   init(filename);
   if (mode != GameScenario::NETWORKED)
     {
@@ -245,9 +244,9 @@ void GamePreferencesDialog::update_shields()
 
 void GamePreferencesDialog::on_player_type_changed()
 {
-  std::list<Gtk::ComboBoxText*>::iterator c = player_types.begin();
   int count = 0;
-  for (; c != player_types.end(); c++)
+  for (std::list<Gtk::ComboBoxText*>::iterator c = player_types.begin();
+       c != player_types.end(); ++c)
     {
       if ((*c)->property_sensitive () == false)
         continue;
@@ -272,8 +271,8 @@ void GamePreferencesDialog::update_buttons()
   std::map<guint32, bool> offplayers;
   guint32 offcount = 0;
   guint32 count = 0;
-  std::list<Gtk::ComboBoxText *>::iterator c = player_types.begin();
-  for (; c != player_types.end(); c++)
+  for (std::list<Gtk::ComboBoxText *>::iterator c = player_types.begin();
+       c != player_types.end(); ++c)
     {
       if (GameParameters::player_param_string_to_player_param((*c)->get_active_text()) == GameParameters::Player::OFF)
         {
@@ -285,9 +284,9 @@ void GamePreferencesDialog::update_buttons()
       count++;
     }
   bool found_empty_name = false;
-  std::list<Gtk::Entry *>::iterator e = player_names.begin();
   count = 0;
-  for (; e != player_names.end(); e++)
+  for (std::list<Gtk::Entry *>::iterator e = player_names.begin();
+       e != player_names.end(); ++e)
     {
       if (offplayers[count] == true)
         continue;
@@ -311,8 +310,8 @@ void GamePreferencesDialog::update_buttons()
 void GamePreferencesDialog::update_difficulty_rating()
 {
   GameParameters g;
-  std::list<Gtk::ComboBoxText *>::iterator c = player_types.begin();
-  for (; c != player_types.end(); c++)
+  for (std::list<Gtk::ComboBoxText *>::iterator c = player_types.begin();
+       c != player_types.end(); ++c)
     {
       GameParameters::Player p;
       p.type = GameParameters::player_param_string_to_player_param((*c)->get_active_text());
@@ -367,7 +366,7 @@ void GamePreferencesDialog::on_start_game_clicked()
   int id = 0;
   std::list<Gtk::ComboBoxText*>::iterator c = player_types.begin();
   std::list<Gtk::Entry *>::iterator e = player_names.begin();
-  for (; c != player_types.end(); c++, e++, id++)
+  for (; c != player_types.end(); ++c, ++e, id++)
     {
       GameParameters::Player p;
       p.type = GameParameters::player_param_string_to_player_param((*c)->get_active_text());
@@ -464,8 +463,8 @@ void GamePreferencesDialog::on_difficulty_changed()
     {
       if (type_num)
 	{
-	  std::list<Gtk::ComboBoxText*>::iterator c = player_types.begin();
-	  for (; c != player_types.end(); c++)
+	  for (std::list<Gtk::ComboBoxText*>::iterator c = player_types.begin();
+               c != player_types.end(); ++c)
 	    {
 	      if ((*c)->get_active_row_number() != 3) //if OFF
 		(*c)->set_active (type_num);
@@ -547,9 +546,9 @@ void GamePreferencesDialog::on_num_players_changed()
       num_players_spinbutton->set_value(d_max_players);
       return;
     }
-  std::list<Gtk::ComboBoxText*>::iterator c = player_types.begin();
   int count = num_players_spinbutton->get_value ();
-  for (; c != player_types.end(); c++)
+  for (std::list<Gtk::ComboBoxText*>::iterator c = player_types.begin();
+       c != player_types.end(); ++c)
     {
       if ((*c)->property_sensitive () == false)
         continue;

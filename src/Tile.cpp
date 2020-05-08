@@ -29,10 +29,8 @@
 Glib::ustring Tile::d_tag = "tile";
 
 Tile::Tile()
+ : d_name (""), d_moves (0), d_type (Tile::GRASS), d_smalltile (new SmallTile())
 {
-  d_type = Tile::GRASS;
-  d_moves = 0;
-  d_smalltile = new SmallTile();
 }
 
 Tile::Tile(Tile::Type type, Glib::ustring name, guint32 moves, SmallTile*small)
@@ -77,7 +75,7 @@ bool Tile::save(XML_Helper *helper) const
 
 Tile::~Tile()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     delete *it;
   clear();
   if (d_smalltile)
@@ -240,7 +238,7 @@ bool Tile::validate() const
 
 void Tile::uninstantiateImages()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->uninstantiateImages();
 }
 
@@ -248,7 +246,7 @@ void Tile::instantiateImages(int tilesize, Tar_Helper *t, bool scale,
                              bool &broken)
 {
   broken = false;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       Glib::ustring file = "";
       if ((*it)->getName().empty() == false && !broken)
@@ -265,8 +263,8 @@ void Tile::instantiateImages(int tilesize, Tar_Helper *t, bool scale,
 guint32 Tile::countTileStyles(TileStyle::Type type) const
 {
   guint32 count = 0;
-  for (const_iterator i = begin(); i != end(); i++)
-    for (std::vector<TileStyle*>::const_iterator j = (*i)->begin(); j != (*i)->end(); j++)
+  for (const_iterator i = begin(); i != end(); ++i)
+    for (std::vector<TileStyle*>::const_iterator j = (*i)->begin(); j != (*i)->end(); ++j)
       if ((*j)->getType() == type)
         count++;
   return count;
@@ -274,7 +272,7 @@ guint32 Tile::countTileStyles(TileStyle::Type type) const
 
 TileStyle* Tile::getTileStyle(guint32 id) const
 {
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     for (auto j: **i)
       if (j->getId() == id)
         return j;
@@ -284,7 +282,7 @@ TileStyle* Tile::getTileStyle(guint32 id) const
 std::list<TileStyle*> Tile::getTileStyles(TileStyle::Type type) const
 {
   std::list<TileStyle*> styles;
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     for (auto j: **i)
       if (j->getType() == type)
         styles.push_back(j);

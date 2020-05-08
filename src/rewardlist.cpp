@@ -56,7 +56,7 @@ void Rewardlist::deleteInstance()
 
 void Rewardlist::deleteReward(const Reward* s)
 {
-  for (const_iterator it = this->begin(); it != this->end(); it++)
+  for (const_iterator it = this->begin(); it != this->end(); ++it)
     if ((*it) == s)
       {
         this->flRemove(s);
@@ -75,7 +75,7 @@ Rewardlist::~Rewardlist()
 
 Rewardlist::Rewardlist(Rewardlist *rewardlist)
 {
-  for (iterator it = rewardlist->begin(); it != rewardlist->end(); it++)
+  for (iterator it = rewardlist->begin(); it != rewardlist->end(); ++it)
     {
       switch ((*it)->getType())
         {
@@ -106,7 +106,7 @@ Rewardlist::Rewardlist(XML_Helper* helper)
 
 void Rewardlist::flClear()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     delete (*it);
 
   clear();
@@ -138,7 +138,7 @@ bool Rewardlist::save(XML_Helper* helper) const
   retval &= helper->openTag(Rewardlist::d_tag);
 
   //save rewards
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getType() == Reward::GOLD)
         static_cast<Reward_Gold*>(*it)->save(helper);
@@ -173,7 +173,7 @@ Reward *Rewardlist::pop (Reward::Type type)
 {
   Rewardlist::iterator iter;
   std::vector<Reward*> rewards;
-  for (iter = begin(); iter != end(); iter++)
+  for (iter = begin(); iter != end(); ++iter)
     {
       if ((*iter)->getType() == type)
         rewards.push_back(*iter);

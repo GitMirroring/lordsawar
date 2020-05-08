@@ -115,7 +115,7 @@ NewRandomMapDialog::NewRandomMapDialog(Gtk::Window &parent)
   Citysetlist::getInstance()->getSizes(sizes);
   Armysetlist::getInstance()->getSizes(sizes);
   for (std::list<guint32>::iterator it = sizes.begin(); it != sizes.end();
-       it++)
+       ++it)
     {
       Glib::ustring s = String::ucompose("%1x%1", *it);
       tile_size_combobox->append(s);

@@ -3,7 +3,7 @@
 // Copyright (C) 2003 Marek Publicewicz
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2005 Bryan Duff
-// Copyright (C) 2006-2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006-2011, 2014, 2015, 2017, 2020 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -230,7 +230,7 @@ class Player: public sigc::trackable
 	void setSurrendered(bool surr);
 
         //! Set the fight order of the player.
-	void setFightOrder(std::list<guint32> order);
+	void setFightOrder(const std::list<guint32> &order);
 
         //! Set path of the stack to the previously moved stack's destination.
         bool setPathOfStackToPreviousDestination(Stack *stack);
@@ -326,9 +326,6 @@ class Player: public sigc::trackable
         //! Remove every Action from the list of the player's actions.
         void clearActionlist();
 
-        //! Show debugging information for the player's Action list.
-        void dumpActionlist() const;
-
 	//! Check to see if it's our turn.
 	bool hasAlreadyInitializedTurn() const;
 
@@ -346,9 +343,6 @@ class Player: public sigc::trackable
 
         //! Remove every History element from the list of the player's events.
         void clearHistorylist();
-
-        //! Show debugging information for the player's History list.
-        void dumpHistorylist() const;
 
 	//! Check the player's history to see if we've conquered the given city.
 	bool conqueredCity(City *c, guint32 &turns_ago) const;
@@ -660,28 +654,6 @@ class Player: public sigc::trackable
         //! Callback to have a Hero drop an Item.
         bool heroDropItem(Hero *hero, Item *item, Vector<int> pos, bool &splash);
 
-	/**
-	 * Callback to drop a all items at a particular position on the 
-	 * game map.  All items in the Hero's backback are removed and placed 
-	 * into a bag at place on the map.
-	 *
-	 * For this method to make sense, the Hero should be in a Stack
-	 * that is co-located with the drop position.  E.g. Heroes should
-	 * drop items here.
-	 *
-	 * This callback must result in one or more Action_Equip elements 
-	 * being given to the addAction method.
-	 *
-	 * @param hero             The Hero that holds the items.
-	 * @param pos              The position of the tile on the game map to 
-	 *                         drop the item onto.
-         * @param splash           Whether or not the items sunk in the water
-         *                         after dropping them.
-	 *
-         * @return False on error, true otherwise.
-	 */
-        //! Callback to have a Hero drop all items.
-        bool heroDropAllItems(Hero *hero, Vector<int> pos, bool &splash);
 
 	/**
 	 * Callback to pickup an Item at a particular position on the game 
@@ -1467,8 +1439,8 @@ class Player: public sigc::trackable
 
 
 	Stack *stackSplitArmy(Stack *stack, Army *a);
-	Stack *stackSplitArmies(Stack *stack, std::list<guint32> armies);
-	Stack *stackSplitArmies(Stack *stack, std::list<Army*> armies);
+	Stack *stackSplitArmies(Stack *stack, const std::list<guint32> &armies);
+	Stack *stackSplitArmies(Stack *stack, const std::list<Army*> &armies);
 	
 	// Static Methods
 
@@ -1635,7 +1607,29 @@ class Player: public sigc::trackable
         void doCityChangeProduction(City *c, int slot);
         void doGiveReward(Stack *s, Reward *reward, StackReflist *stacks);
         void doHeroDropItem(Hero *hero, Item *item, Vector<int> pos, bool &splash);
+	/**
+	 * Callback by the network player to drop a all items at a particular
+         * position on the game map.  All items in the Hero's backback are
+         * removed and placed into a bag at place on the map.
+	 *
+	 * For this method to make sense, the Hero should be in a Stack
+	 * that is co-located with the drop position.  E.g. Heroes should
+	 * drop items here.
+	 *
+	 * This callback must result in one or more Action_Equip elements 
+	 * being given to the addAction method.
+	 *
+	 * @param hero             The Hero that holds the items.
+	 * @param pos              The position of the tile on the game map to 
+	 *                         drop the item onto.
+         * @param splash           Whether or not the items sunk in the water
+         *                         after dropping them.
+	 *
+         * @return False on error, true otherwise.
+	 */
+        //! Callback to have a Hero drop all items.
 	bool doHeroDropAllItems(Hero *h, Vector<int> pos, bool &splash);
+
         bool doHeroUseItem(Hero *h, Item *item, Player *victim, City *friendly_city, City *enemy_city, City *neutral_city, City *city);
         void doHeroPickupItem(Hero *hero, Item *item, Vector<int> pos);
         bool doHeroPickupAllItems(Hero *h, Vector<int> pos);
@@ -1647,7 +1641,7 @@ class Player: public sigc::trackable
         void doSignpostChange(Signpost *signpost, Glib::ustring message);
         void doCityRename(City *c, Glib::ustring name);
         void doVectorFromCity(City * c, Vector<int> dest);
-        void doSetFightOrder(std::list<guint32> order);
+        void doSetFightOrder(const std::list<guint32> &order);
         void doResign(std::list<History*> &history);
         void doHeroPlantStandard(Hero *hero, Item *item, Vector<int> pos);
         void doDeclareDiplomacy (DiplomaticState state, Player *player);
@@ -1667,7 +1661,7 @@ class Player: public sigc::trackable
 	bool doChangeVectorDestination(Vector<int> src, Vector<int> dest,
 				       std::list<City*> &vectored);
 
-	bool doStackSplitArmies(Stack *stack, std::list<guint32> armies,
+	bool doStackSplitArmies(Stack *stack, const std::list<guint32> &armies,
 				Stack *&new_stack);
 
         Quest* doHeroGetQuest(Hero *hero, bool except_raze);
@@ -1724,7 +1718,7 @@ class Player: public sigc::trackable
          * @param heroes           Return a list of id's of the heroes found.
          */
 	//! Get heroes.
-        void getHeroes(const std::list<Stack*> stacks, 
+        void getHeroes(const std::list<Stack*> &stacks, 
 		       std::vector<guint32>& heroes);
 
 

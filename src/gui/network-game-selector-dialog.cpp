@@ -146,7 +146,7 @@ void NetworkGameSelectorDialog::select_first_game()
 void NetworkGameSelectorDialog::fill_games(RecentlyPlayedGameList *rpgl, Glib::RefPtr<Gtk::ListStore> list, const GamesColumns &columns, Profile *p)
 {
   for (RecentlyPlayedGameList::iterator it = rpgl->begin(); it != rpgl->end();
-       it++)
+       ++it)
     {
       if ((*it)->getPlayMode() == GameScenario::NETWORKED)
         {

@@ -29,10 +29,10 @@ ScenarioDetails::ScenarioDetails(Glib::ustring id, guint32 num_cities,
 }
 
 ScenarioDetails::ScenarioDetails (Glib::ustring filename, bool &broken)
+ : d_filename (filename)
 {
   guint32 player_count, city_count;
   Glib::ustring id, comment, name;
-  d_filename = filename;
   GameScenario::loadDetails(filename, broken, player_count, city_count, name, comment, id);
   if (!broken)
     {

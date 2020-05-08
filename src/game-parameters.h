@@ -127,20 +127,6 @@ public:
         return GameParameters::Player::NETWORKED;
       return GameParameters::Player::OFF;
     }
-  static guint32 player_param_to_player_type(guint32 param)
-    {
-      if (param == GameParameters::Player::HUMAN)
-        return 0;
-      else if (param == GameParameters::Player::EASY)
-        return 1;
-      else if (param == GameParameters::Player::HARD)
-        return 4;
-      else if (param == GameParameters::Player::NETWORKED)
-        return 8;
-      else if (param == GameParameters::Player::OFF)
-        return 0; //no equiv.
-      return 0;
-    }
   static GameParameters::Player::Type player_param_string_to_player_param(Glib::ustring s)
     {
       if (s == HUMAN_PLAYER_TYPE) return GameParameters::Player::HUMAN;

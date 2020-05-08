@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007-2010, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -61,19 +61,12 @@
 #include "TarFileImage.h"
 
 EditorBigMap::EditorBigMap()
- : BigMap(false)
+ : BigMap(false),
+    prev_mouse_pos (Vector<int>(0, 0)), mouse_pos (Vector<int>(-1, -1)),
+    pointer (POINTER), pointer_terrain (Tile::GRASS), pointer_size (1),
+    pointer_tile_style_id (-1), moving_objects_from (Vector<int>(-1, -1)),
+    mouse_state (NONE), moving_bag (NULL)
 {
-  mouse_pos = Vector<int>(-1, -1);
-  prev_mouse_pos = Vector<int>(0, 0);
-
-  moving_objects_from = Vector<int>(-1,-1);
-  mouse_state = NONE;
-  input_locked = false;
-  pointer = POINTER;
-  pointer_size = 1;
-  pointer_terrain = Tile::GRASS;
-  pointer_tile_style_id = -1;
-  moving_bag = NULL;
 }
 
 void EditorBigMap::set_pointer(Pointer p, int size, Tile::Type t, 
@@ -190,23 +183,6 @@ void EditorBigMap::mouse_leave_event()
     mouse_pos.x = mouse_pos.y = -10000;
     mouse_on_tile.emit(Vector<int>(-100, -100));
     draw();
-}
-
-std::vector<Vector<int> > EditorBigMap::get_screen_tiles()
-{
-    // find out which tiles are within bounds
-    std::vector<Vector<int> > tiles;
-
-    for (int y = buffer_view.y; y < buffer_view.y + buffer_view.h; y++)
-      for (int x = buffer_view.x; x < buffer_view.x + buffer_view.w; x++)
-	{
-	    Vector<int> tile(x, y);
-	    if (tile.x >= 0 && tile.x < GameMap::getWidth() &&
-		tile.y >= 0 && tile.y < GameMap::getHeight())
-		tiles.push_back(tile);
-	}
-    
-    return tiles;
 }
 
 std::vector<Vector<int> > EditorBigMap::get_cursor_tiles()

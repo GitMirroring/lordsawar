@@ -528,7 +528,7 @@ void ArmySetWindow::on_validate_armyset_activated()
   if (!valid)
     msgs.push_back(_("The picture for the bag of items must be set."));
 
-  for (Armyset::iterator it = d_armyset->begin(); it != d_armyset->end(); it++)
+  for (Armyset::iterator it = d_armyset->begin(); it != d_armyset->end(); ++it)
     {
       Shield::Colour c;
       valid = d_armyset->validateArmyUnitImage(*it, c);
@@ -548,7 +548,7 @@ void ArmySetWindow::on_validate_armyset_activated()
 
   Glib::ustring msg = "";
   for (std::list<Glib::ustring>::iterator it = msgs.begin(); it != msgs.end();
-       it++)
+       ++it)
     {
       msg += (*it) + "\n";
       break;
@@ -1599,23 +1599,6 @@ void ArmySetWindow::update_window_title()
   window->set_title(title);
 }
 
-Gtk::Button *ArmySetWindow::lookup_button_by_colour (Shield::Colour s)
-{
-  switch (s)
-    {
-    case Shield::WHITE: return white_image_button;
-    case Shield::GREEN: return green_image_button;
-    case Shield::YELLOW: return yellow_image_button;
-    case Shield::DARK_BLUE: return dark_blue_image_button;
-    case Shield::ORANGE: return orange_image_button;
-    case Shield::LIGHT_BLUE: return light_blue_image_button;
-    case Shield::RED: return red_image_button;
-    case Shield::BLACK: return black_image_button;
-    case Shield::NEUTRAL: return neutral_image_button;
-    }
-  return NULL;
-}
-
 void ArmySetWindow::on_make_same_clicked()
 {
   Glib::RefPtr<Gtk::TreeSelection> selection = armies_treeview->get_selection();
@@ -1657,7 +1640,7 @@ void ArmySetWindow::refresh_armies()
 {
   Armyset::iterator j = d_armyset->begin();
   for (Gtk::TreeNodeChildren::iterator i = armies_list->children().begin();
-       i != armies_list->children().end(); i++, j++)
+       i != armies_list->children().end(); ++i, ++j)
     (*i)[armies_columns.army] = *j;
 }
 

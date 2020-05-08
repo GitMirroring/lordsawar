@@ -43,8 +43,8 @@ SelectHiddenRuinDialog::SelectHiddenRuinDialog(Gtk::Window &parent)
     hidden_ruins_treeview->set_headers_visible(false);
 
     Ruinlist *ruinlist = Ruinlist::getInstance();
-    Ruinlist::iterator iter = ruinlist->begin();
-    for (;iter != ruinlist->end(); iter++)
+    for (Ruinlist::iterator iter = ruinlist->begin();
+         iter != ruinlist->end(); ++iter)
       if ((*iter)->isHidden() && 
 	  (*iter)->getOwner() == Playerlist::getInstance()->getNeutral())
 	addHiddenRuin(*iter);

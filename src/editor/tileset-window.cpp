@@ -264,12 +264,6 @@ TileSetWindow::connect_tilestyleset_treeview ()
 }
 
 void
-TileSetWindow::disconnect_tilestyleset_treeview ()
-{
-  tilestyleset_selected_connection.disconnect ();
-}
-
-void
 TileSetWindow::update_tileset_buttons()
 {
   if (!tiles_treeview->get_selection()->get_selected())
@@ -438,7 +432,7 @@ bool TileSetWindow::make_new_tileset ()
   d_tileset->setNewTemporaryFile ();
   d_tileset->populateWithDefaultTiles();
 
-  for (Tileset::iterator i = d_tileset->begin(); i != d_tileset->end(); i++)
+  for (Tileset::iterator i = d_tileset->begin(); i != d_tileset->end(); ++i)
     {
       Gtk::TreeIter j = tiles_list->append();
       (*j)[tiles_columns.name] = Tile::tileTypeToFriendlyName((*i)->getType());
@@ -772,7 +766,7 @@ void TileSetWindow::fill_tilestylesets()
   if (!t)
     return;
   tilestylesets_list->clear();
-  for (std::list<TileStyleSet*>::iterator it = t->begin(); it != t->end(); it++)
+  for (std::list<TileStyleSet*>::iterator it = t->begin(); it != t->end(); ++it)
     {
       Gtk::TreeIter l = tilestylesets_list->append();
       (*l)[tilestylesets_columns.name] = (*it)->getName();
@@ -848,7 +842,7 @@ void TileSetWindow::on_remove_tile_clicked()
       tiles_list->erase(iterrow);
 
       for (std::vector<Tile*>::iterator it = d_tileset->begin();
-           it != d_tileset->end(); it++)
+           it != d_tileset->end(); ++it)
 	{
 	  if (*it == a)
 	    {
@@ -1677,7 +1671,7 @@ void TileSetWindow::on_validate_tileset_activated()
 
   Glib::ustring msg = "";
   for (std::list<Glib::ustring>::iterator it = msgs.begin(); it != msgs.end();
-       it++)
+       ++it)
     {
       msg += (*it) + "\n";
       break;
@@ -1696,7 +1690,7 @@ void TileSetWindow::refresh_tiles()
 {
   Tileset::iterator j = d_tileset->begin();
   for (Gtk::TreeNodeChildren::iterator i = tiles_list->children().begin();
-       i != tiles_list->children().end(); i++, j++)
+       i != tiles_list->children().end(); ++i, ++j)
     (*i)[tiles_columns.tile] = *j;
 }
 

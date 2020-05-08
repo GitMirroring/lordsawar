@@ -91,15 +91,11 @@ Tileset::Tileset (const Tileset& t)
     push_back(new Tile(*(*i)));
 
   for (Tileset::const_iterator i = begin(); i != end(); ++i)
-    {
-      for (std::list<TileStyleSet*>::const_iterator j = (*i)->begin(); j != (*i)->end(); j++)
-	{
-	  for (std::vector<TileStyle*>::const_iterator k = (*j)->begin(); k != (*j)->end(); k++)
-            {
-              d_tilestyles[(*k)->getId()] = *k;
-            }
-        }
-    }
+    for (std::list<TileStyleSet*>::const_iterator j = (*i)->begin();
+         j != (*i)->end(); ++j)
+      for (std::vector<TileStyle*>::const_iterator k = (*j)->begin();
+           k != (*j)->end(); ++k)
+        d_tilestyles[(*k)->getId()] = *k;
 
   d_all_movebonus = new TarFileImage (*t.d_all_movebonus);
   d_water_movebonus = new TarFileImage (*t.d_water_movebonus);
@@ -110,7 +106,7 @@ Tileset::Tileset (const Tileset& t)
 }
 
 Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
-	:Set(TILESET_EXT, helper)
+	:Set(TILESET_EXT, helper, directory)
 {
   d_selector[0] = new TarFileMaskedImage ();
   d_selector[1] = new TarFileMaskedImage ();
@@ -126,7 +122,6 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   d_hills_movebonus = new TarFileImage (1);
   d_mountains_movebonus = new TarFileImage (1);
   d_swamp_movebonus = new TarFileImage (1);
-  setDirectory(directory);
   guint32 ts;
   helper->getData(ts, "tilesize");
   setTileSize(ts);
@@ -327,39 +322,33 @@ int Tileset::getFreeTileStyleId() const
 {
   int ids[65535];
   memset (ids, 0, sizeof (ids));
+
   for (Tileset::const_iterator i = begin(); i != end(); ++i)
-    {
-      for (std::list<TileStyleSet*>::const_iterator j = (*i)->begin(); j != (*i)->end(); j++)
-	{
-	  for (std::vector<TileStyle*>::const_iterator k = (*j)->begin(); k != (*j)->end(); k++)
-	    {
-	      ids[(*k)->getId()]++;
-	    }
-	}
-    }
+    for (std::list<TileStyleSet*>::const_iterator j = (*i)->begin();
+         j != (*i)->end(); ++j)
+      for (std::vector<TileStyle*>::const_iterator k = (*j)->begin();
+           k != (*j)->end(); ++k)
+        ids[(*k)->getId()]++;
+
   //these ids range from 0 to 65535.
-  for (unsigned int i = 0; i <= 65535; i++)
-    {
-      if (ids[i] == 0)
-	return i;
-    }
+  for (unsigned int i = 0; i < 65535; i++)
+    if (ids[i] == 0)
+      return i;
   return -1;
 }
 
 int Tileset::getLargestTileStyleId() const
 {
   unsigned int largest = 0;
+
   for (Tileset::const_iterator i = begin(); i != end(); ++i)
-    {
-      for (std::list<TileStyleSet*>::const_iterator j = (*i)->begin(); j != (*i)->end(); j++)
-	{
-	  for (std::vector<TileStyle*>::const_iterator k = (*j)->begin(); k != (*j)->end(); k++)
-	    {
-	      if ((*k)->getId() > largest)
-		largest = (*k)->getId();
-	    }
-	}
-    }
+    for (std::list<TileStyleSet*>::const_iterator j = (*i)->begin();
+         j != (*i)->end(); ++j)
+      for (std::vector<TileStyle*>::const_iterator k = (*j)->begin();
+           k != (*j)->end(); ++k)
+        if ((*k)->getId() > largest)
+          largest = (*k)->getId();
+
   return largest;
 }
 
@@ -374,7 +363,7 @@ bool Tileset::validate() const
     return false;
   if (size() == 0)
     return false;
-  for (Tileset::const_iterator i = begin(); i != end(); i++)
+  for (Tileset::const_iterator i = begin(); i != end(); ++i)
     if ((*i)->validate() == false)
       return false;
   if (countTilesWithPattern(SmallTile::SUNKEN_RADIAL) > 1)
@@ -428,11 +417,9 @@ class TilesetLoader
 {
 public:
     TilesetLoader(Glib::ustring filename, bool &broken, bool &unsupported)
+      :dir (File::get_dirname(filename)), file (File::get_basename(filename)),
+      tileset (NULL), unsupported_version (NULL)
       {
-        unsupported_version = false;
-	tileset = NULL;
-	dir = File::get_dirname(filename);
-        file = File::get_basename(filename);
 	if (File::nameEndsWith(filename, Tileset::file_extension) == false)
 	  filename += Tileset::file_extension;
         Tar_Helper t(filename, std::ios::in, broken);
@@ -491,7 +478,7 @@ Tileset *Tileset::create(Glib::ustring file, bool &unsupported_version)
 
 void Tileset::uninstantiateImages()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->uninstantiateImages();
 
   for (auto i : getImages ())
@@ -511,7 +498,7 @@ void Tileset::instantiateImages(bool scale, bool &broken)
   Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
   if (broken)
     return;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if (!broken)
         (*it)->instantiateImages(siz, &t, scale, broken);
@@ -612,7 +599,7 @@ void Tileset::reload(bool &broken)
     {
       //steal the values from d.tileset and then don't delete it.
       uninstantiateImages();
-      for (iterator it = begin(); it != end(); it++)
+      for (iterator it = begin(); it != end(); ++it)
         delete *it;
       Glib::ustring basename = getBaseName();
       *this = *d.tileset;
@@ -640,10 +627,10 @@ bool Tileset::calculate_preferred_tile_size(guint32 &ts) const
     sizecounts[d_fog->getImage ()->get_unscaled_width()]++;
   if (d_explosion->getImage ())
     sizecounts[d_explosion->getImage ()->get_unscaled_width()]++;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       Tile *tile = *it;
-      for (Tile::const_iterator i = tile->begin(); i != tile->end(); i++)
+      for (Tile::const_iterator i = tile->begin(); i != tile->end(); ++i)
         {
           TileStyle *tilestyle = (*i)->front();
           if (tilestyle && tilestyle->getImage())
@@ -684,7 +671,7 @@ bool Tileset::addTileStyleSet(Tile *tile, Glib::ustring filename)
       return success;
     }
   tile->push_back(set);
-  for (TileStyleSet::iterator it = set->begin(); it != set->end(); it++)
+  for (TileStyleSet::iterator it = set->begin(); it != set->end(); ++it)
     {
       guint32 tile_style_id = getFreeTileStyleId();
       d_tilestyles[tile_style_id] = (*it);
@@ -695,11 +682,11 @@ bool Tileset::addTileStyleSet(Tile *tile, Glib::ustring filename)
 
 bool Tileset::getTileStyle(guint32 id, Tile **tile, TileStyleSet **set, TileStyle ** style) const
 {
-  for (const_iterator t = begin(); t != end(); t++)
+  for (const_iterator t = begin(); t != end(); ++t)
     for (std::list<TileStyleSet*>::const_iterator i = (*t)->begin(); 
-         i != (*t)->end(); i++)
+         i != (*t)->end(); ++i)
       for (std::vector<TileStyle*>::const_iterator j = (*i)->begin(); 
-           j != (*i)->end(); j++)
+           j != (*i)->end(); ++j)
         if ((*j)->getId() == id)
           {
             if (tile)
@@ -730,7 +717,7 @@ void Tileset::support_backward_compatibility()
 
 Tile *Tileset::getFirstTile(SmallTile::Pattern pattern) const
 {
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     if ((*i)->getSmallTile()->getPattern() == pattern)
       return *i;
   return NULL;
@@ -760,7 +747,7 @@ void Tileset::populateWithDefaultTiles()
 int Tileset::countTilesWithPattern(SmallTile::Pattern pattern) const
 {
   int radial_count = 0;
-  for (Tileset::const_iterator i = begin(); i != end(); i++)
+  for (Tileset::const_iterator i = begin(); i != end(); ++i)
     {
       if ((*i)->getSmallTile()->getPattern() == pattern)
         radial_count++;
@@ -807,7 +794,7 @@ void Tileset::uninstantiateSameNamedImages (Glib::ustring name)
   TarFileMaskedImage::uninstantiate (name, getMaskedImages ());
   TarFileImage::uninstantiate (name, getImages ());
   std::vector<TileStyleSet*> sets;
-  for (iterator i = begin (); i != end (); i++)
+  for (iterator i = begin (); i != end (); ++i)
     for (auto tst : *(*i))
       if (tst->getName () == name)
         sets.push_back (tst);

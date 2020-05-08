@@ -19,7 +19,7 @@
 #include "tarhelper.h"
 
 Set::Set(Glib::ustring ext, guint32 id, Glib::ustring name, guint32 ts)
-  : TarFile("", ext), d_id(id), d_name(name), d_license(""), d_info(""),
+  : TarFile("", "", ext), d_id(id), d_name(name), d_license(""), d_info(""),
     d_tileSize(ts), d_scale (1.0)
 {
 }
@@ -30,8 +30,8 @@ Set::Set(const Set &s)
 {
 }
 
-Set::Set(Glib::ustring ext, XML_Helper* helper)
- :TarFile("", ext), d_scale(1.0)
+Set::Set(Glib::ustring ext, XML_Helper* helper, Glib::ustring directory)
+ :TarFile(directory, "", ext), d_scale(1.0)
 {
   helper->getData(d_id, "id");
   helper->getData(d_name, "name");

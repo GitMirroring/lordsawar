@@ -179,7 +179,7 @@ void Tar_Helper::Close(bool clean)
 
 Glib::ustring Tar_Helper::getFirstFile(std::list<Glib::ustring> exts, bool &broken)
 {
-  for (std::list<Glib::ustring>::iterator i = exts.begin(); i != exts.end(); i++)
+  for (std::list<Glib::ustring>::iterator i = exts.begin(); i != exts.end(); ++i)
     {
       Glib::ustring file = getFirstFile(*i, broken);
       if (file != "")
@@ -295,7 +295,7 @@ std::list<Glib::ustring> Tar_Helper::getFilenames(Glib::ustring ext)
 {
   std::list<Glib::ustring> result;
   std::list<Glib::ustring> f = getFilenames(this);
-  for (std::list<Glib::ustring>::iterator i = f.begin(); i != f.end(); i++)
+  for (std::list<Glib::ustring>::iterator i = f.begin(); i != f.end(); ++i)
     {
       if (ext == "")
         result.push_back(*i);
@@ -365,7 +365,7 @@ Glib::ustring Tar_Helper::makeNameUnique(Glib::ustring name)
   //take any trailing numbers
   int digits = 0;
   for (Glib::ustring::reverse_iterator i = bname.rbegin ();
-       i != bname.rend(); i++)
+       i != bname.rend(); ++i)
     {
       if (g_unichar_isdigit (*i))
         digits++;

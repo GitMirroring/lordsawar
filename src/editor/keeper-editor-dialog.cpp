@@ -33,13 +33,12 @@
 
 #define method(x) sigc::mem_fun(*this, &KeeperEditorDialog::x)
 
-KeeperEditorDialog::KeeperEditorDialog(Gtk::Window &parent, Keeper *k, Vector<int> pos, CreateScenarioRandomize *r)
- : LwEditorDialog(parent, "keeper-dialog.ui")
+KeeperEditorDialog::KeeperEditorDialog(Gtk::Window &parent, Keeper *k,
+                                       Vector<int> pos,
+                                       CreateScenarioRandomize *r)
+ : LwEditorDialog(parent, "keeper-dialog.ui"), d_changed (false), d_pos (pos),
+    d_randomizer (r)
 {
-  d_pos = pos;
-  d_changed = false;
-  d_randomizer = r;
-
   keeper_button =
     new ArmyChooserButton (parent, xml, "keeper_button",
                            Playerlist::getInstance ()->getNeutral (),

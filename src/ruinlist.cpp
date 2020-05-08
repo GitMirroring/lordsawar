@@ -77,7 +77,7 @@ bool Ruinlist::save(XML_Helper* helper) const
 
     retval &= helper->openTag(Ruinlist::d_tag);
 
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
     retval &= helper->closeTag();
@@ -176,7 +176,7 @@ Ruin* Ruinlist::getNearestVisibleRuin(const Vector<int>& pos, int dist) const
 
 void Ruinlist::changeOwnership(Player *old_owner, Player *new_owner)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if ((*it)->getOwner() == old_owner)
       (*it)->setOwner(new_owner);
 }
@@ -184,7 +184,7 @@ void Ruinlist::changeOwnership(Player *old_owner, Player *new_owner)
 guint32 Ruinlist::countUnexploredRuins(Player *owner) const
 {
   guint32 count = 0;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       Ruin *ruin = *it;
       if (ruin->isHidden() == true && ruin->getOwner() != owner)
@@ -198,7 +198,7 @@ guint32 Ruinlist::countUnexploredRuins(Player *owner) const
 guint32 Ruinlist::countExploredRuins(Player *owner) const
 {
   guint32 count = 0;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       Ruin *ruin = *it;
       if (ruin->isHidden() == true && ruin->getOwner() != owner)
@@ -212,7 +212,7 @@ guint32 Ruinlist::countExploredRuins(Player *owner) const
 guint32 Ruinlist::countUnamedRuins () const
 {
   guint32 count = 0;
-  for (const_iterator it = begin (); it != end (); it++)
+  for (const_iterator it = begin (); it != end (); ++it)
     if ((*it)->getName () == DEFAULT_RUIN_NAME)
       count++;
   return count;
@@ -221,7 +221,7 @@ guint32 Ruinlist::countUnamedRuins () const
 guint32 Ruinlist::countKeepers () const
 {
   guint32 count = 0;
-  for (const_iterator it = begin (); it != end (); it++)
+  for (const_iterator it = begin (); it != end (); ++it)
     if ((*it)->getOccupant ())
       {
         if ((*it)->getOccupant ()->getStack ())
@@ -235,7 +235,7 @@ guint32 Ruinlist::countKeepers () const
 guint32 Ruinlist::countEmptyKeepers () const
 {
   guint32 count = 0;
-  for (const_iterator it = begin (); it != end (); it++)
+  for (const_iterator it = begin (); it != end (); ++it)
     if ((*it)->getOccupant ())
       {
         if ((*it)->getOccupant ()->getStack () == NULL)

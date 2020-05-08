@@ -45,7 +45,7 @@ ConnectionManager::ConnectionManager()
 
 ConnectionManager::~ConnectionManager()
 {
-  for (iterator i = begin(); i != end(); i++)
+  for (iterator i = begin(); i != end(); ++i)
     (*i)->tear_down_connection();
 }
 

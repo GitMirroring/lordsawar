@@ -36,7 +36,7 @@ void RuinMap::draw_ruins (bool show_selected)
   // Draw all ruins as pictures over their location -- showing them as
   // explored/unexplored
   for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
-      it != Ruinlist::getInstance()->end(); it++)
+      it != Ruinlist::getInstance()->end(); ++it)
   {
       if ((*it)->isHidden() == true && 
           (*it)->getOwner() != Playerlist::getInstance()->getViewingplayer())

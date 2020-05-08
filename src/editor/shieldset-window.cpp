@@ -367,7 +367,7 @@ void ShieldSetWindow::on_validate_shieldset_activated()
 
   Glib::ustring msg = "";
   for (std::list<Glib::ustring>::iterator it = msgs.begin(); it != msgs.end();
-       it++)
+       ++it)
     msg += (*it) + "\n";
 
   if (msg == "")
@@ -993,7 +993,7 @@ void ShieldSetWindow::refresh_shields()
 {
   Glib::RefPtr<Gtk::TreeSelection> selection = shields_treeview->get_selection();
   for (Shieldset::iterator i = d_shieldset->begin(); i != d_shieldset->end();
-       i++)
+       ++i)
     {
       shields_treeview->set_cursor(Gtk::TreePath
                                    (String::ucompose("%1", (*i)->getOwner())));

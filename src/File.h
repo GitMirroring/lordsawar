@@ -109,9 +109,6 @@ class File
 	//! simple basename routine, but also strips the file extension.
 	static Glib::ustring get_basename(Glib::ustring path, bool keep_ext=false);
 
-	//! is a file writable?
-	static bool is_writable(Glib::ustring path);
-
 	//! does a file exist?
 	static bool exists(Glib::ustring f);
 
@@ -131,8 +128,6 @@ class File
         static void clean_dir(Glib::ustring filename);
 
 	static Glib::ustring add_slash_if_necessary(Glib::ustring dir);
-
-	static Glib::ustring getSetConfigurationFilename(Glib::ustring dir, Glib::ustring subdir, Glib::ustring ext);
 
 	static Glib::ustring get_dirname(Glib::ustring path);
 

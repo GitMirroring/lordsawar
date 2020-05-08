@@ -238,7 +238,7 @@ void TilePreviewDialog::on_next_clicked()
   if (scenes.end() != current_scene)
     {
       selected_tilestyle_label->set_text("");
-      current_scene++;
+      ++current_scene;
       TilePreviewScene *scene = *current_scene;
       if (scene)
 	{
@@ -253,7 +253,7 @@ void TilePreviewDialog::on_previous_clicked()
   if (scenes.begin() != current_scene)
     {
       selected_tilestyle_label->set_text("");
-      current_scene--;
+      --current_scene;
       TilePreviewScene *scene = *current_scene;
       if (scene)
 	{

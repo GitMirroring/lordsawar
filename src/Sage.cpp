@@ -185,7 +185,7 @@ Sage::Sage()
 Sage::~Sage ()
 {
   //first put back the ones we didn't make, or select
-  for (iterator i = begin(); i != end(); i++)
+  for (iterator i = begin(); i != end(); ++i)
     {
       if (*i != d_gold_reward  &&
           *i != d_allies_ruin &&

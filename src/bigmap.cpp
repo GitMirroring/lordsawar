@@ -58,20 +58,12 @@
 bool BigMap::s_show_hidden_ruins;
 
 BigMap::BigMap(bool headless)
-    : d_headless (headless), d_renderer(0), buffer(0), d_fighting(LocationBox(Vector<int>(-1,-1)))
+ : d_headless (headless), d_renderer(0), view (LwRectangle (0, 0, 0, 0)),
+    view_pos (Vector<int>(0,0)), buffer(0), input_locked (false),
+    blank_screen (false), d_grid_toggled (false),
+    image (Gtk::Allocation(0, 0, 320, 200)), deltax (0), deltay (0),
+    d_fighting(LocationBox(Vector<int>(-1,-1)))
 {
-    // note: we are not fully initialized before set_view is called
-    view.x = view.y = 0;
-    view.w = 0;
-    view.h = 0;
-    deltax = 0;
-    deltay = 0;
-    view_pos = Vector<int>(0,0);
-    input_locked = false;
-    d_grid_toggled = false;
-
-    blank_screen = false;
-    image = Gtk::Allocation(0, 0, 320, 200);
 }
 
 BigMap::~BigMap()
@@ -234,12 +226,6 @@ Vector<int> BigMap::mouse_pos_to_tile(Vector<int> pos)
     return (view_pos + pos) / ts;
 }
 
-Vector<int> BigMap::mouse_pos_to_tile_offset(Vector<int> pos)
-{
-    int ts = GameMap::getInstance()->getTileSize();
-    return (view_pos + pos) % ts;
-}
-
 MapTipPosition BigMap::map_tip_position(Vector<int> tile)
 {
   return map_tip_position (LwRectangle(tile.x, tile.y, 1, 1)); 
@@ -291,14 +277,6 @@ MapTipPosition BigMap::map_tip_position(LwRectangle tile_area)
     }
     
     return m;
-}
-
-void BigMap::blit_object(const Location &obj, Vector<int> tile, PixMask *im, Cairo::RefPtr<Cairo::Surface> surface)
-{
-  Vector<int> diff = tile - obj.getPos();
-  int tilesize = GameMap::getInstance()->getTileSize();
-  Vector<int> p = tile_to_buffer_pos(tile);
-  im->blit(diff, tilesize, surface, p);
 }
 
 void BigMap::draw_stack(Stack *s, Cairo::RefPtr<Cairo::Surface> surface)
@@ -621,7 +599,7 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
   pixmask->blit(surface, tile_to_buffer_pos(tile));
 }
 
-void BigMap::draw_buffer_tiles(LwRectangle map_view, Cairo::RefPtr<Cairo::Surface> surface)
+void BigMap::draw_buffer_tiles(const LwRectangle &map_view, Cairo::RefPtr<Cairo::Surface> surface)
 {
   for (int i = map_view.x; i < map_view.x + map_view.w; i++)
     for (int j = map_view.y; j < map_view.y + map_view.h; j++)
@@ -629,7 +607,7 @@ void BigMap::draw_buffer_tiles(LwRectangle map_view, Cairo::RefPtr<Cairo::Surfac
 	draw_buffer_tile(Vector<int>(i,j), surface);
 }
 
-void BigMap::draw_buffer(LwRectangle map_view, Cairo::RefPtr<Cairo::Surface> surface)
+void BigMap::draw_buffer(const LwRectangle &map_view, Cairo::RefPtr<Cairo::Surface> surface)
 {
   draw_buffer_tiles(map_view, surface);
 }

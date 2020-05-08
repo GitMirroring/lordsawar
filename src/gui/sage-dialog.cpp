@@ -60,7 +60,7 @@ SageDialog::SageDialog(Gtk::Window &parent, Sage *s, Hero *h, Ruin *r)
 
   dialog->set_title(_("A Sage!"));
 
-  for(Sage::iterator it = sage->begin(); it != sage->end(); it++)
+  for(Sage::iterator it = sage->begin(); it != sage->end(); ++it)
     addReward(*it);
 
   continue_button->set_sensitive(false);

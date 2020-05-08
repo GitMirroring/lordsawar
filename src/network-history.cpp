@@ -24,13 +24,12 @@
 Glib::ustring NetworkHistory::d_tag = "networkhistory";
 
 NetworkHistory::NetworkHistory(History *history, guint32 owner)
-  :OwnerId(owner)
+  :OwnerId(owner), d_history (History::copy (history))
 {
-  d_history = History::copy(history);
 }
 
 NetworkHistory::NetworkHistory(XML_Helper* helper)
-  : OwnerId(helper)
+  : OwnerId(helper), d_history (History::handle_load (helper))
 {
 }
 

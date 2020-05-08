@@ -52,9 +52,8 @@ void StatusBox::pad_image(Gtk::Image *image)
 }
 
 StatusBox::StatusBox(BaseObjectType* baseObject, const Glib::RefPtr<Gtk::Builder> &xml)
-  : Gtk::Box(baseObject)
+  : Gtk::Box(baseObject), d_height_fudge_factor (0)
 {
-  d_height_fudge_factor = 0;
   xml->get_widget("info_notebook", notebook);
   xml->get_widget("stats_box", stats_box);
   xml->get_widget("tartan_box", tartan_box);

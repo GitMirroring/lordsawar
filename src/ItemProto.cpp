@@ -25,7 +25,7 @@
 #include "armyproto.h"
 #include "xmlhelper.h"
 
-Glib::ustring ItemProto::d_tag = "itemproto";
+Glib::ustring ItemProto::d_itemproto_tag = "itemproto";
 
 ItemProto::ItemProto(XML_Helper* helper)
 	: Renamable (helper)
@@ -85,21 +85,13 @@ ItemProto::ItemProto(XML_Helper* helper)
 }
 
 ItemProto::ItemProto(Glib::ustring name)
-	: Renamable(name)
+ : Renamable(name), d_bonus (0), d_uses_left (0), d_army_type_to_kill (0),
+    d_steal_gold_percent (0.0), d_army_type_to_summon (0),
+    d_building_type_to_summon_on (0), d_percent_armies_to_kill (0.0),
+    d_mp_to_add (0), d_army_type_to_raise (0), d_num_armies_to_raise (0),
+    d_has_army_type_to_kill (false), d_has_army_type_to_summon (false),
+    d_has_army_type_to_raise (false)
 {
-  d_bonus = 0;
-  d_uses_left = 0;
-  d_has_army_type_to_kill = false;
-  d_army_type_to_kill = 0;
-  d_steal_gold_percent = 0.0;
-  d_has_army_type_to_summon = false;
-  d_army_type_to_summon = 0;
-  d_building_type_to_summon_on = 0;
-  d_percent_armies_to_kill = 0.0;
-  d_mp_to_add = 0;
-  d_has_army_type_to_raise = false;
-  d_army_type_to_raise = 0;
-  d_num_armies_to_raise = 0;
 }
 
 ItemProto::ItemProto(const ItemProto& orig)
@@ -163,7 +155,7 @@ bool ItemProto::save(XML_Helper* helper) const
 {
   bool retval = true;
   
-  retval &= helper->openTag(d_tag);
+  retval &= helper->openTag(d_itemproto_tag);
   retval &= saveContents(helper);
   retval &= helper->closeTag();
 

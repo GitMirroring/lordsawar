@@ -61,21 +61,21 @@ Tilesetlist::Tilesetlist()
 Tilesetlist::~Tilesetlist()
 {
   uninstantiateImages();
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     delete *it;
   clear();
 }
 
 void Tilesetlist::uninstantiateImages()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->uninstantiateImages();
 }
 
 void Tilesetlist::instantiateImages(bool &broken)
 {
   broken = false;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if (!broken)
         {

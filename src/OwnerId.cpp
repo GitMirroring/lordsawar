@@ -20,15 +20,13 @@
 #include "xmlhelper.h"
 
 OwnerId::OwnerId()
+ : d_owner_id (0), owner_id_set (false)
 {
-  d_owner_id = 0;
-  owner_id_set = false;
 }
 
 OwnerId::OwnerId(guint32 owner)
-  :d_owner_id(owner)
+  :d_owner_id(owner), owner_id_set (true)
 {
-  owner_id_set = true;
 }
 
 OwnerId::OwnerId(const OwnerId& own)

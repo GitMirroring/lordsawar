@@ -297,7 +297,7 @@ Tile::Type SmallmapEditorDialog::get_terrain()
 {
     Tile::Type terrain = Tile::GRASS;
     for (std::vector<TerrainItem>::iterator i = terrain_items.begin(),
-	     end = terrain_items.end(); i != end; ++i)
+         end = terrain_items.end(); i != end; ++i)
     {
 	if (i->button->get_active())
 	{

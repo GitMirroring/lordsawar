@@ -36,8 +36,8 @@ void PastChooser::deleteInstance()
 }
 
 PastChooser::PastChooser()
+ : pattern_dir (std::map<Glib::ustring,Glib::ustring>())
 {
-  pattern_dir = std::map<Glib::ustring,Glib::ustring>();
 }
     
 void PastChooser::set_dir(Glib::RefPtr<Gtk::FileFilter> f, Glib::ustring dir)

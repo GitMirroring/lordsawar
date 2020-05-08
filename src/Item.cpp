@@ -52,20 +52,24 @@ Item::Item(XML_Helper* helper)
 
 }
 
+	bool d_plantable;
+	guint32 d_plantable_owner_id;
+	bool d_planted;
+	guint32 d_plantable_orig_owner_id;
+	guint32 d_type;
+
 Item::Item(Glib::ustring name, bool plantable, Player *plantable_owner)
-	: ItemProto(name), UniquelyIdentified()
+ : ItemProto(name), UniquelyIdentified(), d_plantable (plantable),
+    d_plantable_owner_id (MAX_PLAYERS), d_planted (false),
+    d_plantable_orig_owner_id (d_plantable_owner_id), d_type (0)
 {
-  d_type = 0;
-  d_bonus = 0;
-  d_plantable = plantable;
   if (d_plantable)
     d_bonus = ItemProto::PLANT_TO_VECTOR;
+  else
+    d_bonus = 0;
+
   if (plantable_owner)
     d_plantable_owner_id = plantable_owner->getId();
-  else
-    d_plantable_owner_id = MAX_PLAYERS;
-  d_plantable_orig_owner_id = d_plantable_owner_id;
-  d_planted = false;
   //std::cerr << "item created with id " << d_id << std::endl;
 }
 
@@ -79,14 +83,11 @@ Item::Item(const Item& orig)
 }
 
 Item::Item(const ItemProto &proto, guint32 type_id)
-:ItemProto(proto), UniquelyIdentified()
+: ItemProto(proto), UniquelyIdentified(),
+    d_plantable ((d_bonus & ItemProto::PLANT_TO_VECTOR) == ItemProto::PLANT_TO_VECTOR),
+    d_plantable_owner_id (MAX_PLAYERS), d_planted (false),
+    d_plantable_orig_owner_id (d_plantable_owner_id), d_type (type_id)
 {
-  d_type = type_id;
-  d_plantable = 
-    (d_bonus & ItemProto::PLANT_TO_VECTOR) == ItemProto::PLANT_TO_VECTOR;
-  d_plantable_owner_id = MAX_PLAYERS;
-  d_plantable_orig_owner_id = d_plantable_owner_id;
-  d_planted = false;
 }
 
 Item::~Item()

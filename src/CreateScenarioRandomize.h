@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ class CreateScenarioRandomize
 {
     public:
         CreateScenarioRandomize();
+        CreateScenarioRandomize(const CreateScenarioRandomize &r);
         virtual ~CreateScenarioRandomize() {};
 
 	/** take a random city name
@@ -56,7 +57,6 @@ class CreateScenarioRandomize
 	Glib::ustring getDynamicSignpost(Signpost *signpost);
 	int getNumSignposts() {return d_signposts->size();}
 	Keeper * getRandomRuinKeeper(Vector<int> pos);
-	Reward *getNewRandomReward();
 
 
 	//! Based on the difficulty, get how much gold each player should

@@ -74,7 +74,7 @@ bool Templelist::save(XML_Helper* helper) const
 
     retval &= helper->openTag(Templelist::d_tag);
 
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end();++it)
         retval &= (*it)->save(helper);
     
     retval &= helper->closeTag();
@@ -171,7 +171,7 @@ Temple* Templelist::getNearestVisibleTemple(const Vector<int>& pos, int dist) co
 guint32 Templelist::countUnamedTemples () const
 {
   guint32 count = 0;
-  for (const_iterator it = begin (); it != end (); it++)
+  for (const_iterator it = begin (); it != end (); ++it)
     if ((*it)->getName () == DEFAULT_TEMPLE_NAME)
       count++;
   return count;

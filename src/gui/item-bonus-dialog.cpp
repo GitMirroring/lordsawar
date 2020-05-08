@@ -38,8 +38,8 @@ ItemBonusDialog::ItemBonusDialog(Gtk::Window &parent)
   items_treeview->append_column("", items_columns.name);
   items_treeview->append_column(_("Bonus"), items_columns.bonus);
 
-  Itemlist::iterator iter = Itemlist::getInstance()->begin();
-  for (;iter != Itemlist::getInstance()->end(); iter++)
+  for (Itemlist::iterator iter = Itemlist::getInstance()->begin();
+       iter != Itemlist::getInstance()->end(); ++iter)
     addItemProto((*iter).second);
 }
 

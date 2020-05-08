@@ -1,5 +1,5 @@
 // Copyright (C) 2004 John Farrell
-// Copyright (C) 2004, 2005 Ulf Lorenz
+// Copyright (C) 2004, 2005, 2020 Ulf Lorenz
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -41,8 +41,13 @@ class Threat;
 class AICityInfo
 {
     public:
-        // CREATORS
+
+        //! Constructor.
         AICityInfo(City *c);
+
+        //! Copy Constructor.
+        AICityInfo(const AICityInfo &i);
+
         ~AICityInfo();
 
         //! record this threat as threatening this city

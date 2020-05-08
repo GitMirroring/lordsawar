@@ -54,8 +54,9 @@ void GamehostClient::deleteInstance()
 }
 
 GamehostClient::GamehostClient()
+ : network_connection (NULL), d_host (""), d_port (0), d_connected (false),
+    d_profile_id (""), d_recently_played_game_list (NULL)
 {
-  network_connection = NULL;
 }
 
 GamehostClient::~GamehostClient()

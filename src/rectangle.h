@@ -1,4 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -43,6 +44,8 @@ public:
     {
 	pos = other.pos;
 	dim = other.dim;
+        x = pos.x; y = pos.y;
+        w = dim.x; h = dim.y;
 	return *this;
     }
 
@@ -66,45 +69,6 @@ inline bool is_inside(const LwRectangle &r, Vector<int> v)
 {
     return r.x <= v.x && v.x < r.x + r.w
 	&& r.y <= v.y && v.y < r.y + r.h;
-}
-
-inline bool is_overlapping(const LwRectangle &r1, const LwRectangle &r2)
-{
-    // find the leftmost rectangle
-    LwRectangle const *l, *r;
-    if (r1.x <= r2.x)
-    {
-	l = &r1;
-	r = &r2;
-    }
-    else
-    {
-	l = &r2;
-	r = &r1;
-    }
-    
-    // leftmost is too far to the left
-    if (l->x + l->w <= r->x)
-	return false;
-
-    // find the upper rectangle
-    LwRectangle const *u, *d;
-    if (r1.y <= r2.y)
-    {
-	u = &r1;
-	d = &r2;
-    }
-    else
-    {
-	u = &r2;
-	d = &r1;
-    }
-
-    // upper is too high up
-    if (u->y + u->h <= d->y)
-	return false;
-
-    return true;
 }
 
 #endif

@@ -936,7 +936,7 @@ import_items (FILE *it)
       char name[21];
       int code, value;
       memset (name, 0, sizeof (name));
-      fscanf (it, "%s %d %d", name, &code, &value);
+      fscanf (it, "%20s %d %d", name, &code, &value);
       std::string item_name = std::string(name);
       std::replace (item_name.begin(), item_name.end(), ' ', '\0');
       std::replace (item_name.begin(), item_name.end(), '_', ' ');
@@ -1013,14 +1013,14 @@ set_ruin_defenders(Armyset *armyset)
   // army set.
  
   std::list<ArmyProto*> armies;
-  for (Armyset::iterator i = armyset->begin(); i != armyset->end(); i++)
+  for (Armyset::iterator i = armyset->begin(); i != armyset->end(); ++i)
     armies.push_back(*i);
 
   armies.sort(compare_army_strength);
   //take the top 4 in terms of strength.  but hey, no heroes.
   int count = 0;
   for (std::list<ArmyProto*>::iterator j = armies.begin(); j != armies.end();
-       j++)
+       ++j)
     {
       if ((*j)->getName().uppercase() == "HERO")
         continue;
@@ -1238,14 +1238,14 @@ import_fight_order (FILE *scn, Armyset *armyset)
   for (int i = 0; i < 29; i++)
     order[i] = -1;
   c = 0;
-  for (Armyset::iterator i = armyset->begin(); i != armyset->end(); i++, c++)
+  for (Armyset::iterator i = armyset->begin(); i != armyset->end(); ++i, c++)
     order[fight_order_no_boat[c]] = (*i)->getId();
   std::list<guint32> order_list;
   for (unsigned int i = 0; i < order.capacity(); i++)
     if (order[i] != -1)
       order_list.push_back(order[i]);
   Playerlist *pl = Playerlist::getInstance();
-  for (Playerlist::iterator i = pl->begin(); i != pl->end(); i++)
+  for (Playerlist::iterator i = pl->begin(); i != pl->end(); ++i)
     (*i)->setFightOrder(order_list);
 }
 
@@ -1254,7 +1254,7 @@ static bool compare_strength (const ArmyProto* first, const ArmyProto* second)
   int ffly = first->getMoveBonus() == Tile::isFlying();
   int sfly = second->getMoveBonus() == Tile::isFlying();
   int fhero = first->isHero();
-  int rhero = first->isHero();
+  int rhero = second->isHero();
   int f = (first->getStrength() * 100) + (first->getProduction() * 101) + (ffly * 10) + (fhero * 100000);
   int s = (second->getStrength() * 100) + (second->getProduction() * 101) + (sfly * 10) + (rhero * 100000);
   if (f < s)
@@ -1284,7 +1284,7 @@ import_initial_gold (FILE *scn)
 }
 
 static void 
-import (FILE *map, FILE *scn, FILE *rd, FILE *sg, FILE *it, FILE *sp, FILE *a, Glib::ustring name)
+importer (FILE *map, FILE *scn, FILE *rd, FILE *sg, FILE *it, FILE *sp, FILE *a, Glib::ustring name)
 {
   GameScenario *g = setup_new_map (name);
 
@@ -1514,7 +1514,7 @@ main (int argc, char* argv[])
         a = fopen (armyset_filename.c_str(), "rb");
       else
         a = open_armyset_file (filename, name);
-      import (m, s, r, sg, it, sp, a, name);
+      importer (m, s, r, sg, it, sp, a, name);
       fclose (m);
       fclose (s);
       fclose (r);
@@ -1564,7 +1564,7 @@ main (int argc, char* argv[])
               a = NULL;
             }
         }
-      import (m, s, r, sg, it, sp, a, name);
+      importer (m, s, r, sg, it, sp, a, name);
       fclose (m);
       fclose (s);
       fclose (r);

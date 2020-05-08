@@ -71,7 +71,7 @@ Cityset::Cityset(const Cityset& c)
 }
 
 Cityset::Cityset(XML_Helper *helper, Glib::ustring directory)
- : Set(CITYSET_EXT, helper)
+ : Set(CITYSET_EXT, helper, directory)
 {
   d_port = new TarFileImage (1);
   d_sign = new TarFileImage (1);
@@ -80,7 +80,6 @@ Cityset::Cityset(XML_Helper *helper, Glib::ustring directory)
   d_tower = new TarFileImage (MAX_PLAYERS);
   d_city = new TarFileImage (MAX_PLAYERS + 1);
   d_rcity = new TarFileImage (MAX_PLAYERS);
-  setDirectory(directory);
   guint32 ts;
   helper->getData(ts, "tilesize");
   setTileSize(ts);
@@ -114,11 +113,9 @@ class CitysetLoader
 {
 public:
     CitysetLoader(Glib::ustring filename, bool &broken, bool &unsupported)
+      : dir (File::get_dirname(filename)), file (File::get_basename(filename)),
+      cityset (NULL), unsupported_version (false)
       {
-        unsupported_version = false;
-	cityset = NULL;
-	dir = File::get_dirname(filename);
-        file = File::get_basename(filename);
 	if (File::nameEndsWith(filename, Cityset::file_extension) == false)
 	  filename += Cityset::file_extension;
         Tar_Helper t(filename, std::ios::in, broken);
@@ -314,15 +311,6 @@ bool Cityset::validateTempleTileWidth()
   return true; 
 }
 
-bool Cityset::tileWidthsEqual(Cityset *cityset)
-{
-  if (getCityTileWidth() == cityset->getCityTileWidth() &&
-      getRuinTileWidth() == cityset->getRuinTileWidth() &&
-      getTempleTileWidth() == cityset->getTempleTileWidth())
-    return true;
-  return false;
-}
-
 void Cityset::reload(bool &broken)
 {
   broken = false;
@@ -361,7 +349,7 @@ bool Cityset::calculate_preferred_tile_size(guint32 &ts) const
 
   guint32 maxcount = 0;
   for (std::map<guint32, guint32>::iterator it = sizecounts.begin(); 
-       it != sizecounts.end(); it++)
+       it != sizecounts.end(); ++it)
     {
       if ((*it).second > maxcount)
         {
@@ -378,26 +366,6 @@ bool Cityset::calculate_preferred_tile_size(guint32 &ts) const
   else
     ts = tilesize;
   return ret;
-}
-
-guint32 Cityset::countEmptyImageNames() const
-{
-  guint32 count = 0;
-  if (d_city->getName ().empty() == true)
-    count++;
-  if (d_rcity->getName ().empty() == true)
-    count++;
-  if (d_port->getName ().empty() == true)
-    count++;
-  if (d_sign->getName ().empty() == true)
-    count++;
-  if (d_ruin->getName ().empty() == true)
-    count++;
-  if (d_temple->getName ().empty() == true)
-    count++;
-  if (d_tower->getName ().empty() == true)
-    count++;
-  return count;
 }
 
 bool Cityset::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version)

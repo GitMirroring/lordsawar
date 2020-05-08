@@ -327,8 +327,8 @@ namespace String
   inline Glib::ustring strip_trailing_numbers (Glib::ustring name)
     {
       int digits = 0;
-      Glib::ustring::reverse_iterator i;
-      for (i = name.rbegin (); i != name.rend(); i++)
+      for (Glib::ustring::reverse_iterator i = name.rbegin ();
+                      i != name.rend(); ++i)
         {
           if (g_unichar_isdigit (*i))
             digits++;

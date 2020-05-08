@@ -67,7 +67,7 @@ bool Signpostlist::save(XML_Helper* helper) const
 
     retval &= helper->openTag(Signpostlist::d_tag);
 
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
     retval &= helper->closeTag();
@@ -89,7 +89,7 @@ bool Signpostlist::load(Glib::ustring tag, XML_Helper* helper)
 guint32 Signpostlist::countUnamedSignposts () const
 {
   guint32 count = 0;
-  for (const_iterator it = begin (); it != end (); it++)
+  for (const_iterator it = begin (); it != end (); ++it)
     if ((*it)->getName () == DEFAULT_SIGNPOST)
       count++;
   return count;

@@ -54,7 +54,7 @@ void QuestEnemyArmies::update_targets()
   Stacklist::const_iterator sit ;
   Stacklist *sl = d_victim_player->getStacklist();
   d_targets.clear();
-  for (sit = sl->begin(); sit != sl->end(); sit++)
+  for (sit = sl->begin(); sit != sl->end(); ++sit)
     {
       //is this not a city location?  no?  then it's a target.
       if (GameMap::getCity((*sit)->getPos()) == NULL)

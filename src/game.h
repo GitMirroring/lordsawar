@@ -240,7 +240,6 @@ class Game
     //! Called after a player's stack attacks a city
     void on_city_fight_finished(City *city, Fight::Result result);
     
-    void looting_city(City *city, int &gold);
     void unselect_active_stack();
     void select_active_stack();
     bool recruitHero(HeroProto *hero, City *city, int gold);

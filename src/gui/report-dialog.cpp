@@ -72,7 +72,7 @@ ReportDialog::ReportDialog(Gtk::Window &parent, Player *player, ReportType type)
   std::list<Action*> actions = player->getReportableActions();
   guint32 total = 0;
   std::list<Action*>::const_iterator it;
-  for (it = actions.begin(); it != actions.end(); it++)
+  for (it = actions.begin(); it != actions.end(); ++it)
     {
       if ((*it)->getType() == Action::PRODUCE_UNIT ||
 	  (*it)->getType() == Action::PRODUCE_VECTORED_UNIT)
@@ -314,8 +314,8 @@ Glib::ustring ReportDialog::get_rank_string(int rank)
 Glib::ustring ReportDialog::calculateRank(std::list<guint32> scores, guint32 score)
 {
   guint32 rank = 0;
-  std::list<guint32>::iterator it = scores.begin();
-  for (; it != scores.end(); it++)
+  for (std::list<guint32>::iterator it = scores.begin();
+       it != scores.end(); ++it)
     {
       if (score < *it)
 	rank++;
@@ -363,8 +363,8 @@ void ReportDialog::addProduction(const Action *action)
       const Action_Produce *act;
       act = dynamic_cast<const Action_Produce*>(action);
       army_type = act->getArmy()->getTypeId();
-      Citylist::iterator cit = Citylist::getInstance()->begin();
-      for (; cit != Citylist::getInstance()->end(); ++cit)
+      for (Citylist::iterator cit = Citylist::getInstance()->begin();
+           cit != Citylist::getInstance()->end(); ++cit)
 	if ((*cit)->getId() == act->getCityId())
 	  {
 	    s += (*cit)->getName();

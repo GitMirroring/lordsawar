@@ -58,7 +58,7 @@ Citysetlist::Citysetlist()
 Citysetlist::~Citysetlist()
 {
   uninstantiateImages();
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     delete *it;
   clear();
 }
@@ -66,7 +66,7 @@ Citysetlist::~Citysetlist()
 void Citysetlist::instantiateImages(bool &broken)
 {
   broken = false;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if (!broken)
         {
@@ -78,7 +78,7 @@ void Citysetlist::instantiateImages(bool &broken)
 
 void Citysetlist::uninstantiateImages()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->uninstantiateImages();
 }
 

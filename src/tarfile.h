@@ -33,7 +33,7 @@
 class TarFile
 {
 public:
-    TarFile (Glib::ustring name, Glib::ustring ext);
+    TarFile (Glib::ustring dir, Glib::ustring name, Glib::ustring ext);
     ~TarFile() {};
     TarFile(const TarFile &s);
 
@@ -62,7 +62,6 @@ public:
     void setNewTemporaryFile ();
     //! when we open a file, we work on a copy of it
     void setLoadTemporaryFile ();
-    bool isTemporaryFile() const;
 private:
 
     Glib::ustring d_dir;

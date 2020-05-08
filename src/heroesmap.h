@@ -38,9 +38,9 @@ class HeroesMap : public OverviewMap
  public:
      //! Default constructor.  Make a new HeroesMap.
      /**
-      * @param city  The city where the Hero has emerged.
+      * @param heroes the list of all heroes belonging to a player
       */
-     HeroesMap(std::list<Hero*> heroes);
+     HeroesMap(const std::list<Hero*> &heroes);
 
      //! Destructor.
      ~HeroesMap() {};

@@ -49,7 +49,7 @@ class Hero : public Army
     public:
 
 	//! The xml tag of this object in a saved-game file.
-	static Glib::ustring d_tag; 
+	static Glib::ustring d_hero_tag; 
 
         //! The different genders a Hero unit can have.
 	/**
@@ -151,9 +151,6 @@ class Hero : public Army
 
         //! Convert a Hero::Gender to an easy to read string.
         static Glib::ustring genderToFriendlyName (const Hero::Gender gender);
-
-        //! Convert an easy to read string to a  Hero::Gender.
-        static Hero::Gender friendlyNameToGender (Glib::ustring name);
 
         /** 
 	 * Increase the Hero unit's level, and increase one of three stats;

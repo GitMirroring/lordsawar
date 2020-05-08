@@ -24,7 +24,7 @@ Glib::ustring TurnActionlist::d_tag = "turn";
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
-TurnActionlist::TurnActionlist(const Player *p, const std::list<Action*> actions)
+TurnActionlist::TurnActionlist(const Player *p, const std::list<Action*> &actions)
   : OwnerId(p->getId())
 {
   add (actions);
@@ -32,7 +32,7 @@ TurnActionlist::TurnActionlist(const Player *p, const std::list<Action*> actions
 
 TurnActionlist::~TurnActionlist()
 {
-  for (TurnActionlist::iterator it = begin(); it != end(); it++)
+  for (TurnActionlist::iterator it = begin(); it != end(); ++it)
     delete *it;
   clear();
 }
@@ -51,7 +51,7 @@ bool TurnActionlist::save(XML_Helper* helper) const
     retval &= helper->openTag(TurnActionlist::d_tag);
 
     retval &= OwnerId::save(helper);
-    for (TurnActionlist::const_iterator it = begin(); it != end(); it++)
+    for (TurnActionlist::const_iterator it = begin(); it != end(); ++it)
       retval &= (*it)->save(helper);
     
     retval &= helper->closeTag();

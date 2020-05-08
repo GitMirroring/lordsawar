@@ -96,7 +96,7 @@ void PathCalculator::populateNodeMap()
 
       std::list<Vector<int> > next = calcMoves(pos);
       for (std::list<Vector<int> >::iterator it = next.begin(); 
-	   it != next.end(); it++)
+	   it != next.end(); ++it)
 	process.push(*it);
     }
 }
@@ -160,7 +160,9 @@ PathCalculator::PathCalculator(const PathCalculator &p)
 :stack(new Stack(*p.stack)), flying(p.flying), mountains (p.mountains), d_bonus(p.d_bonus),
     land_reset_moves(p.land_reset_moves),
     boat_reset_moves(p.boat_reset_moves), zigzag(p.zigzag), on_ship(p.on_ship),
-    enemy_city_avoidance(p.enemy_city_avoidance), enemy_stack_avoidance(p.enemy_stack_avoidance), delete_stack(p.delete_stack)
+    enemy_city_avoidance(p.enemy_city_avoidance),
+    enemy_stack_avoidance(p.enemy_stack_avoidance),
+    delete_stack(p.delete_stack), load_unload_stack (NULL)
 {
   int width = GameMap::getWidth();
   int height = GameMap::getHeight();
@@ -524,7 +526,7 @@ Path* PathCalculator::calculate(Vector<int> dest, guint32 &moves, guint32 &turns
       int min = dist;
       Vector<int> minpos = pos;
       for (std::list<Vector<int> >::iterator it = diffs.begin();
-	   it != diffs.end(); it++)
+	   it != diffs.end(); ++it)
 	{
 	  Vector<int> next = pos + (*it);
 	  if (next.x < 0 || next.x == width || next.y < 0 || next.y == height)
@@ -548,7 +550,7 @@ Path* PathCalculator::calculate(Vector<int> dest, guint32 &moves, guint32 &turns
   //calculate when the waypoints show no more movement possible
   guint32 pathcount = 0;
   guint32 moves_left = stack->getMoves();
-  for (Path::iterator it = path->begin(); it != path->end(); it++)
+  for (Path::iterator it = path->begin(); it != path->end(); ++it)
     {
       guint32 tile_moves = stack->calculateTileMovementCost(*it);
       if (moves_left >= tile_moves)

@@ -41,8 +41,8 @@
 #define method(x) sigc::mem_fun(*this, &SplashWindow::x)
 
 SplashWindow::SplashWindow()
+  : network_game_nickname ("")
 {
-  network_game_nickname = "";
 
   Glib::RefPtr<Gtk::Builder> xml = BuilderCache::get("splash-window.ui");
 

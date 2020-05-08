@@ -414,7 +414,7 @@ class Action_Fight : public Action
 	std::list<guint32> getAttackerArmyIds() const {return d_attacker_army_ids;};
 	std::list<guint32> getDefenderArmyIds() const {return d_defender_army_ids;};
 
-        bool is_army_id_in_stacks(guint32 id, std::list<guint32> stack_ids) const;
+        bool is_army_id_in_stacks(guint32 id, const std::list<guint32> &stack_ids) const;
         private:
         
         std::list<FightItem> d_history;
@@ -1122,7 +1122,7 @@ class Action_FightOrder: public Action
 	/**
          * Populate the action with a list of ranks, one per Army unit type.
          */
-        Action_FightOrder(std::list<guint32> order);
+        Action_FightOrder(const std::list<guint32> &order);
 	//! Copy constructor
 	Action_FightOrder(const Action_FightOrder &action);
 	//! Load a new fight order action from an opened saved-game file.
@@ -1822,7 +1822,7 @@ class Action_ReorderArmies: public Action
               String::ucompose("Stack %1 belonging to player id %2 has a new order: ",
                                d_stack_id, d_player_id);
             for (std::list<guint32>::const_iterator i = d_army_ids.begin(); 
-                 i != d_army_ids.end(); i++)
+                 i != d_army_ids.end(); ++i)
               s += String::ucompose("%1 ", (*i));
             s += "\n";
             return s;
@@ -1914,7 +1914,11 @@ class Action_CollectTaxesAndPayUpkeep: public Action
 {
     public:
 	//! Make a new collect taxes and pay upkeep action.
-        Action_CollectTaxesAndPayUpkeep(int toGold, int fromGold);
+        /**
+         * @param fromGold is the amount of gold pieces beforehand
+         * @param toGold is our new treasury afterwards
+         */
+        Action_CollectTaxesAndPayUpkeep(int fromGold, int toGold);
 	//! Copy constructor
 	Action_CollectTaxesAndPayUpkeep(const Action_CollectTaxesAndPayUpkeep &action);
 	//! Load a new collect taxes and pay upkeep action from a saved-game file.

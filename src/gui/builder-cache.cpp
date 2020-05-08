@@ -42,7 +42,7 @@ void BuilderCache::deleteInstance()
 void BuilderCache::preloadAllBuilders(Glib::ustring dir)
 {
   std::list<Glib::ustring> f = File::scanForFiles(dir, ".ui");
-  for (std::list<Glib::ustring>::iterator i = f.begin(); i != f.end(); i++)
+  for (std::list<Glib::ustring>::iterator i = f.begin(); i != f.end(); ++i)
     {
       //for some reason when we load about-dialog.ui, it gets shown.
       if (File::get_basename ((*i)) == "about-dialog")

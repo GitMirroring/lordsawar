@@ -47,7 +47,7 @@ liblordsawar_la_SOURCES = action.cpp action.h AI_Analysis.cpp AI_Analysis.h \
 	LocationBox.cpp LocationBox.h LocationList.h \
         MapGenerator.cpp MapGenerator.h \
         maptile.cpp maptile.h Movable.cpp Movable.h \
-        MoveResult.cpp MoveResult.h Named.cpp Named.h Namable.cpp Namable.h \
+        MoveResult.cpp MoveResult.h Named.cpp Named.h \
         NamedLocation.cpp NamedLocation.h network_player.cpp network_player.h \
 	network-action.cpp network-action.h \
         network-history.cpp network-history.h \
@@ -64,7 +64,7 @@ liblordsawar_la_SOURCES = action.cpp action.h AI_Analysis.cpp AI_Analysis.h \
         QEnemyArmies.cpp QEnemyArmies.h QEnemyArmytype.cpp QEnemyArmytype.h \
 	QKillHero.cpp QKillHero.h QPillageGold.cpp QPillageGold.h \
         Quest.cpp Quest.h QuestsManager.cpp QuestsManager.h \
-        real_player.cpp real_player.h Renamable.cpp Renamable.h \
+        real_player.cpp real_player.h Renamable.h \
         reward.h reward.cpp rewardlist.h rewardlist.cpp \
 	road.cpp road.h roadlist.cpp roadlist.h \
 	stone.cpp stone.h stonelist.cpp stonelist.h \

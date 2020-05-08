@@ -22,13 +22,12 @@
 Glib::ustring NetworkAction::d_tag = "networkaction";
 
 NetworkAction::NetworkAction(const Action *action, guint32 owner)
-  : OwnerId(owner)
+  : OwnerId(owner), d_action (Action::copy (action))
 {
-  d_action = Action::copy(action);
 }
 
 NetworkAction::NetworkAction(XML_Helper* helper)
-  : OwnerId(helper)
+  : OwnerId(helper), d_action (Action::handle_load (helper))
 {
 }
 

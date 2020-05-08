@@ -103,7 +103,7 @@ XML_Helper::~XML_Helper()
       {
     // should never happen unless there was an error
         std::cerr << "Error parsing: ";
-        for (std::list<Glib::ustring>::reverse_iterator i = d_tags.rbegin(); i != d_tags.rend(); i++)
+        for (std::list<Glib::ustring>::reverse_iterator i = d_tags.rbegin(); i != d_tags.rend(); ++i)
           std::cerr << (*i) << "/";
         std::cerr << "\n";
       }
@@ -608,9 +608,8 @@ bool XML_Helper::tag_open(Glib::ustring tag, Glib::ustring version, Glib::ustrin
     
     //first of all, look if another important tag has already been opened
     //and call the appropriate callback if so
-    std::list<Glib::ustring>::iterator ls_it;
-    ls_it = d_tags.begin();
-    ls_it++;
+    std::list<Glib::ustring>::iterator ls_it = d_tags.begin();
+    ++ls_it;
 
     if ((ls_it != d_tags.end()) && (d_last_opened == (*ls_it)))
     {

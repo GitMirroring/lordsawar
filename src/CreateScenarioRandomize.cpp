@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,19 +40,27 @@
 
 CreateScenarioRandomize::CreateScenarioRandomize()
 {
-    // Fill the namelists 
-    bool success = true;
-    
-    d_citynames = new NameList("citynames.xml", "city");
-    d_templenames = new NameList("templenames.xml", "temple");
-    d_ruinnames = new NameList("ruinnames.xml", "ruin");
-    d_signposts = new NameList("signposts.xml", "signpost");
+  // Fill the namelists 
+  bool success = true;
 
-    if (!success)
+  d_citynames = new NameList("citynames.xml", "city");
+  d_templenames = new NameList("templenames.xml", "temple");
+  d_ruinnames = new NameList("ruinnames.xml", "ruin");
+  d_signposts = new NameList("signposts.xml", "signpost");
+
+  if (!success)
     {
-        std::cerr <<"CreateScenarioRandomize: Didn't succeed in reading object names. Aborting!\n";
-        exit(-1);
+      std::cerr <<"CreateScenarioRandomize: Didn't succeed in reading object names. Aborting!\n";
+      exit(-1);
     }
+}
+
+CreateScenarioRandomize::CreateScenarioRandomize(const CreateScenarioRandomize &r)
+{
+  d_citynames = new NameList (*r.d_citynames);
+  d_templenames = new NameList (*r.d_templenames);
+  d_ruinnames = new NameList (*r.d_ruinnames);
+  d_signposts = new NameList (*r.d_signposts);
 }
 
 Glib::ustring CreateScenarioRandomize::popRandomCityName()
@@ -156,11 +164,6 @@ Glib::ustring CreateScenarioRandomize::getDynamicSignpost(Signpost *signpost)
   return String::ucompose(_("%1 lies to the %2"), nearCity->getName(), dir);
 }
   
-Reward *CreateScenarioRandomize::getNewRandomReward()
-{
-  return Reward::createRandomReward(false, false);
-}
-
 int CreateScenarioRandomize::adjustBaseGold (int base_gold)
 {
   int gold = base_gold + ((Rnd::rand() % 7) - 4);

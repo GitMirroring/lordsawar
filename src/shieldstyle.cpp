@@ -31,8 +31,8 @@ Glib::ustring ShieldStyle::d_tag = "shieldstyle";
 #define debug(x)
 
 ShieldStyle::ShieldStyle(ShieldStyle::Type type)
+ : d_type (type)
 {
-  d_type = type;
   d_mimage = new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
 }
         
@@ -42,9 +42,8 @@ ShieldStyle::~ShieldStyle()
 }
 
 ShieldStyle::ShieldStyle(const ShieldStyle &s)
- : sigc::trackable(s)
+ : sigc::trackable(s), d_type (s.d_type)
 {
-  d_type = s.d_type;
   d_mimage = new TarFileMaskedImage (*s.d_mimage);
 }
 

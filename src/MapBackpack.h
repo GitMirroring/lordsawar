@@ -37,7 +37,7 @@ class MapBackpack: public Backpack, public Immovable, public UniquelyIdentified
 {
  public:
      //! The xml tag of this object in a saved-game file.
-     static Glib::ustring d_tag; 
+     static Glib::ustring d_mapbackpack_tag; 
 
      //! Default constructor.
      MapBackpack(Vector<int> pos);

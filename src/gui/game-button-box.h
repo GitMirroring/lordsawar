@@ -37,7 +37,6 @@ class GameButtonBox: public Gtk::Box
     ~GameButtonBox() {drop_connections();};
 
     void give_some_cheese();
-    bool get_end_turn_button_sensitive();
     void setup_signals(Game *game);
 
     //Signals

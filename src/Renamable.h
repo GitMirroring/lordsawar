@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -33,13 +33,13 @@ class Renamable: private Named
 {
  public:
      //! Default constructor.
-     Renamable(Glib::ustring name);
+     Renamable(Glib::ustring name) : Named(name) {}
 
      //! Copy constructor.
-     Renamable(const Renamable&);
+     Renamable(const Renamable& o) : Named(o) {}
 
      //! Loading constructor.
-     Renamable(XML_Helper* helper);
+     Renamable(XML_Helper* helper) : Named(helper) {}
 
      //! Destructor.
      ~Renamable() {};
@@ -53,7 +53,6 @@ class Renamable: private Named
 	   return _(d_name.c_str());
 	 else return d_name; 
        }
-
 
      // Set Methods
 

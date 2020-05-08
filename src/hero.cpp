@@ -32,7 +32,7 @@
 #include "playerlist.h"
 #include "QuestsManager.h"
 
-Glib::ustring Hero::d_tag = "hero";
+Glib::ustring Hero::d_hero_tag = "hero";
 
 Hero::Hero(const HeroProto& a)
   : Army (dynamic_cast<const ArmyProto&>(a)), d_name(a.getName()),
@@ -72,7 +72,7 @@ bool Hero::save(XML_Helper* helper) const
     bool retval = true;
     std::list<Item*>::const_iterator it;
 
-    retval &= helper->openTag(Hero::d_tag);
+    retval &= helper->openTag(Hero::d_hero_tag);
 
     retval &= helper->saveData("name", d_name);
     Glib::ustring gender_str = genderToString(Hero::Gender(d_gender));
@@ -154,14 +154,6 @@ Hero::Gender Hero::genderFromString(const Glib::ustring str)
   if (str == "Hero::MALE") return Hero::MALE;
   else if (str == "Hero::NONE") return Hero::NONE;
   else if (str == "Hero::FEMALE") return Hero::FEMALE;
-  return Hero::FEMALE;
-}
-
-Hero::Gender Hero::friendlyNameToGender (Glib::ustring str)
-{
-  if (str == _("Male")) return Hero::MALE;
-  else if (str == "NONE") return Hero::NONE;
-  else if (str == _("Female")) return Hero::FEMALE;
   return Hero::FEMALE;
 }
 

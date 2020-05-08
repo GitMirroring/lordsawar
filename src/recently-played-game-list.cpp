@@ -104,7 +104,7 @@ RecentlyPlayedGameList::~RecentlyPlayedGameList()
 
 void RecentlyPlayedGameList::remove_all()
 {
-  for (RecentlyPlayedGameList::iterator it = begin(); it != end(); it++)
+  for (RecentlyPlayedGameList::iterator it = begin(); it != end(); ++it)
     delete *it;
   clear();
 }
@@ -116,7 +116,7 @@ bool RecentlyPlayedGameList::save(XML_Helper* helper) const
   retval &= helper->begin(LORDSAWAR_RECENTLY_PLAYED_VERSION);
   retval &= helper->openTag(RecentlyPlayedGameList::d_tag);
 
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     (*it)->save(helper);
 
   retval &= helper->closeTag();
@@ -221,7 +221,7 @@ void RecentlyPlayedGameList::pruneTooManyGames(int too_many)
 	  it = erase (it);
 	  continue;
 	}
-      it++;
+      ++it;
     }
 }
 
@@ -230,7 +230,7 @@ void RecentlyPlayedGameList::pruneSameNamedAndSameHostGames()
   for (RecentlyPlayedGameList::iterator it = begin(); it != end();)
     {
       int count = 0;
-      for (RecentlyPlayedGameList::iterator rit = begin(); rit != end(); rit++)
+      for (RecentlyPlayedGameList::iterator rit = begin(); rit != end(); ++rit)
         {
           if ((*it)->getPlayMode() == GameScenario::NETWORKED &&
               (*rit)->getPlayMode() == GameScenario::NETWORKED)
@@ -256,7 +256,7 @@ void RecentlyPlayedGameList::pruneSameNamedAndSameHostGames()
           it = erase (it);
           continue;
         }
-      it++;
+      ++it;
     }
 }
 
@@ -272,13 +272,13 @@ void RecentlyPlayedGameList::pruneOldGames(int stale)
 	  it = erase (it);
 	  continue;
 	}
-      it++;
+      ++it;
     }
 }
 
 void RecentlyPlayedGameList::updateEntry(GameScenario *game_scenario)
 {
-  for (RecentlyPlayedGameList::iterator it = begin(); it != end(); it++)
+  for (RecentlyPlayedGameList::iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getId() == game_scenario->getId())
 	{
@@ -292,7 +292,7 @@ void RecentlyPlayedGameList::updateEntry(GameScenario *game_scenario)
 	
 void RecentlyPlayedGameList::removeAllNetworkedGames()
 {
-  for (RecentlyPlayedGameList::iterator it = begin(); it != end(); it++)
+  for (RecentlyPlayedGameList::iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getPlayMode() == GameScenario::NETWORKED)
 	{

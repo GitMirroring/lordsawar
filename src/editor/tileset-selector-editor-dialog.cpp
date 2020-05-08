@@ -166,10 +166,10 @@ void TilesetSelectorEditorDialog::clearSelector()
     heartbeat.disconnect();
 
   for (std::map< guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >* >::iterator it = selectors.begin();
-       it != selectors.end(); it++)
+       it != selectors.end(); ++it)
     {
       for (std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator lit =
-           (*it).second->begin(); lit != (*it).second->end(); lit++)
+           (*it).second->begin(); lit != (*it).second->end(); ++lit)
 	{
 	  (*lit).clear();
 	}
@@ -205,7 +205,7 @@ bool TilesetSelectorEditorDialog::loadSelector()
   for (guint32 i = 0; i < p->getNumberOfFrames (); i++)
     {
       for (Shieldset::iterator sit = shieldset->begin();
-           sit != shieldset->end(); sit++)
+           sit != shieldset->end(); ++sit)
         {
           if ((*sit)->getOwner() == 8) //ignore neutral
             continue;
@@ -239,7 +239,7 @@ void TilesetSelectorEditorDialog::on_heartbeat()
   int y = 0;
   int count = 0;
   for (std::map< guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >* >::iterator it = selectors.begin();
-       it != selectors.end(); it++)
+       it != selectors.end(); ++it)
     {
       //make a pixbuf and attach it
       switch (count)
@@ -255,7 +255,7 @@ void TilesetSelectorEditorDialog::on_heartbeat()
 	}
       preview_table->attach(*manage(new Gtk::Image(*frame[count])), y, x, 1, 1);
 
-      frame[count]++;
+      ++frame[count];
       if (frame[count] == selectors[count]->end())
 	frame[count] = selectors[count]->begin();
       count++;

@@ -109,7 +109,7 @@ std::vector<Glib::ustring> Commentator::getComments(Player *player) const
       comments.push_back(_("Your name evokes fear and loathing!"));
     }
   guint32 attacking_enemy_cities = 0;
-  for (Stacklist::iterator it = player->getStacklist()->begin(); it != player->getStacklist()->end(); it++)
+  for (Stacklist::iterator it = player->getStacklist()->begin(); it != player->getStacklist()->end(); ++it)
     {
       Stack *stack = *it;
       if (stack->hasPath() && 

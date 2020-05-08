@@ -46,12 +46,6 @@ class RuinMap : public OverviewMap
      //! Destructor.
      ~RuinMap() {};
 
-     // Set Methods
-
-     //! Change the Ruin or Temple object that is currently selected.
-     void setNamedLocation (NamedLocation *r) {ruin = r;}
-
-
      // Get Methods
   
      //! Return the Ruin or Temple object that is currently selected.

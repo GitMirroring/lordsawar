@@ -1,4 +1,5 @@
 // Copyright (C) 2004 John Farrell
+// Copyright (C) 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,16 +31,22 @@ AICityInfo::AICityInfo(City *c)
     d_num_defenders = d_city->countDefenders();
 }
 
+AICityInfo::AICityInfo (const AICityInfo &i)
+ : d_danger (i.d_danger), d_reinforcements (i.d_reinforcements),
+    d_threats (new Threatlist()), d_city (i.d_city),
+    d_num_defenders (i.d_num_defenders)
+{
+  for (auto t : *i.d_threats)
+    d_threats->push_back (new Threat (*t));
+}
+
 AICityInfo::~AICityInfo()
 {
-    // the threats in the threatlist do not belong to us
-    d_threats->clear();
-    delete d_threats;
+  delete d_threats;
 }
 
 void AICityInfo::addThreat(float dangerFromThisThreat, Threat *threat)
 {
-    this->d_danger += dangerFromThisThreat;
-    this->d_threats->push_back(threat);
+  this->d_danger += dangerFromThisThreat;
+  this->d_threats->push_back (new Threat (*threat));
 }
-

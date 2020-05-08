@@ -102,7 +102,7 @@ Gamelist::Gamelist(XML_Helper* helper)
 
 void Gamelist::remove_all()
 {
-  for (Gamelist::iterator it = begin(); it != end(); it++)
+  for (Gamelist::iterator it = begin(); it != end(); ++it)
     delete *it;
   clear();
 }
@@ -119,7 +119,7 @@ bool Gamelist::save(XML_Helper* helper) const
   retval &= helper->begin(LORDSAWAR_RECENTLY_HOSTED_VERSION);
   retval &= helper->openTag(Gamelist::d_tag);
 
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     (*it)->save(helper);
 
   retval &= helper->closeTag();
@@ -179,7 +179,7 @@ void Gamelist::pruneTooManyGames(int too_many)
 	  it = erase (it);
 	  continue;
 	}
-      it++;
+      ++it;
     }
 }
 
@@ -195,13 +195,13 @@ void Gamelist::pruneOldGames(int stale)
 	  it = erase (it);
 	  continue;
 	}
-      it++;
+      ++it;
     }
 }
 
 void Gamelist::updateEntry(Glib::ustring scenario_id, guint32 round)
 {
-  for (Gamelist::iterator it = begin(); it != end(); it++)
+  for (Gamelist::iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getAdvertisedGame()->getId() == scenario_id)
 	{
@@ -226,7 +226,7 @@ bool Gamelist::save() const
 RecentlyPlayedGameList* Gamelist::getList(bool scrub_profile_id) const
 {
   RecentlyPlayedGameList *l = new RecentlyPlayedGameList();
-  for (Gamelist::const_iterator i = begin(); i != end(); i++)
+  for (Gamelist::const_iterator i = begin(); i != end(); ++i)
     {
       if ((*i)->getUnresponsive())
         continue;
@@ -242,7 +242,7 @@ RecentlyPlayedGameList* Gamelist::getList(bool scrub_profile_id) const
   
 HostedGame *Gamelist::findGameByScenarioId(Glib::ustring scenario_id) const
 {
-  for (Gamelist::const_iterator i = begin(); i != end(); i++)
+  for (Gamelist::const_iterator i = begin(); i != end(); ++i)
     {
       if ((*i)->getAdvertisedGame()->getId() == scenario_id)
         return *i;
@@ -264,7 +264,7 @@ void Gamelist::pingGames()
   double stale = (double) FIVE_MINUTES_OLD;
   Glib::TimeVal now;
   now.assign_current_time();
-  for (iterator i = begin(); i != end(); i++)
+  for (iterator i = begin(); i != end(); ++i)
     {
       AdvertisedGame *a = (*i)->getAdvertisedGame();
       if (a->getGameLastPingedOn().as_double() + stale < now.as_double())
@@ -278,7 +278,7 @@ void Gamelist::pingGames()
 
 void Gamelist::pruneUnresponsiveGames()
 {
-  for (iterator i = begin(); i != end(); i++)
+  for (iterator i = begin(); i != end(); ++i)
     {
       if ((*i)->getUnresponsive())
         {

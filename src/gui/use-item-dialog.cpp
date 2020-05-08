@@ -34,8 +34,8 @@ UseItemDialog::UseItemDialog(Gtk::Window &parent, std::list<Item*> items)
   items_treeview->append_column("", items_columns.name);
   items_treeview->set_headers_visible(false);
 
-  std::list<Item*>::iterator iter = items.begin();
-  for (;iter != items.end(); iter++)
+  for (std::list<Item*>::iterator iter = items.begin();
+       iter != items.end(); ++iter)
     addItem(*iter);
 
   guint32 max = items.size();

@@ -44,7 +44,7 @@ class Tartan
     public:
 
 	//! The xml tag of this object in a shieldset configuration file.
-	static Glib::ustring d_tag; 
+	static Glib::ustring d_tartan_tag; 
 
         enum Type
           {

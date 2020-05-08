@@ -1,6 +1,6 @@
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2005, 2007 Ulf Lorenz
-// Copyright (C) 2009, 2010, 2014 Ben Asselstine
+// Copyright (C) 2009, 2010, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -52,7 +52,6 @@ class MoveResult
 	void setReachedEndOfPath(bool reached) {d_reached_end = reached;};
 	bool getReachedEndOfPath() const {return d_reached_end;}
 
-	void setOutOfMoves(bool out) {d_out_of_moves = out;}
 	bool getOutOfMoves() const {return d_out_of_moves;}
 
 	void setTreachery(bool treachery) {d_treachery = treachery;}

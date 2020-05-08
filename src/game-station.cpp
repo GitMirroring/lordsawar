@@ -32,7 +32,7 @@ GameStation::GameStation()
 void GameStation::clearNetworkActionlist(std::list<NetworkAction*> &a)
 {
   for (std::list<NetworkAction*>::iterator it = a.begin();
-       it != a.end(); it++)
+       it != a.end(); ++it)
     {
       delete (*it);
     }
@@ -42,7 +42,7 @@ void GameStation::clearNetworkActionlist(std::list<NetworkAction*> &a)
 void GameStation::clearNetworkHistorylist(std::list<NetworkHistory*> &h)
 {
   for (std::list<NetworkHistory*>::iterator it = h.begin(); 
-       it != h.end(); it++)
+       it != h.end(); ++it)
     {
       delete (*it);
     }
@@ -62,12 +62,12 @@ void GameStation::listenForLocalEvents(Player *p)
 
 void GameStation::stopListeningForLocalEvents()
 {
-  std::map<guint32, sigc::connection>::iterator i = action_listeners.begin();
-  for (; i != action_listeners.end(); i++)
+  for (std::map<guint32, sigc::connection>::iterator i = action_listeners.begin();
+       i != action_listeners.end(); ++i)
     (*i).second.disconnect();
   action_listeners.clear();
-  std::map<guint32, sigc::connection>::iterator j = history_listeners.begin();
-  for (; j != history_listeners.end(); j++)
+  for (std::map<guint32, sigc::connection>::iterator j = history_listeners.begin();
+       j != history_listeners.end(); ++j)
     (*j).second.disconnect();
   history_listeners.clear();
 }

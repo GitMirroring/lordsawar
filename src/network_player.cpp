@@ -212,9 +212,9 @@ void NetworkPlayer::decodeActions(std::list<Action *> actions)
 {
   if (isDead())
     return;
-  std::list<Action*>::iterator it = actions.begin();
   pruneActionlist();
-  for (; it != actions.end(); it++)
+  for (std::list<Action*>::iterator it = actions.begin();
+       it != actions.end(); ++it)
     decodeAction(*it);
 }
 
@@ -860,7 +860,7 @@ void NetworkPlayer::decodeActionInitTurn(const Action_InitTurn*action)
 {
   (void) action;
   debug ("remote: dumping " << d_actions.size() << " actions");
-  for (std::list<Action*>::iterator i = d_actions.begin(); i != d_actions.end(); i++)
+  for (std::list<Action*>::iterator i = d_actions.begin(); i != d_actions.end(); ++i)
     {
       debug ("\t" << Action::actionTypeToString((*i)->getType()) << " " << (*i)->dump().c_str());
     }
@@ -919,7 +919,7 @@ void NetworkPlayer::decodeActionStackOrder(const Action_ReorderArmies* action)
   assert (action->getArmyIds().size() == s->size());
   std::list<guint32> ids = action->getArmyIds();
   bool success = true;
-  for (std::list<guint32>::iterator i = ids.begin(); i != ids.end(); i++)
+  for (std::list<guint32>::iterator i = ids.begin(); i != ids.end(); ++i)
     {
       if (s->getArmyById(*i) == NULL)
         {
@@ -932,16 +932,16 @@ void NetworkPlayer::decodeActionStackOrder(const Action_ReorderArmies* action)
       exit(0);
     }
   printf("started out with this ordering: ");
-  for (Stack::iterator i = s->begin(); i != s->end(); i++)
+  for (Stack::iterator i = s->begin(); i != s->end(); ++i)
     printf ("%d ", (*i)->getId());
   printf("\n");
   printf("we say order like: ");
-  for (std::list<guint32>::iterator i = ids.begin(); i != ids.end(); i++)
+  for (std::list<guint32>::iterator i = ids.begin(); i != ids.end(); ++i)
     printf ("%d ", *i);
   printf("\n");
   doStackSort(s, ids);
   printf("changed it to: ");
-  for (Stack::iterator i = s->begin(); i != s->end(); i++)
+  for (Stack::iterator i = s->begin(); i != s->end(); ++i)
     printf ("%d ", (*i)->getId());
   printf("\n");
 }

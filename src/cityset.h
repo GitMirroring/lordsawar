@@ -104,7 +104,6 @@ class Cityset : public sigc::trackable, public Set
 
 	void uninstantiateImages();
 
-        guint32 countEmptyImageNames() const;
 	guint32 getCityTileWidth() {return d_city_tile_width;};
 	void setCityTileWidth(guint32 tiles) {d_city_tile_width = tiles;};
 	guint32 getTempleTileWidth() {return d_temple_tile_width;};
@@ -115,7 +114,6 @@ class Cityset : public sigc::trackable, public Set
 	bool validateCityTileWidth();
 	bool validateRuinTileWidth();
 	bool validateTempleTileWidth();
-	bool tileWidthsEqual(Cityset *cityset);
 
         void uninstantiateSameNamedImages (Glib::ustring name);
 

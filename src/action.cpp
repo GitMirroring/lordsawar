@@ -396,9 +396,10 @@ Action_Split::Action_Split(Stack* orig, Stack* added)
 
   for (unsigned int i = 0; i < MAX_STACK_SIZE; i++)
     d_armies_moved[i] = 0;
-  Stack::iterator it = added->begin();
-  for (unsigned int i = 0; it != added->end(); it++, i++)
-    d_armies_moved[i] = (*it)->getId();
+
+  unsigned int j = 0;
+  for (Stack::iterator it = added->begin(); it != added->end(); ++it, j++)
+    d_armies_moved[j] = (*it)->getId();
 }
 
 Action_Split::Action_Split(const Action_Split &action)
@@ -446,14 +447,14 @@ Action_Fight::Action_Fight(const Fight* f)
     :Action(Action::STACK_FIGHT)
 {
   std::list<Stack*> list = f->getAttackers();
-  std::list<Stack*>::const_iterator it;
 
-  for (it = list.begin(); it != list.end(); it++)
+  for (std::list<Stack*>::const_iterator it = list.begin();
+       it != list.end(); ++it)
     d_attackers.push_back((*it)->getId());
 
   list = f->getDefenders();
 
-  for (it = list.begin(); it != list.end(); it++)
+  for (std::list<Stack*>::const_iterator it = list.begin(); it != list.end(); ++it)
     d_defenders.push_back((*it)->getId());
 
   for (auto fighter : f->getAttackerFighters())
@@ -528,11 +529,12 @@ Action_Fight::Action_Fight(XML_Helper* helper)
 Glib::ustring Action_Fight::dump() const
 {
   Glib::ustring s = "Battle fought.\n Attacking stacks: ";
-  std::list<guint32>::const_iterator uit;
-  for (uit = d_attackers.begin(); uit != d_attackers.end(); uit++)
+  for (std::list<guint32>::const_iterator uit = d_attackers.begin();
+       uit != d_attackers.end(); ++uit)
     s += String::ucompose("%1 ", (*uit));
   s += "\n Defending stacks: ";
-  for (uit = d_defenders.begin(); uit != d_defenders.end(); uit++)
+  for (std::list<guint32>::const_iterator uit = d_defenders.begin();
+       uit != d_defenders.end(); ++uit)
     s += String::ucompose("%1 ", (*uit));
   s +="\n Attacking armies: ";
   for (auto i : d_attacker_army_ids)
@@ -550,16 +552,17 @@ Glib::ustring Action_Fight::dump() const
 bool Action_Fight::doSave(XML_Helper* helper) const
 {
   Glib::ustring s;
-    std::list<guint32>::const_iterator uit;
     bool retval = true;
     
     // save the stack's ids
-    for (uit = d_attackers.begin(); uit != d_attackers.end(); uit++)
+    for (std::list<guint32>::const_iterator uit = d_attackers.begin();
+         uit != d_attackers.end(); ++uit)
       s += String::ucompose("%1 ", (*uit));
     retval &= helper->saveData("attackers", s);
 
     s = "";
-    for (uit = d_defenders.begin(); uit != d_defenders.end(); uit++)
+    for (std::list<guint32>::const_iterator uit = d_defenders.begin();
+         uit != d_defenders.end(); ++uit)
       s += String::ucompose("%1 ", (*uit));
     retval &= helper->saveData("defenders", s);
 
@@ -575,7 +578,7 @@ bool Action_Fight::doSave(XML_Helper* helper) const
 
     // save what happened
     for (std::list<FightItem>::const_iterator fit = d_history.begin(); 
-            fit != d_history.end(); fit++)
+            fit != d_history.end(); ++fit)
     {
         retval &= helper->openTag(Item::d_tag);
         retval &= helper->saveData("turn", (*fit).turn);
@@ -589,7 +592,7 @@ bool Action_Fight::doSave(XML_Helper* helper) const
 
 bool Action_Fight::stack_ids_to_stacks(std::list<guint32> stack_ids, std::list<Stack*> &stacks, guint32 &stack_id) const
 {
-  for (std::list<guint32>::iterator i = stack_ids.begin(); i != stack_ids.end(); i++)
+  for (std::list<guint32>::iterator i = stack_ids.begin(); i != stack_ids.end(); ++i)
     {
       bool found = false;
       for (Playerlist::iterator j = Playerlist::getInstance()->begin(), jend = Playerlist::getInstance()->end();
@@ -612,7 +615,7 @@ bool Action_Fight::stack_ids_to_stacks(std::list<guint32> stack_ids, std::list<S
   return true;
 }
 
-bool Action_Fight::is_army_id_in_stacks(guint32 id, std::list<guint32> stack_ids) const
+bool Action_Fight::is_army_id_in_stacks(guint32 id, const std::list<guint32> &stack_ids) const
 {
   std::list<Stack*> stacks;
   guint32 stack_id = 0;
@@ -620,7 +623,7 @@ bool Action_Fight::is_army_id_in_stacks(guint32 id, std::list<guint32> stack_ids
   if (!success)
     return false;
   bool found = false;
-  for (std::list<Stack*>::iterator i = stacks.begin(); i != stacks.end(); i++)
+  for (std::list<Stack*>::iterator i = stacks.begin(); i != stacks.end(); ++i)
     {
       if ((*i)->getArmyById(id))
         {
@@ -1270,7 +1273,7 @@ bool Action_Vector::doSave(XML_Helper* helper) const
 //-----------------------------------------------------------------------------
 //Action_FightOrder
 
-Action_FightOrder::Action_FightOrder(std::list<guint32> order)
+Action_FightOrder::Action_FightOrder(const std::list<guint32> &order)
 :Action(Action::FIGHT_ORDER), d_order(order)
 {
 }
@@ -1290,7 +1293,7 @@ Action_FightOrder::Action_FightOrder(XML_Helper* helper)
   sfight_order.str(fight_order);
   //XXX XXX XXX this business of looking up the first living seems wrong.
   Armyset *as = Armysetlist::getInstance()->get(Playerlist::getInstance()->getFirstLiving()->getArmyset());
-  for (Armyset::iterator i = as->begin(); i != as->end(); i++)
+  for (Armyset::iterator i = as->begin(); i != as->end(); ++i)
     {
       sfight_order >> val;
       d_order.push_back(val);
@@ -1303,7 +1306,7 @@ bool Action_FightOrder::doSave(XML_Helper* helper) const
 
   Glib::ustring s;
   for (std::list<guint32>::const_iterator it = d_order.begin();
-       it != d_order.end(); it++)
+       it != d_order.end(); ++it)
     s += String::ucompose("%1 ", (*it));
   retval &= helper->saveData("order", s);
 
@@ -1629,7 +1632,7 @@ Action_RecruitHero::Action_RecruitHero(XML_Helper* helper)
     helper->getData(d_cost, "cost");
     helper->getData(d_allies, "allies");
     helper->getData(d_ally_army_type, "ally_army_type");
-    helper->registerTag(HeroProto::d_tag, sigc::mem_fun(this, &Action_RecruitHero::load));
+    helper->registerTag(HeroProto::d_heroproto_tag, sigc::mem_fun(this, &Action_RecruitHero::load));
 }
 
 Action_RecruitHero::Action_RecruitHero(const Action_RecruitHero &a)
@@ -1648,7 +1651,7 @@ Action_RecruitHero::~Action_RecruitHero()
 
 bool Action_RecruitHero::load(Glib::ustring tag, XML_Helper *helper)
 {
-    if (tag == HeroProto::d_tag)
+    if (tag == HeroProto::d_heroproto_tag)
       {
 	d_hero = new HeroProto(helper);
 
@@ -1829,7 +1832,7 @@ Action_ReorderArmies::Action_ReorderArmies(Stack *s)
 :Action(Action::STACK_ORDER), d_stack_id(s->getId()), 
     d_player_id(s->getOwner()->getId())
 {
-  for (Stack::iterator i = s->begin(); i != s->end(); i++)
+  for (Stack::iterator i = s->begin(); i != s->end(); ++i)
     d_army_ids.push_back((*i)->getId());
 }
 

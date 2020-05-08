@@ -158,7 +158,7 @@ void GameLobbyDialog::update_buttons()
     {
       Gtk::TreeModel::Children kids = player_list->children();
       for (Gtk::TreeModel::Children::iterator i = kids.begin(); 
-           i != kids.end(); i++)
+           i != kids.end(); ++i)
         {
           Gtk::TreeModel::Row row = *i;
           if (row[player_columns.type] != "")
@@ -175,7 +175,7 @@ void GameLobbyDialog::update_buttons()
       //do we have a horse in the race?
       Gtk::TreeModel::Children kids = player_list->children();
       for (Gtk::TreeModel::Children::iterator i = kids.begin(); 
-           i != kids.end(); i++)
+           i != kids.end(); ++i)
         {
           Gtk::TreeModel::Row row = *i;
           if (row[player_columns.person] == d_game_station->getNickname())
@@ -489,7 +489,7 @@ void GameLobbyDialog::on_player_changes_type(Player *p, int type)
   Gtk::TreeModel::Children kids = player_list->children();
   //look for the row that has the right player id.
   for (Gtk::TreeModel::Children::iterator i = kids.begin(); 
-       i != kids.end(); i++)
+       i != kids.end(); ++i)
     {
       Gtk::TreeModel::Row row = *i;
       if (row[player_columns.player_id] == p->getId())
@@ -517,7 +517,7 @@ void GameLobbyDialog::on_player_sits(Player *p, Glib::ustring nickname)
   Gtk::TreeModel::Children kids = player_list->children();
   //look for the row that has the right player id.
   for (Gtk::TreeModel::Children::iterator i = kids.begin(); 
-       i != kids.end(); i++)
+       i != kids.end(); ++i)
     {
       Gtk::TreeModel::Row row = *i;
       if (row[player_columns.player_id] == p->getId())
@@ -537,7 +537,7 @@ void GameLobbyDialog::on_player_stands(Player *p)
     return;
   Gtk::TreeModel::Children kids = player_list->children();
   for (Gtk::TreeModel::Children::iterator i = kids.begin(); 
-       i != kids.end(); i++)
+       i != kids.end(); ++i)
     {
       Gtk::TreeModel::Row row = *i;
       if (row[player_columns.player_id] == p->getId())
@@ -567,7 +567,7 @@ void GameLobbyDialog::update_turn_indicator()
   ImageCache *gc = ImageCache::getInstance();
   Gtk::TreeModel::Children kids = player_list->children();
   for (Gtk::TreeModel::Children::iterator i = kids.begin(); 
-       i != kids.end(); i++)
+       i != kids.end(); ++i)
     {
       Gtk::TreeModel::Row row = *i;
       Player *active = Playerlist::getActiveplayer();
@@ -825,8 +825,8 @@ void GameLobbyDialog::clean_up_players()
 
 void GameLobbyDialog::disconnect_signals()
 {
-  std::list<sigc::connection>::iterator it = connections.begin();
-  for (; it != connections.end(); it++)
+  for (std::list<sigc::connection>::iterator it = connections.begin();
+       it != connections.end(); ++it)
     (*it).disconnect();
   connections.clear();
 }

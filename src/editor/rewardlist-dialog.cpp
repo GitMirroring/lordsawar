@@ -59,8 +59,8 @@ RewardlistDialog::RewardlistDialog(Gtk::Window &parent, bool select, bool clear)
   rewards_treeview->set_headers_visible(false);
 
   Rewardlist *rewardlist = Rewardlist::getInstance();
-  Rewardlist::iterator iter = rewardlist->begin();
-  for (;iter != rewardlist->end(); iter++)
+  for (Rewardlist::iterator iter = rewardlist->begin();
+       iter != rewardlist->end(); ++iter)
     addReward(*iter);
 
   rewards_treeview->get_selection()->signal_changed().connect

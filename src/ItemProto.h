@@ -44,7 +44,7 @@ class ItemProto: public Renamable
 	 * @note This tag appears in the item configuration file, and in
 	 * saved-game files.
 	 */
-	static Glib::ustring d_tag;
+	static Glib::ustring d_itemproto_tag;
 
 	// The item can confer these special properties.
         enum Bonus {

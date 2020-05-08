@@ -41,7 +41,8 @@ class ItemMap : public OverviewMap
       * @param bags              A list of mapbackpack objects, which are bags
       *                          of stuff dropped on the map.
       */
-     ItemMap(std::list<Stack*> item_laden_stacks, std::list<MapBackpack*> bags);
+     ItemMap(const std::list<Stack*> &item_laden_stacks,
+             const std::list<MapBackpack*> &bags);
 
      //! Destructor.
      ~ItemMap() {};

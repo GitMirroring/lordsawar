@@ -50,7 +50,7 @@ Path::Path(const Path& p)
  : std::list<Vector<int> >(),
     d_moves_exhausted_at_point(p.d_moves_exhausted_at_point)
 {
-  for (const_iterator it = p.begin(); it != p.end(); it++)
+  for (const_iterator it = p.begin(); it != p.end(); ++it)
     push_back(Vector<int>((*it).x, (*it).y));
 }
 
@@ -88,7 +88,7 @@ bool Path::save(XML_Helper* helper) const
     bool retval = true;
 
     std::stringstream sx, sy;
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
     {
         sx <<(*it).x <<" ";
         sy <<(*it).y <<" ";
@@ -113,8 +113,8 @@ bool Path::checkPath(Stack* s, int enemy_city_avoidance, int enemy_stack_avoidan
     if (size() > 1)
       {
 	iterator secondlast = end();
-	secondlast--;
-	for (iterator it = begin(); it != secondlast; it++)
+	--secondlast;
+	for (iterator it = begin(); it != secondlast; ++it)
 	  {
 	    if (PathCalculator::isBlocked(s, *it, enemy_city_avoidance, 
 					  enemy_stack_avoidance) == false)
@@ -136,7 +136,7 @@ void Path::recalculate (Stack* s)
 
   // be careful to not go into cities that are now owned by the enemy
   reverse_iterator it = rbegin();
-  for (; it != rend(); it++)
+  for (; it != rend(); ++it)
     {
       Vector<int> dest = *it;
       City *c = GameMap::getCity(dest);
@@ -257,14 +257,14 @@ void Path::calculate (Stack* s, Vector<int> dest, guint32 &moves, guint32 &turns
   Path *calculated_path = pc.calculate(dest, moves, turns, left, zigzag);
   if (calculated_path->size())
     {
-      for(Path::iterator it = calculated_path->begin(); it!= calculated_path->end(); it++)
+      for(Path::iterator it = calculated_path->begin(); it!= calculated_path->end(); ++it)
 	push_back(*it);
     }
 
   //calculate when the waypoints show no more movement possible
   guint32 pathcount = 0;
   guint32 moves_left = s->getMoves();
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       guint32 tile_moves = s->calculateTileMovementCost(*it);
       if (moves_left >= tile_moves)

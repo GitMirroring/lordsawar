@@ -33,9 +33,9 @@
 #include "editablesmallmap.h"
 
 EditableSmallMap::EditableSmallMap()
+ : pointer (POINTER), pointer_terrain (Tile::GRASS), pointer_size (5),
+    road_start (Vector<int>(-1,-1)), road_finish (Vector<int>(-1,-1))
 {
-  road_start = Vector<int>(-1,-1);
-  road_finish = Vector<int>(-1,-1);
 }
 
 void EditableSmallMap::after_draw()
@@ -243,21 +243,6 @@ bool EditableSmallMap::check_road()
   return success;
 }
 
-void EditableSmallMap::set_road_start(Vector<int> start)
-{
-  road_start = start;
-  road_start_placed.emit(start);
-  check_road();
-
-}
-
-void EditableSmallMap::set_road_finish(Vector<int> finish)
-{
-  road_finish = finish;
-  road_finish_placed.emit(finish);
-  check_road();
-}
-
 bool EditableSmallMap::create_road()
 {
   if (check_road() == false)
@@ -266,15 +251,9 @@ bool EditableSmallMap::create_road()
   Path *p = rpc.calculate(road_finish);
   GameMap *gm = GameMap::getInstance();
   bool success = true;
-  for (Path::iterator it = p->begin(); it != p->end(); it++)
+  for (Path::iterator it = p->begin(); it != p->end(); ++it)
     {
       Vector<int> pos = *it;
-      //if (gm->getTile(pos)->getType() == Tile::WATER &&
-          //gm->getBuilding(pos) != Maptile::BRIDGE)
-        //{
-          //success = false;
-          //break;
-        //}
       if (gm->getBuilding(pos) == Maptile::NONE)
         {
           if (GameMap::getInstance()->getBuilding(pos) == Maptile::NONE)

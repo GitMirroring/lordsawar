@@ -96,7 +96,7 @@ void StackTile::add(Stack *stack)
 guint32 StackTile::countNumberOfArmies(Player *owner) const
 {
   guint32 count = 0;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it).player_id == owner->getId())
 	{
@@ -110,7 +110,7 @@ guint32 StackTile::countNumberOfArmies(Player *owner) const
 
 StackTile::iterator StackTile::findStack(Stack *s)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if (s->getId() == (*it).stack_id)
       return it;
   return end();
@@ -118,7 +118,7 @@ StackTile::iterator StackTile::findStack(Stack *s)
 
 StackTile::const_iterator StackTile::findStack(const Stack *s) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     if (s->getId() == (*it).stack_id)
       return it;
   return end();
@@ -138,7 +138,7 @@ Stack *StackTile::getStack() const
 std::vector<Stack *> StackTile::getStacks() const
 {
   std::vector<Stack *> stacks;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       for (auto i: *Playerlist::getInstance())
 	{
@@ -153,7 +153,7 @@ std::vector<Stack *> StackTile::getStacks() const
 std::vector<Stack *> StackTile::getFriendlyStacks(Player *owner) const
 {
   std::vector<Stack *> stacks;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it).player_id != owner->getId())
 	continue;
@@ -166,7 +166,7 @@ std::vector<Stack *> StackTile::getFriendlyStacks(Player *owner) const
 Stack *StackTile::getFriendlyStack(Player *owner) const
 {
   //return just one of the stacks located here, but owned by OWNER
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it).player_id != owner->getId())
 	continue;
@@ -180,7 +180,7 @@ Stack *StackTile::getFriendlyStack(Player *owner) const
 Stack *StackTile::getEnemyStack(Player *owner) const
 {
   //return just one of the stacks located here, but not owned by OWNER
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it).player_id == owner->getId())
 	continue;
@@ -195,7 +195,7 @@ Stack *StackTile::getEnemyStack(Player *owner) const
 std::vector<Stack *> StackTile::getEnemyStacks(Player *owner) const
 {
   std::vector<Stack *> stacks;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it).player_id == owner->getId())
 	continue;
@@ -209,7 +209,7 @@ std::vector<Stack *> StackTile::getEnemyStacks(Player *owner) const
 
 bool StackTile::contains(guint32 id) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     if ((*it).stack_id == id)
       return true;
   return false;
@@ -237,7 +237,7 @@ Stack *StackTile::groupStacks(Player *owner, Stack *stack)
   else if (findStack(stack) == end())
     return NULL;
 
-  for (std::vector<Stack*>::iterator i = stacks.begin(); i != stacks.end(); i++)
+  for (std::vector<Stack*>::iterator i = stacks.begin(); i != stacks.end(); ++i)
     {
       if (*i == stack)
 	continue;
@@ -252,10 +252,10 @@ void StackTile::ungroup(Player *owner)
 {
   std::vector<Stack*> stacks = getFriendlyStacks(owner);
   std::list<Army *> armies;
-  for (std::vector<Stack*>::iterator i = stacks.begin(); i != stacks.end(); i++)
+  for (std::vector<Stack*>::iterator i = stacks.begin(); i != stacks.end(); ++i)
     {
       bool first = true;
-      for (Stack::iterator j = (*i)->begin(); j != (*i)->end(); j++)
+      for (Stack::iterator j = (*i)->begin(); j != (*i)->end(); ++j)
 	{
 	  if (first == true)
 	    {
@@ -275,7 +275,7 @@ void StackTile::ungroup(Player *owner)
 void StackTile::setDefending(Player *owner, bool defending)
 {
   std::vector<Stack *> stks = getFriendlyStacks(owner);
-  for (std::vector<Stack *>::iterator it = stks.begin(); it != stks.end(); it++)
+  for (std::vector<Stack *>::iterator it = stks.begin(); it != stks.end(); ++it)
     {
       if ((*it)->getDefending() != defending)
         {
@@ -290,7 +290,7 @@ void StackTile::setDefending(Player *owner, bool defending)
 void StackTile::setParked(Player *owner, bool parked)
 {
   std::vector<Stack *> stks = getFriendlyStacks(owner);
-  for (std::vector<Stack *>::iterator it = stks.begin(); it != stks.end(); it++)
+  for (std::vector<Stack *>::iterator it = stks.begin(); it != stks.end(); ++it)
     {
       if ((*it)->getParked() != parked)
         {

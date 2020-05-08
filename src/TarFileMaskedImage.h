@@ -100,10 +100,6 @@ public:
   std::vector<PixMask*> getImages () const
     { std::vector<PixMask*> o; for (auto f : frames) o.push_back (f.first); return o; }
 
-  //! Return all of the masks
-  std::vector<PixMask*> getMasks () const
-    { std::vector<PixMask*> o; for (auto f : frames) o.push_back (f.second); return o; }
-
   //! Return the dimensions that the images are scaled to
   Vector<int> getScaledImageDimensions () const {return scale_dimension;}
 
@@ -123,21 +119,46 @@ public:
   void load_name (XML_Helper *helper, Glib::ustring data_tag);
 
   //! Load an image from a tar file, with bname already provided
+  /**
+   * @param          t the unopened tar file
+   * @param bname    the archive member containing the image
+   * @return         true if something went wrong
+   */
   bool load (TarFile *t, Glib::ustring bname);
 
   //! Load an image from the tar file, with bname already set by setName
+  /**
+   * @return         true if something went wrong
+   */
   bool load ();
 
   //! Load an image from the tar file t, already provided bname
+  /**
+   * @param t        the opened tar file
+   * @return         true if something went wrong
+   */
   bool load (Tar_Helper *t);
 
   //! Load an image named bname from the tar file t
+  /**
+   * @param t        the opened tar file
+   * @param bname    the archive member containing the image
+   * @return         true if something went wrong
+   */
   bool load (Tar_Helper *t, Glib::ustring bname);
 
   //! Load an image named bname from the tar file
+  /**
+   * @param          bname the archive member containing the image
+   * @return         true if something went wrong
+   */
   bool load (Glib::ustring bname);
 
   //! Load an image named filename from disk
+  /**
+   * @param filename the file holding the image
+   * @return         true if something went wrong
+   */
   bool loadFromFile (Glib::ustring filename);
 
   //! Process the backing image into a set of images and masks

@@ -30,12 +30,27 @@ template<class T> class PixMaskCache: public std::list<T>, public sigc::trackabl
 {
 public:
     typedef sigc::slot<PixMask*, T> Generator;
-    PixMaskCache(Generator g) {generate = g;cachesize=0;};
+
+    PixMaskCache(Generator g): generate (g), cachesize (0) {}
+
+    PixMaskCache(const PixMaskCache &c)
+      : std::list<T>(), sigc::trackable (), generate (c.generate), cachesize (c.cachesize)
+      {
+        for (typename std::map<T, PixMask *>::const_iterator i = c.surfaces.begin ();
+             i != c.surfaces.end (); ++i)
+          {
+            this->push_back (T((*i).first));
+            surfaces[this->back ()] = (*i).second->copy ();
+          }
+      }
+
     ~PixMaskCache()
       {
         reset();
-      };
-    guint32 getCacheSize() const {return cachesize;};
+      }
+
+    guint32 getCacheSize() const {return cachesize;}
+
     guint32 eraseLeastRecentlyUsed()
       {
         guint32 siz = 0;
@@ -57,13 +72,14 @@ public:
               }
           }
         return siz;
-      };
+      }
+
     void reset()
       {
         while (this->empty() == false)
           this->eraseLeastRecentlyUsed();
         cachesize = 0;
-      };
+      }
 
     PixMask* get(T &item, guint32 &size_added)
       {
@@ -91,7 +107,7 @@ public:
               }
             return s;
           }
-      };
+      }
 
     guint32 discardHalf()
       {
@@ -106,7 +122,7 @@ public:
               siz += this->eraseLeastRecentlyUsed();
           }
         return siz;
-      };
+      }
 private:
     std::map<T, PixMask *> surfaces;
     Generator generate;

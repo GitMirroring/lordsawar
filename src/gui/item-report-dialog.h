@@ -31,7 +31,9 @@ class MapBackpack;
 class ItemReportDialog: public LwDialog
 {
  public:
-    ItemReportDialog(Gtk::Window &parent, std::list<Stack*> item_laden_stacks, std::list<MapBackpack*> bags);
+    ItemReportDialog(Gtk::Window &parent,
+                     const std::list<Stack*> &item_laden_stacks,
+                     const std::list<MapBackpack*> &bags);
     ~ItemReportDialog() {delete itemmap;};
 
     void hide() {dialog->hide();};

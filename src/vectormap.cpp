@@ -103,34 +103,33 @@ void VectorMap::draw_cities (std::list<City*> citylist, guint32 type)
 {
   bool prod;
 
-  std::list<City*>::iterator it;
-  for (it = citylist.begin(); it != citylist.end(); it++)
+  for (auto it : citylist)
     {
       switch (click_action)
 	{
 	case CLICK_VECTORS:
 	case CLICK_CHANGES_DESTINATION:
-	  if ((*it)->canAcceptMoreVectoring() == false)
+	  if (it->canAcceptMoreVectoring() == false)
 	    {
 	      prod = false; //the inn is full
 	      type = 4;
 	    }
 	  else
 	    {
-              if ((*it)->getActiveProductionSlot() == -1)
+              if (it->getActiveProductionSlot() == -1)
                 prod = false;
               else
                 prod = true;
 	    }
 	  break;
 	case CLICK_SELECTS:
-          if ((*it)->getActiveProductionSlot() == -1)
+          if (it->getActiveProductionSlot() == -1)
             prod = false;
           else
             prod = true;
 	  break;
 	}
-      draw_city ((*it), type, prod);
+      draw_city (it, type, prod);
     }
 }
 
@@ -161,32 +160,30 @@ void VectorMap::draw_vectoring_line_to_here_from (Vector<int> src)
 void VectorMap::draw_lines (std::list<City*> srcs, std::list<City*> dests)
 {
   Vector<int> end;
-  std::list<City*>::iterator it;
-  std::list<City*>::iterator cit;
   //yellow lines first.  cities vectoring units to their destinations.
-  for (it = srcs.begin(); it != srcs.end(); it++)
+  for (auto it : srcs)
     {
-      if ((*it)->getVectoring() == Vector<int>(-1, -1))
+      if (it->getVectoring() == Vector<int>(-1, -1))
 	continue;
-      if ((*it)->isVisible(Playerlist::getViewingplayer()) == false)
+      if (it->isVisible(Playerlist::getViewingplayer()) == false)
         continue;
       City *c = 
-        Citylist::getInstance()->getNearestObjectBefore((*it)->getVectoring(), 2);
+        Citylist::getInstance()->getNearestObjectBefore(it->getVectoring(), 2);
       if (c)
         end = c->getPos();
       else
         end = planted_standard;
 
       //Vector<int> pos = (*it)->getVectoring();
-      draw_vectoring_line ((*it)->getPos(), end, true);
+      draw_vectoring_line (it->getPos(), end, true);
     }
   //orange lines next.  cities receiving units from their sources.
-  for (it = dests.begin(); it != dests.end(); it++)
+  for (auto it : dests)
     {
       //who is vectoring to this (*it) city?
-      std::list<City*> sources = Citylist::getInstance()->getCitiesVectoringTo(*it);
-      for (cit = sources.begin(); cit != sources.end(); cit++)
-	draw_vectoring_line ((*it)->getPos(), (*cit)->getPos(), false);
+      std::list<City*> sources = Citylist::getInstance()->getCitiesVectoringTo(it);
+      for (auto cit : sources)
+	draw_vectoring_line (it->getPos(), cit->getPos(), false);
     }
 }
 

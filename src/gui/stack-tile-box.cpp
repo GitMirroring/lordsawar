@@ -180,7 +180,7 @@ void StackTileBox::show_stack(StackTile *s)
   guint32 colour_id = 0;
   if (colour_id == p->getId())
     colour_id = Shield::get_next_shield(colour_id);
-  for (std::vector<Stack *>::iterator j = stks.begin(); j != stks.end(); j++)
+  for (std::vector<Stack *>::iterator j = stks.begin(); j != stks.end(); ++j)
     {
       bool first = true;
       for (Stack::iterator i = (*j)->begin(); i != (*j)->end(); ++i)

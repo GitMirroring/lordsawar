@@ -123,12 +123,9 @@ class BigMap: public sigc::trackable
 
     // helpers
     Vector<int> mouse_pos_to_tile(Vector<int> pos);
-    // offset in pixels within tile
-    Vector<int> mouse_pos_to_tile_offset(Vector<int> pos); 
     Vector<int> tile_to_buffer_pos(Vector<int> tile);
     Vector<int> get_view_pos_from_view();
     void draw_buffer();  
-    void blit_object(const Location &obj, Vector<int> tile, PixMask* image, Cairo::RefPtr<Cairo::Surface> surface);
 
     virtual void after_draw() { }
 
@@ -136,8 +133,8 @@ class BigMap: public sigc::trackable
     void draw_stack(Stack *s, Cairo::RefPtr<Cairo::Surface> surface);
     LocationBox d_fighting;
  private:
-    void draw_buffer(LwRectangle map_view, Cairo::RefPtr<Cairo::Surface> surface);
-    void draw_buffer_tiles(LwRectangle map_view, Cairo::RefPtr<Cairo::Surface> surface);
+    void draw_buffer(const LwRectangle &map_view, Cairo::RefPtr<Cairo::Surface> surface);
+    void draw_buffer_tiles(const LwRectangle &map_view, Cairo::RefPtr<Cairo::Surface> surface);
 
     void draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> surface);
     void clip_viewable_buffer(Cairo::RefPtr<Cairo::Surface> pixmap, Vector<int> pos, Cairo::RefPtr<Cairo::Surface> out);

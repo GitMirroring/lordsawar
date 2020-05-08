@@ -54,7 +54,7 @@ AI_Allocation* AI_Allocation::s_instance = 0;
 
 
 AI_Allocation::AI_Allocation(AI_Analysis *analysis, const Threatlist *threats, Player *owner)
-    :d_owner(owner), d_analysis(analysis), d_threats(threats)
+ : d_owner(owner), d_analysis(analysis), d_stacks (NULL), d_threats(threats)
 {
     s_instance = this;
 }
@@ -136,7 +136,7 @@ int AI_Allocation::allocateStacksToCapacityBuilding(City *first_city,
   int count = 0;
 
   for (Threatlist::const_iterator it = d_threats->begin(); 
-       it != d_threats->end(); it++)
+       it != d_threats->end(); ++it)
     {
       Threat *t = *it;
       if (d_stacks->size() == 0)
@@ -174,7 +174,7 @@ int AI_Allocation::continueQuests()
     return count;
 
   auto quests = QuestsManager::getInstance()->getPlayerQuests(d_owner);
-  for (std::vector<Quest*>::iterator i = quests.begin(); i != quests.end(); i++)
+  for (std::vector<Quest*>::iterator i = quests.begin(); i != quests.end(); ++i)
     {
       Quest *quest = *i;
       if (quest == NULL)
@@ -195,7 +195,7 @@ int AI_Allocation::continueQuests()
 int AI_Allocation::continueAttacks()
 {
   int count = 0;
-  for (StackReflist::iterator i = d_stacks->begin(); i != d_stacks->end(); i++)
+  for (StackReflist::iterator i = d_stacks->begin(); i != d_stacks->end(); ++i)
     {
       Stack *s = *i;
       Vector<int> pos = s->getLastPointInPath();
@@ -267,7 +267,7 @@ int AI_Allocation::attackNearbyEnemies()
       if (city->getOwner() == d_owner || city->isBurnt() == true)
         continue;
       std::list<Vector<int> > p = GameMap::getNearbyPoints(city->getPos(), 2);
-      for (std::list<Vector<int> >::iterator j = p.begin(); j != p.end(); j++)
+      for (std::list<Vector<int> >::iterator j = p.begin(); j != p.end(); ++j)
         {
           Stack *s = GameMap::getFriendlyStack(*j);
           if (!s)
@@ -300,7 +300,7 @@ int AI_Allocation::attackNearbyEnemies()
   //attack nearby stacks in the field.
   Stacklist *sl = d_owner->getStacklist();
   std::list<Vector<int> > pos = sl->getPositions();
-  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); i++)
+  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); ++i)
     {
       if (d_owner->abortRequested())
         return count;
@@ -314,7 +314,7 @@ int AI_Allocation::attackNearbyEnemies()
       if (s->getParked() == true)
         continue;
       std::list<Vector<int> > p = GameMap::getNearbyPoints(*i, 2);
-      for (std::list<Vector<int> >::iterator j = p.begin(); j != p.end(); j++)
+      for (std::list<Vector<int> >::iterator j = p.begin(); j != p.end(); ++j)
         {
           Stack *enemy = GameMap::getEnemyStack(*j);
           if (!enemy)
@@ -341,7 +341,7 @@ int AI_Allocation::attackNearbyEnemies()
     }
   //don't leave heroes sitting around in cities.
   pos = sl->getPositions();
-  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); i++)
+  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); ++i)
     {
       if (d_owner->abortRequested())
         return count;
@@ -372,7 +372,7 @@ int AI_Allocation::attackNearbyEnemies()
    //fixme: this should probably be commented out in favour of emptyOutCities
   //don't leave stacks of eight lying around in cities.
   pos = sl->getPositions();
-  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); i++)
+  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); ++i)
     {
       if (d_owner->abortRequested())
         return count;
@@ -460,7 +460,7 @@ int AI_Allocation::visitTemples(bool get_quests)
   int count = 0;
   Stacklist *sl = d_owner->getStacklist();
   std::list<Vector<int> > pos = sl->getPositions();
-  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); i++)
+  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); ++i)
     {
       Stack *s = GameMap::getFriendlyStack(*i);
       if (!s)
@@ -512,7 +512,7 @@ int AI_Allocation::visitRuins()
   int count = 0;
   Stacklist *sl = d_owner->getStacklist();
   std::list<Vector<int> > pos = sl->getPositions();
-  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); i++)
+  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); ++i)
     {
       Stack *s = GameMap::getFriendlyStack(*i);
       if (!s)
@@ -543,7 +543,7 @@ int AI_Allocation::pickupItems()
   int count = 0;
   //loop over all heroes
   std::list<Vector<int> > pos = d_owner->getStacklist()->getPositions();
-  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); i++)
+  for (std::list<Vector<int> >::iterator i = pos.begin(); i != pos.end(); ++i)
     {
       Stack *s = GameMap::getFriendlyStack(*i);
       if (!s)
@@ -560,67 +560,6 @@ int AI_Allocation::pickupItems()
               groupStacks(s);
               deleteStack(s);
             }
-        }
-    }
-  return count;
-}
-
-int AI_Allocation::oldPickupItems()
-{
-  int count = 0;
-  if (d_owner->getHeroes().size() == 0)
-    return count;
-  std::vector<Vector<int> > items = GameMap::getInstance()->getItems();
-  for (std::vector<Vector<int> >::iterator i = items.begin(); i != items.end();
-       i++)
-    {
-      std::vector<Stack*> stks = GameMap::getNearbyFriendlyStacks(*i, 8);
-      for (std::vector<Stack*>::iterator j = stks.begin(); j != stks.end(); j++)
-        {
-          Stack *s = *j;
-          if (s->hasHero() == false)
-            continue;
-          if (GameMap::getEnemyCity(*i) != NULL)
-            continue;
-          if (s->isOnCity() == false)
-            {
-              bool killed = false;
-              if (moveStack(s, *i, killed))
-                {
-                  count++;
-                  if (!killed)
-                    {
-                      if (s->getPos() == *i)
-                        {
-                          Hero *hero = dynamic_cast<Hero*>(s->getFirstHero());
-                          d_owner->heroPickupAllItems (hero, *i);
-                        }
-                      //deleteStack(s);
-                    }
-                }
-            }
-          else
-            {
-              City *c = GameMap::getCity(s->getPos());
-              if (c->contains(*i) == true)
-                {
-                  bool killed = false;
-                  if (moveStack(s, *i, killed))
-                    {
-                      count++;
-                      if (!killed)
-                        {
-                          if (s->getPos() == *i)
-                            {
-                              Hero *hero = dynamic_cast<Hero*>(s->getFirstHero());
-                              d_owner->heroPickupAllItems (hero, *i);
-                            }
-                          deleteStack(s);
-                        }
-                    }
-                }
-            }
-          break;
         }
     }
   return count;
@@ -788,8 +727,7 @@ int AI_Allocation::allocateDefensiveStacksToCity(City *city)
           shuffleStacksWithinCity(city, d, Vector<int>(0,0));
       }
   std::vector<Stack*> defenders = city->getDefenders();
-  std::vector<Stack*>::iterator it;
-  for (it = defenders.begin(); it != defenders.end(); it++)
+  for (std::vector<Stack*>::iterator it = defenders.begin(); it != defenders.end(); ++it)
     {
       Stack *defender = *it;
       if (defender->getParked() == true)
@@ -883,10 +821,6 @@ int AI_Allocation::allocateDefensiveStacksToCity(City *city)
         }
     }
 
-  if (totalDefenderStrength < cityDanger)
-    {
-      debug(city->getName() << " cannot be adequately defended")
-    }
   return count;
 }
 
@@ -1021,7 +955,7 @@ Vector<int> AI_Allocation::getFreeOtherSpotInCity(City *city, Stack *stack)
         std::vector<Stack*> f = GameMap::getFriendlyStacks(pos);
         if (f.size() > 0)
           {
-            for (std::vector<Stack*>::iterator k = f.begin(); k != f.end(); k++)
+            for (std::vector<Stack*>::iterator k = f.begin(); k != f.end(); ++k)
               {
                 if ((*k)->size() > size)
                   {
@@ -1188,7 +1122,7 @@ int AI_Allocation::defaultStackMovements()
             leave = true;
         }
       else
-        leave = true;
+        leave = (Rnd::rand () % 100) > 98 ? false : true;
 
       if (leave == true)
         {
@@ -1253,10 +1187,7 @@ int AI_Allocation::defaultStackMovements()
         {
           bool moved;
           if (!source_city)
-            {
-              //moved = stackReinforce(s);
-              continue;
-            }
+            moved = stackReinforce(s);
           else
             {
               City *c = source_city;
@@ -1276,8 +1207,7 @@ int AI_Allocation::defaultStackMovements()
 bool AI_Allocation::stackReinforce(Stack *s)
 {
   float mostNeeded = -1000.0;
-  City *cityNeeds = 0;
-  int moves = 1000;
+  City *cityNeeds = NULL;
   Vector<int> target_tile = Vector<int>(-1,-1);
   for (auto city: *Citylist::getInstance())
     {
@@ -1292,22 +1222,28 @@ bool AI_Allocation::stackReinforce(Stack *s)
       if (city->contains(s->getPos()))
 	return false;
 
+      if (city->countDefenders () != 0)
+        continue;
+
       //disregard if the city is too far away
       int movesToCity = (distToCity + 6) / 7;
-      if (movesToCity > 3) continue;
+      if (movesToCity > 2) continue;
       
       //disregard if the city can't hold our stack
       Vector<int> dest = getFreeSpotInCity(city, s->size());
       if (dest == Vector<int>(-1,-1))
 	continue;
 
-      //pick the city that needs us the most
-      float need = d_analysis->reinforcementsNeeded(city);
+      //pick the city that needs us the most and is closer
+      /*
+       * movesToCity is a category 0, 1, or 2 .
+       */
+      float need = d_analysis->reinforcementsNeeded(city) *
+        ((3 - movesToCity) * 7);
       if (need > mostNeeded)
 	{
 	  cityNeeds = city;
 	  mostNeeded = need;
-	  moves = movesToCity;
           target_tile = dest;
 	}
     }
@@ -1317,29 +1253,17 @@ bool AI_Allocation::stackReinforce(Stack *s)
     // don't forget to send the stack to a free field within the city
     if (target_tile != Vector<int>(-1,-1))
       {
-        d_analysis->reinforce(cityNeeds, s, moves);
+        guint32 m, t, l;
+        PathCalculator pc (s);
+        Path *p = pc.calculateToCity (cityNeeds, m, t, l);
+        delete p;
+        d_analysis->reinforce(cityNeeds, s, m);
         bool killed = false;
         bool moved = moveStack(s, target_tile, killed);
         return moved;
       }
   }
 
-  //okay, no city needed us, just try to reinforce our nearest city
-  City *target = Citylist::getInstance()->getNearestFriendlyCity(s->getPos());
-  if (!target) // no friendly city?
-    return false;
-  //are we already there?
-  if (target->contains(s->getPos()))
-    return false;
-  else
-    {
-      Vector<int> dest = getFreeSpotInCity(target, s->size());
-      if (dest == Vector<int>(-1, -1))
-        return false;
-      bool killed = false;
-      bool moved = moveStack(s, dest, killed);
-      return moved;
-    }
   return 0;
 }
 
@@ -1386,7 +1310,7 @@ bool AI_Allocation::shuffleStacksWithinCity(City *city, Stack *stack,
     {
       printf("i am stack %d at %d,%d\n", stack->getId(), stack->getPos().x, stack->getPos().y);
       printf("crap.  there are %lu stacks at %d,%d\n", f.size(), target.x, target.y);
-      for (std::vector<Stack*>::iterator it = f.begin(); it != f.end(); it++)
+      for (std::vector<Stack*>::iterator it = f.begin(); it != f.end(); ++it)
         {
           Stack *n = *it;
           if (n)

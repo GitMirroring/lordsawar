@@ -73,7 +73,7 @@ Stack::Stack(const Stack& s, bool uniq)
     }
     d_path = new Path(*s.d_path);
 
-    for (const_iterator sit = s.begin(); sit != s.end(); sit++)
+    for (const_iterator sit = s.begin(); sit != s.end(); ++sit)
     {
 	if ((*sit)->isHero())
           push_back(new Hero(dynamic_cast<Hero&>(**sit)));
@@ -91,7 +91,7 @@ Stack::Stack(XML_Helper* helper)
 
   helper->registerTag(Path::d_tag, sigc::mem_fun((*this), &Stack::load));
   helper->registerTag(Army::d_tag, sigc::mem_fun((*this), &Stack::load));
-  helper->registerTag(Hero::d_tag, sigc::mem_fun((*this), &Stack::load));
+  helper->registerTag(Hero::d_hero_tag, sigc::mem_fun((*this), &Stack::load));
 }
 
 Stack::~Stack()
@@ -108,7 +108,7 @@ void Stack::setPlayer(Player* p)
 {
   // we need to change the armies' loyalties as well!!
   setOwner(p);
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->setOwner(p);
 }
 
@@ -157,7 +157,7 @@ bool Stack::isMovingToOrFromAShip(Vector<int> dest, bool &on_ship) const
 
 void Stack::drainMovement()
 {
-  for (Stack::iterator it = begin(); it != end(); it++)
+  for (Stack::iterator it = begin(); it != end(); ++it)
     (*it)->decrementMoves((*it)->getMoves());
 }
 
@@ -178,7 +178,7 @@ void Stack::moveToDest(Vector<int> dest, bool skipping)
     }
   else
     {
-      for (Stack::iterator it = begin(); it != end(); it++)
+      for (Stack::iterator it = begin(); it != end(); ++it)
 	(*it)->setInShip(false);
     }
 
@@ -190,7 +190,7 @@ void Stack::moveToDest(Vector<int> dest, bool skipping)
     drainMovement();
   else
     {
-      for (Stack::iterator it = begin(); it != end(); it++)
+      for (Stack::iterator it = begin(); it != end(); ++it)
         {
           //maybe the army has a natural movement ability
           if ((*it)->getStat(Army::MOVE_BONUS) & maptype && needed_moves > 1)
@@ -279,7 +279,7 @@ void Stack::decrementMoves(guint32 moves)
 {
   debug("decrement_moves()");
 
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->decrementMoves(moves);
 }
 
@@ -287,7 +287,7 @@ void Stack::incrementMoves(guint32 moves)
 {
   debug("increment_moves()");
 
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->incrementMoves(moves);
 }
 
@@ -352,7 +352,7 @@ Army *Stack::getArmyById(guint32 id) const
 
 bool Stack::hasHero() const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     if ((*it)->isHero())
       return true;
 
@@ -361,7 +361,7 @@ bool Stack::hasHero() const
 
 Army* Stack::getFirstHero() const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     if ((*it)->isHero())
       return (*it);
 
@@ -383,7 +383,7 @@ void Stack::getHeroes(std::vector<guint32>& dst) const
 int Stack::bless()
 {
   int count = 0;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       Temple *temple = GameMap::getTemple(this);
       if ((*it)->bless(temple))
@@ -417,7 +417,7 @@ Vector<int> Stack::getLastReachablePointInPath() const
   if (d_path->size() == 0)
     return Vector<int>(-1,-1);
   unsigned int count = 0;
-  for (Path::iterator it = d_path->begin(); it != d_path->end(); it++)
+  for (Path::iterator it = d_path->begin(); it != d_path->end(); ++it)
     {
       count++;
       if (count == d_path->getMovesExhaustedAtPoint())
@@ -460,7 +460,7 @@ bool Stack::canMove() const
 guint32 Stack::getMaxSight() const
 {
   guint32 max = 0;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     if ((*it)->getStat(Army::SIGHT) > max)
       max = (*it)->getStat(Army::SIGHT);
 
@@ -478,7 +478,7 @@ void Stack::reset(bool recalculate_path)
   guint32 movement_multiplier = 1;
 
   //count the number of items that double the movement in the stack.
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     if ((*it)->isHero())
       {
 	Hero *hero = dynamic_cast<Hero*>(*it);
@@ -491,7 +491,7 @@ void Stack::reset(bool recalculate_path)
     movement_multiplier = 1024;
 
   //set the multipler on all armies in the stack
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     (*it)->setStat(Army::MOVES_MULTIPLIER, movement_multiplier);
 
   if (d_defending == true)
@@ -534,7 +534,7 @@ bool Stack::save(XML_Helper* helper) const
   retval &= d_path->save(helper);
 
   //save armies
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     retval &= (*it)->save(helper);
 
   retval &= helper->closeTag();
@@ -558,7 +558,7 @@ bool Stack::load(Glib::ustring tag, XML_Helper* helper)
       return true;
     }
 
-  if (tag == Hero::d_tag)
+  if (tag == Hero::d_hero_tag)
     {
       Hero* h = new Hero(helper);
       h->setOwner(d_owner);
@@ -572,7 +572,7 @@ bool Stack::load(Glib::ustring tag, XML_Helper* helper)
 
 void Stack::flClear()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       Army *a = *it;
       if (a->isHero())
@@ -611,7 +611,7 @@ guint32 Stack::calculateMoveBonus() const
   int num_landedother = 0;
   if (size() == 0)
     return 0;
-  for (const_iterator it = this->begin(); it != this->end(); it++)
+  for (const_iterator it = this->begin(); it != this->end(); ++it)
     {
       bonus = (*it)->getStat(Army::MOVE_BONUS);
       if (bonus == Tile::GRASS || (bonus & Tile::WATER) == 0 || 
@@ -637,7 +637,7 @@ guint32 Stack::calculateMoveBonus() const
     }
 
   //or maybe we have an item that lets us all fly
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isHero())
 	{
@@ -653,7 +653,7 @@ guint32 Stack::calculateMoveBonus() const
   //calculate move bonuses for non-flying stacks
   
   //first we see if any have a move bonus that confers to the whole stack
-  for (Stack::const_iterator it = this->begin(); it != this->end(); it++)
+  for (Stack::const_iterator it = this->begin(); it != this->end(); ++it)
     {
       bonus = (*it)->getStat(Army::MOVE_BONUS);
       if (((*it)->getStat(Army::ARMY_BONUS) & ArmyBase::CONFER_MOVE_BONUS) > 0)
@@ -662,7 +662,7 @@ guint32 Stack::calculateMoveBonus() const
 
   //check if all army units have the ability to move through forest
   bool found = true;
-  for (Stack::const_iterator it = this->begin(); it != this->end(); it++)
+  for (Stack::const_iterator it = this->begin(); it != this->end(); ++it)
     {
       bonus = (*it)->getStat(Army::MOVE_BONUS);
       if ((bonus & Tile::FOREST) == 0)
@@ -673,7 +673,7 @@ guint32 Stack::calculateMoveBonus() const
 
   //check if all army units have the ability to move through hills
   found = true;
-  for (Stack::const_iterator it = this->begin(); it != this->end(); it++)
+  for (Stack::const_iterator it = this->begin(); it != this->end(); ++it)
     {
       bonus = (*it)->getStat(Army::MOVE_BONUS);
       if ((bonus & Tile::HILLS) == 0)
@@ -684,7 +684,7 @@ guint32 Stack::calculateMoveBonus() const
 
   //check if all army units have the ability to move through mountains
   found = true;
-  for (Stack::const_iterator it = this->begin(); it != this->end(); it++)
+  for (Stack::const_iterator it = this->begin(); it != this->end(); ++it)
     {
       bonus = (*it)->getStat(Army::MOVE_BONUS);
       if ((bonus & Tile::MOUNTAIN) == 0)
@@ -695,7 +695,7 @@ guint32 Stack::calculateMoveBonus() const
 
   //check if all army units have the ability to move through swamp
   found = true;
-  for (Stack::const_iterator it = this->begin(); it != this->end(); it++)
+  for (Stack::const_iterator it = this->begin(); it != this->end(); ++it)
     {
       bonus = (*it)->getStat(Army::MOVE_BONUS);
       if ((bonus & Tile::SWAMP) == 0)
@@ -720,7 +720,7 @@ bool Stack::isFlying () const
  * a boat */
 bool Stack::hasShip () const
 {
-  for (Stack::const_iterator it = this->begin(); it != this->end(); it++)
+  for (Stack::const_iterator it = this->begin(); it != this->end(); ++it)
     {
       if ((*it)->getStat(Army::SHIP))
 	return true;
@@ -732,7 +732,7 @@ guint32 getFightOrder(std::list<guint32> values, guint32 value)
 {
   guint32 count = 0;
   for (std::list<guint32>::const_iterator it = values.begin(); 
-       it != values.end(); it++)
+       it != values.end(); ++it)
     {
       count++;
       if (*it == value)
@@ -775,7 +775,7 @@ void Stack::setFortified(bool fortified)
 {
   if (empty())
     return;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->setFortified(false);
 
   (*begin())->setFortified(fortified);
@@ -785,7 +785,7 @@ bool Stack::getFortified() const
 {
   if (empty())
     return false;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getFortified())
 	return true;
@@ -796,7 +796,7 @@ bool Stack::getFortified() const
 guint32 Stack::getUpkeep() const
 {
   guint32 upkeep = 0;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     upkeep += (*it)->getUpkeep();
   return upkeep;
 }
@@ -822,7 +822,7 @@ std::list<guint32> Stack::determineArmiesByStrength(float strength) const
   float remaining = strength; 
   Stack *stack = new Stack(*this);
   stack->sortByStrength(false);
-  for (iterator it = stack->begin(); it != stack->end(); it++)
+  for (iterator it = stack->begin(); it != stack->end(); ++it)
     {
       float score = AI_Analysis::assessArmyStrength(*it);
       if (score > remaining)
@@ -853,7 +853,7 @@ std::list<guint32> Stack::determineReachableArmies(Vector<int> dest) const
   //try each army individually to see if it reaches
 	  
   Stack *stack = Stack::createNonUniqueStack(getOwner(), getPos());
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getMoves() > 0)
 	{
@@ -869,7 +869,7 @@ std::list<guint32> Stack::determineReachableArmies(Vector<int> dest) const
 
   //now try to see if any army units can tag along
   stack = Stack::createNonUniqueStack(getOwner(), getPos());
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       //skip over armies that are already known to be reachable
       if (find(ids.begin(), ids.end(), (*it)->getId()) != ids.end())
@@ -878,8 +878,8 @@ std::list<guint32> Stack::determineReachableArmies(Vector<int> dest) const
 	{
 	  stack->push_back(*it);
 	  //also push back the rest of the known reachables
-	  std::list<guint32>::iterator iit = ids.begin();
-	  for (; iit != ids.end(); iit++)
+	  for (std::list<guint32>::iterator iit = ids.begin();
+               iit != ids.end(); ++iit)
 	    {
 	      Army *army = getArmyById(*iit);
 	      if (army)
@@ -899,7 +899,7 @@ std::list<guint32> Stack::determineReachableArmies(Vector<int> dest) const
 guint32 Stack::countArmiesBlessedAtTemple(guint32 temple_id) const
 {
   guint32 blessed = 0;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->blessedAtTemple(temple_id))
 	blessed++;
@@ -942,7 +942,7 @@ guint32 Stack::getMaxLandMoves() const
   //alright, we're not flying.  what would our group moves be if we were on land
   //remove ship status from all army units
   copy->decrementMoves(copy->getMoves());
-  for (Stack::iterator it = copy->begin(); it != copy->end(); it++)
+  for (Stack::iterator it = copy->begin(); it != copy->end(); ++it)
     (*it)->setInShip(false);
   copy->reset(false);
 
@@ -971,7 +971,7 @@ guint32 Stack::getMaxBoatMoves() const
   //alright, we're not flying.  what would our group moves be if we were on water?
   copy->decrementMoves(copy->getMoves());
 	      
-  for (Stack::iterator it = copy->begin(); it != copy->end(); it++)
+  for (Stack::iterator it = copy->begin(); it != copy->end(); ++it)
     {
       if (((*it)->getStat(Army::MOVE_BONUS) & Tile::WATER) == 0)
 	(*it)->setInShip(true);
@@ -1005,7 +1005,7 @@ Stack *Stack::splitArmy(Army *army)
 
   assert (army != NULL);
   Stack *new_stack = NULL;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if (*it == army || (*it)->getId() == army->getId())
 	{
@@ -1020,26 +1020,26 @@ Stack *Stack::splitArmy(Army *army)
 }
 
 //! split the given armies from this stack, into a brand new stack.
-Stack *Stack::splitArmies(std::list<Army*> armies)
+Stack *Stack::splitArmies(const std::list<Army*> &armies)
 {
   std::list<guint32> ids;
-  for (std::list<Army*>::iterator i = armies.begin(); i != armies.end(); i++)
+  for (std::list<Army*>::const_iterator i = armies.begin(); i != armies.end(); ++i)
     ids.push_back((*i)->getId());
   return splitArmies(ids);
 }
 
-Stack *Stack::splitArmies(std::list<guint32> armies)
+Stack *Stack::splitArmies(const std::list<guint32> & armies)
 {
   if (armies.size() == 0) //we can't split 0 armies into a new stack.
     return NULL;
   if (armies.size() >= size()) //we can't split everyone into a new stack.
     return NULL;
   Stack *new_stack = NULL;
-  for (std::list<guint32>::iterator i = armies.begin(); i != armies.end(); i++)
+  for (std::list<guint32>::const_iterator i = armies.begin(); i != armies.end(); ++i)
     {
       bool found = false;
       iterator found_army_it = end();
-      for (iterator it = begin(); it != end(); it++)
+      for (iterator it = begin(); it != end(); ++it)
 	{
 	  if ((*it)->getId() == *i)
 	    {
@@ -1059,19 +1059,9 @@ Stack *Stack::splitArmies(std::list<guint32> armies)
   return new_stack;
 }
 
-//! split the armies in the stack that this much mp or more into a new stack.
-Stack *Stack::splitArmiesWithMovement(guint32 mp)
-{
-  std::list<Army*> armies;
-  for (iterator it = begin(); it != end(); it++)
-    if ((*it)->getMoves() >= mp)
-      armies.push_back(*it);
-  return splitArmies(armies);
-}
-
 void Stack::join(Stack *s)
 {
-  for (iterator i = s->begin(); i != s->end(); i++)
+  for (iterator i = s->begin(); i != s->end(); ++i)
     push_back(*i);
   s->clear();
 }
@@ -1125,7 +1115,7 @@ bool Stack::hasPath() const
 
 bool Stack::hasQuest() const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isHero() == true)
         {
@@ -1140,7 +1130,7 @@ bool Stack::hasQuest() const
 
 bool Stack::hasArmyType(guint32 army_type) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getTypeId() == army_type)
         return true;
@@ -1151,7 +1141,7 @@ bool Stack::hasArmyType(guint32 army_type) const
 Hero *Stack::getFirstHeroWithoutAQuest() const
 {
   Hero *hero = NULL;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isHero() == false)
         continue;
@@ -1165,7 +1155,7 @@ Hero *Stack::getFirstHeroWithoutAQuest() const
 Hero *Stack::getFirstHeroWithAQuest() const
 {
   Hero *hero = NULL;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isHero() == false)
         continue;
@@ -1180,7 +1170,7 @@ guint32 Stack::countItems() const
 {
   guint32 count = 0;
   Hero *hero = NULL;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isHero() == false)
         continue;
@@ -1193,7 +1183,7 @@ guint32 Stack::countItems() const
 
 bool Stack::hasUsableItem() const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isHero() == false)
         continue;
@@ -1207,7 +1197,7 @@ bool Stack::hasUsableItem() const
         
 void Stack::getUsableItems(std::list<Item*> &items) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isHero() == false)
         continue;
@@ -1218,7 +1208,7 @@ void Stack::getUsableItems(std::list<Item*> &items) const
       //now we dwindle the items from the backpack, depending on whether or
       //not they're actually usable.
       for (std::list<Item*>::iterator i = backpack_items.begin(); 
-           i !=backpack_items.end(); i++)
+           i !=backpack_items.end(); ++i)
         {
           Maptile::Building b = GameMap::getInstance()->getBuilding(getPos());
           Ruin *ruin = GameMap::getInstance()->getRuin(getPos());
@@ -1245,7 +1235,7 @@ void Stack::getUsableItems(std::list<Item*> &items) const
 
 Hero* Stack::getHeroWithItem(Item *item) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->isHero() == false)
         continue;
@@ -1259,7 +1249,7 @@ Hero* Stack::getHeroWithItem(Item *item) const
 
 void Stack::kill()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->kill();
 }
 
@@ -1274,7 +1264,7 @@ bool Stack::killArmyUnitsInBoats()
   std::list<Army*> flyers;
   std::list<Army*> landedother;
   std::list<Army*> landedhero;
-  for (iterator it = this->begin(); it != this->end(); it++)
+  for (iterator it = this->begin(); it != this->end(); ++it)
     {
       guint32 bonus = (*it)->getStat(Army::MOVE_BONUS);
       if (bonus == Tile::GRASS || (bonus & Tile::WATER) == 0 || 
@@ -1291,7 +1281,7 @@ bool Stack::killArmyUnitsInBoats()
     }
   //sink the landed others.
   for (std::list<Army*>::iterator it = landedother.begin(); 
-       it != landedother.end(); it++)
+       it != landedother.end(); ++it)
     {
       retval = true;
       (*it)->kill();
@@ -1301,7 +1291,7 @@ bool Stack::killArmyUnitsInBoats()
     {
       //sink the unlucky heroes and any items they might have.
       for (std::list<Army*>::reverse_iterator it = landedhero.rbegin();
-           it != landedhero.rend(); it++)
+           it != landedhero.rend(); ++it)
         {
           retval = true;
           (*it)->kill();
@@ -1312,7 +1302,7 @@ bool Stack::killArmyUnitsInBoats()
     }
       
   for (std::list<Army*>::iterator it = landedhero.begin(); 
-       it != landedhero.end(); it++)
+       it != landedhero.end(); ++it)
     {
       if ((*it)->getHP() > 0)
         (*it)->setInShip(false); //we're being carried by a flyer
@@ -1324,7 +1314,7 @@ bool Stack::killArmyUnitsInBoats()
 bool Stack::killArmies(guint32 army_type)
 {
   bool killed = false;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getTypeId() == army_type)
         {
@@ -1342,7 +1332,7 @@ bool Stack::compareIds(const Army *lhs, const Army *rhs)
   guint32 rhs_rank = MAX_STACK_SIZE + 1;
   int count = 0;
   for (std::list<guint32>::iterator i = compare_ids.begin(); 
-       i != compare_ids.end(); i++)
+       i != compare_ids.end(); ++i)
     {
       if (lhs && *i == lhs->getId())
         lhs_rank = count;
@@ -1352,7 +1342,8 @@ bool Stack::compareIds(const Army *lhs, const Army *rhs)
     }
   return lhs_rank < rhs_rank;
 }
-void Stack::sortByIds(std::list<guint32> ids)
+
+void Stack::sortByIds(const std::list<guint32> &ids)
 {
   compare_ids = ids;
   sort(compareIds);
@@ -1362,7 +1353,7 @@ void Stack::updateShipStatus(Vector<int> dest)
 {
   bool to_water = (GameMap::getInstance()->getTile(dest)->getType() == Tile::WATER);
   bool to_bridge = (GameMap::getBridge(dest) != NULL);
-  for (Stack::iterator it = begin(); it != end(); it++)
+  for (Stack::iterator it = begin(); it != end(); ++it)
     {
       if (to_water && !to_bridge && 
           ((*it)->getStat(Army::MOVE_BONUS) & Tile::WATER) == 0)
@@ -1374,7 +1365,7 @@ void Stack::updateShipStatus(Vector<int> dest)
 
 bool Stack::hasDeadArmies() const
 {
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     if ((*i)->getHP() == 0)
       return true;
   return false;
@@ -1383,7 +1374,7 @@ bool Stack::hasDeadArmies() const
 bool Stack::removeArmiesWithoutArmyType(guint32 armyset)
 {
   bool removedArmy = false;
-  for (iterator i = begin(); i != end(); i++)
+  for (iterator i = begin(); i != end(); ++i)
     {
       Armyset *a = Armysetlist::getInstance()->get(armyset);
       ArmyProto *armyproto = a->lookupArmyByType((*i)->getTypeId());
@@ -1391,7 +1382,7 @@ bool Stack::removeArmiesWithoutArmyType(guint32 armyset)
         {
           i = flErase(i);
           if (size() > 0)
-            i--;
+            --i;
           removedArmy = true;
           continue;
         }

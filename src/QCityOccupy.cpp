@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,36 +35,30 @@
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
-//=======================================================================
 QuestCityOccupy::QuestCityOccupy (QuestsManager& mgr, guint32 hero) 
-    : Quest(mgr, hero, Quest::CITYOCCUPY)
+ : Quest(mgr, hero, Quest::CITYOCCUPY),
+    d_city (chooseToOccupy(getHero()->getOwner())->getId ())
 {
-    // find us a victim
-    City* c = chooseToOccupy(getHero()->getOwner());
-    assert(c);      // should never fail because isFeasible is checked first
+  d_targets.push_back (getCity ()->getPos ());
+  debug("city_id = " << d_city);
+  initDescription();
+}
 
-    d_city = c->getId();
-    d_targets.push_back(c->getPos());
-    debug("city_id = " << d_city);
-    initDescription();
-}
-//=======================================================================
 QuestCityOccupy::QuestCityOccupy (QuestsManager& q_mgr, XML_Helper* helper) 
-     : Quest(q_mgr, helper)
+ : Quest(q_mgr, helper)
 {
-    helper->getData(d_city, "city");
-    d_targets.push_back(getCity()->getPos());
-    initDescription();
+  helper->getData(d_city, "city");
+  d_targets.push_back(getCity()->getPos());
+  initDescription();
 }
-//=======================================================================
+
 QuestCityOccupy::QuestCityOccupy (QuestsManager& mgr, guint32 hero, guint32 target) 
-    : Quest(mgr, hero, Quest::CITYOCCUPY)
+ : Quest(mgr, hero, Quest::CITYOCCUPY), d_city (target)
 {
-    d_city = target;
-    d_targets.push_back(getCity()->getPos());
-    initDescription();
+  d_targets.push_back(getCity()->getPos());
+  initDescription();
 }
-//=======================================================================
+
 bool QuestCityOccupy::isFeasible(guint32 heroId)
 {
   if (QuestCityOccupy::chooseToOccupy(getHeroById(heroId)->getOwner()))
@@ -72,38 +66,38 @@ bool QuestCityOccupy::isFeasible(guint32 heroId)
 
   return false;
 }
-//=======================================================================
+
 bool QuestCityOccupy::save(XML_Helper* helper) const
 {
-    bool retval = true;
+  bool retval = true;
 
-    retval &= helper->openTag(Quest::d_tag);
-    retval &= Quest::save(helper);
-    retval &= helper->saveData("city", d_city);
-    retval &= helper->closeTag();
+  retval &= helper->openTag(Quest::d_tag);
+  retval &= Quest::save(helper);
+  retval &= helper->saveData("city", d_city);
+  retval &= helper->closeTag();
 
-    return retval;
+  return retval;
 }
-//=======================================================================
+
 Glib::ustring QuestCityOccupy::getProgress() const
 {
-    return _("You aren't afraid of doing it, are you?");
+  return _("You aren't afraid of doing it, are you?");
 }
-//=======================================================================
+
 void QuestCityOccupy::getSuccessMsg(std::queue<Glib::ustring>& msgs) const
 {
-    msgs.push(_("The priests thank you for occupying this evil place."));
+  msgs.push(_("The priests thank you for occupying this evil place."));
 }
-//=======================================================================
+
 void QuestCityOccupy::getExpiredMsg(std::queue<Glib::ustring>& msgs) const
 {
-    const City* c = getCity();
+  const City* c = getCity();
 
-    msgs.push(String::ucompose
-	      (_("The occupation of city \"%1\" could not be accomplished."), 
-	       c->getName()));
+  msgs.push(String::ucompose
+            (_("The occupation of city \"%1\" could not be accomplished."), 
+             c->getName()));
 }
-//=======================================================================
+
 City* QuestCityOccupy::getCity() const
 {
   for (auto it: *Citylist::getInstance())
@@ -112,14 +106,14 @@ City* QuestCityOccupy::getCity() const
 
   return NULL;
 }
-//=======================================================================
+
 void QuestCityOccupy::initDescription()
 {
   const City* c = getCity();
   d_description = String::ucompose
     (_("You must take over the city \"%1\" and occupy it."), c->getName());
 }
-//=======================================================================
+
 City * QuestCityOccupy::chooseToOccupy(Player *p)
 {
   std::vector<City*> cities;

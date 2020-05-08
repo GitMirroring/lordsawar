@@ -63,7 +63,7 @@ void FileCompat::deleteInstance()
 
 bool FileCompat::contains(FileCompat::Type type) const
 {
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     if ((*i).type == type)
       return true;
   return false;
@@ -95,7 +95,7 @@ FileCompat::Type FileCompat::getType(Glib::ustring filename) const
 {
   if (File::exists(filename) == false)
     return UNKNOWN;
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     {
       if (File::nameEndsWith(filename, (*i).file_extension) == true &&
           (*i).file_extension != ".xml")
@@ -119,10 +119,10 @@ FileCompat::Type FileCompat::getTypeByTarFileInspection(Glib::ustring filename) 
   std::list<FileDetails> details;
   //whittle down the files it can't be
   for (std::list<Glib::ustring>::iterator i = files.begin(); i != files.end(); 
-       i++)
+       ++i)
     {
       bool found = false;
-      for (const_iterator j = begin(); j != end(); j++)
+      for (const_iterator j = begin(); j != end(); ++j)
         {
           if (File::nameEndsWith(*i, (*j).file_extension) == true)
             {
@@ -152,7 +152,7 @@ FileCompat::Type FileCompat::getTypeByXmlFileInspection(Glib::ustring filename) 
 
   if (tag == "")
     return UNKNOWN;
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     {
       if (tag == (*i).tag)
         return FileCompat::Type((*i).type);
@@ -208,7 +208,7 @@ bool FileCompat::get_tag_and_version_from_file(Glib::ustring filename, FileCompa
 
 bool FileCompat::isTarFile(FileCompat::Type type) const
 {
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     if ((*i).type == type)
       return (*i).tar;
   return false;
@@ -216,7 +216,7 @@ bool FileCompat::isTarFile(FileCompat::Type type) const
 
 Glib::ustring FileCompat::getFileExtension(FileCompat::Type type) const
 {
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     if ((*i).type == type)
       return (*i).file_extension;
   return "";
@@ -224,7 +224,7 @@ Glib::ustring FileCompat::getFileExtension(FileCompat::Type type) const
 
 Glib::ustring FileCompat::getTag(FileCompat::Type type) const
 {
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     if ((*i).type == type)
       return (*i).tag;
   return "";
@@ -274,7 +274,7 @@ bool FileCompat::upgrade(Glib::ustring filename, bool &same) const
 bool FileCompat::can_upgrade_to(FileCompat::Type type, Glib::ustring version) const
 {
   for (std::list<UpgradeDetails>::const_iterator i = versions[type].begin();
-       i != versions[type].end(); i++)
+       i != versions[type].end(); ++i)
     {
       if ((*i).to_version == version)
         return true;
@@ -285,7 +285,7 @@ bool FileCompat::can_upgrade_to(FileCompat::Type type, Glib::ustring version) co
 bool FileCompat::get_upgrade_method(FileCompat::Type type, Glib::ustring version, Glib::ustring &next_version, FileCompat::Slot &slot) const
 {
   for (std::list<UpgradeDetails>::const_iterator i = versions[type].begin();
-       i != versions[type].end(); i++)
+       i != versions[type].end(); ++i)
     {
       if ((*i).from_version == version)
         {
@@ -339,7 +339,7 @@ bool FileCompat::rewrite_with_updated_version(Glib::ustring filename, FileCompat
 
 FileCompat::Type FileCompat::getTypeByFileExtension(Glib::ustring ext) const
 {
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     if ((*i).file_extension == ext)
       return FileCompat::Type((*i).type);
   return UNKNOWN;
@@ -431,7 +431,7 @@ bool FileCompat::upgradeGameScenario(Glib::ustring filename, Glib::ustring versi
             }
         }
       t.Close();
-      for (std::list<Glib::ustring>::iterator i = delfiles.begin(); i != delfiles.end(); i++)
+      for (std::list<Glib::ustring>::iterator i = delfiles.begin(); i != delfiles.end(); ++i)
         File::erase(*i);
     }
   return upgraded;
@@ -615,7 +615,7 @@ bool FileCompat::upgradeGameScenarioWithXslt(Glib::ustring filename, Glib::ustri
               delfiles.push_back(tmpfile);
             }
         }
-      for (std::list<Glib::ustring>::iterator i = delfiles.begin(); i != delfiles.end(); i++)
+      for (std::list<Glib::ustring>::iterator i = delfiles.begin(); i != delfiles.end(); ++i)
         File::erase(*i);
       t.Close();
     }
@@ -671,7 +671,7 @@ bool FileCompat::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib
 std::list<Glib::ustring> FileCompat::getFileExtensions(FileCompat::Type type) const
 {
   std::list<Glib::ustring> ext;
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     if ((*i).type == type)
       ext.push_back((*i).file_extension);
   return ext;

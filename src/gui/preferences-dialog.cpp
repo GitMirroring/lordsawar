@@ -126,7 +126,7 @@ PreferencesDialog::PreferencesDialog(Gtk::Window &parent, bool readonly)
 void PreferencesDialog::on_type_changed(Gtk::ComboBoxText *combo)
 {
   for (PlayerTypeMap::iterator it = player_types.begin();
-       it != player_types.end(); it++)
+       it != player_types.end(); ++it)
     {
       if (combo == (*it).second)
 	{
@@ -152,7 +152,7 @@ void PreferencesDialog::on_type_changed(Gtk::ComboBoxText *combo)
 void PreferencesDialog::on_observe_toggled(Gtk::CheckButton *button)
 {
   for (PlayerObserveMap::iterator it = player_observed.begin();
-       it != player_observed.end(); it++)
+       it != player_observed.end(); ++it)
     {
       if (button == (*it).second)
 	(*it).first->setObservable(button->get_active());
@@ -186,8 +186,8 @@ void PreferencesDialog::run(Game *game)
     Configuration::saveConfigurationFile();
     if (game->getScenario()->getPlayMode() == GameScenario::HOTSEAT)
       {
-        PlayerTypeMap::iterator j = player_types.begin();
-        for (; j != player_types.end(); ++j)
+        for (PlayerTypeMap::iterator j = player_types.begin();
+             j != player_types.end(); ++j)
           {
             Player *p = (*j).first;
             if (p == NULL)

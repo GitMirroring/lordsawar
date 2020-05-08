@@ -33,6 +33,7 @@ class Rnd
 
  private:
     Rnd();
+    Rnd(const Rnd &r);
     ~Rnd();
   static Rnd *s_instance;
   Glib::Rand *rnd;

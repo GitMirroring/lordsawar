@@ -102,7 +102,7 @@ float AI_Analysis::assessStackStrength(const Stack *stack)
     {
         // our stack, so we can look inside it
         float total = 0.0;
-        for (Stack::const_iterator it = stack->begin(); it != stack->end(); it++)
+        for (Stack::const_iterator it = stack->begin(); it != stack->end(); ++it)
           total += assessArmyStrength(*it);
             
 
@@ -140,15 +140,15 @@ const Threatlist* AI_Analysis::getThreatsInOrder(Vector<int> pos)
 
 void AI_Analysis::getCityWorstDangers(float dangers[3])
 {
-    std::map<guint32, AICityInfo *>::iterator it;
 
 
     // i wanto to have a result array with the first worst dangers
-    for (int i=0;i<3;i++)
+    for (int i = 0; i < 3; i++)
     {
         float tmp=0.0;
 
-        for (it=d_cityInfo.begin();it!=d_cityInfo.end();it++)
+        for (std::map<guint32, AICityInfo *>::iterator it = d_cityInfo.begin();
+             it!=d_cityInfo.end(); ++it)
 	{
             tmp=(*it->second).getDanger();
 

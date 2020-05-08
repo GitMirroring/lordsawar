@@ -60,6 +60,8 @@ CityEditorDialog::CityEditorDialog(Gtk::Window &parent, City *cit, CreateScenari
 
   xml->get_widget("income_spinbutton", income_spinbutton);
   income_spinbutton->set_value(city->getGold());
+  income_spinbutton->signal_insert_text().connect
+    (sigc::hide(sigc::hide(method(on_income_text_changed))));
   income_spinbutton->signal_changed().connect (method (on_income_changed));
 
   xml->get_widget("burned_switch", burned_switch);

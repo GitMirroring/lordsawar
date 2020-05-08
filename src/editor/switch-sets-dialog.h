@@ -40,14 +40,7 @@ class SwitchSetsDialog: public LwEditorDialog
 
     int run();
 
-    Tileset* get_selected_tileset() {return selected_tileset;}
-    Cityset* get_selected_cityset() {return selected_cityset;}
-    Shieldset* get_selected_shieldset() {return selected_shieldset;}
-
-    bool get_armyset_changed() const {return armyset_changed;}
     bool get_tileset_changed() const {return tileset_changed;}
-    bool get_cityset_changed() const {return cityset_changed;}
-    bool get_shieldset_changed() const {return shieldset_changed;}
 
     bool get_set_changed () const {return armyset_changed || tileset_changed ||
       cityset_changed || shieldset_changed;}

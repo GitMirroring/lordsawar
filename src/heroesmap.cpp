@@ -23,10 +23,9 @@
 #include "stacklist.h"
 #include "hero.h"
 
-HeroesMap::HeroesMap(std::list<Hero*> h)
+HeroesMap::HeroesMap(const std::list<Hero*> &h)
+ : heroes (h), active_hero (*(heroes.begin()))
 {
-  heroes = h;
-  active_hero = *(heroes.begin());
 }
 
 void HeroesMap::after_draw()
@@ -34,7 +33,7 @@ void HeroesMap::after_draw()
   OverviewMap::after_draw();
   draw_cities(false);
   for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end();
-       it++)
+       ++it)
     {
       Player *player = Playerlist::getActiveplayer();
       Vector<int> pos = player->getStacklist()->getPosition((*it)->getId());

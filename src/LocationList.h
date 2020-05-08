@@ -159,9 +159,9 @@ void resizeLocations(Maptile::Building building_type, guint32 tile_width, guint3
             continue;
 	  if (filters)
 	    {
-	      std::list<bool (*)(void*)>::iterator fit = filters->begin();
 	      bool filtered = false;
-	      for (; fit != filters->end(); fit++)
+	      for (std::list<bool (*)(void*)>::iterator fit = filters->begin();
+                   fit != filters->end(); ++fit)
 	        {
 	          if ((*fit)(*it) == true)
 	            {
@@ -199,9 +199,9 @@ void resizeLocations(Maptile::Building building_type, guint32 tile_width, guint3
           int delta = abs(p.x - pos.x) + abs(p.y - pos.y);
 	  if (filters)
 	    {
-	      std::list<bool (*)(void*)>::iterator fit = filters->begin();
 	      bool filtered = false;
-	      for (; fit != filters->end(); fit++)
+	      for (std::list<bool (*)(void*)>::iterator fit = filters->begin();
+                   fit != filters->end(); ++fit)
 	        {
 	          if ((*fit)(*it) == true)
 	            {
@@ -250,9 +250,9 @@ void resizeLocations(Maptile::Building building_type, guint32 tile_width, guint3
         {
 	  if (filters)
 	    {
-	      std::list<bool (*)(void*)>::iterator fit = filters->begin();
 	      bool filtered = false;
-	      for (; fit != filters->end(); fit++)
+	      for (std::list<bool (*)(void*)>::iterator fit = filters->begin();
+                   fit != filters->end(); ++fit)
 	        {
 	          if ((*fit)(*it) == true)
 	            {

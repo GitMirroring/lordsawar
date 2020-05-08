@@ -215,19 +215,16 @@ guint32 Reward_Gold::getRandomSageGoldPieces()
 }
 
 Reward_Allies::Reward_Allies(guint32 army_type, guint32 army_set, guint32 count)
-    :Reward(Reward::ALLIES), d_count(count)
+    :Reward(Reward::ALLIES), 
+    d_army (Armysetlist::getInstance()->getArmy (army_set, army_type)),
+    d_army_set (army_set), d_army_type (army_type), d_count(count)
 {
-  d_army_type = army_type;
-  d_army_set = army_set;
-  d_army  = Armysetlist::getInstance()->getArmy (army_set, army_type);
 }
 
 Reward_Allies::Reward_Allies(const ArmyProto *army, guint32 count)
-    :Reward(Reward::ALLIES), d_count(count)
+    :Reward(Reward::ALLIES), d_army (army), d_army_set (army->getArmyset ()),
+    d_army_type (army->getId ()), d_count(count)
 {
-  d_army_type = army->getId();
-  d_army_set = army->getArmyset();
-  d_army = army;
 }
 
 Reward_Allies::Reward_Allies(XML_Helper* helper)
@@ -241,8 +238,8 @@ Reward_Allies::Reward_Allies(XML_Helper* helper)
 }
 
 Reward_Allies::Reward_Allies (const Reward_Allies& orig)
-	:Reward(orig), d_army(orig.d_army), d_army_type(orig.d_army_type), 
-	d_army_set(orig.d_army_set), d_count(orig.d_count)
+	:Reward(orig), d_army(orig.d_army), d_army_set(orig.d_army_set), 
+        d_army_type(orig.d_army_type), d_count(orig.d_count)
 {
 }
 

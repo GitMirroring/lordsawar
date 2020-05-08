@@ -55,29 +55,18 @@ struct Main::Impl: public sigc::trackable
 					 int msecs_interval);
 };
 
-
 static Main *singleton;
 
 Main::Main(int &argc, char **&argv)
-    : impl(new Impl)
+  : start_stress_test (false), start_editor (false), start_robots (0),
+    start_test_scenario (false), start_net_test_scenario (false),
+    speedy (false), own_all_on_round_two (false), load_filename (""),
+    turn_filename (""), start_headless_server (false), port (0),
+    cacheSize (0), impl(new Impl)
 {
   impl->driver = NULL;
     singleton = this;
 
-    start_test_scenario = false;
-    start_net_test_scenario = false;
-    speedy = false;
-    own_all_on_round_two = false;
-    start_stress_test = false;
-    start_editor = false;
-    start_robots = 0;
-    start_headless_server = false;
-    load_filename = "";
-    turn_filename = "";
-    random_number_seed = 0;
-    port = 0;
-    cacheSize = 0;
-    
     Glib::thread_init();
     try
     {

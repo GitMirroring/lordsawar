@@ -109,11 +109,12 @@ class Fight
         Fight(Stack* attacker, Stack* defender, FightType type = FOR_KEEPS);
 
         // construct from serialized action
-        Fight(std::list<Stack*> attackers, std::list<Stack*> defenders,
-              std::list<FightItem> history);
+        Fight(const std::list<Stack*> &attackers,
+              const std::list<Stack*> &defenders,
+              const std::list<FightItem> &history);
 
         // construct for the battle calculator
-        Fight(std::list<Stack*> attackers, std::list<Stack*> defenders, bool city, Tile::Type terrain, FightType type = FOR_KEEPS);
+        Fight(const std::list<Stack*> &attackers, const std::list<Stack*> &defenders, bool city, Tile::Type terrain, FightType type = FOR_KEEPS);
 
 	//! Destructor.
         ~Fight();
@@ -149,8 +150,6 @@ class Fight
 	//! Get the modified strength bonus of the given Army unit.
 	guint32 getModifiedStrengthBonus(Army *a);
 
-        void setModifiedStrengthBonus(Army *a, guint32 str);
-
         // CONSTANTS
         //! The number of rounds the fight lasts.
 	/**
@@ -162,7 +161,7 @@ class Fight
 	/**
 	 * @note This is used for calculation and display purposes.
 	 */
-        static void orderArmies(std::list<Stack*> stacks,
+        static void orderArmies(const std::list<Stack*> &stacks,
 				std::vector<Army*> &armies);
 
         std::map<guint32, guint32> getInitialHPs() { return initial_hps; }
@@ -213,7 +212,7 @@ class Fight
 
         void fillInInitialHPs();
 
-        void setupFight(std::list<Stack*> attackers, std::list<Stack*> defenders, bool city, Tile::Type terrain, FightType type);
+        void setupFight(const std::list<Stack*> &attackers, const std::list<Stack*> &defenders, bool city, Tile::Type terrain, FightType type);
 
         Army *findArmyById(const std::list<Stack *> &l, guint32 id);
 

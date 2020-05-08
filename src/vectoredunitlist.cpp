@@ -62,7 +62,7 @@ VectoredUnitlist::VectoredUnitlist()
 
 VectoredUnitlist::~VectoredUnitlist()
 {
-  for (VectoredUnitlist::iterator it = begin(); it != end(); it++)
+  for (VectoredUnitlist::iterator it = begin(); it != end(); ++it)
     delete *it;
 }
 
@@ -78,7 +78,7 @@ bool VectoredUnitlist::save(XML_Helper* helper) const
 
     retval &= helper->openTag(VectoredUnitlist::d_tag);
 
-    for (VectoredUnitlist::const_iterator it = begin(); it != end(); it++)
+    for (VectoredUnitlist::const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
     retval &= helper->closeTag();
@@ -109,7 +109,7 @@ void VectoredUnitlist::nextTurn(Player* p)
 {
   debug("next_turn(" <<p->getName() <<")");
 
-  for (VectoredUnitlist::iterator it = begin(); it != end(); it++)
+  for (VectoredUnitlist::iterator it = begin(); it != end(); ++it)
     {
       City *c = GameMap::getCity((*it)->getPos());
       if (c)
@@ -128,7 +128,7 @@ void VectoredUnitlist::nextTurn(Player* p)
 	  it = flErase(it);
 	  continue;
 	}
-      it++;
+      ++it;
     }
 }
 
@@ -144,18 +144,8 @@ bool VectoredUnitlist::removeVectoredUnitsGoingTo(Vector<int> pos)
 	  it = flErase(it);
 	  continue;
 	}
-      it++;
+      ++it;
     }
-  /*
-  for (VectoredUnitlist::iterator it = begin(); it != end(); it++)
-    {
-      if ((*it)->getDestination() == pos)
-	{
-	  printf ("crap.  it's still there!!\n");
-	  exit(0);
-	}
-    }
-  */
   return found;
 }
 
@@ -170,7 +160,7 @@ bool VectoredUnitlist::removeVectoredUnitsComingFrom(Vector<int> pos)
 	  it = flErase(it);
 	  continue;
 	}
-      it++;
+      ++it;
     }
   return found;
 }
@@ -189,7 +179,7 @@ bool VectoredUnitlist::removeVectoredUnitsGoingTo(City *c)
 	  counter++;
 	  continue;
 	}
-      it++;
+      ++it;
     }
   if (counter != count)
     {
@@ -204,7 +194,7 @@ bool VectoredUnitlist::removeVectoredUnitsGoingTo(City *c)
 	  counter++;
 	  continue;
 	}
-      it++;
+      ++it;
     }
   if (counter)
     {
@@ -226,14 +216,14 @@ bool VectoredUnitlist::removeVectoredUnitsComingFrom(City *c)
 	  it = flErase(it);
 	  continue;
 	}
-      it++;
+      ++it;
     }
   return found;
 }
 
 void VectoredUnitlist::getVectoredUnitsGoingTo(City *c, std::list<VectoredUnit*>& vectored) const
 {
-  for (VectoredUnitlist::const_iterator it = begin(); it != end(); it++)
+  for (VectoredUnitlist::const_iterator it = begin(); it != end(); ++it)
     {
       if (c->contains((*it)->getDestination()))
 	{
@@ -243,7 +233,7 @@ void VectoredUnitlist::getVectoredUnitsGoingTo(City *c, std::list<VectoredUnit*>
 }
 void VectoredUnitlist::getVectoredUnitsGoingTo(Vector<int> pos, std::list<VectoredUnit*>& vectored) const
 {
-  for (VectoredUnitlist::const_iterator it = begin(); it != end(); it++)
+  for (VectoredUnitlist::const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getDestination() == pos)
 	{
@@ -253,7 +243,7 @@ void VectoredUnitlist::getVectoredUnitsGoingTo(Vector<int> pos, std::list<Vector
 }
 void VectoredUnitlist::getVectoredUnitsComingFrom(Vector<int> pos, std::list<VectoredUnit*>& vectored) const
 {
-  for (VectoredUnitlist::const_iterator it = begin(); it != end(); it++)
+  for (VectoredUnitlist::const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getPos() == pos)
 	{
@@ -265,7 +255,7 @@ void VectoredUnitlist::getVectoredUnitsComingFrom(Vector<int> pos, std::list<Vec
 guint32 VectoredUnitlist::getNumberOfVectoredUnitsGoingTo(Vector<int> pos) const
 {
   guint32 count = 0;
-  for (VectoredUnitlist::const_iterator it = begin(); it != end(); it++)
+  for (VectoredUnitlist::const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->getDestination() == pos)
 	{
@@ -278,7 +268,7 @@ guint32 VectoredUnitlist::getNumberOfVectoredUnitsGoingTo(Vector<int> pos) const
 bool VectoredUnitlist::changeDestination(City *c, Vector<int> new_dest)
 {
   bool found = false;
-  for (VectoredUnitlist::iterator it = begin(); it != end(); it++)
+  for (VectoredUnitlist::iterator it = begin(); it != end(); ++it)
     {
       if (c->contains((*it)->getPos()))
 	{
@@ -298,7 +288,7 @@ VectoredUnitlist::iterator VectoredUnitlist::flErase(iterator object)
 
 void VectoredUnitlist::changeOwnership(Player *old_owner, Player *new_owner)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     if ((*it)->getOwner() == old_owner)
       (*it)->setOwner(new_owner);
 }

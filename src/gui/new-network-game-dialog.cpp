@@ -50,7 +50,7 @@ NewNetworkGameDialog::NewNetworkGameDialog(Gtk::Window &parent, bool force_serve
     Profilelist::getInstance()->push_back(new Profile(Glib::get_user_name()));
 
   for (Profilelist::iterator i = Profilelist::getInstance()->begin();
-       i != Profilelist::getInstance()->end(); i++)
+       i != Profilelist::getInstance()->end(); ++i)
     add_profile(*i);
 
   xml->get_widget("advertise_checkbutton", advertise_checkbutton);
@@ -90,7 +90,7 @@ void NewNetworkGameDialog::select_preferred_profile(Glib::ustring user)
   Profile *p = Profilelist::getInstance()->findLastPlayedProfileForUser(user);
   Gtk::TreeModel::Children kids = profiles_list->children();
   for (Gtk::TreeModel::Children::iterator i = kids.begin(); 
-       i != kids.end(); i++)
+       i != kids.end(); ++i)
     {
       Gtk::TreeModel::Row row = *i;
       if (row[profiles_columns.profile] == p)

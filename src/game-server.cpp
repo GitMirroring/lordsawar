@@ -1,5 +1,5 @@
 // Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2008, 2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2008, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -742,7 +742,7 @@ GameServer::add_to_player_list(std::list<GameParameters::Player> &list, guint32 
     }
   if (found == false)
     {
-      GameParameters::Player p;
+      GameParameters::Player p = GameParameters::Player ();
       p.id = id;
       p.type = GameParameters::Player::Type(type);
       p.name = name;
@@ -755,7 +755,7 @@ bool
 GameServer::remove_from_player_list(std::list<GameParameters::Player> &list, guint32 id)
 {
   //remove player id from part.
-  for (std::list<GameParameters::Player>::iterator i = list.begin(); i != list.end(); i++)
+  for (std::list<GameParameters::Player>::iterator i = list.begin(); i != list.end(); ++i)
     {
       if ((*i).id == id)
 	{
@@ -839,15 +839,6 @@ void GameServer::sendMap(Participant *part)
       Playerlist::getInstance()->swap(p, i);
     }
 
-  /*
-  std::vector<Player*>::iterator j = players.begin();
-  for (Playerlist::iterator i = Playerlist::getInstance()->begin();
-       i != Playerlist::getInstance()->end(); ++i)
-    {
-      Playerlist::getInstance()->swap(*i, *j);
-      j++;
-    }
-    */
   for (auto i : deletables)
     {
       NetworkPlayer *p = dynamic_cast<NetworkPlayer*>(i);

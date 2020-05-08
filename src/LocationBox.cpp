@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2000, 2001, 2002, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -62,9 +62,8 @@ LocationBox::LocationBox(const LocationBox& loc, Vector<int> pos)
 }
 
 LocationBox::LocationBox(XML_Helper* helper, guint32 size)
-    :Immovable(helper)
+    :Immovable(helper), d_size (size)
 {
-    d_size = size;
 }
 
 Stack *LocationBox::addArmy(Army *a) const
@@ -171,18 +170,6 @@ bool LocationBox::contains(Vector<int> pos) const
 {
     return (pos.x >= getPos().x) && (pos.x < getPos().x + (int) d_size) 
       && (pos.y >= getPos().y) && (pos.y < getPos().y + (int) d_size);
-}
-
-bool LocationBox::isCompletelyObscuredByFog(Player *p) const
-{
-  for (unsigned int i = 0; i < d_size; i++)
-    for (unsigned int j = 0; j < d_size; j++)
-      {
-	Vector<int> pos = Vector<int>(i,j);
-	if (p->getFogMap()->isCompletelyObscuredFogTile(pos) == false)
-	  return false;
-      }
-  return true;
 }
 
 Vector<int> LocationBox::getNearestPos(Movable *m) const

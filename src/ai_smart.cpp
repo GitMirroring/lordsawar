@@ -396,7 +396,7 @@ bool AI_Smart::cityNewlyTaken(City *city, guint32 turns) const
 {
   guint count = 0;
   std::list<History*> h = getHistoryForCityId(city->getId());
-  for (std::list<History*>::reverse_iterator i = h.rbegin(); i != h.rend(); i++)
+  for (std::list<History*>::reverse_iterator i = h.rbegin(); i != h.rend(); ++i)
     {
       if ((*i)->getType() == History::START_TURN)
         count++;
@@ -441,7 +441,7 @@ void AI_Smart::examineCities()
   //now we get to spend this amount on the city production.
   //we'll turn off the cities we can't afford.
   std::list<City*> cities = Citylist::getInstance()->getNearestFriendlyCities(this);
-  for (std::list<City*>::iterator it = cities.begin(); it != cities.end(); it++)
+  for (std::list<City*>::iterator it = cities.begin(); it != cities.end(); ++it)
     {
       City *c = *it;
       if (total_gp_to_spend <= 0)
@@ -481,7 +481,7 @@ Reward *AI_Smart::chooseReward(Ruin *ruin, Sage *sage, Stack *stack)
   (void) stack;
   //always pick the money.
   Reward *reward = NULL;
-  for (Sage::iterator it = sage->begin(); it != sage->end(); it++)
+  for (Sage::iterator it = sage->begin(); it != sage->end(); ++it)
     if ((*it)->getType() == Reward::GOLD)
       {
         reward = (*it);
@@ -554,7 +554,7 @@ bool AI_Smart::computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32 m
         dist = abs(diff.y);
       std::vector<Stack*> stacks = GameMap::getNearbyFriendlyStacks(dest, dist);
       for (std::vector<Stack*>::iterator it = stacks.begin(); it != stacks.end();
-           it++)
+           ++it)
         {
           if ((*it)->hasHero() && (*it)->getId() != stack->getId())
             return false;

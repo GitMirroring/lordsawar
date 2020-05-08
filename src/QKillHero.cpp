@@ -38,14 +38,10 @@
 #define debug(x)
 
 QuestKillHero::QuestKillHero(QuestsManager& mgr, guint32 hero) 
-  : Quest(mgr, hero, Quest::KILLHERO)
+  : Quest(mgr, hero, Quest::KILLHERO),
+    d_victim (chooseToKill ()->getId ())
 {
-  // find a suitable hero for us
-  Hero *hunted = chooseToKill();
-  assert(hunted);         // should never fail, since isFeasible is checked
-
-  d_victim = hunted->getId();
-  d_targets.push_back(hunted->getOwner()->getStacklist()->getPosition(d_victim));
+  d_targets.push_back(Stacklist::getPosition (d_victim));
   initDescription();
 }
 
@@ -67,10 +63,8 @@ QuestKillHero::QuestKillHero(QuestsManager& q_mgr, XML_Helper* helper)
 }
 
 QuestKillHero::QuestKillHero(QuestsManager& q_mgr, guint32 hero, guint32 victim) 
-  : Quest(q_mgr, hero, Quest::KILLHERO)
+  : Quest(q_mgr, hero, Quest::KILLHERO), d_victim (victim)
 {
-  d_victim = victim;
-
   // double and triple check :)
   Hero *h = Quest::getHeroById(d_victim);
   assert(h);
@@ -145,8 +139,8 @@ Hero* QuestKillHero::chooseToKill()
 	continue;
 
       const Stacklist* sl = pit->getStacklist();
-      for (Stacklist::const_iterator it = sl->begin(); it != sl->end(); it++)
-	for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); sit++)
+      for (Stacklist::const_iterator it = sl->begin(); it != sl->end(); ++it)
+	for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); ++sit)
 	  if ((*sit)->isHero()) 
 	    heroes.push_back(dynamic_cast<Hero*>(*sit));
     }

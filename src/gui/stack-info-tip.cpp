@@ -65,8 +65,8 @@ StackInfoTip::StackInfoTip(Gtk::Widget *target, MapTipPosition mpos, StackTile *
           return;
       }
     guint32 fs = FontSize::getInstance ()->get_height ();
-    for (std::vector<Stack *>::iterator i = stks.begin(); i != stks.end(); i++)
-      for (Stack::iterator it = (*i)->begin(); it != (*i)->end(); it++)
+    for (std::vector<Stack *>::iterator i = stks.begin(); i != stks.end(); ++i)
+      for (Stack::iterator it = (*i)->begin(); it != (*i)->end(); ++it)
 	{
 	  Gtk::Image *image = new Gtk::Image();
           PixMask *armypic = gc->getDialogArmyPic(*it, fs)->copy();

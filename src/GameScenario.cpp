@@ -89,7 +89,7 @@ sigc::signal<void> GameScenario::load_finish;
 
 GameScenario::GameScenario(Glib::ustring name,Glib::ustring comment,
 			   GameScenario::PlayMode playmode)
-    :TarFile(name, MAP_EXT), d_name(name),d_comment(comment), d_copyright(""),
+ : TarFile("", name, MAP_EXT), d_name(name),d_comment(comment), d_copyright(""),
     d_license(""), d_playmode(playmode), inhibit_autosave_removal(false),
     loaded_game_filename("")
 {
@@ -105,7 +105,7 @@ GameScenario::GameScenario(Glib::ustring name,Glib::ustring comment,
 
 //savegame has an absolute path
 GameScenario::GameScenario(Glib::ustring savegame, bool& broken)
-  :TarFile (File::get_basename (savegame, false),
+ : TarFile (File::get_dirname (savegame), File::get_basename (savegame, false),
             File::get_extension (savegame)),
     d_playmode(GameScenario::HOTSEAT), inhibit_autosave_removal(false),
     loaded_game_filename("")
@@ -128,7 +128,7 @@ GameScenario::GameScenario(Glib::ustring savegame, bool& broken)
       ext.push_back(SAVE_EXT);
       Glib::ustring filename = t.getFirstFile(ext, broken);
       XML_Helper helper(filename, std::ios::in);
-      broken = loadWithHelper(helper, File::get_dirname(savegame));
+      broken = loadWithHelper(helper);
       load_tick.emit ();
       ScenarioMedia::getInstance()->instantiateImages(t, broken);
       load_tick.emit ();
@@ -153,7 +153,7 @@ bool GameScenario::loadArmysets(Tar_Helper *t)
   bool broken = false;
   std::list<Glib::ustring> armysets = t->getFilenames(Armyset::file_extension);
   for (std::list<Glib::ustring>::iterator it = armysets.begin();
-       it != armysets.end(); it++)
+       it != armysets.end(); ++it)
     {
       guint32 id = Armysetlist::getInstance()->import(t, *it, broken);
       if (!broken)
@@ -221,7 +221,7 @@ void GameScenario::quickStartEvenlyDivided()
 	  cities_left--;
 	}
 
-      pit++;
+      ++pit;
       if (pit == plist->end())
 	pit = plist->begin();
     }
@@ -249,7 +249,7 @@ void GameScenario::quickStartEvenlyDivided()
 			GameMap::getStacks(c->getPos() + Vector<int>(x,y));
 		      std::vector<Stack*> stks = stile->getStacks();
 		      for (std::vector<Stack *>::iterator k = stks.begin();
-			   k != stks.end(); k++)
+			   k != stks.end(); ++k)
 			Stacklist::changeOwnership(*k, p);
 		    }
 		}
@@ -297,7 +297,7 @@ void GameScenario::quickStartAIHeadStart()
 			GameMap::getStacks(c->getPos() + Vector<int>(x,y));
 		      std::vector<Stack*> stks = stile->getStacks();
 		      for (std::vector<Stack *>::iterator k = stks.begin();
-			   k != stks.end(); k++)
+			   k != stks.end(); ++k)
 			Stacklist::changeOwnership(*k, p);
 		    }
 		}
@@ -326,12 +326,12 @@ bool GameScenario::setupStacks(bool hidden_map)
   if (!hidden_map)
     return true;
   for (Playerlist::iterator it = Playerlist::getInstance()->begin();
-       it != Playerlist::getInstance()->end(); it++)
+       it != Playerlist::getInstance()->end(); ++it)
     {
       if ((*it) == Playerlist::getInstance()->getNeutral())
 	continue;
       for (Stacklist::iterator sit = (*it)->getStacklist()->begin();
-	   sit != (*it)->getStacklist()->end(); sit++)
+	   sit != (*it)->getStacklist()->end(); ++sit)
 	(*sit)->deFog();
     }
   return true;
@@ -378,7 +378,7 @@ bool GameScenario::setupRuinOccupants()
 {
   debug("GameScenario::setupRuinOccupants")
     for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
-	 it != Ruinlist::getInstance()->end(); it++)
+	 it != Ruinlist::getInstance()->end(); ++it)
       {
         if ((*it)->getOccupant () == NULL)
           {
@@ -414,7 +414,7 @@ bool GameScenario::setupRuinRewards(int difficulty)
     // first, mark some ruins as hidden for rewards
     // only til we have as many hidden ruins as we have non-hidden ruins
     for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
-         it != Ruinlist::getInstance()->end(); it++)
+         it != Ruinlist::getInstance()->end(); ++it)
       {
         if ((*it)->isHidden () == false && Rnd::rand() % 100 < chance &&
             (*it)->hasSage() == false && (*it)->getReward() == NULL &&
@@ -428,7 +428,7 @@ bool GameScenario::setupRuinRewards(int difficulty)
 
   // now we populate the rewards
   for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
-       it != Ruinlist::getInstance()->end(); it++)
+       it != Ruinlist::getInstance()->end(); ++it)
     {
       if ((*it)->isHidden() == true)
         {
@@ -482,7 +482,7 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
   debug("GameScenario::setupCities")
 
   for (Playerlist::iterator it = Playerlist::getInstance()->begin();
-       it != Playerlist::getInstance()->end(); it++)
+       it != Playerlist::getInstance()->end(); ++it)
     {
       if ((*it) == Playerlist::getInstance()->getNeutral())
 	continue;
@@ -500,7 +500,7 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
     quickStartAIHeadStart();
 
   for (Citylist::iterator it = Citylist::getInstance()->begin();
-       it != Citylist::getInstance()->end(); it++)
+       it != Citylist::getInstance()->end(); ++it)
     {
       if ((*it)->isBurnt())
         continue;
@@ -541,7 +541,7 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
   //set up build production
   std::list<City*> cities;
   for (Citylist::iterator it = Citylist::getInstance()->begin();
-       it != Citylist::getInstance()->end(); it++)
+       it != Citylist::getInstance()->end(); ++it)
     {
       if ((*it)->isBurnt())
         continue;
@@ -555,7 +555,7 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
     {
     case GameParameters::BUILD_PRODUCTION_ALWAYS:
       for (Citylist::iterator it = Citylist::getInstance()->begin();
-           it != Citylist::getInstance()->end(); it++)
+           it != Citylist::getInstance()->end(); ++it)
         {
           if ((*it)->isBurnt())
             continue;
@@ -570,7 +570,7 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
           if (to_turn_off > 0)
             {
               for (Citylist::iterator it = Citylist::getInstance()->begin();
-                   it != Citylist::getInstance()->end(); it++)
+                   it != Citylist::getInstance()->end(); ++it)
                 {
                   if ((*it)->isBurnt())
                     continue;
@@ -594,7 +594,7 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
           if (to_turn_off > 0)
             {
               for (Citylist::iterator it = Citylist::getInstance()->begin();
-                   it != Citylist::getInstance()->end(); it++)
+                   it != Citylist::getInstance()->end(); ++it)
                 {
                   if ((*it)->isBurnt())
                     continue;
@@ -612,7 +612,7 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
       break;
     case GameParameters::BUILD_PRODUCTION_NEVER:
       for (Citylist::iterator it = Citylist::getInstance()->begin();
-           it != Citylist::getInstance()->end(); it++)
+           it != Citylist::getInstance()->end(); ++it)
         {
           if ((*it)->isBurnt())
             continue;
@@ -652,9 +652,8 @@ void GameScenario::setupDiplomacy(bool diplomacy)
       Playerlist::getInstance()->calculateDiplomaticRankings();
 }
 
-bool GameScenario::loadWithHelper(XML_Helper& helper, Glib::ustring dir)
+bool GameScenario::loadWithHelper(XML_Helper& helper)
 {
-  setDirectory(dir);
   Armysetlist::getInstance();
   Tilesetlist::getInstance();
   Shieldsetlist::getInstance();
@@ -1469,28 +1468,30 @@ GameScenario::PlayMode GameScenario::loadPlayMode(Glib::ustring filename, bool &
 class DetailsLoader
 {
 public:
-    DetailsLoader(Glib::ustring filename, bool &broken) {
-      player_count = 0; city_count = 0; name = ""; comment = "";
-      Tar_Helper tar(filename, std::ios::in, broken);
-      if (broken)
-        return;
-      std::list<Glib::ustring> ext;
-      ext.push_back(MAP_EXT);
-      ext.push_back(SAVE_EXT);
-      Glib::ustring tmpfile = tar.getFirstFile(ext, broken);
-      XML_Helper helper(tmpfile, std::ios::in);
-      helper.registerTag(GameScenario::d_tag, 
-			 sigc::mem_fun(this, &DetailsLoader::loadDetails));
-      helper.registerTag(Player::d_tag, 
-			 sigc::mem_fun(this, &DetailsLoader::loadDetails));
-      helper.registerTag(City::d_tag, 
-                         sigc::mem_fun(this, &DetailsLoader::loadDetails));
-      bool retval = helper.parseXML();
-      helper.close();
-      File::erase(tmpfile);
-      if (!broken)
-	broken = !retval;
-    }
+
+    DetailsLoader(Glib::ustring filename, bool &broken) 
+      : name(""), comment (""), player_count (0), city_count (0), id ("")
+      {
+        Tar_Helper tar(filename, std::ios::in, broken);
+        if (broken)
+          return;
+        std::list<Glib::ustring> ext;
+        ext.push_back(MAP_EXT);
+        ext.push_back(SAVE_EXT);
+        Glib::ustring tmpfile = tar.getFirstFile(ext, broken);
+        XML_Helper helper(tmpfile, std::ios::in);
+        helper.registerTag(GameScenario::d_tag, 
+                           sigc::mem_fun(this, &DetailsLoader::loadDetails));
+        helper.registerTag(Player::d_tag, 
+                           sigc::mem_fun(this, &DetailsLoader::loadDetails));
+        helper.registerTag(City::d_tag, 
+                           sigc::mem_fun(this, &DetailsLoader::loadDetails));
+        bool retval = helper.parseXML();
+        helper.close();
+        File::erase(tmpfile);
+        if (!broken)
+          broken = !retval;
+      }
 
     bool loadDetails(Glib::ustring tag, XML_Helper* helper)
       {

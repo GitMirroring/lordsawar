@@ -117,8 +117,8 @@ bool GameOptionsDialog::run()
 
     dialog->run();
   
-    std::list<sigc::connection>::iterator it = connections.begin();
-    for (; it != connections.end(); it++) 
+    for (std::list<sigc::connection>::iterator it = connections.begin();
+         it != connections.end(); ++it) 
       (*it).disconnect();
     connections.clear();
     

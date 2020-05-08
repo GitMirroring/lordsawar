@@ -346,11 +346,11 @@ class Reward_Allies: public Reward
 	//! The Army prototype that represents the allies to give the Player.
         const ArmyProto *d_army;
 
-	//! The army type of the given prototype.
-	guint32 d_army_type;
-
 	//! The army set of the given prototype.
 	guint32 d_army_set;
+
+	//! The army type of the given prototype.
+	guint32 d_army_type;
 
 	//! The number of allies to give the Player.
         guint32 d_count;

@@ -33,11 +33,11 @@ template<class T>
 class SetList: public std::list<T*>
 {
 public:
-    SetList(Glib::ustring ext){extension=ext;};
+    SetList(Glib::ustring ext) : extension (ext) {}
     ~SetList()
       {
         for (class SetList<T>::iterator it = this->begin(); it != this->end();
-             it++)
+             ++it)
           delete (*it);
       };
     static Glib::ustring getConfigurationFilename(Glib::ustring dir, Glib::ustring subdir, Glib::ustring ext) {return File::add_slash_if_necessary(dir) + subdir + "/" + subdir + ext;};
@@ -64,7 +64,7 @@ public:
     bool contains(Glib::ustring name) const
       {
         for (class SetList<T>::const_iterator it = this->begin(); 
-             it != this->end(); it++)
+             it != this->end(); ++it)
           if ((*it)->getName() == name)
             return true;
 
@@ -77,7 +77,7 @@ public:
         std::list<guint32> ids;
         std::list<Glib::ustring> sets = SetList::scan(T::file_extension);
         for (std::list<Glib::ustring>::const_iterator i = sets.begin(); 
-             i != sets.end(); i++)
+             i != sets.end(); ++i)
           {
             T *set = T::create(*i, unsupported_version);
             if (set != NULL)
@@ -88,7 +88,7 @@ public:
           }
         sets = SetList::scan(T::file_extension, false);
         for (std::list<Glib::ustring>::const_iterator i = sets.begin(); 
-             i != sets.end(); i++)
+             i != sets.end(); ++i)
           {
             T *set = T::create(*i, unsupported_version);
             if (set != NULL)
@@ -316,7 +316,7 @@ public:
     void getSizes(std::list<guint32> &sizes) const
       {
         for (class SetList<T>::const_iterator it = this->begin(); 
-             it != this->end(); it++)
+             it != this->end(); ++it)
           sizes.push_back((*it)->getUnscaledTileSize());
         sizes.sort ();
         sizes.unique ();
@@ -326,7 +326,7 @@ public:
       {
         std::list<Glib::ustring> names;
         for (class SetList<T>::const_iterator it = this->begin(); 
-             it != this->end(); it++)
+             it != this->end(); ++it)
           if ((*it)->getUnscaledTileSize() == tilesize &&
               (*it)->validate() == true)
             names.push_back((*it)->getName());
@@ -357,7 +357,7 @@ public:
     void loadSets(std::list<Glib::ustring> sets)
       {
         for (std::list<Glib::ustring>::const_iterator i = sets.begin(); 
-             i != sets.end(); i++)
+             i != sets.end(); ++i)
           {
             T *set = loadSet(*i);
             if (!set)
@@ -385,7 +385,7 @@ private:
     void remove_mapping_setid_with_id (guint32 id)
       {
         for (typename SetIdMap::iterator i = d_setids.begin ();
-             i != d_setids.end (); i++)
+             i != d_setids.end (); ++i)
           {
             T *s = (*i).second;
             if (s && s->getId () == id)
@@ -399,7 +399,7 @@ private:
     void remove_mapping_set_with_id (guint32 id)
       {
         for (typename SetMap::iterator i = d_sets.begin ();
-             i != d_sets.end (); i++)
+             i != d_sets.end (); ++i)
           {
             T *s = (*i).second;
             if (s && s->getId () == id)
@@ -413,7 +413,7 @@ private:
     void remove_mapping_nameset_with_id (guint32 id)
       {
         for (typename SetNameMap::iterator i = d_namesets.begin ();
-             i != d_namesets.end (); i++)
+             i != d_namesets.end (); ++i)
           {
             T *s = (*i).second;
             if (s && s->getId () == id)

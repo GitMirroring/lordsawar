@@ -77,8 +77,8 @@ void AI_Dummy::setDefensiveProduction(City *city)
   else
     {
       std::list<Action_Produce *> actions = getUnitsProducedThisTurn();
-      std::list<Action_Produce *>::iterator it = actions.begin();
-      for (; it != actions.end(); it++)
+      for (std::list<Action_Produce *>::iterator it = actions.begin();
+           it != actions.end(); ++it)
 	{
 	  if ((*it)->getCityId() == city->getId())
 	    {

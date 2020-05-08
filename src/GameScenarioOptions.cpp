@@ -46,13 +46,13 @@ GameScenarioOptions::GameScenarioOptions()
 {
 }
 
-int GameScenarioOptions::calculate_difficulty_rating(const GameParameters g)
+int GameScenarioOptions::calculate_difficulty_rating(const GameParameters &g)
 {
   float total_difficulty = 0;
   int max_player_difficulty = 73;
   int players_on = 0;
   for (std::vector<GameParameters::Player>::const_iterator it = g.players.begin();
-       it != g.players.end(); it++)
+       it != g.players.end(); ++it)
     {
       if ((*it).type != GameParameters::Player::OFF)
 	players_on++;
@@ -68,7 +68,7 @@ int GameScenarioOptions::calculate_difficulty_rating(const GameParameters g)
 
   //go through all players, adding up difficulty points for each
   for (std::vector<GameParameters::Player>::const_iterator i = g.players.begin();
-       i != g.players.end(); i++)
+       i != g.players.end(); ++i)
     {
       if ((*i).type == GameParameters::Player::HUMAN || 
 	  ((*i).type == GameParameters::Player::HARD))

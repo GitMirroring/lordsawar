@@ -68,7 +68,7 @@ void TilePreviewScene::regenerate()
   //populate d_view
   d_view.clear();
   for (std::list<struct tile_model>::iterator it = d_model.begin();
-       it != d_model.end(); it++)
+       it != d_model.end(); ++it)
     {
       struct tile_model model = *it;
       TileStyle *tilestyle = NULL;

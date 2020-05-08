@@ -102,31 +102,31 @@ Army* Army::createNonUniqueArmy(const ArmyProdBase& a, Player *player)
 }
 
 Army::Army(const ArmyProdBase& a, Player* p)
-    :ArmyBase(a), UniquelyIdentified(), Ownable(p), 
-    d_type_id(a.getTypeId()), d_armyset(a.getArmyset()), 
-    d_max_hp(2), d_max_moves_multiplier(1), d_max_moves_rest_bonus(0),
-    d_ship(false), d_hp(2), d_moves(a.getMaxMoves()), d_xp(0), d_level(0),
-    d_battles_number(0), d_number_hashit(0), d_number_hasbeenhit(0)
+ : ArmyBase(a), UniquelyIdentified(), Ownable(p), d_type_id(a.getTypeId()),
+    d_armyset(a.getArmyset()), d_max_hp(2), d_max_moves_multiplier(1),
+    d_max_moves_rest_bonus(0), d_ship(false), d_hp(2), d_moves(a.getMaxMoves()),
+    d_xp(0), d_level(0), d_medal_bonus {false}, d_battles_number(0),
+    d_number_hashit(0), d_number_hasbeenhit(0)
 {
-  for(int i = 0; i < 3; i++)
-    d_medal_bonus[i] = 0;
   d_visitedTemples.clear();
 }
 
 Army::Army()
-  :ArmyBase(), UniquelyIdentified(), Ownable((Player *)0),
-    d_type_id(0), d_armyset(0), d_max_hp(2), d_max_moves_multiplier(1), 
+ : ArmyBase(), UniquelyIdentified(), Ownable((Player *)0), d_type_id(0),
+    d_armyset(0), d_max_hp(2), d_max_moves_multiplier(1),
     d_max_moves_rest_bonus(0), d_ship(false), d_hp(2), d_moves(0), d_xp(0),
-    d_level(0), d_battles_number(0), d_number_hashit(0), d_number_hasbeenhit(0)
+    d_level(0), d_medal_bonus {false},  d_battles_number(0), d_number_hashit(0),
+    d_number_hasbeenhit(0)
 {
   d_visitedTemples.clear();
 }
 
 Army::Army(XML_Helper* helper)
-  :ArmyBase(helper), UniquelyIdentified(helper), Ownable((XML_Helper*) 0),
+ : ArmyBase(helper), UniquelyIdentified(helper), Ownable((XML_Helper*) 0),
     d_type_id(0), d_armyset(0), d_max_hp(2), d_max_moves_multiplier(1), 
     d_max_moves_rest_bonus(0), d_ship(false), d_hp(2), d_moves(0), d_xp(0),
-    d_level(0), d_battles_number(0), d_number_hashit(0), d_number_hasbeenhit(0)
+    d_level(0), d_medal_bonus {false}, d_battles_number(0), d_number_hashit(0),
+    d_number_hasbeenhit(0)
 {
   //d_owner is not read in here.  it is set to the owner of the stack
   //in stack.cpp

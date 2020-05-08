@@ -33,7 +33,7 @@
 class QuestReportDialog: public LwDialog
 {
  public:
-    QuestReportDialog(Gtk::Window &parent, std::vector<Quest *>quests, Hero *preferred_hero);
+    QuestReportDialog(Gtk::Window &parent, const std::vector<Quest *>&quests, Hero *preferred_hero);
     ~QuestReportDialog() {delete questmap;};
 
     void run();

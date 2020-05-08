@@ -139,13 +139,6 @@ bool Maptile::isCityTerrain()
   return false;
 }
 
-bool Maptile::isRoadTerrain()
-{
-  if (getBuilding() == Maptile::ROAD || getBuilding() == Maptile::BRIDGE)
-    return true;
-  return false;
-}
-
 bool Maptile::isOpenTerrain()
 {
   if (isCityTerrain())

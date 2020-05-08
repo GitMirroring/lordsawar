@@ -61,10 +61,6 @@ public:
     //! Set the pointer characteristics.
     void set_pointer(Pointer pointer, int size, Tile::Type terrain);
 
-    void set_road_start(Vector<int> start);
-
-    void set_road_finish(Vector<int> finish);
-
     void clear_road();
 
     // Methods that operate on the class data and modify the class.

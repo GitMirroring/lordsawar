@@ -161,7 +161,7 @@ bool AI_Fast::startTurn()
     debug("trying to complete quests");
     //try to complete our quests
     std::vector<Quest*> q = QuestsManager::getInstance()->getPlayerQuests(this);
-    for (std::vector<Quest*>::iterator it = q.begin(); it != q.end(); it++)
+    for (std::vector<Quest*>::iterator it = q.begin(); it != q.end(); ++it)
       {
         Quest *quest = *it;
         if (quest->isPendingDeletion())
@@ -183,7 +183,7 @@ bool AI_Fast::startTurn()
 	bool found = false;
     
 	//are there any stacks with paths that can move?
-	for (Stacklist::reverse_iterator it = d_stacklist->rbegin(); it != d_stacklist->rend(); it++)
+	for (Stacklist::reverse_iterator it = d_stacklist->rbegin(); it != d_stacklist->rend(); ++it)
 	  {
 	    Stack *s = (*it);
 	    if (s->getPath()->size() > 0 && s->enoughMoves())
@@ -700,12 +700,13 @@ bool AI_Fast::computerTurn()
       if (d_maniac)
         {
           const Threatlist* threats = d_analysis->getThreatsInOrder(s->getPos());
-          Threatlist::const_iterator tit = threats->begin();
           const Threat* target = 0;
 
           // prefer weak forces (take strong if neccessary) and stop after 10
           // stacks
-          for (int i = 0; tit != threats->end() && i < 10; tit++, i++)
+          int i = 0;
+          for (Threatlist::const_iterator tit = threats->begin();
+               tit != threats->end() && i < 10; ++tit, i++)
             {
               // in a first step, we only look at enemy stacks
               if ((*tit)->isCity() || (*tit)->isRuin())
@@ -822,7 +823,7 @@ Reward *AI_Fast::chooseReward(Ruin *ruin, Sage *sage, Stack *stack)
   (void) stack;
   //always pick the money.
   Reward *reward = NULL;
-  for (Sage::iterator it = sage->begin(); it != sage->end(); it++)
+  for (Sage::iterator it = sage->begin(); it != sage->end(); ++it)
     if ((*it)->getType() == Reward::GOLD)
       {
         reward = (*it);

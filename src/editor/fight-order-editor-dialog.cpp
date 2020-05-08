@@ -128,8 +128,8 @@ void FightOrderEditorDialog::fill_armies(Player *player)
 {
   armies_list->clear();
   std::list<guint32> fight_order = player->getFightOrder();
-  std::list<guint32>::iterator it = fight_order.begin();
-  for (; it != fight_order.end(); it++)
+  for (std::list<guint32>::iterator it = fight_order.begin();
+       it != fight_order.end(); ++it)
     addArmyType(*it, player);
 }
 

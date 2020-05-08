@@ -297,7 +297,7 @@ void CitySetWindow::on_validate_cityset_activated()
 
   Glib::ustring msg = "";
   for (std::list<Glib::ustring>::iterator it = msgs.begin(); it != msgs.end();
-       it++)
+       ++it)
     {
       msg += (*it) + "\n";
       break;

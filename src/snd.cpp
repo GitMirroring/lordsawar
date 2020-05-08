@@ -1,6 +1,6 @@
 // Copyright (C) 2006 Ulf Lorenz
 // Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2014, 2015 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -102,23 +102,8 @@ Snd::~Snd()
     
     // remove all music pieces
     std::map<Glib::ustring, MusicItem*>::iterator it;
-    for (it = d_musicMap.begin(); it != d_musicMap.end(); it++)
+    for (it = d_musicMap.begin(); it != d_musicMap.end(); ++it)
         delete (*it).second;
-}
-
-bool Snd::setMusic(bool enable, int volume)
-{
-    if (volume < 0 || volume > 128)
-        return false;
-
-    Configuration::s_musicenable = enable;
-    Configuration::s_musicvolume = volume;
-#ifdef LW_SOUND
-    impl->effect->property_volume() = (double)Configuration::s_musicvolume/128.0;
-    impl->back->property_volume() = (double)Configuration::s_musicvolume/128.0;
-#endif
-
-    return true;
 }
 
 bool Snd::isMusicEnabled()
@@ -296,29 +281,31 @@ void Snd::nextPiece()
 
 bool Snd::loadMusic(Glib::ustring tag, XML_Helper* helper)
 {
-    if (tag != "piece")
+  if (tag != "piece")
     {
-        std::cerr <<"Loading music: Wrong tag name\n";
-        return false;
+      std::cerr <<"Loading music: Wrong tag name\n";
+      return false;
     }
 
-    Glib::ustring tagname;
-    MusicItem* item = new MusicItem();
-    
-    bool retval = true;
-    retval &= helper->getData(tagname, "name");
-    retval &= helper->getData(item->file, "filename");
-    retval &= helper->getData(item->background, "background");
-    retval &= helper->getData(item->alias, "alias");
-    
-    if (retval)
+  Glib::ustring tagname;
+  MusicItem* item = new MusicItem();
+
+  bool retval = true;
+  retval &= helper->getData(tagname, "name");
+  retval &= helper->getData(item->file, "filename");
+  retval &= helper->getData(item->background, "background");
+  retval &= helper->getData(item->alias, "alias");
+
+  if (retval)
     {
-        d_musicMap[tagname] = item;
-        if (item->background)
-            d_bgMap.push_back(tagname);
+      d_musicMap[tagname] = item;
+      if (item->background)
+        d_bgMap.push_back(tagname);
     }
-    
-    return retval;
+  else
+    delete item;
+
+  return retval;
 }
         
 void Snd::updateVolume()

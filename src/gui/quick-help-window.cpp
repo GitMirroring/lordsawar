@@ -28,8 +28,8 @@
 
 #define method(x) sigc::mem_fun(*this, &QuickHelpWindow::x)
 QuickHelpWindow::QuickHelpWindow()
+ : xml (BuilderCache::get("quick-help-window.ui"))
 {
-  xml = BuilderCache::get("quick-help-window.ui");
   xml->get_widget("window", window);
   window->set_title (_("Quick Help"));
   xml->get_widget("close_button", close_button);

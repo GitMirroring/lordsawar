@@ -1,6 +1,6 @@
 // Copyright (C) 2006 Ulf Lorenz
 // Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2007, 2009, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2009, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -74,18 +74,6 @@ class Snd : public sigc::trackable
 
         //! Get the filename for the given piece.
         Glib::ustring getFile(Glib::ustring piece);
-
-	// Set Methods
-
-        /** Enables/disables music and sets volume. If the sound is disabled,
-          * subsequent calls to play sounds will be silently ignored.
-          *
-          * @param enable       enable/disable sound
-          * @param volume       set the sound volume in the range from 0 to 128
-          *
-          * @return false for wrong volume data, otherwise true
-          */
-        bool setMusic(bool enable, int volume);
 
 
 	// Methods that operate on class data and modify the class.

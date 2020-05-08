@@ -1,7 +1,7 @@
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2004, 2005 Ulf Lorenz
 // Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,17 @@
 #include "AI_Analysis.h"
 #include "player.h"
 
+Threat::Threat (const Threat &t)
+ : Ownable (t), d_city (t.d_city), d_ruin (t.d_ruin),
+    d_stacks (new StackReflist ()), d_danger (t.d_danger), d_value (t.d_value),
+    d_strength (t.d_strength)
+
+{
+  for (StackReflist::const_iterator i = t.d_stacks->begin ();
+       i != t.d_stacks->end (); ++i)
+    d_stacks->addStack (new Stack (*(*i)));
+}
+
 Threat::Threat(City *c)
     :Ownable(*c), d_city(c), d_ruin(0), d_danger(0), d_value(0), d_strength(0)
 {
@@ -51,7 +62,7 @@ Threat::Threat(Ruin *r)
 
 Threat::~Threat()
 {
-  for (StackReflist::iterator i = d_stacks->begin(); i != d_stacks->end(); i++)
+  for (StackReflist::iterator i = d_stacks->begin(); i != d_stacks->end(); ++i)
     delete *i;
   d_stacks->clear();
   delete d_stacks;
@@ -91,7 +102,7 @@ bool Threat::Near(Vector<int> pos, Player *p) const
             it != d_stacks->end(); ++it)
         {
             Vector<int> spos = (*it)->getPos();
-            if (abs(pos.x - spos.x) <= 1 && abs(pos.y - spos.y <= 1))
+            if (abs(pos.x - spos.x) <= 1 && abs(pos.y - spos.y) <= 1)
                 return true;
         }
 

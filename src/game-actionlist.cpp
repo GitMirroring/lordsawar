@@ -58,7 +58,7 @@ GameActionlist::GameActionlist()
 
 GameActionlist::~GameActionlist()
 {
-  for (GameActionlist::iterator it = begin(); it != end(); it++)
+  for (GameActionlist::iterator it = begin(); it != end(); ++it)
     delete *it;
   clear();
 }
@@ -74,7 +74,7 @@ bool GameActionlist::save(XML_Helper* helper) const
 
     retval &= helper->openTag(GameActionlist::d_tag);
 
-    for (GameActionlist::const_iterator it = begin(); it != end(); it++)
+    for (GameActionlist::const_iterator it = begin(); it != end(); ++it)
       retval &= (*it)->save(helper);
     
     retval &= helper->closeTag();

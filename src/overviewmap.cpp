@@ -335,7 +335,7 @@ int OverviewMap::calculatePixelsPerTile(int width, int height)
     GameMap::calculateTilesPerOverviewMapTile();
 
   double ratio = 28.36; //overviewmaps are 28.36 font heights tall
-  for (;h * pixels < FontSize::getInstance ()->get_height () * ratio; pixels ++)
+  for (;h * pixels < FontSize::getInstance ()->get_height () * ratio; pixels++)
     ;
 
   return pixels + 1;
@@ -529,7 +529,7 @@ void OverviewMap::draw()
 
   Gdk::RGBA ruindotcolor = ts->getRuinColor();
   for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
-       it != Ruinlist::getInstance()->end(); it++)
+       it != Ruinlist::getInstance()->end(); ++it)
     {
       Ruin *r = *it;
       if (BigMap::s_show_hidden_ruins == false)
@@ -549,7 +549,7 @@ void OverviewMap::draw()
   // Draw temples as a white dot
   Gdk::RGBA templedotcolor = ts->getTempleColor();
   for (Templelist::iterator it = Templelist::getInstance()->begin();
-       it != Templelist::getInstance()->end(); it++)
+       it != Templelist::getInstance()->end(); ++it)
     {
       Temple *t = *it;
       if (t->isVisible(Playerlist::getViewingplayer()) == false)
@@ -656,7 +656,7 @@ void OverviewMap::draw_cities (bool all_razed)
   // Draw all cities as shields over the city location, in the colors of
   // the players.
   for (Citylist::iterator it = Citylist::getInstance()->begin();
-      it != Citylist::getInstance()->end(); it++)
+      it != Citylist::getInstance()->end(); ++it)
   {
       City *c = *it;
       PixMask *tmp;

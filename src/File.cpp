@@ -348,13 +348,6 @@ bool File::create_dir(Glib::ustring dir)
   return retval;
 }
 	
-bool File::is_writable(Glib::ustring file)
-{
-  Glib::RefPtr<Gio::File> f = Gio::File::create_for_path(file);
-  Glib::RefPtr<Gio::FileInfo> info = f->query_info("access::can-write");
-  return info->get_attribute_boolean("access::can-write");
-}
-
 bool File::directory_exists(Glib::ustring d)
 {
   return Glib::file_test(d, Glib::FILE_TEST_IS_DIR);
@@ -431,16 +424,10 @@ void File::clean_dir(Glib::ustring dirname)
   if (File::exists(dirname) == false)
     return;
   Glib::Dir dir(dirname);
-  for (Glib::DirIterator it = dir.begin(); it != dir.end(); it++)
+  for (Glib::DirIterator it = dir.begin(); it != dir.end(); ++it)
     File::erase(File::add_slash_if_necessary(dirname) + *it);
   dir.close();
   File::erase_dir(dirname);
-}
-
-Glib::ustring File::getSetConfigurationFilename(Glib::ustring dir, Glib::ustring subdir, Glib::ustring ext)
-{
-  return Glib::build_filename (add_slash_if_necessary(dir), 
-                               subdir, subdir + ext);
 }
 
 char *File::_sanify(const char *string)

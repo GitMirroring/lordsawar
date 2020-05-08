@@ -26,7 +26,7 @@
 #include "gui/image-helpers.h"
 #include "TarFileMaskedImage.h"
 
-Glib::ustring Tartan::d_tag = "tartan";
+Glib::ustring Tartan::d_tartan_tag = "tartan";
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -70,7 +70,7 @@ bool Tartan::saveTartan(XML_Helper *helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(d_tag);
+  retval &= helper->openTag(d_tartan_tag);
   retval &= helper->saveData("left_image", d_left_mimage->getName ());
   retval &= helper->saveData("center_image", d_center_mimage->getName ());
   retval &= helper->saveData("right_image", d_right_mimage->getName ());

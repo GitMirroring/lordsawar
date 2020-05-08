@@ -25,8 +25,8 @@
 class BarChart: public Gtk::Image
 {
 public:
-    BarChart(std::list<unsigned int> bars, std::list<Gdk::RGBA> colours,
-	     unsigned int max_value);
+    BarChart(const std::list<unsigned int> &bars,
+             const std::list<Gdk::RGBA> &colours, unsigned int max_value);
     virtual ~BarChart() {};
 
 protected:

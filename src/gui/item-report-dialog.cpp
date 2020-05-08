@@ -31,14 +31,14 @@
 
 #define method(x) sigc::mem_fun(*this, &ItemReportDialog::x)
 
-ItemReportDialog::ItemReportDialog(Gtk::Window &parent, std::list<Stack*> item_laden_stacks, std::list<MapBackpack*> bags_of_stuff)
- : LwDialog(parent, "item-report-dialog.ui")
+ItemReportDialog::ItemReportDialog(Gtk::Window &parent,
+                                   const std::list<Stack*> &item_laden_stacks,
+                                   const std::list<MapBackpack*> &bags_of_stuff)
+ : LwDialog(parent, "item-report-dialog.ui"), stacks (item_laden_stacks),
+    bags (bags_of_stuff), itemmap (new ItemMap(item_laden_stacks, bags))
 {
-  stacks = item_laden_stacks;
-  bags = bags_of_stuff;
   xml->get_widget("map_image", map_image);
 
-  itemmap = new ItemMap(item_laden_stacks, bags);
   itemmap->map_changed.connect(method(on_map_changed));
 
   xml->get_widget("label", label);
@@ -67,7 +67,7 @@ void ItemReportDialog::fill_in_item_info()
 {
   int count = 0;
   for (std::list<Stack*>::iterator it = stacks.begin(); it != stacks.end();
-       it++)
+       ++it)
     {
       Stack *stack = (*it);
       count += stack->countItems();

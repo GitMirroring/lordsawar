@@ -67,7 +67,7 @@ bool Bridgelist::save(XML_Helper* helper) const
 
     retval &= helper->openTag(Bridgelist::d_tag);
 
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
     retval &= helper->closeTag();

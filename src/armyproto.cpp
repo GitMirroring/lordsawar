@@ -174,7 +174,7 @@ bool ArmyProto::instantiateImage (Glib::ustring cfgfile, Shield::Colour col)
   if (imgname.empty() == false)
     {
       getMaskedImage (col)->clear (false);
-      getMaskedImage (col)->load (&t);
+      broken = getMaskedImage (col)->load (&t);
       getMaskedImage (col)->instantiateImages();
     }
   return broken;

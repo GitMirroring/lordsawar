@@ -45,8 +45,8 @@ SelectItemDialog::SelectItemDialog(Gtk::Window &parent, bool clear)
   items_treeview->set_headers_visible(false);
 
   Itemlist *itemlist = Itemlist::getInstance();
-  Itemlist::iterator iter = itemlist->begin();
-  for (;iter != itemlist->end(); iter++)
+  for (Itemlist::iterator iter = itemlist->begin();
+       iter != itemlist->end(); ++iter)
     addItemProto((*iter).second);
 
   guint32 max = itemlist->size();
@@ -86,8 +86,8 @@ void SelectItemDialog::run()
           Gtk::TreeModel::Row row = *iterrow;
           selected_item = row[items_columns.item];
           selected_item_type_id = 0;
-          Itemlist::iterator iter = Itemlist::getInstance()->begin();
-          for (;iter != Itemlist::getInstance()->end(); iter++)
+          for (Itemlist::iterator iter = Itemlist::getInstance()->begin();
+               iter != Itemlist::getInstance()->end(); ++iter)
             {
               if ((*iter).second == selected_item)
                 break;

@@ -29,12 +29,12 @@ Glib::ustring Profile::d_tag = "profile";
 #define debug(x)
 
 Profile::Profile(Glib::ustring nickname)
+ : d_id (GameScenario::generate_guid ()), d_nickname (nickname),
+    d_user (Glib::get_user_name ()), d_creation_date (Glib::TimeVal ()),
+    d_last_played_date (Glib::TimeVal ())
 {
-  d_id = GameScenario::generate_guid();
-  d_nickname = nickname;
-  d_user = Glib::get_user_name();
-  d_creation_date.assign_current_time();
-  d_last_played_date.assign_current_time();
+  d_creation_date.assign_current_time ();
+  d_last_played_date.assign_current_time ();
 }
 
 Profile::Profile(XML_Helper* helper)

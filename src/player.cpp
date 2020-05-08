@@ -137,7 +137,7 @@ Player::Player(const Player& player)
   // everything.
   d_stacklist = new Stacklist();
   for (Stacklist::iterator it = player.d_stacklist->begin();
-       it != player.d_stacklist->end(); it++)
+       it != player.d_stacklist->end(); ++it)
     {
       Stack* mine = new Stack(**it, true);
       // change the stack's loyalty
@@ -342,18 +342,6 @@ Glib::ustring Player::getName() const
   return d_name;
 }
 
-void Player::dumpActionlist() const
-{
-    for (auto it: d_actions)
-      std::cerr << it->dump() << std::endl;
-}
-
-void Player::dumpHistorylist() const
-{
-  for (auto it: d_history)
-    std::cerr << it->dump() << std::endl;
-}
-
 void Player::clearActionlist()
 {
   for (auto it: d_actions)
@@ -413,7 +401,7 @@ void Player::doKill()
     d_dead = true;
     //drop the bags of stuff that the heroes might be carrying
     std::list<Hero*> h = getHeroes();
-    for (std::list<Hero*>::iterator it = h.begin(); it != h.end(); it++)
+    for (std::list<Hero*>::iterator it = h.begin(); it != h.end(); ++it)
       {
 	Stack *s = d_stacklist->getArmyStackById((*it)->getId());
 	if (s)
@@ -453,7 +441,7 @@ bool Player::save(XML_Helper* helper) const
     // save the fight order, one ranking per army type
     std::stringstream fight_order;
     for (std::list<guint32>::const_iterator it = d_fight_order.begin();
-         it != d_fight_order.end(); it++)
+         it != d_fight_order.end(); ++it)
       {
         fight_order << (*it) << " ";
       }
@@ -572,7 +560,7 @@ guint32 Player::getScore() const
   //go get our last published score in the history
   guint32 score = 0;
   std::list<History*>::const_reverse_iterator it = d_history.rbegin();
-  for (; it != d_history.rend(); it++)
+  for (; it != d_history.rend(); ++it)
     {
       if ((*it)->getType() == History::SCORE)
         {
@@ -599,12 +587,12 @@ void Player::calculateIncome()
         d_income += city->getGold();
 }
 
-void Player::doSetFightOrder(std::list<guint32> order)
+void Player::doSetFightOrder(const std::list<guint32> &order)
 {
   d_fight_order = order;
 }
 
-void Player::setFightOrder(std::list<guint32> order) 
+void Player::setFightOrder(const std::list<guint32> &order) 
 {
   doSetFightOrder(order);
   
@@ -625,7 +613,7 @@ bool Player::doStackSplitArmy(Stack *s, Army *a, Stack *& new_stack)
 }
 
 
-bool Player::doStackSplitArmies(Stack *stack, std::list<guint32> armies,
+bool Player::doStackSplitArmies(Stack *stack, const std::list<guint32> &armies,
 				Stack *& new_stack)
 {
   new_stack = stack->splitArmies(armies);
@@ -637,7 +625,7 @@ bool Player::doStackSplitArmies(Stack *stack, std::list<guint32> armies,
   return false;
 }
 
-Stack *Player::stackSplitArmies(Stack *stack, std::list<guint32> armies)
+Stack *Player::stackSplitArmies(Stack *stack, const std::list<guint32> &armies)
 {
   Stack *new_stack = NULL;
   bool retval = doStackSplitArmies(stack, armies, new_stack);
@@ -1274,18 +1262,18 @@ void Player::finishStackFight (Fight *fight, Stack **attacker, Stack **defender)
     cleanupAfterFight(attackers, defenders, attacker_history, defender_history);
 
     for (std::list<History*>::iterator i = attacker_history.begin();
-         i != attacker_history.end(); i++)
+         i != attacker_history.end(); ++i)
       addHistory(*i);
     for (std::list<History*>::iterator i = defender_history.begin();
-         i != defender_history.end(); i++)
+         i != defender_history.end(); ++i)
       addHistory(*i);
   
     for (std::list<Stack*>::iterator i = attackers.begin();
-         i != attackers.end(); i++)
+         i != attackers.end(); ++i)
       addAction(new Action_ReorderArmies(*i));
 
     for (std::list<Stack*>::iterator i = defenders.begin();
-         i != defenders.end(); i++)
+         i != defenders.end(); ++i)
       addAction(new Action_ReorderArmies(*i));
     
     // Set the attacker and defender stack to 0 if neccessary. This is a great
@@ -1370,7 +1358,7 @@ Fight::Result ruinfight (Stack **attacker, Stack **defender)
       for (Stack::iterator sit = loser->begin(); sit != loser->end();)
         {
           (*sit)->setHP (0);
-          sit++;
+          ++sit;
         }
     }
   else
@@ -1453,7 +1441,7 @@ Reward* Player::stackSearchRuin(Stack* s, Ruin* r, bool &stackdied)
       if (result == Fight::ATTACKER_WON)
         delete keeper;
       for (std::list<History*>::iterator i = attacker_history.begin();
-           i != attacker_history.end(); i++)
+           i != attacker_history.end(); ++i)
         addHistory(*i);
       clearHistorylist(defender_history);
 
@@ -1988,13 +1976,6 @@ bool Player::heroDropItem(Hero *h, Item *i, Vector<int> pos, bool &splash)
   return true;
 }
 
-bool Player::heroDropAllItems(Hero *h, Vector<int> pos, bool &splash)
-{
-  while (h->getBackpack()->empty() == false)
-    heroDropItem(h, h->getBackpack()->front(), pos, splash);
-  return true;
-}
-
 bool Player::doHeroDropAllItems(Hero *h, Vector<int> pos, bool &splash)
 {
   while (h->getBackpack()->empty() == false)
@@ -2068,7 +2049,7 @@ void Player::resign()
   std::list<History*> history;
   doResign(history);
   for (std::list<History*>::iterator i = history.begin(); i != history.end();
-       i++)
+       ++i)
     addHistory(*i);
   
   addAction(new Action_Resign());
@@ -2174,7 +2155,7 @@ bool Player::doChangeVectorDestination(Vector<int> src, Vector<int> dest,
 
   //okay, do the vectoring changes.
   std::list<City*>::iterator it = sources.begin();
-  for (; it != sources.end(); it++)
+  for (; it != sources.end(); ++it)
     retval &= (*it)->changeVectorDestination(dest);
   vectored = sources;
   return retval;
@@ -2188,7 +2169,7 @@ bool Player::changeVectorDestination(Vector<int> src, Vector<int> dest)
     return retval;
 
   std::list<City*>::iterator it = vectored.begin();
-  for (; it != vectored.end(); it++)
+  for (; it != vectored.end(); ++it)
     addAction(new Action_Vector((*it), dest));
   return true;
 }
@@ -2199,7 +2180,7 @@ bool Player::heroPlantStandard(Stack* s)
   if (!s)
     s = getActivestack();
   
-  for (Stack::iterator it = s->begin(); it != s->end(); it++)
+  for (Stack::iterator it = s->begin(); it != s->end(); ++it)
   {
     if ((*it)->isHero())
     {
@@ -2226,11 +2207,11 @@ void Player::doHeroPlantStandard(Hero *hero, Item *item, Vector<int> pos)
   supdatingStack.emit(0);
 }
 
-void Player::getHeroes(const std::list<Stack*> stacks, std::vector<guint32>& dst)
+void Player::getHeroes(const std::list<Stack*> &stacks, std::vector<guint32>& dst)
 {
-    std::list<Stack*>::const_iterator it;
-    for (it = stacks.begin(); it != stacks.end(); it++)
-        (*it)->getHeroes(dst);
+  for (std::list<Stack*>::const_iterator it = stacks.begin();
+       it != stacks.end(); ++it)
+    (*it)->getHeroes(dst);
 }
 
 guint32 Player::removeDeadArmies(Stack *stack, std::list<History*> &history)
@@ -2290,7 +2271,7 @@ guint32 Player::removeDeadArmies(std::list<Stack*>& stacks,
                 continue;
               }
 
-          sit++;
+          ++sit;
         }
 
       debug("Is stack empty?")
@@ -2329,7 +2310,7 @@ guint32 Player::removeDeadArmies(std::list<Stack*>& stacks,
             it = stacks.erase(it);
           }
         else
-          it++;
+          ++it;
     }
   debug("after removeDead: num stacks = " << stacks.size());
   return count;
@@ -2345,7 +2326,7 @@ void Player::updateArmyValues(std::list<Stack*>& stacks, double xp_sum)
   std::list<Stack*>::iterator it;
   double numberarmy = 0;
 
-  for (it = stacks.begin(); it != stacks.end(); it++)
+  for (it = stacks.begin(); it != stacks.end(); ++it)
     numberarmy += (*it)->size();
 
   for (it = stacks.begin(); it != stacks.end(); )
@@ -2447,9 +2428,9 @@ void Player::updateArmyValues(std::list<Stack*>& stacks, double xp_sum)
 		  }
 		debug("Hero new XP=" << h->getXP())
 	      }
-	    sit++;
+	    ++sit;
 	  }
-      it++;
+      ++it;
     }
 }
 
@@ -3127,7 +3108,7 @@ bool Player::AI_maybeDisband(Stack *s, int safe_mp, bool &stack_killed)
     }
 
   //ungroup the lucky ones not being disbanded
-  for (Stack::reverse_iterator i = s->rbegin(); i != s->rend(); i++)
+  for (Stack::reverse_iterator i = s->rbegin(); i != s->rend(); ++i)
     {
       if ((*i)->isHero() == false)
 	{
@@ -3165,7 +3146,7 @@ bool Player::AI_maybeDisband(Stack *s, City *city, guint32 min_defenders,
 
   //before we move, ungroup the lucky ones not being disbanded
   unsigned int count = 0;
-  for (Stack::reverse_iterator i = s->rbegin(); i != s->rend(); i++)
+  for (Stack::reverse_iterator i = s->rbegin(); i != s->rend(); ++i)
     {
       if (count == min_defenders)
 	break;
@@ -3392,7 +3373,7 @@ bool Player::vectoredUnitArrives(VectoredUnit *unit)
       int turn = -1;
       std::list<History*> h = dest->getOwner()->getHistoryForCityId(dest->getId());
       std::list<History*>::const_iterator pit;
-      for (pit = h.begin(); pit != h.end(); pit++)
+      for (pit = h.begin(); pit != h.end(); ++pit)
         {
           switch ((*pit)->getType())
             {
@@ -3424,8 +3405,8 @@ bool Player::vectoredUnitArrives(VectoredUnit *unit)
 std::list<Action_Produce *> Player::getUnitsProducedThisTurn() const
 {
   std::list<Action_Produce *> actions;
-  std::list<Action *>::const_reverse_iterator it = d_actions.rbegin();
-  for (; it != d_actions.rend(); it++)
+  for (std::list<Action *>::const_reverse_iterator it = d_actions.rbegin();
+       it != d_actions.rend(); ++it)
     {
       if ((*it)->getType() == Action::PRODUCE_UNIT)
 	actions.push_back(dynamic_cast<Action_Produce*>(*it));
@@ -3466,8 +3447,8 @@ void Player::pruneCityProductions(std::list<Action*> &actions)
 
   //enumerate the ones we want
   std::list<Action_Production*> keepers;
-  std::list<Action*>::reverse_iterator ait;
-  for (ait = actions.rbegin(); ait != actions.rend(); ait++)
+  for ( std::list<Action*>::reverse_iterator ait = actions.rbegin();
+        ait != actions.rend(); ++ait)
     {
       if ((*ait)->getType() != Action::CITY_PROD)
 	continue;
@@ -3475,8 +3456,8 @@ void Player::pruneCityProductions(std::list<Action*> &actions)
 
       Action_Production *action = static_cast<Action_Production*>(*ait);
       bool found = false;
-      std::list<Action_Production*>::const_iterator it;
-      for (it = keepers.begin(); it != keepers.end(); it++)
+      for (std::list<Action_Production*>::const_iterator it = keepers.begin();
+           it != keepers.end(); ++it)
 	{
 	  if (action->getCityId() == (*it)->getCityId())
 	    {
@@ -3491,8 +3472,8 @@ void Player::pruneCityProductions(std::list<Action*> &actions)
 
   //now delete all city production events that aren't in keepers
   int total = 0;
-  std::list<Action*>::iterator bit;
-  for (bit = actions.begin(); bit != actions.end(); bit++)
+  for (std::list<Action*>::iterator bit = actions.begin();
+       bit != actions.end(); ++bit)
     {
       if ((*bit)->getType() != Action::CITY_PROD)
 	continue;
@@ -3513,8 +3494,8 @@ void Player::pruneCityVectorings(std::list<Action*> &actions)
 
   //enumerate the ones we want
   std::list<Action_Vector*> keepers;
-  std::list<Action*>::reverse_iterator ait;
-  for (ait = actions.rbegin(); ait != actions.rend(); ait++)
+  for (std::list<Action*>::reverse_iterator ait = actions.rbegin();
+       ait != actions.rend(); ++ait)
     {
       if ((*ait)->getType() != Action::CITY_VECTOR)
 	continue;
@@ -3522,8 +3503,8 @@ void Player::pruneCityVectorings(std::list<Action*> &actions)
 
       Action_Vector *action = static_cast<Action_Vector *>(*ait);
       bool found = false;
-      std::list<Action_Vector*>::const_iterator it;
-      for (it = keepers.begin(); it != keepers.end(); it++)
+      for (std::list<Action_Vector*>::const_iterator it = keepers.begin();
+           it != keepers.end(); ++it)
 	{
 	  if (action->getCityId() == (*it)->getCityId())
 	    {
@@ -3538,8 +3519,8 @@ void Player::pruneCityVectorings(std::list<Action*> &actions)
 
   //now delete all city vector events that aren't in keepers
   int total = 0;
-  std::list<Action*>::iterator bit;
-  for (bit = actions.begin(); bit != actions.end(); bit++)
+  for (std::list<Action*>::iterator bit = actions.begin();
+       bit != actions.end(); ++bit)
     {
       if ((*bit)->getType() != Action::CITY_VECTOR)
 	continue;
@@ -3614,7 +3595,7 @@ guint32 Player::countEndTurnHistoryEntries() const
 {
   guint32 count = 0;
   for (std::list<History*>::const_iterator it = d_history.begin();
-       it != d_history.end(); it++)
+       it != d_history.end(); ++it)
     {
       if ((*it)->getType() == History::END_TURN)
 	count++;
@@ -3627,7 +3608,7 @@ bool Player::searchedRuin(Ruin *r) const
   if (!r)
     return false;
   for (std::list<History*>::const_iterator it = d_history.begin();
-       it != d_history.end(); it++)
+       it != d_history.end(); ++it)
     {
       if ((*it)->getType() == History::HERO_RUIN_EXPLORED)
 	{
@@ -3645,7 +3626,7 @@ bool Player::conqueredCity(City *c, guint32 &turns_ago) const
   if (!c)
     return false;
   for (std::list<History*>::const_reverse_iterator it = d_history.rbegin();
-       it != d_history.rend(); it++)
+       it != d_history.rend(); ++it)
     {
       if ((*it)->getType() == History::CITY_WON)
 	{
@@ -3689,8 +3670,9 @@ std::list<Vector<int> > Player::getStackTrack(Stack *s) const
 std::list<History *>Player::getHistoryForCityId(guint32 id) const
 {
   std::list<History*> events;
-  std::list<History*>::const_iterator pit;
-  for (pit = d_history.begin(); pit != d_history.end(); pit++)
+  
+  for (std::list<History*>::const_iterator pit = d_history.begin();
+       pit != d_history.end(); ++pit)
     {
       switch ((*pit)->getType())
 	{
@@ -3726,8 +3708,8 @@ std::list<History *>Player::getHistoryForHeroId(guint32 id) const
 {
   Glib::ustring hero_name = "";
   std::list<History*> events;
-  std::list<History*>::const_iterator pit;
-  for (pit = d_history.begin(); pit != d_history.end(); pit++)
+  for (std::list<History*>::const_iterator pit = d_history.begin();
+       pit != d_history.end(); ++pit)
     {
       switch ((*pit)->getType())
 	{
@@ -3906,7 +3888,7 @@ Vector<int> Player::AI_getQuestDestination(Quest *quest, Stack *stack) const
           guint32 army_type = q->getArmytypeToKill();
           std::vector<Stack*> s =
             GameMap::getNearbyEnemyStacks(stack->getPos(), GameMap::getWidth());
-          for (std::vector<Stack*>::iterator i = s.begin(); i != s.end(); i++)
+          for (std::vector<Stack*>::iterator i = s.begin(); i != s.end(); ++i)
             {
               if ((*i)->hasArmyType(army_type) == true)
                 {
@@ -3921,7 +3903,7 @@ Vector<int> Player::AI_getQuestDestination(Quest *quest, Stack *stack) const
           QuestEnemyArmies *q = dynamic_cast<QuestEnemyArmies*>(quest);
           auto enemy = Playerlist::getInstance()->getPlayer(q->getVictimPlayerId());
           auto s = GameMap::getNearbyEnemyStacks(stack->getPos(), GameMap::getWidth());
-          for (std::vector<Stack*>::iterator i = s.begin(); i != s.end(); i++)
+          for (std::vector<Stack*>::iterator i = s.begin(); i != s.end(); ++i)
             {
               if ((*i)->getOwner() != enemy)
                 continue;
@@ -3949,7 +3931,7 @@ bool Player::AI_invadeCityQuestPreference(City *c, CityDefeatedAction &action) c
 {
   bool found = false;
   std::vector<Quest*> q = QuestsManager::getInstance()->getPlayerQuests(this);
-  for (std::vector<Quest*>::iterator i = q.begin(); i != q.end(); i++)
+  for (std::vector<Quest*>::iterator i = q.begin(); i != q.end(); ++i)
     {
       if (*i == NULL)
         continue;
@@ -4092,9 +4074,8 @@ bool Player::setPathOfStackToPreviousDestination(Stack *stack)
   if (moves.size() > 0)
     {
       Vector<int> dest = Vector<int>(-1,-1);
-      std::list<Action*>::const_reverse_iterator it =
-        moves.rbegin();
-      for (;it != moves.rend(); it++)
+      for (std::list<Action*>::const_reverse_iterator it = moves.rbegin();
+           it != moves.rend(); ++it)
         {
           if ((*it)->getType() != Action::STACK_MOVE)
             continue;
@@ -4162,8 +4143,8 @@ bool Player::doHeroUseItem(Hero *hero, Item *item, Player *victim,
       guint32 num_bags = 0;
       std::list<MapBackpack*> bags = GameMap::getInstance()->getBackpacks();
       num_bags = bags.size();
-      std::list<MapBackpack*>::iterator it = bags.begin();
-      for (; it != bags.end(); it++)
+      for (std::list<MapBackpack*>::iterator it = bags.begin();
+           it != bags.end(); ++it)
         doHeroPickupAllItems(hero, (*it)->getPos());
       bags_picked_up.emit(hero, num_bags);
     }
@@ -4323,10 +4304,10 @@ bool Player::getItemHolder(Item *item, Stack **stack, Hero **hero) const
 
 void Player::tallyDeadArmyTriumphs(std::list<Stack*> &stacks)
 {
-  std::list<Stack*>::iterator it;
-  for (it = stacks.begin(); it != stacks.end(); it++)
+  for (std::list<Stack*>::iterator it = stacks.begin();
+       it != stacks.end(); ++it)
     {
-      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); sit++)
+      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); ++sit)
         {
           if ((*sit)->getHP() > 0)
             continue;
@@ -4367,10 +4348,10 @@ History* Player::handleDeadHero(Hero *h, Maptile *tile, Vector<int> pos)
 
 void Player::handleDeadHeroes(std::list<Stack*> &stacks, std::list<History*> &history)
 {
-  std::list<Stack*>::iterator it;
-  for (it = stacks.begin(); it != stacks.end(); it++)
+  for (std::list<Stack*>::iterator it = stacks.begin();
+       it != stacks.end(); ++it)
     {
-      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); sit++)
+      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); ++sit)
         {
           if ((*sit)->getHP() > 0)
             continue;
@@ -4397,12 +4378,12 @@ void Player::handleDeadHeroes(std::list<Stack*> &stacks, std::list<History*> &hi
 void Player::handleDeadArmiesForQuests(std::list<Stack*> &stacks,
                                        std::vector<guint32> &culprits)
 {
-  std::list<Stack*>::iterator it;
-  for (it = stacks.begin(); it != stacks.end(); it++)
+  for (std::list<Stack*>::iterator it = stacks.begin();
+       it != stacks.end(); ++it)
     {
       if ((*it)->getOwner() == this)
         continue;
-      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); sit++)
+      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); ++sit)
         {
           if ((*sit)->getHP() == 0)
             QuestsManager::getInstance()->armyDied(*sit, culprits);
@@ -4414,12 +4395,12 @@ void Player::handleDeadArmiesForQuests(std::list<Stack*> &stacks,
 double Player::countXPFromDeadArmies(std::list<Stack*>& stacks)
 {
   double total = 0.0;
-  std::list<Stack*>::iterator it;
-  for (it = stacks.begin(); it != stacks.end(); it++)
+  for (std::list<Stack*>::iterator it = stacks.begin();
+       it != stacks.end(); ++it)
     {
       if ((*it)->getOwner() == this)
         continue;
-      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); sit++)
+      for (Stack::iterator sit = (*it)->begin(); sit != (*it)->end(); ++sit)
         {
           if ((*sit)->getHP() > 0)
             continue;
@@ -4581,8 +4562,8 @@ void Player::reportEndOfTurn()
 
 City *Player::getFirstCity() const
 {
-  std::list<History*>::const_iterator it;
-  for (it = d_history.begin(); it != d_history.end(); it++)
+  for (std::list<History*>::const_iterator it = d_history.begin();
+       it != d_history.end(); ++it)
     {
       if ((*it)->getType() == History::CITY_WON)
         {

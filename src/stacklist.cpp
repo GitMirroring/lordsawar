@@ -48,11 +48,11 @@ Glib::ustring Stacklist::d_tag = "stacklist";
 Vector<int> Stacklist::getPosition(guint32 id)
 {
     for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-        pit != Playerlist::getInstance()->end(); pit++)
+        pit != Playerlist::getInstance()->end(); ++pit)
     {
         Stacklist* mylist = (*pit)->getStacklist();
-        for (const_iterator it = mylist->begin(); it !=mylist->end(); it++)
-            for (Stack::const_iterator sit = (*it)->begin(); sit != (*it)->end(); sit++)
+        for (const_iterator it = mylist->begin(); it !=mylist->end(); ++it)
+            for (Stack::const_iterator sit = (*it)->begin(); sit != (*it)->end(); ++sit)
                 if ((*sit)->getId() == id)
                     return (*it)->getPos();
     }
@@ -64,10 +64,10 @@ Vector<int> Stacklist::getPosition(guint32 id)
 bool Stacklist::deleteStack(Stack* s)
 {
     for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-        pit != Playerlist::getInstance()->end(); pit++)
+        pit != Playerlist::getInstance()->end(); ++pit)
     {
         Stacklist* mylist = (*pit)->getStacklist();
-        for (const_iterator it = mylist->begin(); it != mylist->end(); it++)
+        for (const_iterator it = mylist->begin(); it != mylist->end(); ++it)
             if ((*it) == s)
                 return mylist->flRemove(s);
     }
@@ -77,10 +77,10 @@ bool Stacklist::deleteStack(Stack* s)
 bool Stacklist::deleteStack(guint32 id)
 {
     for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-        pit != Playerlist::getInstance()->end(); pit++)
+        pit != Playerlist::getInstance()->end(); ++pit)
     {
         Stacklist* mylist = (*pit)->getStacklist();
-        for (const_iterator it = mylist->begin(); it != mylist->end(); it++)
+        for (const_iterator it = mylist->begin(); it != mylist->end(); ++it)
             if ((*it)->getId() == id)
                 return mylist->flRemove(*it);
     }
@@ -90,20 +90,20 @@ bool Stacklist::deleteStack(guint32 id)
 guint32 Stacklist::calculateUpkeep() const
 {
   guint32 upkeep = 0;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     upkeep += (*it)->getUpkeep();
   return upkeep;
 }
 
 void Stacklist::payUpkeep(Player *p)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->payUpkeep(p);
 }
 
 bool Stacklist::check()
 {
-    for (iterator it = begin(); it != end(); it++)
+    for (iterator it = begin(); it != end(); ++it)
       {
         if ((*it)->getOwner()->isComputer() == false)
           continue;
@@ -112,7 +112,7 @@ bool Stacklist::check()
           {
 	      fprintf (stderr, "%lu stacks found on %d,%d\n", f.size(),
                        (*it)->getPos().x, (*it)->getPos().y);
-              for (std::vector<Stack*>::iterator t = f.begin(); t != f.end(); t++)
+              for (std::vector<Stack*>::iterator t = f.begin(); t != f.end(); ++t)
                 {
                   Stack *stack = *t;
                   if (stack)
@@ -131,7 +131,7 @@ bool Stacklist::check()
 
 void Stacklist::resetStacks()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->reset();
 }
 
@@ -140,8 +140,8 @@ void Stacklist::nextTurn()
     debug("nextTurn()");
     resetStacks();
 
-    for (iterator it = begin(); it != end(); it++)
-      for (iterator jit = begin(); jit != end(); jit++)
+    for (iterator it = begin(); it != end(); ++it)
+      for (iterator jit = begin(); jit != end(); ++jit)
 	if (*jit != *it)
 	  if ((*jit)->getId() == (*it)->getId())
 	    {
@@ -167,7 +167,7 @@ std::vector<Stack*> Stacklist::getDefendersInCity(const City *city)
 	    std::vector<Stack *>stacks =
 	      GameMap::getFriendlyStacks(p, city->getOwner());
 	    for (std::vector<Stack*>::iterator it = stacks.begin();
-		 it != stacks.end(); it++)
+		 it != stacks.end(); ++it)
 		stackvector.push_back(*it);
         }
     }
@@ -180,7 +180,7 @@ unsigned int Stacklist::getNoOfStacks()
     unsigned int mysize = 0;
 
     for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-        pit != Playerlist::getInstance()->end(); pit++)
+        pit != Playerlist::getInstance()->end(); ++pit)
       mysize += (*pit)->getStacklist()->size();
 
     return mysize;
@@ -191,7 +191,7 @@ unsigned int Stacklist::getNoOfArmies()
     unsigned int mysize = 0;
 
     for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-        pit != Playerlist::getInstance()->end(); pit++)
+        pit != Playerlist::getInstance()->end(); ++pit)
       mysize += (*pit)->getStacklist()->countArmies();
 
     return mysize;
@@ -201,7 +201,7 @@ unsigned int Stacklist::countArmies() const
 {
     unsigned int mysize = 0;
 
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
       mysize += (*it)->size();
 
     return mysize;
@@ -215,7 +215,7 @@ Stacklist::Stacklist()
 Stacklist::Stacklist(Stacklist *stacklist)
     :d_activestack(0)
 {
-    for (iterator it = stacklist->begin(); it != stacklist->end(); it++)
+    for (iterator it = stacklist->begin(); it != stacklist->end(); ++it)
       add(new Stack(**it));
 }
 
@@ -244,8 +244,8 @@ Stack* Stacklist::getNextMovable() const
     //first, if we already have an active stack, loop through until we meet it
     if (d_activestack)
     {
-        for (; *it != d_activestack; it++);
-        it++;   //we want to start with the next stack :)
+        for (; *it != d_activestack; ++it);
+        ++it;   //we want to start with the next stack :)
     }
 
     //continue looping until we meet the next not defending stack of this player
@@ -299,7 +299,7 @@ void Stacklist::flClear()
 {
     d_activestack = 0;
 
-    for (iterator it = begin(); it != end(); it++)
+    for (iterator it = begin(); it != end(); ++it)
       delete (*it);
 
     clear();
@@ -351,7 +351,7 @@ bool Stacklist::save(XML_Helper* helper) const
       retval &= helper->saveData("active", 0);
 
     //save stacks
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
 
     retval &= helper->closeTag();
@@ -361,7 +361,7 @@ bool Stacklist::save(XML_Helper* helper) const
 
 bool Stacklist::enoughMoves() const 
 {
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
     {
         Stack* s = *it;
         if (!s->getPath()->empty() && s->enoughMoves())
@@ -396,7 +396,7 @@ bool Stacklist::load(Glib::ustring tag, XML_Helper* helper)
 
 void Stacklist::getHeroes(std::vector<guint32>& dst) const
 {
-  for (Stacklist::const_iterator it = begin(); it != end(); it++)
+  for (Stacklist::const_iterator it = begin(); it != end(); ++it)
     (*it)->getHeroes(dst);
 }
 
@@ -407,7 +407,7 @@ void Stacklist::collectTaxes(Player *p, guint32 num_cities) const
 
   //now let's see if we have any items that give us gold per city
   for (std::vector<guint32>::iterator it = hero_ids.begin(); 
-       it != hero_ids.end(); it++)
+       it != hero_ids.end(); ++it)
     {
       Stack *stack = getArmyStackById(*it);
       Army *army = stack->getArmyById(*it);
@@ -428,7 +428,7 @@ bool Stacklist::canJumpOverTooLargeStack(Stack *s)
 {
   bool found = false;
   guint32 mp = s->getMoves();
-  for (Path::iterator it = s->getPath()->begin(); it != s->getPath()->end(); it++)
+  for (Path::iterator it = s->getPath()->begin(); it != s->getPath()->end(); ++it)
     {
       guint32 moves = s->calculateTileMovementCost(*it);
       if (moves > mp)
@@ -451,7 +451,7 @@ std::list<Hero*> Stacklist::getHeroes() const
   std::vector<guint32> hero_ids;
   getHeroes(hero_ids);
   for (std::vector<guint32>::const_iterator it = hero_ids.begin(); 
-       it != hero_ids.end(); it++)
+       it != hero_ids.end(); ++it)
     {
         Stack *s = getArmyStackById(*it);
 	if (s)
@@ -468,13 +468,13 @@ Hero *Stacklist::getNearestHero(Vector<int> pos, int dist) const
 {
   std::list<Hero*> heroes = getHeroes();
   LocationList<Location*> hero_locales;
-  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); it++)
+  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); ++it)
     hero_locales.push_back(new Location(getPosition((*it)->getId()), 1));
   Location *hero_locale = hero_locales.getNearestObjectBefore(pos, dist);
   if (hero_locale)
     {
       for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); 
-	   it++)
+	   ++it)
 	{
 	  if (getPosition((*it)->getId()) == hero_locale->getPos())
 	    return (*it);
@@ -552,14 +552,14 @@ void Stacklist::setActivestack(Stack* activestack)
 
 void Stacklist::drainAllMovement()
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     (*it)->drainMovement();
 }
 
 void Stacklist::changeOwnership(Player *old_owner, Player *new_owner)
 {
   StackReflist *stacks = new StackReflist(old_owner->getStacklist());
-  for (StackReflist::iterator it = stacks->begin(); it != stacks->end(); it++)
+  for (StackReflist::iterator it = stacks->begin(); it != stacks->end(); ++it)
     Stacklist::changeOwnership (*it, new_owner);
   delete stacks;
 }
@@ -579,7 +579,7 @@ Stack* Stacklist::changeOwnership(Stack *stack, Player *new_owner)
 std::list<Vector<int> > Stacklist::getPositions() const
 {
   std::list<Vector<int> > points;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if (std::find(points.begin(), points.end(), (*it)->getPos()) == 
           points.end())
@@ -591,7 +591,7 @@ std::list<Vector<int> > Stacklist::getPositions() const
 std::list<Stack*> Stacklist::getStacksWithItems() const
 {
   std::list<Stack*> stacks;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->countItems() > 0)
         stacks.push_back((*it));
@@ -602,7 +602,7 @@ std::list<Stack*> Stacklist::getStacksWithItems() const
 std::list<Stack*> Stacklist::kill()
 {
   std::list<Stack*> stacks;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       (*it)->kill();
       stacks.push_back(*it);
@@ -613,7 +613,7 @@ std::list<Stack*> Stacklist::kill()
 std::list<Stack*> Stacklist::killArmyUnitsInBoats()
 {
   std::list<Stack*> stacks;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->hasShip())
         {
@@ -627,7 +627,7 @@ std::list<Stack*> Stacklist::killArmyUnitsInBoats()
 std::list<Stack*> Stacklist::killArmies(guint32 army_type)
 {
   std::list<Stack*> stacks;
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->killArmies(army_type))
         stacks.push_back(*it);
@@ -638,7 +638,7 @@ std::list<Stack*> Stacklist::killArmies(guint32 army_type)
 std::list<Item*> Stacklist::getUsableItems() const
 {
   std::list<Item*> items;
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->hasUsableItem())
         (*it)->getUsableItems(items);
@@ -648,7 +648,7 @@ std::list<Item*> Stacklist::getUsableItems() const
 
 bool Stacklist::hasUsableItem() const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       if ((*it)->hasUsableItem())
         return true;
@@ -658,7 +658,7 @@ bool Stacklist::hasUsableItem() const
         
 bool Stacklist::getItemHolder(Item *item, Stack **stack, Hero **hero) const
 {
-  for (const_iterator it = begin(); it != end(); it++)
+  for (const_iterator it = begin(); it != end(); ++it)
     {
       *hero = (*it)->getHeroWithItem(item);
       if (*hero != NULL)
@@ -673,7 +673,7 @@ bool Stacklist::getItemHolder(Item *item, Stack **stack, Hero **hero) const
 guint32 Stacklist::countMovableStacks() const
 {
   guint32 count = 0;
-  for (const_iterator i = begin(); i != end(); i++)
+  for (const_iterator i = begin(); i != end(); ++i)
     {
       if (!(*i)->getParked() && (*i)->canMove())
         {

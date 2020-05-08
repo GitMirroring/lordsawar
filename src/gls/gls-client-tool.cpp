@@ -33,21 +33,18 @@
 #include "gls-client-tool.h"
 
 
-GlsClientTool::GlsClientTool(Glib::ustring host, int port, Profile *p, bool show_list, std::list<Glib::ustring> unadvertise, bool advertise, bool reload, Glib::ustring remove_all, bool terminate)
+GlsClientTool::GlsClientTool(Glib::ustring host, int port, Profile *p,
+                             bool show_list,
+                             const std::list<Glib::ustring> &unadvertise,
+                             bool advertise, bool reload,
+                             Glib::ustring remove_all, bool terminate)
+ : new_profile (NULL), profile (p), d_show_list (show_list),
+    d_unadvertise (unadvertise), d_advertise (advertise), d_reload (reload),
+    d_remove_all (remove_all), d_terminate (terminate), request_count (0)
 {
-  request_count = 0;
-  d_show_list = show_list;
-  d_unadvertise = unadvertise;
-  d_advertise = advertise;
-  d_reload = reload;
-  d_remove_all = remove_all;
-  d_terminate = terminate;
   GamelistClient *gamelistclient = GamelistClient::getInstance();
   Profilelist *plist = Profilelist::getInstance();
-  new_profile = NULL;
-  if (p)
-    profile = p;
-  else
+  if (!profile)
     {
       if (plist->size() > 0)
         profile = plist->front();
@@ -120,7 +117,7 @@ void GlsClientTool::on_got_list_response(RecentlyPlayedGameList *l, Glib::ustrin
                                                "Listing %1 games", l->size()),
                                     l->size());
   std::cout << s << std::endl;
-  for (RecentlyPlayedGameList::iterator i = l->begin(); i != l->end(); i++)
+  for (RecentlyPlayedGameList::iterator i = l->begin(); i != l->end(); ++i)
     {
       std::cout << std::endl;
       RecentlyPlayedNetworkedGame *g = 
@@ -148,7 +145,7 @@ void GlsClientTool::on_got_list_response_for_unadvertising(RecentlyPlayedGameLis
       return;
     }
   std::list<Glib::ustring> scenario_ids;
-  for (RecentlyPlayedGameList::iterator i = l->begin(); i != l->end(); i++)
+  for (RecentlyPlayedGameList::iterator i = l->begin(); i != l->end(); ++i)
     if ((*i)->getProfileId() == d_remove_all || d_remove_all == "-1") 
       scenario_ids.push_back((*i)->getId());
 
@@ -227,7 +224,7 @@ void GlsClientTool::unadvertise_games(std::list<Glib::ustring> scenario_ids)
   gamelistclient->received_advertising_removal_response.connect
     (sigc::mem_fun(*this, &GlsClientTool::on_got_unadvertise_response));
   for (std::list<Glib::ustring>::iterator i = scenario_ids.begin(); 
-       i != scenario_ids.end(); i++)
+       i != scenario_ids.end(); ++i)
     {
       request_count++;
       gamelistclient->request_advertising_removal(*i);

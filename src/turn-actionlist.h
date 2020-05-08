@@ -39,7 +39,7 @@ class TurnActionlist : public std::list<Action*>, public OwnerId, public sigc::t
 	static Glib::ustring d_tag; 
 
 	//! Default constructor.
-        TurnActionlist (const Player *p, const std::list<Action*> actions);
+        TurnActionlist (const Player *p, const std::list<Action*> &actions);
 
 	//! Loading constructor.
         TurnActionlist (XML_Helper* helper);

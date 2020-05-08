@@ -88,8 +88,8 @@ GameButtonBox::GameButtonBox(BaseObjectType* baseObject, const Glib::RefPtr<Gtk:
 
 void GameButtonBox::drop_connections()
 {
-  std::list<sigc::connection>::iterator it = connections.begin();
-  for (; it != connections.end(); it++) 
+  for (std::list<sigc::connection>::iterator it = connections.begin();
+       it != connections.end(); ++it) 
     (*it).disconnect();
   connections.clear();
 }
@@ -185,9 +185,4 @@ void GameButtonBox::change_diplomacy_button_image (bool proposals_present)
 void GameButtonBox::give_some_cheese()
 {
   end_turn_button->set_sensitive(false);
-}
-
-bool GameButtonBox::get_end_turn_button_sensitive()
-{
-  return end_turn_button->get_sensitive();
 }

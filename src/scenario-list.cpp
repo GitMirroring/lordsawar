@@ -74,7 +74,7 @@ bool ScenarioList::compare(const ScenarioDetails *lhs, const ScenarioDetails *rh
 
 ScenarioList::~ScenarioList()
 {
-  for (ScenarioList::iterator it = begin(); it != end(); it++)
+  for (ScenarioList::iterator it = begin(); it != end(); ++it)
     delete *it;
 }
 
@@ -94,7 +94,7 @@ bool ScenarioList::add_file (Glib::ustring filename)
 bool ScenarioList::remove_file (Glib::ustring filename)
 {
   std::list<ScenarioDetails*> del;
-  for (iterator i = begin (); i != end (); i++)
+  for (iterator i = begin (); i != end (); ++i)
     if ((*i)->getFilename () == filename)
       del.push_back (*i);
 
@@ -119,7 +119,7 @@ Glib::ustring ScenarioList::findFreeName (Glib::ustring name)
     {
       new_name = String::ucompose("%1 %2", name, count);
       bool found = false;
-      for (iterator i = begin (); i != end (); i++)
+      for (iterator i = begin (); i != end (); ++i)
         {
           if ((*i)->getName () == new_name)
             {

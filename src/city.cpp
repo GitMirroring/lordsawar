@@ -363,8 +363,8 @@ guint32 City::countDefenders() const
   defenders = getDefenders();
 
   guint32 armies = 0;
-  std::vector<Stack*>::iterator it = defenders.begin();
-  for (;it != defenders.end(); it++)
+  for (std::vector<Stack*>::iterator it = defenders.begin();
+       it != defenders.end(); ++it)
     armies += (*it)->size();
 
   return armies;
@@ -413,7 +413,7 @@ void City::sortProduction()
       productibles.sort(armyCompareStrength);
       j = 0;
       for (std::list<ArmyProdBase*>::iterator it = productibles.begin();
-	   it != productibles.end(); it++, j++)
+	   it != productibles.end(); ++it, j++)
        	(*this)[j]->setArmyProdBase(*it);
     }
   return;
@@ -546,7 +546,7 @@ std::list<Stack*> City::diseaseDefenders(double percent_to_kill)
   std::vector<guint32> ids;
   for (unsigned int i = 0; i < stacks.size(); i++)
     {
-      for (Stack::iterator j = stacks[i]->begin(); j != stacks[i]->end(); j++)
+      for (Stack::iterator j = stacks[i]->begin(); j != stacks[i]->end(); ++j)
         ids.push_back((*j)->getId());
     }
   std::random_shuffle(ids.begin(), ids.end());

@@ -803,23 +803,6 @@ void Game::on_temple_queried (Temple* t, bool brief)
     map_tip_changed.emit("", MapTipPosition(), false);
 }
 
-void Game::looting_city(City* city, int &gold)
-{
-  Player *attacker = Playerlist::getActiveplayer();
-  Player *defender = city->getOwner();
-  int amt = (defender->getGold() / 
-             (2 * Citylist::getInstance()->countCities (defender)) * 2);
-  // give (Enemy-Gold/(2Enemy-Cities)) to the attacker 
-  // and then take away twice that from the defender.
-  // the idea here is that some money is taken in the invasion
-  // and other monies are lost forever
-  defender->withdrawGold (amt);
-  amt /= 2;
-  attacker->addGold (amt);
-  gold = amt;
-  return;
-}
-
 void Game::invading_city(City* city, int gold)
 {
   Player *player = Playerlist::getInstance()->getActiveplayer();
@@ -1198,7 +1181,7 @@ void Game::center_view_on_city()
   //FIXME: if player is not to be observed, bail now
   // preferred city is a capital city that belongs to the player 
   for (Citylist::iterator i = Citylist::getInstance()->begin();
-       i != Citylist::getInstance()->end(); i++)
+       i != Citylist::getInstance()->end(); ++i)
     {
       City *c = *i;
       if (c->getOwner() == p && c->isCapital() &&
@@ -1212,7 +1195,7 @@ void Game::center_view_on_city()
 
   // okay, then find any city that belongs to the player and center on it
   for (Citylist::iterator i = Citylist::getInstance()->begin();
-       i != Citylist::getInstance()->end(); i++)
+       i != Citylist::getInstance()->end(); ++i)
     {
       City *c = *i;
       if (c->getOwner() == p)

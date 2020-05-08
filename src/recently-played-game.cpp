@@ -30,15 +30,14 @@ Glib::ustring RecentlyPlayedGame::d_tag = "recentlyplayedgame";
 #define debug(x)
 
 RecentlyPlayedGame::RecentlyPlayedGame(GameScenario *game_scenario, Profile *p)
+ : d_id (game_scenario->getId()), d_last_played(Glib::TimeVal()),
+    d_round (game_scenario->getRound()),
+    d_number_of_cities (Citylist::getInstance()->size()),
+    d_number_of_players (Playerlist::getInstance()->size() - 1),
+    d_playmode (GameScenario::PlayMode(game_scenario->getPlayMode())),
+    d_name (game_scenario->getName()), d_profile_id (p->getId())
 {
-  d_id = game_scenario->getId();
   d_last_played.assign_current_time();
-  d_round = game_scenario->getRound();
-  d_number_of_cities = Citylist::getInstance()->size();
-  d_number_of_players = Playerlist::getInstance()->size() - 1;
-  d_playmode = GameScenario::PlayMode(game_scenario->getPlayMode());
-  d_name = game_scenario->getName();
-  d_profile_id = p->getId();
 }
 
 RecentlyPlayedGame::RecentlyPlayedGame(XML_Helper* helper)

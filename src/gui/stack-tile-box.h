@@ -42,7 +42,6 @@ class StackTileBox: public Gtk::Box
 
     static StackTileBox * create();
     void on_stack_info_changed(Stack *s);
-    void setInhibit(bool inhibit) {d_inhibit = inhibit;};
     Stack * get_currently_selected_stack() const {return currently_selected_stack;};
     void show_stack(StackTile *s);
     void clear_selected_stack() {currently_selected_stack = NULL;};

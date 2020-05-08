@@ -26,11 +26,8 @@
 #define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::flush<<std::endl;}
 //#define debug(x)
 
-        bool d_computer_searched_temple;
-        bool d_computer_searched_ruin;
-        bool d_computer_got_quest;
 MoveResult::MoveResult()
-    : d_fight(false), d_stepCount(0), d_out_of_moves(false), 
+    : d_result (false), d_fight(false), d_stepCount(0), d_out_of_moves(false), 
     d_reached_end(false), d_treachery(false), d_considered_treachery(false),
     d_too_large_stack_in_the_way(false), d_fightResult(Fight::DRAW),
     d_move_aborted(false), d_computer_searched_temple(false), 

@@ -36,14 +36,10 @@
 #define debug(x)
 
 QuestCityRaze::QuestCityRaze (QuestsManager& mgr, guint32 hero) 
-  : Quest(mgr, hero, Quest::CITYRAZE)
+  : Quest(mgr, hero, Quest::CITYRAZE),
+    d_city (chooseToRaze (getHero ()->getOwner ())->getId ())
 {
-  // find us a victim
-  City* c = chooseToRaze(getHero()->getOwner());
-  assert(c);      // should never fail because isFeasible is checked first
-
-  d_city = c->getId();
-  d_targets.push_back(c->getPos());
+  d_targets.push_back(getCity ()->getPos());
   debug("city_id = " << d_city);
   initDescription();
 }
@@ -57,9 +53,8 @@ QuestCityRaze::QuestCityRaze (QuestsManager& q_mgr, XML_Helper* helper)
 }
 
 QuestCityRaze::QuestCityRaze (QuestsManager& mgr, guint32 hero, guint32 target) 
-  : Quest(mgr, hero, Quest::CITYRAZE)
+  : Quest(mgr, hero, Quest::CITYRAZE), d_city (target)
 {
-  d_city = target;
   d_targets.push_back(getCity()->getPos());
   initDescription();
 }

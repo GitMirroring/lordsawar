@@ -51,7 +51,7 @@ UseItemOnPlayerDialog::UseItemOnPlayerDialog(Gtk::Window &parent)
   xml->get_widget("map_eventbox", map_eventbox);
 
   Playerlist *pl = Playerlist::getInstance();
-  for (Playerlist::iterator it = pl->begin(); it != pl->end(); it++)
+  for (Playerlist::iterator it = pl->begin(); it != pl->end(); ++it)
     if ((*it) != pl->getActiveplayer() && pl->getNeutral() != (*it) &&
         (*it)->isDead() == false)
       addPlayer(*it);

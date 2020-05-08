@@ -31,21 +31,16 @@
 #include "GameScenario.h"
 #include "ghs-client-tool.h"
 
-GhsClientTool::GhsClientTool(Glib::ustring host, int port, Profile *p, bool show_list, bool reload, Glib::ustring unhost, Glib::ustring file, bool terminate)
+GhsClientTool::GhsClientTool(Glib::ustring host, int port, Profile *p,
+                             bool show_list, bool reload, Glib::ustring unhost,
+                             Glib::ustring file, bool terminate)
+ : new_profile (NULL), profile (p), d_host (host), d_show_list (show_list),
+    d_reload (reload), d_unhost (unhost), d_file_to_host (file),
+    d_terminate (terminate)
 {
-  d_host = host;
-  request_count = 0;
-  d_show_list = show_list;
-  d_reload = reload;
-  d_unhost = unhost;
-  d_file_to_host = file;
-  d_terminate = terminate;
   GamehostClient *gamehostclient = GamehostClient::getInstance();
   Profilelist *plist = Profilelist::getInstance();
-  new_profile = NULL;
-  if (p)
-    profile = p;
-  else
+  if (!profile)
     {
       if (plist->size() > 0)
         profile = plist->front();
@@ -85,7 +80,7 @@ void GhsClientTool::on_got_list_response(RecentlyPlayedGameList *l, Glib::ustrin
                                                "Listing %1 games", l->size()),
                                     l->size());
   std::cout << s << std::endl;
-  for (RecentlyPlayedGameList::iterator i = l->begin(); i != l->end(); i++)
+  for (RecentlyPlayedGameList::iterator i = l->begin(); i != l->end(); ++i)
     {
       std::cout << std::endl;
       RecentlyPlayedNetworkedGame *g = 

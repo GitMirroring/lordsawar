@@ -223,7 +223,6 @@ class TileSetWindow: public sigc::trackable
     void connect_tilestyle_treeview ();
     void disconnect_tilestyle_treeview ();
     void connect_tilestyleset_treeview ();
-    void disconnect_tilestyleset_treeview ();
 };
 
 #endif

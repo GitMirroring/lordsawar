@@ -30,11 +30,9 @@ Glib::ustring HostedGame::d_tag = "hostedgame";
 #define debug(x)
 
 HostedGame::HostedGame(AdvertisedGame *advertised_game)
+  : d_advertised_game (advertised_game), d_pid (0), unresponsive (false)
 {
-  unresponsive = false;
-  d_pid = 0;
   //watch out, not copying here.
-  d_advertised_game = advertised_game;
 }
 
 HostedGame::HostedGame(XML_Helper *helper)

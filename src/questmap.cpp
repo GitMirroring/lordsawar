@@ -39,7 +39,7 @@ void QuestMap::draw_stacks(Player *p, std::list< Vector<int> > targets)
   Gdk::RGBA cross_color = p->getColor();
   int size = int(pixels_per_tile) > 1 ? int(pixels_per_tile) : 1;
         
-  for (std::list< Vector<int> >::iterator it= targets.begin(); it != targets.end(); it++)
+  for (std::list< Vector<int> >::iterator it= targets.begin(); it != targets.end(); ++it)
   {
       Vector<int> pos = (*it);
 

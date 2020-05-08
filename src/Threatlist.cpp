@@ -56,7 +56,7 @@ void Threatlist::sortByDistance(Vector<int> pos)
 
     std::list<int> distances;
 
-    for (iterator it = begin(); it != end(); it++)
+    for (iterator it = begin(); it != end(); ++it)
     {
         //int dist = abs((*it)->getClosestPoint(pos).x - pos.x);
         //if (dist < abs((*it)->getClosestPoint(pos).y - pos.y))
@@ -74,13 +74,13 @@ void Threatlist::sortByDistance(Vector<int> pos)
         // setup
         std::list<int>::iterator dit = distances.begin();
         std::list<int>::iterator dnextit = distances.begin();
-        dnextit++;
+        ++dnextit;
 
         iterator it = begin();
         iterator nextit = it;
-        nextit++;
+        ++nextit;
 
-        for (; nextit != end(); it++, nextit++, dit++, dnextit++)
+        for (; nextit != end(); ++it, ++nextit, ++dit, ++dnextit)
             if ((*dit) > (*dnextit))
             {
                 // exchange the items in both lists
@@ -101,7 +101,7 @@ void Threatlist::sortByDistance(Vector<int> pos)
 
 void Threatlist::addStack(Stack *stack)
 {
-    for (iterator it = begin(); it != end(); it++)
+    for (iterator it = begin(); it != end(); ++it)
     {
         Threat *threat = *it;
         if (threat->Near(stack->getPos(), stack->getOwner()))
@@ -130,7 +130,7 @@ void Threatlist::findThreats(AICityInfo *info) const
     //shortcut
     Vector<int> location = info->getPos();
 
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
     {
         Threat *threat = *it;
         Vector<int> closestPoint = threat->getClosestPoint(location);
@@ -169,13 +169,13 @@ void Threatlist::findThreats(AICityInfo *info) const
 
 void Threatlist::deleteStack(guint32 id)
 {
-    for (Threatlist::iterator it = begin(); it != end(); it++)
+    for (Threatlist::iterator it = begin(); it != end(); ++it)
         (*it)->deleteStack(id);
 }
 
 void Threatlist::deleteStack(Stack* s)
 {
-    for (Threatlist::iterator it = begin(); it != end(); it++)
+    for (Threatlist::iterator it = begin(); it != end(); ++it)
         (*it)->deleteStack(s);
 }
 
@@ -183,7 +183,7 @@ Glib::ustring Threatlist::toString() const
 {
     Glib::ustring result = "{";
     bool first = true;
-    for (const_iterator it = begin(); it != end(); it++)
+    for (const_iterator it = begin(); it != end(); ++it)
     {
         if (first)
         {
@@ -201,7 +201,7 @@ Glib::ustring Threatlist::toString() const
 
 void Threatlist::flClear()
 {
-    for (iterator it = begin(); it != end(); it++)
+    for (iterator it = begin(); it != end(); ++it)
         delete (*it);
 
     clear();
@@ -227,7 +227,7 @@ bool Threatlist::flRemove(Threat* object)
 
 void Threatlist::changeOwnership(Player *old_owner, Player *new_owner)
 {
-  for (iterator it = begin(); it != end(); it++)
+  for (iterator it = begin(); it != end(); ++it)
     {
       (*it)->changeOwnership(old_owner, new_owner);
     }

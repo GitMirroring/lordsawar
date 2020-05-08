@@ -38,16 +38,15 @@
 #define method(x) sigc::mem_fun(*this, &HeroDialog::x)
 
 HeroDialog::HeroDialog(Gtk::Window &parent, Hero *h, Vector<int> p)
- : LwDialog(parent, "hero-dialog.ui")
+ : LwDialog(parent, "hero-dialog.ui"),
+  heroesmap (new HeroesMap(Playerlist::getActiveplayer()->getHeroes())),
+  hero (h), pos (p)
 {
   inhibit_hero_changed = false;
-  hero = h;
-  pos = p;
 
   xml->get_widget("map_image", map_image);
 
   std::list<Hero*> heroes = Playerlist::getActiveplayer()->getHeroes();
-  heroesmap = new HeroesMap(heroes);
   if (hero)
     heroesmap->setSelectedHero(hero);
   else
@@ -93,7 +92,7 @@ HeroDialog::HeroDialog(Gtk::Window &parent, Hero *h, Vector<int> p)
 
   heroes_list->clear();
   guint32 count = 0;
-  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); it++)
+  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); ++it)
     {
       add_hero (*it);
       if (*it == hero)
@@ -229,7 +228,7 @@ void HeroDialog::update_hero_list()
   std::list<Hero*> heroes;
   heroes = Playerlist::getActiveplayer()->getHeroes();
   guint32 count = 0;
-  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); it++)
+  for (std::list<Hero*>::iterator it = heroes.begin(); it != heroes.end(); ++it)
     {
       if (*it == hero)
         {
@@ -302,7 +301,7 @@ void HeroDialog::on_next_clicked()
   next = find (heroes.begin(), heroes.end(), hero);
   if (next != heroes.end())
     {
-      next++;
+      ++next;
       if (next == heroes.end())
 	next = heroes.begin();
       hero = *next;
@@ -312,6 +311,7 @@ void HeroDialog::on_next_clicked()
     }
   update_hero_list();
 }
+
 void HeroDialog::on_prev_clicked()
 {
   std::list<Hero*> heroes;
@@ -320,7 +320,7 @@ void HeroDialog::on_prev_clicked()
   prev = find (heroes.rbegin(), heroes.rend(), hero);
   if (prev != heroes.rend())
     {
-      prev++;
+      ++prev;
       if (prev == heroes.rend())
 	prev = heroes.rbegin();
       hero = *prev;
@@ -442,7 +442,7 @@ void HeroDialog::show_hero()
   events = hero->getOwner()->getHistoryForHeroId(hero->getId());
   events_list->clear();
   for (std::list<History*>::iterator i = events.begin(); i != events.end();
-       i++)
+       ++i)
     addHistoryEvent(*i);
 
   // populate the item list
@@ -452,7 +452,7 @@ void HeroDialog::show_hero()
     add_item(*i, true);
 
   MapBackpack *ground = GameMap::getInstance()->getTile(pos)->getBackpack();
-  for (MapBackpack::iterator i = ground->begin(); i != ground->end(); i++)
+  for (MapBackpack::iterator i = ground->begin(); i != ground->end(); ++i)
     add_item(*i, false);
 
   return;
