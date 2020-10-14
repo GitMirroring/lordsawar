@@ -1077,8 +1077,8 @@ bool GameScenario::autoSave()
   File::erase(File::getSaveFile(filename));
   if (File::rename(tmpfile, File::getSaveFile(filename)) == false)
     {
-      char* err = strerror(errno);
-      std::cerr << String::ucompose(_("Error! can't rename the temporary file `%1' to the autosave file `%2'.  %3"), tmpfile, File::getSaveFile(filename), err) << std::endl;
+      Glib::ustring errmsg = Glib::strerror(errno);
+      std::cerr << String::ucompose(_("Error! can't rename the temporary file `%1' to the autosave file `%2'.  %3"), tmpfile, File::getSaveFile(filename), errmsg) << std::endl;
       return false;
     }
   return true;
