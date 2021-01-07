@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Ben Asselstine
+// Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ TarFileImage::TarFileImage (const TarFileImage &i)
 {
   if (i.image)
     image = i.image->copy ();
-  frames.reserve (i.frames.size ());
+  frames.clear ();
   for (auto f : i.frames)
     frames.push_back (f->copy ());
 }
@@ -103,7 +103,7 @@ bool TarFileImage::loadFromFile (Glib::ustring filename)
       file_on_disk = filename;
       int size =
         p->get_unscaled_width () / number_of_frames;
-      frames.reserve (number_of_frames);
+      frames.resize (number_of_frames);
       dimension = Vector<int>(size,size);
     }
 
@@ -120,6 +120,7 @@ void TarFileImage::instantiateImages (Vector<int> scale_to_dimension)
   int h = image->get_unscaled_height ();
   int w = image->get_unscaled_width () / number_of_frames;
 
+  frames.clear ();
   Glib::RefPtr<Gdk::Pixbuf> row = image->to_pixbuf ();
   for (guint32 i = 0; i < number_of_frames; ++i)
     {
@@ -147,7 +148,7 @@ void TarFileImage::uninstantiateImages ()
         }
     }
   frames.clear ();
-  frames.reserve (oldsize);
+  frames.resize (oldsize);
 }
 
 void TarFileImage::clear (bool clear_name)

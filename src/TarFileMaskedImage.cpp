@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Ben Asselstine
+// Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ TarFileMaskedImage::TarFileMaskedImage (const TarFileMaskedImage &i)
 {
   if (i.image)
     image = i.image->copy ();
-  frames.reserve (i.frames.size ());
+  frames.clear ();
   for (auto f : i.frames)
     frames.push_back (std::make_pair (f.first->copy (), f.second->copy ()));
 }
@@ -109,13 +109,13 @@ bool TarFileMaskedImage::loadFromFile (Glib::ustring filename)
         {
           size = p->get_unscaled_width () / 2;
           calculated_number_of_frames = 1;
-          frames.reserve (calculated_number_of_frames);
+          frames.resize (calculated_number_of_frames);
         }
       else if (orientation == VERTICAL_MASK)
         {
           size = p->get_unscaled_height () / 2;
           calculated_number_of_frames = p->get_unscaled_width () / size;
-          frames.reserve (calculated_number_of_frames);
+          frames.resize (calculated_number_of_frames);
         }
       dimension = Vector<int>(size,size);
     }
@@ -135,6 +135,14 @@ void TarFileMaskedImage::instantiateImages (Vector<int> scale_to_dimension)
 
 void TarFileMaskedImage::instantiateHorizontal ()
 {
+  if (frames.empty () == false)
+    {
+      if (frames[0].first)
+        delete frames[0].first;
+      if (frames[0].second)
+        delete frames[0].second;
+      frames.clear ();
+    }
   frames.push_back (std::make_pair (image->cropLeftHalf (), image->cropRightHalf ()));
 }
 
@@ -159,6 +167,7 @@ void TarFileMaskedImage::instantiateVertical ()
     for (guint32 i = 0; i < masks.size (); i++)
       PixMask::scale(masks[i], scale_dimension.x, scale_dimension.y);
 
+  frames.clear ();
   for (guint32 i = 0; i < images.size (); i++)
     frames.push_back (std::make_pair (images[i], masks[i]));
   return;
@@ -183,7 +192,7 @@ void TarFileMaskedImage::uninstantiateImages ()
         }
     }
   frames.clear ();
-  frames.reserve (oldsize);
+  frames.resize (oldsize);
 }
 
 void TarFileMaskedImage::clear (bool clear_name)

@@ -1,7 +1,7 @@
 // Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
 // Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2016,
-// 2020 Ben Asselstine
+// 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -2167,12 +2167,6 @@ PixMask *ShieldPixMaskCacheItem::generate(const ShieldPixMaskCacheItem &i)
                                                             i.type, i.colour);
   Gdk::RGBA colour =
     Shieldsetlist::getInstance()->getColor(i.shieldset, i.colour);
-  if (sh->getMaskedImage ()->getNumberOfFrames () == 0)
-    {
-      bool broken = false;
-    Shieldsetlist::getInstance()->get (i.shieldset)->instantiateImages (true, broken);
-    printf ("broken is %d\n", broken);
-    }
   PixMask *p =sh->getMaskedImage ()->applyMask (colour);
   if (i.map)
     return p;
