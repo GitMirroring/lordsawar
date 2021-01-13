@@ -431,7 +431,7 @@ void MainWindow::setup_terrain_radiobuttons()
 	Tile *tile = (*tset)[i];
 	TerrainItem item;
 	item.button = manage(new Gtk::RadioButton);
-        item.button->set_tooltip_text(tile->getName());
+        //item.button->set_tooltip_text(tile->getName());
 	if (group_set)
 	    item.button->set_group(group);
 	else
@@ -440,9 +440,11 @@ void MainWindow::setup_terrain_radiobuttons()
 	    group_set = true;
 	}
 	item.button->property_draw_indicator() = false;
+        item.button->set_label (tile->getName ());
 
 	terrain_type_table->add (*item.button);
 	item.button->signal_toggled().connect(method(on_terrain_radiobutton_toggled));
+        /*
 	Glib::RefPtr<Gdk::Pixbuf> pic;
 	PixMask *pix = (*(*(*tile).begin())->begin())->getImage()->copy();
         int fs = FontSize::getInstance ()->get_height ();
@@ -453,6 +455,7 @@ void MainWindow::setup_terrain_radiobuttons()
         PixMask::scale (pix, new_width, new_height);
 	item.button->add(*manage(new Gtk::Image(pix->to_pixbuf())));
 	delete pix;
+        */
 
 	item.terrain = tile->getType();
 	terrain_items.push_back(item);
