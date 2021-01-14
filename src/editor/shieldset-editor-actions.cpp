@@ -53,15 +53,20 @@ ShieldSetEditorAction_Color::ShieldSetEditorAction_Color (const ShieldSetEditorA
 //-----------------------------------------------------------------------------
 //ShieldSetEditorAction_Properties
 
-ShieldSetEditorAction_Properties::ShieldSetEditorAction_Properties(Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l)
+ShieldSetEditorAction_Properties::ShieldSetEditorAction_Properties(Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 sw, guint32 sh, guint32 mw, guint32 mh, guint32 lw, guint32 lh)
  :ShieldSetEditorAction(ShieldSetEditorAction::CHANGE_PROPERTIES), d_name (n),
-    d_desc (d), d_copyright (c), d_license (l)
+    d_desc (d), d_copyright (c), d_license (l), d_small_width (sw),
+    d_small_height (sh), d_medium_width (mw), d_medium_height (mh),
+    d_large_width (lw), d_large_height (lh)
 {
 }
 
 ShieldSetEditorAction_Properties::ShieldSetEditorAction_Properties (const ShieldSetEditorAction_Properties &a)
 :ShieldSetEditorAction(a), d_name (a.d_name), d_desc(a.d_desc),
-    d_copyright(a.d_copyright), d_license (a.d_license)
+    d_copyright(a.d_copyright), d_license (a.d_license),
+    d_small_width (a.d_small_width), d_small_height (a.d_small_height),
+    d_medium_width (a.d_medium_width), d_medium_height (a.d_medium_height),
+    d_large_width (a.d_large_width), d_large_height (a.d_large_height)
 {
 }
 

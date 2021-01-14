@@ -642,16 +642,26 @@ void ShieldSetWindow::on_edit_shieldset_info_activated()
   if (changed)
     {
       ShieldSetEditorAction_Properties *action = 
-        new ShieldSetEditorAction_Properties (d_shieldset->getName (), 
-                                              d_shieldset->getInfo (),
-                                              d_shieldset->getCopyright (),
-                                              d_shieldset->getLicense ());
+        new ShieldSetEditorAction_Properties
+        (d_shieldset->getName (), 
+         d_shieldset->getInfo (),
+         d_shieldset->getCopyright (),
+         d_shieldset->getLicense (),
+         d_shieldset->getSmallWidth (), d_shieldset->getSmallHeight (),
+         d_shieldset->getMediumWidth (), d_shieldset->getMediumHeight (),
+         d_shieldset->getLargeWidth (), d_shieldset->getLargeHeight ());
       undos.push_front (action);
 
       d_shieldset->setName (d.getName ());
       d_shieldset->setInfo (d.getDescription ());
       d_shieldset->setCopyright (d.getCopyright ());
       d_shieldset->setLicense (d.getLicense ());
+      d_shieldset->setSmallWidth (d.getSmallWidth ());
+      d_shieldset->setSmallHeight (d.getSmallHeight ());
+      d_shieldset->setMediumWidth (d.getMediumWidth ());
+      d_shieldset->setMediumHeight (d.getMediumHeight ());
+      d_shieldset->setLargeWidth (d.getLargeWidth ());
+      d_shieldset->setLargeHeight (d.getLargeHeight ());
       needs_saving = true;
       update ();
     }
@@ -1290,6 +1300,12 @@ ShieldSetWindow::executeProperties (ShieldSetEditorAction_Properties *action)
   d_shieldset->setInfo (action->getDescription ());
   d_shieldset->setCopyright (action->getCopyright ());
   d_shieldset->setLicense (action->getLicense ());
+  d_shieldset->setSmallWidth (action->getSmallWidth ());
+  d_shieldset->setSmallHeight (action->getSmallHeight ());
+  d_shieldset->setMediumWidth (action->getMediumWidth ());
+  d_shieldset->setMediumHeight (action->getMediumHeight ());
+  d_shieldset->setLargeWidth (action->getLargeWidth ());
+  d_shieldset->setLargeHeight (action->getLargeHeight ());
   return;
 }
 
@@ -1348,7 +1364,10 @@ ShieldSetWindow::executeAction (ShieldSetEditorAction *action)
               (d_shieldset->getName (),
                d_shieldset->getInfo (),
                d_shieldset->getCopyright (),
-               d_shieldset->getLicense ());
+               d_shieldset->getLicense (),
+               d_shieldset->getSmallWidth (), d_shieldset->getSmallHeight (),
+               d_shieldset->getMediumWidth (), d_shieldset->getMediumHeight (),
+               d_shieldset->getLargeWidth (), d_shieldset->getLargeHeight ());
             executeProperties (a);
             break;
           }

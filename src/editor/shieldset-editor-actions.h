@@ -69,7 +69,7 @@ class ShieldSetEditorAction
 
 //! A record of the player's color changing in the shieldset editor.
 /**
- * The purpose of the ShieldsetEditorAction_Color class is to record
+ * The purpose of the ShieldSetEditorAction_Color class is to record
  * when a player's color has been modified.
  */
 class ShieldSetEditorAction_Color: public ShieldSetEditorAction
@@ -99,7 +99,7 @@ class ShieldSetEditorAction_Color: public ShieldSetEditorAction
 
 //! A record of the shieldset's properties changing in the editor.
 /**
- * The purpose of the ShieldsetEditorAction_Properties class is to record
+ * The purpose of the ShieldSetEditorAction_Properties class is to record
  * when a shieldset's name, description, copyright and license have changed.
  */
 class ShieldSetEditorAction_Properties: public ShieldSetEditorAction
@@ -108,9 +108,10 @@ class ShieldSetEditorAction_Properties: public ShieldSetEditorAction
 	//! Make a new change properties action
 	/**
          * Populate the change color action with the new name, description,
-         * copyright, and license text.
+         * copyright, license text, and shield image dimensions:
+         * small medium large, and width and heights.
          */
-        ShieldSetEditorAction_Properties (Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l);
+        ShieldSetEditorAction_Properties (Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 sw, guint32 sh, guint32 mw, guint32 mh, guint32 lw, guint32 lh);
 	//! Copy constructor
         ShieldSetEditorAction_Properties(const ShieldSetEditorAction_Properties &action);
 	//! Destroy a change properties action.
@@ -121,16 +122,23 @@ class ShieldSetEditorAction_Properties: public ShieldSetEditorAction
         Glib::ustring getCopyright () {return d_copyright;}
         Glib::ustring getLicense () {return d_license;}
 
-        void setName (Glib::ustring n) {d_name = n;}
-        void setDescription (Glib::ustring d) {d_desc = d;}
-        void setCopyright (Glib::ustring c) {d_copyright = c;}
-        void setLicense (Glib::ustring l) {d_license = l;}
-
+        guint32 getSmallWidth () {return d_small_width;}
+        guint32 getSmallHeight () {return d_small_height;}
+        guint32 getMediumWidth () {return d_medium_width;}
+        guint32 getMediumHeight () {return d_medium_height;}
+        guint32 getLargeWidth () {return d_large_width;}
+        guint32 getLargeHeight  () {return d_large_height;}
     private:
         Glib::ustring d_name;
         Glib::ustring d_desc;
         Glib::ustring d_copyright;
         Glib::ustring d_license;
+        guint32 d_small_width;
+        guint32 d_small_height;
+        guint32 d_medium_width;
+        guint32 d_medium_height;
+        guint32 d_large_width;
+        guint32 d_large_height;
 };
 
 //-----------------------------------------------------------------------------
@@ -157,7 +165,7 @@ class ShieldSetEditorAction_Save: public ShieldSetEditorAction
 
 //! A record of the shieldset's shields changing in the editor en masse.
 /**
- * The purpose of the ShieldsetEditorAction_WhiteDown class is to record
+ * The purpose of the ShieldSetEditorAction_WhiteDown class is to record
  * when a shieldset's white shields are copied down to the other shields.
  *
  * We take a copy of the whole shieldset to get all of the images in one
@@ -182,7 +190,7 @@ class ShieldSetEditorAction_WhiteDown: public ShieldSetEditorAction_Save
 
 //! A record of a shieldset image being added or replaced
 /**
- * The purpose of the ShieldsetEditorAction_AddImage class is to record
+ * The purpose of the ShieldSetEditorAction_AddImage class is to record
  * when we select a new file.
  *
  * We take a copy of the whole shieldset.  Our copy is a file on disk and
@@ -206,7 +214,7 @@ class ShieldSetEditorAction_AddImage: public ShieldSetEditorAction_Save
 
 //! A record of a shieldset image being cleared
 /**
- * The purpose of the ShieldsetEditorAction_ClearImage class is to record
+ * The purpose of the ShieldSetEditorAction_ClearImage class is to record
  * when we disassociate an image file with a shield or tartan.
  *
  * We take a copy of the whole shieldset.  Our copy is a file on disk and
