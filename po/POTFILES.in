@@ -308,6 +308,7 @@ src/editor/hero-editor-dialog.cpp
 src/editor/backpack-editor-dialog.cpp
 src/editor/shieldset-info-dialog.cpp
 src/editor/shieldset-window.cpp
+src/editor/shieldset-editor-actions.cpp
 src/editor/tileset-flag-editor-dialog.cpp
 src/editor/tileset-selector-editor-dialog.cpp
 src/editor/armyset-selector-editor-dialog.cpp

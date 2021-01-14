@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2010, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007-2010, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 
 #include "shieldset.h"
 #include "shieldstyle.h"
+#include "shieldset-editor-actions.h"
 
 class Shield;
 //! Shieldset Editor.  Edit an Shieldset.
@@ -34,7 +35,7 @@ class ShieldSetWindow: public sigc::trackable
 {
  public:
     ShieldSetWindow(Glib::ustring load_filename = "");
-    ~ShieldSetWindow() {delete window;}
+    ~ShieldSetWindow();
 
     void show() {window->show();}
     void hide() {window->hide();}
@@ -44,11 +45,13 @@ class ShieldSetWindow: public sigc::trackable
     sigc::signal<void, guint32> shieldset_saved;
 
  private:
+    bool needs_saving;
     Gtk::Window* window;
     Glib::ustring current_save_filename;
     Shieldset *d_shieldset; //current shieldset
     Shield *d_shield; //current shield
-    bool needs_saving;
+    std::list<ShieldSetEditorAction *> undos;
+    std::list<ShieldSetEditorAction *> redos;
     Gtk::TreeView *shields_treeview;
     Gtk::Image *small_image;
     Gtk::Image *medium_image;
@@ -61,6 +64,8 @@ class ShieldSetWindow: public sigc::trackable
     Gtk::MenuItem *save_shieldset_menuitem;
     Gtk::MenuItem *save_as_menuitem;
     Gtk::MenuItem *validate_shieldset_menuitem;
+    Gtk::MenuItem *edit_undo_menuitem;
+    Gtk::MenuItem *edit_redo_menuitem;
     Gtk::MenuItem *edit_shieldset_info_menuitem;
     Gtk::MenuItem *edit_copy_shields_menuitem;
     Gtk::MenuItem *quit_menuitem;
@@ -94,6 +99,8 @@ class ShieldSetWindow: public sigc::trackable
     void on_validate_shieldset_activated();
     void on_quit_activated();
     bool on_window_closed(GdkEventAny*);
+    void on_edit_undo_activated ();
+    void on_edit_redo_activated ();
     void on_edit_shieldset_info_activated();
     void on_edit_copy_shields_activated();
     void on_help_about_activated();
@@ -129,13 +136,23 @@ class ShieldSetWindow: public sigc::trackable
     Gtk::FileChooserDialog* image_filechooser (Glib::ustring title, bool clear);
 
     void update_shield_panel();
+    void update_menuitems ();
     void refresh_shields();
     void update_window_title();
+    void update ();
 
     bool isValidName ();
 
     void connect_shield_treeview();
     void disconnect_shield_treeview();
+
+    void clearUndoAndRedo ();
+    bool doReloadShieldset (ShieldSetEditorAction_Save *action);
+    bool replaceCurrentShieldset (Glib::ustring filename, bool &unsupported_version);
+
+    ShieldSetEditorAction *executeAction (ShieldSetEditorAction *a);
+    void executeColor (ShieldSetEditorAction_Color *a);
+    void executeProperties (ShieldSetEditorAction_Properties *a);
 };
 
 #endif

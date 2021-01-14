@@ -1,4 +1,4 @@
-// Copyright (C) 2017, 2020 Ben Asselstine
+// Copyright (C) 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -50,7 +50,8 @@ public:
     void clean_tmp_dir();
 
     bool saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring dest, std::vector<Glib::ustring> extrafiles) const;
-    Glib::ustring getBaseName() const {return d_basename;}
+    Glib::ustring getBaseName () const {return d_basename;}
+    Glib::ustring getExtension () const {return d_extension;}
 
     void setBaseName(Glib::ustring bname) {d_basename = bname;}
     void setExtension(Glib::ustring ext) {d_extension = ext;}
@@ -62,6 +63,7 @@ public:
     void setNewTemporaryFile ();
     //! when we open a file, we work on a copy of it
     void setLoadTemporaryFile ();
+
 private:
 
     Glib::ustring d_dir;

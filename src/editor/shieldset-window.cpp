@@ -1,5 +1,5 @@
 //  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017,
-//  2020 Ben Asselstine
+//  2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -79,6 +79,12 @@ ShieldSetWindow::ShieldSetWindow(Glib::ustring load_filename)
     validate_shieldset_menuitem->signal_activate().connect (method(on_validate_shieldset_activated));
     xml->get_widget("quit_menuitem", quit_menuitem);
     quit_menuitem->signal_activate().connect (method(on_quit_activated));
+    xml->get_widget("edit_undo_menuitem", edit_undo_menuitem);
+    edit_undo_menuitem->signal_activate().connect
+      (method(on_edit_undo_activated));
+    xml->get_widget("edit_redo_menuitem", edit_redo_menuitem);
+    edit_redo_menuitem->signal_activate().connect
+      (method(on_edit_redo_activated));
     xml->get_widget("edit_shieldset_info_menuitem", edit_shieldset_info_menuitem);
     edit_shieldset_info_menuitem->signal_activate().connect
       (method(on_edit_shieldset_info_activated));
@@ -134,11 +140,24 @@ ShieldSetWindow::ShieldSetWindow(Glib::ustring load_filename)
     if (load_filename.empty() == false)
       {
 	if (load_shieldset (load_filename))
-          {
-            update_shield_panel();
-            update_window_title();
-          }
+          update ();
       }
+}
+
+void ShieldSetWindow::clearUndoAndRedo ()
+{
+  for (auto a : redos)
+    delete a;
+  redos.clear ();
+  for (auto a : undos)
+    delete a;
+  undos.clear ();
+}
+
+ShieldSetWindow::~ShieldSetWindow()
+{
+  clearUndoAndRedo ();
+  delete window;
 }
 
 void
@@ -209,7 +228,8 @@ bool ShieldSetWindow::make_new_shieldset ()
   update_shield_panel();
   shields_treeview->set_cursor (Gtk::TreePath ("0"));
   needs_saving = true;
-  update_window_title();
+  clearUndoAndRedo ();
+  update ();
   return true;
 }
 
@@ -621,8 +641,19 @@ void ShieldSetWindow::on_edit_shieldset_info_activated()
   bool changed = d.run();
   if (changed)
     {
+      ShieldSetEditorAction_Properties *action = 
+        new ShieldSetEditorAction_Properties (d_shieldset->getName (), 
+                                              d_shieldset->getInfo (),
+                                              d_shieldset->getCopyright (),
+                                              d_shieldset->getLicense ());
+      undos.push_front (action);
+
+      d_shieldset->setName (d.getName ());
+      d_shieldset->setInfo (d.getDescription ());
+      d_shieldset->setCopyright (d.getCopyright ());
+      d_shieldset->setLicense (d.getLicense ());
       needs_saving = true;
-      update_window_title();
+      update ();
     }
 }
 
@@ -765,8 +796,9 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
   current_save_filename = filename;
 
   bool unsupported_version = false;
-  Shieldset *shieldset = Shieldset::create(filename, unsupported_version);
-  if (shieldset == NULL)
+  bool success = replaceCurrentShieldset (filename, unsupported_version);
+
+  if (!success)
     {
       Glib::ustring msg;
       if (unsupported_version)
@@ -778,13 +810,8 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
       dialog.run_and_hide ();
       return false;
     }
-  disconnect_shield_treeview ();
-  shields_list->clear();
-  connect_shield_treeview ();
-  if (d_shieldset)
-    delete d_shieldset;
-  d_shieldset = shieldset;
-  d_shieldset->setLoadTemporaryFile ();
+
+  clearUndoAndRedo ();
 
   bool broken = false;
   d_shieldset->instantiateImages(false, broken);
@@ -804,8 +831,7 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
       
   if (d_shieldset->empty () == false)
     shields_treeview->set_cursor (Gtk::TreePath ("0"));
-  update_shield_panel();
-  update_window_title();
+  update ();
   return true;
 }
 
@@ -903,8 +929,11 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
 	}
       else if (response == Gtk::RESPONSE_REJECT && f != "")
         {
+          ShieldSetEditorAction_ClearImage *action =
+            new ShieldSetEditorAction_ClearImage (d_shieldset);
           if (d_shieldset->removeFileInCfgFile(f))
             {
+              undos.push_front (action);
               d_shieldset->uninstantiateSameNamedImages
                 (ss->getMaskedImage()->getName ());
               d_shieldset->setHeightsAndWidthsFromImages(ss);
@@ -912,6 +941,7 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
             }
           else
             {
+              delete action;
               Glib::ustring errmsg = Glib::strerror(errno);
               TimedMessageDialog
                 td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
@@ -935,8 +965,12 @@ void ShieldSetWindow::on_player_color_changed()
     {
       Gtk::TreeModel::Row row = *iterrow;
       Shield *s = row[shields_columns.shield];
-      s->setColor(player_colorbutton->get_rgba());
+      ShieldSetEditorAction_Color *action = 
+        new ShieldSetEditorAction_Color (s->getOwner (), s->getColor ());
+      undos.push_front (action);
+      s->setColor(player_colorbutton->get_rgba ());
       update_shield_panel();
+      update_menuitems ();
       needs_saving = true;
       update_window_title();
     }
@@ -964,6 +998,10 @@ void ShieldSetWindow::update_window_title()
 
 void ShieldSetWindow::on_edit_copy_shields_activated()
 {
+  ShieldSetEditorAction_WhiteDown *action =
+    new ShieldSetEditorAction_WhiteDown (d_shieldset);
+  undos.push_front (action);
+
   Shield *w = d_shieldset->lookupShieldByColour (Shield::WHITE);
   for (guint32 i = Shield::WHITE + 1; i <= Shield::NEUTRAL; i++)
     {
@@ -985,8 +1023,7 @@ void ShieldSetWindow::on_edit_copy_shields_activated()
   needs_saving = true;
   bool broken = false;
   d_shieldset->instantiateImages (false, broken);
-  update_shield_panel ();
-  update_window_title ();
+  update ();
 }
 
 void ShieldSetWindow::refresh_shields()
@@ -1037,6 +1074,8 @@ Gtk::FileChooserDialog* ShieldSetWindow::shield_filechooser(Shield *s, ShieldSty
 
 void ShieldSetWindow::process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialog *d)
 {
+  ShieldSetEditorAction_AddImage *action =
+    new ShieldSetEditorAction_AddImage (d_shieldset);
   Glib::ustring newname = "";
   bool ret = false;
   if (ss->getMaskedImage()->getName() == "")
@@ -1046,14 +1085,17 @@ void ShieldSetWindow::process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialo
                                             d->get_filename(), newname);
   if (ret == true)
     {
+      undos.push_front (action);
       ss->getMaskedImage ()->uninstantiateImages ();
       ss->getMaskedImage ()->load (d_shieldset, newname);
       ss->getMaskedImage ()->instantiateImages ();
       needs_saving = true;
       update_window_title();
+      update_menuitems ();
     }
   else
     {
+      delete action;
       Glib::ustring errmsg = Glib::strerror(errno);
       TimedMessageDialog
         td(*d, String::ucompose(_("Couldn't add %1 to:\n%2\n%3"),
@@ -1106,15 +1148,20 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
         }
       else if (response == Gtk::RESPONSE_REJECT)
         {
+          ShieldSetEditorAction_ClearImage *action =
+            new ShieldSetEditorAction_ClearImage (d_shieldset);
           Glib::ustring file = shield->getTartanMaskedImage(type)->getName ();
           if (d_shieldset->removeFileInCfgFile(file))
             {
+              undos.push_front (action);
               d_shieldset->uninstantiateSameNamedImages
                 (shield->getTartanMaskedImage(type)->getName ());
+
               needs_saving = true;
             }
           else
             {
+              delete action;
               Glib::ustring errmsg = Glib::strerror(errno);
               TimedMessageDialog
                 td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
@@ -1131,6 +1178,9 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
 
 void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk::FileChooserDialog *d)
 {
+  ShieldSetEditorAction_AddImage *action =
+    new ShieldSetEditorAction_AddImage (d_shieldset);
+
   Glib::ustring newname = "";
   Glib::ustring f = shield->getTartanMaskedImage(type)->getName ();
   bool ret = false;
@@ -1140,15 +1190,18 @@ void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk:
     ret = d_shieldset->replaceFileInCfgFile(f, d->get_filename(), newname);
   if (ret == true)
     {
+      undos.push_front (action);
       TarFileMaskedImage *mim = shield->getTartanMaskedImage (type);
       mim->uninstantiateImages ();
       mim->load (d_shieldset, newname);
       mim->instantiateImages ();
       needs_saving = true;
       update_window_title();
+      update_menuitems ();
     }
   else
     {
+      delete action;
       Glib::ustring errmsg = Glib::strerror(errno);
       TimedMessageDialog
         td(*d, String::ucompose(_("Couldn't add %1 to:\n%2\n%3"),
@@ -1179,6 +1232,168 @@ void ShieldSetWindow::disconnect_shield_treeview()
     shield_selected_connection.disconnect ();
 }
 
+void ShieldSetWindow::on_edit_undo_activated ()
+{
+  ShieldSetEditorAction *a = undos.front ();
+  undos.pop_front ();
+  ShieldSetEditorAction *redo = executeAction (a);
+  if (redo)
+    redos.push_front (redo);
+  delete a;
+  if (undos.empty ())
+    needs_saving = false;
+  update ();
+}
+      
+void ShieldSetWindow::on_edit_redo_activated ()
+{
+  needs_saving = true;
+  ShieldSetEditorAction *a = redos.front ();
+  redos.pop_front ();
+  ShieldSetEditorAction *undo = executeAction (a);
+  delete a;
+  undos.push_front (undo);
+  update ();
+}
+
+void ShieldSetWindow::update_menuitems ()
+{
+  edit_redo_menuitem->set_sensitive (redos.empty () == false);
+  edit_undo_menuitem->set_sensitive (undos.empty () == false);
+}
+
+void ShieldSetWindow::update ()
+{
+  update_window_title ();
+  update_shield_panel ();
+  update_menuitems ();
+}
+
+void
+ShieldSetWindow::executeColor (ShieldSetEditorAction_Color *action)
+{
+  Gtk::TreeModel::iterator iterrow =
+    shields_treeview->get_selection()->get_selected();
+  Shield *active_shield = (*iterrow)[shields_columns.shield];
+
+  if (action->getPlayerId () == active_shield->getOwner ())
+    player_colorbutton->set_rgba (action->getColor ());
+  Shield *s = d_shieldset->lookupShieldByColour (action->getPlayerId ());
+  s->setColor (action->getColor ());
+  return;
+}
+
+void
+ShieldSetWindow::executeProperties (ShieldSetEditorAction_Properties *action)
+{
+  d_shieldset->setName (action->getName ());
+  d_shieldset->setInfo (action->getDescription ());
+  d_shieldset->setCopyright (action->getCopyright ());
+  d_shieldset->setLicense (action->getLicense ());
+  return;
+}
+
+bool ShieldSetWindow::doReloadShieldset (ShieldSetEditorAction_Save *action)
+{
+  Glib::RefPtr<Gtk::TreeSelection> s = shields_treeview->get_selection ();
+  std::vector<Gtk::TreeModel::Path> v = s->get_selected_rows ();
+
+  Glib::ustring olddir = d_shieldset->getDirectory ();
+  Glib::ustring oldname =
+    File::get_basename (d_shieldset->getConfigurationFile (true));
+  Glib::ustring oldext = d_shieldset->getExtension ();
+
+  bool unsupported = false;
+  replaceCurrentShieldset (action->getShieldsetFilename (), unsupported);
+
+  bool broken = false;
+  d_shieldset->instantiateImages(false, broken);
+
+  for (Shieldset::iterator i = d_shieldset->begin(); i != d_shieldset->end();
+       ++i)
+    add_shield_to_treeview (*i);
+      
+  shields_treeview->set_cursor (v[0]);
+  update ();
+
+  d_shieldset->setDirectory (olddir);
+  d_shieldset->setBaseName (oldname);
+  d_shieldset->setExtension (oldext);
+  return broken;
+}
+
+ShieldSetEditorAction*
+ShieldSetWindow::executeAction (ShieldSetEditorAction *action)
+{
+  ShieldSetEditorAction *out = NULL;
+
+    switch (action->getType ())
+      {
+      case ShieldSetEditorAction::CHANGE_COLOR:
+          {
+            ShieldSetEditorAction_Color *a =
+              dynamic_cast<ShieldSetEditorAction_Color*>(action);
+            ShieldSetEditorAction_Color *c =
+              new ShieldSetEditorAction_Color (*a);
+            c->setColor (player_colorbutton->get_rgba  ());
+            out = c;
+            executeColor (a);
+            break;
+          }
+      case ShieldSetEditorAction::CHANGE_PROPERTIES:
+          {
+            ShieldSetEditorAction_Properties *a =
+              dynamic_cast<ShieldSetEditorAction_Properties*>(action);
+            out = new ShieldSetEditorAction_Properties
+              (d_shieldset->getName (),
+               d_shieldset->getInfo (),
+               d_shieldset->getCopyright (),
+               d_shieldset->getLicense ());
+            executeProperties (a);
+            break;
+          }
+      case ShieldSetEditorAction::COPY_WHITE_DOWN:
+          {
+            ShieldSetEditorAction_WhiteDown *a =
+              dynamic_cast<ShieldSetEditorAction_WhiteDown*>(action);
+            out = new ShieldSetEditorAction_WhiteDown (d_shieldset);
+            doReloadShieldset (a);
+            break;
+          }
+      case ShieldSetEditorAction::ADD_IMAGE:
+          {
+            ShieldSetEditorAction_AddImage *a =
+              dynamic_cast<ShieldSetEditorAction_AddImage*>(action);
+            out = new ShieldSetEditorAction_AddImage (d_shieldset);
+            doReloadShieldset (a);
+            break;
+          }
+      case ShieldSetEditorAction::CLEAR_IMAGE:
+          {
+            ShieldSetEditorAction_ClearImage *a =
+              dynamic_cast<ShieldSetEditorAction_ClearImage*>(action);
+            out = new ShieldSetEditorAction_ClearImage (d_shieldset);
+            doReloadShieldset (a);
+            break;
+          }
+      }
+    return out;
+}
+
+bool ShieldSetWindow::replaceCurrentShieldset (Glib::ustring filename, bool &unsupported_version)
+{
+  Shieldset *shieldset = Shieldset::create(filename, unsupported_version);
+  if (unsupported_version || shieldset == NULL)
+    return false;
+  disconnect_shield_treeview ();
+  shields_list->clear();
+  connect_shield_treeview ();
+  if (d_shieldset)
+    delete d_shieldset;
+  d_shieldset = shieldset;
+  d_shieldset->setLoadTemporaryFile ();
+  return true;
+}
 /*
  some test cases
   1. create a new shieldset from scratch, save invalid set, close, load it

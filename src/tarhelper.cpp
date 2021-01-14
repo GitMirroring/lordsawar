@@ -1,4 +1,4 @@
-// Copyright (C) 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -251,6 +251,8 @@ Glib::ustring Tar_Helper::getFile(Tar_Helper *t, Glib::ustring filename, bool &b
       return outfile;
     }
 
+  //broken = true;
+  // couldn't find filename in t->pathname
   return "";
 }
 

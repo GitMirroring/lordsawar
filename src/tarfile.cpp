@@ -1,4 +1,4 @@
-// Copyright (C) 2017, 2020 Ben Asselstine
+// Copyright (C) 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -225,7 +225,7 @@ void TarFile::setNewTemporaryFile ()
 
 void TarFile::setLoadTemporaryFile ()
 {
-  Glib::ustring f = File::get_tmp_file ();
+  Glib::ustring f = File::get_tmp_file () + d_extension;
   File::copy (getConfigurationFile (), f);
   d_tmp_filename = f;
 }

@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -88,12 +88,17 @@ ShieldSetInfoDialog::ShieldSetInfoDialog(Gtk::Window &parent, Shieldset *s)
     (method(on_description_changed));
   xml->get_widget("notebook", notebook);
   on_name_changed ();
+  d_name = d_shieldset->getName ();
+  d_description = d_shieldset->getInfo ();
+  d_copyright = d_shieldset->getCopyright ();
+  d_license = d_shieldset->getLicense ();
   d_changed = false;
 }
 
 void ShieldSetInfoDialog::on_name_changed()
 {
   d_changed = true;
+  Glib::ustring oldname = d_shieldset->getName ();
   d_shieldset->setName (String::utrim (name_entry->get_text ()));
   close_button->set_sensitive (File::sanify (d_shieldset->getName ()) != "");
 
@@ -103,32 +108,34 @@ void ShieldSetInfoDialog::on_name_changed()
     status_label->set_text (_("That name is already in use."));
   else
     status_label->set_text ("");
+  d_shieldset->setName (oldname);
+  d_name = String::utrim (name_entry->get_text ());
 }
 
 bool ShieldSetInfoDialog::run()
 {
-    dialog->show_all();
-    dialog->run();
-    dialog->hide ();
-    return d_changed;
+  dialog->show_all();
+  dialog->run();
+  dialog->hide ();
+  return d_changed;
 }
 
 void ShieldSetInfoDialog::on_copyright_changed ()
 {
   d_changed = true;
-  d_shieldset->setCopyright(copyright_textview->get_buffer()->get_text());
+  d_copyright = copyright_textview->get_buffer()->get_text();
 }
 
 void ShieldSetInfoDialog::on_license_changed ()
 {
   d_changed = true;
-  d_shieldset->setLicense(license_textview->get_buffer()->get_text());
+  d_license = license_textview->get_buffer()->get_text();
 }
 
 void ShieldSetInfoDialog::on_description_changed ()
 {
   d_changed = true;
-  d_shieldset->setInfo(description_textview->get_buffer()->get_text());
+  d_description = description_textview->get_buffer()->get_text();
 }
 
 ShieldSetInfoDialog::~ShieldSetInfoDialog()

@@ -29,6 +29,7 @@ libeditutil_la_SOURCES = \
 
 libshieldsetwindow_la_SOURCES = \
 	shieldset-window.cpp shieldset-window.h \
+	shieldset-editor-actions.cpp shieldset-editor-actions.h \
 	shieldset-info-dialog.cpp shieldset-info-dialog.h
 
 libarmysetwindow_la_SOURCES = \
