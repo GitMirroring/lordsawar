@@ -24,9 +24,9 @@
 
 class Cityset;
 
-//! A record of an event in the shieldset editor
+//! A record of an event in the cityset editor
 /** 
- * The purpose of these classes is to implement undo/redo in the shieldset
+ * The purpose of these classes is to implement undo/redo in the cityset
  * editor.
  */
 
@@ -138,7 +138,7 @@ class CitySetEditorAction_AddImage: public CitySetEditorAction_Save
     public:
 	//! Make a new add-file action
 	/**
-         * Populate the add image action with the shieldset.
+         * Populate the add image action with the cityset.
          */
         CitySetEditorAction_AddImage (Cityset *s);
 	//! Copy constructor
@@ -152,7 +152,7 @@ class CitySetEditorAction_AddImage: public CitySetEditorAction_Save
 //! A record of a cityset image being cleared
 /**
  * The purpose of the CitySetEditorAction_ClearImage class is to record
- * when we disassociate an image file with a shield or tartan.
+ * when we disassociate an image file with a city, ruin, temple, port etc.
  *
  * We take a copy of the whole cityset.  Our copy is a file on disk and
  * is deleted when this class is destroyed.
