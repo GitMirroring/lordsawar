@@ -107,7 +107,7 @@ class ShieldSetEditorAction_Properties: public ShieldSetEditorAction
     public:
 	//! Make a new change properties action
 	/**
-         * Populate the change color action with the new name, description,
+         * Populate the properties action with the new name, description,
          * copyright, license text, and shield image dimensions:
          * small medium large, and width and heights.
          */

@@ -80,8 +80,8 @@ class CitySetEditorAction_Properties: public CitySetEditorAction
     public:
 	//! Make a new change properties action
 	/**
-         * Populate the change color action with the new name, description,
-         * copyright, and license text.
+         * Populate the properties action with the new name, description,
+         * copyright, license text, and tile size.
          */
         CitySetEditorAction_Properties (Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 ts);
 	//! Copy constructor
