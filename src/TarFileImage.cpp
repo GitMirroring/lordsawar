@@ -112,6 +112,8 @@ bool TarFileImage::loadFromFile (Glib::ustring filename)
 
 void TarFileImage::instantiateImages (Vector<int> scale_to_dimension)
 {
+  if (!image)
+    return;
   uninstantiateImages ();
   scale_dimension = scale_to_dimension;
   bool scale =

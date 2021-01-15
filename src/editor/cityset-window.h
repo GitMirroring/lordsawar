@@ -24,6 +24,7 @@
 #include <sigc++/signal.h>
 #include <sigc++/trackable.h>
 #include <gtkmm.h>
+#include "cityset-editor-actions.h"
 
 #include "cityset.h"
 
@@ -47,11 +48,15 @@ class CitySetWindow: public sigc::trackable
     Glib::ustring current_save_filename;
     Cityset *d_cityset; //current cityset
     bool needs_saving;
+    std::list<CitySetEditorAction *> undos;
+    std::list<CitySetEditorAction *> redos;
     Gtk::MenuItem *new_cityset_menuitem;
     Gtk::MenuItem *load_cityset_menuitem;
     Gtk::MenuItem *save_cityset_menuitem;
     Gtk::MenuItem *save_as_menuitem;
     Gtk::MenuItem *validate_cityset_menuitem;
+    Gtk::MenuItem *edit_undo_menuitem;
+    Gtk::MenuItem *edit_redo_menuitem;
     Gtk::MenuItem *edit_cityset_info_menuitem;
     Gtk::MenuItem *quit_menuitem;
     Gtk::MenuItem *help_about_menuitem;
@@ -84,6 +89,8 @@ class CitySetWindow: public sigc::trackable
     bool on_window_closed(GdkEventAny*);
     bool quit();
     void on_edit_cityset_info_activated();
+    void on_edit_undo_activated();
+    void on_edit_redo_activated();
     void on_help_about_activated();
     void on_tutorial_video_activated();
     void on_city_tile_width_changed();
@@ -112,7 +119,13 @@ class CitySetWindow: public sigc::trackable
     void connect_signals ();
     std::vector<sigc::connection> connections;
     guint32 getDefaultImageTileWidth ();
-
+    void clearUndoAndRedo ();
+    void update_menuitems ();
+    void update ();
+    CitySetEditorAction* executeAction (CitySetEditorAction *action);
+    void executeProperties (CitySetEditorAction_Properties *action);
+    void doReloadCityset (CitySetEditorAction_Save *action);
+    bool replaceCurrentCityset (Glib::ustring filename, bool &unsupported_version);
 };
 
 #endif

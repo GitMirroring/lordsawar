@@ -37,6 +37,12 @@ class ShieldSetInfoDialog: public LwEditorDialog
     Glib::ustring getDescription () const {return d_description;}
     Glib::ustring getCopyright () const {return d_copyright;}
     Glib::ustring getLicense () const {return d_license;}
+    guint32 getSmallWidth () const {return d_small_width;}
+    guint32 getSmallHeight () const {return d_small_height;}
+    guint32 getMediumWidth () const {return d_medium_width;}
+    guint32 getMediumHeight () const {return d_medium_height;}
+    guint32 getLargeWidth () const {return d_large_width;}
+    guint32 getLargeHeight () const {return d_large_height;}
 
  private:
     Shieldset *d_shieldset;
@@ -45,6 +51,12 @@ class ShieldSetInfoDialog: public LwEditorDialog
     Glib::ustring d_description;
     Glib::ustring d_copyright;
     Glib::ustring d_license;
+    guint32 d_small_width;
+    guint32 d_small_height;
+    guint32 d_medium_width;
+    guint32 d_medium_height;
+    guint32 d_large_width;
+    guint32 d_large_height;
     Gtk::Entry *name_entry;
     Gtk::TextView *copyright_textview;
     Gtk::TextView *license_textview;

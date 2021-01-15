@@ -92,6 +92,12 @@ ShieldSetInfoDialog::ShieldSetInfoDialog(Gtk::Window &parent, Shieldset *s)
   d_description = d_shieldset->getInfo ();
   d_copyright = d_shieldset->getCopyright ();
   d_license = d_shieldset->getLicense ();
+  d_small_width = d_shieldset->getSmallWidth ();
+  d_small_height = d_shieldset->getSmallHeight ();
+  d_medium_width = d_shieldset->getMediumWidth ();
+  d_medium_height = d_shieldset->getMediumHeight ();
+  d_large_width = d_shieldset->getLargeWidth ();
+  d_large_height = d_shieldset->getLargeHeight ();
   d_changed = false;
 }
 
@@ -146,37 +152,37 @@ ShieldSetInfoDialog::~ShieldSetInfoDialog()
 void ShieldSetInfoDialog::on_small_width_changed ()
 {
   d_changed = true;
-  d_shieldset->setSmallWidth (small_width_spinbutton->get_value ());
+  d_small_width = small_width_spinbutton->get_value ();
 }
 
 void ShieldSetInfoDialog::on_small_height_changed ()
 {
   d_changed = true;
-  d_shieldset->setSmallHeight (small_height_spinbutton->get_value ());
+  d_small_height = small_height_spinbutton->get_value ();
 }
 
 void ShieldSetInfoDialog::on_medium_width_changed ()
 {
   d_changed = true;
-  d_shieldset->setMediumWidth (medium_width_spinbutton->get_value ());
+  d_medium_width = medium_width_spinbutton->get_value ();
 }
 
 void ShieldSetInfoDialog::on_medium_height_changed ()
 {
   d_changed = true;
-  d_shieldset->setMediumHeight (medium_height_spinbutton->get_value ());
+  d_medium_height = medium_height_spinbutton->get_value ();
 }
 
 void ShieldSetInfoDialog::on_large_width_changed ()
 {
   d_changed = true;
-  d_shieldset->setLargeWidth (large_width_spinbutton->get_value ());
+  d_large_width = large_width_spinbutton->get_value ();
 }
 
 void ShieldSetInfoDialog::on_large_height_changed ()
 {
   d_changed = true;
-  d_shieldset->setLargeHeight (large_height_spinbutton->get_value ());
+  d_large_height = large_height_spinbutton->get_value ();
 }
 
 void ShieldSetInfoDialog::on_fit_pressed ()

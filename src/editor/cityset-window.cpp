@@ -75,6 +75,12 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
     xml->get_widget("edit_cityset_info_menuitem", edit_cityset_info_menuitem);
     edit_cityset_info_menuitem->signal_activate().connect
       (method(on_edit_cityset_info_activated));
+    xml->get_widget("edit_undo_menuitem", edit_undo_menuitem);
+    edit_undo_menuitem->signal_activate().connect
+      (method(on_edit_undo_activated));
+    xml->get_widget("edit_redo_menuitem", edit_redo_menuitem);
+    edit_redo_menuitem->signal_activate().connect
+      (method(on_edit_redo_activated));
     xml->get_widget ("help_about_menuitem", help_about_menuitem);
     help_about_menuitem->signal_activate().connect
        (method(on_help_about_activated));
@@ -83,23 +89,11 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
       (method(on_tutorial_video_activated));
     xml->get_widget("city_tile_width_spinbutton", city_tile_width_spinbutton);
     city_tile_width_spinbutton->set_range (1, 4);
-    city_tile_width_spinbutton->signal_changed().connect
-      (method(on_city_tile_width_changed));
-    city_tile_width_spinbutton->signal_insert_text().connect
-      (sigc::hide(sigc::hide(method(on_city_tile_width_text_changed))));
     xml->get_widget("ruin_tile_width_spinbutton", ruin_tile_width_spinbutton);
     ruin_tile_width_spinbutton->set_range (1, 4);
-    ruin_tile_width_spinbutton->signal_changed().connect
-      (method(on_ruin_tile_width_changed));
-    ruin_tile_width_spinbutton->signal_insert_text().connect
-      (sigc::hide(sigc::hide(method(on_ruin_tile_width_text_changed))));
     xml->get_widget("temple_tile_width_spinbutton",
 		    temple_tile_width_spinbutton);
     temple_tile_width_spinbutton->set_range (1, 4);
-    temple_tile_width_spinbutton->signal_changed().connect
-      (method(on_temple_tile_width_changed));
-    temple_tile_width_spinbutton->signal_insert_text().connect
-      (sigc::hide(sigc::hide(method(on_temple_tile_width_text_changed))));
 
     xml->get_widget("change_citypics_button", change_citypics_button);
     xml->get_widget("change_razedcitypics_button", change_razedcitypics_button);
@@ -117,8 +111,7 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
     if (load_filename.empty() == false)
       {
 	load_cityset (load_filename);
-	update_cityset_panel();
-        update_window_title();
+        update ();
       }
 }
 
@@ -148,17 +141,26 @@ void CitySetWindow::connect_signals ()
     (change_ruinpics_button->signal_clicked().connect
      (sigc::bind (method(on_change_clicked), _("Select a Ruin image"),
                   d_cityset->getRuin (),
-                 sigc::mem_fun (d_cityset, &Cityset::getRuinTileWidth))));
+                  sigc::mem_fun (d_cityset, &Cityset::getRuinTileWidth))));
   connections.push_back
     (change_templepic_button->signal_clicked().connect
      (sigc::bind (method(on_change_clicked), _("Select a Temple image"),
                   d_cityset->getTemple (),
-                 sigc::mem_fun (d_cityset, &Cityset::getTempleTileWidth))));
+                  sigc::mem_fun (d_cityset, &Cityset::getTempleTileWidth))));
   connections.push_back
     (change_towerpics_button->signal_clicked().connect
      (sigc::bind (method(on_change_clicked), _("Select a Tower image"),
                   d_cityset->getTower (),
                   method (getDefaultImageTileWidth))));
+  connections.push_back
+    (city_tile_width_spinbutton->signal_insert_text().connect
+     (sigc::hide(sigc::hide(method(on_city_tile_width_text_changed)))));
+  connections.push_back
+    (ruin_tile_width_spinbutton->signal_insert_text().connect
+     (sigc::hide(sigc::hide(method(on_ruin_tile_width_text_changed)))));
+  connections.push_back
+    (temple_tile_width_spinbutton->signal_insert_text().connect
+     (sigc::hide(sigc::hide(method(on_temple_tile_width_text_changed)))));
 }
 
 void CitySetWindow::disconnect_signals ()
@@ -244,7 +246,8 @@ bool CitySetWindow::make_new_cityset ()
 
   update_cityset_panel();
   needs_saving = true;
-  update_window_title();
+  clearUndoAndRedo ();
+  update ();
   return true;
 }
 
@@ -425,8 +428,21 @@ void CitySetWindow::on_edit_cityset_info_activated()
   bool changed = d.run();
   if (changed)
     {
+      CitySetEditorAction_Properties *action = 
+        new CitySetEditorAction_Properties
+        (d_cityset->getName (), 
+         d_cityset->getInfo (),
+         d_cityset->getCopyright (),
+         d_cityset->getLicense (),
+         d_cityset->getTileSize ());
+      undos.push_front (action);
+      d_cityset->setName (d.getName ());
+      d_cityset->setInfo (d.getDescription ());
+      d_cityset->setCopyright (d.getCopyright ());
+      d_cityset->setLicense (d.getLicense ());
+      d_cityset->setTileSize (d.getTileSize ());
       needs_saving = true;
-      update_window_title();
+      update ();
     }
 }
 
@@ -493,8 +509,8 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
   current_save_filename = filename;
 
   bool unsupported_version = false;
-  Cityset *cityset = Cityset::create(filename, unsupported_version);
-  if (cityset == NULL)
+  bool success = replaceCurrentCityset (filename, unsupported_version);
+  if (!success)
     {
       Glib::ustring msg;
       if (unsupported_version)
@@ -506,12 +522,6 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
       dialog.run_and_hide();
       return false;
     }
-  disconnect_signals ();
-  if (d_cityset)
-    delete d_cityset;
-  d_cityset = cityset;
-  connect_signals ();
-  d_cityset->setLoadTemporaryFile ();
 
   bool broken = false;
   d_cityset->instantiateImages(false, broken);
@@ -523,7 +533,7 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
       td.run_and_hide();
       return false;
     }
-  update_window_title();
+  update ();
   return true;
 }
 
@@ -588,9 +598,12 @@ void CitySetWindow::on_city_tile_width_changed()
 {
   if (!d_cityset)
     return;
+  CitySetEditorAction_CityWidth *action = 
+    new CitySetEditorAction_CityWidth (d_cityset->getCityTileWidth ());
+  undos.push_front (action);
   d_cityset->setCityTileWidth(city_tile_width_spinbutton->get_value());
   needs_saving = true;
-  update_window_title();
+  update ();
 }
 
 void CitySetWindow::on_ruin_tile_width_text_changed()
@@ -655,6 +668,8 @@ Glib::ustring CitySetWindow::change_image(Glib::ustring msg, TarFileImage *im,
   int response = d.run();
   if (response == Gtk::RESPONSE_ACCEPT && d.get_filename() != "")
     {
+      CitySetEditorAction_AddImage *action =
+        new CitySetEditorAction_AddImage (d_cityset);
       Glib::ustring newname = "";
       bool success = false;
       if (imgname.empty () == true)
@@ -664,24 +679,35 @@ Glib::ustring CitySetWindow::change_image(Glib::ustring msg, TarFileImage *im,
           d_cityset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
+          undos.push_front (action);
           newfile = newname;
           needs_saving = true;
-          update_window_title();
+          update ();
         }
       else
-        show_add_file_error(*d.get_dialog(), d.get_filename ());
+        {
+          delete action;
+          show_add_file_error(*d.get_dialog(), d.get_filename ());
+        }
     }
   else if (response == Gtk::RESPONSE_REJECT)
     {
+          
+      CitySetEditorAction_ClearImage *action =
+        new CitySetEditorAction_ClearImage (d_cityset);
       if (d_cityset->removeFileInCfgFile(imgname))
         {
+          undos.push_front (action);
           needs_saving = true;
-          update_window_title();
+          update ();
           cleared = true;
           newfile = "";
         }
       else
-        show_remove_file_error(*d.get_dialog(), imgname);
+        {
+          delete action;
+          show_remove_file_error(*d.get_dialog(), imgname);
+        }
     }
   return newfile;
 }
@@ -720,6 +746,7 @@ void CitySetWindow::show_remove_file_error(Gtk::Dialog &d, Glib::ustring file)
 CitySetWindow::~CitySetWindow()
 {
   notebook->property_show_tabs () = false;
+  clearUndoAndRedo ();
   delete window;
 }
 
@@ -899,6 +926,175 @@ guint32 CitySetWindow::getDefaultImageTileWidth ()
   return 1;
 }
 
+void CitySetWindow::on_edit_undo_activated ()
+{
+  CitySetEditorAction *a = undos.front ();
+  undos.pop_front ();
+  CitySetEditorAction *redo = executeAction (a);
+  if (redo)
+    redos.push_front (redo);
+  delete a;
+  if (undos.empty ())
+    needs_saving = false;
+  update ();
+}
+      
+void CitySetWindow::on_edit_redo_activated ()
+{
+  needs_saving = true;
+  CitySetEditorAction *a = redos.front ();
+  redos.pop_front ();
+  CitySetEditorAction *undo = executeAction (a);
+  delete a;
+  undos.push_front (undo);
+  update ();
+}
+
+void CitySetWindow::update_menuitems ()
+{
+  edit_redo_menuitem->set_sensitive (redos.empty () == false);
+  edit_undo_menuitem->set_sensitive (undos.empty () == false);
+}
+
+CitySetEditorAction*
+CitySetWindow::executeAction (CitySetEditorAction *action)
+{
+  CitySetEditorAction *out = NULL;
+
+    switch (action->getType ())
+      {
+      case CitySetEditorAction::CHANGE_PROPERTIES:
+          {
+            CitySetEditorAction_Properties *a =
+              dynamic_cast<CitySetEditorAction_Properties*>(action);
+            out = new CitySetEditorAction_Properties
+              (d_cityset->getName (),
+               d_cityset->getInfo (),
+               d_cityset->getCopyright (),
+               d_cityset->getLicense (),
+               d_cityset->getTileSize ());
+            executeProperties (a);
+            break;
+          }
+      case CitySetEditorAction::ADD_IMAGE:
+          {
+            CitySetEditorAction_AddImage *a =
+              dynamic_cast<CitySetEditorAction_AddImage*>(action);
+            out = new CitySetEditorAction_AddImage (d_cityset);
+            doReloadCityset (a);
+            break;
+          }
+      case CitySetEditorAction::CLEAR_IMAGE:
+          {
+            CitySetEditorAction_ClearImage *a =
+              dynamic_cast<CitySetEditorAction_ClearImage*>(action);
+            out = new CitySetEditorAction_ClearImage (d_cityset);
+            doReloadCityset (a);
+            break;
+          }
+      case CitySetEditorAction::CITY_TILE_WIDTH:
+          {
+            CitySetEditorAction_CityWidth *a =
+              dynamic_cast<CitySetEditorAction_CityWidth*>(action);
+            out = new CitySetEditorAction_CityWidth 
+              (d_cityset->getCityTileWidth ());
+            disconnect_signals ();
+            city_tile_width_spinbutton->set_text
+              (String::ucompose ("%1", a->getCityWidth ()));
+            connect_signals ();
+            d_cityset->setCityTileWidth (a->getCityWidth ());
+            break;
+          }
+      case CitySetEditorAction::RUIN_TILE_WIDTH:
+          {
+            CitySetEditorAction_RuinWidth *a =
+              dynamic_cast<CitySetEditorAction_RuinWidth*>(action);
+            out = new CitySetEditorAction_RuinWidth 
+              (d_cityset->getRuinTileWidth ());
+            disconnect_signals ();
+            ruin_tile_width_spinbutton->set_text
+              (String::ucompose ("%1", a->getRuinWidth ()));
+            connect_signals ();
+            d_cityset->setRuinTileWidth (a->getRuinWidth ());
+            break;
+          }
+      case CitySetEditorAction::TEMPLE_TILE_WIDTH:
+          {
+            CitySetEditorAction_TempleWidth *a =
+              dynamic_cast<CitySetEditorAction_TempleWidth*>(action);
+            out = new CitySetEditorAction_TempleWidth 
+              (d_cityset->getTempleTileWidth ());
+            disconnect_signals ();
+            temple_tile_width_spinbutton->set_text
+              (String::ucompose ("%1", a->getTempleWidth ()));
+            connect_signals ();
+            d_cityset->setTempleTileWidth (a->getTempleWidth ());
+            break;
+          }
+      }
+    return out;
+}
+
+void
+CitySetWindow::doReloadCityset (CitySetEditorAction_Save *action)
+{
+  Glib::ustring olddir = d_cityset->getDirectory ();
+  Glib::ustring oldname =
+    File::get_basename (d_cityset->getConfigurationFile (true));
+  Glib::ustring oldext = d_cityset->getExtension ();
+
+  bool unsupported = false;
+  replaceCurrentCityset (action->getCitysetFilename (), unsupported);
+
+  bool broken = false;
+  d_cityset->instantiateImages(false, broken);
+  d_cityset->setDirectory (olddir);
+  d_cityset->setBaseName (oldname);
+  d_cityset->setExtension (oldext);
+  update ();
+}
+
+bool CitySetWindow::replaceCurrentCityset (Glib::ustring filename, bool &unsupported_version)
+{
+  Cityset *cityset = Cityset::create(filename, unsupported_version);
+  if (cityset == NULL)
+    return false;
+  disconnect_signals ();
+  if (d_cityset)
+    delete d_cityset;
+  d_cityset = cityset;
+  connect_signals ();
+  d_cityset->setLoadTemporaryFile ();
+  return true;
+}
+
+void CitySetWindow::update ()
+{
+  update_window_title ();
+  update_cityset_panel ();
+  update_menuitems ();
+}
+
+void CitySetWindow::clearUndoAndRedo ()
+{
+  for (auto a : redos)
+    delete a;
+  redos.clear ();
+  for (auto a : undos)
+    delete a;
+  undos.clear ();
+}
+
+void
+CitySetWindow::executeProperties (CitySetEditorAction_Properties *action)
+{
+  d_cityset->setName (action->getName ());
+  d_cityset->setInfo (action->getDescription ());
+  d_cityset->setCopyright (action->getCopyright ());
+  d_cityset->setLicense (action->getLicense ());
+  d_cityset->setTileSize (action->getTileSize ());
+  return;
+}
 /*
  some test cases
   1. create a new cityset from scratch, save invalid set, close, load it
