@@ -959,7 +959,7 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
                                         errmsg), 0);
               td.run_and_hide ();
             }
-	  update_shield_panel();
+	  update ();
         }
       d->hide();
       delete d;
@@ -1100,8 +1100,7 @@ void ShieldSetWindow::process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialo
       ss->getMaskedImage ()->load (d_shieldset, newname);
       ss->getMaskedImage ()->instantiateImages ();
       needs_saving = true;
-      update_window_title();
-      update_menuitems ();
+      update ();
     }
   else
     {
@@ -1179,7 +1178,7 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
                                         errmsg), 0);
               td.run_and_hide ();
             }
-          update_shield_panel();
+          update ();
         }
       d->hide();
       delete d;
@@ -1206,8 +1205,7 @@ void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk:
       mim->load (d_shieldset, newname);
       mim->instantiateImages ();
       needs_saving = true;
-      update_window_title();
-      update_menuitems ();
+      update ();
     }
   else
     {
