@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -50,6 +50,8 @@ ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, doub
 
   if (im->getName ().empty () == false)
     clear_button->set_visible (true);
+  else
+    return;
 
   for (guint32 i = 0; i < d_num_frames; i++)
     {
