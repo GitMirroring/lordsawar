@@ -30,25 +30,12 @@ CitySetEditorAction::CitySetEditorAction(Type type)
 {
 }
 
-CitySetEditorAction::CitySetEditorAction(const CitySetEditorAction &action)
-:d_type(action.d_type)
-{
-
-}
-
 //-----------------------------------------------------------------------------
 //CitySetEditorAction_Properties
 
 CitySetEditorAction_Properties::CitySetEditorAction_Properties(Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 ts)
  :CitySetEditorAction(CitySetEditorAction::CHANGE_PROPERTIES), d_name (n),
     d_desc (d), d_copyright (c), d_license (l), d_tile_size (ts)
-{
-}
-
-CitySetEditorAction_Properties::CitySetEditorAction_Properties (const CitySetEditorAction_Properties &a)
-:CitySetEditorAction(a), d_name (a.d_name), d_desc(a.d_desc),
-    d_copyright(a.d_copyright), d_license (a.d_license),
-    d_tile_size (a.d_tile_size)
 {
 }
 
@@ -60,13 +47,6 @@ CitySetEditorAction_Save::CitySetEditorAction_Save(Cityset *c, Type t)
 {
   d_filename = File::get_tmp_file () + CITYSET_EXT;
   c->save (d_filename, CITYSET_EXT);
-}
-
-CitySetEditorAction_Save::CitySetEditorAction_Save (const CitySetEditorAction_Save &a)
-:CitySetEditorAction(a)
-{
-  d_filename = File::get_tmp_file () + CITYSET_EXT;
-  File::copy (a.d_filename, d_filename);
 }
 
 CitySetEditorAction_Save::~CitySetEditorAction_Save ()
@@ -82,21 +62,11 @@ CitySetEditorAction_AddImage::CitySetEditorAction_AddImage(Cityset *c)
 {
 }
 
-CitySetEditorAction_AddImage::CitySetEditorAction_AddImage (const CitySetEditorAction_AddImage &a)
-:CitySetEditorAction_Save(a)
-{
-}
-
 //-----------------------------------------------------------------------------
 //CitySetEditorAction_ClearImage
 
 CitySetEditorAction_ClearImage::CitySetEditorAction_ClearImage(Cityset *c)
  :CitySetEditorAction_Save (c, CitySetEditorAction::CLEAR_IMAGE)
-{
-}
-
-CitySetEditorAction_ClearImage::CitySetEditorAction_ClearImage (const CitySetEditorAction_ClearImage &a)
-:CitySetEditorAction_Save(a)
 {
 }
 
@@ -108,21 +78,11 @@ CitySetEditorAction_CityWidth::CitySetEditorAction_CityWidth(guint32 w)
 {
 }
 
-CitySetEditorAction_CityWidth::CitySetEditorAction_CityWidth (const CitySetEditorAction_CityWidth &a)
-:CitySetEditorAction (a), d_city_width (a.d_city_width)
-{
-}
-
 //-----------------------------------------------------------------------------
 //CitySetEditorAction_RuinWidth
 
 CitySetEditorAction_RuinWidth::CitySetEditorAction_RuinWidth(guint32 w)
  :CitySetEditorAction (CitySetEditorAction::RUIN_TILE_WIDTH), d_ruin_width (w)
-{
-}
-
-CitySetEditorAction_RuinWidth::CitySetEditorAction_RuinWidth (const CitySetEditorAction_RuinWidth &a)
-:CitySetEditorAction (a), d_ruin_width (a.d_ruin_width)
 {
 }
 
@@ -132,10 +92,5 @@ CitySetEditorAction_RuinWidth::CitySetEditorAction_RuinWidth (const CitySetEdito
 CitySetEditorAction_TempleWidth::CitySetEditorAction_TempleWidth(guint32 w)
  :CitySetEditorAction (CitySetEditorAction::TEMPLE_TILE_WIDTH),
     d_temple_width (w)
-{
-}
-
-CitySetEditorAction_TempleWidth::CitySetEditorAction_TempleWidth (const CitySetEditorAction_TempleWidth &a)
-:CitySetEditorAction (a), d_temple_width (a.d_temple_width)
 {
 }

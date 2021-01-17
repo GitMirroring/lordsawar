@@ -51,9 +51,6 @@ class ShieldSetEditorAction
 	//! Default constructor.
         ShieldSetEditorAction(Type type);
 
-	//! Copy constructor (shallow).
-	ShieldSetEditorAction(const ShieldSetEditorAction &action);
-
 	//! Destructor.
         virtual ~ShieldSetEditorAction() {};
 
@@ -80,15 +77,11 @@ class ShieldSetEditorAction_Color: public ShieldSetEditorAction
          * Populate the change color action with the player id and a color.
          */
         ShieldSetEditorAction_Color (guint32 player_id, Gdk::RGBA color);
-	//! Copy constructor
-        ShieldSetEditorAction_Color(const ShieldSetEditorAction_Color &action);
 	//! Destroy a change color action.
         ~ShieldSetEditorAction_Color () {};
 
         guint32 getPlayerId () const {return d_player_id;}
         Gdk::RGBA getColor () const {return d_color;}
-        void setPlayerId (guint32 id) {d_player_id = id;}
-        void setColor (Gdk::RGBA c) {d_color = c;}
 
     private:
         guint32 d_player_id;
@@ -112,8 +105,6 @@ class ShieldSetEditorAction_Properties: public ShieldSetEditorAction
          * small medium large, and width and heights.
          */
         ShieldSetEditorAction_Properties (Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 sw, guint32 sh, guint32 mw, guint32 mh, guint32 lw, guint32 lh);
-	//! Copy constructor
-        ShieldSetEditorAction_Properties(const ShieldSetEditorAction_Properties &action);
 	//! Destroy a change properties action.
         ~ShieldSetEditorAction_Properties () {};
 
@@ -153,7 +144,6 @@ class ShieldSetEditorAction_Save: public ShieldSetEditorAction
 {
     public:
         ShieldSetEditorAction_Save (Shieldset *s, Type t);
-        ShieldSetEditorAction_Save(const ShieldSetEditorAction_Save &action);
         ~ShieldSetEditorAction_Save ();
 
         Glib::ustring getShieldsetFilename () const {return d_filename;}
@@ -180,8 +170,6 @@ class ShieldSetEditorAction_WhiteDown: public ShieldSetEditorAction_Save
          * Populate the white down action with the shieldset.
          */
         ShieldSetEditorAction_WhiteDown (Shieldset *s);
-	//! Copy constructor
-        ShieldSetEditorAction_WhiteDown(const ShieldSetEditorAction_WhiteDown &action);
 	//! Destroy a white down action, and delete the file.
         ~ShieldSetEditorAction_WhiteDown () {};
 };
@@ -204,8 +192,6 @@ class ShieldSetEditorAction_AddImage: public ShieldSetEditorAction_Save
          * Populate the add image action with the shieldset.
          */
         ShieldSetEditorAction_AddImage (Shieldset *s);
-	//! Copy constructor
-        ShieldSetEditorAction_AddImage (const ShieldSetEditorAction_AddImage &action);
 	//! Destroy an add-image action, and delete the file.
         ~ShieldSetEditorAction_AddImage () {};
 };
@@ -228,8 +214,6 @@ class ShieldSetEditorAction_ClearImage: public ShieldSetEditorAction_Save
          * Populate the clear image action with the shieldset.
          */
         ShieldSetEditorAction_ClearImage (Shieldset *s);
-	//! Copy constructor
-        ShieldSetEditorAction_ClearImage (const ShieldSetEditorAction_ClearImage &action);
 	//! Destroy an clear-image action, and delete the file.
         ~ShieldSetEditorAction_ClearImage () {};
 };

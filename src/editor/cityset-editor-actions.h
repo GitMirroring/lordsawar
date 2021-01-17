@@ -53,9 +53,6 @@ class CitySetEditorAction
 	//! Default constructor.
         CitySetEditorAction(Type type);
 
-	//! Copy constructor (shallow).
-	CitySetEditorAction(const CitySetEditorAction &action);
-
 	//! Destructor.
         virtual ~CitySetEditorAction() {};
 
@@ -84,8 +81,6 @@ class CitySetEditorAction_Properties: public CitySetEditorAction
          * copyright, license text, and tile size.
          */
         CitySetEditorAction_Properties (Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 ts);
-	//! Copy constructor
-        CitySetEditorAction_Properties(const CitySetEditorAction_Properties &action);
 	//! Destroy a change properties action.
         ~CitySetEditorAction_Properties () {};
 
@@ -115,7 +110,6 @@ class CitySetEditorAction_Save: public CitySetEditorAction
 {
     public:
         CitySetEditorAction_Save (Cityset *s, Type t);
-        CitySetEditorAction_Save(const CitySetEditorAction_Save &action);
         ~CitySetEditorAction_Save ();
 
         Glib::ustring getCitysetFilename () const {return d_filename;}
@@ -141,8 +135,6 @@ class CitySetEditorAction_AddImage: public CitySetEditorAction_Save
          * Populate the add image action with the cityset.
          */
         CitySetEditorAction_AddImage (Cityset *s);
-	//! Copy constructor
-        CitySetEditorAction_AddImage (const CitySetEditorAction_AddImage &action);
 	//! Destroy an add-image action, and delete the file.
         ~CitySetEditorAction_AddImage () {};
 };
@@ -165,8 +157,6 @@ class CitySetEditorAction_ClearImage: public CitySetEditorAction_Save
          * Populate the clear image action with the cityset.
          */
         CitySetEditorAction_ClearImage (Cityset *s);
-	//! Copy constructor
-        CitySetEditorAction_ClearImage (const CitySetEditorAction_ClearImage &action);
 	//! Destroy an clear-image action, and delete the file.
         ~CitySetEditorAction_ClearImage () {};
 };
@@ -186,8 +176,6 @@ class CitySetEditorAction_CityWidth: public CitySetEditorAction
          * Populate the city width action with the width in tiles
          */
         CitySetEditorAction_CityWidth  (guint32 tiles);
-	//! Copy constructor
-        CitySetEditorAction_CityWidth (const CitySetEditorAction_CityWidth&action);
 	//! Destroy a city width action.
         ~CitySetEditorAction_CityWidth () {};
 
@@ -212,8 +200,6 @@ class CitySetEditorAction_RuinWidth: public CitySetEditorAction
          * Populate the ruin width action with the width in tiles
          */
         CitySetEditorAction_RuinWidth  (guint32 tiles);
-	//! Copy constructor
-        CitySetEditorAction_RuinWidth (const CitySetEditorAction_RuinWidth&action);
 	//! Destroy a ruin width action.
         ~CitySetEditorAction_RuinWidth () {};
 
@@ -238,8 +224,6 @@ class CitySetEditorAction_TempleWidth: public CitySetEditorAction
          * Populate the temple width action with the width in tiles
          */
         CitySetEditorAction_TempleWidth  (guint32 tiles);
-	//! Copy constructor
-        CitySetEditorAction_TempleWidth (const CitySetEditorAction_TempleWidth&action);
 	//! Destroy a temple width action.
         ~CitySetEditorAction_TempleWidth () {};
 

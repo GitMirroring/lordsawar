@@ -1347,10 +1347,9 @@ ShieldSetWindow::executeAction (ShieldSetEditorAction *action)
           {
             ShieldSetEditorAction_Color *a =
               dynamic_cast<ShieldSetEditorAction_Color*>(action);
-            ShieldSetEditorAction_Color *c =
-              new ShieldSetEditorAction_Color (*a);
-            c->setColor (player_colorbutton->get_rgba  ());
-            out = c;
+            out =
+              new ShieldSetEditorAction_Color (a->getPlayerId (), 
+                                               player_colorbutton->get_rgba ());
             executeColor (a);
             break;
           }
