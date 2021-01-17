@@ -67,6 +67,11 @@ ArmySetInfoDialog::ArmySetInfoDialog(Gtk::Window &parent, Armyset *armyset)
   size_spinbutton->signal_changed().connect (method(on_size_changed));
   fit_button->signal_clicked().connect (method(on_fit_pressed));
   on_name_changed ();
+  d_name = d_armyset->getName ();
+  d_description = d_armyset->getInfo ();
+  d_copyright = d_armyset->getCopyright ();
+  d_license = d_armyset->getLicense ();
+  d_tilesize = d_armyset->getTileSize ();
   d_changed = false;
 }
 

@@ -66,6 +66,11 @@ CitySetInfoDialog::CitySetInfoDialog(Gtk::Window &parent, Cityset *c)
     (method(on_description_changed));
   xml->get_widget("notebook", notebook);
   on_name_changed ();
+  d_name = d_cityset->getName ();
+  d_description = d_cityset->getInfo ();
+  d_copyright = d_cityset->getCopyright ();
+  d_license = d_cityset->getLicense ();
+  d_tilesize = d_cityset->getTileSize ();
   d_changed = false;
 }
 
