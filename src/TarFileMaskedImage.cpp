@@ -126,6 +126,8 @@ bool TarFileMaskedImage::loadFromFile (Glib::ustring filename)
 void TarFileMaskedImage::instantiateImages (Vector<int> scale_to_dimension)
 {
   uninstantiateImages ();
+  if (image == NULL)
+    return;
   scale_dimension = scale_to_dimension;
   if (orientation == HORIZONTAL_MASK)
     instantiateHorizontal ();

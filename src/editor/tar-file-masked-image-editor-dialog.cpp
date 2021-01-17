@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -121,7 +121,7 @@ void TarFileMaskedImageEditorDialog::update_panel()
       imagebutton->set_label (_("No image set"));
       show_image ();
     }
-  clear_button->set_visible (d_mim->getImage () == NULL);
+  clear_button->set_visible (d_mim->getImage () != NULL);
 }
 
 void TarFileMaskedImageEditorDialog::show_image()

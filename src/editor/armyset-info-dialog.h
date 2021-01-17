@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,9 +32,19 @@ class ArmySetInfoDialog: public LwEditorDialog
 
     bool run();
 
+    Glib::ustring getName () const {return d_name;}
+    Glib::ustring getDescription () const {return d_description;}
+    Glib::ustring getCopyright () const {return d_copyright;}
+    Glib::ustring getLicense () const {return d_license;}
+    guint32 getTileSize () const {return d_tilesize;}
  private:
     Armyset *d_armyset;
     bool d_changed;
+    Glib::ustring d_name;
+    Glib::ustring d_description;
+    Glib::ustring d_copyright;
+    Glib::ustring d_license;
+    guint32 d_tilesize;
     Gtk::Entry *name_entry;
     Gtk::TextView *copyright_textview;
     Gtk::TextView *license_textview;

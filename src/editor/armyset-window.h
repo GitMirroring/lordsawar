@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "armyproto.h"
 #include "armyset.h"
 #include "shield.h"
+#include "armyset-editor-actions.h"
 
 //! Armyset Editor.  Edit an Armyset.
 class ArmySetWindow: public sigc::trackable
@@ -48,9 +49,10 @@ class ArmySetWindow: public sigc::trackable
     Glib::ustring current_save_filename;
     Armyset *d_armyset; //current armyset
     ArmyProto *d_army; //current army
+    ArmySetEditorAction_Reorder *d_reorder_action;
     bool needs_saving;
-    bool inhibit_needs_saving;
-    bool inhibit_updates;
+    std::list<ArmySetEditorAction *> undos;
+    std::list<ArmySetEditorAction *> redos;
     Gtk::Image *white_image;
     Gtk::Image *green_image;
     Gtk::Image *yellow_image;
@@ -115,6 +117,8 @@ class ArmySetWindow: public sigc::trackable
     Gtk::MenuItem *save_armyset_menuitem;
     Gtk::MenuItem *save_as_menuitem;
     Gtk::MenuItem *validate_armyset_menuitem;
+    Gtk::MenuItem *edit_undo_menuitem;
+    Gtk::MenuItem *edit_redo_menuitem;
     Gtk::MenuItem *edit_armyset_info_menuitem;
     Gtk::MenuItem *edit_ship_picture_menuitem;
     Gtk::MenuItem *edit_standard_picture_menuitem;
@@ -136,7 +140,6 @@ class ArmySetWindow: public sigc::trackable
     };
     const ArmiesColumns armies_columns;
     Glib::RefPtr<Gtk::ListStore> armies_list;
-    bool inhibit_scrolldown;
 
     void addArmyType(guint32 army_type);
     void update_army_panel();
@@ -150,6 +153,8 @@ class ArmySetWindow: public sigc::trackable
     void on_quit_activated();
     bool on_window_closed(GdkEventAny*);
     bool quit();
+    void on_edit_undo_activated();
+    void on_edit_redo_activated();
     void on_edit_armyset_info_activated();
     void on_edit_standard_picture_activated();
     void on_edit_bag_picture_activated();
@@ -214,6 +219,20 @@ class ArmySetWindow: public sigc::trackable
     void sync_armies ();
     void instantiateOthers (ArmyProto *a, Shield::Colour c, Glib::ustring f);
     void on_army_moved ();
+    void update_menuitems ();
+    void update ();
+    ArmySetEditorAction* executeAction (ArmySetEditorAction *action);
+    void executeProperties (ArmySetEditorAction_Properties *action);
+    ArmyProto* getArmyByIndex (ArmySetEditorAction_ArmyIndex *a);
+    void doReloadArmyset (ArmySetEditorAction_Save *action);
+    bool replaceCurrentArmyset (Glib::ustring filename, bool &unsupported_version);
+    void clearUndoAndRedo ();
+    void on_drag_begin ();
+    void on_drag_end ();
+    int getCurIndex ();
+    void disconnect_signals ();
+    void connect_signals ();
+    std::vector<sigc::connection> connections;
 };
 
 #endif

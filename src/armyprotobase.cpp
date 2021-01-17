@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -67,4 +67,18 @@ bool ArmyProtoBase::saveData(XML_Helper* helper) const
   retval &= helper->saveData("production", d_production);
   retval &= ArmyBase::saveData(helper);
   return retval;
+}
+
+void ArmyProtoBase::setArmyBonus (guint32 b, bool flag)
+{
+  if ((d_army_bonus & b) != 0)
+    {
+      if (!flag)
+        d_army_bonus ^= b;
+    }
+  else
+    {
+      if (flag)
+        d_army_bonus |= b;
+    }
 }

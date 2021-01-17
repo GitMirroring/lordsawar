@@ -281,6 +281,7 @@ src/editor/select-hidden-ruin-dialog.cpp
 src/editor/armyset-info-dialog.cpp
 src/editor/cityset-info-dialog.cpp
 src/editor/armyset-window.cpp
+src/editor/armyset-editor-actions.cpp
 src/editor/cityset-window.cpp
 src/editor/cityset-editor-actions.cpp
 src/editor/rewardlist-dialog.cpp

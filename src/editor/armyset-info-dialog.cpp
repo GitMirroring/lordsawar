@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -73,6 +73,7 @@ ArmySetInfoDialog::ArmySetInfoDialog(Gtk::Window &parent, Armyset *armyset)
 void ArmySetInfoDialog::on_name_changed()
 {
   d_changed = true;
+  Glib::ustring oldname = d_armyset->getName ();
   d_armyset->setName (String::utrim (name_entry->get_text ()));
   close_button->set_sensitive (File::sanify (d_armyset->getName ()) != "");
 
@@ -82,6 +83,8 @@ void ArmySetInfoDialog::on_name_changed()
     status_label->set_text (_("That name is already in use."));
   else
     status_label->set_text ("");
+  d_armyset->setName (oldname);
+  d_name = String::utrim (name_entry->get_text ());
 }
 
 bool ArmySetInfoDialog::run()
@@ -95,19 +98,19 @@ bool ArmySetInfoDialog::run()
 void ArmySetInfoDialog::on_copyright_changed ()
 {
   d_changed = true;
-  d_armyset->setCopyright(copyright_textview->get_buffer()->get_text());
+  d_copyright = copyright_textview->get_buffer()->get_text();
 }
 
 void ArmySetInfoDialog::on_license_changed ()
 {
   d_changed = true;
-  d_armyset->setLicense(license_textview->get_buffer()->get_text());
+  d_license = license_textview->get_buffer()->get_text();
 }
 
 void ArmySetInfoDialog::on_description_changed ()
 {
   d_changed = true;
-  d_armyset->setInfo(description_textview->get_buffer()->get_text());
+  d_description = description_textview->get_buffer()->get_text();
 }
 
 ArmySetInfoDialog::~ArmySetInfoDialog()
@@ -118,7 +121,7 @@ ArmySetInfoDialog::~ArmySetInfoDialog()
 void ArmySetInfoDialog::on_size_changed()
 {
   d_changed = true;
-  d_armyset->setTileSize (size_spinbutton->get_value ());
+  d_tilesize = size_spinbutton->get_value ();
   on_name_changed ();
 }
 
