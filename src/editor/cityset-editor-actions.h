@@ -21,6 +21,7 @@
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
+#include "defs.h"
 
 class Cityset;
 
@@ -54,7 +55,10 @@ class CitySetEditorAction
         CitySetEditorAction(Type type);
 
 	//! Destructor.
-        virtual ~CitySetEditorAction() {};
+        virtual ~CitySetEditorAction() {}
+
+        //! Get the name of this action for the undo/redo menuitem.
+        virtual Glib::ustring getActionName () {return "";}
 
         //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}
@@ -83,6 +87,8 @@ class CitySetEditorAction_Properties: public CitySetEditorAction
         CitySetEditorAction_Properties (Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 ts);
 	//! Destroy a change properties action.
         ~CitySetEditorAction_Properties () {};
+
+        Glib::ustring getActionName () {return _("Properties");}
 
         Glib::ustring getName () {return d_name;}
         Glib::ustring getDescription () {return d_desc;}
@@ -137,6 +143,8 @@ class CitySetEditorAction_AddImage: public CitySetEditorAction_Save
         CitySetEditorAction_AddImage (Cityset *s);
 	//! Destroy an add-image action, and delete the file.
         ~CitySetEditorAction_AddImage () {};
+
+        Glib::ustring getActionName () {return _("Add Image");}
 };
 
 //-----------------------------------------------------------------------------
@@ -159,6 +167,8 @@ class CitySetEditorAction_ClearImage: public CitySetEditorAction_Save
         CitySetEditorAction_ClearImage (Cityset *s);
 	//! Destroy an clear-image action, and delete the file.
         ~CitySetEditorAction_ClearImage () {};
+
+        Glib::ustring getActionName () {return _("Clear Image");}
 };
 
 //-----------------------------------------------------------------------------
@@ -178,6 +188,8 @@ class CitySetEditorAction_CityWidth: public CitySetEditorAction
         CitySetEditorAction_CityWidth  (guint32 tiles);
 	//! Destroy a city width action.
         ~CitySetEditorAction_CityWidth () {};
+
+        Glib::ustring getActionName () {return _("City Width");}
 
         guint32 getCityWidth () const {return d_city_width;}
 
@@ -203,8 +215,9 @@ class CitySetEditorAction_RuinWidth: public CitySetEditorAction
 	//! Destroy a ruin width action.
         ~CitySetEditorAction_RuinWidth () {};
 
-        guint32 getRuinWidth () const {return d_ruin_width;}
+        Glib::ustring getActionName () {return _("Ruin Width");}
 
+        guint32 getRuinWidth () const {return d_ruin_width;}
     private:
         guint32 d_ruin_width;
 };
@@ -226,6 +239,8 @@ class CitySetEditorAction_TempleWidth: public CitySetEditorAction
         CitySetEditorAction_TempleWidth  (guint32 tiles);
 	//! Destroy a temple width action.
         ~CitySetEditorAction_TempleWidth () {};
+
+        Glib::ustring getActionName () {return _("Temple  Width");}
 
         guint32 getTempleWidth () const {return d_temple_width;}
 
