@@ -126,6 +126,7 @@ class CitySetWindow: public sigc::trackable
     void executeProperties (CitySetEditorAction_Properties *action);
     void doReloadCityset (CitySetEditorAction_Save *action);
     bool replaceCurrentCityset (Glib::ustring filename, bool &unsupported_version);
+    void addUndo(CitySetEditorAction *a);
 };
 
 #endif

@@ -153,6 +153,7 @@ class ShieldSetWindow: public sigc::trackable
     void disconnect_signals ();
     void connect_signals ();
     std::vector<sigc::connection> connections;
+    void addUndo(ShieldSetEditorAction *a);
 };
 
 #endif

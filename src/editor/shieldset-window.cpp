@@ -48,8 +48,8 @@
 #include "TarFileMaskedImage.h"
 
 Glib::ustring no_shield_msg = N_("No image set");
-
 Glib::ustring no_tartan_msg = N_("No image set");
+const int UNDO_LIMIT = 100;
 
 #define method(x) sigc::mem_fun(*this, &ShieldSetWindow::x)
 
@@ -653,7 +653,7 @@ void ShieldSetWindow::on_edit_shieldset_info_activated()
          d_shieldset->getSmallWidth (), d_shieldset->getSmallHeight (),
          d_shieldset->getMediumWidth (), d_shieldset->getMediumHeight (),
          d_shieldset->getLargeWidth (), d_shieldset->getLargeHeight ());
-      undos.push_front (action);
+      addUndo (action);
 
       d_shieldset->setName (d.getName ());
       d_shieldset->setInfo (d.getDescription ());
@@ -948,7 +948,7 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
             new ShieldSetEditorAction_ClearImage (d_shieldset);
           if (d_shieldset->removeFileInCfgFile(f))
             {
-              undos.push_front (action);
+              addUndo (action);
               d_shieldset->uninstantiateSameNamedImages
                 (ss->getMaskedImage()->getName ());
               d_shieldset->setHeightsAndWidthsFromImages(ss);
@@ -982,7 +982,7 @@ void ShieldSetWindow::on_player_color_changed()
       Shield *s = row[shields_columns.shield];
       ShieldSetEditorAction_Color *action = 
         new ShieldSetEditorAction_Color (s->getOwner (), s->getColor ());
-      undos.push_front (action);
+      addUndo (action);
       s->setColor(player_colorbutton->get_rgba ());
       update_shield_panel();
       update_menuitems ();
@@ -1015,7 +1015,7 @@ void ShieldSetWindow::on_edit_copy_shields_activated()
 {
   ShieldSetEditorAction_WhiteDown *action =
     new ShieldSetEditorAction_WhiteDown (d_shieldset);
-  undos.push_front (action);
+  addUndo (action);
 
   Shield *w = d_shieldset->lookupShieldByColour (Shield::WHITE);
   for (guint32 i = Shield::WHITE + 1; i <= Shield::NEUTRAL; i++)
@@ -1100,7 +1100,7 @@ void ShieldSetWindow::process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialo
                                             d->get_filename(), newname);
   if (ret == true)
     {
-      undos.push_front (action);
+      addUndo (action);
       ss->getMaskedImage ()->uninstantiateImages ();
       ss->getMaskedImage ()->load (d_shieldset, newname);
       ss->getMaskedImage ()->instantiateImages ();
@@ -1167,7 +1167,7 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
           Glib::ustring file = shield->getTartanMaskedImage(type)->getName ();
           if (d_shieldset->removeFileInCfgFile(file))
             {
-              undos.push_front (action);
+              addUndo (action);
               d_shieldset->uninstantiateSameNamedImages
                 (shield->getTartanMaskedImage(type)->getName ());
 
@@ -1204,7 +1204,7 @@ void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk:
     ret = d_shieldset->replaceFileInCfgFile(f, d->get_filename(), newname);
   if (ret == true)
     {
-      undos.push_front (action);
+      addUndo (action);
       TarFileMaskedImage *mim = shield->getTartanMaskedImage (type);
       mim->uninstantiateImages ();
       mim->load (d_shieldset, newname);
@@ -1239,7 +1239,11 @@ void ShieldSetWindow::on_edit_undo_activated ()
   undos.pop_front ();
   ShieldSetEditorAction *redo = executeAction (a);
   if (redo)
-    redos.push_front (redo);
+    {
+      redos.push_front (redo);
+      if (redos.size () > UNDO_LIMIT)
+        delete redos.back ();
+    }
   delete a;
   if (undos.empty ())
     needs_saving = false;
@@ -1254,6 +1258,8 @@ void ShieldSetWindow::on_edit_redo_activated ()
   ShieldSetEditorAction *undo = executeAction (a);
   delete a;
   undos.push_front (undo);
+  if (undos.size () > UNDO_LIMIT)
+    delete undos.back ();
   update ();
 }
 
@@ -1444,6 +1450,13 @@ void ShieldSetWindow::disconnect_signals ()
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();
+}
+    
+void ShieldSetWindow::addUndo (ShieldSetEditorAction *a)
+{
+  undos.push_front (a);
+  if (undos.size () > UNDO_LIMIT)
+    delete undos.back ();
 }
 /*
  some test cases

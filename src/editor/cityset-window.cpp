@@ -46,6 +46,7 @@
 #include "TarFileImage.h"
 
 #define method(x) sigc::mem_fun(*this, &CitySetWindow::x)
+const int UNDO_LIMIT = 100;
 
 CitySetWindow::CitySetWindow(Glib::ustring load_filename)
 {
@@ -436,7 +437,7 @@ void CitySetWindow::on_edit_cityset_info_activated()
          d_cityset->getCopyright (),
          d_cityset->getLicense (),
          d_cityset->getTileSize ());
-      undos.push_front (action);
+      addUndo (action);
       d_cityset->setName (d.getName ());
       d_cityset->setInfo (d.getDescription ());
       d_cityset->setCopyright (d.getCopyright ());
@@ -601,7 +602,7 @@ void CitySetWindow::on_city_tile_width_changed()
     return;
   CitySetEditorAction_CityWidth *action = 
     new CitySetEditorAction_CityWidth (d_cityset->getCityTileWidth ());
-  undos.push_front (action);
+  addUndo (action);
   d_cityset->setCityTileWidth(city_tile_width_spinbutton->get_value());
   needs_saving = true;
   update ();
@@ -617,6 +618,9 @@ void CitySetWindow::on_ruin_tile_width_changed()
 {
   if (!d_cityset)
     return;
+  CitySetEditorAction_RuinWidth *action = 
+    new CitySetEditorAction_RuinWidth (d_cityset->getRuinTileWidth ());
+  addUndo (action);
   d_cityset->setRuinTileWidth(ruin_tile_width_spinbutton->get_value());
   needs_saving = true;
   update_window_title();
@@ -632,6 +636,9 @@ void CitySetWindow::on_temple_tile_width_changed()
 {
   if (!d_cityset)
     return;
+  CitySetEditorAction_TempleWidth *action = 
+    new CitySetEditorAction_TempleWidth (d_cityset->getTempleTileWidth ());
+  addUndo (action);
   d_cityset->setTempleTileWidth(temple_tile_width_spinbutton->get_value());
   needs_saving = true;
   update_window_title();
@@ -680,7 +687,7 @@ Glib::ustring CitySetWindow::change_image(Glib::ustring msg, TarFileImage *im,
           d_cityset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          undos.push_front (action);
+          addUndo (action);
           newfile = newname;
           needs_saving = true;
           update ();
@@ -698,7 +705,7 @@ Glib::ustring CitySetWindow::change_image(Glib::ustring msg, TarFileImage *im,
         new CitySetEditorAction_ClearImage (d_cityset);
       if (d_cityset->removeFileInCfgFile(imgname))
         {
-          undos.push_front (action);
+          addUndo (action);
           needs_saving = true;
           update ();
           cleared = true;
@@ -933,7 +940,11 @@ void CitySetWindow::on_edit_undo_activated ()
   undos.pop_front ();
   CitySetEditorAction *redo = executeAction (a);
   if (redo)
-    redos.push_front (redo);
+    {
+      redos.push_front (redo);
+      if (redos.size () > UNDO_LIMIT)
+        delete redos.back ();
+    }
   delete a;
   if (undos.empty ())
     needs_saving = false;
@@ -948,6 +959,8 @@ void CitySetWindow::on_edit_redo_activated ()
   CitySetEditorAction *undo = executeAction (a);
   delete a;
   undos.push_front (undo);
+  if (undos.size () > UNDO_LIMIT)
+    delete undos.back ();
   update ();
 }
 
@@ -1101,6 +1114,13 @@ CitySetWindow::executeProperties (CitySetEditorAction_Properties *action)
   d_cityset->setLicense (action->getLicense ());
   d_cityset->setTileSize (action->getTileSize ());
   return;
+}
+
+void CitySetWindow::addUndo (CitySetEditorAction *a)
+{
+  undos.push_front (a);
+  if (undos.size () > UNDO_LIMIT)
+    delete undos.back ();
 }
 /*
  some test cases
