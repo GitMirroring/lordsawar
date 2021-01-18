@@ -222,10 +222,8 @@ class ArmySetWindow: public sigc::trackable
     void update_menuitems ();
     void update ();
     ArmySetEditorAction* executeAction (ArmySetEditorAction *action);
-    void executeProperties (ArmySetEditorAction_Properties *action);
     ArmyProto* getArmyByIndex (ArmySetEditorAction_ArmyIndex *a);
     void doReloadArmyset (ArmySetEditorAction_Save *action);
-    bool replaceCurrentArmyset (Glib::ustring filename, bool &unsupported_version);
     void clearUndoAndRedo ();
     void on_drag_begin ();
     void on_drag_end ();

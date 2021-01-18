@@ -511,8 +511,8 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
   current_save_filename = filename;
 
   bool unsupported_version = false;
-  bool success = replaceCurrentCityset (filename, unsupported_version);
-  if (!success)
+  Cityset *cityset = Cityset::create(filename, unsupported_version);
+  if (cityset == NULL || unsupported_version)
     {
       Glib::ustring msg;
       if (unsupported_version)
@@ -524,6 +524,12 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
       dialog.run_and_hide();
       return false;
     }
+  disconnect_signals ();
+  if (d_cityset)
+    delete d_cityset;
+  d_cityset = cityset;
+  connect_signals ();
+  d_cityset->setLoadTemporaryFile ();
 
   bool broken = false;
   d_cityset->instantiateImages(false, broken);
@@ -993,7 +999,11 @@ CitySetWindow::executeAction (CitySetEditorAction *action)
                d_cityset->getCopyright (),
                d_cityset->getLicense (),
                d_cityset->getTileSize ());
-            executeProperties (a);
+            d_cityset->setName (a->getName ());
+            d_cityset->setInfo (a->getDescription ());
+            d_cityset->setCopyright (a->getCopyright ());
+            d_cityset->setLicense (a->getLicense ());
+            d_cityset->setTileSize (a->getTileSize ());
             break;
           }
       case CitySetEditorAction::ADD_IMAGE:
@@ -1074,20 +1084,6 @@ CitySetWindow::doReloadCityset (CitySetEditorAction_Save *action)
   update ();
 }
 
-bool CitySetWindow::replaceCurrentCityset (Glib::ustring filename, bool &unsupported_version)
-{
-  Cityset *cityset = Cityset::create(filename, unsupported_version);
-  if (cityset == NULL)
-    return false;
-  disconnect_signals ();
-  if (d_cityset)
-    delete d_cityset;
-  d_cityset = cityset;
-  connect_signals ();
-  d_cityset->setLoadTemporaryFile ();
-  return true;
-}
-
 void CitySetWindow::update ()
 {
   update_window_title ();
@@ -1103,17 +1099,6 @@ void CitySetWindow::clearUndoAndRedo ()
   for (auto a : undos)
     delete a;
   undos.clear ();
-}
-
-void
-CitySetWindow::executeProperties (CitySetEditorAction_Properties *action)
-{
-  d_cityset->setName (action->getName ());
-  d_cityset->setInfo (action->getDescription ());
-  d_cityset->setCopyright (action->getCopyright ());
-  d_cityset->setLicense (action->getLicense ());
-  d_cityset->setTileSize (action->getTileSize ());
-  return;
 }
 
 void CitySetWindow::addUndo (CitySetEditorAction *a)

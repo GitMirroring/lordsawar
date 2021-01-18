@@ -1942,17 +1942,6 @@ ArmyProto* ArmySetWindow::getArmyByIndex (ArmySetEditorAction_ArmyIndex *i)
   return a;
 }
 
-void
-ArmySetWindow::executeProperties (ArmySetEditorAction_Properties *action)
-{
-  d_armyset->setName (action->getName ());
-  d_armyset->setInfo (action->getDescription ());
-  d_armyset->setCopyright (action->getCopyright ());
-  d_armyset->setLicense (action->getLicense ());
-  d_armyset->setTileSize (action->getTileSize ());
-  return;
-}
-
 ArmySetEditorAction*
 ArmySetWindow::executeAction (ArmySetEditorAction *action)
 {
@@ -1970,7 +1959,11 @@ ArmySetWindow::executeAction (ArmySetEditorAction *action)
                d_armyset->getCopyright (),
                d_armyset->getLicense (),
                d_armyset->getTileSize ());
-            executeProperties (a);
+            d_armyset->setName (a->getName ());
+            d_armyset->setInfo (a->getDescription ());
+            d_armyset->setCopyright (a->getCopyright ());
+            d_armyset->setLicense (a->getLicense ());
+            d_armyset->setTileSize (a->getTileSize ());
             break;
           }
       case ArmySetEditorAction::ADD_IMAGE:
@@ -2277,19 +2270,6 @@ ArmySetWindow::doReloadArmyset (ArmySetEditorAction_Save *action)
   d_armyset->setBaseName (oldname);
   d_armyset->setExtension (oldext);
   update ();
-}
-
-bool ArmySetWindow::replaceCurrentArmyset (Glib::ustring filename, bool &unsupported_version)
-{
-  Armyset *armyset = Armyset::create(filename, unsupported_version);
-  if (armyset == NULL || unsupported_version)
-    return false;
-  if (d_armyset)
-    delete d_armyset;
-  d_armyset = armyset;
-  d_armyset->setLoadTemporaryFile ();
-
-  return true;
 }
 
 void ArmySetWindow::clearUndoAndRedo ()

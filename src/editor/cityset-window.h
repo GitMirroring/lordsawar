@@ -123,9 +123,7 @@ class CitySetWindow: public sigc::trackable
     void update_menuitems ();
     void update ();
     CitySetEditorAction* executeAction (CitySetEditorAction *action);
-    void executeProperties (CitySetEditorAction_Properties *action);
     void doReloadCityset (CitySetEditorAction_Save *action);
-    bool replaceCurrentCityset (Glib::ustring filename, bool &unsupported_version);
     void addUndo(CitySetEditorAction *a);
 };
 

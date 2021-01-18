@@ -144,11 +144,9 @@ class ShieldSetWindow: public sigc::trackable
 
     void clearUndoAndRedo ();
     bool doReloadShieldset (ShieldSetEditorAction_Save *action);
-    bool replaceCurrentShieldset (Glib::ustring filename, bool &unsupported_version);
 
     ShieldSetEditorAction *executeAction (ShieldSetEditorAction *a);
     void executeColor (ShieldSetEditorAction_Color *a);
-    void executeProperties (ShieldSetEditorAction_Properties *a);
     int getCurIndex ();
     void disconnect_signals ();
     void connect_signals ();

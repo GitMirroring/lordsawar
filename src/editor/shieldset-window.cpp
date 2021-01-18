@@ -809,9 +809,8 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
   current_save_filename = filename;
 
   bool unsupported_version = false;
-  bool success = replaceCurrentShieldset (filename, unsupported_version);
-
-  if (!success)
+  Shieldset *shieldset = Shieldset::create(filename, unsupported_version);
+  if (unsupported_version || shieldset == NULL)
     {
       Glib::ustring msg;
       if (unsupported_version)
@@ -823,7 +822,10 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
       dialog.run_and_hide ();
       return false;
     }
-
+  if (d_shieldset)
+    delete d_shieldset;
+  d_shieldset = shieldset;
+  d_shieldset->setLoadTemporaryFile ();
 
   bool broken = false;
   d_shieldset->instantiateImages(false, broken);
@@ -1298,22 +1300,6 @@ ShieldSetWindow::executeColor (ShieldSetEditorAction_Color *action)
   return;
 }
 
-void
-ShieldSetWindow::executeProperties (ShieldSetEditorAction_Properties *action)
-{
-  d_shieldset->setName (action->getName ());
-  d_shieldset->setInfo (action->getDescription ());
-  d_shieldset->setCopyright (action->getCopyright ());
-  d_shieldset->setLicense (action->getLicense ());
-  d_shieldset->setSmallWidth (action->getSmallWidth ());
-  d_shieldset->setSmallHeight (action->getSmallHeight ());
-  d_shieldset->setMediumWidth (action->getMediumWidth ());
-  d_shieldset->setMediumHeight (action->getMediumHeight ());
-  d_shieldset->setLargeWidth (action->getLargeWidth ());
-  d_shieldset->setLargeHeight (action->getLargeHeight ());
-  return;
-}
-
 int ShieldSetWindow::getCurIndex ()
 {
   Glib::RefPtr<Gtk::TreeSelection> selection =
@@ -1395,7 +1381,16 @@ ShieldSetWindow::executeAction (ShieldSetEditorAction *action)
                d_shieldset->getSmallWidth (), d_shieldset->getSmallHeight (),
                d_shieldset->getMediumWidth (), d_shieldset->getMediumHeight (),
                d_shieldset->getLargeWidth (), d_shieldset->getLargeHeight ());
-            executeProperties (a);
+            d_shieldset->setName (a->getName ());
+            d_shieldset->setInfo (a->getDescription ());
+            d_shieldset->setCopyright (a->getCopyright ());
+            d_shieldset->setLicense (a->getLicense ());
+            d_shieldset->setSmallWidth (a->getSmallWidth ());
+            d_shieldset->setSmallHeight (a->getSmallHeight ());
+            d_shieldset->setMediumWidth (a->getMediumWidth ());
+            d_shieldset->setMediumHeight (a->getMediumHeight ());
+            d_shieldset->setLargeWidth (a->getLargeWidth ());
+            d_shieldset->setLargeHeight (a->getLargeHeight ());
             break;
           }
       case ShieldSetEditorAction::COPY_WHITE_DOWN:
@@ -1424,18 +1419,6 @@ ShieldSetWindow::executeAction (ShieldSetEditorAction *action)
           }
       }
     return out;
-}
-
-bool ShieldSetWindow::replaceCurrentShieldset (Glib::ustring filename, bool &unsupported_version)
-{
-  Shieldset *shieldset = Shieldset::create(filename, unsupported_version);
-  if (unsupported_version || shieldset == NULL)
-    return false;
-  if (d_shieldset)
-    delete d_shieldset;
-  d_shieldset = shieldset;
-  d_shieldset->setLoadTemporaryFile ();
-  return true;
 }
 
 void ShieldSetWindow::connect_signals ()
