@@ -2284,12 +2284,20 @@ TileSetWindow::doReloadTileset (TileSetEditorAction_Save *a)
       (*l)[tiles_columns.name] = (*i)->getName();
       (*l)[tiles_columns.tile] = *i;
     }
-  if (idx < 0)
-    tiles_treeview->set_cursor (Gtk::TreePath ("0"));
-  else if (d_tileset->size() >= idx)
-    tiles_treeview->set_cursor (Gtk::TreePath (String::ucompose ("%1", idx)));
-  else
-    tiles_treeview->set_cursor (Gtk::TreePath ("0"));
+  if (idx >= 0)
+    {
+      if (d_tileset->size() >= (guint32)idx)
+        tiles_treeview->set_cursor
+          (Gtk::TreePath (String::ucompose ("%1", idx)));
+      else
+        tiles_treeview->set_cursor (Gtk::TreePath ("0"));
+
+      Glib::RefPtr<Gtk::TreeSelection> selection =
+        tiles_treeview->get_selection();
+      Gtk::TreeModel::iterator i = selection->get_selected ();
+      tiles_treeview->scroll_to_row
+        (tiles_treeview->get_model ()->get_path (i));
+    }
   connect_signals ();
 
   d_tileset->setDirectory (olddir);
