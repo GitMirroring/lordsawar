@@ -750,6 +750,14 @@ void ArmySetWindow::on_edit_armyset_info_activated()
   bool changed = d.run();
   if (changed)
     {
+      ArmySetEditorAction_Properties *action = 
+        new ArmySetEditorAction_Properties
+        (d_armyset->getName (), 
+         d_armyset->getInfo (),
+         d_armyset->getCopyright (),
+         d_armyset->getLicense (),
+         d_armyset->getTileSize ());
+      undos.push_front (action);
       d_armyset->setName (d.getName ());
       d_armyset->setInfo (d.getDescription ());
       d_armyset->setCopyright (d.getCopyright ());
@@ -2290,6 +2298,7 @@ void ArmySetWindow::disconnect_signals ()
 {
   for (auto c : connections)
     c.disconnect ();
+  connections.clear ();
 }
 
 void ArmySetWindow::connect_signals ()
