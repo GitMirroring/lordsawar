@@ -1910,6 +1910,12 @@ void ArmySetWindow::update_menuitems ()
 {
   edit_redo_menuitem->set_sensitive (redos.empty () == false);
   edit_undo_menuitem->set_sensitive (undos.empty () == false);
+  if (undos.empty () == false)
+    edit_undo_menuitem->set_label
+      (String::ucompose (_("Undo %1"), undos.front ()->getActionName ()));
+  if (redos.empty () == false)
+    edit_redo_menuitem->set_label
+      (String::ucompose (_("Redo %1"), redos.front ()->getActionName ()));
 }
 
 void ArmySetWindow::update ()

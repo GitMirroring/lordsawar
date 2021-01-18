@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -208,6 +208,8 @@ class ArmyBase
 	 */
 	static Glib::ustring moveFlagsToString(const guint32 move_bonus);
 
+	//! Convert an ArmyBase::Bonus enum value to text suitable for display.
+        static Glib::ustring bonusFlagToFriendlyName(const ArmyBase::Bonus bonus);
     protected:
 
         //! Generic method for saving Army base data.

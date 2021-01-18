@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2015, 2020, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -79,72 +79,74 @@ Glib::ustring ArmyBase::getArmyBonusDescription() const
   Glib::ustring s = "";
   if (bonus & ArmyBase::ADD1STRINOPEN && bonus & ArmyBase::ADD2STRINOPEN)
     s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  _("+3 str in open"));
+			  _("+3 Str In Open"));
   else if (bonus & ArmyBase::ADD1STRINOPEN)
     s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  _("+1 str in open"));
+			  bonusFlagToFriendlyName(ArmyBase::ADD1STRINOPEN));
   else if (bonus & ArmyBase::ADD2STRINOPEN)
     s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  _("+2 str in open"));
+			  bonusFlagToFriendlyName(ArmyBase::ADD2STRINOPEN));
   if (bonus & ArmyBase::ADD1STRINFOREST && bonus & ArmyBase::ADD2STRINFOREST)
     s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  _("+3 str in woods"));
+			  _("+3 Str In Forest"));
   else if (bonus & ArmyBase::ADD1STRINFOREST)
     s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  _("+1 str in woods"));
+			  bonusFlagToFriendlyName(ArmyBase::ADD1STRINFOREST));
   else if (bonus & ArmyBase::ADD2STRINFOREST)
     s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  _("+2 str in woods"));
+			  bonusFlagToFriendlyName(ArmyBase::ADD2STRINFOREST));
   if (bonus & ArmyBase::ADD1STRINHILLS && bonus & ArmyBase::ADD2STRINHILLS)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("+3 str in hills"));
+			  _("+3 Str In Hills"));
   else if (bonus & ArmyBase::ADD1STRINHILLS)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("+1 str in hills"));
+			  bonusFlagToFriendlyName(ArmyBase::ADD1STRINHILLS));
   else if (bonus & ArmyBase::ADD2STRINHILLS)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("+2 str in hills"));
+			  bonusFlagToFriendlyName(ArmyBase::ADD2STRINHILLS));
 
   if (bonus & ArmyBase::ADD1STRINCITY && bonus & ArmyBase::ADD2STRINCITY)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("+3 str in city"));
+			  _("+3 Str In City"));
   else if (bonus & ArmyBase::ADD1STRINCITY)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("+1 str in city"));
+			  bonusFlagToFriendlyName(ArmyBase::ADD1STRINCITY));
   else if (bonus & ArmyBase::ADD2STRINCITY)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("+2 str in city"));
+			  bonusFlagToFriendlyName(ArmyBase::ADD2STRINCITY));
   if (bonus & ArmyBase::ADD1STACKINHILLS)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("+1 stack in hills"));
+			  bonusFlagToFriendlyName(ArmyBase::ADD1STACKINHILLS));
   if (bonus & ArmyBase::SUBALLCITYBONUS)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("Cancel city bonus"));
+			  bonusFlagToFriendlyName(ArmyBase::SUBALLCITYBONUS));
   if (bonus & ArmyBase::SUB1ENEMYSTACK && bonus & ArmyBase::SUB2ENEMYSTACK)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("-3 enemy stack"));
+			  _("-3 Enemy Stack"));
   else if (bonus & ArmyBase::SUB1ENEMYSTACK)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("-1 enemy stack"));
+			  bonusFlagToFriendlyName(ArmyBase::SUB1ENEMYSTACK));
   else if (bonus & ArmyBase::SUB2ENEMYSTACK)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("-2 enemy stack"));
+			  bonusFlagToFriendlyName(ArmyBase::SUB2ENEMYSTACK));
 
   if (bonus & ArmyBase::ADD1STACK && bonus & ArmyBase::ADD2STACK)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ", _("+3 stack"));
+    s += String::ucompose("%1%2", s == "" ? " " : " & ", _("+3 Stack"));
   else if (bonus & ArmyBase::ADD1STACK)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ", _("+1 stack"));
+    s += String::ucompose("%1%2", s == "" ? " " : " & ", 
+			  bonusFlagToFriendlyName(ArmyBase::ADD1STACK));
   else if (bonus & ArmyBase::ADD2STACK)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ", _("+2 stack"));
+    s += String::ucompose("%1%2", s == "" ? " " : " & ", 
+			  bonusFlagToFriendlyName(ArmyBase::ADD2STACK));
   if (bonus & ArmyBase::SUBALLNONHEROBONUS)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("Cancel non-hero"));
+			  bonusFlagToFriendlyName(ArmyBase::SUBALLNONHEROBONUS));
   if (bonus & ArmyBase::SUBALLHEROBONUS)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("Cancel hero"));
+			  bonusFlagToFriendlyName(ArmyBase::SUBALLHEROBONUS));
   if (bonus & ArmyBase::CONFER_MOVE_BONUS)
     s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("Confers move bonus to stack"));
+			  bonusFlagToFriendlyName(ArmyBase::CONFER_MOVE_BONUS));
   return s;
 }
 
@@ -192,6 +194,32 @@ Glib::ustring ArmyBase::bonusFlagToString(const ArmyBase::Bonus bonus)
     case ArmyBase::ADD2STRINHILLS: return "ArmyBase::ADD2STRINHILLS";
     case ArmyBase::SUB2ENEMYSTACK: return "ArmyBase::SUB2ENEMYSTACK";
     case ArmyBase::CONFER_MOVE_BONUS: return "ArmyBase::CONFER_MOVE_BONUS";
+    }
+  return "";
+}
+
+Glib::ustring ArmyBase::bonusFlagToFriendlyName(const ArmyBase::Bonus bonus)
+{
+  switch (bonus)
+    {
+    case ArmyBase::ADD1STRINOPEN: return _("+1 Str In Open");
+    case ArmyBase::ADD2STRINOPEN: return _("+2 Str In Open");
+    case ArmyBase::ADD1STRINFOREST: return _("+1 Str In Forest");
+    case ArmyBase::ADD1STRINHILLS: return _("+1 Str In Hills");
+    case ArmyBase::ADD1STRINCITY: return _("+1 Str In City");
+    case ArmyBase::ADD2STRINCITY: return _("+2 Str In City");
+    case ArmyBase::ADD1STACKINHILLS: return _("+1 Stack In Hills");
+    case ArmyBase::SUBALLCITYBONUS: return _("Cancel City Bonus");
+    case ArmyBase::SUB1ENEMYSTACK: return _("-1 Enemy Stack)");
+    case ArmyBase::ADD1STACK: return _("+1 Stack");
+    case ArmyBase::ADD2STACK: return _("+2 Stack");
+    case ArmyBase::SUBALLNONHEROBONUS: return _("Cancel Non-Hero");
+    case ArmyBase::SUBALLHEROBONUS: return _("Cancel Hero");
+    case ArmyBase::FORTIFY: return _("Fortify");
+    case ArmyBase::ADD2STRINFOREST: return _("+2 Str In Forest");
+    case ArmyBase::ADD2STRINHILLS: return _("+2 Str In Hills");
+    case ArmyBase::SUB2ENEMYSTACK: return _("-2 Enemy Stack");
+    case ArmyBase::CONFER_MOVE_BONUS: return _("Confers Move Bonus To Stack");
     }
   return "";
 }
