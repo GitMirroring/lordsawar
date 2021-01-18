@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -252,6 +252,7 @@ void TilesetMoveBonusImageDialog::on_image_button_clicked (TarFileImage *im)
               im->instantiateImages ();
               d_changed = true;
               update_button_names ();
+              update_preview ();
             }
           else
             {
@@ -274,6 +275,7 @@ void TilesetMoveBonusImageDialog::on_image_button_clicked (TarFileImage *im)
               im->clear();
               d_changed = true;
               update_button_names ();
+              update_preview ();
             }
           else
             {
