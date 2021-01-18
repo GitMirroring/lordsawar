@@ -45,6 +45,7 @@ ArmySetEditorAction_Properties::ArmySetEditorAction_Properties(Glib::ustring n, 
 ArmySetEditorAction_Save::ArmySetEditorAction_Save(Armyset *a, Type t)
  :ArmySetEditorAction (t)
 {
+  d_armyset = new Armyset (*a);
   d_filename = File::get_tmp_file () + ARMYSET_EXT;
   a->save (d_filename, ARMYSET_EXT);
 }
@@ -52,4 +53,5 @@ ArmySetEditorAction_Save::ArmySetEditorAction_Save(Armyset *a, Type t)
 ArmySetEditorAction_Save::~ArmySetEditorAction_Save ()
 {
   File::erase (d_filename);
+  delete d_armyset;
 }

@@ -2266,18 +2266,10 @@ TileSetWindow::doReloadTileset (TileSetEditorAction_Save *a)
     File::get_basename (d_tileset->getConfigurationFile (true));
   Glib::ustring oldext = d_tileset->getExtension ();
 
-  bool unsupported_version = false;
-  Tileset *tileset = Tileset::create(a->getTilesetFilename (),
-                                     unsupported_version);
-  if (!tileset || unsupported_version)
-    return false;
-  if (d_tileset)
-    delete d_tileset;
-  d_tileset = tileset;
+  d_tileset->clean_tmp_dir ();
+  delete d_tileset;
+  d_tileset = new Tileset (*(a->getTileset ()));
   d_tileset->setLoadTemporaryFile ();
-
-  bool broken = false;
-  d_tileset->instantiateImages(false, broken);
 
   disconnect_signals ();
   tilestyles_list->clear();
@@ -2310,7 +2302,7 @@ TileSetWindow::doReloadTileset (TileSetEditorAction_Save *a)
   d_tileset->setBaseName (oldname);
   d_tileset->setExtension (oldext);
   update ();
-  return broken == false;
+  return false;
 }
 
 void TileSetWindow::on_moves_text_changed()

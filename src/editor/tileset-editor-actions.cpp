@@ -31,6 +31,7 @@
 TileSetEditorAction_Save::TileSetEditorAction_Save(Tileset *s, Type t)
  :TileSetEditorAction (t)
 {
+  d_tileset = new Tileset (*s);
   d_filename = File::get_tmp_file () + TILESET_EXT;
   s->save (d_filename, TILESET_EXT);
 }
@@ -38,4 +39,5 @@ TileSetEditorAction_Save::TileSetEditorAction_Save(Tileset *s, Type t)
 TileSetEditorAction_Save::~TileSetEditorAction_Save ()
 {
   File::erase (d_filename);
+  delete d_tileset;
 }

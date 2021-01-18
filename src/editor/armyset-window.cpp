@@ -2241,10 +2241,10 @@ ArmySetWindow::doReloadArmyset (ArmySetEditorAction_Save *action)
   Glib::ustring oldext = d_armyset->getExtension ();
 
   int idx = getCurIndex ();
-  bool unsupported = false;
-  replaceCurrentArmyset (action->getArmysetFilename (), unsupported);
-  bool broken = false;
-  d_armyset->instantiateImages(false, broken);
+  d_armyset->clean_tmp_dir ();
+  delete d_armyset;
+  d_armyset = new Armyset (*(action->getArmyset ()));
+  d_armyset->setLoadTemporaryFile ();
 
   disconnect_signals ();
   armies_list->clear();

@@ -119,8 +119,10 @@ class CitySetEditorAction_Save: public CitySetEditorAction
         ~CitySetEditorAction_Save ();
 
         Glib::ustring getCitysetFilename () const {return d_filename;}
+        Cityset *getCityset () const {return d_cityset;}
     private:
         Glib::ustring d_filename;
+        Cityset *d_cityset;
 };
 
 //-----------------------------------------------------------------------------

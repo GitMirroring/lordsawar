@@ -1319,6 +1319,7 @@ int ShieldSetWindow::getCurIndex ()
   else
     return -1;
 }
+
 bool ShieldSetWindow::doReloadShieldset (ShieldSetEditorAction_Save *action)
 {
   Glib::RefPtr<Gtk::TreeSelection> s = shields_treeview->get_selection ();
@@ -1329,11 +1330,10 @@ bool ShieldSetWindow::doReloadShieldset (ShieldSetEditorAction_Save *action)
     File::get_basename (d_shieldset->getConfigurationFile (true));
   Glib::ustring oldext = d_shieldset->getExtension ();
 
-  bool unsupported = false;
-  replaceCurrentShieldset (action->getShieldsetFilename (), unsupported);
-
-  bool broken = false;
-  d_shieldset->instantiateImages(false, broken);
+  d_shieldset->clean_tmp_dir ();
+  delete d_shieldset;
+  d_shieldset = new Shieldset (*(action->getShieldset ()));
+  d_shieldset->setLoadTemporaryFile ();
 
   disconnect_signals ();
   int idx = getCurIndex ();
@@ -1357,7 +1357,7 @@ bool ShieldSetWindow::doReloadShieldset (ShieldSetEditorAction_Save *action)
   d_shieldset->setBaseName (oldname);
   d_shieldset->setExtension (oldext);
   update ();
-  return broken;
+  return false;
 }
 
 ShieldSetEditorAction*

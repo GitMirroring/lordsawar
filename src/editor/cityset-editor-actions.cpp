@@ -45,6 +45,8 @@ CitySetEditorAction_Properties::CitySetEditorAction_Properties(Glib::ustring n, 
 CitySetEditorAction_Save::CitySetEditorAction_Save(Cityset *c, Type t)
  :CitySetEditorAction (t)
 {
+  d_cityset = new Cityset (*c);
+
   d_filename = File::get_tmp_file () + CITYSET_EXT;
   c->save (d_filename, CITYSET_EXT);
 }
@@ -52,6 +54,7 @@ CitySetEditorAction_Save::CitySetEditorAction_Save(Cityset *c, Type t)
 CitySetEditorAction_Save::~CitySetEditorAction_Save ()
 {
   File::erase (d_filename);
+  delete d_cityset;
 }
 
 //-----------------------------------------------------------------------------

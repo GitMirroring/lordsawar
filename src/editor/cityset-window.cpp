@@ -1050,11 +1050,11 @@ CitySetWindow::doReloadCityset (CitySetEditorAction_Save *action)
     File::get_basename (d_cityset->getConfigurationFile (true));
   Glib::ustring oldext = d_cityset->getExtension ();
 
-  bool unsupported = false;
-  replaceCurrentCityset (action->getCitysetFilename (), unsupported);
+  d_cityset->clean_tmp_dir ();
+  delete d_cityset;
+  d_cityset = new Cityset (*(action->getCityset ()));
+  d_cityset->setLoadTemporaryFile ();
 
-  bool broken = false;
-  d_cityset->instantiateImages(false, broken);
   d_cityset->setDirectory (olddir);
   d_cityset->setBaseName (oldname);
   d_cityset->setExtension (oldext);

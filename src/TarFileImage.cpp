@@ -38,6 +38,8 @@ TarFileImage::TarFileImage (const TarFileImage &i)
 {
   if (i.image)
     image = i.image->copy ();
+  else
+    return;
   frames.clear ();
   for (auto f : i.frames)
     frames.push_back (f->copy ());

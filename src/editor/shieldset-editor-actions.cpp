@@ -56,6 +56,8 @@ ShieldSetEditorAction_Properties::ShieldSetEditorAction_Properties(Glib::ustring
 ShieldSetEditorAction_Save::ShieldSetEditorAction_Save(Shieldset *s, Type t)
  :ShieldSetEditorAction (t)
 {
+  d_shieldset = new Shieldset (*s);
+
   d_filename = File::get_tmp_file () + SHIELDSET_EXT;
   s->save (d_filename, SHIELDSET_EXT);
 }
@@ -63,6 +65,7 @@ ShieldSetEditorAction_Save::ShieldSetEditorAction_Save(Shieldset *s, Type t)
 ShieldSetEditorAction_Save::~ShieldSetEditorAction_Save ()
 {
   File::erase (d_filename);
+  delete d_shieldset;
 }
 
 //-----------------------------------------------------------------------------

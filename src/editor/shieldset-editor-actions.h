@@ -155,8 +155,10 @@ class ShieldSetEditorAction_Save: public ShieldSetEditorAction
         ~ShieldSetEditorAction_Save ();
 
         Glib::ustring getShieldsetFilename () const {return d_filename;}
+        Shieldset *getShieldset () const {return d_shieldset;}
     private:
         Glib::ustring d_filename;
+        Shieldset *d_shieldset;
 };
 
 //-----------------------------------------------------------------------------

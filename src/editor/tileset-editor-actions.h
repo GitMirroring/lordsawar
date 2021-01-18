@@ -311,8 +311,10 @@ class TileSetEditorAction_Save: public TileSetEditorAction
         ~TileSetEditorAction_Save ();
 
         Glib::ustring getTilesetFilename () const {return d_filename;}
+        Tileset *getTileset () const {return d_tileset;}
     private:
         Glib::ustring d_filename;
+        Tileset *d_tileset;
 };
 
 //-----------------------------------------------------------------------------

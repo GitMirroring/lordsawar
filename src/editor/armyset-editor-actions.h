@@ -163,8 +163,10 @@ class ArmySetEditorAction_Save: public ArmySetEditorAction
         ~ArmySetEditorAction_Save ();
 
         Glib::ustring getArmysetFilename () const {return d_filename;}
+        Armyset *getArmyset () const {return d_armyset;}
     private:
         Glib::ustring d_filename;
+        Armyset *d_armyset;
 };
 
 //-----------------------------------------------------------------------------
