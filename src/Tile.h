@@ -1,6 +1,6 @@
 // Copyright (C) 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -113,6 +113,9 @@ class Tile : public std::list<TileStyleSet*>
 	void setName(Glib::ustring name) {d_name = name;}
 
 	void setTypeByIndex(int idx);
+
+        //! Set the number of moves to cross this terrain w/o a bonus.
+        void setMoves (guint32 mp) {d_moves = mp;}
 
 	//! Set the SmallTile object associated with this tile.
 	void setSmallTile(SmallTile *smalltile) {d_smalltile = smalltile;};

@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2012, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2010, 2012, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -63,8 +63,6 @@ TileStyleOrganizerDialog::TileStyleOrganizerDialog(Gtk::Window &parent, Tile *ti
       (sigc::hide(sigc::hide(method(on_category_drag_data_get))));
     category_iconview->signal_drag_data_received().connect
       (method(on_category_drop_drag_data_received));
-    category_iconview->signal_item_activated().connect
-      (method(on_category_tilestyle_activated));
 
     category_iconview->signal_selection_changed().connect
       (sigc::bind(method(on_selection_made), category_iconview));
@@ -81,8 +79,6 @@ TileStyleOrganizerDialog::TileStyleOrganizerDialog(Gtk::Window &parent, Tile *ti
       (sigc::hide(sigc::hide(method(on_unsorted_drag_data_get))));
     unsorted_iconview->signal_drag_data_received().connect
       (method(on_unsorted_drop_drag_data_received));
-    unsorted_iconview->signal_item_activated().connect
-      (method(on_unsorted_tilestyle_activated));
     unsorted_iconview->signal_drag_begin().connect
       (sigc::bind(sigc::hide<0>(method(on_drag_begin)), unsorted_iconview));
     unsorted_iconview->signal_selection_changed().connect
@@ -101,6 +97,7 @@ TileStyleOrganizerDialog::TileStyleOrganizerDialog(Gtk::Window &parent, Tile *ti
     fill_category(TileStyle::UNKNOWN);
     categories_iconview->select_path(Gtk::TreeModel::Path("0"));
     inhibit_select = false;
+    d_changed = false;
 }
       
 void TileStyleOrganizerDialog::on_category_drag_data_get(const Glib::RefPtr<Gdk::DragContext> &drag_context, Gtk::SelectionData &data)
@@ -299,6 +296,7 @@ void TileStyleOrganizerDialog::on_categories_drop_drag_data_received(const Glib:
     }
 
   context->drag_finish (false, false, time);
+  d_changed = true;
 }
 
 void TileStyleOrganizerDialog::on_category_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext> &context, int a, int b, const Gtk::SelectionData& selection_data, guint c, guint time)
@@ -334,6 +332,7 @@ void TileStyleOrganizerDialog::on_category_drop_drag_data_received(const Glib::R
         }
     }
   context->drag_finish (false, false, time);
+  d_changed = true;
 }
 
 void TileStyleOrganizerDialog::on_unsorted_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext> &context, int a, int b, const Gtk::SelectionData& selection_data, guint c, guint time)
@@ -367,24 +366,9 @@ void TileStyleOrganizerDialog::on_unsorted_drop_drag_data_received(const Glib::R
         }
     }
   context->drag_finish (false, false, time);
+  d_changed = true;
 }
     
-void TileStyleOrganizerDialog::on_category_tilestyle_activated(const Gtk::TreeModel::Path &path)
-{
-  Gtk::TreeModel::iterator iter = category_list->get_iter(path);
-  Gtk::TreeModel::Row row = *iter;
-  TileStyle *style = row[tilestyle_columns.style];
-  tilestyle_selected.emit(style->getId());
-}
-
-void TileStyleOrganizerDialog::on_unsorted_tilestyle_activated(const Gtk::TreeModel::Path &path)
-{
-  Gtk::TreeModel::iterator iter = unsorted_list->get_iter(path);
-  Gtk::TreeModel::Row row = *iter;
-  TileStyle *style = row[tilestyle_columns.style];
-  tilestyle_selected.emit(style->getId());
-}
-
 /**
  * This is how we're getting multiple drag to work.
  * 1. we remember the last multiple selection. (last_multiple_selection)
@@ -441,4 +425,10 @@ bool TileStyleOrganizerDialog::expire_selection()
 {
   last_multiple_selection.clear();
   return Timing::STOP;
+}
+
+bool TileStyleOrganizerDialog::run()
+{
+  dialog->run();
+  return d_changed;
 }

@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2010, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,9 +30,8 @@ class TileStyleOrganizerDialog: public LwEditorDialog
 {
  public:
     TileStyleOrganizerDialog(Gtk::Window &parent, Tile *tile);
+    bool run ();
     ~TileStyleOrganizerDialog() {}
-
-    sigc::signal<void, guint32> tilestyle_selected;
 
  protected:
 
@@ -74,6 +73,7 @@ class TileStyleOrganizerDialog: public LwEditorDialog
   Glib::RefPtr<Gtk::ListStore> unsorted_list;
  private:
     Tile *d_tile;
+    bool d_changed;
     Gtk::IconView *categories_iconview;
     Gtk::IconView *category_iconview;
     Gtk::IconView *unsorted_iconview;
@@ -97,8 +97,6 @@ class TileStyleOrganizerDialog: public LwEditorDialog
     void on_categories_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext> &context, int a, int b, const Gtk::SelectionData& selection_data, guint c, guint time);
     void on_category_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext> &context, int a, int b, const Gtk::SelectionData& selection_data, guint c, guint time);
     void on_unsorted_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext> &context, int a, int b, const Gtk::SelectionData& selection_data, guint c, guint time);
-    void on_category_tilestyle_activated(const Gtk::TreeModel::Path &path);
-    void on_unsorted_tilestyle_activated(const Gtk::TreeModel::Path &path);
 
     void on_drag_begin(Gtk::IconView *i);
     std::list<TileStyle*> selected_category_tilestyles;

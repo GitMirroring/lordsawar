@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -67,12 +67,18 @@ TileSetInfoDialog::TileSetInfoDialog(Gtk::Window &parent, Tileset *s)
     (method(on_description_changed));
   xml->get_widget("notebook", notebook);
   on_name_changed ();
+  d_name = d_tileset->getName ();
+  d_description = d_tileset->getInfo ();
+  d_copyright = d_tileset->getCopyright ();
+  d_license = d_tileset->getLicense ();
+  d_tilesize = d_tileset->getTileSize ();
   d_changed = false;
 }
 
 void TileSetInfoDialog::on_name_changed()
 {
   d_changed = true;
+  Glib::ustring oldname = d_tileset->getName ();
   d_tileset->setName (String::utrim (name_entry->get_text ()));
   close_button->set_sensitive (File::sanify (d_tileset->getName ()) != "");
 
@@ -82,6 +88,8 @@ void TileSetInfoDialog::on_name_changed()
     status_label->set_text (_("That name is already in use."));
   else
     status_label->set_text ("");
+  d_tileset->setName (oldname);
+  d_name = String::utrim (name_entry->get_text ());
 }
 
 bool TileSetInfoDialog::run()
@@ -95,19 +103,19 @@ bool TileSetInfoDialog::run()
 void TileSetInfoDialog::on_copyright_changed ()
 {
   d_changed = true;
-  d_tileset->setCopyright(copyright_textview->get_buffer()->get_text());
+  d_copyright = copyright_textview->get_buffer()->get_text();
 }
 
 void TileSetInfoDialog::on_license_changed ()
 {
   d_changed = true;
-  d_tileset->setLicense(license_textview->get_buffer()->get_text());
+  d_license = license_textview->get_buffer()->get_text();
 }
 
 void TileSetInfoDialog::on_description_changed ()
 {
   d_changed = true;
-  d_tileset->setInfo(description_textview->get_buffer()->get_text());
+  d_description = description_textview->get_buffer()->get_text();
 }
 
 TileSetInfoDialog::~TileSetInfoDialog()
@@ -118,7 +126,7 @@ TileSetInfoDialog::~TileSetInfoDialog()
 void TileSetInfoDialog::on_size_changed()
 {
   d_changed = true;
-  d_tileset->setTileSize (size_spinbutton->get_value ());
+  d_tilesize = size_spinbutton->get_value ();
   on_name_changed ();
 }
 

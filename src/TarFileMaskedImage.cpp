@@ -39,9 +39,11 @@ TarFileMaskedImage::TarFileMaskedImage (const TarFileMaskedImage &i)
     dimension (i.dimension), image (NULL),
     calculated_number_of_frames (i.calculated_number_of_frames)
 {
+  frames.clear ();
   if (i.image)
     image = i.image->copy ();
-  frames.clear ();
+  else
+    return;
   for (auto f : i.frames)
     frames.push_back (std::make_pair (f.first->copy (), f.second->copy ()));
 }
@@ -202,6 +204,7 @@ void TarFileMaskedImage::clear (bool clear_name)
   if (clear_name)
     name = "";
 
+  dropBackingImage ();
   uninstantiateImages ();
 }
 

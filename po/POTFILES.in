@@ -304,6 +304,7 @@ src/editor/select-army-dialog.cpp
 src/editor/map-info-dialog.cpp
 src/editor/reward-editor-dialog.cpp
 src/editor/tileset-window.cpp
+src/editor/tileset-editor-actions.cpp
 src/editor/tilestyle-organizer-dialog.cpp
 src/editor/stack-editor-dialog.cpp
 src/editor/hero-editor-dialog.cpp

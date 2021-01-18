@@ -85,6 +85,8 @@ TilesetMoveBonusImageDialog::TilesetMoveBonusImageDialog(Gtk::Window &parent, Ti
   xml->get_widget("hills_mountains_swamp_image", hills_mountains_swamp_image);
   xml->get_widget("forest_hills_mountains_swamp_image", 
                   forest_hills_mountains_swamp_image);
+
+  d_changed = false;
   update_button_names ();
   update_preview ();
 }

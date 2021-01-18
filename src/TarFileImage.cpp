@@ -158,6 +158,7 @@ void TarFileImage::clear (bool clear_name)
   if (clear_name)
     name = "";
 
+  dropBackingImage ();
   uninstantiateImages ();
 }
 

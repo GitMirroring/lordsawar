@@ -167,6 +167,7 @@ void CitySetWindow::disconnect_signals ()
 {
   for (auto c : connections)
     c.disconnect ();
+  connections.clear ();
 }
 
 void

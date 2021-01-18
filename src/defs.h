@@ -4,7 +4,7 @@
 // Copyright (C) 2004 David Sterba
 // Copyright (C) 2005 Bryan Duff
 // Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2016,
-// 2020 Ben Asselstine
+// 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -140,6 +140,8 @@ const unsigned int MIN_EXP_FOR_ARMY_UNITS = 0;
 const unsigned int MAX_EXP_FOR_ARMY_UNITS = 50000;
 const unsigned int MIN_SIGHT_FOR_ARMY_UNITS = 0;
 const unsigned int MAX_SIGHT_FOR_ARMY_UNITS = 25;
+const unsigned int MIN_MOVES_FOR_TILES = 1;
+const unsigned int MAX_MOVES_FOR_TILES = 12;
 
 const float SIGNPOST_FREQUENCY = 0.0030;
 

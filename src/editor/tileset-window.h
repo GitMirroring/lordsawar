@@ -1,4 +1,4 @@
-//  Copyright (C) 2008-2010, 2012, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2008-2010, 2012, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "Tile.h"
 #include "tileset.h"
 #include "PixMask.h"
+#include "tileset-editor-actions.h"
 
 //! Tileset Editor.  Edit an Tileset.
 class TileSetWindow: public sigc::trackable
@@ -51,6 +52,8 @@ class TileSetWindow: public sigc::trackable
     Tileset *d_tileset; //current tileset
     Tile *d_tile; //current tile
     bool needs_saving;
+    std::list<TileSetEditorAction *> undos;
+    std::list<TileSetEditorAction *> redos;
     Gtk::Entry *name_entry;
     Gtk::TreeView *tiles_treeview;
     Gtk::Button *add_tile_button;
@@ -72,6 +75,8 @@ class TileSetWindow: public sigc::trackable
     Gtk::MenuItem *save_as_menuitem;
     Gtk::MenuItem *validate_tileset_menuitem;
     Gtk::MenuItem *edit_tileset_info_menuitem;
+    Gtk::MenuItem *edit_undo_menuitem;
+    Gtk::MenuItem *edit_redo_menuitem;
     Gtk::MenuItem *roads_picture_menuitem;
     Gtk::MenuItem *stones_picture_menuitem;
     Gtk::MenuItem *bridges_picture_menuitem;
@@ -139,7 +144,6 @@ class TileSetWindow: public sigc::trackable
     void update_tilestyle_panel();
     void update_tileset_buttons();
     void update_tilestyleset_buttons();
-    void update_tile_preview_menuitem();
 
     void on_new_tileset_activated();
     void on_load_tileset_activated();
@@ -183,6 +187,8 @@ class TileSetWindow: public sigc::trackable
     void on_tile_pattern_changed();
     void on_tilestyle_changed();
     void on_image_chosen();
+    void on_moves_text_changed();
+    void on_moves_changed();
 
     void on_add_tile_clicked();
     void on_remove_tile_clicked();
@@ -215,14 +221,18 @@ class TileSetWindow: public sigc::trackable
     void dirty ();
     bool remove_tilestyleset_files (Tile *a);
     
-    sigc::connection tile_selected_connection;
-    sigc::connection tilestyle_selected_connection;
-    sigc::connection tilestyleset_selected_connection;
-    void connect_tile_treeview ();
-    void disconnect_tile_treeview ();
-    void connect_tilestyle_treeview ();
-    void disconnect_tilestyle_treeview ();
-    void connect_tilestyleset_treeview ();
+    void on_edit_undo_activated ();
+    void on_edit_redo_activated ();
+    void update_menuitems ();
+    void update ();
+    Tile* getTileByIndex (TileSetEditorAction_TileIndex *i);
+    TileSetEditorAction* executeAction (TileSetEditorAction *action);
+    int getCurIndex ();
+    bool doReloadTileset (TileSetEditorAction_Save *action);
+    void disconnect_signals ();
+    bool connect_signals ();
+    void clearUndoAndRedo ();
+    std::vector<sigc::connection> connections;
 };
 
 #endif
