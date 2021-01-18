@@ -1992,6 +1992,12 @@ void TileSetWindow::update_menuitems ()
 {
   edit_redo_menuitem->set_sensitive (redos.empty () == false);
   edit_undo_menuitem->set_sensitive (undos.empty () == false);
+  if (undos.empty () == false)
+    edit_undo_menuitem->set_label
+      (String::ucompose (_("Undo %1"), undos.front ()->getActionName ()));
+  if (redos.empty () == false)
+    edit_redo_menuitem->set_label
+      (String::ucompose (_("Redo %1"), redos.front ()->getActionName ()));
   if (get_selected_tile())
     preview_tile_menuitem->set_sensitive(true);
   else

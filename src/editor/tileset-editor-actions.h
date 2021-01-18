@@ -24,6 +24,7 @@
 #include "Tile.h"
 #include "SmallTile.h"
 #include "tilestyle.h"
+#include "defs.h"
 
 class Tileset;
 
@@ -68,6 +69,9 @@ public:
     //! Destructor.
     virtual ~TileSetEditorAction() {}
 
+    //! Get the name of this action for the undo/redo menuitem.
+    virtual Glib::ustring getActionName () {return "";}
+
     //! Returns the Action::Type for this action.
     Type getType() const {return d_type;}
 
@@ -97,6 +101,8 @@ class TileSetEditorAction_Properties: public TileSetEditorAction
           d_copyright (c), d_license (l), d_tile_size (ts) {}
 	//! Destroy a change properties action.
         ~TileSetEditorAction_Properties () {}
+
+        Glib::ustring getActionName () {return _("Properties");}
 
         Glib::ustring getName () {return d_name;}
         Glib::ustring getDescription () {return d_desc;}
@@ -150,6 +156,8 @@ class TileSetEditorAction_Name: public TileSetEditorAction_TileIndex
 	//! Destroy a name action.
         ~TileSetEditorAction_Name () {}
 
+        Glib::ustring getActionName () {return _("Name");}
+
         Glib::ustring getName () {return d_name;}
 
     private:
@@ -177,6 +185,8 @@ class TileSetEditorAction_Type: public TileSetEditorAction_TileIndex
 	//! Destroy a type action.
         ~TileSetEditorAction_Type () {}
 
+        Glib::ustring getActionName () {return _("Type");}
+
         Tile::Type getTileType () {return d_tile_type;}
 
     private:
@@ -203,6 +213,8 @@ class TileSetEditorAction_Pattern: public TileSetEditorAction_TileIndex
           : TileSetEditorAction_TileIndex (PATTERN, i), d_pattern (p) {}
 	//! Destroy a pattern action.
         ~TileSetEditorAction_Pattern () {}
+
+        Glib::ustring getActionName () {return _("Pattern");}
 
         SmallTile::Pattern getPattern () {return d_pattern;}
 
@@ -232,6 +244,8 @@ class TileSetEditorAction_Moves: public TileSetEditorAction_TileIndex
 	//! Destroy a moves action.
         ~TileSetEditorAction_Moves () {}
 
+        Glib::ustring getActionName () {return _("Moves");}
+
         guint32 getMoves () {return d_moves;}
 
     private:
@@ -259,6 +273,21 @@ class TileSetEditorAction_Colour: public TileSetEditorAction_TileIndex
 	//! Destroy a colour action.
         ~TileSetEditorAction_Colour () {}
 
+        Glib::ustring getActionName ()
+          {
+            switch (d_colour_number)
+              {
+              case 0:
+                return _("First Colour");
+              case 1:
+                return _("Second Colour");
+              case 2:
+                return _("Third Colour");
+              default:
+                break;
+              }
+            return "";
+          }
         guint32 getColourNumber () {return d_colour_number;}
         Gdk::RGBA getColour () const {return d_colour;}
 
@@ -307,6 +336,8 @@ class TileSetEditorAction_AddTileStyleSet: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::ADD_TILESTYLESET) {}
 	//! Destroy an add tilestyleset action, and delete the file.
         ~TileSetEditorAction_AddTileStyleSet () {}
+
+        Glib::ustring getActionName () {return _("Add TileStyle Set");}
 };
 
 //-----------------------------------------------------------------------------
@@ -331,6 +362,8 @@ class TileSetEditorAction_RemoveTileStyleSet: public TileSetEditorAction_Save
            (t, TileSetEditorAction::REMOVE_TILESTYLESET) {}
 	//! Destroy a remove tilestyleset action, and delete the file.
         ~TileSetEditorAction_RemoveTileStyleSet () {}
+
+        Glib::ustring getActionName () {return _("Remove TileStyle Set");}
 };
 
 //-----------------------------------------------------------------------------
@@ -355,6 +388,8 @@ class TileSetEditorAction_TileStyle: public TileSetEditorAction_TileIndex
           d_tilestyle_type (t) {}
 	//! Destroy a tilestyle action.
         ~TileSetEditorAction_TileStyle () {}
+
+        Glib::ustring getActionName () {return _("TileStyle Type");}
 
         guint32 getTileStyleIndex () {return d_tilestyle_index;}
         TileStyle::Type getTileStyleType () {return d_tilestyle_type;}
@@ -384,6 +419,8 @@ class TileSetEditorAction_AddTile: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::ADD_TILE) {}
 	//! Destroy an add tile action, and delete the file.
         ~TileSetEditorAction_AddTile () {}
+
+        Glib::ustring getActionName () {return _("Add Tile");}
 };
 
 //-----------------------------------------------------------------------------
@@ -407,6 +444,8 @@ class TileSetEditorAction_RemoveTile: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::REMOVE_TILE) {}
 	//! Destroy a remove tile action, and delete the file.
         ~TileSetEditorAction_RemoveTile () {}
+
+        Glib::ustring getActionName () {return _("Remove Tile");}
 };
 
 //-----------------------------------------------------------------------------
@@ -430,6 +469,7 @@ class TileSetEditorAction_Selector: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::SELECTOR) {}
 	//! Destroy a selector action, and delete the file.
         ~TileSetEditorAction_Selector () {}
+        Glib::ustring getActionName () {return _("Selector");}
 };
 
 //-----------------------------------------------------------------------------
@@ -453,6 +493,7 @@ class TileSetEditorAction_Explosion: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::EXPLOSION) {}
 	//! Destroy a explosion action, and delete the file.
         ~TileSetEditorAction_Explosion () {}
+        Glib::ustring getActionName () {return _("Explosion");}
 };
 
 //-----------------------------------------------------------------------------
@@ -476,6 +517,7 @@ class TileSetEditorAction_Roads: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::ROADS) {}
 	//! Destroy a roads action, and delete the file.
         ~TileSetEditorAction_Roads () {}
+        Glib::ustring getActionName () {return _("Roads");}
 };
 
 //-----------------------------------------------------------------------------
@@ -499,6 +541,7 @@ class TileSetEditorAction_Stones: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::STONES) {}
 	//! Destroy a stones action, and delete the file.
         ~TileSetEditorAction_Stones () {}
+        Glib::ustring getActionName () {return _("Stones");}
 };
 
 //-----------------------------------------------------------------------------
@@ -522,6 +565,7 @@ class TileSetEditorAction_Bridges: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::BRIDGES) {}
 	//! Destroy a bridges action, and delete the file.
         ~TileSetEditorAction_Bridges () {}
+        Glib::ustring getActionName () {return _("Bridges");}
 };
 
 //-----------------------------------------------------------------------------
@@ -545,6 +589,7 @@ class TileSetEditorAction_Fog: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::FOG) {}
 	//! Destroy a fog action, and delete the file.
         ~TileSetEditorAction_Fog () {}
+        Glib::ustring getActionName () {return _("Fog");}
 };
 
 //-----------------------------------------------------------------------------
@@ -568,6 +613,7 @@ class TileSetEditorAction_Flag: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::FLAGS) {}
 	//! Destroy a flag action, and delete the file.
         ~TileSetEditorAction_Flag () {}
+        Glib::ustring getActionName () {return _("Flags");}
 };
 
 //-----------------------------------------------------------------------------
@@ -591,6 +637,7 @@ class TileSetEditorAction_TileStyles: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::TILESTYLES) {}
 	//! Destroy a tilestyles action, and delete the file.
         ~TileSetEditorAction_TileStyles () {}
+        Glib::ustring getActionName () {return _("TileStyles");}
 };
 
 //-----------------------------------------------------------------------------
@@ -616,6 +663,7 @@ class TileSetEditorAction_BuildingColours: public TileSetEditorAction_Save
            (t, TileSetEditorAction::BUILDING_COLOURS) {}
 	//! Destroy a building colours action, and delete the file.
         ~TileSetEditorAction_BuildingColours () {}
+        Glib::ustring getActionName () {return _("Building Colours");}
 };
 
 //-----------------------------------------------------------------------------
@@ -640,5 +688,6 @@ class TileSetEditorAction_MoveBonus: public TileSetEditorAction_Save
           :TileSetEditorAction_Save (t, TileSetEditorAction::MOVE_BONUS) {}
 	//! Destroy a move bonus action, and delete the file.
         ~TileSetEditorAction_MoveBonus () {}
+        Glib::ustring getActionName () {return _("Move Bonus");}
 };
 #endif //TILESET_EDITOR_ACTIONS_H
