@@ -21,6 +21,7 @@
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
+#include "defs.h"
 
 class Shieldset;
 
@@ -52,7 +53,10 @@ class ShieldSetEditorAction
         ShieldSetEditorAction(Type type);
 
 	//! Destructor.
-        virtual ~ShieldSetEditorAction() {};
+        virtual ~ShieldSetEditorAction() {}
+
+        //! Get the name of this action for the undo/redo menuitem.
+        virtual Glib::ustring getActionName () {return "";}
 
         //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}
@@ -79,6 +83,8 @@ class ShieldSetEditorAction_Color: public ShieldSetEditorAction
         ShieldSetEditorAction_Color (guint32 player_id, Gdk::RGBA color);
 	//! Destroy a change color action.
         ~ShieldSetEditorAction_Color () {};
+
+        Glib::ustring getActionName () {return _("Color");}
 
         guint32 getPlayerId () const {return d_player_id;}
         Gdk::RGBA getColor () const {return d_color;}
@@ -107,6 +113,8 @@ class ShieldSetEditorAction_Properties: public ShieldSetEditorAction
         ShieldSetEditorAction_Properties (Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 sw, guint32 sh, guint32 mw, guint32 mh, guint32 lw, guint32 lh);
 	//! Destroy a change properties action.
         ~ShieldSetEditorAction_Properties () {};
+
+        Glib::ustring getActionName () {return _("Properties");}
 
         Glib::ustring getName () {return d_name;}
         Glib::ustring getDescription () {return d_desc;}
@@ -172,6 +180,9 @@ class ShieldSetEditorAction_WhiteDown: public ShieldSetEditorAction_Save
         ShieldSetEditorAction_WhiteDown (Shieldset *s);
 	//! Destroy a white down action, and delete the file.
         ~ShieldSetEditorAction_WhiteDown () {};
+
+        Glib::ustring getActionName () {return _("Copy White Shields");}
+
 };
 
 //-----------------------------------------------------------------------------
@@ -194,6 +205,8 @@ class ShieldSetEditorAction_AddImage: public ShieldSetEditorAction_Save
         ShieldSetEditorAction_AddImage (Shieldset *s);
 	//! Destroy an add-image action, and delete the file.
         ~ShieldSetEditorAction_AddImage () {};
+
+        Glib::ustring getActionName () {return _("Add Image");}
 };
 
 //-----------------------------------------------------------------------------
@@ -216,5 +229,7 @@ class ShieldSetEditorAction_ClearImage: public ShieldSetEditorAction_Save
         ShieldSetEditorAction_ClearImage (Shieldset *s);
 	//! Destroy an clear-image action, and delete the file.
         ~ShieldSetEditorAction_ClearImage () {};
+
+        Glib::ustring getActionName () {return _("Clear Image");}
 };
 #endif //SHIELDSET_EDITOR_ACTIONS_H
