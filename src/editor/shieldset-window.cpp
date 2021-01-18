@@ -130,7 +130,7 @@ ShieldSetWindow::ShieldSetWindow(Glib::ustring load_filename)
     shields_treeview->set_model(shields_list);
     shields_treeview->append_column("", shields_columns.name);
     shields_treeview->set_headers_visible(false);
-    connect_shield_treeview();
+    connect_signals ();
 
     update_shield_panel();
 
@@ -197,9 +197,9 @@ bool ShieldSetWindow::make_new_shieldset ()
   if (check_discard (msg) == false)
     return false;
   current_save_filename = "";
-  shields_list->clear();
   if (d_shieldset)
     delete d_shieldset;
+
 
   guint32 num = 0;
   Glib::ustring name =
@@ -208,7 +208,9 @@ bool ShieldSetWindow::make_new_shieldset ()
   d_shieldset = new Shieldset (Shieldsetlist::getNextAvailableId (1), name);
   d_shieldset->setNewTemporaryFile ();
 
+  disconnect_signals ();
   //populate the list with initial entries.
+  shields_list->clear();
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
       Gdk::RGBA colour = Shield::get_default_color_for_no(i);
@@ -224,6 +226,7 @@ bool ShieldSetWindow::make_new_shieldset ()
           d_shieldset->push_back(shield);
         }
     }
+  connect_signals ();
 
   update_shield_panel();
   shields_treeview->set_cursor (Gtk::TreePath ("0"));
@@ -821,7 +824,6 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
       return false;
     }
 
-  clearUndoAndRedo ();
 
   bool broken = false;
   d_shieldset->instantiateImages(false, broken);
@@ -834,13 +836,16 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
       td.run_and_hide();
       return false;
     }
-      
+  disconnect_signals ();
+  shields_list->clear();
   for (Shieldset::iterator i = d_shieldset->begin(); i != d_shieldset->end();
        ++i)
     add_shield_to_treeview (*i);
       
   if (d_shieldset->empty () == false)
     shields_treeview->set_cursor (Gtk::TreePath ("0"));
+  connect_signals ();
+  clearUndoAndRedo ();
   update ();
   return true;
 }
@@ -1228,18 +1233,6 @@ void ShieldSetWindow::on_tutorial_video_activated()
   return;
 }
 
-void ShieldSetWindow::connect_shield_treeview()
-{
-  shield_selected_connection =
-    shields_treeview->get_selection()->signal_changed().connect (method(on_shield_selected));
-}
-
-void ShieldSetWindow::disconnect_shield_treeview()
-{
-  if (shield_selected_connection.connected ())
-    shield_selected_connection.disconnect ();
-}
-
 void ShieldSetWindow::on_edit_undo_activated ()
 {
   ShieldSetEditorAction *a = undos.front ();
@@ -1272,9 +1265,11 @@ void ShieldSetWindow::update_menuitems ()
 
 void ShieldSetWindow::update ()
 {
+  disconnect_signals ();
   update_window_title ();
   update_shield_panel ();
   update_menuitems ();
+  connect_signals ();
 }
 
 void
@@ -1307,6 +1302,17 @@ ShieldSetWindow::executeProperties (ShieldSetEditorAction_Properties *action)
   return;
 }
 
+int ShieldSetWindow::getCurIndex ()
+{
+  Glib::RefPtr<Gtk::TreeSelection> selection =
+    shields_treeview->get_selection();
+  Gtk::TreeModel::iterator i = selection->get_selected();
+  if (i)
+    return
+      atoi (shields_treeview->get_model ()->get_path (i).to_string ().c_str ());
+  else
+    return -1;
+}
 bool ShieldSetWindow::doReloadShieldset (ShieldSetEditorAction_Save *action)
 {
   Glib::RefPtr<Gtk::TreeSelection> s = shields_treeview->get_selection ();
@@ -1323,16 +1329,28 @@ bool ShieldSetWindow::doReloadShieldset (ShieldSetEditorAction_Save *action)
   bool broken = false;
   d_shieldset->instantiateImages(false, broken);
 
+  disconnect_signals ();
+  int idx = getCurIndex ();
+  shields_list->clear();
   for (Shieldset::iterator i = d_shieldset->begin(); i != d_shieldset->end();
        ++i)
     add_shield_to_treeview (*i);
       
-  shields_treeview->set_cursor (v[0]);
-  update ();
+  if (idx >= 0)
+    {
+      if (d_shieldset->size () >= (guint32)idx)
+        shields_treeview->set_cursor
+          (Gtk::TreePath (String::ucompose ("%1", idx)));
+      else
+        shields_treeview->set_cursor (Gtk::TreePath ("0"));
+
+    }
+  connect_signals ();
 
   d_shieldset->setDirectory (olddir);
   d_shieldset->setBaseName (oldname);
   d_shieldset->setExtension (oldext);
+  update ();
   return broken;
 }
 
@@ -1401,14 +1419,25 @@ bool ShieldSetWindow::replaceCurrentShieldset (Glib::ustring filename, bool &uns
   Shieldset *shieldset = Shieldset::create(filename, unsupported_version);
   if (unsupported_version || shieldset == NULL)
     return false;
-  disconnect_shield_treeview ();
-  shields_list->clear();
-  connect_shield_treeview ();
   if (d_shieldset)
     delete d_shieldset;
   d_shieldset = shieldset;
   d_shieldset->setLoadTemporaryFile ();
   return true;
+}
+
+void ShieldSetWindow::connect_signals ()
+{
+  connections.push_back
+    (shields_treeview->get_selection()->signal_changed().connect
+     (method(on_shield_selected)));
+}
+
+void ShieldSetWindow::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
 }
 /*
  some test cases

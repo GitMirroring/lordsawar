@@ -79,7 +79,6 @@ class ShieldSetWindow: public sigc::trackable
     Gtk::Button *change_right_tartan_button;
     Gtk::ColorButton *player_colorbutton;
     Gtk::Alignment *shield_alignment;
-    sigc::connection shield_selected_connection;
 
     class ShieldsColumns: public Gtk::TreeModelColumnRecord {
     public:
@@ -143,9 +142,6 @@ class ShieldSetWindow: public sigc::trackable
 
     bool isValidName ();
 
-    void connect_shield_treeview();
-    void disconnect_shield_treeview();
-
     void clearUndoAndRedo ();
     bool doReloadShieldset (ShieldSetEditorAction_Save *action);
     bool replaceCurrentShieldset (Glib::ustring filename, bool &unsupported_version);
@@ -153,6 +149,10 @@ class ShieldSetWindow: public sigc::trackable
     ShieldSetEditorAction *executeAction (ShieldSetEditorAction *a);
     void executeColor (ShieldSetEditorAction_Color *a);
     void executeProperties (ShieldSetEditorAction_Properties *a);
+    int getCurIndex ();
+    void disconnect_signals ();
+    void connect_signals ();
+    std::vector<sigc::connection> connections;
 };
 
 #endif
