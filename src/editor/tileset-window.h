@@ -232,6 +232,7 @@ class TileSetWindow: public sigc::trackable
     void disconnect_signals ();
     bool connect_signals ();
     void clearUndoAndRedo ();
+    void addUndo(TileSetEditorAction *a);
     std::vector<sigc::connection> connections;
 };
 

@@ -54,6 +54,7 @@
 #include "TarFileMaskedImage.h"
 #include "TarFileImage.h"
 
+const int UNDO_LIMIT = 100;
 #define method(x) sigc::mem_fun(*this, &TileSetWindow::x)
 
 TileSetWindow::TileSetWindow(Glib::ustring load_filename)
@@ -651,7 +652,7 @@ void TileSetWindow::on_edit_tileset_info_activated()
          d_tileset->getCopyright (),
          d_tileset->getLicense (),
          d_tileset->getTileSize ());
-      undos.push_front (action);
+      addUndo (action);
       d_tileset->setName (d.getName ());
       d_tileset->setInfo (d.getDescription ());
       d_tileset->setCopyright (d.getCopyright ());
@@ -731,7 +732,7 @@ void TileSetWindow::on_add_tile_clicked()
 {
   TileSetEditorAction_AddTile *action =
     new TileSetEditorAction_AddTile (d_tileset);
-  undos.push_front (action);
+  addUndo (action);
   //add a new empty tile to the tileset
   Tile *t = new Tile();
   //add it to the treeview
@@ -777,7 +778,7 @@ void TileSetWindow::on_remove_tile_clicked()
     {
       TileSetEditorAction_RemoveTile *action =
         new TileSetEditorAction_RemoveTile (d_tileset);
-      undos.push_front (action);
+      addUndo (action);
       Gtk::TreeModel::Row row = *iterrow;
       Tile *a = row[tiles_columns.tile];
       if (a)
@@ -811,7 +812,7 @@ void TileSetWindow::on_tile_first_color_changed()
       TileSetEditorAction_Colour *action =
         new TileSetEditorAction_Colour (getCurIndex (), 0, 
                                          t->getSmallTile ()->getColor ());
-      undos.push_front (action);
+      addUndo (action);
       t->getSmallTile()->setColor(tile_smallmap_first_colorbutton->get_rgba());
       fill_tile_smallmap(t);
       dirty ();
@@ -830,7 +831,7 @@ void TileSetWindow::on_tile_second_color_changed()
       TileSetEditorAction_Colour *action =
         new TileSetEditorAction_Colour (getCurIndex (), 1, 
                                          t->getSmallTile ()->getSecondColor ());
-      undos.push_front (action);
+      addUndo (action);
       t->getSmallTile()->setSecondColor(tile_smallmap_second_colorbutton->get_rgba());
       fill_tile_smallmap(t);
       dirty ();
@@ -849,7 +850,7 @@ void TileSetWindow::on_tile_third_color_changed()
       TileSetEditorAction_Colour *action =
         new TileSetEditorAction_Colour (getCurIndex (), 2, 
                                          t->getSmallTile ()->getThirdColor ());
-      undos.push_front (action);
+      addUndo (action);
       t->getSmallTile()->setThirdColor(tile_smallmap_third_colorbutton->get_rgba());
       fill_tile_smallmap(t);
       dirty ();
@@ -897,7 +898,7 @@ void TileSetWindow::on_tile_pattern_changed()
       TileSetEditorAction_Pattern *action =
         new TileSetEditorAction_Pattern (getCurIndex (),
                                          t->getSmallTile ()->getPattern ());
-      undos.push_front (action);
+      addUndo (action);
       int idx = tile_smallmap_pattern_combobox->get_active_row_number();
       SmallTile::Pattern pattern = SmallTile::Pattern(idx);
       t->getSmallTile()->setPattern(pattern);
@@ -919,7 +920,7 @@ void TileSetWindow::on_tile_type_changed()
       Tile *t = row[tiles_columns.tile];
       TileSetEditorAction_Type *action =
         new TileSetEditorAction_Type (getCurIndex (), t->getType ());
-      undos.push_front (action);
+      addUndo (action);
       t->setTypeByIndex(idx);
       dirty ();
     }
@@ -937,7 +938,7 @@ void TileSetWindow::on_tile_name_changed()
       Tile *t = row[tiles_columns.tile];
       TileSetEditorAction_Name *action =
         new TileSetEditorAction_Name (getCurIndex (), t->getName ());
-      undos.push_front (action);
+      addUndo (action);
       t->setName(tile_name_entry->get_text());
 
       dirty ();
@@ -1071,7 +1072,7 @@ void TileSetWindow::choose_and_add_or_replace_tilestyleset(Glib::ustring replace
           return;
         }
 
-      undos.push_front (action);
+      addUndo (action);
       PastChooser::getInstance()->set_dir(&chooser);
       //now make a new one
       TileStyleSet *set = tile->back();
@@ -1157,7 +1158,7 @@ bool TileSetWindow::remove_selected_tilestyleset (Gtk::Window *d)
           show_remove_file_error(d_tileset, *d, imgname);
           return ret;
         }
-      undos.push_front (action);
+      addUndo (action);
       tilestylesets_list->erase(iterrow);
 
       d_tileset->uninstantiateSameNamedImages (imgname);
@@ -1191,7 +1192,7 @@ void TileSetWindow::on_tilestyle_changed()
       TileSetEditorAction_TileStyle *action =
         new TileSetEditorAction_TileStyle (getCurIndex (), t->getId (),
                                            t->getType ());
-      undos.push_front (action);
+      addUndo (action);
       dirty ();
       t->setType(TileStyle::Type(tilestyle_combobox->get_active_row_number()));
       int idx = t->getType();
@@ -1226,7 +1227,7 @@ void TileSetWindow::on_organize_tilestyles_activated()
   TileStyleOrganizerDialog d(*window, get_selected_tile());
   if (d.run ())
     {
-      undos.push_front (action);
+      addUndo (action);
       dirty ();
       update ();
     }
@@ -1242,7 +1243,7 @@ void TileSetWindow::on_smallmap_building_colors_activated()
   d.run_and_hide();
   if (d.get_changed ())
     {
-      undos.push_front (action);
+      addUndo (action);
       dirty ();
     }
   else
@@ -1257,7 +1258,7 @@ void TileSetWindow::on_move_bonus_images_activated()
   d.run_and_hide();
   if (d.get_changed ())
     {
-      undos.push_front (action);
+      addUndo (action);
       dirty ();
     }
   else
@@ -1369,7 +1370,7 @@ void TileSetWindow::on_roads_picture_activated()
           d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          undos.push_front (action);
+          addUndo (action);
           d_tileset->getRoad()->load (d_tileset, newname);
           d_tileset->getRoad()->instantiateImages ();
           dirty ();
@@ -1386,7 +1387,7 @@ void TileSetWindow::on_roads_picture_activated()
         new TileSetEditorAction_Roads (d_tileset);
       if (d_tileset->removeFileInCfgFile(imgname))
         {
-          undos.push_front (action);
+          addUndo (action);
           d_tileset->uninstantiateSameNamedImages (imgname);
           dirty ();
         }
@@ -1419,7 +1420,7 @@ void TileSetWindow::on_stones_picture_activated()
           d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          undos.push_front (action);
+          addUndo (action);
           d_tileset->getStone()->load (d_tileset, newname);
           d_tileset->getStone()->instantiateImages ();
           dirty ();
@@ -1436,7 +1437,7 @@ void TileSetWindow::on_stones_picture_activated()
         new TileSetEditorAction_Stones (d_tileset);
       if (d_tileset->removeFileInCfgFile(imgname))
         {
-          undos.push_front (action);
+          addUndo (action);
           d_tileset->uninstantiateSameNamedImages (imgname);
           dirty ();
         }
@@ -1469,7 +1470,7 @@ void TileSetWindow::on_bridges_picture_activated()
           d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          undos.push_front (action);
+          addUndo (action);
           d_tileset->getBridge ()->load (d_tileset, newname);
           d_tileset->getBridge ()->instantiateImages ();
           dirty ();
@@ -1486,7 +1487,7 @@ void TileSetWindow::on_bridges_picture_activated()
         new TileSetEditorAction_Bridges (d_tileset);
       if (d_tileset->removeFileInCfgFile(imgname))
         {
-          undos.push_front (action);
+          addUndo (action);
           d_tileset->uninstantiateSameNamedImages (imgname);
           dirty ();
         }
@@ -1518,7 +1519,7 @@ void TileSetWindow::on_fog_picture_activated()
           d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
       if (success)
         {
-          undos.push_front (action);
+          addUndo (action);
           d_tileset->getFog ()->load(d_tileset, newname);
           d_tileset->getFog ()->instantiateImages ();
           dirty ();
@@ -1535,7 +1536,7 @@ void TileSetWindow::on_fog_picture_activated()
         new TileSetEditorAction_Fog (d_tileset);
       if (d_tileset->removeFileInCfgFile(imgname))
         {
-          undos.push_front (action);
+          addUndo (action);
           d_tileset->uninstantiateSameNamedImages (imgname);
           dirty ();
         }
@@ -1553,7 +1554,7 @@ void TileSetWindow::on_flags_picture_activated()
   TilesetFlagEditorDialog d(*window, d_tileset);
   if (d.run())
     {
-      undos.push_front (action);
+      addUndo (action);
       dirty ();
     }
   else
@@ -1567,7 +1568,7 @@ void TileSetWindow::on_army_unit_selector_activated()
   TilesetSelectorEditorDialog d(*window, d_tileset);
   if (d.run ())
     {
-      undos.push_front (action);
+      addUndo (action);
       dirty ();
     }
   else
@@ -1581,7 +1582,7 @@ void TileSetWindow::on_explosion_picture_activated()
   TilesetExplosionPictureEditorDialog d(*window, d_tileset);
   if (d.run())
     {
-      undos.push_front (action);
+      addUndo (action);
       dirty ();
     }
   else
@@ -1970,7 +1971,11 @@ void TileSetWindow::on_edit_undo_activated ()
   undos.pop_front ();
   TileSetEditorAction *redo = executeAction (a);
   if (redo)
-    redos.push_front (redo);
+    {
+      redos.push_front (redo);
+      if (redos.size () > UNDO_LIMIT)
+        delete redos.back ();
+    }
   delete a;
   if (undos.empty ())
     needs_saving = false;
@@ -1985,6 +1990,8 @@ void TileSetWindow::on_edit_redo_activated ()
   TileSetEditorAction *undo = executeAction (a);
   delete a;
   undos.push_front (undo);
+  if (undos.size () > UNDO_LIMIT)
+    delete undos.back ();
   update ();
 }
 
@@ -2334,7 +2341,7 @@ void TileSetWindow::on_moves_changed()
       Tile *t = row[tiles_columns.tile];
       TileSetEditorAction_Moves *action =
         new TileSetEditorAction_Moves (getCurIndex (), t->getMoves ());
-      undos.push_front (action);
+      addUndo (action);
       if (tile_moves_spinbutton->get_value () < MIN_MOVES_FOR_TILES)
         tile_moves_spinbutton->set_value (MIN_MOVES_FOR_TILES);
       else if (tile_moves_spinbutton->get_value () > MAX_MOVES_FOR_TILES)
@@ -2398,6 +2405,13 @@ void TileSetWindow::clearUndoAndRedo ()
   for (auto a : undos)
     delete a;
   undos.clear ();
+}
+
+void TileSetWindow::addUndo (TileSetEditorAction *a)
+{
+  undos.push_front (a);
+  if (undos.size () > UNDO_LIMIT)
+    delete undos.back ();
 }
 /*
  some test cases

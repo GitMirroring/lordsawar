@@ -232,6 +232,7 @@ class ArmySetWindow: public sigc::trackable
     int getCurIndex ();
     void disconnect_signals ();
     void connect_signals ();
+    void addUndo(ArmySetEditorAction *a);
     std::vector<sigc::connection> connections;
 };
 
