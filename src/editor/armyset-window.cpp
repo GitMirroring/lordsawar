@@ -201,11 +201,8 @@ ArmySetWindow::ArmySetWindow(Glib::ustring load_filename)
   update_armyset_buttons();
 
   if (load_filename.empty() == false)
-    {
-      load_armyset (load_filename);
-      update_armyset_buttons();
-      update_army_panel();
-    }
+    load_armyset (load_filename);
+  update ();
   d_reorder_action = NULL;
 }
 
@@ -315,15 +312,16 @@ bool ArmySetWindow::make_new_armyset ()
   d_armyset = new Armyset (Armysetlist::getNextAvailableId (1), name);
   d_armyset->setNewTemporaryFile ();
 
-  armies_list->clear();
 
   clearUndoAndRedo ();
 
+  disconnect_signals ();
+  armies_list->clear();
   refresh_armies ();
-  update_army_panel ();
+  connect_signals ();
+
   needs_saving = true;
-  update_window_title ();
-  update_menuitems ();
+  update ();
   return true;
 }
 
@@ -365,8 +363,7 @@ bool ArmySetWindow::load_armyset ()
         }
     }
 
-  refresh_armies ();
-  update_army_panel ();
+  update ();
   return ret;
 }
 
@@ -1550,7 +1547,6 @@ bool ArmySetWindow::load_armyset(Glib::ustring filename)
       dialog.run_and_hide();
       return false;
     }
-  armies_list->clear();
   if (d_armyset)
     delete d_armyset;
   d_armyset = armyset;
@@ -1566,6 +1562,8 @@ bool ArmySetWindow::load_armyset(Glib::ustring filename)
       td.run_and_hide();
       return false;
     }
+  disconnect_signals ();
+  armies_list->clear();
   for (Armyset::iterator i = d_armyset->begin(); i != d_armyset->end(); ++i)
     addArmyType((*i)->getId());
   if (d_armyset->empty() == false)
@@ -1575,10 +1573,10 @@ bool ArmySetWindow::load_armyset(Glib::ustring filename)
       if(row)
 	armies_treeview->get_selection()->select(row);
     }
+  connect_signals ();
+
   needs_saving = false;
-  update_window_title ();
   clearUndoAndRedo ();
-  update_menuitems ();
   return true;
 }
 
@@ -2236,19 +2234,31 @@ ArmySetWindow::doReloadArmyset (ArmySetEditorAction_Save *action)
     File::get_basename (d_armyset->getConfigurationFile (true));
   Glib::ustring oldext = d_armyset->getExtension ();
 
+  int idx = getCurIndex ();
   bool unsupported = false;
   replaceCurrentArmyset (action->getArmysetFilename (), unsupported);
   bool broken = false;
   d_armyset->instantiateImages(false, broken);
+
+  disconnect_signals ();
+  armies_list->clear();
   for (Armyset::iterator i = d_armyset->begin(); i != d_armyset->end(); ++i)
     addArmyType((*i)->getId());
-  if (d_armyset->empty() == false)
+  if (idx >= 0)
     {
-      Gtk::TreeModel::Row row;
-      row = armies_treeview->get_model()->children()[0];
-      if(row)
-	armies_treeview->get_selection()->select(row);
+      if (d_armyset->size () >= (guint32)idx)
+        armies_treeview->set_cursor
+          (Gtk::TreePath (String::ucompose ("%1", idx)));
+      else
+        armies_treeview->set_cursor (Gtk::TreePath ("0"));
+
+      Glib::RefPtr<Gtk::TreeSelection> selection =
+        armies_treeview->get_selection();
+      Gtk::TreeModel::iterator i = selection->get_selected ();
+      armies_treeview->scroll_to_row
+        (armies_treeview->get_model ()->get_path (i));
     }
+  connect_signals ();
 
   d_armyset->setDirectory (olddir);
   d_armyset->setBaseName (oldname);
@@ -2261,7 +2271,6 @@ bool ArmySetWindow::replaceCurrentArmyset (Glib::ustring filename, bool &unsuppo
   Armyset *armyset = Armyset::create(filename, unsupported_version);
   if (armyset == NULL || unsupported_version)
     return false;
-  armies_list->clear();
   if (d_armyset)
     delete d_armyset;
   d_armyset = armyset;
