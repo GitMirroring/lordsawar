@@ -50,7 +50,7 @@ class ShieldSetEditorAction
         };
 
 	//! Default constructor.
-        ShieldSetEditorAction(Type type);
+        ShieldSetEditorAction(Type type) : d_type(type) {}
 
 	//! Destructor.
         virtual ~ShieldSetEditorAction() {}
@@ -80,9 +80,11 @@ class ShieldSetEditorAction_Color: public ShieldSetEditorAction
 	/**
          * Populate the change color action with the player id and a color.
          */
-        ShieldSetEditorAction_Color (guint32 player_id, Gdk::RGBA color);
+        ShieldSetEditorAction_Color (guint32 id, Gdk::RGBA c)
+          : ShieldSetEditorAction(ShieldSetEditorAction::CHANGE_COLOR),
+          d_player_id (id), d_color (c) {}
 	//! Destroy a change color action.
-        ~ShieldSetEditorAction_Color () {};
+        ~ShieldSetEditorAction_Color () {}
 
         Glib::ustring getActionName () {return _("Color");}
 
@@ -110,9 +112,13 @@ class ShieldSetEditorAction_Properties: public ShieldSetEditorAction
          * copyright, license text, and shield image dimensions:
          * small medium large, and width and heights.
          */
-        ShieldSetEditorAction_Properties (Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 sw, guint32 sh, guint32 mw, guint32 mh, guint32 lw, guint32 lh);
+        ShieldSetEditorAction_Properties (Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 sw, guint32 sh, guint32 mw, guint32 mh, guint32 lw, guint32 lh)
+          :ShieldSetEditorAction(ShieldSetEditorAction::CHANGE_PROPERTIES),
+          d_name (n), d_desc (d), d_copyright (c), d_license (l),
+          d_small_width (sw), d_small_height (sh), d_medium_width (mw),
+          d_medium_height (mh), d_large_width (lw), d_large_height (lh) {}
 	//! Destroy a change properties action.
-        ~ShieldSetEditorAction_Properties () {};
+        ~ShieldSetEditorAction_Properties () {}
 
         Glib::ustring getActionName () {return _("Properties");}
 
@@ -179,9 +185,11 @@ class ShieldSetEditorAction_WhiteDown: public ShieldSetEditorAction_Save
 	/**
          * Populate the white down action with the shieldset.
          */
-        ShieldSetEditorAction_WhiteDown (Shieldset *s);
+        ShieldSetEditorAction_WhiteDown (Shieldset *s)
+          :ShieldSetEditorAction_Save(s,
+                                      ShieldSetEditorAction::COPY_WHITE_DOWN){}
 	//! Destroy a white down action, and delete the file.
-        ~ShieldSetEditorAction_WhiteDown () {};
+        ~ShieldSetEditorAction_WhiteDown () {}
 
         Glib::ustring getActionName () {return _("Copy White Shields");}
 
@@ -204,9 +212,10 @@ class ShieldSetEditorAction_AddImage: public ShieldSetEditorAction_Save
 	/**
          * Populate the add image action with the shieldset.
          */
-        ShieldSetEditorAction_AddImage (Shieldset *s);
+        ShieldSetEditorAction_AddImage (Shieldset *s)
+          :ShieldSetEditorAction_Save(s, ShieldSetEditorAction::ADD_IMAGE) {}
 	//! Destroy an add-image action, and delete the file.
-        ~ShieldSetEditorAction_AddImage () {};
+        ~ShieldSetEditorAction_AddImage () {}
 
         Glib::ustring getActionName () {return _("Add Image");}
 };
@@ -228,9 +237,10 @@ class ShieldSetEditorAction_ClearImage: public ShieldSetEditorAction_Save
 	/**
          * Populate the clear image action with the shieldset.
          */
-        ShieldSetEditorAction_ClearImage (Shieldset *s);
+        ShieldSetEditorAction_ClearImage (Shieldset *s)
+          :ShieldSetEditorAction_Save(s, ShieldSetEditorAction::CLEAR_IMAGE){}
 	//! Destroy an clear-image action, and delete the file.
-        ~ShieldSetEditorAction_ClearImage () {};
+        ~ShieldSetEditorAction_ClearImage () {}
 
         Glib::ustring getActionName () {return _("Clear Image");}
 };

@@ -25,31 +25,6 @@
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<< x << std::endl<<std::flush;}
 #define debug(x)
 
-ShieldSetEditorAction::ShieldSetEditorAction(Type type)
-    :d_type(type)
-{
-}
-
-//-----------------------------------------------------------------------------
-//ShieldSetEditorAction_Color
-
-ShieldSetEditorAction_Color::ShieldSetEditorAction_Color(guint32 id, Gdk::RGBA c)
- :ShieldSetEditorAction(ShieldSetEditorAction::CHANGE_COLOR), d_player_id (id),
-    d_color (c)
-{
-}
-
-//-----------------------------------------------------------------------------
-//ShieldSetEditorAction_Properties
-
-ShieldSetEditorAction_Properties::ShieldSetEditorAction_Properties(Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 sw, guint32 sh, guint32 mw, guint32 mh, guint32 lw, guint32 lh)
- :ShieldSetEditorAction(ShieldSetEditorAction::CHANGE_PROPERTIES), d_name (n),
-    d_desc (d), d_copyright (c), d_license (l), d_small_width (sw),
-    d_small_height (sh), d_medium_width (mw), d_medium_height (mh),
-    d_large_width (lw), d_large_height (lh)
-{
-}
-
 //-----------------------------------------------------------------------------
 //ShieldSetEditorAction_Save
 
@@ -66,28 +41,4 @@ ShieldSetEditorAction_Save::~ShieldSetEditorAction_Save ()
 {
   File::erase (d_filename);
   delete d_shieldset;
-}
-
-//-----------------------------------------------------------------------------
-//ShieldSetEditorAction_WhiteDown
-
-ShieldSetEditorAction_WhiteDown::ShieldSetEditorAction_WhiteDown(Shieldset *s)
- :ShieldSetEditorAction_Save(s, ShieldSetEditorAction::COPY_WHITE_DOWN)
-{
-}
-
-//-----------------------------------------------------------------------------
-//ShieldSetEditorAction_AddImage
-
-ShieldSetEditorAction_AddImage::ShieldSetEditorAction_AddImage(Shieldset *s)
- :ShieldSetEditorAction_Save(s, ShieldSetEditorAction::ADD_IMAGE)
-{
-}
-
-//-----------------------------------------------------------------------------
-//ShieldSetEditorAction_ClearImage
-
-ShieldSetEditorAction_ClearImage::ShieldSetEditorAction_ClearImage(Shieldset *s)
- :ShieldSetEditorAction_Save(s, ShieldSetEditorAction::CLEAR_IMAGE)
-{
 }
