@@ -1,4 +1,4 @@
-// Copyright (C) 2017, 2020 Ben Asselstine
+// Copyright (C) 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -44,6 +44,9 @@ class ScenarioMedia
 
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag;
+
+        //! Makes a copy of the scenario media.
+        ScenarioMedia * copy () {return new ScenarioMedia (*this);}
 
         //! Returns the singleton instance.
 	static ScenarioMedia* getInstance();
@@ -146,6 +149,12 @@ class ScenarioMedia
           {return Snd::getInstance ()->getFile ("victory");}
         static Glib::ustring getDefaultBackSoundFilename ()
           {return Snd::getInstance ()->getFile ("back");}
+        //! Replace the current scenario media with another.
+        static void reset (ScenarioMedia *m);
+
+        //! Destructor.
+        ~ScenarioMedia();
+
     protected:
 
 	//! Creates a new ScenarioMedia object from scratch.
@@ -156,9 +165,6 @@ class ScenarioMedia
 
 	//! Creates a new ScenarioMedia object from an opened save-file.
         ScenarioMedia(XML_Helper *helper);
-
-        //! Destructor.
-        ~ScenarioMedia();
 
     private:
 

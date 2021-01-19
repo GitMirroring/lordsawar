@@ -1,8 +1,8 @@
 // Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014, 2015, 2017,
-// 2020 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014, 2015, 2017, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -146,6 +146,15 @@ GameScenario::GameScenario(Glib::ustring savegame, bool& broken)
       t.Close();
       cleanup();
     }
+}
+
+GameScenario::GameScenario (const GameScenario &g)
+ : GameScenarioOptions (g), TarFile (g), d_name (g.d_name),
+    d_comment (g.d_comment), d_copyright (g.d_copyright),
+    d_license (g.d_license), d_playmode (g.d_playmode), d_id (g.d_id),
+    inhibit_autosave_removal (g.inhibit_autosave_removal),
+    loaded_game_filename (g.loaded_game_filename)
+{
 }
 
 bool GameScenario::loadArmysets(Tar_Helper *t)

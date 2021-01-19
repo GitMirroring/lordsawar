@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -56,6 +56,21 @@ Signpostlist::Signpostlist()
 {
 }
 
+Signpostlist::~Signpostlist()
+{
+  for (iterator it = begin(); it != end(); ++it)
+    delete *it;
+  d_object.clear();
+  d_id.clear();
+}
+
+Signpostlist::Signpostlist (const Signpostlist &s)
+ : LocationList<Signpost*> (), sigc::trackable (s)
+{
+  for (auto signpost : s)
+    push_back (new Signpost (*signpost));
+}
+
 Signpostlist::Signpostlist(XML_Helper* helper)
 {
     helper->registerTag(Signpost::d_tag, sigc::mem_fun(this, &Signpostlist::load));
@@ -93,4 +108,10 @@ guint32 Signpostlist::countUnamedSignposts () const
     if ((*it)->getName () == DEFAULT_SIGNPOST)
       count++;
   return count;
+}
+
+void Signpostlist::reset (Signpostlist *s)
+{
+  delete s_instance;
+  s_instance = s;
 }

@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -54,6 +54,21 @@ void Bridgelist::deleteInstance()
 
 Bridgelist::Bridgelist()
 {
+}
+
+Bridgelist::~Bridgelist()
+{
+  for (iterator it = begin(); it != end(); ++it)
+    delete *it;
+  d_object.clear();
+  d_id.clear();
+}
+
+Bridgelist::Bridgelist (const Bridgelist &b)
+ : LocationList<Bridge*> (), sigc::trackable (b)
+{
+  for (auto bridge : b)
+    push_back (new Bridge (*bridge));
 }
 
 Bridgelist::Bridgelist(XML_Helper* helper)
@@ -131,3 +146,8 @@ std::list<Vector<int> > Bridgelist::getRoadEntryPoints(Bridge *bridge)
   return points;
 }
 
+void Bridgelist::reset (Bridgelist *b)
+{
+  delete s_instance;
+  s_instance = b;
+}

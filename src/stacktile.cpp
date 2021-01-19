@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2009, 2014, 2015, 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,11 @@
 
 StackTile::StackTile(Vector<int> pos)
   :tile(pos)
+{
+}
+
+StackTile::StackTile(const StackTile &s)
+ :std::list<StackTileRecord> (s), tile (s.tile)
 {
 }
 

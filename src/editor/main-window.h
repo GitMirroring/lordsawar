@@ -28,6 +28,7 @@
 
 #include "map-tip-position.h"
 #include "editorbigmap.h"
+#include "editor-actions.h"
 
 class EditorBigMap;
 class SmallMap;
@@ -78,6 +79,8 @@ class MainWindow: public sigc::trackable
     Gtk::MenuItem *import_map_from_sav_menuitem;
     Gtk::MenuItem *validate_menuitem;
     Gtk::MenuItem *quit_menuitem;
+    Gtk::MenuItem *edit_undo_menuitem;
+    Gtk::MenuItem *edit_redo_menuitem;
     Gtk::MenuItem *edit_players_menuitem;
     Gtk::MenuItem *edit_map_info_menuitem;
     Gtk::MenuItem *edit_shieldset_menuitem;
@@ -143,6 +146,8 @@ class MainWindow: public sigc::trackable
 
     void on_quit_activated();
     bool quit();
+    void on_edit_undo_activated();
+    void on_edit_redo_activated();
     void on_edit_map_info_activated();
     void on_edit_players_activated();
     void on_edit_shieldset_activated();
@@ -295,7 +300,11 @@ class MainWindow: public sigc::trackable
     std::list<Army*> battle_calculator_attackers;
     std::list<Army*> battle_calculator_defenders;
     Gtk::Allocation unmaximized_box;
-
+    std::list<EditorAction *> undos;
+    std::list<EditorAction *> redos;
+    void addUndo(EditorAction *a);
+    void clearUndoAndRedo ();
+    EditorAction* executeAction (EditorAction *action);
 };
 
 #endif

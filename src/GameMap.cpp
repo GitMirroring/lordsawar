@@ -2,7 +2,7 @@
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2003, 2005, 2006 Andrea Paternesi
 // Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2017,
-// 2020 Ben Asselstine
+// 2020, 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 // Copyright (C) 2008 Janek Kozicki
 //
@@ -129,6 +129,20 @@ GameMap::GameMap(Glib::ustring TilesetName, Glib::ustring ShieldsetName,
   for (int j = 0; j < s_height; j++)
     for (int i = 0; i < s_width; i++)
       d_map[j*s_width + i].setPos(Vector<int>(i, j));
+}
+
+GameMap::GameMap(const GameMap &m)
+ : sigc::trackable (m)
+{
+  Vector<int>::setMaximumWidth(s_width);
+  d_map = new Maptile[s_width*s_height];
+  for (int j = 0; j < s_height; j++)
+    for (int i = 0; i < s_width; i++)
+      d_map[j+s_width + i] = Maptile (m.d_map[j+s_width + i]);
+
+  d_tileset = m.d_tileset;
+  d_shieldset = m.d_shieldset;
+  d_cityset = m.d_cityset;
 }
 
 bool GameMap::offmap(int x, int y)
@@ -2784,4 +2798,13 @@ std::vector<Armyset*> GameMap::getArmysets ()
   for (auto id : Playerlist::getInstance()->getArmysets ())
     armysets.push_back (Armysetlist::getInstance ()->get(id));
   return armysets;
+}
+
+void GameMap::reset (GameMap *m)
+{
+  delete s_instance;
+  s_instance = m;
+  s_tileset = Tilesetlist::getInstance ()->get (m->d_tileset);
+  s_cityset = Citysetlist::getInstance ()->get (m->d_cityset);
+  s_shieldset = Shieldsetlist::getInstance ()->get (m->d_shieldset);
 }

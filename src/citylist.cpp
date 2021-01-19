@@ -2,7 +2,8 @@
 // Copyright (C) 2001, 2002, 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -70,6 +71,21 @@ void Citylist::deleteInstance()
 
 Citylist::Citylist()
 {
+}
+
+Citylist::~Citylist()
+{
+  for (iterator it = begin(); it != end(); ++it)
+    delete *it;
+  d_object.clear();
+  d_id.clear();
+}
+
+Citylist::Citylist (const Citylist &c)
+ : LocationList<City*> (), sigc::trackable (c)
+{
+  for (auto city : c)
+    push_back (new City (*city));
 }
 
 Citylist::Citylist(XML_Helper* helper)
@@ -619,5 +635,11 @@ guint32 Citylist::countUnamedCities () const
     if ((*it)->getName () == DEFAULT_CITY_NAME)
       count++;
   return count;
+}
+
+void Citylist::reset (Citylist *c)
+{
+  delete s_instance;
+  s_instance = c;
 }
 // End of file

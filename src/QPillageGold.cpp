@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -46,6 +46,12 @@ QuestPillageGold::QuestPillageGold(QuestsManager& q_mgr, XML_Helper* helper)
   helper->getData(d_pillaged, "pillaged");
 
   initDescription();
+}
+
+QuestPillageGold::QuestPillageGold (const QuestPillageGold &q)
+ : Quest (q), sigc::trackable (q), d_to_pillage (q.d_to_pillage),
+    d_pillaged (q.d_pillaged)
+{
 }
 
 QuestPillageGold::QuestPillageGold(QuestsManager& q_mgr, guint32 hero, guint32 gold)

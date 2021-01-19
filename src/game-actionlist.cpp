@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -56,6 +56,13 @@ GameActionlist::GameActionlist()
 {
 }
 
+GameActionlist::GameActionlist (const GameActionlist &g)
+ : std::list<TurnActionlist*> (), sigc::trackable (g)
+{
+  for (auto turnactionlist: g)
+    push_back (new TurnActionlist (*turnactionlist));
+}
+
 GameActionlist::~GameActionlist()
 {
   for (GameActionlist::iterator it = begin(); it != end(); ++it)
@@ -97,4 +104,10 @@ bool GameActionlist::load(Glib::ustring tag, XML_Helper* helper)
 void GameActionlist::add(TurnActionlist *t)
 {
   push_back(t);
+}
+
+void GameActionlist::reset (GameActionlist *g)
+{
+  delete s_instance;
+  s_instance = g;
 }

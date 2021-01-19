@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -47,6 +47,9 @@ public:
      * @param hero   The Id of the Hero who is responsible for the quest.
      */
     QuestCitySack(QuestsManager& q_mgr, guint32 hero);
+
+    //! Copy constructor.
+    QuestCitySack (const QuestCitySack &q);
 
     //! Destructor.
     ~QuestCitySack() {};

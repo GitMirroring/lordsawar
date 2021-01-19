@@ -1,4 +1,4 @@
-// Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -57,6 +57,21 @@ Portlist::Portlist()
 {
 }
 
+Portlist::~Portlist()
+{
+  for (iterator it = begin(); it != end(); ++it)
+    delete *it;
+  d_object.clear();
+  d_id.clear();
+}
+
+Portlist::Portlist (const Portlist &p)
+ : LocationList<Port*> (), sigc::trackable (p)
+{
+  for (auto port : p)
+    push_back (new Port (*port));
+}
+
 Portlist::Portlist(XML_Helper* helper)
 {
     helper->registerTag(Port::d_tag, sigc::mem_fun(this, &Portlist::load));
@@ -87,3 +102,8 @@ bool Portlist::load(Glib::ustring tag, XML_Helper* helper)
     return true;
 }
 
+void Portlist::reset (Portlist *p)
+{
+  delete s_instance;
+  s_instance = p;
+}

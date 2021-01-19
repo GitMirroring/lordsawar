@@ -1,6 +1,7 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -51,6 +52,20 @@ Maptile::Maptile(int x, int y, Tile::Type type)
     d_stacktile = NULL;
     d_backpack = NULL;
     memset (d_blocked, 0, sizeof (d_blocked));
+}
+
+Maptile::Maptile(const Maptile &m)
+ :Movable (m), d_index (m.d_index), d_building (m.d_building)
+{
+  if (d_backpack)
+    d_backpack = new MapBackpack (*m.d_backpack);
+  else
+    d_backpack = NULL;
+
+  if (d_stacktile)
+    d_stacktile = new StackTile (*m.d_stacktile);
+  else
+    d_stacktile = NULL;
 }
 
 Maptile::~Maptile()

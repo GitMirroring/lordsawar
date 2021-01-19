@@ -2,7 +2,8 @@
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -85,6 +86,35 @@ Playerlist::Playerlist()
 {
     d_activeplayer = 0;
     viewingplayer = 0;
+}
+
+Playerlist::Playerlist (const Playerlist &plist)
+ : std::list<Player*> (), sigc::trackable (plist)
+{
+  for (auto p : plist)
+    {
+      switch (p->getType ())
+        {
+        case Player::HUMAN:
+          push_back (new RealPlayer (*p));
+          break;
+        case Player::AI_FAST:
+          push_back (new AI_Fast (*p));
+          break;
+        case Player::AI_DUMMY:
+          push_back (new AI_Dummy (*p));
+          break;
+        case Player::AI_SMART:
+          push_back (new AI_Smart (*p));
+          break;
+        case Player::NETWORKED:
+          push_back (new NetworkPlayer (*p));
+          break;
+        }
+      if (plist.getNeutral () == p)
+        d_neutral = back ();
+      d_id[back ()->getId ()] = back ();
+    }
 }
 
 Playerlist::Playerlist(XML_Helper* helper)
@@ -1004,4 +1034,10 @@ std::list<guint32> Playerlist::getArmysets() const
     ids.push_back ((*i)->getArmyset ());
   ids.unique ();
   return ids;
+}
+
+void Playerlist::reset (Playerlist *p)
+{
+  delete s_instance;
+  s_instance = p;
 }

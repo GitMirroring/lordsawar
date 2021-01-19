@@ -1,5 +1,5 @@
 // Copyright (C) 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -79,6 +79,13 @@ Itemlist::Itemlist(XML_Helper* helper)
 
 Itemlist::Itemlist()
 {
+}
+
+Itemlist::Itemlist (const Itemlist &ilist)
+ : std::map<guint32, ItemProto*> (), sigc::trackable (ilist)
+{
+  for (auto i : ilist)
+    (*this)[i.first] = new ItemProto (*i.second);
 }
 
 Itemlist::~Itemlist()
@@ -165,3 +172,8 @@ void Itemlist::create()
     getInstance();
 }
 
+void Itemlist::reset (Itemlist *i)
+{
+  delete d_instance;
+  d_instance = i;
+}

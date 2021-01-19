@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -43,6 +43,11 @@ QuestKillHero::QuestKillHero(QuestsManager& mgr, guint32 hero)
 {
   d_targets.push_back(Stacklist::getPosition (d_victim));
   initDescription();
+}
+
+QuestKillHero::QuestKillHero (const QuestKillHero &q)
+ : Quest (q), sigc::trackable (q), d_victim (q.d_victim)
+{
 }
 
 QuestKillHero::QuestKillHero(QuestsManager& q_mgr, XML_Helper* helper) 

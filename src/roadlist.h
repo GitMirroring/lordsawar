@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,6 +36,9 @@ class Roadlist : public LocationList<Road*>, public sigc::trackable
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
 
+        //! Makes a copy of the roadlist.
+        Roadlist* copy () {return new Roadlist (*this);}
+
 	// Methods that operate on the class data but do not modify the class.
 
         //! Saves the list of roads to the opened saved-game file.
@@ -63,6 +66,12 @@ class Roadlist : public LocationList<Road*>, public sigc::trackable
         //! Explicitly delete the singleton instance.
         static void deleteInstance();
         
+        //! Replace the current roadlist with another.
+        static void reset (Roadlist *r);
+
+        //! Destructor.
+        ~Roadlist();
+
     protected:
         //! Default constructor.
         Roadlist();
@@ -77,6 +86,8 @@ class Roadlist : public LocationList<Road*>, public sigc::trackable
 	 */
         Roadlist(XML_Helper* helper);
 
+        //! Copy constructor
+        Roadlist (const Roadlist &c);
     private:
         //! Callback for loading road objects into the list.
         bool load(Glib::ustring tag, XML_Helper* helper);

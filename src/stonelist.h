@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,6 +36,9 @@ class Stonelist : public LocationList<Stone*>, public sigc::trackable
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
 
+        //! Makes a copy of the stonelist.
+        Stonelist* copy () {return new Stonelist (*this);}
+
 	// Methods that operate on the class data but do not modify the class.
 
         //! Saves the list of stones to the opened saved-game file.
@@ -52,6 +55,12 @@ class Stonelist : public LocationList<Stone*>, public sigc::trackable
         //! Explicitly delete the singleton instance.
         static void deleteInstance();
         
+        //! Replace the current stonelist with another.
+        static void reset (Stonelist *s);
+
+        //! Destructor.
+        ~Stonelist();
+
     protected:
         //! Default constructor.
         Stonelist();
@@ -65,6 +74,9 @@ class Stonelist : public LocationList<Stone*>, public sigc::trackable
 	 *                from.
 	 */
         Stonelist(XML_Helper* helper);
+
+        //! Copy constructor
+        Stonelist (const Stonelist &s);
 
     private:
         //! Callback for loading stone objects into the list.

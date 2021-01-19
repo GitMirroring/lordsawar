@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001 Michael Bartl
 // Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004 John Farrell
-// Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,6 +40,8 @@ class Ruinlist : public LocationList<Ruin*>, public sigc::trackable
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
 
+        //! Makes a copy of the ruinlist.
+        Ruinlist* copy () {return new Ruinlist (*this);}
 
 	// Methods that operate on class data and modify the class.
 
@@ -161,6 +163,11 @@ class Ruinlist : public LocationList<Ruin*>, public sigc::trackable
         //! Explicitly deletes the singleton instance.
         static void deleteInstance();
         
+        //! Replace the current ruinlist with another.
+        static void reset (Ruinlist *r);
+
+	//! Destructor.
+        ~Ruinlist();
     protected:
 
 	//! Default constructor.
@@ -175,6 +182,9 @@ class Ruinlist : public LocationList<Ruin*>, public sigc::trackable
 	 *                from.
 	 */
         Ruinlist(XML_Helper* helper);
+
+        //! Copy constructor
+        Ruinlist (const Ruinlist &r);
 
     private:
         //! Loading callback for loading Ruin objects into the list.

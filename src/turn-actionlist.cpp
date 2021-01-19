@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,13 @@ TurnActionlist::TurnActionlist(const Player *p, const std::list<Action*> &action
   : OwnerId(p->getId())
 {
   add (actions);
+}
+
+TurnActionlist::TurnActionlist (const TurnActionlist &t)
+ : std::list<Action *> (), OwnerId (t), sigc::trackable (t)
+{
+  for (auto action: t)
+    push_back (Action::copy (action));
 }
 
 TurnActionlist::~TurnActionlist()

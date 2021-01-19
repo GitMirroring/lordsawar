@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2007-2009, 2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2007-2009, 2011, 2014, 2015, 2017, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -74,6 +74,35 @@ void QuestsManager::deleteInstance()
 QuestsManager::QuestsManager()
 {
     sharedInit();
+}
+
+QuestsManager::QuestsManager(const QuestsManager &q)
+: sigc::trackable (q),
+    d_quests (std::map<guint32,Quest*>()),
+    d_inactive_quests (std::list<Quest*>()),
+    d_completed_quests (std::list<Quest*>()),
+    d_questsFeasible (std::vector<QFeasibilityType>(q.d_questsFeasible))
+{
+  for (auto a : q.d_quests)
+    {
+      Quest *quest = Quest::copy (a.second);
+      quest->setQuestsManager (*this);
+      d_quests[a.first] = quest;
+    }
+
+  for (auto b : q.d_inactive_quests)
+    {
+      Quest *quest = Quest::copy (b);
+      quest->setQuestsManager (*this);
+      d_inactive_quests.push_back (quest);
+    }
+
+  for (auto c : q.d_completed_quests)
+    {
+      Quest *quest = Quest::copy (c);
+      quest->setQuestsManager (*this);
+      d_completed_quests.push_back (quest);
+    }
 }
 
 QuestsManager::QuestsManager(XML_Helper* helper)
@@ -525,4 +554,10 @@ void QuestsManager::nextTurn(Player *p)
 	    delete q;
 	}
     }
+}
+
+void QuestsManager::reset (QuestsManager *q)
+{
+  delete s_instance;
+  s_instance = q;
 }

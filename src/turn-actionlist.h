@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -43,6 +43,9 @@ class TurnActionlist : public std::list<Action*>, public OwnerId, public sigc::t
 
 	//! Loading constructor.
         TurnActionlist (XML_Helper* helper);
+
+        //! Copy constructor
+        TurnActionlist (const TurnActionlist &c);
 
 	//! Destructor.
         ~TurnActionlist ();

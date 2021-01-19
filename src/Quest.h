@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -84,6 +84,9 @@ class Quest: public OwnerId
 	 */
         Quest(QuestsManager& q_mgr, guint32 hero, Type type);
         
+        //! Copy constructor.
+        Quest (const Quest &q);
+
         //! Loading constructor.
 	/**
 	 * Make a new quest by loading it in from an opened saved-game file.
@@ -137,6 +140,8 @@ class Quest: public OwnerId
 	//! Set the Quest as not mattering anymore.
         void deactivate() {d_pending = true;}
 
+        //! Set quests manager
+        void setQuestsManager (QuestsManager &q);
 	
 	// Methods that operate on the class data but do not modify the class.
 
@@ -223,6 +228,9 @@ class Quest: public OwnerId
 
 	//! Convert a Quest::Type enumerated value to a string.
 	static Glib::ustring questTypeToString(const Quest::Type type);
+
+	//! deep copy a quest into another one
+	static Quest* copy(const Quest* q);
 
 	//! Return the Stack and Hero of a Quest.
         /**

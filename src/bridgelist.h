@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,6 +37,9 @@ class Bridgelist : public LocationList<Bridge*>, public sigc::trackable
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
 
+        //! Makes a copy of the bridgelist.
+        Bridgelist* copy () {return new Bridgelist (*this);}
+
 	// Methods that operate on the class data but do not modify the class.
 
         //! Saves the list of Bridge objects to the opened saved-game file.
@@ -71,6 +74,12 @@ class Bridgelist : public LocationList<Bridge*>, public sigc::trackable
         //! Explicitly delete the singleton instance.
         static void deleteInstance();
 
+        //! Replace the current bridgelist with another.
+        static void reset (Bridgelist *b);
+
+        //! Destructor.
+        ~Bridgelist();
+
     protected:
         //! Default constructor.
         Bridgelist();
@@ -83,6 +92,9 @@ class Bridgelist : public LocationList<Bridge*>, public sigc::trackable
 	 *                from.
 	 */
         Bridgelist(XML_Helper* helper);
+
+        //! Copy constructor
+        Bridgelist (const Bridgelist &b);
 
     private:
         //! Callback for loading Bridge objects into the list of bridges.

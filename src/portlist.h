@@ -1,4 +1,4 @@
-// Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,6 +37,9 @@ class Portlist : public LocationList<Port*>, public sigc::trackable
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
 
+        //! Makes a copy of the portlist.
+        Portlist* copy () {return new Portlist (*this);}
+
 	// Methods that operate on the class data but do not modify the class.
 
         //! Saves the list of Port objects to the opened saved-game file.
@@ -54,6 +57,11 @@ class Portlist : public LocationList<Port*>, public sigc::trackable
         //! Explicitly delete the singleton instance.
         static void deleteInstance();
 
+        //! Replace the current portlist with another.
+        static void reset (Portlist *p);
+
+        //! Destructor.
+        ~Portlist();
     protected:
 
         //! Default constructor.
@@ -66,6 +74,9 @@ class Portlist : public LocationList<Port*>, public sigc::trackable
 	 * @param helper  The opened saved-game file to load Port objects from.
 	 */
         Portlist(XML_Helper* helper);
+
+        //! Copy constructor
+        Portlist (const Portlist &p);
 
     private:
         //! Callback for loading Port objects into the list of ports.

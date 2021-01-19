@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -47,6 +47,9 @@ class QuestPillageGold : public Quest, public sigc::trackable
 	 * @param hero   The Id of the Hero who is responsible for the quest.
 	 */
         QuestPillageGold(QuestsManager& q_mgr, guint32 hero);
+
+        //! Copy constructor.
+        QuestPillageGold (const QuestPillageGold &q);
 
         //! Destructor.
         ~QuestPillageGold() {};
@@ -130,10 +133,6 @@ class QuestPillageGold : public Quest, public sigc::trackable
 
         //! The number of gold pieces already sacked and pillaged.
         guint32 d_pillaged;
-
-	//! The player whose cities this quest is targetting.
-	Player *d_victim_player;
-
 };
 
 #endif

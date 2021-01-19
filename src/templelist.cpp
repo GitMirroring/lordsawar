@@ -1,6 +1,6 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020, 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -61,6 +61,21 @@ void Templelist::deleteInstance()
 
 Templelist::Templelist()
 {
+}
+
+Templelist::~Templelist()
+{
+  for (iterator it = begin(); it != end(); ++it)
+    delete *it;
+  d_object.clear();
+  d_id.clear();
+}
+
+Templelist::Templelist (const Templelist &t)
+ : LocationList<Temple*> (), sigc::trackable (t)
+{
+  for (auto temple : t)
+    push_back (new Temple (*temple));
 }
 
 Templelist::Templelist(XML_Helper* helper)
@@ -175,4 +190,10 @@ guint32 Templelist::countUnamedTemples () const
     if ((*it)->getName () == DEFAULT_TEMPLE_NAME)
       count++;
   return count;
+}
+
+void Templelist::reset (Templelist *t)
+{
+  delete s_instance;
+  s_instance = t;
 }

@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2005 Ulf Lorenz
 // Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -56,6 +56,9 @@ class QuestsManager : public sigc::trackable
 
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
+
+        //! Makes a copy of the quests manager.
+        QuestsManager* copy () {return new QuestsManager (*this);}
 
 	// Methods that operate on the class data and modify it.
 
@@ -245,10 +248,15 @@ class QuestsManager : public sigc::trackable
         //! Explicitly deletes the singleton instance.
         static void deleteInstance();
 
+        //! Replace the current quests manager  with another.
+        static void reset (QuestsManager *q);
     protected:
 
 	//! Default constructor.
         QuestsManager();
+
+        //! Copy constructor.
+        QuestsManager(const QuestsManager &a);
 
 	//! Loading constructor.
 	/**

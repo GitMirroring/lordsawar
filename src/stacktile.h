@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2009, 2014, 2015, 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -57,6 +57,9 @@ class StackTile: public std::list<StackTileRecord>
 public:
     //! Constructor.
     StackTile(Vector<int> pos);
+
+    //! Copy constructor.
+    StackTile (const StackTile &s);
 
     //! Destructor.
     ~StackTile() {};

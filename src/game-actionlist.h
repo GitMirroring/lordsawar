@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -43,6 +43,9 @@ class GameActionlist : public std::list<TurnActionlist*>, public sigc::trackable
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
 
+        //! Makes a copy of the gameactionlist.
+        GameActionlist* copy () {return new GameActionlist (*this);}
+
         void add(TurnActionlist *t);
 
 	// Methods that operate on the class data but do not modify the class.
@@ -69,6 +72,8 @@ class GameActionlist : public std::list<TurnActionlist*>, public sigc::trackable
         //! Explicitly deletes the singleton instance.
         static void deleteInstance();
         
+        //! Replace the current gameactionlist with another.
+        static void reset (GameActionlist *g);
     protected:
 
 	//! Default constructor.
@@ -76,6 +81,9 @@ class GameActionlist : public std::list<TurnActionlist*>, public sigc::trackable
 
 	//! Loading constructor.
         GameActionlist (XML_Helper* helper);
+
+        //! Copy constructor
+        GameActionlist (const GameActionlist &g);
 
 	//! Destructor.
         ~GameActionlist ();
@@ -85,8 +93,8 @@ class GameActionlist : public std::list<TurnActionlist*>, public sigc::trackable
         //! Callback for loading the GameActionlist from a saved-game file.
         bool load(Glib::ustring tag, XML_Helper* helper);
 
-	// DATA
-
+        // DATA
+ 
         //! A static pointer for the singleton instance.
         static GameActionlist * s_instance;
 };

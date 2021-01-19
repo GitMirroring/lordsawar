@@ -1,7 +1,8 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2003, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2008 Janek Kozicki
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -70,6 +71,9 @@ class GameMap: public sigc::trackable
 
 	//! The xml tag of the itemstack subobject in a saved-game file.
 	static Glib::ustring d_itemstack_tag; 
+
+        //! Makes a copy of the citylist.
+        GameMap* copy () {return new GameMap (*this);}
 
         /** Singleton function to get the GameMap instance
           * 
@@ -1409,6 +1413,8 @@ class GameMap: public sigc::trackable
 
         static int calculateTilesPerOverviewMapTile(int width, int height);
         static int calculateTilesPerOverviewMapTile();
+        //! Replace the current GameMap with another.
+        static void reset (GameMap *m);
 
         Vector<int> findNearestAreaForBuilding(Maptile::Building building_type, Vector<int> pos, guint32 width);
 
@@ -1416,16 +1422,21 @@ class GameMap: public sigc::trackable
         static bool enemyCitiesPresent();
         static bool neutralCitiesPresent();
         static Stack* getStrongestStack(Vector<int> pos);
+
+        //! Destructor
+        ~GameMap();
+        
     protected:
         //! Create the map with the given tileset
         GameMap(Glib::ustring TilesetName = "", Glib::ustring ShieldsetName = "",
 		Glib::ustring Citysetname = "");
 
+        //! Copy constructor
+        GameMap (const GameMap &m);
+
         //! Load the map using the given XML_Helper
         GameMap(XML_Helper* helper);
 
-        ~GameMap();
-        
     private:
         //! Callback for item loading used during loading.
         bool loadItems(Glib::ustring tag, XML_Helper* helper);

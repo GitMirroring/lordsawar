@@ -1,6 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
 //  Copyright (C) 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2016, 2017,
-//  2020 Ben Asselstine
+//  2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -104,7 +104,9 @@
 #include "font-size.h"
 #include "scenario-list.h"
 #include "CreateScenario.h"
+#include "Scenario.h"
 
+const int UNDO_LIMIT = 100;
 #define method(x) sigc::mem_fun(*this, &MainWindow::x)
 
 #define EDITOR_DIALOG_BUTTON_TILE_PIC_FONTSIZE_MULTIPLE 3.7
@@ -235,6 +237,12 @@ MainWindow::MainWindow(Glib::ustring load_filename)
     xml->get_widget("quit_menuitem", quit_menuitem);
     quit_menuitem->signal_activate().connect(method(on_quit_activated));
 
+    xml->get_widget("edit_undo_menuitem", edit_undo_menuitem);
+    edit_undo_menuitem->signal_activate().connect
+      (method(on_edit_undo_activated));
+    xml->get_widget("edit_redo_menuitem", edit_redo_menuitem);
+    edit_redo_menuitem->signal_activate().connect
+      (method(on_edit_redo_activated));
     xml->get_widget("edit_players_menuitem", edit_players_menuitem);
     edit_players_menuitem->signal_activate().connect
       (method(on_edit_players_activated));
@@ -358,6 +366,7 @@ MainWindow::~MainWindow()
   delete window;
   SmallMap::s_quick = false;
   BigMap::s_show_hidden_ruins = false;
+  clearUndoAndRedo ();
 }
 
 void MainWindow::setup_pointer_radiobutton(Glib::RefPtr<Gtk::Builder> xml,
@@ -902,6 +911,7 @@ void MainWindow::on_new_map_activated()
       Playerlist::getInstance()->setActiveplayer(Playerlist::getInstance()->getNeutral());
       fill_players ();
       needs_saving = true;
+      clearUndoAndRedo ();
       update_window_title();
     }
 }
@@ -949,6 +959,7 @@ void MainWindow::on_load_map_activated()
             return;
           }
 
+        clearUndoAndRedo ();
 	init_map_state();
 	bigmap->screen_size_changed(bigmap_image->get_allocation()); 
         needs_saving = false;
@@ -1076,6 +1087,10 @@ void MainWindow::on_edit_map_info_activated()
     MapInfoDialog d(*window, game_scenario);
     if (d.run())
       {
+        game_scenario->setName (d.getName ());
+        game_scenario->setComment (d.getDescription ());
+        game_scenario->setCopyright (d.getCopyright ());
+        game_scenario->setLicense (d.getLicense ());
         needs_saving = true;
         update_window_title();
       }
@@ -2454,6 +2469,15 @@ void MainWindow::update_menuitems ()
   bool needs_capitals = Playerlist::getInstance()->playerHasNoCapitalCity ();
   random_assign_capital_cities_menuitem->set_sensitive
     (Citylist::getInstance ()->empty () == false && needs_capitals);
+
+  edit_redo_menuitem->set_sensitive (redos.empty () == false);
+  edit_undo_menuitem->set_sensitive (undos.empty () == false);
+  if (undos.empty () == false)
+    edit_undo_menuitem->set_label
+      (String::ucompose (_("Undo %1"), undos.front ()->getActionName ()));
+  if (redos.empty () == false)
+    edit_redo_menuitem->set_label
+      (String::ucompose (_("Redo %1"), redos.front ()->getActionName ()));
 }
 
 void MainWindow::set_default_bigmap_zoom ()
@@ -2474,4 +2498,87 @@ void MainWindow::on_tutorial_activated()
   gtk_show_uri(window->get_screen()->gobj(),
                "https://vimeo.com/408293387", 0, &errs);
   return;
+}
+
+void MainWindow::on_edit_undo_activated ()
+{
+  EditorAction *a = undos.front ();
+  undos.pop_front ();
+  EditorAction *redo = executeAction (a);
+  if (redo)
+    {
+      redos.push_front (redo);
+      if (redos.size () > UNDO_LIMIT)
+        delete redos.back ();
+    }
+  delete a;
+  if (undos.empty ())
+    needs_saving = false;
+  update_window_title ();
+  update_menuitems ();
+}
+
+void MainWindow::on_edit_redo_activated ()
+{
+  needs_saving = true;
+  EditorAction *a = redos.front ();
+  redos.pop_front ();
+  EditorAction *undo = executeAction (a);
+  delete a;
+  undos.push_front (undo);
+  if (undos.size () > UNDO_LIMIT)
+    delete undos.back ();
+  update_window_title ();
+  update_menuitems ();
+}
+
+void MainWindow::addUndo(EditorAction *a)
+{
+  undos.push_front (a);
+  if (undos.size () > UNDO_LIMIT)
+    delete undos.back ();
+  update_menuitems ();
+}
+
+void MainWindow::clearUndoAndRedo ()
+{
+  for (auto a : redos)
+    delete a;
+  redos.clear ();
+  for (auto a : undos)
+    delete a;
+  undos.clear ();
+}
+
+EditorAction* MainWindow::executeAction (EditorAction *action)
+{
+  EditorAction *out = NULL;
+
+    switch (action->getType ())
+      {
+      case EditorAction::CHANGE_PROPERTIES:
+          {
+            EditorAction_Properties *a =
+              dynamic_cast<EditorAction_Properties*>(action);
+            out = new EditorAction_Properties
+              (game_scenario->getName (),
+               game_scenario->getComment (),
+               game_scenario->getCopyright (),
+               game_scenario->getLicense ());
+            game_scenario->setName (a->getName ());
+            game_scenario->setComment (a->getDescription ());
+            game_scenario->setCopyright (a->getCopyright ());
+            game_scenario->setLicense (a->getLicense ());
+            break;
+          }
+      case EditorAction::SCENARIO_MEDIA:
+          {
+            EditorAction_ScenarioMedia *a =
+              dynamic_cast<EditorAction_ScenarioMedia*>(action);
+            out = new EditorAction_ScenarioMedia (game_scenario);
+            Scenario::reset (a->getScenario ());
+            break;
+          }
+      }
+    return out;
 }

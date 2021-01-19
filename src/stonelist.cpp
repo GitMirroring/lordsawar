@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -57,6 +57,20 @@ Stonelist::Stonelist()
 {
 }
 
+Stonelist::~Stonelist()
+{
+  for (iterator it = begin(); it != end(); ++it)
+    delete *it;
+  d_object.clear();
+  d_id.clear();
+}
+Stonelist::Stonelist (const Stonelist &s)
+ : LocationList<Stone*> (), sigc::trackable (s)
+{
+  for (auto stone : s)
+    push_back (new Stone (*stone));
+}
+
 Stonelist::Stonelist(XML_Helper* helper)
 {
     helper->registerTag(Stone::d_tag, sigc::mem_fun(this, &Stonelist::load));
@@ -85,4 +99,10 @@ bool Stonelist::load(Glib::ustring tag, XML_Helper* helper)
     add(new Stone(helper));
 
     return true;
+}
+
+void Stonelist::reset (Stonelist *s)
+{
+  delete s_instance;
+  s_instance = s;
 }

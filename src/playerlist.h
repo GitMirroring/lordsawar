@@ -1,6 +1,6 @@
 // Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,9 @@ class Stack;
 class Playerlist : public std::list<Player*>, public sigc::trackable
 {
     public:
+
+        //! Makes a copy of the playerlist.
+        Playerlist* copy () {return new Playerlist (*this);}
 
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
@@ -305,6 +308,12 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
         //! Returns the viewing player (the Player who is looking at maps).
 	static Player *getViewingplayer() {return viewingplayer;}
 
+        //! Replace the current playerlist with another.
+        static void reset (Playerlist *p);
+
+	//! Destructor.
+        ~Playerlist();
+
     protected:
 
 	//! Default constructor.
@@ -313,8 +322,8 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	//! Loading constructor.
         Playerlist(XML_Helper* helper);
 
-	//! Destructor.
-        ~Playerlist();
+        //! Copy constructor
+        Playerlist (const Playerlist &p);
         
     private:
         //! Callback for loading the playerlist from an opened saved-game file.
@@ -354,7 +363,6 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 
         //! A static pointer for the singleton instance.
         static Playerlist* s_instance;
-        
 };
 
 //! A helper struct in Playerlist to help with sorting Player objects by score.

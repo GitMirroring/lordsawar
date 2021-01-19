@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,8 @@ Player* getVictimPlayer(Player *p)
 void QuestEnemyArmies::update_targets()
 {
   Stacklist::const_iterator sit ;
-  Stacklist *sl = d_victim_player->getStacklist();
+  Player *p = Playerlist::getInstance()->getPlayer (d_victim_player_id);
+  Stacklist *sl = p->getStacklist();
   d_targets.clear();
   for (sit = sl->begin(); sit != sl->end(); ++sit)
     {
@@ -68,7 +69,7 @@ QuestEnemyArmies::QuestEnemyArmies(QuestsManager& q_mgr, guint32 hero)
   : Quest(q_mgr, hero, Quest::KILLARMIES), d_killed(0)
 {
   // have us be informed when hostilities break out
-  d_victim_player = getVictimPlayer(getHero()->getOwner());
+  d_victim_player_id = getVictimPlayer(getHero()->getOwner())->getId ();
 
   /** we have to kill 14-20 units: 14 + rand(0..6) */
   d_to_kill = 14 + (Rnd::rand() % 7);
@@ -77,16 +78,18 @@ QuestEnemyArmies::QuestEnemyArmies(QuestsManager& q_mgr, guint32 hero)
   initDescription();
 }
 
+QuestEnemyArmies::QuestEnemyArmies (const QuestEnemyArmies &q)
+ : Quest (q), sigc::trackable (q), d_to_kill (q.d_to_kill),
+    d_killed (q.d_killed), d_victim_player_id (q.d_victim_player_id)
+{
+}
+
 QuestEnemyArmies::QuestEnemyArmies(QuestsManager& q_mgr, XML_Helper* helper) 
   : Quest(q_mgr, helper)
 {
-  guint32 ui;
-
   helper->getData(d_to_kill, "to_kill");
   helper->getData(d_killed,  "killed");
-  helper->getData(ui, "victim_player");
-
-  d_victim_player = Playerlist::getInstance()->getPlayer(ui);
+  helper->getData(d_victim_player_id, "victim_player");
 
   update_targets();
   initDescription();
@@ -97,7 +100,7 @@ QuestEnemyArmies::QuestEnemyArmies(QuestsManager& q_mgr, guint32 hero,
   : Quest(q_mgr, hero, Quest::KILLARMIES), d_killed(0)
 {
   // have us be informed when hostilities break out
-  d_victim_player = Playerlist::getInstance()->getPlayer(victim_player);
+  d_victim_player_id = victim_player;
   d_to_kill = armies_to_kill;
 
   update_targets();
@@ -112,7 +115,7 @@ bool QuestEnemyArmies::save(XML_Helper *helper) const
   retval &= Quest::save(helper);
   retval &= helper->saveData("to_kill", d_to_kill);
   retval &= helper->saveData("killed",  d_killed);
-  retval &= helper->saveData("victim_player", d_victim_player->getId());
+  retval &= helper->saveData("victim_player", d_victim_player_id);
   retval &= helper->closeTag();
 
   return retval;
@@ -137,8 +140,9 @@ void QuestEnemyArmies::getExpiredMsg(std::queue<Glib::ustring>& msgs) const
 
 void QuestEnemyArmies::initDescription()
 {
+  Player *p = Playerlist::getInstance()->getPlayer (d_victim_player_id);
   d_description = String::ucompose(_("You shall slaughter %1 armies of the treacherous %2."),
-				   d_to_kill, d_victim_player->getName());
+				   d_to_kill, p->getName());
 }
 
 bool QuestEnemyArmies::isFeasible(guint32 heroId)
@@ -159,7 +163,7 @@ void QuestEnemyArmies::armyDied(Army *a, bool heroIsCulprit)
       return;
     }
 
-  if (heroIsCulprit == true && a->getOwner() == d_victim_player)
+  if (heroIsCulprit == true && a->getOwner()->getId () == d_victim_player_id)
     {
       d_killed++;
       if (d_killed >= d_to_kill)
@@ -181,5 +185,5 @@ void QuestEnemyArmies::cityAction(City *c, CityDefeatedAction action,
     
 guint32 QuestEnemyArmies::getVictimPlayerId()
 {
-  return d_victim_player->getId();
+  return d_victim_player_id;
 }

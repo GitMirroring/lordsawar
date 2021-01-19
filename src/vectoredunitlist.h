@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -46,6 +46,8 @@ class VectoredUnitlist : public std::list<VectoredUnit*>, public sigc::trackable
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
 
+        //! Makes a copy of the vectoredunitlist.
+        VectoredUnitlist* copy () {return new VectoredUnitlist (*this);}
 
 	// Methods that operate on the class data and modify the class.
 
@@ -220,17 +222,21 @@ class VectoredUnitlist : public std::list<VectoredUnit*>, public sigc::trackable
         //! Explicitly deletes the singleton instance.
         static void deleteInstance();
         
+        //! Replace the current vectoredunitlist with another.
+        static void reset (VectoredUnitlist *v);
     protected:
 
 	//! Default constructor.
         VectoredUnitlist();
+
+        //! Copy constructor
+        VectoredUnitlist (const VectoredUnitlist &v);
 
 	//! Loading constructor.
         VectoredUnitlist(XML_Helper* helper);
 
 	//! Destructor.
         ~VectoredUnitlist();
-
     private:
 
         //! Callback for loading the VectoredUnitlist from a saved-game file.

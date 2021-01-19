@@ -1,5 +1,6 @@
 #   Copyright (C) 2007, 2008 Ole Laursen
-#   Copyright (C) 2007, 2008, 2009, 2010, 2015, 2017, 2020 Ben Asselstine
+#   Copyright (C) 2007, 2008, 2009, 2010, 2015, 2017, 2020,
+#   2021 Ben Asselstine
 #   Copyright (C) 2008 Barry deFreese
 # 
 #   This program is free software; you can redistribute it and/or modify
@@ -63,7 +64,9 @@ libtilesetwindow_la_SOURCES = \
 	image-editor-dialog.cpp image-editor-dialog.h
 
 libeditor_la_SOURCES =\
+	../Scenario.cpp ../Scenario.h \
 	main-window.cpp main-window.h \
+	editor-actions.cpp editor-actions.h \
 	signpost-editor-dialog.cpp signpost-editor-dialog.h \
 	temple-editor-dialog.cpp temple-editor-dialog.h \
 	ruin-editor-dialog.cpp ruin-editor-dialog.h \

@@ -1,5 +1,5 @@
 // Copyright (C) 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2011, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2011, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,6 +40,9 @@ class Itemlist : public std::map<guint32, ItemProto*>, public sigc::trackable
 {
     public:
 
+        //! Makes a copy of the Itemlist.
+        Itemlist* copy () {return new Itemlist (*this);}
+
 	//! The xml tag of this object.
 	/** 
 	 * @note This tag appears in the items configuration file, or in a 
@@ -71,13 +74,21 @@ class Itemlist : public std::map<guint32, ItemProto*>, public sigc::trackable
 
         static bool upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version);
         static void support_backward_compatibility();
+
+        //! Replace the current Itemlist with another.
+        static void reset (Itemlist *p);
+
+	//! Destructor.
+        ~Itemlist();
+
     protected:
+
 	//! Default constructor.
 	Itemlist();
 	//! Loading constructor.
         Itemlist(XML_Helper* helper);
-	//! Destructor.
-        ~Itemlist();
+        //! Copy constructor
+        Itemlist (const Itemlist &i);
 
     private:
 
@@ -91,6 +102,7 @@ class Itemlist : public std::map<guint32, ItemProto*>, public sigc::trackable
         void flClear();
 
         static Itemlist* d_instance;
+
 };
 
 #endif //ITEMLIST_H

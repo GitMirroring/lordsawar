@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,6 +37,9 @@ class Signpostlist : public LocationList<Signpost*>, public sigc::trackable
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
 
+        //! Makes a copy of the signpostlist.
+        Signpostlist* copy () {return new Signpostlist (*this);}
+
 	// Methods that operate on the class data but do not modify the class.
 
         //! Saves the signpost list to the opened saved-game file.
@@ -56,9 +59,18 @@ class Signpostlist : public LocationList<Signpost*>, public sigc::trackable
         //! Explicitly delete the singleton instance.
         static void deleteInstance();
 
+        //! Replace the current signpostlist with another.
+        static void reset (Signpostlist *s);
+
+        //! Destructor.
+        ~Signpostlist();
+
     protected:
         //! Default constructor.
         Signpostlist();
+
+        //! Copy constructor
+        Signpostlist (const Signpostlist &s);
 
         //! Loading constructor.
 	/**

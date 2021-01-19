@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -66,6 +66,13 @@ void Rewardlist::deleteReward(const Reward* s)
 
 Rewardlist::Rewardlist()
 {
+}
+
+Rewardlist::Rewardlist (const Rewardlist &r)
+ : std::list<Reward*> (), sigc::trackable (r)
+{
+  for (auto reward : r)
+    push_back (Reward::copy (reward));
 }
 
 Rewardlist::~Rewardlist()
@@ -186,5 +193,11 @@ Reward *Rewardlist::pop (Reward::Type type)
     }
   else
     return NULL;
+}
+
+void Rewardlist::reset (Rewardlist *r)
+{
+  delete s_instance;
+  s_instance = r;
 }
 // End of file

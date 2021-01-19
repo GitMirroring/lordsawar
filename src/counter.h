@@ -1,6 +1,6 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -43,11 +43,19 @@ class FL_Counter : public sigc::trackable
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
 
+        //! Makes a copy of the counter.
+        FL_Counter* copy () {return new FL_Counter (*this);}
+
         //! Initialise the counter with a start value
         FL_Counter(guint32 start = 0);
 
         //! Load the counter. See XML_Helper for details.
         FL_Counter(XML_Helper* helper);
+
+        //! Copy constructor.
+        FL_Counter (const FL_Counter &f);
+
+        //! Destructor.
         ~FL_Counter() {};
 
         //! Returns a unique id
@@ -58,6 +66,8 @@ class FL_Counter : public sigc::trackable
         //! Saves the current counter position
         bool save(XML_Helper* helper);
 
+        //! Replace the current counter with another.
+        static void reset (FL_Counter *f);
     private:
         guint32 d_curID;
 };

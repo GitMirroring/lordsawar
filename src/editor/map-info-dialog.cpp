@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -112,6 +112,10 @@ MapInfoDialog::MapInfoDialog(Gtk::Window &parent, GameScenario *g)
     String::ucompose ("%1", Rewardlist::getInstance ()->size ());
   bags_label->property_label () =
     String::ucompose ("%1", GameMap::countBags ());
+  d_name = g->getName ();
+  d_description = g->getComment ();
+  d_copyright = g->getCopyright ();
+  d_license = g->getLicense ();
 }
 
 bool MapInfoDialog::run()
@@ -125,25 +129,25 @@ bool MapInfoDialog::run()
 void MapInfoDialog::on_name_changed()
 {
   d_changed = true;
-  game_scenario->setName (name_entry->get_text ());
+  d_name = String::utrim (name_entry->get_text ());
 }
 
 void MapInfoDialog::on_copyright_changed ()
 {
   d_changed = true;
-  game_scenario->setCopyright(copyright_textview->get_buffer()->get_text());
+  d_copyright = copyright_textview->get_buffer()->get_text();
 }
 
 void MapInfoDialog::on_license_changed ()
 {
   d_changed = true;
-  game_scenario->setLicense(license_textview->get_buffer()->get_text());
+  d_license = license_textview->get_buffer()->get_text();
 }
 
 void MapInfoDialog::on_description_changed ()
 {
   d_changed = true;
-  game_scenario->setComment(description_textview->get_buffer()->get_text());
+  d_description = description_textview->get_buffer()->get_text();
 }
 
 MapInfoDialog::~MapInfoDialog()

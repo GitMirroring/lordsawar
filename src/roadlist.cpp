@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -55,6 +55,21 @@ void Roadlist::deleteInstance()
 
 Roadlist::Roadlist()
 {
+}
+
+Roadlist::~Roadlist()
+{
+  for (iterator it = begin(); it != end(); ++it)
+    delete *it;
+  d_object.clear();
+  d_id.clear();
+}
+
+Roadlist::Roadlist (const Roadlist &r)
+ : LocationList<Road*> (), sigc::trackable (r)
+{
+  for (auto road : r)
+    push_back (new Road (*road));
 }
 
 Roadlist::Roadlist(XML_Helper* helper)
@@ -142,3 +157,8 @@ int Roadlist::calculateType (Vector<int> t) const
     return type;
 }
 
+void Roadlist::reset (Roadlist *r)
+{
+  delete s_instance;
+  s_instance = r;
+}

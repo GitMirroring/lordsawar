@@ -122,6 +122,27 @@
                       <object class="GtkMenu" id="edit_menuitem_menu">
                         <property name="can-focus">False</property>
                         <child>
+                          <object class="GtkImageMenuItem" id="edit_undo_menuitem">
+                            <property name="label">gtk-undo</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="use-underline">True</property>
+                            <property name="use-stock">True</property>
+                            <accelerator key="z" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkImageMenuItem" id="edit_redo_menuitem">
+                            <property name="label">gtk-redo</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="use-underline">True</property>
+                            <property name="use-stock">True</property>
+                            <accelerator key="z" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
+                            <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                          </object>
+                        </child>
+                        <child>
                           <object class="GtkMenuItem" id="edit_map_info_menuitem">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>

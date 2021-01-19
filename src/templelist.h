@@ -1,6 +1,6 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,6 +38,9 @@ class Templelist : public LocationList<Temple*>, public sigc::trackable
     public:
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
+
+        //! Makes a copy of the templelist.
+        Templelist* copy () {return new Templelist (*this);}
 
 	// Methods that operate on class data but do not modify the class.
 	
@@ -122,9 +125,17 @@ class Templelist : public LocationList<Temple*>, public sigc::trackable
         //! Explicitly delete the singleton instance.
         static void deleteInstance();
 
+        //! Replace the current templelist with another.
+        static void reset (Templelist *t);
+
+        //! Destructor.
+        ~Templelist();
     protected:
         //! Default constructor.
         Templelist();
+
+        //! Copy constructor.
+        Templelist (const Templelist &t);
 
         //! Loading constructor.
 	/**

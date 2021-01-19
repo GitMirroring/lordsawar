@@ -1,6 +1,6 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -28,6 +28,11 @@ FL_Counter* fl_counter;
 
 FL_Counter::FL_Counter(guint32 start)
     :d_curID(start)
+{
+}
+
+FL_Counter::FL_Counter (const FL_Counter &c)
+ : sigc::trackable (c), d_curID (c.d_curID)
 {
 }
 
@@ -60,3 +65,8 @@ bool FL_Counter::save(XML_Helper* helper)
     return retval;
 }
 
+void FL_Counter::reset (FL_Counter *f)
+{
+  delete fl_counter;
+  fl_counter = f;
+}

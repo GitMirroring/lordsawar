@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -60,6 +60,9 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	static Glib::ustring playModeToString(const GameScenario::PlayMode mode);
 	static GameScenario::PlayMode playModeFromString(const Glib::ustring str);
 
+        //! Makes a copy of the GameScenario.
+        GameScenario * copy () {return new GameScenario (*this);}
+
         /** Initializes an "empty" scenario
           *
           * @param name     the name of the scenario
@@ -76,6 +79,10 @@ class GameScenario: public GameScenarioOptions, public TarFile
           */
         GameScenario(Glib::ustring savegame, bool& broken);
 
+        //! Copy constructor
+        GameScenario (const GameScenario &g);
+    
+        //! Destructor
         ~GameScenario();
 
         //! Returns the number of the current turn.
@@ -150,6 +157,7 @@ class GameScenario: public GameScenarioOptions, public TarFile
         //for progress bar
         static sigc::signal<void> load_tick;
         static sigc::signal<void> load_finish;
+
     private:
 	  /** Callback function for loading a game. See XML_Helper for details.
 	   *

@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2015, 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -42,6 +42,11 @@ QuestCityRaze::QuestCityRaze (QuestsManager& mgr, guint32 hero)
   d_targets.push_back(getCity ()->getPos());
   debug("city_id = " << d_city);
   initDescription();
+}
+
+QuestCityRaze::QuestCityRaze (const QuestCityRaze &q)
+ : Quest (q), sigc::trackable (q), d_city (q.d_city)
+{
 }
 
 QuestCityRaze::QuestCityRaze (QuestsManager& q_mgr, XML_Helper* helper) 

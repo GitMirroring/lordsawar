@@ -292,6 +292,7 @@ src/editor/editablesmallmap.cpp
 src/editor/smallmap-editor-dialog.cpp
 src/editor/city-editor-dialog.cpp
 src/editor/main-window.cpp
+src/editor/editor-actions.cpp
 src/editor/temple-editor-dialog.cpp
 src/editor/tileset-info-dialog.cpp
 src/editor/tile-preview-dialog.cpp

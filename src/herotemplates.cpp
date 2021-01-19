@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020, 2021 Ben Asselstine
 //  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -67,6 +67,22 @@ HeroTemplates::HeroTemplates()
   if (!helper.parseXML())
     std::cerr << String::ucompose(_("Error!  can't load heronames file `%1'.  Exiting."), File::getMiscFile("heronames.xml")) << std::endl;
   helper.close();
+}
+
+HeroTemplates::HeroTemplates(const HeroTemplates &h)
+{
+  for (guint32 i = 0; i < MAX_PLAYERS; i++)
+    {
+      d_herotemplates[i] = std::vector<HeroProto*>();
+      for (guint32 j = 0; j < h.d_herotemplates[i].size (); j++)
+        d_herotemplates[i].push_back (h.d_herotemplates[i][j]);
+    }
+
+  for (guint32 i = 0; i < h.d_male_heroes.size (); i++)
+    d_male_heroes.push_back (h.d_male_heroes[i]);
+
+  for (guint32 i = 0; i < h.d_female_heroes.size (); i++)
+    d_female_heroes.push_back (h.d_female_heroes[i]);
 }
 
 HeroTemplates::HeroTemplates(XML_Helper *helper)
@@ -280,4 +296,10 @@ bool HeroTemplates::save(XML_Helper* helper) const
     retval &= helper->closeTag();
 
     return retval;
+}
+
+void HeroTemplates::reset (HeroTemplates *h)
+{
+  delete d_instance;
+  d_instance = h;
 }

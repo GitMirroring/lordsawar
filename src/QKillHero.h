@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -48,6 +48,9 @@ public:
      * @param hero   The Id of the Hero who is responsible for the quest.
      */
     QuestKillHero(QuestsManager& q_mgr, guint32 hero);
+
+    //! Copy constructor.
+    QuestKillHero (const QuestKillHero &q);
 
     //! Destructor.
     ~QuestKillHero() {};

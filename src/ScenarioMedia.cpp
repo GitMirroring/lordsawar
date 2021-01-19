@@ -1,4 +1,4 @@
-// Copyright (C) 2017, 2020 Ben Asselstine
+// Copyright (C) 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -346,4 +346,10 @@ void ScenarioMedia::uninstantiateSameNamedImages (Glib::ustring name)
 {
   TarFileImage::uninstantiate (name, getImages ());
   TarFileMaskedImage::uninstantiate (name, getMaskedImages ());
+}
+
+void ScenarioMedia::reset (ScenarioMedia *m)
+{
+  delete d_instance;
+  d_instance = m;
 }

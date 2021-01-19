@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -58,6 +58,13 @@ void VectoredUnitlist::deleteInstance()
 
 VectoredUnitlist::VectoredUnitlist()
 {
+}
+
+VectoredUnitlist::VectoredUnitlist (const VectoredUnitlist &v)
+ : std::list<VectoredUnit*> (), sigc::trackable (v)
+{
+  for (auto vectoredunit: v)
+    push_back (new VectoredUnit (*vectoredunit));
 }
 
 VectoredUnitlist::~VectoredUnitlist()
@@ -291,4 +298,10 @@ void VectoredUnitlist::changeOwnership(Player *old_owner, Player *new_owner)
   for (iterator it = begin(); it != end(); ++it)
     if ((*it)->getOwner() == old_owner)
       (*it)->setOwner(new_owner);
+}
+
+void VectoredUnitlist::reset (VectoredUnitlist *v)
+{
+  delete s_instance;
+  s_instance = v;
 }

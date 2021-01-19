@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020, 2021 Ben Asselstine
 //  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,9 @@ class HeroTemplates
 	//! The xml object holds several of entities named this.
 	static Glib::ustring d_child_tag;
 
+        //! Makes a copy of the hero templates.
+        HeroTemplates* copy () {return new HeroTemplates (*this);}
+
         //! Returns the singleton instance.
 	static HeroTemplates* getInstance();
 
@@ -77,13 +80,20 @@ class HeroTemplates
         bool save(XML_Helper* helper) const;
 
         bool isDefault () const;
+
+        //! Replace the current hero templates with another.
+        static void reset (HeroTemplates *t);
+
+	//! Destructor.
+        ~HeroTemplates();
+
     protected:
 	//! Default constructor. The function reads in the heronames file and produces a set of hero templates to be randomly selected from.
 	HeroTemplates();
+        //! Copy constructor.
+	HeroTemplates (const HeroTemplates &h);
         //! Construct the object from an opened saved-game file.
 	HeroTemplates(XML_Helper *helper);
-	//! Destructor.
-        ~HeroTemplates();
 
 	bool load(Glib::ustring tag, XML_Helper *helper);
 

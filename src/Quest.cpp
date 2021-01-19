@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,13 @@
 #include "playerlist.h"
 #include "stacklist.h"
 #include "history.h"
+#include "QCityOccupy.h"
+#include "QCityRaze.h"
+#include "QCitySack.h"
+#include "QEnemyArmies.h"
+#include "QEnemyArmytype.h"
+#include "QKillHero.h"
+#include "QPillageGold.h"
 
 Glib::ustring Quest::d_tag = "quest";
 #define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -43,6 +50,13 @@ Quest::Quest(QuestsManager& q_mgr, guint32 hero, Type type)
       d_hero_name = h->getName();
     }
 
+}
+
+Quest::Quest (const Quest &q)
+ : OwnerId (q), d_q_mgr (q.d_q_mgr), d_description (q.d_description),
+    d_hero (q.d_hero), d_type (q.d_type), d_pending (q.d_pending),
+    d_hero_name (q.d_hero_name), d_targets (std::list<Vector<int>> (d_targets))
+{
 }
 
 Quest::Quest(QuestsManager& q_mgr, XML_Helper* helper)
@@ -132,4 +146,32 @@ Quest::Type Quest::questTypeFromString(Glib::ustring str)
   else if (str == "Quest::PILLAGEGOLD") return Quest::PILLAGEGOLD;
     
   return Quest::KILLHERO;
+}
+
+Quest* Quest::copy(const Quest* q)
+{
+  switch(q->getType())
+    {
+    case KILLHERO: 
+      return (new QuestKillHero (*dynamic_cast<const QuestKillHero*>(q)));
+    case KILLARMIES:
+      return (new QuestEnemyArmies (*dynamic_cast<const QuestEnemyArmies*>(q)));
+    case CITYSACK: 
+      return (new QuestCitySack (*dynamic_cast<const QuestCitySack*>(q)));
+    case CITYRAZE: 
+      return (new QuestCityRaze (*dynamic_cast<const QuestCityRaze*>(q)));
+    case CITYOCCUPY:
+      return (new QuestCityOccupy (*dynamic_cast<const QuestCityOccupy*>(q)));
+    case KILLARMYTYPE: 
+      return (new QuestEnemyArmytype
+              (*dynamic_cast<const QuestEnemyArmytype*>(q)));
+    case PILLAGEGOLD:
+      return (new QuestPillageGold (*dynamic_cast<const QuestPillageGold*>(q)));
+    }
+  return 0;
+}
+        
+void Quest::setQuestsManager (QuestsManager &q_mgr)
+{
+  d_q_mgr = q_mgr;
 }

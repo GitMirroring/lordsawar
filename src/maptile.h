@@ -2,7 +2,7 @@
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2005 Andrea Paternesi
 // Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2017,
-// 2020 Ben Asselstine
+// 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -100,6 +100,9 @@ class Maptile: public Movable
          * no tilestyle is set.
          */
         Maptile(int x, int y, Tile::Type type);
+
+        //! Copy constructor.
+        Maptile (const Maptile &m);
 
 	//! Destructor.
         ~Maptile();

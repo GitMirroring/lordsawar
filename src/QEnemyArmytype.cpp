@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -70,6 +70,11 @@ QuestEnemyArmytype::QuestEnemyArmytype(QuestsManager& q_mgr, guint32 hero)
   d_type_to_kill (getVictimArmytype (getHero ()->getOwner (), d_targets))
 {
   initDescription();
+}
+
+QuestEnemyArmytype::QuestEnemyArmytype (const QuestEnemyArmytype &q)
+ : Quest (q), sigc::trackable (q), d_type_to_kill (q.d_type_to_kill)
+{
 }
 
 QuestEnemyArmytype::QuestEnemyArmytype(QuestsManager& q_mgr, XML_Helper* helper) 
