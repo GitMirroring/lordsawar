@@ -64,7 +64,7 @@ libtilesetwindow_la_SOURCES = \
 	image-editor-dialog.cpp image-editor-dialog.h
 
 libeditor_la_SOURCES =\
-	../Scenario.cpp ../Scenario.h \
+	Scenario.cpp Scenario.h \
 	main-window.cpp main-window.h \
 	editor-actions.cpp editor-actions.h \
 	signpost-editor-dialog.cpp signpost-editor-dialog.h \

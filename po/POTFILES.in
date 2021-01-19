@@ -275,6 +275,7 @@ src/gui/quick-help-window.cpp
 src/gui/load-progress-window.cpp
 src/CreateScenarioRandomize.cpp
 src/vectoredunitlist.cpp
+src/editor/Scenario.cpp
 src/editor/itemlist-dialog.cpp
 src/editor/signpost-editor-dialog.cpp
 src/editor/select-hidden-ruin-dialog.cpp
