@@ -112,6 +112,7 @@ class EditorAction_Save: public EditorAction
 
         Glib::ustring getScenarioFilename () const {return d_filename;}
         Scenario *getScenario () const {return d_scenario;}
+        void clearScenario () {d_scenario = NULL;}
     private:
         Glib::ustring d_filename;
         Scenario *d_scenario;

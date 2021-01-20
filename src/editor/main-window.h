@@ -305,6 +305,7 @@ class MainWindow: public sigc::trackable
     void addUndo(EditorAction *a);
     void clearUndoAndRedo ();
     EditorAction* executeAction (EditorAction *action);
+    void doReloadScenario (EditorAction_Save *action);
 };
 
 #endif

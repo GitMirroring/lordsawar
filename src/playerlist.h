@@ -62,7 +62,7 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	void setActiveplayer(Player *p) {d_activeplayer = p;};
 
 	//! set the player who is looking at the bigmap and smallmap.
-	//void setViewingplayer(Player *p) {viewingplayer = p;};
+	void setViewingplayer(Player *p) {viewingplayer = p;};
 
 	//! Get Methods
 

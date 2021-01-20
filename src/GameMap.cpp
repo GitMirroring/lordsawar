@@ -143,7 +143,6 @@ GameMap::GameMap(const GameMap &m)
 
   for (int j = 0; j < s_height; j++)
     for (int i = 0; i < s_width; i++)
-      //d_map[j*s_width + i] = Maptile (m.d_map[j*s_width + i]);
       d_map[j*s_width + i].copy (&m.d_map[j*s_width +i]);
 
   d_tileset = m.d_tileset;
@@ -2811,7 +2810,7 @@ void GameMap::reset (GameMap *m)
 {
   delete s_instance;
   s_instance = m;
-  s_tileset = Tilesetlist::getInstance ()->get (m->d_tileset);
-  s_cityset = Citysetlist::getInstance ()->get (m->d_cityset);
-  s_shieldset = Shieldsetlist::getInstance ()->get (m->d_shieldset);
+  s_tileset = NULL;
+  s_cityset = NULL;
+  s_shieldset = NULL;
 }

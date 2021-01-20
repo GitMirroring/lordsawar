@@ -559,15 +559,15 @@ void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ust
     d_width = width;
     d_height = height;
 
+    if (game_scenario)
+      delete game_scenario;
+
     GameMap::deleteInstance();
     GameMap::setWidth(width);
     GameMap::setHeight(height);
     GameMap::getInstance(tileset, shieldset, cityset);
     Itemlist::createStandardInstance();
 
-    if (game_scenario)
-      delete game_scenario;
-    // sets up the lists
     Glib::ustring scenario_name =
       ScenarioList::getInstance ()->findFreeName (_("Untitled"));
     game_scenario = new GameScenario(scenario_name, _("No description"));
@@ -2253,13 +2253,18 @@ void MainWindow::append_defender_to_battle_calculator(Stack *s)
 
 void MainWindow::on_edit_scenario_media_activated()
 {
+  EditorAction_ScenarioMedia *action =
+    new EditorAction_ScenarioMedia (game_scenario);
   MediaDialog d (*window, game_scenario);
   d.run();
   if (d.get_needs_saving())
     {
+      addUndo (action);
       needs_saving = true;
       update_window_title ();
     }
+  else
+    delete action;
 }
 
 Glib::ustring MainWindow::getDefaultMapFilename()
@@ -2576,9 +2581,41 @@ EditorAction* MainWindow::executeAction (EditorAction *action)
             EditorAction_ScenarioMedia *a =
               dynamic_cast<EditorAction_ScenarioMedia*>(action);
             out = new EditorAction_ScenarioMedia (game_scenario);
-            Scenario::reset (a->getScenario ());
+            doReloadScenario (a);
             break;
           }
       }
     return out;
+}
+
+void MainWindow::doReloadScenario (EditorAction_Save *action)
+{
+  Glib::ustring olddir = game_scenario->getDirectory ();
+  Glib::ustring oldname =
+    File::get_basename (game_scenario->getConfigurationFile (true));
+  Glib::ustring oldext = game_scenario->getExtension ();
+  int old_viewingplayer = -1;
+  if (Playerlist::getViewingplayer ())
+    old_viewingplayer = Playerlist::getViewingplayer ()->getId ();
+  int old_activeplayer = -1;
+  if (Playerlist::getActiveplayer ())
+    old_activeplayer = Playerlist::getActiveplayer ()->getId ();
+  delete game_scenario;
+  Scenario::reset (action->getScenario ());
+  if (old_viewingplayer >= -1)
+    Playerlist::getInstance()->setViewingplayer
+      (Playerlist::getInstance ()->getPlayer ((guint32) old_viewingplayer));
+  if (old_activeplayer >= -1)
+    Playerlist::getInstance()->setActiveplayer
+      (Playerlist::getInstance ()->getPlayer ((guint32) old_activeplayer));
+  game_scenario =
+    action->getScenario ()->getGameScenario ();
+  action->clearScenario ();
+  File::copy (action->getScenarioFilename (),
+              game_scenario->getConfigurationFile(true));
+  game_scenario->setDirectory (olddir);
+  game_scenario->setBaseName (oldname);
+  game_scenario->setExtension (oldext);
+  GameMap::getInstance ()->applyTileStyles (0, 0, d_height, d_width, false);
+  redraw ();
 }
