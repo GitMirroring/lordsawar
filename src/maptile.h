@@ -101,9 +101,6 @@ class Maptile: public Movable
          */
         Maptile(int x, int y, Tile::Type type);
 
-        //! Copy constructor.
-        Maptile (const Maptile &m);
-
 	//! Destructor.
         ~Maptile();
 
@@ -149,6 +146,10 @@ class Maptile: public Movable
 
 	//! Get the list of Stack objects on this maptile.
 	StackTile *getStacks();
+
+        bool checkBackpack () {return d_backpack != NULL;}
+        //! Initialize.
+        void init () {d_backpack = NULL; d_stacktile = NULL;}
 
         //! Set the backpack for this tile.
         void setBackpack(MapBackpack *bag) {if (getBackpack()) delete getBackpack(); d_backpack = bag;};
@@ -216,6 +217,8 @@ class Maptile: public Movable
 	static Maptile::Building buildingFromString(const Glib::ustring str);
 	static Glib::ustring buildingToString(const Maptile::Building bldg);
         static Glib::ustring buildingToFriendlyName(const guint32 bldg);
+
+        void copy (Maptile *m);
     private:
 	//! The index of the Tile within the Tileset (GameMap::s_tileset).
 	/**

@@ -54,26 +54,14 @@ Maptile::Maptile(int x, int y, Tile::Type type)
     memset (d_blocked, 0, sizeof (d_blocked));
 }
 
-Maptile::Maptile(const Maptile &m)
- :Movable (m), d_index (m.d_index), d_building (m.d_building)
-{
-  if (m.d_backpack)
-    d_backpack = new MapBackpack (*m.d_backpack);
-  else
-    d_backpack = NULL;
-
-  if (m.d_stacktile)
-    d_stacktile = new StackTile (*m.d_stacktile);
-  else
-    d_stacktile = NULL;
-}
-
 Maptile::~Maptile()
 {
   if (d_backpack)
     delete d_backpack;
+  d_backpack = NULL;
   if (d_stacktile)
     delete d_stacktile;
+  d_stacktile = NULL;
 }
 
 Gdk::RGBA Maptile::getColor() const
@@ -271,5 +259,24 @@ Glib::ustring Maptile::buildingToFriendlyName(const guint32 bldg)
     case Maptile::STONE: return _("Stone");
     }
   return _("None");
+}
+
+void Maptile::copy (Maptile *m)
+{
+  setPos (m->getPos ());
+
+  if (m->d_backpack != NULL)
+    d_backpack = new MapBackpack (*m->d_backpack);
+  else
+    d_backpack = NULL;
+
+  if (m->d_stacktile != NULL)
+    d_stacktile = new StackTile (*m->d_stacktile);
+  else
+    d_stacktile = NULL;
+
+  for (int i = 0; i < 2; i++)
+    for (int j = 0; j < 8; j++)
+      d_blocked[i][j] = m->d_blocked[i][j];
 }
 // End of file

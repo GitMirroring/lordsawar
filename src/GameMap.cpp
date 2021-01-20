@@ -128,7 +128,11 @@ GameMap::GameMap(Glib::ustring TilesetName, Glib::ustring ShieldsetName,
   d_map = new Maptile[s_width*s_height];
   for (int j = 0; j < s_height; j++)
     for (int i = 0; i < s_width; i++)
-      d_map[j*s_width + i].setPos(Vector<int>(i, j));
+      {
+        Maptile *mtile = &d_map[j*s_width +i];
+        mtile->init ();
+        mtile->setPos(Vector<int>(i, j));
+      }
 }
 
 GameMap::GameMap(const GameMap &m)
@@ -136,9 +140,11 @@ GameMap::GameMap(const GameMap &m)
 {
   Vector<int>::setMaximumWidth(s_width);
   d_map = new Maptile[s_width*s_height];
+
   for (int j = 0; j < s_height; j++)
     for (int i = 0; i < s_width; i++)
-      d_map[j+s_width + i] = Maptile (m.d_map[j+s_width + i]);
+      //d_map[j*s_width + i] = Maptile (m.d_map[j*s_width + i]);
+      d_map[j*s_width + i].copy (&m.d_map[j*s_width +i]);
 
   d_tileset = m.d_tileset;
   d_shieldset = m.d_shieldset;
@@ -348,8 +354,8 @@ bool GameMap::save(XML_Helper* helper) const
     // last, save all items lying around somewhere
     for (int i = 0; i < s_width; i++)
       for (int j = 0; j < s_height; j++)
-	if (!getTile(i,j)->getBackpack()->empty())
-	  retval &= getTile(i,j)->getBackpack()->save(helper);
+	if (getTile(i,j)->checkBackpack())
+          retval &= getTile(i,j)->getBackpack()->save(helper);
      
     retval &= helper->closeTag();
     return retval;
@@ -652,6 +658,7 @@ TileStyle *GameMap::calculatePreferredStyle(int i, int j)
   Tileset *tileset = GameMap::getTileset();
   Maptile *mtile = getTile(j, i);
   int box[3][3];
+  memset (box, 0, sizeof (box));
   for (int k = -1; k <= +1; k++)
     for (int l = -1; l <= +1; l++)
       {
