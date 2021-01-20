@@ -75,14 +75,15 @@ HeroTemplates::HeroTemplates(const HeroTemplates &h)
     {
       d_herotemplates[i] = std::vector<HeroProto*>();
       for (guint32 j = 0; j < h.d_herotemplates[i].size (); j++)
-        d_herotemplates[i].push_back (h.d_herotemplates[i][j]);
+        d_herotemplates[i].push_back
+          (new HeroProto(*h.d_herotemplates[i][j]));
     }
 
   for (guint32 i = 0; i < h.d_male_heroes.size (); i++)
-    d_male_heroes.push_back (h.d_male_heroes[i]);
+    d_male_heroes.push_back (new ArmyProto (*h.d_male_heroes[i]));
 
   for (guint32 i = 0; i < h.d_female_heroes.size (); i++)
-    d_female_heroes.push_back (h.d_female_heroes[i]);
+    d_female_heroes.push_back (new ArmyProto (*h.d_female_heroes[i]));
 }
 
 HeroTemplates::HeroTemplates(XML_Helper *helper)
@@ -100,16 +101,10 @@ HeroTemplates::~HeroTemplates()
       d_herotemplates[i].clear();
     }
   for (unsigned int i = 0; i < d_male_heroes.size(); i++)
-    {
-      d_male_heroes[i]->uninstantiateImages();
-      delete d_male_heroes[i];
-    }
+    delete d_male_heroes[i];
   d_male_heroes.clear();
   for (unsigned int i = 0; i < d_female_heroes.size(); i++)
-    {
-      d_female_heroes[i]->uninstantiateImages();
-      delete d_female_heroes[i];
-    }
+    delete d_female_heroes[i];
   d_female_heroes.clear();
 }
 
