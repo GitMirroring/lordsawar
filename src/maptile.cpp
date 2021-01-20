@@ -263,6 +263,10 @@ Glib::ustring Maptile::buildingToFriendlyName(const guint32 bldg)
 
 void Maptile::copy (Maptile *m)
 {
+  d_index = m->d_index;
+
+  d_building  = m->d_building;
+
   setPos (m->getPos ());
 
   if (m->d_backpack != NULL)
