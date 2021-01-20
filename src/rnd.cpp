@@ -17,7 +17,7 @@
 
 #include "rnd.h"
 
-Rnd *Rnd::s_instance;
+Rnd *Rnd::s_instance = 0;
 
 Rnd* Rnd::instance()
 {
