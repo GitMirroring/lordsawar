@@ -57,12 +57,12 @@ Maptile::Maptile(int x, int y, Tile::Type type)
 Maptile::Maptile(const Maptile &m)
  :Movable (m), d_index (m.d_index), d_building (m.d_building)
 {
-  if (d_backpack)
+  if (m.d_backpack)
     d_backpack = new MapBackpack (*m.d_backpack);
   else
     d_backpack = NULL;
 
-  if (d_stacktile)
+  if (m.d_stacktile)
     d_stacktile = new StackTile (*m.d_stacktile);
   else
     d_stacktile = NULL;
