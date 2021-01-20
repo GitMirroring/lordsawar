@@ -61,8 +61,8 @@ Main::Main(int &argc, char **&argv)
   : start_stress_test (false), start_editor (false), start_robots (0),
     start_test_scenario (false), start_net_test_scenario (false),
     speedy (false), own_all_on_round_two (false), load_filename (""),
-    turn_filename (""), start_headless_server (false), port (0),
-    cacheSize (0), impl(new Impl)
+    turn_filename (""), random_number_seed (0), start_headless_server (false),
+    port (0), cacheSize (0), impl(new Impl)
 {
   impl->driver = NULL;
     singleton = this;
