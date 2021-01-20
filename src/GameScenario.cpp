@@ -1553,7 +1553,20 @@ Glib::ustring GameScenario::generate_guid()
 {
   char buf[40];
   //this is a very poor guid generator.
-  snprintf (buf, sizeof (buf), "{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}", Rnd::rand(), Rnd::rand() % 4096, Rnd::rand() % 4096, Rnd::rand() % 256, Rnd::rand() % 256, Rnd::rand() % 256, Rnd::rand() % 256, Rnd::rand() % 256, Rnd::rand() % 256, Rnd::rand() % 256, Rnd::rand() % 256);
+  guint32 num[11];
+  num[0] = Rnd::rand ();
+  num[1] = Rnd::rand () % 4096;
+  num[2] = Rnd::rand () % 4096;
+  num[3] = Rnd::rand () % 256;
+  num[4] = Rnd::rand () % 256;
+  num[5] = Rnd::rand () % 256;
+  num[6] = Rnd::rand () % 256;
+  num[7] = Rnd::rand () % 256;
+  num[8] = Rnd::rand () % 256;
+  num[9] = Rnd::rand () % 256;
+  num[10] = Rnd::rand () % 256;
+
+  snprintf (buf, sizeof (buf), "{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}", num[0], num[1], num[2], num[3], num[4], num[5], num[6], num[7], num[8], num[9], num[10]);
 
   return Glib::ustring(buf);
 }
