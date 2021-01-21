@@ -102,7 +102,7 @@ class ArmySetEditorAction
         virtual ~ArmySetEditorAction() {};
 
         //! Get the name of this action for the undo/redo menuitem.
-        virtual Glib::ustring getActionName () {return "";}
+        virtual Glib::ustring getActionName () const {return "";}
 
         //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}
@@ -132,7 +132,7 @@ class ArmySetEditorAction_Properties: public ArmySetEditorAction
 	//! Destroy a change properties action.
         ~ArmySetEditorAction_Properties () {};
 
-        Glib::ustring getActionName () {return _("Properties");}
+        Glib::ustring getActionName () const {return _("Properties");}
 
         Glib::ustring getName () {return d_name;}
         Glib::ustring getDescription () {return d_desc;}
@@ -191,7 +191,7 @@ class ArmySetEditorAction_AddImage: public ArmySetEditorAction_Save
 	//! Destroy an add-image action, and delete the file.
         ~ArmySetEditorAction_AddImage () {};
 
-        Glib::ustring getActionName () {return _("Add Image");}
+        Glib::ustring getActionName () const {return _("Add Image");}
 };
 
 //-----------------------------------------------------------------------------
@@ -216,7 +216,7 @@ class ArmySetEditorAction_ClearImage: public ArmySetEditorAction_Save
 	//! Destroy an clear-image action, and delete the file.
         ~ArmySetEditorAction_ClearImage () {};
 
-        Glib::ustring getActionName () {return _("Clear Image");}
+        Glib::ustring getActionName () const {return _("Clear Image");}
 };
 
 //-----------------------------------------------------------------------------
@@ -256,7 +256,7 @@ class ArmySetEditorAction_Name: public ArmySetEditorAction_ArmyIndex
 	//! Destroy a name action.
         ~ArmySetEditorAction_Name () {};
 
-        Glib::ustring getActionName () {return _("Name");}
+        Glib::ustring getActionName () const {return _("Name");}
 
         Glib::ustring getName () {return d_name;}
 
@@ -284,7 +284,7 @@ class ArmySetEditorAction_Description: public ArmySetEditorAction_ArmyIndex
 	//! Destroy a description action.
         ~ArmySetEditorAction_Description () {};
 
-        Glib::ustring getActionName () {return _("Description");}
+        Glib::ustring getActionName () const {return _("Description");}
 
         Glib::ustring getDescription () {return d_description;}
 
@@ -315,7 +315,7 @@ class ArmySetEditorAction_WhiteDown: public ArmySetEditorAction_Save
 	//! Destroy a white down action, and delete the file.
         ~ArmySetEditorAction_WhiteDown () {};
 
-        Glib::ustring getActionName () {return _("Copy White Army");}
+        Glib::ustring getActionName () const {return _("Copy White Army");}
 };
 
 //-----------------------------------------------------------------------------
@@ -340,7 +340,7 @@ class ArmySetEditorAction_Reorder: public ArmySetEditorAction_Save
 	//! Destroy a reorder action, and delete the file.
         ~ArmySetEditorAction_Reorder () {};
 
-        Glib::ustring getActionName () {return _("Reorder");}
+        Glib::ustring getActionName () const {return _("Reorder");}
 };
 
 //-----------------------------------------------------------------------------
@@ -365,7 +365,7 @@ class ArmySetEditorAction_AddArmy: public ArmySetEditorAction_Save
 	//! Destroy an add army action, and delete the file.
         ~ArmySetEditorAction_AddArmy () {};
 
-        Glib::ustring getActionName () {return _("Add Army");}
+        Glib::ustring getActionName () const {return _("Add Army");}
 };
 
 //-----------------------------------------------------------------------------
@@ -390,7 +390,7 @@ class ArmySetEditorAction_RemoveArmy: public ArmySetEditorAction_Save
 	//! Destroy an remove army action, and delete the file.
         ~ArmySetEditorAction_RemoveArmy () {};
 
-        Glib::ustring getActionName () {return _("Remove Army");}
+        Glib::ustring getActionName () const {return _("Remove Army");}
 };
 
 //-----------------------------------------------------------------------------
@@ -415,7 +415,7 @@ class ArmySetEditorAction_Bonus : public ArmySetEditorAction_ArmyIndex
 	//! Destroy a bonus action
         ~ArmySetEditorAction_Bonus () {};
 
-        Glib::ustring getActionName ()
+        Glib::ustring getActionName () const
           {return ArmyBase::bonusFlagToFriendlyName (d_bonus);}
 
         ArmyBase::Bonus getBonusType () {return d_bonus;}
@@ -446,7 +446,7 @@ class ArmySetEditorAction_Turns : public ArmySetEditorAction_ArmyIndex
 	//! Destroy a turns action
         ~ArmySetEditorAction_Turns () {}
 
-        Glib::ustring getActionName () {return _("Turns");}
+        Glib::ustring getActionName () const {return _("Turns");}
 
         guint32 getTurns () {return d_turns;}
     private:
@@ -475,7 +475,7 @@ class ArmySetEditorAction_Cost : public ArmySetEditorAction_ArmyIndex
 	//! Destroy a cost action
         ~ArmySetEditorAction_Cost () {}
 
-        Glib::ustring getActionName () {return _("Cost");}
+        Glib::ustring getActionName () const {return _("Cost");}
 
         guint32 getCost () {return d_cost;}
     private:
@@ -504,7 +504,7 @@ class ArmySetEditorAction_Upkeep : public ArmySetEditorAction_ArmyIndex
 	//! Destroy a upkeep action
         ~ArmySetEditorAction_Upkeep () {}
 
-        Glib::ustring getActionName () {return _("Upkeep");}
+        Glib::ustring getActionName () const {return _("Upkeep");}
 
         guint32 getUpkeep () {return d_upkeep;}
     private:
@@ -532,7 +532,7 @@ class ArmySetEditorAction_NewCost : public ArmySetEditorAction_ArmyIndex
 	//! Destroy a new-cost action
         ~ArmySetEditorAction_NewCost () {}
 
-        Glib::ustring getActionName () {return _("New Cost");}
+        Glib::ustring getActionName () const {return _("New Cost");}
 
         guint32 getNewCost () {return d_cost;}
     private:
@@ -560,7 +560,7 @@ class ArmySetEditorAction_Stat : public ArmySetEditorAction_ArmyIndex
 	//! Destroy a stat action
         ~ArmySetEditorAction_Stat () {};
 
-        Glib::ustring getActionName ()
+        Glib::ustring getActionName () const
           {
             switch (d_stat)
               {
@@ -603,7 +603,7 @@ class ArmySetEditorAction_Id : public ArmySetEditorAction_ArmyIndex
 	//! Destroy an id action
         ~ArmySetEditorAction_Id () {}
 
-        Glib::ustring getActionName () {return _("Id");}
+        Glib::ustring getActionName () const {return _("Id");}
 
         guint32 getId () {return d_id;}
     private:
@@ -631,7 +631,7 @@ class ArmySetEditorAction_RuinAward: public ArmySetEditorAction_ArmyIndex
 	//! Destroy a defends-ruin action
         ~ArmySetEditorAction_RuinAward () {};
 
-        Glib::ustring getActionName () {return _("Ruin Award");}
+        Glib::ustring getActionName () const {return _("Ruin Award");}
 
         bool getAward () {return d_award;}
     private:
@@ -660,7 +660,7 @@ class ArmySetEditorAction_DefendsRuins: public ArmySetEditorAction_ArmyIndex
 	//! Destroy a defends-ruin action
         ~ArmySetEditorAction_DefendsRuins () {};
 
-        Glib::ustring getActionName () {return _("Defends Ruins");}
+        Glib::ustring getActionName () const {return _("Defends Ruins");}
 
         bool getDefend () {return d_defend;}
     private:
@@ -687,7 +687,7 @@ class ArmySetEditorAction_Hero: public ArmySetEditorAction_ArmyIndex
 	//! Destroy a hero action
         ~ArmySetEditorAction_Hero () {};
 
-        Glib::ustring getActionName () {return _("Hero");}
+        Glib::ustring getActionName () const {return _("Hero");}
 
         Hero::Gender getHero () {return d_hero;}
     private:
@@ -736,7 +736,7 @@ class ArmySetEditorAction_FasterInForest: public ArmySetEditorAction_Faster
           : ArmySetEditorAction_Faster (FASTER_IN_FORESTS, i, b) {};
 	//! Destroy a faster in forests action.
         ~ArmySetEditorAction_FasterInForest() {};
-        Glib::ustring getActionName () {return _("Faster In Forests");}
+        Glib::ustring getActionName () const {return _("Faster In Forests");}
 };
 
 //-----------------------------------------------------------------------------
@@ -759,7 +759,7 @@ class ArmySetEditorAction_FasterInMarsh: public ArmySetEditorAction_Faster
           : ArmySetEditorAction_Faster (FASTER_IN_MARSHES, i, b) {};
 	//! Destroy a faster in marsh action.
         ~ArmySetEditorAction_FasterInMarsh () {};
-        Glib::ustring getActionName () {return _("Faster In Marshland");}
+        Glib::ustring getActionName () const {return _("Faster In Marshland");}
 };
 
 //-----------------------------------------------------------------------------
@@ -782,7 +782,7 @@ class ArmySetEditorAction_FasterInHills: public ArmySetEditorAction_Faster
           : ArmySetEditorAction_Faster (FASTER_IN_HILLS, i, b) {};
 	//! Destroy a faster in hills action.
         ~ArmySetEditorAction_FasterInHills () {};
-        Glib::ustring getActionName () {return _("Faster In Hills");}
+        Glib::ustring getActionName () const {return _("Faster In Hills");}
 };
 
 //-----------------------------------------------------------------------------
@@ -805,7 +805,7 @@ class ArmySetEditorAction_FasterInMountains: public ArmySetEditorAction_Faster
           : ArmySetEditorAction_Faster (FASTER_IN_MOUNTAINS, i, b) {};
 	//! Destroy a faster in mountains action.
         ~ArmySetEditorAction_FasterInMountains () {};
-        Glib::ustring getActionName () {return _("Faster In Mountains");}
+        Glib::ustring getActionName () const {return _("Faster In Mountains");}
 };
 
 //-----------------------------------------------------------------------------
@@ -827,7 +827,7 @@ class ArmySetEditorAction_Fly : public ArmySetEditorAction_Faster
           :ArmySetEditorAction_Faster (ArmySetEditorAction::FLY, i, b) {}
 	//! Destroy a fly action
         ~ArmySetEditorAction_Fly () {};
-        Glib::ustring getActionName () {return _("Fly");}
+        Glib::ustring getActionName () const {return _("Fly");}
 };
 
 //-----------------------------------------------------------------------------
@@ -851,7 +851,7 @@ class ArmySetEditorAction_Selector: public ArmySetEditorAction_Save
           :ArmySetEditorAction_Save(a, ArmySetEditorAction::SELECTOR) {};
 	//! Destroy a selector action, and delete the file.
         ~ArmySetEditorAction_Selector () {};
-        Glib::ustring getActionName () {return _("Selector");}
+        Glib::ustring getActionName () const {return _("Selector");}
 };
 
 //-----------------------------------------------------------------------------
@@ -875,7 +875,7 @@ class ArmySetEditorAction_Exp : public ArmySetEditorAction_ArmyIndex
 	//! Destroy an exp action
         ~ArmySetEditorAction_Exp () {}
 
-        Glib::ustring getActionName () {return _("Exp Points");}
+        Glib::ustring getActionName () const {return _("Exp Points");}
 
         guint32 getExp () {return d_exp;}
     private:

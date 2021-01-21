@@ -58,7 +58,7 @@ class CitySetEditorAction
         virtual ~CitySetEditorAction() {}
 
         //! Get the name of this action for the undo/redo menuitem.
-        virtual Glib::ustring getActionName () {return "";}
+        virtual Glib::ustring getActionName () const {return "";}
 
         //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}
@@ -88,7 +88,7 @@ class CitySetEditorAction_Properties: public CitySetEditorAction
 	//! Destroy a change properties action.
         ~CitySetEditorAction_Properties () {};
 
-        Glib::ustring getActionName () {return _("Properties");}
+        Glib::ustring getActionName () const {return _("Properties");}
 
         Glib::ustring getName () {return d_name;}
         Glib::ustring getDescription () {return d_desc;}
@@ -146,7 +146,7 @@ class CitySetEditorAction_AddImage: public CitySetEditorAction_Save
 	//! Destroy an add-image action, and delete the file.
         ~CitySetEditorAction_AddImage () {};
 
-        Glib::ustring getActionName () {return _("Add Image");}
+        Glib::ustring getActionName () const {return _("Add Image");}
 };
 
 //-----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ class CitySetEditorAction_ClearImage: public CitySetEditorAction_Save
 	//! Destroy an clear-image action, and delete the file.
         ~CitySetEditorAction_ClearImage () {};
 
-        Glib::ustring getActionName () {return _("Clear Image");}
+        Glib::ustring getActionName () const {return _("Clear Image");}
 };
 
 //-----------------------------------------------------------------------------
@@ -191,7 +191,7 @@ class CitySetEditorAction_CityWidth: public CitySetEditorAction
 	//! Destroy a city width action.
         ~CitySetEditorAction_CityWidth () {};
 
-        Glib::ustring getActionName () {return _("City Width");}
+        Glib::ustring getActionName () const {return _("City Width");}
 
         guint32 getCityWidth () const {return d_city_width;}
 
@@ -217,7 +217,7 @@ class CitySetEditorAction_RuinWidth: public CitySetEditorAction
 	//! Destroy a ruin width action.
         ~CitySetEditorAction_RuinWidth () {};
 
-        Glib::ustring getActionName () {return _("Ruin Width");}
+        Glib::ustring getActionName () const {return _("Ruin Width");}
 
         guint32 getRuinWidth () const {return d_ruin_width;}
     private:
@@ -242,7 +242,7 @@ class CitySetEditorAction_TempleWidth: public CitySetEditorAction
 	//! Destroy a temple width action.
         ~CitySetEditorAction_TempleWidth () {};
 
-        Glib::ustring getActionName () {return _("Temple  Width");}
+        Glib::ustring getActionName () const {return _("Temple  Width");}
 
         guint32 getTempleWidth () const {return d_temple_width;}
 

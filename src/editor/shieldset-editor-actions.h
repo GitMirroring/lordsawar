@@ -56,7 +56,7 @@ class ShieldSetEditorAction
         virtual ~ShieldSetEditorAction() {}
 
         //! Get the name of this action for the undo/redo menuitem.
-        virtual Glib::ustring getActionName () {return "";}
+        virtual Glib::ustring getActionName () const {return "";}
 
         //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}
@@ -86,7 +86,7 @@ class ShieldSetEditorAction_Color: public ShieldSetEditorAction
 	//! Destroy a change color action.
         ~ShieldSetEditorAction_Color () {}
 
-        Glib::ustring getActionName () {return _("Color");}
+        Glib::ustring getActionName () const {return _("Color");}
 
         guint32 getPlayerId () const {return d_player_id;}
         Gdk::RGBA getColor () const {return d_color;}
@@ -120,7 +120,7 @@ class ShieldSetEditorAction_Properties: public ShieldSetEditorAction
 	//! Destroy a change properties action.
         ~ShieldSetEditorAction_Properties () {}
 
-        Glib::ustring getActionName () {return _("Properties");}
+        Glib::ustring getActionName () const {return _("Properties");}
 
         Glib::ustring getName () {return d_name;}
         Glib::ustring getDescription () {return d_desc;}
@@ -191,7 +191,7 @@ class ShieldSetEditorAction_WhiteDown: public ShieldSetEditorAction_Save
 	//! Destroy a white down action, and delete the file.
         ~ShieldSetEditorAction_WhiteDown () {}
 
-        Glib::ustring getActionName () {return _("Copy White Shields");}
+        Glib::ustring getActionName () const {return _("Copy White Shields");}
 
 };
 
@@ -217,7 +217,7 @@ class ShieldSetEditorAction_AddImage: public ShieldSetEditorAction_Save
 	//! Destroy an add-image action, and delete the file.
         ~ShieldSetEditorAction_AddImage () {}
 
-        Glib::ustring getActionName () {return _("Add Image");}
+        Glib::ustring getActionName () const {return _("Add Image");}
 };
 
 //-----------------------------------------------------------------------------
@@ -242,6 +242,6 @@ class ShieldSetEditorAction_ClearImage: public ShieldSetEditorAction_Save
 	//! Destroy an clear-image action, and delete the file.
         ~ShieldSetEditorAction_ClearImage () {}
 
-        Glib::ustring getActionName () {return _("Clear Image");}
+        Glib::ustring getActionName () const {return _("Clear Image");}
 };
 #endif //SHIELDSET_EDITOR_ACTIONS_H
