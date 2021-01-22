@@ -3,8 +3,8 @@
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015,
-// 2020 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -62,7 +62,7 @@ Stack::Stack(guint32 id, Player* player, Vector<int> pos)
 }
 
 Stack::Stack(const Stack& s, bool uniq)
-    : UniquelyIdentified(s), Movable(s), Ownable(s), std::list<Army*>(),
+    : UniquelyIdentified(s, !uniq), Movable(s), Ownable(s), std::list<Army*>(),
     sigc::trackable(s), d_defending(s.d_defending), d_parked(s.d_parked), 
     d_deleting(false)
 {
@@ -76,9 +76,9 @@ Stack::Stack(const Stack& s, bool uniq)
     for (const_iterator sit = s.begin(); sit != s.end(); ++sit)
     {
 	if ((*sit)->isHero())
-          push_back(new Hero(dynamic_cast<Hero&>(**sit)));
+          push_back(new Hero(dynamic_cast<Hero&>(**sit), !uniq));
 	else
-          push_back(new Army((**sit), (*sit)->getOwner()));
+          push_back(new Army((**sit), !uniq, (*sit)->getOwner()));
     }
 }
 

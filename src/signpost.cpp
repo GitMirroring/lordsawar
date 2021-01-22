@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,8 +35,8 @@ Signpost::Signpost(XML_Helper* helper)
     GameMap::getInstance()->getTile(getPos())->setBuilding(Maptile::SIGNPOST);
 }
 
-Signpost::Signpost(const Signpost& s)
-  :Location(s), Renamable(s)
+Signpost::Signpost(const Signpost& s, bool sync_id)
+  :Location(s, sync_id), Renamable(s)
 {
 }
 Signpost::Signpost(const Signpost& s, Vector<int> pos)

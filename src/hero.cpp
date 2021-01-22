@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014, 2017, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2017, 2020, 2021 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -43,8 +43,8 @@ Hero::Hero(const HeroProto& a)
   d_owner = Playerlist::getInstance()->getPlayer(a.getOwnerId());
 }
 
-Hero::Hero(Hero& h)
-  : Army(h, h.d_owner), d_name(h.d_name), d_gender(h.d_gender)
+Hero::Hero(Hero& h, bool sync_id)
+  : Army(h, sync_id, h.d_owner), d_name(h.d_name), d_gender(h.d_gender)
 {
   d_backpack = new Backpack(*h.d_backpack);
 }

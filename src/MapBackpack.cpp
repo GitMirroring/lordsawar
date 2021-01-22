@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, Ben Asselstine
+//  Copyright (C) 2008, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@ MapBackpack::MapBackpack(Vector<int> pos)
 {
 }
 
-MapBackpack::MapBackpack(const MapBackpack& object)
-  :Backpack(object), Immovable(object), UniquelyIdentified((guint32)0)
+MapBackpack::MapBackpack(const MapBackpack& object, bool sync_id)
+  :Backpack(object), Immovable(object), UniquelyIdentified(object, sync_id)
 {
 }
 
@@ -70,6 +70,16 @@ Item *MapBackpack::getPlantedItem(Player *player)
     {
       if ((*it)->getPlanted() == true &&
 	  (*it)->getPlantableOwner() == player)
+	return *it;
+    }
+  return NULL;
+}
+
+Item *MapBackpack::getPlantedItem()
+{
+  for (MapBackpack::iterator it = begin(); it != end(); ++it)
+    {
+      if ((*it)->getPlanted() == true)
 	return *it;
     }
   return NULL;

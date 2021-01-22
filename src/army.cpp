@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2017, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -40,10 +40,10 @@ Glib::ustring Army::d_tag = "army";
 
 sigc::signal<void, Army*> Army::sdying;
 
-Army::Army(const Army& a, Player* p)
-    : ArmyBase(a), UniquelyIdentified(a), Ownable(p), sigc::trackable(a),
-    d_type_id(a.d_type_id), d_armyset(a.d_armyset), d_max_hp(a.d_max_hp),
-    d_max_moves_multiplier(a.d_max_moves_multiplier),
+Army::Army(const Army& a, bool sync_id, Player *owner)
+    : ArmyBase(a), UniquelyIdentified(a, sync_id), Ownable(owner),
+    sigc::trackable(a), d_type_id(a.d_type_id), d_armyset(a.d_armyset),
+    d_max_hp(a.d_max_hp), d_max_moves_multiplier(a.d_max_moves_multiplier),
     d_max_moves_rest_bonus(a.d_max_moves_rest_bonus),
     d_ship(a.d_ship), d_hp(a.d_hp), d_moves(a.d_moves), d_xp(a.d_xp),
     d_level(a.d_level), d_battles_number(a.d_battles_number), 

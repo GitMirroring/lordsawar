@@ -306,6 +306,21 @@ class MainWindow: public sigc::trackable
     void clearUndoAndRedo ();
     EditorAction* executeAction (EditorAction *action);
     void doReloadScenario (EditorAction_Save *action);
+    void doChangeMap (EditorAction_ChangeMap *action);
+    void on_got_undo_action (EditorAction *action);
+    bool assign_capital_cities ();
+    bool active_armyset_saved_in_editor;
+    bool active_tileset_saved_in_editor;
+    bool active_cityset_saved_in_editor;
+    bool active_shieldset_saved_in_editor;
+    void doReloadArmyset (EditorAction_ArmySet *a);
+    void doReloadCityset (EditorAction_CitySet *a);
+    void doReloadTileset (EditorAction_TileSet *a);
+    void doReloadShieldset (EditorAction_ShieldSet *a);
+    void doReloadTileset (guint32 id);
+    void doReloadArmyset (guint32 id);
+    void doReloadCityset ();
+    void doReloadShieldset ();
 };
 
 #endif

@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2009, 2010, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -347,7 +347,7 @@ bool PathCalculator::load_or_unload(Vector<int> src, Vector<int> dest, bool &shi
 
 int PathCalculator::pointsToMoveTo(Vector<int> pos, Vector<int> next) const
 {
-  const Maptile* tile = GameMap::getInstance()->getTile(next);
+  Maptile* tile = GameMap::getInstance()->getTile(next);
   if (pos == next) //probably shouldn't happen
     return 0;
 

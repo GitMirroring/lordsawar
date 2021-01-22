@@ -1,6 +1,6 @@
 // Copyright (C) 2001, 2003 Michael Bartl
 // Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ class Ruin : public NamedLocation, public sigc::trackable
 	     Player *owner = 0, bool sage = false);
 
         //! Copy constructor.
-        Ruin(const Ruin&);
+        Ruin(const Ruin&, bool sync_id = false);
 
 	//! Alternative copying constructor that changes the ruin position.
         Ruin(const Ruin&, Vector<int> pos);
@@ -146,7 +146,6 @@ class Ruin : public NamedLocation, public sigc::trackable
 
 	//! Sets the reward for this ruin.
 	void setReward(Reward *r);
-
 
 	// Methods that operate on class data and modify the class.
 

@@ -1,6 +1,6 @@
 // Copyright (C) 2001, 2003 Michael Bartl
 // Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -46,10 +46,10 @@ Ruin::Ruin(Vector<int> pos, guint32 width, Glib::ustring name, int type, Keeper*
 	}
 }
 
-Ruin::Ruin(const Ruin& ruin)
-    :NamedLocation(ruin), sigc::trackable(ruin), d_searched(ruin.d_searched), 
-    d_type(ruin.d_type), d_hidden(ruin.d_hidden), d_owner(ruin.d_owner),
-    d_sage(ruin.d_sage)
+Ruin::Ruin(const Ruin& ruin, bool sync_id)
+    :NamedLocation(ruin, sync_id), sigc::trackable(ruin),
+    d_searched(ruin.d_searched), d_type(ruin.d_type), d_hidden(ruin.d_hidden),
+    d_owner(ruin.d_owner), d_sage(ruin.d_sage)
 {
   if (ruin.d_occupant)
     d_occupant = new Keeper(*ruin.d_occupant);
@@ -247,4 +247,5 @@ void Ruin::clearOccupant()
   //and now we need to make sure this pointer isn't hanging around.
   d_occupant = NULL;
 }
+        
 // End of file

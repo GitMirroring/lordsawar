@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@ Road::Road(XML_Helper* helper)
   GameMap::getInstance()->getTile(getPos())->setBuilding(Maptile::ROAD);
 }
 
-Road::Road(const Road& s)
-  :Location(s), d_type(s.d_type)
+Road::Road(const Road& s, bool sync_id)
+  :Location(s, sync_id), d_type(s.d_type)
 {
 }
 

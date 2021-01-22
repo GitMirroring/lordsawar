@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "bigmap.h"
 #include "Tile.h"
 #include "UniquelyIdentified.h"
+#include "editor-actions.h"
 
 class MapBackpack;
 //! Scenario editor.  Specializatoin of the BigMap class for the editor.
@@ -80,6 +81,7 @@ class EditorBigMap: public BigMap
     sigc::signal<void, Vector<int> > bag_selected;
     sigc::signal<void, Vector<int> > flag_selected;
     sigc::signal<void, Stack*> stack_selected_for_battle_calculator;
+    sigc::signal<void, EditorAction*> undo_map;
 
     void smooth_view();
 

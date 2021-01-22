@@ -160,7 +160,6 @@ bool GameMap::offmap(int x, int y)
 void GameMap::processStyles(Glib::ustring s, int chars_per_style)
 {
   std::string styles = s.raw();
-  Tileset *tileset = GameMap::getTileset();
   int c = chars_per_style;
     int offset = 0;
     for (int j = 0; j < s_height; j++)
@@ -187,10 +186,7 @@ void GameMap::processStyles(Glib::ustring s, int chars_per_style)
 	    char *end = NULL;
 	    val = strtoul (hexstr, &end, 16);
 	    guint32 id = (guint32) val;
-	    TileStyle *style = tileset->getTileStyle(id);
-	    if (!style)
-	      style = tileset->getTileStyle(0);
-	    d_map[j*s_width + i].setTileStyle(style);
+	    d_map[j*s_width + i].setTileStyleId (id);
         }
     }
 }
@@ -332,9 +328,8 @@ bool GameMap::save(XML_Helper* helper) const
         for (int j = 0; j < s_width; j++)
 	  {
 	    Glib::ustring hexstr;
-	    TileStyle *style = getTile(j, i)->getTileStyle();
-	    assert (style != NULL);
-            hexstr = TileStyle::idToString(style->getId(), num_digits);
+	    guint32 id = getTile(j, i)->getTileStyleId();
+            hexstr = TileStyle::idToString(id, num_digits);
 	    styles << hexstr;
 	  }
         styles <<std::endl;
@@ -756,21 +751,21 @@ void GameMap::close_circles (int minx, int miny, int maxx, int maxy)
 	  if (offmap(j, i))
 	    continue;
 	  Maptile *tile = getTile(j, i);
-	  TileStyle *tilestyle = tile->getTileStyle();
+	  TileStyle *tilestyle = tile->getTileStyle(tileset);
 	  if (j + 1 < s_width)
 	    {
 	      Maptile *nexttile = getTile(j + 1, i);
-	      TileStyle *nextstyle = nexttile->getTileStyle();
+	      TileStyle *nextstyle = nexttile->getTileStyle(tileset);
 	      if (tilestyle->getType() == TileStyle::OUTERTOPCENTER &&
 		  nextstyle->getType() == TileStyle::OUTERBOTTOMCENTER)
 		{
 		  TileStyle *style;
 		  style = tileset->getRandomTileStyle(tile->getIndex(),
 						      TileStyle::OUTERTOPRIGHT);
-		  tile->setTileStyle(style);
+		  tile->setTileStyleId(style->getId ());
 		  style = tileset->getRandomTileStyle(nexttile->getIndex(),
 						      TileStyle::OUTERBOTTOMLEFT);
-		  nexttile->setTileStyle(style);
+		  nexttile->setTileStyleId(style->getId ());
 		}
 	      if (tilestyle->getType() == TileStyle::OUTERBOTTOMCENTER &&
 		  nextstyle->getType() == TileStyle::OUTERTOPCENTER)
@@ -778,26 +773,26 @@ void GameMap::close_circles (int minx, int miny, int maxx, int maxy)
 		  TileStyle *style;
 		  style = tileset->getRandomTileStyle(tile->getIndex(),
 						      TileStyle::OUTERBOTTOMRIGHT);
-		  tile->setTileStyle(style);
+		  tile->setTileStyleId(style->getId ());
 		  style = tileset->getRandomTileStyle(nexttile->getIndex(),
 						      TileStyle::OUTERTOPLEFT);
-		  nexttile->setTileStyle(style);
+		  nexttile->setTileStyleId(style->getId ());
 		}
 	      }
 	  if (i + 1 < s_height)
 	    {
 	      Maptile *nexttile = getTile(j, i + 1);
-	      TileStyle *nextstyle = nexttile->getTileStyle();
+	      TileStyle *nextstyle = nexttile->getTileStyle(tileset);
 	      if (tilestyle->getType() == TileStyle::OUTERMIDDLERIGHT&&
 		  nextstyle->getType() == TileStyle::OUTERMIDDLELEFT)
 		{
 		  TileStyle *style;
 		  style = tileset->getRandomTileStyle(tile->getIndex(),
 						      TileStyle::OUTERBOTTOMRIGHT);
-		  tile->setTileStyle(style);
+		  tile->setTileStyleId(style->getId ());
 		  style = tileset->getRandomTileStyle(nexttile->getIndex(),
 						      TileStyle::OUTERTOPLEFT);
-		  nexttile->setTileStyle(style);
+		  nexttile->setTileStyleId(style->getId ());
 		}
 	      if (tilestyle->getType() == TileStyle::OUTERMIDDLELEFT&&
 		  nextstyle->getType() == TileStyle::OUTERMIDDLERIGHT)
@@ -805,10 +800,10 @@ void GameMap::close_circles (int minx, int miny, int maxx, int maxy)
 		  TileStyle *style;
 		  style = tileset->getRandomTileStyle(tile->getIndex(),
 						      TileStyle::OUTERBOTTOMLEFT);
-		  tile->setTileStyle(style);
+		  tile->setTileStyleId(style->getId ());
 		  style = tileset->getRandomTileStyle(nexttile->getIndex(),
 						      TileStyle::OUTERTOPRIGHT);
-		  nexttile->setTileStyle(style);
+		  nexttile->setTileStyleId(style->getId ());
 		}
 	      }
 	}
@@ -984,7 +979,7 @@ void GameMap::applyTileStyle (int i, int j)
   if (!style)
     printf ("applying null tile style at %d,%d for tile of kind %d\n", i, j,
 	    mtile->getType());
-  mtile->setTileStyle(style);
+  mtile->setTileStyleId(style->getId ());
 }
 
 Vector<int> GameMap::findNearestObjectInDir(Vector<int> pos, Vector<int> dir)
@@ -1492,6 +1487,7 @@ bool GameMap::canDropBag (Vector<int> pos)
 
 bool GameMap::canPutBuilding(Maptile::Building bldg, guint32 size, Vector<int> to, bool making_islands)
 {
+  Tileset *tileset = GameMap::getTileset();
   bool can_move = true;
   //gotta have a building to move
   if (bldg == Maptile::NONE)
@@ -1549,7 +1545,7 @@ bool GameMap::canPutBuilding(Maptile::Building bldg, guint32 size, Vector<int> t
 	break;
       case Maptile::PORT: 
 	if (getTerrainType(to) == Tile::WATER &&
-	    getTile(to)->getTileStyle()->getType() !=
+	    getTile(to)->getTileStyle(tileset)->getType() !=
 	    TileStyle::INNERMIDDLECENTER)
 	  return can_move;
 	else
@@ -1557,13 +1553,13 @@ bool GameMap::canPutBuilding(Maptile::Building bldg, guint32 size, Vector<int> t
 	break;
       case Maptile::BRIDGE: 
 	if (getTerrainType(to) == Tile::WATER &&
-	    (getTile(to)->getTileStyle()->getType() ==
+	    (getTile(to)->getTileStyle(tileset)->getType() ==
 	     TileStyle::OUTERTOPCENTER || 
-	    getTile(to)->getTileStyle()->getType() ==
+	    getTile(to)->getTileStyle(tileset)->getType() ==
 	    TileStyle::OUTERBOTTOMCENTER || 
-	    getTile(to)->getTileStyle()->getType() ==
+	    getTile(to)->getTileStyle(tileset)->getType() ==
 	    TileStyle::OUTERMIDDLELEFT || 
-	    getTile(to)->getTileStyle()->getType() ==
+	    getTile(to)->getTileStyle(tileset)->getType() ==
 	    TileStyle::OUTERMIDDLERIGHT ))
 	  return can_move;
 	else
@@ -2060,8 +2056,7 @@ LwRectangle GameMap::putTerrain(LwRectangle r, Tile::Type type, int tile_style_i
           {
             if (offmap(x,y))
               continue;
-	    TileStyle *style = tileset->getTileStyle(tile_style_id);
-	    getTile(x, y)->setTileStyle(style);
+	    getTile(x, y)->setTileStyleId(tile_style_id);
           }
     }
 
@@ -2806,11 +2801,201 @@ std::vector<Armyset*> GameMap::getArmysets ()
   return armysets;
 }
 
+void GameMap::resetCityset ()
+{
+  s_cityset = NULL;
+}
+
+void GameMap::resetTileset ()
+{
+  s_tileset = NULL;
+}
+
+void GameMap::resetShieldset ()
+{
+  s_shieldset = NULL;
+}
+
 void GameMap::reset (GameMap *m)
 {
   delete s_instance;
   s_instance = m;
-  s_tileset = NULL;
-  s_cityset = NULL;
-  s_shieldset = NULL;
+  resetTileset ();
+  resetCityset ();
+  resetShieldset ();
+}
+        
+std::list<Vector<int> > GameMap::getPoints (std::list<LwRectangle> rects)
+{
+  std::list<Vector<int> > points;
+  for (auto r : rects)
+    {
+      for (int x = r.x; x < r.x + r.w; ++x)
+        for (int y = r.y; y < r.y + r.h; ++y)
+          {
+            if (offmap(x,y))
+              continue;
+            points.push_back (Vector<int>(x,y));
+          }
+    }
+  points.sort ();
+  points.unique ();
+  return points;
+}
+
+std::list<UniquelyIdentified*> GameMap::copyObjects(std::list<LwRectangle> rects)
+{
+  std::list<UniquelyIdentified*> objects;
+  std::list<Vector<int> > points = getPoints (rects);
+  std::list<guint32> road_ids;
+  std::list<guint32> bridge_ids;
+  std::list<guint32> port_ids;
+  std::list<guint32> stone_ids;
+  std::list<guint32> city_ids;
+  std::list<guint32> temple_ids;
+  std::list<guint32> ruin_ids;
+  std::list<guint32> signpost_ids;
+  std::list<guint32> stack_ids;
+  std::list<guint32> backpack_ids;
+  for (auto pos : points)
+    {
+      Road *road = getRoad (pos);
+      if (road)
+        {
+          auto it = 
+            std::find (road_ids.begin (), road_ids.end (), road->getId ());
+          if (it != road_ids.end ())
+            {
+              Road *new_road = new Road (*road, true);
+              objects.push_back (new_road);
+              road_ids.push_back (road->getId ());
+            }
+        }
+
+      Bridge *bridge = getBridge (pos);
+      if (bridge)
+        {
+          auto it = 
+            std::find (bridge_ids.begin (), bridge_ids.end (),
+                       bridge->getId ());
+          if (it != bridge_ids.end ())
+            {
+              Bridge *new_bridge = new Bridge (*bridge, true);
+              objects.push_back (new_bridge);
+              bridge_ids.push_back (bridge->getId ());
+            }
+        }
+
+      Port *port = getPort (pos);
+      if (port)
+        {
+          auto it = 
+            std::find (port_ids.begin (), port_ids.end (), port->getId ());
+          if (it != port_ids.end ())
+            {
+              Port *new_port = new Port (*port, true);
+              objects.push_back (new_port);
+              port_ids.push_back (port->getId ());
+            }
+        }
+
+      Stone *stone = getStone (pos);
+      if (stone)
+        {
+          auto it = 
+            std::find (stone_ids.begin (), stone_ids.end (), stone->getId ());
+          if (it != stone_ids.end ())
+            {
+              Stone *new_stone = new Stone (*stone, true);
+              objects.push_back (new_stone);
+              stone_ids.push_back (stone->getId ());
+            }
+        }
+
+      City *city = getCity (pos);
+      if (city)
+        {
+          auto it = 
+            std::find (city_ids.begin (), city_ids.end (), city->getId ());
+          if (it != city_ids.end ())
+            {
+              City *new_city = new City (*city, true);
+              objects.push_back (new_city);
+              city_ids.push_back (stone->getId ());
+            }
+        }
+
+      Temple *temple = getTemple (pos);
+      if (temple)
+        {
+          auto it = 
+            std::find (temple_ids.begin (), temple_ids.end (),
+                       temple->getId ());
+          if (it != temple_ids.end ())
+            {
+              Temple *new_temple = new Temple (*temple, true);
+              objects.push_back (new_temple);
+              temple_ids.push_back (temple->getId ());
+            }
+        }
+
+      Ruin *ruin = getRuin (pos);
+      if (ruin)
+        {
+          auto it = 
+            std::find (ruin_ids.begin (), ruin_ids.end (), ruin->getId ());
+          if (it != ruin_ids.end ())
+            {
+              Ruin *new_ruin = new Ruin (*ruin, true);
+              objects.push_back (new_ruin);
+              ruin_ids.push_back (ruin->getId ());
+            }
+        }
+
+      Signpost *signpost = getSignpost (pos);
+      if (signpost)
+        {
+          auto it = 
+            std::find (signpost_ids.begin (), signpost_ids.end (),
+                       signpost->getId ());
+          if (it != signpost_ids.end ())
+            {
+              Signpost *new_signpost = new Signpost (*signpost, true);
+              objects.push_back (new_signpost);
+              signpost_ids.push_back (signpost->getId ());
+            }
+        }
+
+      StackTile *stacktile = getStacks (pos);
+      for (auto stack : stacktile->getStacks ())
+        {
+          auto it = 
+            std::find (stack_ids.begin (), stack_ids.end (), stack->getId ());
+          if (it != stack_ids.end ())
+            {
+              Stack *new_stack = new Stack (*stack, false); //opposite land
+              objects.push_back (new_stack);
+              stack_ids.push_back (stack->getId ());
+            }
+        }
+    }
+  return objects;
+}
+
+std::list<Maptile*> GameMap::copyMaptiles (std::list<LwRectangle> rects)
+{
+  std::list<Maptile*> maptiles;
+  std::list<Vector<int> > points = getPoints (rects);
+  for (auto p : points)
+    maptiles.push_back (new Maptile (*GameMap::getTile (p), true));
+  return maptiles;
+}
+
+LwRectangle GameMap::getBoundingBox (Vector<int> pos)
+{
+  Location *l = getLocation (pos);
+  if (l)
+    return l->getArea ();
+  else
+    return LwRectangle (pos);
 }

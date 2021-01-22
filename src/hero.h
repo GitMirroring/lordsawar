@@ -1,5 +1,5 @@
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2014, 2017, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2017, 2020, 2021 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -76,7 +76,7 @@ class Hero : public Army
          * This performs a deep copy, including the Hero's items.
          */
 	//! Copy constructor.
-        Hero(Hero& h);
+        Hero(Hero& h, bool sync_id = false);
 
         /** 
 	 * @param helper   The opened saved-file to read the Hero from.

@@ -1,6 +1,6 @@
 // Copyright (C) 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2021 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -52,12 +52,6 @@ Item::Item(XML_Helper* helper)
 
 }
 
-	bool d_plantable;
-	guint32 d_plantable_owner_id;
-	bool d_planted;
-	guint32 d_plantable_orig_owner_id;
-	guint32 d_type;
-
 Item::Item(Glib::ustring name, bool plantable, Player *plantable_owner)
  : ItemProto(name), UniquelyIdentified(), d_plantable (plantable),
     d_plantable_owner_id (MAX_PLAYERS), d_planted (false),
@@ -73,8 +67,8 @@ Item::Item(Glib::ustring name, bool plantable, Player *plantable_owner)
   //std::cerr << "item created with id " << d_id << std::endl;
 }
 
-Item::Item(const Item& orig)
-:ItemProto(orig), UniquelyIdentified(orig), 
+Item::Item(const Item& orig, bool sync_id)
+:ItemProto(orig), UniquelyIdentified(orig, sync_id), 
     d_plantable(orig.d_plantable), 
     d_plantable_owner_id(orig.d_plantable_owner_id), d_planted(orig.d_planted),
     d_plantable_orig_owner_id(orig.d_plantable_orig_owner_id),

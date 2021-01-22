@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2009, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007-2009, 2011, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -51,9 +51,10 @@ Reward::Reward(XML_Helper *helper)
   helper->getData(d_name, "name");
 }
 
-Reward::Reward (const Reward& orig)
+Reward::Reward (const Reward& orig, bool sync_id)
 	:d_type(orig.d_type), d_name(orig.d_name)
 {
+  (void)sync_id;
 }
 
 Reward* Reward::handle_load(XML_Helper* helper)
@@ -177,8 +178,8 @@ Reward_Gold::Reward_Gold(XML_Helper* helper)
   helper->getData(d_gold, "gold");
 }
 
-Reward_Gold::Reward_Gold (const Reward_Gold & orig)
-	:Reward(orig), d_gold(orig.d_gold)
+Reward_Gold::Reward_Gold (const Reward_Gold & orig, bool sync_id)
+	:Reward(orig, sync_id), d_gold(orig.d_gold)
 {
 }
 
@@ -237,9 +238,10 @@ Reward_Allies::Reward_Allies(XML_Helper* helper)
   d_army = Armysetlist::getInstance()->getArmy (d_army_set, d_army_type);
 }
 
-Reward_Allies::Reward_Allies (const Reward_Allies& orig)
-	:Reward(orig), d_army(orig.d_army), d_army_set(orig.d_army_set), 
-        d_army_type(orig.d_army_type), d_count(orig.d_count)
+Reward_Allies::Reward_Allies (const Reward_Allies& orig, bool sync_id)
+	:Reward(orig, sync_id), d_army(orig.d_army),
+        d_army_set(orig.d_army_set), d_army_type(orig.d_army_type),
+        d_count(orig.d_count)
 {
 }
 
@@ -363,11 +365,11 @@ Reward_Item::Reward_Item(XML_Helper* helper)
   helper->registerTag(Item::d_tag, sigc::mem_fun(this, &Reward_Item::loadItem));
 }
 
-Reward_Item::Reward_Item (const Reward_Item& orig)
- : Reward(orig)
+Reward_Item::Reward_Item (const Reward_Item& orig, bool sync_id)
+ : Reward(orig, sync_id)
 {
   if (orig.d_item)
-    d_item = new Item(*orig.d_item);
+    d_item = new Item(*orig.d_item, sync_id);
   else
     d_item = NULL;
 }
@@ -415,8 +417,8 @@ Reward_Ruin::Reward_Ruin(XML_Helper* helper)
   d_ruin_pos = Vector<int>(x,y);
 }
 
-Reward_Ruin::Reward_Ruin (const Reward_Ruin& orig)
-	:Reward(orig), d_ruin_pos(orig.d_ruin_pos)
+Reward_Ruin::Reward_Ruin (const Reward_Ruin& orig, bool sync_id)
+	:Reward(orig, sync_id), d_ruin_pos(orig.d_ruin_pos)
 {
 }
 
@@ -496,8 +498,8 @@ Reward_Map::Reward_Map(XML_Helper* helper)
   helper->registerTag(SightMap::d_tag, sigc::mem_fun(this, &Reward_Map::loadMap));
 }
 
-Reward_Map::Reward_Map (const Reward_Map& orig)
-	:Reward(orig)
+Reward_Map::Reward_Map (const Reward_Map& orig, bool sync_id)
+	:Reward(orig, sync_id)
 {
   d_sightmap = new SightMap(*orig.d_sightmap);
 }

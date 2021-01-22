@@ -1,5 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020,
+//  2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -281,7 +282,8 @@ void EditorBigMap::change_map_under_cursor()
       break;
 
     case TERRAIN:
-
+      undo_map.emit
+        (new EditorAction_Terrain (pointer_terrain, get_cursor_rectangle ()));
       changed_tiles = GameMap::getInstance()->putTerrain(get_cursor_rectangle(), pointer_terrain, pointer_tile_style_id, true);
       if (pointer_terrain == Tile::WATER)
         map_water_changed.emit();
@@ -316,6 +318,13 @@ void EditorBigMap::change_map_under_cursor()
                   enemy_stacks.empty() == true)
                 {
                   std::vector<Stack*> friendly_stacks = gm->getFriendlyStacks(tile, s->getOwner());
+                  if (s->getPos () != tile)
+                    {
+                      EditorAction_Move *action =
+                        new EditorAction_Move (LwRectangle (s->getPos ()),
+                                               LwRectangle (tile));
+                      undo_map.emit (action);
+                    }
                   if (friendly_stacks.empty() == true)
                     gm->moveStack(s, tile);
                   else
@@ -341,6 +350,11 @@ void EditorBigMap::change_map_under_cursor()
                 {
                   if (moving_bag->getPos () != tile)
                     {
+                      EditorAction_Move *action =
+                        new EditorAction_Move
+                        (LwRectangle (moving_bag->getPos ()),
+                         LwRectangle (tile));
+                      undo_map.emit (action);
                       gm->moveBackpack(moving_bag, tile);
                       changed_tiles = LwRectangle (tile);
                     }
@@ -355,6 +369,11 @@ void EditorBigMap::change_map_under_cursor()
               if (gm->canPutBuilding
                   (gm->getBuilding(from), s, tile, false) == true)
                 {
+                  LwRectangle r1 = gm->getBoundingBox (from);
+                  LwRectangle r2 = LwRectangle (tile);
+                  r2.dim = r1.dim;
+                  EditorAction_Move *action = new EditorAction_Move (r1, r2);
+                  undo_map.emit (action);
                   gm->moveBuilding(from, tile);
                   changed_tiles = LwRectangle (tile);
                 }
@@ -363,6 +382,12 @@ void EditorBigMap::change_map_under_cursor()
                   if (gm->getLocation(from)->contains(tile) ||
                       LocationBox(tile, s).contains(from))
                     {
+                      LwRectangle r1 = gm->getBoundingBox (from);
+                      LwRectangle r2 = LwRectangle (tile);
+                      r2.dim = r1.dim;
+                      EditorAction_Move *action =
+                        new EditorAction_Move (r1, r2);
+                      undo_map.emit (action);
                       gm->moveBuilding(from, tile);
                       changed_tiles = LwRectangle (tile);
                     }
@@ -372,9 +397,18 @@ void EditorBigMap::change_map_under_cursor()
         }
       break;
     case ERASE:
-      // check if there is a building or a stack there and remove it
-      if (GameMap::getInstance()->eraseTile(tile))
-        changed_tiles = LwRectangle (tile);
+        {
+          EditorAction_Erase *action = new EditorAction_Erase
+            (GameMap::getInstance ()->getBoundingBox (tile));
+          // check if there is a building or a stack there and remove it
+          if (GameMap::getInstance()->eraseTile(tile))
+            {
+              undo_map.emit (action);
+              changed_tiles = LwRectangle (tile);
+            }
+          else
+            delete action;
+        }
       break;
 
     case STACK:
@@ -393,6 +427,10 @@ void EditorBigMap::change_map_under_cursor()
           // Create a new dummy stack. As we don't want to have empty
           // stacks hanging around, it's assumed that the default armyset
           // has at least one entry.
+
+          EditorAction_Stack *action =
+            new EditorAction_Stack (LwRectangle (tile));
+          undo_map.emit (action);
           Stack* s = new Stack(active, tile);
           const Armysetlist* al = Armysetlist::getInstance();
           Army* a = new Army(*al->getArmy(active->getArmyset(), 0), active);
@@ -428,8 +466,21 @@ void EditorBigMap::change_map_under_cursor()
         }
       else
         {
-          GameMap::getInstance()->putNewCity(tile);
-          changed_tiles = LwRectangle (tile);
+          GameMap *gm = GameMap::getInstance ();
+          Cityset *cs = GameMap::getCityset();
+          // check if we can place the city
+          bool city_placeable =
+            gm->canPutBuilding (Maptile::CITY, cs->getCityTileWidth(), tile);
+          if (city_placeable)
+            {
+              LwRectangle rect = LwRectangle (tile);
+              rect.dim =
+                Vector<int>(cs->getCityTileWidth (), cs->getCityTileWidth ());
+              EditorAction_City *action = new EditorAction_City (rect);
+              undo_map.emit (action);
+              GameMap::getInstance()->putNewCity(tile);
+              changed_tiles = LwRectangle (tile);
+            }
         }
       break;
 
@@ -446,8 +497,21 @@ void EditorBigMap::change_map_under_cursor()
         }
       else
         {
-          GameMap::getInstance()->putNewRuin(tile);
-          changed_tiles = LwRectangle (tile);
+          GameMap *gm = GameMap::getInstance ();
+          Cityset *cs = GameMap::getCityset();
+          // check if we can place the ruin
+          bool ruin_placeable =
+            gm->canPutBuilding (Maptile::RUIN, cs->getRuinTileWidth(), tile);
+          if (ruin_placeable)
+            {
+              LwRectangle rect = LwRectangle (tile);
+              rect.dim =
+                Vector<int>(cs->getRuinTileWidth (), cs->getRuinTileWidth ());
+              EditorAction_Ruin *action = new EditorAction_Ruin (rect);
+              undo_map.emit (action);
+              GameMap::getInstance()->putNewRuin(tile);
+              changed_tiles = LwRectangle (tile);
+            }
         }
       break;
 
@@ -464,8 +528,23 @@ void EditorBigMap::change_map_under_cursor()
         }
       else
         {
-          GameMap::getInstance()->putNewTemple(tile);
-          changed_tiles = LwRectangle (tile);
+          GameMap *gm = GameMap::getInstance ();
+          Cityset *cs = GameMap::getCityset();
+          // check if we can place the temple
+          bool temple_placeable =
+            gm->canPutBuilding (Maptile::TEMPLE, cs->getTempleTileWidth(),
+                                tile);
+          if (temple_placeable)
+            {
+              LwRectangle rect = LwRectangle (tile);
+              rect.dim =
+                Vector<int>(cs->getTempleTileWidth (),
+                            cs->getTempleTileWidth ());
+              EditorAction_Temple *action = new EditorAction_Temple (rect);
+              undo_map.emit (action);
+              GameMap::getInstance()->putNewTemple(tile);
+              changed_tiles = LwRectangle (tile);
+            }
         }
       break;
 
@@ -487,6 +566,9 @@ void EditorBigMap::change_map_under_cursor()
                 (Maptile::SIGNPOST, 1, tile);
               if (!signpost_placeable)
                 break;
+              LwRectangle rect = LwRectangle (tile);
+              EditorAction_Signpost *action = new EditorAction_Signpost (rect);
+              undo_map.emit (action);
               Signpost *s = new Signpost(tile);
               GameMap::getInstance()->putSignpost(s);
               changed_tiles = LwRectangle (tile);
@@ -500,6 +582,9 @@ void EditorBigMap::change_map_under_cursor()
             (Maptile::PORT, 1, tile);
           if (!port_placeable)
             break;
+          LwRectangle rect = LwRectangle (tile);
+          EditorAction_Port *action = new EditorAction_Port (rect);
+          undo_map.emit (action);
           Port *p = new Port(tile);
           GameMap::getInstance()->putPort(p);
           changed_tiles = LwRectangle (tile);
@@ -520,6 +605,9 @@ void EditorBigMap::change_map_under_cursor()
             (Maptile::BRIDGE, 1, tile);
           if (!bridge_placeable)
             break;
+          LwRectangle rect = LwRectangle (tile);
+          EditorAction_Bridge *action = new EditorAction_Bridge (rect);
+          undo_map.emit (action);
           Bridge *b = new Bridge(tile, tile_to_bridge_type (tile));
           GameMap::getInstance()->putBridge(b);
           changed_tiles = LwRectangle (tile);
@@ -540,6 +628,9 @@ void EditorBigMap::change_map_under_cursor()
                   if (GameMap::getRoad(tile) != NULL)
                     GameMap::getInstance()->removeRoad(tile);
 
+                  LwRectangle rect = LwRectangle (tile);
+                  EditorAction_Road *action = new EditorAction_Road (rect);
+                  undo_map.emit (action);
                   int type = CreateScenario::calculateRoadType(tile);
                   Road *r = new Road(tile, type);
                   GameMap::getInstance()->putRoad(r);
@@ -590,13 +681,21 @@ void EditorBigMap::change_map_under_cursor()
             }
           else
             {
-              int type = Stone::ROAD_E_AND_W_STONE_N;
-              Road *r = GameMap::getRoad(tile);
-              if (r)
-                type = Stone::getRandomType(Road::Type(r->getType()));
-              Stone *s = new Stone(tile, type);
-              GameMap::getInstance()->putStone(s);
-              changed_tiles = LwRectangle (tile);
+              Maptile::Building b =
+                GameMap::getInstance ()->getBuilding (tile);
+              if (b != Maptile::ROAD && b != Maptile::STONE)
+                {
+                  int type = Stone::ROAD_E_AND_W_STONE_N;
+                  Road *r = GameMap::getRoad(tile);
+                  if (r)
+                    type = Stone::getRandomType(Road::Type(r->getType()));
+                  LwRectangle rect = LwRectangle (tile);
+                  EditorAction_Stone *action = new EditorAction_Stone (rect);
+                  undo_map.emit (action);
+                  Stone *s = new Stone(tile, type);
+                  GameMap::getInstance()->putStone(s);
+                  changed_tiles = LwRectangle (tile);
+                }
             }
         }
       break;
@@ -951,3 +1050,4 @@ void EditorBigMap::after_draw()
     }
   return;
 }
+

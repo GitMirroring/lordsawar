@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2009, 2011, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2007-2009, 2011, 2014, 2015, 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ class Reward
 	 *       other Reward objects, and shouldn't be called directly.
 	 *       It only copies the parts common to all Reward objects.
 	 */
-        Reward (const Reward& orig);
+        Reward (const Reward& orig, bool sync_id = false);
 
 	//! Destructor.
         virtual ~Reward() {};
@@ -207,7 +207,7 @@ class Reward_Gold : public Reward
 	Reward_Gold(XML_Helper *helper);
 
 	//! Copy constructor.
-	Reward_Gold(const Reward_Gold& orig);
+	Reward_Gold(const Reward_Gold& orig, bool sync_id = false);
 
 	//! Destructor.
         ~Reward_Gold();
@@ -269,7 +269,7 @@ class Reward_Allies: public Reward
         Reward_Allies(guint32 army_type, guint32 army_set, guint32 count);
 
 	//! Make a new reward of allies from another one.
-	Reward_Allies(const Reward_Allies& orig);
+	Reward_Allies(const Reward_Allies& orig, bool sync_id = false);
 
 	//! Loading constructor.  Load the allies reward from a saved-game file.
 	Reward_Allies(XML_Helper *helper);
@@ -385,7 +385,7 @@ class Reward_Item: public Reward
 	 *
 	 * @param orig  The reward item to copy from.
 	 */
-	Reward_Item(const Reward_Item& orig);
+	Reward_Item(const Reward_Item& orig, bool sync_id = false);
 
 	//! Destructor.
         virtual ~Reward_Item();
@@ -461,7 +461,7 @@ class Reward_Ruin: public Reward
 	 *
 	 * @param orig  The reward ruin to copy from.
 	 */
-	Reward_Ruin(const Reward_Ruin& orig);
+	Reward_Ruin(const Reward_Ruin& orig, bool sync_id = false);
 
 	//! Destructor.
         ~Reward_Ruin();
@@ -545,7 +545,7 @@ class Reward_Map: public Reward
 	 *
 	 * @param orig  The reward map to copy from.
 	 */
-	Reward_Map(const Reward_Map& orig);
+	Reward_Map(const Reward_Map& orig, bool sync_id = false);
 
 	//! Destructor.
         ~Reward_Map();

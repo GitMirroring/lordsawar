@@ -2,7 +2,7 @@
 // Copyright (C) 2002 Mark L. Amidon
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014, 2021 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -82,7 +82,7 @@ class City : public Ownable, public NamedLocation, public ProdSlotlist
 	     guint32 numslots = MAX_PRODUCTION_SLOTS_IN_A_CITY);
 
 	//! Copy constructor.
-        City(const City&);
+        City(const City&, bool sync_id = false);
 
 	//! Alternative copy constructor.
 	/**

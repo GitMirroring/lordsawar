@@ -531,6 +531,9 @@ class GameMap: public sigc::trackable
          */
         static std::list<Vector<int> > getNearbyPoints(Vector<int> pos, int dist);
 
+        //! Gather up the points on the map specified by the list of rectangles
+        std::list<Vector<int> > getPoints (std::list<LwRectangle> rects);
+
         /** Returns the number of Army units at a given position on the map.
          *
          * @param pos The position on the map to count Army units for.
@@ -1366,6 +1369,8 @@ class GameMap: public sigc::trackable
          */
 	Location *getLocation(Vector<int> pos);
 
+        LwRectangle getBoundingBox (Vector<int> pos);
+
         /** Check if all City objects are reachable.
          *
          * Loop over all cities to see if they can all be reached via a 
@@ -1411,6 +1416,8 @@ class GameMap: public sigc::trackable
                              bool always_alter_tilestyles = false);
 
 
+        std::list<UniquelyIdentified*> copyObjects(std::list<LwRectangle> rects);
+        std::list<Maptile*> copyMaptiles (std::list<LwRectangle> rects);
         static int calculateTilesPerOverviewMapTile(int width, int height);
         static int calculateTilesPerOverviewMapTile();
         //! Replace the current GameMap with another.
@@ -1423,6 +1430,9 @@ class GameMap: public sigc::trackable
         static bool neutralCitiesPresent();
         static Stack* getStrongestStack(Vector<int> pos);
 
+        static void resetCityset ();
+        static void resetTileset ();
+        static void resetShieldset ();
         //! Destructor
         ~GameMap();
         

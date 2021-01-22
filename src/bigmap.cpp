@@ -2,8 +2,8 @@
 // Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
 // Copyright (C) 2004, 2005 Bryan Duff
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2016, 2017,
-// 2020 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2016, 2017, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -414,7 +414,7 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
   guint32 tilesize = GameMap::getInstance()->getTileSize();
   Player *viewing = Playerlist::getViewingplayer();
   ImageCache *gc = ImageCache::getInstance();
-  int tile_style_id = GameMap::getInstance()->getTile(tile)->getTileStyle()->getId();
+  int tile_style_id = GameMap::getInstance()->getTile(tile)->getTileStyleId();
   int fog_type_id = 0;
   if (Playerlist::getViewingplayer()->getType() != Player::HUMAN &&
       GameScenarioOptions::s_hidden_map == true)

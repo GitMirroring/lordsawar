@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2000, 2001, 2002, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2014 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@ Location::Location(Vector<int> pos, guint32 size)
 {
 }
 
-Location::Location(const Location& loc)
-  :UniquelyIdentified(loc), LocationBox(loc)
+Location::Location(const Location& loc, bool sync_id)
+  :UniquelyIdentified(loc, sync_id), LocationBox(loc)
 {
 }
 

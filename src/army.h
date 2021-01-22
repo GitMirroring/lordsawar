@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2017, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -104,7 +104,7 @@ class Army :public ArmyBase, public UniquelyIdentified, public Ownable, public s
         Army(const ArmyProto& armyproto, Player* owner = 0);
 
 	//! Copy constructor. 
-        Army(const Army& army, Player *owner = 0);
+        Army(const Army& army, bool sync_id = false, Player *owner = 0);
 
         /** 
 	 * Load an Army from an opened saved-game file or from an opened

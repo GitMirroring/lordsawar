@@ -1,8 +1,8 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015,
-// 2020 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2020,
+// 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "ImageCache.h"
 #include "playerlist.h"
 #include "File.h"
+#include "tileset.h"
 
 MapRenderer::MapRenderer(Cairo::RefPtr<Cairo::Surface> surface)
  : d_surface (surface), gc (Cairo::Context::create(surface))
@@ -49,7 +50,7 @@ void MapRenderer::render_tile(Vector<int> draw, Vector<int> tile,
   // get correct tile
   Maptile *mtile = GameMap::getInstance()->getTile(tile);
 
-  TileStyle *style = mtile->getTileStyle();
+  TileStyle *style = mtile->getTileStyle(GameMap::getTileset ());
   bool use_default_pic = false;
   if (style == NULL)
     {

@@ -1,7 +1,7 @@
 // Copyright (C) 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2004, 2005 Ulf Lorenz
 // Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,9 +28,13 @@ UniquelyIdentified::UniquelyIdentified()
 {
 }
 
-UniquelyIdentified::UniquelyIdentified(const UniquelyIdentified& obj)
+UniquelyIdentified::UniquelyIdentified(const UniquelyIdentified& obj, bool sync_id)
  : d_id(obj.d_id), d_unique(false)
 {
+  if (!sync_id)
+    assignNewId ();
+  else
+    d_unique = true;
 }
 
 UniquelyIdentified::UniquelyIdentified(guint32 id)

@@ -31,6 +31,7 @@ Maptile::Maptile()
         :Movable(Vector<int>(-1,-1)), d_index(0), d_building(NONE)
 {
     d_tileStyle = NULL;
+    d_tilestyle_id = 0;
     d_stacktile = NULL;
     d_backpack = NULL;
     memset (d_blocked, 0, sizeof (d_blocked));
@@ -40,6 +41,7 @@ Maptile::Maptile(int x, int y, guint32 index)
     :Movable (Vector<int>(x, y)), d_index(index), d_building(NONE)
 {
     d_tileStyle = NULL;
+    d_tilestyle_id = 0;
     d_stacktile = NULL;
     d_backpack = NULL;
     memset (d_blocked, 0, sizeof (d_blocked));
@@ -49,6 +51,7 @@ Maptile::Maptile(int x, int y, Tile::Type type)
     : Movable (Vector<int>(x, y)), d_index(GameMap::getTileset()->lookupIndexByType (type)), d_building(NONE)
 {
     d_tileStyle = NULL;
+    d_tilestyle_id = 0;
     d_stacktile = NULL;
     d_backpack = NULL;
     memset (d_blocked, 0, sizeof (d_blocked));
@@ -107,7 +110,7 @@ Tile::Type Maptile::getType() const
   return (*GameMap::getTileset())[d_index]->getType();
 }
 
-guint32 Maptile::getMoves() const
+guint32 Maptile::getMoves()
 {
     if (d_building == Maptile::CITY)
         return 1;
@@ -116,13 +119,14 @@ guint32 Maptile::getMoves() const
     else if (d_building == Maptile::BRIDGE)
         return 1;
 
-    if ((*GameMap::getTileset())[d_index]->getType() == Tile::WATER)
+    Tileset *ts = GameMap::getTileset ();
+    if ((*ts)[d_index]->getType() == Tile::WATER)
       {
 	// if we're sailing and we're not on shore, then we move faster
-	if (d_tileStyle->getType() == TileStyle::INNERMIDDLECENTER)
-	  return (*GameMap::getTileset())[d_index]->getMoves() / 2;
+	if (getTileStyle (ts)->getType() == TileStyle::INNERMIDDLECENTER)
+	  return (*ts)[d_index]->getMoves() / 2;
       }
-    return (*GameMap::getTileset())[d_index]->getMoves();
+    return (*ts)[d_index]->getMoves();
 }
 
 void Maptile::setIndex(guint32 index)
@@ -261,16 +265,43 @@ Glib::ustring Maptile::buildingToFriendlyName(const guint32 bldg)
   return _("None");
 }
 
-void Maptile::copy (Maptile *m)
+Maptile::Maptile (const Maptile &m, bool sync_id)
+ : Movable (m)
+{
+  d_index = m.d_index;
+  d_building = m.d_building;
+  d_tilestyle_id = m.d_tilestyle_id;
+  d_tileStyle = NULL;
+
+  if (m.d_backpack != NULL)
+    d_backpack = new MapBackpack (*m.d_backpack, sync_id);
+  else
+    d_backpack = NULL;
+
+  if (m.d_stacktile != NULL)
+    d_stacktile = new StackTile (*m.d_stacktile);
+  else
+    d_stacktile = NULL;
+
+  for (int i = 0; i < 2; i++)
+    for (int j = 0; j < 8; j++)
+      d_blocked[i][j] = m.d_blocked[i][j];
+}
+
+void Maptile::copy (Maptile *m, bool sync_ids)
 {
   d_index = m->d_index;
-
   d_building  = m->d_building;
+  d_tilestyle_id = m->d_tilestyle_id;
+  d_tileStyle = NULL;
 
   setPos (m->getPos ());
 
   if (m->d_backpack != NULL)
-    d_backpack = new MapBackpack (*m->d_backpack);
+    {
+      MapBackpack *new_backpack = new MapBackpack (*m->d_backpack, sync_ids);
+      d_backpack = new_backpack;
+    }
   else
     d_backpack = NULL;
 
@@ -282,5 +313,12 @@ void Maptile::copy (Maptile *m)
   for (int i = 0; i < 2; i++)
     for (int j = 0; j < 8; j++)
       d_blocked[i][j] = m->d_blocked[i][j];
+}
+
+TileStyle * Maptile::getTileStyle (Tileset *tileset)
+{
+  if (d_tileStyle == NULL)
+    d_tileStyle = tileset->getTileStyle (d_tilestyle_id);
+  return d_tileStyle;
 }
 // End of file

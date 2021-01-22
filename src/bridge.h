@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ class Bridge: public Location
         Bridge(Vector<int> pos, int type = 0);
 
 	//! Copy constructor.
-        Bridge(const Bridge&);
+        Bridge(const Bridge&, bool sync_id = false);
 
         Bridge(const Bridge&, Vector<int> pos);
 

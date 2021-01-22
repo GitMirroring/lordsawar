@@ -1,6 +1,6 @@
 // Copyright (C) 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ class Item: public ItemProto, public UniquelyIdentified
         Item(XML_Helper* helper);
 
 	//! Copy constructor.
-        Item(const Item& orig);
+        Item(const Item& orig, bool sync_id = false);
 
 	//! Copy constructor.  make an item from a prototype.
 	Item(const ItemProto &proto, guint32 type_id);

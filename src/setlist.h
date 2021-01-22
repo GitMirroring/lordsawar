@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2009, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -366,6 +366,14 @@ public:
             add(set, *i);
           }
       }
+
+    void replace (T* set)
+      {
+        T* orig = get (set->getId ());
+        if (orig)
+          std::replace (this->begin (), this->end (), orig, set);
+      }
+
     sigc::signal<void, T*> signal_add() {return add_signal;}
     sigc::signal<void, T*> signal_reload() {return reload_signal;}
 

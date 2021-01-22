@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, Ben Asselstine
+//  Copyright (C) 2008, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,8 +25,9 @@ NamedLocation::NamedLocation(Vector<int> pos, guint32 size, Glib::ustring name,
 {
 }
 
-NamedLocation::NamedLocation(const NamedLocation& object)
-  :Location(object), Renamable(object), d_description(object.d_description)
+NamedLocation::NamedLocation(const NamedLocation& object, bool sync_id)
+  :Location(object, sync_id), Renamable(object),
+    d_description(object.d_description)
 {
 }
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2001, 2003 Michael Bartl
 // Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -54,8 +54,8 @@ Temple::Temple(XML_Helper* helper, guint32 width)
 	}
 }
 
-Temple::Temple(const Temple& t)
-  :NamedLocation(t), d_type(t.d_type)
+Temple::Temple(const Temple& t, bool sync_id)
+  :NamedLocation(t, sync_id), d_type(t.d_type)
 {
 }
 

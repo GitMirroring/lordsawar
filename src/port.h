@@ -1,4 +1,4 @@
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class Port: public Location
         Port(Vector<int> pos);
 
 	//! Copy constructor.
-        Port(const Port&);
+        Port(const Port&, bool sync_id = false);
 
 	//! Alternative copying constructor that gives the port a new position.
         Port(const Port&, Vector<int> pos);

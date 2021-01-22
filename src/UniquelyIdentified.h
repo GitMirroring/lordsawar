@@ -1,7 +1,7 @@
 // Copyright (C) 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ class UniquelyIdentified
     UniquelyIdentified();
 
     //! Copy constructor.
-    UniquelyIdentified(const UniquelyIdentified&);
+    UniquelyIdentified(const UniquelyIdentified&, bool sync_ids = false);
 
     //! non-default constructor. 
     UniquelyIdentified(guint32 id);
@@ -61,6 +61,7 @@ class UniquelyIdentified
     //! Go get a new unique identifier for this object.
     void assignNewId();
         
+    //! Whether or not this Id is unique (copied objects might not be unique)
     bool isUnique() {return d_unique;}
  protected:
 

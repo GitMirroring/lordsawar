@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2015 Ben Asselstine
+//  Copyright (C) 2008, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class NamedLocation: public Location, public Renamable
      NamedLocation(Vector<int> pos, guint32 size, Glib::ustring name, 
 		   Glib::ustring desc);
      //! Copy constructor.
-     NamedLocation(const NamedLocation&);
+     NamedLocation(const NamedLocation&, bool sync_id = false);
 
      NamedLocation(const NamedLocation&, Vector<int> pos);
 

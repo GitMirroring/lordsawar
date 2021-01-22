@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ class Signpost: public Location, public Renamable
         Signpost(Vector<int> pos, Glib::ustring name = "nowhere");
 
 	//! Copy constructor.
-        Signpost(const Signpost&);
+        Signpost(const Signpost&, bool sync_id = false);
 
 	//! Alternative copy constructor that changes the signpost's position.
         Signpost(const Signpost&, Vector<int> pos);

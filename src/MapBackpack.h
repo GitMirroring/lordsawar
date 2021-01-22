@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, Ben Asselstine
+//  Copyright (C) 2008, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class MapBackpack: public Backpack, public Immovable, public UniquelyIdentified
      MapBackpack(Vector<int> pos);
 
      //! Copy constructor.
-     MapBackpack(const MapBackpack&);
+     MapBackpack(const MapBackpack&, bool sync_id = false);
 
      //! Loading constructor.
      MapBackpack(XML_Helper* helper);
@@ -59,6 +59,9 @@ class MapBackpack: public Backpack, public Immovable, public UniquelyIdentified
 
     //! Return the plantable item owned by player that is planted here.
     Item *getPlantedItem(Player *player);
+
+    //! Return the plantable item that is planted here.
+    Item *getPlantedItem();
  private:
 
     bool loadBackpack(Glib::ustring tag, XML_Helper *helper);

@@ -77,6 +77,9 @@ class Maptile: public Movable
 	//! Default constructor.
         Maptile();
 
+        //! Copy constructor.
+        Maptile(const Maptile &m, bool sync_id = false);
+
 	//! Default constructor.
         /** 
 	 * Make a new Maptile.
@@ -124,7 +127,7 @@ class Maptile: public Movable
 	 * @return The number of movement points required to cross this 
 	 *         Maptile.
 	 */
-        guint32 getMoves() const;
+        guint32 getMoves();
 
         //! Get the smalltile color of this maptile.
 	Gdk::RGBA getColor() const;
@@ -208,17 +211,21 @@ class Maptile: public Movable
          */
 	bool d_blocked[2][8];
 
-	//! Get the TileStyle associated with this Maptile.
-	TileStyle * getTileStyle() const {return d_tileStyle;}
+	//! Get the TileStyle from T associated with this Maptile.
+	TileStyle * getTileStyle (Tileset *t);
+
+        //! Get the id of the TileStyle associated with this Maptile.
+        guint32 getTileStyleId () const {return d_tilestyle_id;}
 
 	//! Set the TileStyle associated with this Maptile.
-	void setTileStyle(TileStyle *style) {d_tileStyle = style;}
+	void setTileStyleId (guint32 id)
+          {d_tilestyle_id = id; d_tileStyle = NULL;}
 
 	static Maptile::Building buildingFromString(const Glib::ustring str);
 	static Glib::ustring buildingToString(const Maptile::Building bldg);
         static Glib::ustring buildingToFriendlyName(const guint32 bldg);
 
-        void copy (Maptile *m);
+        void copy (Maptile *m, bool sync_ids = false);
     private:
 	//! The index of the Tile within the Tileset (GameMap::s_tileset).
 	/**
@@ -226,6 +233,9 @@ class Maptile: public Movable
 	 * identified by it's index within GameMap::s_tileset.
 	 */
         guint32 d_index;
+
+        //! The look of the maptile by id.
+        guint32 d_tilestyle_id;
 
 	//! The look of the maptile.
 	TileStyle *d_tileStyle;

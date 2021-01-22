@@ -1069,17 +1069,24 @@ void MainWindow::on_quit_activated()
 
 void MainWindow::on_edit_players_activated()
 {
+    EditorAction_Players *action = new EditorAction_Players (game_scenario);
     PlayersDialog d(*window, d_create_scenario_names);
     Player *active = Playerlist::getActiveplayer();
     bool changed = d.run();
     if (changed)
       {
+        addUndo (action);
 	if (Playerlist::getInstance()->getPlayer(active->getId()))
 	  Playerlist::getInstance()->setActiveplayer(active);
+        else
+          Playerlist::getInstance()->setActiveplayer
+            (Playerlist::getInstance ()->getNeutral ());
 	needs_saving = true;
         update_window_title();
 	fill_players();
       }
+    else
+      delete action;
 }
 
 void MainWindow::on_edit_map_info_activated()
@@ -1099,11 +1106,22 @@ void MainWindow::on_edit_map_info_activated()
 void MainWindow::on_edit_shieldset_activated()
 {
   Gtk::Main *kit = Gtk::Main::instance();;
+
+  EditorAction_ShieldSet *action =
+    new EditorAction_ShieldSet (GameMap::getShieldset ());
+  active_shieldset_saved_in_editor = false;
+
   ShieldSetWindow *shieldset_window = new ShieldSetWindow
     (GameMap::getShieldset()->getConfigurationFile());
   shieldset_window->get_window().property_transient_for() = window;
   shieldset_window->shieldset_saved.connect (method(on_shieldset_saved));
   kit->run(shieldset_window->get_window());
+
+  if (active_shieldset_saved_in_editor)
+    addUndo (action);
+  else
+    delete action;
+
   delete shieldset_window;
 }
 
@@ -1113,12 +1131,8 @@ void MainWindow::on_shieldset_saved(guint32 id)
   Shieldset *shieldset = GameMap::getShieldset();
   if (id == shieldset->getId())
     {
-      ImageCache::getInstance()->reset();
-      GameMap::getInstance()->reloadShieldset();
-      fill_players();
-      bigmap->screen_size_changed(bigmap_image->get_allocation()); 
-      on_best_fit_activated ();
-      redraw();
+      active_shieldset_saved_in_editor = true;
+      doReloadShieldset ();
       needs_saving = true;
       update_window_title();
     }
@@ -1131,10 +1145,17 @@ void MainWindow::on_edit_armyset_activated()
   Armyset *armyset = Armysetlist::getInstance()->get(army_set_id);
   Glib::ustring file = armyset->getConfigurationFile();
  
+  EditorAction_ArmySet *action = new EditorAction_ArmySet (armyset);
+  active_armyset_saved_in_editor = false;
+
   ArmySetWindow* armyset_window = new ArmySetWindow (file);
   armyset_window->get_window().property_transient_for() = window;
   armyset_window->armyset_saved.connect (method(on_armyset_saved));
   kit->run(armyset_window->get_window());
+  if (active_armyset_saved_in_editor)
+    addUndo (action);
+  else
+    delete action;
   delete armyset_window;
 }
 
@@ -1143,18 +1164,8 @@ void MainWindow::on_armyset_saved(guint32 id)
   //did we save any of the active armysets?
   if (Playerlist::getInstance()->hasArmyset(id) == true)
     {
-      ImageCache::getInstance()->reset();
-      //we're doing reload before, because we need the maps to be updated.
-      //but then the armyset* gets changed and the switch has no effect.
-      Armysetlist::getInstance()->reload(id);
-
-      std::vector<Player*> players =
-        Playerlist::getInstance()->getPlayersWithArmyset (id);
-      for (auto p : players)
-        GameMap::getInstance()->switchArmysets(p, Armysetlist::getInstance()->get(id));
-      bigmap->screen_size_changed(bigmap_image->get_allocation()); 
-      on_best_fit_activated ();
-      redraw();
+      active_armyset_saved_in_editor = true;
+      doReloadArmyset (id);
       needs_saving = true;
       update_window_title();
     }
@@ -1164,11 +1175,21 @@ void MainWindow::on_edit_cityset_activated()
 {
   Gtk::Main *kit = Gtk::Main::instance();;
   Cityset *cityset = GameMap::getCityset();
+
+  EditorAction_CitySet *action = new EditorAction_CitySet (cityset);
+  active_cityset_saved_in_editor = false;
+
   Glib::ustring file = cityset->getConfigurationFile();
   CitySetWindow* cityset_window = new CitySetWindow (file);
   cityset_window->get_window().property_transient_for() = window;
   cityset_window->cityset_saved.connect (method(on_cityset_saved));
   kit->run(cityset_window->get_window());
+
+  if (active_cityset_saved_in_editor)
+    addUndo (action);
+  else
+    delete action;
+
   delete cityset_window;
 }
 
@@ -1177,11 +1198,8 @@ void MainWindow::on_cityset_saved(guint32 id)
   //did we save the active cityset?
   if (id == GameMap::getInstance()->getCitysetId())
     {
-      ImageCache::getInstance()->reset();
-      GameMap::getInstance()->reloadCityset();
-      bigmap->screen_size_changed(bigmap_image->get_allocation()); 
-      on_best_fit_activated ();
-      redraw();
+      active_cityset_saved_in_editor = true;
+      doReloadCityset ();
       needs_saving = true;
       update_window_title();
     }
@@ -1189,6 +1207,7 @@ void MainWindow::on_cityset_saved(guint32 id)
 
 void MainWindow::on_edit_smallmap_activated()
 {
+  EditorAction_MiniMap *action = new EditorAction_MiniMap (game_scenario);
   SmallmapEditorDialog d(*window);
   bool changed = d.run();
   d.hide();
@@ -1197,7 +1216,12 @@ void MainWindow::on_edit_smallmap_activated()
   smallmap->resize();
   redraw();
   if (changed)
-    needs_saving = true;
+    {
+      addUndo (action);
+      needs_saving = true;
+    }
+  else
+    delete action;
   update_window_title();
 }
 
@@ -1205,11 +1229,21 @@ void MainWindow::on_edit_tileset_activated()
 {
   Gtk::Main *kit = Gtk::Main::instance();;
   Tileset *tileset = GameMap::getTileset();
+
+  EditorAction_TileSet *action = new EditorAction_TileSet (tileset);
+  active_tileset_saved_in_editor = false;
+
   Glib::ustring file = tileset->getConfigurationFile();
   TileSetWindow* tileset_window = new TileSetWindow (file);
   tileset_window->get_window().property_transient_for() = window;
   tileset_window->tileset_saved.connect (method(on_tileset_saved));
   kit->run(tileset_window->get_window());
+
+  if (active_tileset_saved_in_editor)
+    addUndo (action);
+  else
+    delete action;
+
   delete tileset_window;
 }
 
@@ -1218,15 +1252,8 @@ void MainWindow::on_tileset_saved(guint32 id)
   //did we save the active tileset?
   if (id == GameMap::getInstance()->getTilesetId())
     {
-      ImageCache::getInstance()->reset();
-      Tilesetlist::getInstance()->reload(id);
-      GameMap::getInstance()->switchTileset(Tilesetlist::getInstance()->get(id));
-      smallmap->resize();
-      bigmap->screen_size_changed(bigmap_image->get_allocation()); 
-      setup_terrain_radiobuttons();
-      on_terrain_radiobutton_toggled();
-      on_best_fit_activated ();
-      redraw();
+      active_tileset_saved_in_editor = true;
+      doReloadTileset (id);
       needs_saving = true;
       update_window_title();
     }
@@ -1490,6 +1517,7 @@ void MainWindow::init_maps()
     bigmap->flag_selected.connect (method(on_flag_selected));
     bigmap->stack_selected_for_battle_calculator.connect
       (method(on_stack_selected_for_battle_calculator));
+    bigmap->undo_map.connect (method (on_got_undo_action));
 
     // grid is on by default
     bigmap->toggle_grid();
@@ -1619,60 +1647,85 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
 {
     if (Stack *s = dynamic_cast<Stack *>(object))
     {
+        EditorAction_EditStack *action =
+          new EditorAction_EditStack (LwRectangle (s->getPos ()));
 	StackEditorDialog d(*window, s);
 	int response = d.run();
 	if (response == Gtk::RESPONSE_ACCEPT)
           {
+            addUndo (action);
             needs_saving = true;
             update_window_title();
           }
+        else
+          delete action;
 
 	// we might have changed something visible
 	redraw();
     }
     else if (City *c = dynamic_cast<City *>(object))
     {
+        EditorAction_EditCity *action =
+          new EditorAction_EditCity (LwRectangle (c->getPos ()));
 	CityEditorDialog d(*window, c, d_create_scenario_names);
 	int response = d.run();
 	if (response == Gtk::RESPONSE_ACCEPT)
           {
+            addUndo (action);
             needs_saving = true;
             update_window_title();
           }
+        else
+          delete action;
 
 	// we might have changed something visible
 	redraw();
     }
     else if (Ruin *r = dynamic_cast<Ruin *>(object))
     {
+        EditorAction_EditRuin *action =
+          new EditorAction_EditRuin (LwRectangle (r->getPos ()));
 	RuinEditorDialog d(*window, r, d_create_scenario_names);
 	int response = d.run();
 	if (response == Gtk::RESPONSE_ACCEPT)
           {
+            addUndo (action);
             needs_saving = true;
             update_window_title();
           }
+        else
+          delete action;
 	redraw();
     }
     else if (Signpost *si = dynamic_cast<Signpost *>(object))
     {
+        EditorAction_EditSignpost *action =
+          new EditorAction_EditSignpost (LwRectangle (si->getPos ()));
 	SignpostEditorDialog d(*window, si, d_create_scenario_names);
 	int response = d.run();
 	if (response == Gtk::RESPONSE_ACCEPT)
           {
+            addUndo (action);
             needs_saving = true;
             update_window_title();
           }
+        else
+          delete action;
     }
     else if (Temple *t = dynamic_cast<Temple *>(object))
     {
+        EditorAction_EditTemple *action =
+          new EditorAction_EditTemple (LwRectangle (t->getPos ()));
 	TempleEditorDialog d(*window, t, d_create_scenario_names);
 	int response = d.run();
 	if (response == Gtk::RESPONSE_ACCEPT)
           {
+            addUndo (action);
             needs_saving = true;
             update_window_title();
           }
+        else
+          delete action;
 
 	// we might have changed something visible
 	redraw();
@@ -1690,12 +1743,17 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
       Road *road = GameMap::getRoad(st->getPos());
       Stone *stone = GameMap::getStone(st->getPos());
 
+      EditorAction_EditStone *action =
+        new EditorAction_EditStone (LwRectangle (st->getPos ()));
       StoneEditorDialog d(*window, stone, road);
       if (d.run ())
         {
+          addUndo (action);
           needs_saving = true;
           update_window_title();
         }
+      else
+        delete action;
       redraw();
     }
     else if (MapBackpack *b = dynamic_cast<MapBackpack*>(object))
@@ -1705,22 +1763,43 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
 
         if (tag == "bag")
           {
+            EditorAction_EditBackpack *action =
+              new EditorAction_EditBackpack (LwRectangle (b->getPos ()));
             BackpackEditorDialog d(*window, b);
             if (d.run())
               {
+                addUndo (action);
                 redraw ();
                 needs_saving = true;
                 update_window_title();
               }
+            else
+              delete action;
           }
         else if (tag == "flag")
           {
+            EditorAction_EditFlag *action = NULL;
+            if (b->getPlantedItem () == NULL)
+              addUndo (new EditorAction_Flag (LwRectangle (b->getPos ())));
+            else
+              {
+                LwRectangle rect = LwRectangle (b->getPos ());
+                action = new EditorAction_EditFlag (rect);
+              }
+
             PlantedStandardEditorDialog d (*window, b->getPos ());
             if (d.run ())
               {
+                if (action)
+                  addUndo (action);
                 redraw ();
                 needs_saving = true;
                 update_window_title();
+              }
+            else
+              {
+                if (action)
+                  delete action;
               }
           }
 
@@ -1729,6 +1808,8 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
 
 void MainWindow::on_smooth_map_activated()
 {
+  EditorAction_Smooth *action = new EditorAction_Smooth (game_scenario);
+  addUndo (action);
   GameMap::getInstance()->applyTileStyles(0, 0, GameMap::getHeight(), 
 					  GameMap::getWidth(), true);
   redraw();
@@ -1738,6 +1819,8 @@ void MainWindow::on_smooth_map_activated()
 
 void MainWindow::on_smooth_screen_activated()
 {
+  EditorAction_Smooth *action = new EditorAction_Smooth (game_scenario);
+  addUndo (action);
   bigmap->smooth_view();
   needs_saving = true;
   update_window_title ();
@@ -1745,26 +1828,36 @@ void MainWindow::on_smooth_screen_activated()
 
 void MainWindow::on_edit_items_activated()
 {
+  EditorAction_Items *action = new EditorAction_Items (game_scenario);
   ItemlistDialog d(*window);
   int response = d.run_and_hide();
   if (response == Gtk::RESPONSE_ACCEPT)
     {
       if (d.item_was_changed ())
         {
+          addUndo (action);
           needs_saving = true;
           update_window_title();
         }
+      else
+        delete action;
     }
+  else
+    delete action;
 }
 
 void MainWindow::on_edit_rewards_activated()
 {
+  EditorAction_Rewards *action = new EditorAction_Rewards (game_scenario);
   RewardlistDialog d(*window, false, false);
   if (d.run())
     {
+      addUndo (action);
       needs_saving = true;
       update_window_title();
     }
+  else
+    delete action;
 }
 
 void MainWindow::randomize_city(City *c)
@@ -1779,17 +1872,37 @@ void MainWindow::randomize_city(City *c)
 
 void MainWindow::on_random_all_cities_activated()
 {
+  guint32 count = 0;
+  EditorAction_RandAllCities *action =
+    new EditorAction_RandAllCities (game_scenario);
   Citylist *cl = Citylist::getInstance();
   for (Citylist::iterator it = cl->begin(); it != cl->end(); ++it)
-    randomize_city(*it);
+    {
+      count++;
+      randomize_city(*it);
+    }
+  if (count != 0)
+    addUndo (action);
+  else
+    delete action;
 }
 
 void MainWindow::on_random_unnamed_cities_activated()
 {
+  guint32 count = 0;
+  EditorAction_RandUnnamedCities *action =
+    new EditorAction_RandUnnamedCities (game_scenario);
   Citylist *cl = Citylist::getInstance();
   for (Citylist::iterator it = cl->begin(); it != cl->end(); ++it)
     if ((*it)->isUnnamed() == true)
-      randomize_city(*it);
+      {
+        count++;
+        randomize_city(*it);
+      }
+  if (count != 0)
+    addUndo (action);
+  else
+    delete action;
 }
 
 void MainWindow::randomize_ruin(Ruin *r)
@@ -1807,27 +1920,51 @@ void MainWindow::randomize_ruin(Ruin *r)
 
 void MainWindow::on_random_all_ruins_activated()
 {
+  guint32 count = 0;
+  EditorAction_RandAllRuins *action =
+    new EditorAction_RandAllRuins (game_scenario);
   Ruinlist *rl = Ruinlist::getInstance();
   for (Ruinlist::iterator it = rl->begin(); it != rl->end(); ++it)
-    randomize_ruin(*it);
+    {
+      count++;
+      randomize_ruin(*it);
+    }
+  if (count != 0)
+    addUndo (action);
+  else
+    delete action;
 }
 
 void MainWindow::on_random_unnamed_ruins_activated()
 {
+  guint32 count = 0;
+  EditorAction_RandUnnamedRuins *action =
+    new EditorAction_RandUnnamedRuins (game_scenario);
   Ruinlist *rl = Ruinlist::getInstance();
   for (Ruinlist::iterator it = rl->begin(); it != rl->end(); ++it)
     if ((*it)->isUnnamed() == true)
-      randomize_ruin(*it);
+      {
+        count++;
+        randomize_ruin(*it);
+      }
+  if (count != 0)
+    addUndo (action);
+  else
+    delete action;
 }
 
 void MainWindow::on_random_all_temples_activated()
 {
+  guint32 count = 0;
+  EditorAction_RandAllTemples *action =
+    new EditorAction_RandAllTemples (game_scenario);
   Templelist *tl = Templelist::getInstance();
   for (Templelist::iterator it = tl->begin(); it != tl->end(); ++it)
     {
       Glib::ustring name = d_create_scenario_names->popRandomTempleName();
       if (name != "")
 	{
+          count++;
 	  Location *l = *it;
 	  RenamableLocation *renamable_temple = 
 	    static_cast<RenamableLocation*>(l);
@@ -1836,10 +1973,17 @@ void MainWindow::on_random_all_temples_activated()
           update_window_title();
 	}
     }
+  if (count != 0)
+    addUndo (action);
+  else
+    delete action;
 }
 
 void MainWindow::on_random_unnamed_temples_activated()
 {
+  guint32 count = 0;
+  EditorAction_RandUnnamedTemples *action =
+    new EditorAction_RandUnnamedTemples (game_scenario);
   Templelist *tl = Templelist::getInstance();
   for (Templelist::iterator it = tl->begin(); it != tl->end(); ++it)
     {
@@ -1848,6 +1992,7 @@ void MainWindow::on_random_unnamed_temples_activated()
 	  Glib::ustring name = d_create_scenario_names->popRandomTempleName();
 	  if (name != "")
 	    {
+              count++;
 	      Location *l = *it;
 	      RenamableLocation *renamable_temple = 
 		static_cast<RenamableLocation*>(l);
@@ -1857,6 +2002,10 @@ void MainWindow::on_random_unnamed_temples_activated()
 	    }
 	}
     }
+  if (count != 0)
+    addUndo (action);
+  else
+    delete action;
 }
 
 void MainWindow::randomize_signpost(Signpost *signpost)
@@ -1878,17 +2027,37 @@ void MainWindow::randomize_signpost(Signpost *signpost)
 
 void MainWindow::on_random_all_signs_activated()
 {
+  EditorAction_RandUnnamedSigns *action =
+    new EditorAction_RandUnnamedSigns (game_scenario);
+  guint32 count = 0;
   Signpostlist *sl = Signpostlist::getInstance();
   for (Signpostlist::iterator it = sl->begin(); it != sl->end(); ++it)
-    randomize_signpost(*it);
+    {
+      count++;
+      randomize_signpost(*it);
+    }
+  if (count != 0)
+    addUndo (action);
+  else
+    delete action;
 }
 
 void MainWindow::on_random_unnamed_signs_activated()
 {
+  EditorAction_RandUnnamedSigns *action =
+    new EditorAction_RandUnnamedSigns (game_scenario);
+  guint32 count = 0;
   Signpostlist *sl = Signpostlist::getInstance();
   for (Signpostlist::iterator it = sl->begin(); it != sl->end(); ++it)
     if ((*it)->getName() == DEFAULT_SIGNPOST)
-      randomize_signpost(*it);
+      {
+        count++;
+        randomize_signpost(*it);
+      }
+  if (count != 0)
+    addUndo (action);
+  else
+    delete action;
 }
 
 void MainWindow::on_help_about_activated()
@@ -1989,6 +2158,7 @@ void MainWindow::on_import_map_activated()
       //now lets get rid of stuff.
       clear_save_file_of_scenario_specific_data();
 
+      clearUndoAndRedo ();
       init_map_state();
       bigmap->screen_size_changed(bigmap_image->get_allocation()); 
       fill_players();
@@ -2007,10 +2177,12 @@ void MainWindow::redraw(bool center)
 
 void MainWindow::on_switch_sets_activated()
 {
+  EditorAction_SwitchSets *action = new EditorAction_SwitchSets (game_scenario);
   SwitchSetsDialog d(*window);
   int response = d.run();
   if (response == Gtk::RESPONSE_ACCEPT && d.get_set_changed ())
     {
+      addUndo (action);
       needs_saving = true;
       update_window_title();
       ImageCache::getInstance()->reset();
@@ -2025,13 +2197,24 @@ void MainWindow::on_switch_sets_activated()
       redraw();
       fill_players();
     }
+  else
+    delete action;
 }
 
 void MainWindow::on_player_toggled(PlayerItem item)
 {
+  guint32 id = 0;
+  if (Playerlist::getActiveplayer ())
+    id = Playerlist::getActiveplayer ()->getId ();
+  EditorAction_ActivePlayer *action = new EditorAction_ActivePlayer (id);
   Player *p = Playerlist::getInstance()->getPlayer(item.player_id);
   if (p)
-    Playerlist::getInstance()->setActiveplayer(p);
+    {
+      addUndo (action);
+      Playerlist::getInstance()->setActiveplayer(p);
+    }
+  else
+    delete action;
   fill_players();
 }
 
@@ -2141,6 +2324,9 @@ void MainWindow::on_remove_all_stacks_activated()
     }
   if (remove_stacks)
     {
+      EditorAction_RemoveStacks *action =
+        new EditorAction_RemoveStacks (game_scenario);
+      addUndo (action);
       for (auto p: *Playerlist::getInstance())
         p->clearStacklist();
       redraw();
@@ -2151,13 +2337,17 @@ void MainWindow::on_remove_all_stacks_activated()
 
 void MainWindow::on_edit_fight_order_activated()
 {
+  EditorAction_FightOrder *action = new EditorAction_FightOrder (game_scenario);
   FightOrderEditorDialog d(*window);
   d.run();
   if (d.get_modified())
     {
+      addUndo (action);
       needs_saving = true;
       update_window_title ();
     }
+  else
+    delete action;
 }
 
 bool MainWindow::on_bigmap_scrolled(GdkEventScroll* event)
@@ -2173,7 +2363,10 @@ void MainWindow::on_road_edited(Vector<int> pos, int type)
   update_window_title();
   close_road_editor_tip ();
   Road *road = new Road (pos, Road::Type(type));
+  EditorAction_EditRoad *action =
+    new EditorAction_EditRoad (LwRectangle (pos));
   GameMap::getInstance()->putRoad(road, false);
+  addUndo (action);
   redraw();
 }
 
@@ -2288,7 +2481,7 @@ void MainWindow::change_city_ownership(City *city, Player *player)
     }
 }
 
-void MainWindow::on_random_assign_capital_cities_activated()
+bool MainWindow::assign_capital_cities ()
 {
   bool capitals_set = false;
   for (auto p : *Playerlist::getInstance())
@@ -2336,6 +2529,7 @@ void MainWindow::on_random_assign_capital_cities_activated()
       update_window_title ();
     }
 
+  guint assigned = 0;
   //for each player except neutral, pick a new capital
   for (auto p : *Playerlist::getInstance())
     {
@@ -2358,6 +2552,7 @@ void MainWindow::on_random_assign_capital_cities_activated()
         cities = neutral_cities;
       if (cities.empty() == false)
         {
+          assigned++;
           City *capital = cities[Rnd::rand() % cities.size()];
           change_city_ownership(capital, p);
           capital->setCapital(true);
@@ -2366,8 +2561,21 @@ void MainWindow::on_random_assign_capital_cities_activated()
           update_window_title ();
         }
     }
+  return assigned != 0;
+}
 
-  redraw();
+void MainWindow::on_random_assign_capital_cities_activated()
+{
+
+  EditorAction_AssignCapitals *action =
+    new EditorAction_AssignCapitals (game_scenario);
+  if (assign_capital_cities ())
+    {
+      addUndo (action);
+      redraw();
+    }
+  else
+    delete action;
 }
 
 bool MainWindow::on_window_state_event (GdkEventWindowState *e)
@@ -2584,6 +2792,367 @@ EditorAction* MainWindow::executeAction (EditorAction *action)
             doReloadScenario (a);
             break;
           }
+      case EditorAction::TERRAIN:
+          {
+            EditorAction_Terrain *a =
+              dynamic_cast<EditorAction_Terrain*>(action);
+            out = new EditorAction_Terrain (a->getTile (), a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::ERASE:
+          {
+            EditorAction_Erase *a =
+              dynamic_cast<EditorAction_Erase*>(action);
+            out = new EditorAction_Erase (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::MOVE:
+          {
+            EditorAction_Move*a =
+              dynamic_cast<EditorAction_Move*>(action);
+            
+            LwRectangle r1 = a->getRectangles().front ();
+            LwRectangle r2 = a->getRectangles().back();
+            out = new EditorAction_Move (r1, r2);
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::STACK:
+          {
+            EditorAction_Stack *a =
+              dynamic_cast<EditorAction_Stack*>(action);
+            out = new EditorAction_Stack (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::CITY:
+          {
+            EditorAction_City *a =
+              dynamic_cast<EditorAction_City*>(action);
+            out = new EditorAction_City (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::RUIN:
+          {
+            EditorAction_Ruin *a =
+              dynamic_cast<EditorAction_Ruin*>(action);
+            out = new EditorAction_Ruin (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::TEMPLE:
+          {
+            EditorAction_Temple *a =
+              dynamic_cast<EditorAction_Temple*>(action);
+            out = new EditorAction_Temple (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::STONE:
+          {
+            EditorAction_Stone *a =
+              dynamic_cast<EditorAction_Stone*>(action);
+            out = new EditorAction_Stone (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::SIGNPOST:
+          {
+            EditorAction_Signpost *a =
+              dynamic_cast<EditorAction_Signpost*>(action);
+            out = new EditorAction_Signpost (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::PORT:
+          {
+            EditorAction_Port *a =
+              dynamic_cast<EditorAction_Port*>(action);
+            out = new EditorAction_Port (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::BRIDGE:
+          {
+            EditorAction_Bridge *a =
+              dynamic_cast<EditorAction_Bridge*>(action);
+            out = new EditorAction_Bridge (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::ROAD:
+          {
+            EditorAction_Road *a =
+              dynamic_cast<EditorAction_Road*>(action);
+            out = new EditorAction_Road (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::FLAG:
+          {
+            EditorAction_Flag *a =
+              dynamic_cast<EditorAction_Flag*>(action);
+            out = new EditorAction_Flag (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::EDIT_FLAG:
+          {
+            EditorAction_EditFlag *a =
+              dynamic_cast<EditorAction_EditFlag*>(action);
+            out = new EditorAction_EditFlag (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::EDIT_STACK:
+          {
+            EditorAction_EditStack *a =
+              dynamic_cast<EditorAction_EditStack*>(action);
+            out = new EditorAction_EditStack (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::EDIT_CITY:
+          {
+            EditorAction_EditCity *a =
+              dynamic_cast<EditorAction_EditCity*>(action);
+            out = new EditorAction_EditCity (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::EDIT_RUIN:
+          {
+            EditorAction_EditRuin *a =
+              dynamic_cast<EditorAction_EditRuin*>(action);
+            out = new EditorAction_EditRuin (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::EDIT_TEMPLE:
+          {
+            EditorAction_EditTemple *a =
+              dynamic_cast<EditorAction_EditTemple*>(action);
+            out = new EditorAction_EditTemple (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::EDIT_STONE:
+          {
+            EditorAction_EditStone *a =
+              dynamic_cast<EditorAction_EditStone*>(action);
+            out = new EditorAction_EditStone (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::EDIT_SIGNPOST:
+          {
+            EditorAction_EditSignpost *a =
+              dynamic_cast<EditorAction_EditSignpost*>(action);
+            out = new EditorAction_EditSignpost (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::EDIT_ROAD:
+          {
+            EditorAction_EditRoad *a =
+              dynamic_cast<EditorAction_EditRoad*>(action);
+            out = new EditorAction_EditRoad (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::EDIT_BACKPACK:
+          {
+            EditorAction_EditBackpack *a =
+              dynamic_cast<EditorAction_EditBackpack*>(action);
+            out = new EditorAction_EditBackpack (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
+      case EditorAction::MINIMAP:
+          {
+            EditorAction_MiniMap *a =
+              dynamic_cast<EditorAction_MiniMap *>(action);
+            out = new EditorAction_MiniMap (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::PLAYERS:
+          {
+            EditorAction_Players *a =
+              dynamic_cast<EditorAction_Players*>(action);
+            out = new EditorAction_Players (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::ITEMS:
+          {
+            EditorAction_Items *a =
+              dynamic_cast<EditorAction_Items*>(action);
+            out = new EditorAction_Items (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::REWARDS:
+          {
+            EditorAction_Rewards *a =
+              dynamic_cast<EditorAction_Rewards*>(action);
+            out = new EditorAction_Rewards (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::SMOOTH:
+          {
+            EditorAction_Smooth *a =
+              dynamic_cast<EditorAction_Smooth*>(action);
+            out = new EditorAction_Smooth (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::SWITCH_SETS:
+          {
+            EditorAction_SwitchSets *a =
+              dynamic_cast<EditorAction_SwitchSets*>(action);
+            out = new EditorAction_SwitchSets (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::TILESET:
+          {
+            EditorAction_TileSet *a =
+              dynamic_cast<EditorAction_TileSet*>(action);
+            out = new EditorAction_TileSet (GameMap::getTileset ());
+            doReloadTileset (a);
+            break;
+          }
+      case EditorAction::CITYSET:
+          {
+            EditorAction_CitySet *a =
+              dynamic_cast<EditorAction_CitySet*>(action);
+            out = new EditorAction_CitySet (GameMap::getCityset ());
+            doReloadCityset (a);
+            break;
+          }
+      case EditorAction::SHIELDSET:
+          {
+            EditorAction_ShieldSet *a =
+              dynamic_cast<EditorAction_ShieldSet*>(action);
+            out = new EditorAction_ShieldSet (GameMap::getShieldset ());
+            doReloadShieldset (a);
+            break;
+          }
+      case EditorAction::ARMYSET:
+          {
+            EditorAction_ArmySet *a =
+              dynamic_cast<EditorAction_ArmySet*>(action);
+            Player *p = Playerlist::getActiveplayer ();
+            Armyset *ar = Armysetlist::getInstance ()->get (p->getArmyset ());
+            out = new EditorAction_ArmySet (ar);
+            doReloadArmyset (a);
+            break;
+          }
+      case EditorAction::FIGHT_ORDER:
+          {
+            EditorAction_FightOrder *a =
+              dynamic_cast<EditorAction_FightOrder*>(action);
+            out = new EditorAction_FightOrder (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::REMOVE_STACKS:
+          {
+            EditorAction_RemoveStacks *a =
+              dynamic_cast<EditorAction_RemoveStacks*>(action);
+            out = new EditorAction_RemoveStacks (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::RAND_ALL_CITIES:
+          {
+            EditorAction_RandAllCities *a =
+              dynamic_cast<EditorAction_RandAllCities*>(action);
+            out = new EditorAction_RandAllCities (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::RAND_UNNAMED_CITIES:
+          {
+            EditorAction_RandUnnamedCities *a =
+              dynamic_cast<EditorAction_RandUnnamedCities*>(action);
+            out = new EditorAction_RandUnnamedCities (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::RAND_ALL_RUINS:
+          {
+            EditorAction_RandAllRuins *a =
+              dynamic_cast<EditorAction_RandAllRuins*>(action);
+            out = new EditorAction_RandAllRuins (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::RAND_UNNAMED_RUINS:
+          {
+            EditorAction_RandUnnamedRuins *a =
+              dynamic_cast<EditorAction_RandUnnamedRuins*>(action);
+            out = new EditorAction_RandUnnamedRuins (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::RAND_ALL_TEMPLES:
+          {
+            EditorAction_RandAllTemples *a =
+              dynamic_cast<EditorAction_RandAllTemples*>(action);
+            out = new EditorAction_RandAllTemples (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::RAND_UNNAMED_TEMPLES:
+          {
+            EditorAction_RandUnnamedTemples *a =
+              dynamic_cast<EditorAction_RandUnnamedTemples*>(action);
+            out = new EditorAction_RandUnnamedTemples (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::RAND_ALL_SIGNS:
+          {
+            EditorAction_RandAllSigns *a =
+              dynamic_cast<EditorAction_RandAllSigns*>(action);
+            out = new EditorAction_RandAllSigns (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::RAND_UNNAMED_SIGNS:
+          {
+            EditorAction_RandUnnamedSigns *a =
+              dynamic_cast<EditorAction_RandUnnamedSigns*>(action);
+            out = new EditorAction_RandUnnamedSigns (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::ASSIGN_CAPITALS:
+          {
+            EditorAction_AssignCapitals *a =
+              dynamic_cast<EditorAction_AssignCapitals*>(action);
+            out = new EditorAction_AssignCapitals (game_scenario);
+            doReloadScenario (a);
+            break;
+          }
+      case EditorAction::ACTIVE_PLAYER:
+          {
+            EditorAction_ActivePlayer *a =
+              dynamic_cast<EditorAction_ActivePlayer*>(action);
+            guint32 id = Playerlist::getActiveplayer ()->getId ();
+            out = new EditorAction_ActivePlayer (id);
+            Player *p = Playerlist::getInstance ()->getPlayer (a->getId ());
+            if (p)
+              Playerlist::getInstance()->setActiveplayer (p);
+            fill_players();
+            break;
+          }
       }
     return out;
 }
@@ -2619,3 +3188,177 @@ void MainWindow::doReloadScenario (EditorAction_Save *action)
   GameMap::getInstance ()->applyTileStyles (0, 0, d_height, d_width, false);
   redraw ();
 }
+
+void MainWindow::doChangeMap (EditorAction_ChangeMap *action)
+{
+  // hang on to your socks, this is going to be a fun one!
+
+  // first the maptiles
+  for (auto m : action->getMaptiles ())
+    {
+      Maptile *maptile = GameMap::getInstance ()->getTile (m->getPos ());
+      maptile->copy (m, true);
+    }
+
+  // then the objects
+  for (auto object : action->getObjects ())
+    {
+      if (City *city = dynamic_cast<City*>(object))
+        {
+          Citylist *cities = Citylist::getInstance ();
+          City *old_city = cities->getById (city->getId ());
+          std::replace (cities->begin (), cities->end (), old_city, city);
+          delete old_city;
+        }
+      else if (Ruin *ruin = dynamic_cast<Ruin*>(object))
+        {
+          Ruinlist *ruins = Ruinlist::getInstance ();
+          Ruin *old_ruin = ruins->getById (ruin->getId ());
+          std::replace (ruins->begin (), ruins->end (), old_ruin, ruin);
+          delete old_ruin;
+        }
+      else if (Temple *temple = dynamic_cast<Temple*>(object))
+        {
+          Templelist *temples = Templelist::getInstance ();
+          Temple *old_temple = temples->getById (temple->getId ());
+          std::replace (temples->begin (), temples->end (), old_temple, temple);
+          delete old_temple;
+        }
+      else if (Port *port = dynamic_cast<Port*>(object))
+        {
+          Portlist *ports = Portlist::getInstance ();
+          Port *old_port = ports->getById (port->getId ());
+          std::replace (ports->begin (), ports->end (), old_port, port);
+          delete old_port;
+        }
+      else if (Stone *stone = dynamic_cast<Stone*>(object))
+        {
+          Stonelist *stones = Stonelist::getInstance ();
+          Stone *old_stone = stones->getById (stone->getId ());
+          std::replace (stones->begin (), stones->end (), old_stone, stone);
+          delete old_stone;
+        }
+      else if (Signpost *signpost = dynamic_cast<Signpost*>(object))
+        {
+          Signpostlist *signposts = Signpostlist::getInstance ();
+          Signpost *old_signpost = signposts->getById (signpost->getId ());
+          std::replace (signposts->begin (), signposts->end (), old_signpost,
+                        signpost);
+          delete old_signpost;
+        }
+      else if (Road *road = dynamic_cast<Road*>(object))
+        {
+          Roadlist *roads = Roadlist::getInstance ();
+          Road *old_road = roads->getById (road->getId ());
+          std::replace (roads->begin (), roads->end (), old_road, road);
+          delete old_road;
+        }
+      else if (Bridge *bridge = dynamic_cast<Bridge*>(object))
+        {
+          Bridgelist *bridges = Bridgelist::getInstance ();
+          Bridge *old_bridge = bridges->getById (bridge->getId ());
+          std::replace (bridges->begin (), bridges->end (), old_bridge, bridge);
+          delete old_bridge;
+        }
+      else if (Stack *stack = dynamic_cast<Stack*>(object))
+        {
+          Player *p = stack->getOwner ();
+          Stacklist *stacks = p->getStacklist ();
+          Stack *old_stack = stacks->getStackById (stack->getId ());
+          std::replace (stacks->begin (), stacks->end (), old_stack, stack);
+          delete old_stack;
+        }
+    }
+  action->clearObjects ();
+
+  redraw ();
+}
+
+void MainWindow::on_got_undo_action (EditorAction *action)
+{
+  addUndo (action);
+}
+
+void MainWindow::doReloadArmyset (EditorAction_ArmySet *a)
+{
+  Armyset *ar = a->getArmySet ();
+  File::copy (a->getArmySetFilename (), ar->getConfigurationFile (true));
+  Armysetlist::getInstance ()->replace (ar);
+  doReloadArmyset (ar->getId ());
+}
+
+void MainWindow::doReloadArmyset (guint32 id)
+{
+  ImageCache::getInstance()->reset();
+  //we're doing reload before, because we need the maps to be updated.
+  //but then the armyset* gets changed and the switch has no effect.
+  Armysetlist::getInstance()->reload(id);
+
+  std::vector<Player*> players =
+    Playerlist::getInstance()->getPlayersWithArmyset (id);
+  for (auto p : players)
+    GameMap::getInstance()->switchArmysets(p, Armysetlist::getInstance()->get(id));
+  bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+  on_best_fit_activated ();
+  redraw();
+}
+
+void MainWindow::doReloadCityset (EditorAction_CitySet *a)
+{
+  Cityset *c = a->getCitySet ();
+  File::copy (a->getCitySetFilename (), c->getConfigurationFile (true));
+  Citysetlist::getInstance ()->replace (c);
+  doReloadCityset ();
+}
+
+void MainWindow::doReloadCityset ()
+{
+  ImageCache::getInstance()->reset();
+  GameMap::resetCityset ();
+  GameMap::getInstance()->reloadCityset();
+  bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+  on_best_fit_activated ();
+  redraw();
+}
+
+void MainWindow::doReloadTileset (EditorAction_TileSet *a)
+{
+  Tileset *t = a->getTileSet ();
+  File::copy (a->getTileSetFilename (), t->getConfigurationFile (true));
+  Tilesetlist::getInstance ()->replace (t);
+  doReloadTileset (t->getId ());
+}
+
+void MainWindow::doReloadTileset (guint32 id)
+{
+  ImageCache::getInstance()->reset();
+  GameMap::resetTileset ();
+  Tilesetlist::getInstance()->reload(id);
+  GameMap::getInstance()->switchTileset(Tilesetlist::getInstance()->get(id));
+  smallmap->resize();
+  bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+  setup_terrain_radiobuttons();
+  on_terrain_radiobutton_toggled();
+  on_best_fit_activated ();
+  redraw();
+}
+
+void MainWindow::doReloadShieldset (EditorAction_ShieldSet *a)
+{
+  Shieldset *s = a->getShieldSet ();
+  File::copy (a->getShieldSetFilename (), s->getConfigurationFile (true));
+  Shieldsetlist::getInstance ()->replace (s);
+  doReloadShieldset ();
+}
+
+void MainWindow::doReloadShieldset ()
+{
+  ImageCache::getInstance()->reset();
+  GameMap::resetShieldset ();
+  GameMap::getInstance()->reloadShieldset();
+  fill_players();
+  bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+  on_best_fit_activated ();
+  redraw();
+}
+

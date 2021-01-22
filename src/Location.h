@@ -43,7 +43,7 @@ class Location : public UniquelyIdentified, public LocationBox
      Location(Vector<int> pos, guint32 size = 1);
 
      //! Copy constructor.
-     Location(const Location&);
+     Location(const Location&, bool sync_ids = false);
 
      //! Alternative copying constructor to change the position of the object.
      Location(const Location&, Vector<int> pos);

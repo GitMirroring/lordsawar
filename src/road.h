@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ class Road: public Location
         Road(Vector<int> pos, int type = CONNECTS_ALL_DIRECTIONS);
 
 	//! Copy constructor.
-        Road(const Road&);
+        Road(const Road&, bool sync_id = false);
 
 	//! Alternative copy constructor that changes the road's position.
         Road(const Road&, Vector<int> pos);

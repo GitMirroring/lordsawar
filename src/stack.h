@@ -1,7 +1,7 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -226,7 +226,6 @@ class Stack : public ::UniquelyIdentified, public Movable, public Ownable, publi
 
         //! Sets the hitpoints of all army units in the stack to zero.
         void kill();
-
 
 	//! Add an army to this stack.
 	/**

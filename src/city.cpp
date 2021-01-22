@@ -104,8 +104,8 @@ City::City(XML_Helper* helper, guint32 width)
                                   ->setBuilding(Maptile::CITY);
 }
 
-City::City(const City& c)
-    :Ownable(c), NamedLocation(c), ProdSlotlist(c),
+City::City(const City& c, bool sync_id)
+    :Ownable(c), NamedLocation(c, sync_id), ProdSlotlist(c),
     d_gold(c.d_gold), d_defense_level(c.d_defense_level), d_burnt(c.d_burnt),
     d_vectoring(c.d_vectoring),d_vector(c.d_vector), d_capital(c.d_capital), 
     d_capital_owner(c.d_capital_owner), d_build_production(c.d_build_production)

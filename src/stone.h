@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ class Stone: public Location
         Stone(Vector<int> pos, int type = ROAD_E_AND_W_STONE_N);
 
 	//! Copy constructor.
-        Stone(const Stone&);
+        Stone(const Stone&, bool sync_id = false);
 
 	//! Alternative copy constructor that changes the stone's position.
         Stone(const Stone&, Vector<int> pos);

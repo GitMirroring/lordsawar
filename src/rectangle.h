@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -48,6 +48,19 @@ public:
         w = dim.x; h = dim.y;
 	return *this;
     }
+
+    //! Grow the rectangle by N on all sides
+    inline void grow (int n)
+      {
+        pos.x -= n;
+        if (pos.x < 0)
+          pos.x = 0;
+        pos.y -= n;
+        if (pos.y < 0)
+          pos.y = 0;
+        dim.x += n * 2;
+        dim.y += n * 2;
+      }
 
     Vector<int> pos, dim; // position and dimensions
 

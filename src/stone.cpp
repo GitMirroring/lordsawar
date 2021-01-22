@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -44,8 +44,8 @@ Stone::Stone(XML_Helper* helper)
     mtile->setBuilding(Maptile::STONE);
 }
 
-Stone::Stone(const Stone& s)
-  :Location(s), d_type(s.d_type)
+Stone::Stone(const Stone& s, bool sync_id)
+  :Location(s, sync_id), d_type(s.d_type)
 {
 }
 

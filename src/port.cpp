@@ -1,4 +1,4 @@
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,8 +35,8 @@ Port::Port(XML_Helper* helper)
     GameMap::getInstance()->getTile(getPos())->setBuilding(Maptile::PORT);
 }
 
-Port::Port(const Port& s)
-  :Location(s)
+Port::Port(const Port& s, bool sync_id)
+  :Location(s, sync_id)
 {
 }
 
