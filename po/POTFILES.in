@@ -371,7 +371,6 @@ src/shieldset.cpp
 src/Itemlist.cpp
 src/File.cpp
 src/armyset.cpp
-src/Ownable.cpp
 src/main.cpp
 src/ai_smart.cpp
 src/MapRenderer.cpp
