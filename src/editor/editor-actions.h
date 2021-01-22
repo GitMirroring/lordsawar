@@ -207,7 +207,6 @@ class EditorAction_Save: public EditorAction
 
         Glib::ustring getScenarioFilename () const {return d_filename;}
         Scenario *getScenario () const {return d_scenario;}
-        void clearScenario () {d_scenario = NULL;}
     private:
         Glib::ustring d_filename;
         Scenario *d_scenario;
@@ -909,7 +908,7 @@ class EditorAction_RandUnnamedCities: public EditorAction_Save
 {
     public:
         EditorAction_RandUnnamedCities (GameScenario *g)
-          :EditorAction_Save(EditorAction::RAND_UNNAMED_RUINS, g) {}
+          :EditorAction_Save(EditorAction::RAND_UNNAMED_CITIES, g) {}
         ~EditorAction_RandUnnamedCities () {}
         Glib::ustring getActionName () const {return _("Random Unnamed Cities");}
 };

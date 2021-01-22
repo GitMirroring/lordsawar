@@ -74,11 +74,11 @@ Ruinlist::~Ruinlist()
   d_id.clear();
 }
 
-Ruinlist::Ruinlist (const Ruinlist &r)
+Ruinlist::Ruinlist (const Ruinlist &r, bool sync_ids)
  : LocationList<Ruin*> (), sigc::trackable (r)
 {
   for (auto ruin : r)
-    push_back (new Ruin (*ruin));
+    add (new Ruin (*ruin, sync_ids));
 }
 
 Ruinlist::Ruinlist(XML_Helper* helper)

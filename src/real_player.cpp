@@ -3,7 +3,7 @@
 // Copyright (C) 2004, 2006 Andrea Paternesi
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2004 Bryan Duff
-// Copyright (C) 2006, 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -47,8 +47,8 @@ RealPlayer::RealPlayer(Glib::ustring name, guint32 armyset, Gdk::RGBA color,
 {
 }
 
-RealPlayer::RealPlayer(const Player& player)
-    :Player(player)
+RealPlayer::RealPlayer(const Player& player, bool sync_ids)
+    :Player(player, sync_ids)
 {
     d_type = HUMAN;
     d_abort_requested = false;

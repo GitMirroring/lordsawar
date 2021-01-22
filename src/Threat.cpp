@@ -1,7 +1,7 @@
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2004, 2005 Ulf Lorenz
 // Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 #include "player.h"
 
 Threat::Threat (const Threat &t)
- : Ownable (t), d_city (t.d_city), d_ruin (t.d_ruin),
+ : OwnerId (t), d_city (t.d_city), d_ruin (t.d_ruin),
     d_stacks (new StackReflist ()), d_danger (t.d_danger), d_value (t.d_value),
     d_strength (t.d_strength)
 
@@ -40,14 +40,14 @@ Threat::Threat (const Threat &t)
 }
 
 Threat::Threat(City *c)
-    :Ownable(*c), d_city(c), d_ruin(0), d_danger(0), d_value(0), d_strength(0)
+    :OwnerId(*c), d_city(c), d_ruin(0), d_danger(0), d_value(0), d_strength(0)
 {
     d_stacks = new StackReflist();
     calculateStrength();
 }
 
 Threat::Threat(Stack *s)
-    :Ownable(*s), d_city(0), d_ruin(0), d_danger(0), d_value(0), d_strength(0)
+    :OwnerId(*s), d_city(0), d_ruin(0), d_danger(0), d_value(0), d_strength(0)
 {
     d_stacks = new StackReflist();
     d_stacks->addStack(new Stack(*s));
@@ -55,7 +55,7 @@ Threat::Threat(Stack *s)
 }
 
 Threat::Threat(Ruin *r)
-    :Ownable((Player *)0), d_city(0), d_ruin(r), d_danger(0), d_value(0), d_strength(0)
+    :OwnerId((Player *)0), d_city(0), d_ruin(r), d_danger(0), d_value(0), d_strength(0)
 {
     d_stacks = new StackReflist();
 }
@@ -72,7 +72,7 @@ Glib::ustring Threat::toString() const
 {
     if (d_city)
     {
-        return d_city->getName() + " owned by " + d_owner->getName();
+        return d_city->getName() + " owned by " + getOwner ()->getName();
     }
     else if (d_ruin)
     {
@@ -80,13 +80,13 @@ Glib::ustring Threat::toString() const
     }
     else
     {
-        return "stack owned by " + d_owner->getName();
+        return "stack owned by " + getOwner ()->getName();
     }
 }
 
 bool Threat::Near(Vector<int> pos, Player *p) const
 {
-    if (p != d_owner)
+    if (p != getOwner ())
         return false;
 
     if (d_city)

@@ -38,7 +38,7 @@ class Portlist : public LocationList<Port*>, public sigc::trackable
 	static Glib::ustring d_tag; 
 
         //! Makes a copy of the portlist.
-        Portlist* copy () {return new Portlist (*this);}
+        Portlist* copy () {return new Portlist (*this, true);}
 
 	// Methods that operate on the class data but do not modify the class.
 
@@ -76,7 +76,7 @@ class Portlist : public LocationList<Port*>, public sigc::trackable
         Portlist(XML_Helper* helper);
 
         //! Copy constructor
-        Portlist (const Portlist &p);
+        Portlist (const Portlist &p, bool sync_ids = false);
 
     private:
         //! Callback for loading Port objects into the list of ports.

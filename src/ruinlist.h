@@ -41,7 +41,7 @@ class Ruinlist : public LocationList<Ruin*>, public sigc::trackable
 	static Glib::ustring d_tag; 
 
         //! Makes a copy of the ruinlist.
-        Ruinlist* copy () {return new Ruinlist (*this);}
+        Ruinlist* copy () {return new Ruinlist (*this, true);}
 
 	// Methods that operate on class data and modify the class.
 
@@ -184,7 +184,7 @@ class Ruinlist : public LocationList<Ruin*>, public sigc::trackable
         Ruinlist(XML_Helper* helper);
 
         //! Copy constructor
-        Ruinlist (const Ruinlist &r);
+        Ruinlist (const Ruinlist &r, bool sync_ids = false);
 
     private:
         //! Loading callback for loading Ruin objects into the list.

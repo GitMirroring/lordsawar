@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class TempleEditorDialog: public LwEditorDialog
     TempleEditorDialog(Gtk::Window &parent, Temple *temple, CreateScenarioRandomize *randomizer);
     ~TempleEditorDialog() {}
 
-    int run();
+    bool run();
     
  private:
     Gtk::Entry *name_entry;
@@ -43,6 +43,7 @@ class TempleEditorDialog: public LwEditorDialog
     Temple *temple;
     Gtk::Button *randomize_name_button;
     CreateScenarioRandomize *d_randomizer;
+    bool d_changed;
 
     void on_randomize_name_clicked();
     void on_description_changed ();

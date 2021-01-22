@@ -34,7 +34,7 @@
 #include "herotemplates.h"
 
 Scenario::Scenario (const GameScenario *g)
- : d_game_scenario (new GameScenario (*g)),
+ : d_game_scenario (new GameScenario (*g, false)),
   d_game_map (GameMap::getInstance ()->copy ()),
   d_scenario_media (ScenarioMedia::getInstance ()->copy ()),
   d_fl_counter (fl_counter->copy ()),
@@ -51,10 +51,11 @@ Scenario::Scenario (const GameScenario *g)
   d_bridgelist (Bridgelist::getInstance ()->copy ()),
   d_hero_templates (HeroTemplates::getInstance ()->copy ())
 {
+  d_resetted = false;
 }
         
 Scenario::Scenario (const Scenario &s)
- : d_game_scenario (new GameScenario (*s.d_game_scenario)),
+ : d_game_scenario (new GameScenario (*s.d_game_scenario, false)),
   d_game_map (s.d_game_map->copy ()),
   d_scenario_media (d_scenario_media->copy ()),
   d_fl_counter (s.d_fl_counter->copy ()),
@@ -71,28 +72,32 @@ Scenario::Scenario (const Scenario &s)
   d_bridgelist (s.d_bridgelist->copy ()),
   d_hero_templates (s.d_hero_templates->copy ())
 {
+  d_resetted = s.d_resetted;
 }
 
 Scenario::~Scenario ()
 {
-  delete d_game_scenario;
-  delete d_game_map;
-  delete d_scenario_media;
-  delete d_fl_counter;
-  delete d_itemlist;
-  delete d_playerlist;
-  delete d_citylist;
-  delete d_templelist;
-  delete d_ruinlist;
-  delete d_rewardlist;
-  delete d_signpostlist;
-  delete d_roadlist;
-  delete d_stonelist;
-  delete d_portlist;
-  delete d_bridgelist;
-  delete d_hero_templates;
+  if (!d_resetted)
+    {
+      delete d_game_scenario;
+      delete d_game_map;
+      delete d_scenario_media;
+      delete d_fl_counter;
+      delete d_itemlist;
+      delete d_playerlist;
+      delete d_citylist;
+      delete d_templelist;
+      delete d_ruinlist;
+      delete d_rewardlist;
+      delete d_signpostlist;
+      delete d_roadlist;
+      delete d_stonelist;
+      delete d_portlist;
+      delete d_bridgelist;
+      delete d_hero_templates;
+    }
 }
-        
+
 void Scenario::reset (Scenario *s)
 {
   GameMap::getInstance()->reset (s->d_game_map);
@@ -110,4 +115,5 @@ void Scenario::reset (Scenario *s)
   Portlist::getInstance()->reset (s->d_portlist);
   Bridgelist::getInstance()->reset (s->d_bridgelist);
   HeroTemplates::getInstance()->reset (s->d_hero_templates);
+  s->d_resetted = true;
 }

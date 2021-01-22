@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009, 2010, 2011, 2014 Ben Asselstine
+// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2021 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -84,7 +84,7 @@ class NetworkPlayer : public Player
         // CREATORS
         NetworkPlayer(Glib::ustring name, guint32 armyset, Gdk::RGBA color, int width, int height,
                    Player::Type type = Player::HUMAN, int player_no = -1);
-        NetworkPlayer(const Player&);
+        NetworkPlayer(const Player&, bool sync_ids = false);
         NetworkPlayer(XML_Helper* helper);
         ~NetworkPlayer() {};
 

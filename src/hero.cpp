@@ -40,11 +40,11 @@ Hero::Hero(const HeroProto& a)
 {
   d_level = 1;
   d_backpack = new Backpack();
-  d_owner = Playerlist::getInstance()->getPlayer(a.getOwnerId());
+  d_owner_id = a.getOwnerId();
 }
 
 Hero::Hero(Hero& h, bool sync_id)
-  : Army(h, sync_id, h.d_owner), d_name(h.d_name), d_gender(h.d_gender)
+  : Army(h, sync_id, h.getOwner ()), d_name(h.d_name), d_gender(h.d_gender)
 {
   d_backpack = new Backpack(*h.d_backpack);
 }

@@ -81,11 +81,11 @@ Citylist::~Citylist()
   d_id.clear();
 }
 
-Citylist::Citylist (const Citylist &c)
+Citylist::Citylist (const Citylist &c, bool sync_ids)
  : LocationList<City*> (), sigc::trackable (c)
 {
   for (auto city : c)
-    push_back (new City (*city));
+    add (new City (*city, sync_ids));
 }
 
 Citylist::Citylist(XML_Helper* helper)

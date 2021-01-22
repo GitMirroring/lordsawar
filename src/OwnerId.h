@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,6 +36,9 @@ class OwnerId
      //! Default constructor.
      OwnerId(guint32 owner);
 
+     //! Alternate constructor.
+     OwnerId(Player *p);
+
      //! Copy constructor.
      OwnerId(const OwnerId&);
 
@@ -54,13 +57,17 @@ class OwnerId
 
     // Set Methods
 
+    void setOwner (Player *p);
     void setOwnerId(guint32 owner){d_owner_id = owner; owner_id_set = true;};
 
     bool save(XML_Helper *helper) const;
 
+    bool isOwnerIdSet () const {return owner_id_set;}
+
+    bool isFriend(Player *opponent) const;
     // Static Methods
 
-    //! Callback for loading an Ownable object from an opened saved-game file.
+    //! Callback for loading an OwnerId object from an opened saved-game file.
     static OwnerId load(XML_Helper *helper);
 
  protected:

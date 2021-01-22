@@ -1,7 +1,7 @@
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2004 Ulf Lorenz
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 #include <gtkmm.h>
 #include "vector.h"
-#include "Ownable.h"
+#include "OwnerId.h"
 
 class City;
 class StackReflist;
@@ -55,7 +55,7 @@ class Ruin;
   * For more information about the smart AI, see ai_smart.h
   */
 
-class Threat: public Ownable
+class Threat: public OwnerId
 {
     public:
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -43,8 +43,8 @@ AI_Dummy::AI_Dummy(Glib::ustring name, guint32 armyset, Gdk::RGBA color, int wid
 {
 }
 
-AI_Dummy::AI_Dummy(const Player& player)
-    :RealPlayer(player)
+AI_Dummy::AI_Dummy(const Player& player, bool sync_ids)
+    :RealPlayer(player, sync_ids)
 {
     d_type = AI_DUMMY;
 }

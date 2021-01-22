@@ -88,7 +88,7 @@ Playerlist::Playerlist()
     viewingplayer = 0;
 }
 
-Playerlist::Playerlist (const Playerlist &plist)
+Playerlist::Playerlist (const Playerlist &plist, bool sync_ids)
  : std::list<Player*> (), sigc::trackable (plist)
 {
   for (auto p : plist)
@@ -96,19 +96,19 @@ Playerlist::Playerlist (const Playerlist &plist)
       switch (p->getType ())
         {
         case Player::HUMAN:
-          push_back (new RealPlayer (*p));
+          add (new RealPlayer (*p, sync_ids));
           break;
         case Player::AI_FAST:
-          push_back (new AI_Fast (*p));
+          add (new AI_Fast (*p, sync_ids));
           break;
         case Player::AI_DUMMY:
-          push_back (new AI_Dummy (*p));
+          add (new AI_Dummy (*p, sync_ids));
           break;
         case Player::AI_SMART:
-          push_back (new AI_Smart (*p));
+          add (new AI_Smart (*p, sync_ids));
           break;
         case Player::NETWORKED:
-          push_back (new NetworkPlayer (*p));
+          add (new NetworkPlayer (*p, sync_ids));
           break;
         }
       if (plist.getNeutral () == p)

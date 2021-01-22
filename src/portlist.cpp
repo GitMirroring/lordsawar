@@ -65,11 +65,11 @@ Portlist::~Portlist()
   d_id.clear();
 }
 
-Portlist::Portlist (const Portlist &p)
+Portlist::Portlist (const Portlist &p, bool sync_ids)
  : LocationList<Port*> (), sigc::trackable (p)
 {
   for (auto port : p)
-    push_back (new Port (*port));
+    add (new Port (*port, sync_ids));
 }
 
 Portlist::Portlist(XML_Helper* helper)

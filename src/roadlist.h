@@ -37,7 +37,7 @@ class Roadlist : public LocationList<Road*>, public sigc::trackable
 	static Glib::ustring d_tag; 
 
         //! Makes a copy of the roadlist.
-        Roadlist* copy () {return new Roadlist (*this);}
+        Roadlist* copy () {return new Roadlist (*this, true);}
 
 	// Methods that operate on the class data but do not modify the class.
 
@@ -87,7 +87,7 @@ class Roadlist : public LocationList<Road*>, public sigc::trackable
         Roadlist(XML_Helper* helper);
 
         //! Copy constructor
-        Roadlist (const Roadlist &c);
+        Roadlist (const Roadlist &c, bool sync_ids = false);
     private:
         //! Callback for loading road objects into the list.
         bool load(Glib::ustring tag, XML_Helper* helper);

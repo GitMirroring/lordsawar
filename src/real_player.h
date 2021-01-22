@@ -3,7 +3,7 @@
 // Copyright (C) 2004 Andrea Paternesi
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2004 Bryan Duff
-// Copyright (C) 2006, 2007, 2008, 2009, 2014 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,7 @@ class RealPlayer : public Player
 		   int player_no = -1);
 
 	//! Copy constructor.
-        RealPlayer(const Player&);
+        RealPlayer(const Player&, bool sync_ids = false);
 
 	//! Loading constructor.
         RealPlayer(XML_Helper* helper);

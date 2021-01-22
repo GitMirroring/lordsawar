@@ -80,7 +80,7 @@ class GameScenario: public GameScenarioOptions, public TarFile
         GameScenario(Glib::ustring savegame, bool& broken);
 
         //! Copy constructor
-        GameScenario (const GameScenario &g);
+        GameScenario (const GameScenario &g, bool unique);
     
         //! Destructor
         ~GameScenario();
@@ -91,6 +91,8 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	Glib::ustring getId() const {return d_id;};
 
 	void setNewRandomId();
+
+        void setUnique (bool unique) {d_unique = unique;}
 
         //! Returns the name of the scenario.
         Glib::ustring getName() const;
@@ -195,6 +197,7 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	  Glib::ustring d_id; //globally unique id identifying the scenario
 	  bool inhibit_autosave_removal;
           Glib::ustring loaded_game_filename;
+          bool d_unique; //whether we're the main singleton controller or not
 };
 
 #endif // GAME_SCENARIO_H

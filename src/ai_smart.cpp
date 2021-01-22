@@ -1,7 +1,7 @@
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -49,8 +49,8 @@ AI_Smart::AI_Smart(Glib::ustring name, unsigned int armyset, Gdk::RGBA color, in
 {
 }
 
-AI_Smart::AI_Smart(const Player& player)
-    :RealPlayer(player),d_mustmakemoney(0)
+AI_Smart::AI_Smart(const Player& player, bool sync_ids)
+    :RealPlayer(player, sync_ids),d_mustmakemoney(0)
 {
     d_type = AI_SMART;
 }

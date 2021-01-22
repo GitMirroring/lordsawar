@@ -37,7 +37,7 @@ class Stonelist : public LocationList<Stone*>, public sigc::trackable
 	static Glib::ustring d_tag; 
 
         //! Makes a copy of the stonelist.
-        Stonelist* copy () {return new Stonelist (*this);}
+        Stonelist* copy () {return new Stonelist (*this, true);}
 
 	// Methods that operate on the class data but do not modify the class.
 
@@ -76,7 +76,7 @@ class Stonelist : public LocationList<Stone*>, public sigc::trackable
         Stonelist(XML_Helper* helper);
 
         //! Copy constructor
-        Stonelist (const Stonelist &s);
+        Stonelist (const Stonelist &s, bool sync_ids = false);
 
     private:
         //! Callback for loading stone objects into the list.

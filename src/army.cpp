@@ -41,7 +41,7 @@ Glib::ustring Army::d_tag = "army";
 sigc::signal<void, Army*> Army::sdying;
 
 Army::Army(const Army& a, bool sync_id, Player *owner)
-    : ArmyBase(a), UniquelyIdentified(a, sync_id), Ownable(owner),
+    : ArmyBase(a), UniquelyIdentified(a, sync_id), OwnerId(owner),
     sigc::trackable(a), d_type_id(a.d_type_id), d_armyset(a.d_armyset),
     d_max_hp(a.d_max_hp), d_max_moves_multiplier(a.d_max_moves_multiplier),
     d_max_moves_rest_bonus(a.d_max_moves_rest_bonus),
@@ -56,7 +56,7 @@ Army::Army(const Army& a, bool sync_id, Player *owner)
 }
 
 Army::Army(const ArmyProto& a, Player* p)
-    :ArmyBase(a), UniquelyIdentified(), Ownable(p), 
+    :ArmyBase(a), UniquelyIdentified(), OwnerId(p), 
     d_type_id(a.getId()), d_armyset(a.getArmyset()), 
     d_max_hp(2), d_max_moves_multiplier(1), d_max_moves_rest_bonus(0),
     d_ship(false), d_hp(2), d_moves(a.getMaxMoves()), d_xp(0), d_level(0),
@@ -68,7 +68,7 @@ Army::Army(const ArmyProto& a, Player* p)
 }
 
 Army::Army(const ArmyProto& a, guint32 id, Player *p)
-    :ArmyBase(a), UniquelyIdentified(id), Ownable(p), 
+    :ArmyBase(a), UniquelyIdentified(id), OwnerId(p), 
     d_type_id(a.getId()), d_armyset(a.getArmyset()), 
     d_max_hp(2), d_max_moves_multiplier(1), d_max_moves_rest_bonus(0),
     d_ship(false), d_hp(2), d_moves(a.getMaxMoves()), d_xp(0), d_level(0),
@@ -80,7 +80,7 @@ Army::Army(const ArmyProto& a, guint32 id, Player *p)
 }
 
 Army::Army(const ArmyProdBase& a, guint32 id, Player *p)
-    :ArmyBase(a), UniquelyIdentified(id), Ownable(p), 
+    :ArmyBase(a), UniquelyIdentified(id), OwnerId(p), 
     d_type_id(a.getTypeId()), d_armyset(a.getArmyset()), 
     d_max_hp(2), d_max_moves_multiplier(1), d_max_moves_rest_bonus(0),
     d_ship(false), d_hp(2), d_moves(a.getMaxMoves()), d_xp(0), d_level(0),
@@ -102,7 +102,7 @@ Army* Army::createNonUniqueArmy(const ArmyProdBase& a, Player *player)
 }
 
 Army::Army(const ArmyProdBase& a, Player* p)
- : ArmyBase(a), UniquelyIdentified(), Ownable(p), d_type_id(a.getTypeId()),
+ : ArmyBase(a), UniquelyIdentified(), OwnerId(p), d_type_id(a.getTypeId()),
     d_armyset(a.getArmyset()), d_max_hp(2), d_max_moves_multiplier(1),
     d_max_moves_rest_bonus(0), d_ship(false), d_hp(2), d_moves(a.getMaxMoves()),
     d_xp(0), d_level(0), d_medal_bonus {false}, d_battles_number(0),
@@ -112,7 +112,7 @@ Army::Army(const ArmyProdBase& a, Player* p)
 }
 
 Army::Army()
- : ArmyBase(), UniquelyIdentified(), Ownable((Player *)0), d_type_id(0),
+ : ArmyBase(), UniquelyIdentified(), OwnerId((Player *)0), d_type_id(0),
     d_armyset(0), d_max_hp(2), d_max_moves_multiplier(1),
     d_max_moves_rest_bonus(0), d_ship(false), d_hp(2), d_moves(0), d_xp(0),
     d_level(0), d_medal_bonus {false},  d_battles_number(0), d_number_hashit(0),
@@ -122,13 +122,13 @@ Army::Army()
 }
 
 Army::Army(XML_Helper* helper)
- : ArmyBase(helper), UniquelyIdentified(helper), Ownable((XML_Helper*) 0),
+ : ArmyBase(helper), UniquelyIdentified(helper), OwnerId((XML_Helper*) 0),
     d_type_id(0), d_armyset(0), d_max_hp(2), d_max_moves_multiplier(1), 
     d_max_moves_rest_bonus(0), d_ship(false), d_hp(2), d_moves(0), d_xp(0),
     d_level(0), d_medal_bonus {false}, d_battles_number(0), d_number_hashit(0),
     d_number_hasbeenhit(0)
 {
-  //d_owner is not read in here.  it is set to the owner of the stack
+  //d_owner_id is not read in here.  it is set to the owner of the stack
   //in stack.cpp
   d_visitedTemples.clear();
 

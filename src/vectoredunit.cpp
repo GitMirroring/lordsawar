@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 Glib::ustring VectoredUnit::d_tag = "vectoredunit";
 
 VectoredUnit::VectoredUnit(Vector<int> pos, Vector<int> dest, ArmyProdBase *army, int duration, Player *player)
-    :Ownable(player), LocationBox(pos), d_destination(dest), 
+    :OwnerId(player), LocationBox(pos), d_destination(dest), 
     d_duration(duration)
 {
   if (army)
@@ -40,7 +40,7 @@ VectoredUnit::VectoredUnit(Vector<int> pos, Vector<int> dest, ArmyProdBase *army
 }
 
 VectoredUnit::VectoredUnit(const VectoredUnit& v)
-    :Ownable(v), LocationBox(v), sigc::trackable(v),
+    :OwnerId(v), LocationBox(v), sigc::trackable(v),
     d_destination(v.d_destination), d_duration(v.d_duration)
 {
   if (v.d_army)
@@ -50,7 +50,7 @@ VectoredUnit::VectoredUnit(const VectoredUnit& v)
 }
 
 VectoredUnit::VectoredUnit(XML_Helper* helper)
-    :Ownable(helper), LocationBox(helper), d_army(NULL)
+    :OwnerId(helper), LocationBox(helper), d_army(NULL)
 {
     helper->getData(d_duration, "duration");
     helper->getData(d_destination.x, "dest_x");
@@ -76,8 +76,8 @@ bool VectoredUnit::save(XML_Helper* helper) const
     retval &= helper->saveData("duration", d_duration);
     retval &= helper->saveData("dest_x", d_destination.x);
     retval &= helper->saveData("dest_y", d_destination.y);
-    if (d_owner)
-        retval &= helper->saveData("owner", d_owner->getId());
+    if (getOwner ())
+        retval &= helper->saveData("owner", d_owner_id);
     else
         retval &= helper->saveData("owner", -1);
     retval &= d_army->save(helper);
@@ -102,10 +102,10 @@ Army *VectoredUnit::armyArrives(Stack *& stack) const
       Maptile *tile = GameMap::getInstance()->getTile(d_destination);
       if (tile)
 	{
-	  if (tile->getBackpack()->getPlantedItem(d_owner))
+	  if (tile->getBackpack()->getPlantedItem(getOwner ()))
 	    {
 	      //army arrives on a planted standard
-	      Army *a = new Army(*d_army, d_owner);
+	      Army *a = new Army(*d_army, getOwner ());
 	      LocationBox loc = LocationBox(d_destination);
               stack = GameMap::getInstance()->addArmy(d_destination, a);
 	      return a;
@@ -114,14 +114,14 @@ Army *VectoredUnit::armyArrives(Stack *& stack) const
     }
   else
     {
-      if (!dest->isBurnt() && dest->getOwner() == d_owner)
+      if (!dest->isBurnt() && dest->getOwner() == getOwner ())
 	{
 	  //army arrives in a city
-	  Army *a = new Army(*d_army, d_owner);
+	  Army *a = new Army(*d_army, getOwner ());
           stack = GameMap::getInstance()->addArmy(d_destination, a);
 	  return a;
 	}
-      printf ("destination city is owned by `%s', but the vectored unit is owned by `%s'\n", dest->getOwner()->getName().c_str(), d_owner->getName().c_str());
+      printf ("destination city is owned by `%s', but the vectored unit is owned by `%s'\n", dest->getOwner()->getName().c_str(), getOwner ()->getName().c_str());
     }
   return NULL;
 }
@@ -130,7 +130,7 @@ bool VectoredUnit::nextTurn()
 {
   d_duration--;
   if (d_duration == 0)
-    return d_owner->vectoredUnitArrives(this);
+    return getOwner ()->vectoredUnitArrives(this);
   return false;
 }
 

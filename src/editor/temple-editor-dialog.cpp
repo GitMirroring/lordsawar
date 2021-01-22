@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,19 +36,19 @@ TempleEditorDialog::TempleEditorDialog(Gtk::Window &parent, Temple *t, CreateSce
 {
     d_randomizer = randomizer;
     temple = t;
+    d_changed = false;
     
     xml->get_widget("name_entry", name_entry);
-    name_entry->signal_changed().connect (method(on_name_changed));
     name_entry->set_text(temple->getName());
+    name_entry->signal_changed().connect (method(on_name_changed));
 
     xml->get_widget("description_entry", description_entry);
+    description_entry->set_text(temple->getDescription());
     description_entry->signal_changed().connect
       (method(on_description_changed));
-    description_entry->set_text(temple->getDescription());
 
     xml->get_widget("type_spinbutton", type_spinbutton);
     type_spinbutton->set_value(temple->getType());
-    type_spinbutton->signal_changed().connect (method(on_type_changed));
     type_spinbutton->signal_insert_text().connect
       (sigc::hide(sigc::hide(method(on_type_text_changed))));
 
@@ -59,6 +59,7 @@ TempleEditorDialog::TempleEditorDialog(Gtk::Window &parent, Temple *t, CreateSce
 
 void TempleEditorDialog::on_type_changed ()
 {
+  d_changed = true;
   if (type_spinbutton->get_value() >= TEMPLE_TYPES)
     type_spinbutton->set_value(TEMPLE_TYPES - 1);
   else
@@ -71,10 +72,11 @@ void TempleEditorDialog::on_type_text_changed ()
   on_type_changed();
 }
 
-int TempleEditorDialog::run()
+bool TempleEditorDialog::run()
 {
   dialog->show_all();
-  return dialog->run();
+  dialog->run();
+  return d_changed;
 }
 
 void TempleEditorDialog::on_randomize_name_clicked()
@@ -91,11 +93,13 @@ void TempleEditorDialog::on_randomize_name_clicked()
 
 void TempleEditorDialog::on_description_changed ()
 {
+  d_changed = true;
   temple->setDescription(description_entry->get_text());
 }
 
 void TempleEditorDialog::on_name_changed ()
 {
+  d_changed = true;
   Location *l = temple;
   RenamableLocation *renamable_temple = static_cast<RenamableLocation*>(l);
   renamable_temple->setName(name_entry->get_text());

@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,11 +36,12 @@ SignpostEditorDialog::SignpostEditorDialog(Gtk::Window &parent, Signpost *s, Cre
 {
     d_randomizer = randomizer;
     signpost = s;
+    d_changed = false;
     
     xml->get_widget("sign_textview", sign_textview);
+    sign_textview->get_buffer()->set_text(s->getName());
     sign_textview->get_buffer()->signal_changed().connect
       (method(on_sign_changed));
-    sign_textview->get_buffer()->set_text(s->getName());
     
     xml->get_widget("randomize_button", randomize_button);
     randomize_button->signal_clicked().connect(method(on_randomize_clicked));
@@ -48,13 +49,15 @@ SignpostEditorDialog::SignpostEditorDialog(Gtk::Window &parent, Signpost *s, Cre
 
 void SignpostEditorDialog::on_sign_changed ()
 {
+  d_changed = true;
   signpost->setName(sign_textview->get_buffer()->get_text());
 }
 
-int SignpostEditorDialog::run()
+bool SignpostEditorDialog::run()
 {
   dialog->show_all();
-  return dialog->run();
+  dialog->run();
+  return d_changed;
 }
 
 void SignpostEditorDialog::on_randomize_clicked()

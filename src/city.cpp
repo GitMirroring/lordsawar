@@ -2,7 +2,7 @@
 //  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 //  Copyright (C) 2002 Mark L. Amidon
 //  Copyright (C) 2005 Andrea Paternesi
-//  Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014, 2015, 2021 Ben Asselstine
 //  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ Glib::ustring City::d_tag = "city";
 
 City::City(Vector<int> pos, guint32 width, Glib::ustring name, guint32 gold, 
 	   guint32 numslots)
-    :Ownable((Player *)0), NamedLocation(pos, width, name, ""),
+    :OwnerId((Player *)0), NamedLocation(pos, width, name, ""),
     ProdSlotlist(numslots), d_gold(gold), d_defense_level(1), d_burnt(false), 
     d_vectoring(false), d_vector(Vector<int>(-1,-1)), 
     d_capital(false), d_capital_owner(0), d_build_production (true)
@@ -63,7 +63,7 @@ City::City(Vector<int> pos, guint32 width, Glib::ustring name, guint32 gold,
 }
 
 City::City(XML_Helper* helper, guint32 width)
-    :Ownable(helper), NamedLocation(helper, width),
+    :OwnerId(helper), NamedLocation(helper, width),
     ProdSlotlist(helper)
 {
     //initialize the city
@@ -105,7 +105,7 @@ City::City(XML_Helper* helper, guint32 width)
 }
 
 City::City(const City& c, bool sync_id)
-    :Ownable(c), NamedLocation(c, sync_id), ProdSlotlist(c),
+    :OwnerId(c), NamedLocation(c, sync_id), ProdSlotlist(c),
     d_gold(c.d_gold), d_defense_level(c.d_defense_level), d_burnt(c.d_burnt),
     d_vectoring(c.d_vectoring),d_vector(c.d_vector), d_capital(c.d_capital), 
     d_capital_owner(c.d_capital_owner), d_build_production(c.d_build_production)
@@ -113,7 +113,7 @@ City::City(const City& c, bool sync_id)
 }
 
 City::City(const City& c, Vector<int> pos)
-    :Ownable(c), NamedLocation(c, pos), ProdSlotlist(c),
+    :OwnerId(c), NamedLocation(c, pos), ProdSlotlist(c),
     d_gold(c.d_gold), d_defense_level(c.d_defense_level), d_burnt(c.d_burnt),
     d_vectoring(c.d_vectoring),d_vector(c.d_vector), d_capital(c.d_capital), 
     d_capital_owner(c.d_capital_owner), d_build_production(c.d_build_production)
@@ -134,7 +134,7 @@ bool City::save(XML_Helper* helper) const
     retval &= helper->saveData("y", getPos().y);
     retval &= helper->saveData("name", getName(false));
     retval &= helper->saveData("description", getDescription());
-    retval &= helper->saveData("owner", d_owner->getId());
+    retval &= helper->saveData("owner", d_owner_id);
     retval &= helper->saveData("defense", d_defense_level);
     retval &= helper->saveData("gold", d_gold);
     retval &= helper->saveData("burnt", d_burnt);
@@ -171,7 +171,7 @@ void City::produceStrongestProductionBase()
   if (getNoOfProductionBases() == 0)
     return;
 
-  if (!isFull(d_owner))
+  if (!isFull(getOwner ()))
     {
       unsigned int max_strength = 0;
       int strong_idx = -1;
@@ -199,9 +199,9 @@ void City::produceStrongestProductionBase()
 
 void City::produceWeakestQuickestArmyInArmyset()
 {
-  guint32 set = d_owner->getArmyset();
+  guint32 set = getOwner ()->getArmyset();
   ArmyProto *scout = Armysetlist::getInstance()->lookupWeakestQuickestArmy(set);
-  Army *a = new Army(*scout, d_owner);
+  Army *a = new Army(*scout, getOwner ());
   GameMap::getInstance()->addArmy(this, a);
 }
 
@@ -212,7 +212,7 @@ void City::produceWeakestProductionBase()
   if (getNoOfProductionBases() == 0)
     return;
 
-  if (!isFull(d_owner))
+  if (!isFull(getOwner ()))
     {
       unsigned int min_strength = 100;
       int weak_idx = -1;
@@ -247,9 +247,9 @@ const Army *City::armyArrives(Stack *& stack)
       VectoredUnit *v = 
         new VectoredUnit (getPos(), d_vector, 
                           (*this)[d_active_production_slot]->getArmyProdBase(),
-                          turns, d_owner);
+                          turns, getOwner ());
       VectoredUnitlist::getInstance()->push_back(v);
-      d_owner->cityChangeProduction(this, d_active_production_slot);
+      getOwner ()->cityChangeProduction(this, d_active_production_slot);
       //we don't return an army when we've vectored it.
       //it doesn't really exist until it lands at the destination.
       return NULL;
@@ -269,15 +269,15 @@ void City::nextTurn()
   // check if an army should be produced
   if (d_active_production_slot >= 0 && --d_duration == 0) 
     {
-      if (d_owner->getGold() <= 0)
+      if (getOwner ()->getGold() <= 0)
 	{
 	  //dont make or vector the unit
 	  //and also stop production
-	  d_owner->cityChangeProduction(this, -1);
-	  d_owner->vectorFromCity(this, Vector<int>(-1,-1));
+	  getOwner ()->cityChangeProduction(this, -1);
+	  getOwner ()->vectorFromCity(this, Vector<int>(-1,-1));
 	  return;
 	}
-      d_owner->cityProducesArmy(this);
+      getOwner ()->cityProducesArmy(this);
     }
 }
 
@@ -304,14 +304,15 @@ Army *City::produceArmy(Stack *& stack)
 
   // do not produce an army if the player has no gold.
   // unless it's the neutrals
-  if (d_owner != Playerlist::getInstance()->getNeutral() && 
-      d_owner->getGold() < 0) 
+  if (getOwner () != Playerlist::getInstance()->getNeutral() && 
+      getOwner ()->getGold() < 0) 
     return NULL;
 
-  Army *a = new Army(*(getProductionBase(d_active_production_slot)), d_owner);
+  Army *a =
+    new Army(*(getProductionBase(d_active_production_slot)), getOwner ());
   stack = GameMap::getInstance()->addArmy(this, a);
 
-  if (d_owner == Playerlist::getInstance()->getNeutral()) 
+  if (getOwner ()== Playerlist::getInstance()->getNeutral()) 
     {
       //we're an active neutral city
       //check to see if we've made 5 or not.
@@ -425,7 +426,7 @@ void City::setRandomArmytypes(bool produce_allies, int likely)
   for (unsigned int i = 0; i < getMaxNoOfProductionBases(); i++)
     removeProductionBase(i);
 
-  guint32 set = d_owner->getArmyset();
+  guint32 set = getOwner ()->getArmyset();
 
   int army_type;
   int num = Rnd::rand() % 10;

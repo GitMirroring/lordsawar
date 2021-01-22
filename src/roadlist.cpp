@@ -65,11 +65,11 @@ Roadlist::~Roadlist()
   d_id.clear();
 }
 
-Roadlist::Roadlist (const Roadlist &r)
+Roadlist::Roadlist (const Roadlist &r, bool sync_ids)
  : LocationList<Road*> (), sigc::trackable (r)
 {
   for (auto road : r)
-    push_back (new Road (*road));
+    add (new Road (*road, sync_ids));
 }
 
 Roadlist::Roadlist(XML_Helper* helper)

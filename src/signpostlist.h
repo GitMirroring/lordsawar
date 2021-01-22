@@ -38,7 +38,7 @@ class Signpostlist : public LocationList<Signpost*>, public sigc::trackable
 	static Glib::ustring d_tag; 
 
         //! Makes a copy of the signpostlist.
-        Signpostlist* copy () {return new Signpostlist (*this);}
+        Signpostlist* copy () {return new Signpostlist (*this, true);}
 
 	// Methods that operate on the class data but do not modify the class.
 
@@ -70,7 +70,7 @@ class Signpostlist : public LocationList<Signpost*>, public sigc::trackable
         Signpostlist();
 
         //! Copy constructor
-        Signpostlist (const Signpostlist &s);
+        Signpostlist (const Signpostlist &s, bool sync_ids = false);
 
         //! Loading constructor.
 	/**

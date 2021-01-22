@@ -342,6 +342,9 @@ void ItemlistDialog::on_add_item_clicked()
   a->setName(_("Untitled"));
   (*i)[items_columns.name] = a->getName();
   (*i)[items_columns.item] = a;
+  items_treeview->get_selection()->select(i);
+  items_treeview->scroll_to_row (items_treeview->get_model ()->get_path (i));
+
   d_changed = true;
 }
 

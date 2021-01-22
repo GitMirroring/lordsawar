@@ -48,7 +48,7 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
     public:
 
         //! Makes a copy of the playerlist.
-        Playerlist* copy () {return new Playerlist (*this);}
+        Playerlist* copy () {return new Playerlist (*this, true);}
 
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
@@ -323,7 +323,7 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
         Playerlist(XML_Helper* helper);
 
         //! Copy constructor
-        Playerlist (const Playerlist &p);
+        Playerlist (const Playerlist &p, bool sync_ids = false);
         
     private:
         //! Callback for loading the playerlist from an opened saved-game file.

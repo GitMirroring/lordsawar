@@ -40,7 +40,7 @@ class Templelist : public LocationList<Temple*>, public sigc::trackable
 	static Glib::ustring d_tag; 
 
         //! Makes a copy of the templelist.
-        Templelist* copy () {return new Templelist (*this);}
+        Templelist* copy () {return new Templelist (*this, true);}
 
 	// Methods that operate on class data but do not modify the class.
 	
@@ -135,7 +135,7 @@ class Templelist : public LocationList<Temple*>, public sigc::trackable
         Templelist();
 
         //! Copy constructor.
-        Templelist (const Templelist &t);
+        Templelist (const Templelist &t, bool sync_ids = false);
 
         //! Loading constructor.
 	/**

@@ -81,6 +81,7 @@ class Scenario
         Portlist *d_portlist;
         Bridgelist *d_bridgelist;
         HeroTemplates *d_hero_templates;
+        bool d_resetted;
 };
 
 #endif // SCENARIO_H

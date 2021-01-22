@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -44,27 +44,28 @@
 RuinEditorDialog::RuinEditorDialog(Gtk::Window &parent, Ruin *r, CreateScenarioRandomize *randomizer)
  : LwEditorDialog(parent, "ruin-editor-dialog.ui")
 {
+  d_changed = false;
   d_randomizer = randomizer;
   ruin = r;
 
   xml->get_widget("name_entry", name_entry);
-  name_entry->signal_changed ().connect (method (on_name_changed));
   name_entry->set_text(ruin->getName());
+  name_entry->signal_changed ().connect (method (on_name_changed));
   xml->get_widget("description_entry", description_entry);
+  description_entry->set_text(ruin->getDescription());
   description_entry->signal_changed ().connect
     (method (on_description_changed));
-  description_entry->set_text(ruin->getDescription());
 
   xml->get_widget("type_spinbutton", type_spinbutton);
-  type_spinbutton->signal_changed().connect (method(on_type_changed));
+  type_spinbutton->set_value(ruin->getType());
   type_spinbutton->signal_insert_text().connect
     (sigc::hide(sigc::hide(method(on_type_text_changed))));
-  type_spinbutton->set_value(ruin->getType());
 
   xml->get_widget("keeper_button", keeper_button);
   keeper_button->signal_clicked().connect(method(on_keeper_clicked));
   xml->get_widget("new_keeper_hbox", new_keeper_hbox);
   xml->get_widget("random_keeper_switch", random_keeper_switch);
+  random_keeper_switch->set_active (ruin->getOccupant () == NULL);
   random_keeper_switch->property_active().signal_changed().connect(method(on_new_keeper_toggled));
 
   xml->get_widget("randomize_name_button", randomize_name_button);
@@ -96,24 +97,24 @@ RuinEditorDialog::RuinEditorDialog(Gtk::Window &parent, Ruin *r, CreateScenarioR
   Gtk::Alignment *alignment;
   xml->get_widget("player_alignment", alignment);
   alignment->add(*player_combobox);
-  on_hidden_toggled();
+  player_combobox->set_sensitive (hidden_switch->get_active ());
 
   xml->get_widget("new_reward_hbox", new_reward_hbox);
   xml->get_widget("random_reward_switch", random_reward_switch);
+  random_reward_switch->set_active (ruin->getReward () == NULL);
   random_reward_switch->property_active().signal_changed().connect(method(on_new_reward_toggled));
 
   xml->get_widget("reward_button", reward_button);
   reward_button->signal_clicked().connect(method(on_reward_clicked));
 
-  random_reward_switch->set_active (ruin->getReward () == NULL);
-  random_keeper_switch->set_active (ruin->getOccupant () == NULL);
   set_reward_name();
 }
 
-int RuinEditorDialog::run()
+bool RuinEditorDialog::run()
 {
   dialog->show_all();
-  return dialog->run();
+  dialog->run();
+  return d_changed;
 }
 
 void RuinEditorDialog::set_keeper_name()
@@ -144,6 +145,7 @@ void RuinEditorDialog::on_hidden_toggled()
 
 void RuinEditorDialog::update_hidden_status ()
 {
+  d_changed = true;
   ruin->setHidden(hidden_switch->get_active());
   if (hidden_switch->get_active())
     {
@@ -175,13 +177,15 @@ void RuinEditorDialog::on_keeper_clicked()
   KeeperEditorDialog d(*dialog, ruin->getOccupant (), ruin->getPos (),
                        d_randomizer);
 
-  d.run();
-
-  Keeper *keeper = d.get_keeper ();
-  ruin->setOccupant (keeper);
-  set_keeper_name();
-  if (keeper == NULL)
-    random_keeper_switch->set_active (true);
+  if (d.run())
+    {
+      d_changed = true;
+      Keeper *keeper = d.get_keeper ();
+      ruin->setOccupant (keeper);
+      set_keeper_name();
+      if (keeper == NULL)
+        random_keeper_switch->set_active (true);
+    }
 }
 
 void RuinEditorDialog::on_randomize_name_clicked()
@@ -198,6 +202,7 @@ void RuinEditorDialog::on_randomize_name_clicked()
 
 void RuinEditorDialog::on_new_keeper_toggled()
 {
+  d_changed = true;
   if (random_keeper_switch->get_active () == true)
     {
       ruin->setOccupant (NULL);
@@ -216,6 +221,8 @@ void RuinEditorDialog::on_new_reward_toggled()
 {
   if (random_reward_switch->get_active () == true)
     {
+      if (ruin->getReward () != NULL)
+        d_changed = true;
       ruin->setReward (NULL);
       set_reward_name();
     }
@@ -224,6 +231,7 @@ void RuinEditorDialog::on_new_reward_toggled()
 
 void RuinEditorDialog::on_reward_clicked()
 {
+  //d_changed = true;
   //this is a dog's breakfast right here.  wow.
   //ruin rewards are not in the rewards list, so we have to push it on
   //and off.
@@ -234,17 +242,22 @@ void RuinEditorDialog::on_reward_clicked()
       Reward *copy = Reward::copy (ruin->getReward ());
       Rewardlist::getInstance ()->push_front (copy);
       RewardlistDialog d(*dialog, true, true);
-      d.run();
+      bool changed = d.run();
+      if (changed)
+        d_changed = true;
       if (d.get_reward())
         {
+          d_changed = true;
           ruin->setReward (Reward::copy (d.get_reward ()));
           //if (d.get_reward () != Rewardlist::getInstance ()->front ())
-            //Rewardlist::getInstance()->deleteReward
-              //(Rewardlist::getInstance()->front ());
+          //Rewardlist::getInstance()->deleteReward
+          //(Rewardlist::getInstance()->front ());
           Rewardlist::getInstance()->deleteReward (d.get_reward ());
         }
       else
         {
+          if (ruin->getReward () != NULL)
+            d_changed = true;
           ruin->setReward (NULL);
           Rewardlist::getInstance()->deleteReward
             (Rewardlist::getInstance()->front ());
@@ -254,9 +267,12 @@ void RuinEditorDialog::on_reward_clicked()
   else
     {
       RewardlistDialog d(*dialog, true, false);
-      d.run();
+      bool changed = d.run();
+      if (changed)
+        d_changed = true;
       if (d.get_reward ())
         {
+          d_changed = true;
           ruin->setReward (Reward::copy (d.get_reward ()));
           Rewardlist::getInstance()->deleteReward (d.get_reward ());
         }
@@ -281,6 +297,7 @@ void RuinEditorDialog::set_reward_name()
 
 void RuinEditorDialog::on_name_changed ()
 {
+  d_changed = true;
   Location *l = ruin;
   RenamableLocation *renamable_ruin = static_cast<RenamableLocation*>(l);
   renamable_ruin->setName(name_entry->get_text());
@@ -288,11 +305,13 @@ void RuinEditorDialog::on_name_changed ()
 
 void RuinEditorDialog::on_description_changed ()
 {
+  d_changed = true;
   ruin->setDescription(description_entry->get_text());
 }
 
 void RuinEditorDialog::on_type_changed ()
 {
+  d_changed = true;
   if (type_spinbutton->get_value() >= RUIN_TYPES)
     type_spinbutton->set_value(RUIN_TYPES - 1);
   else

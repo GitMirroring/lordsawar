@@ -31,7 +31,7 @@
 #include <sstream>
 
 #include "UniquelyIdentified.h"
-#include "Ownable.h"
+#include "OwnerId.h"
 #include "Movable.h"
 
 class Player;
@@ -50,7 +50,7 @@ class Item;
  * this is the location of the units, the intended movement path, and more.
  */
 
-class Stack : public ::UniquelyIdentified, public Movable, public Ownable, public std::list<Army*>, public sigc::trackable
+class Stack : public ::UniquelyIdentified, public Movable, public OwnerId, public std::list<Army*>, public sigc::trackable
 {
     public:
 	//! The xml tag of this object in a saved-game file.

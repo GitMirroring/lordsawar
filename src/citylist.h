@@ -41,7 +41,7 @@ class Citylist : public LocationList<City*>, public sigc::trackable
     public:
 
         //! Makes a copy of the citylist.
-        Citylist* copy () {return new Citylist (*this);}
+        Citylist* copy () {return new Citylist (*this, true);}
 
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
@@ -393,7 +393,7 @@ class Citylist : public LocationList<City*>, public sigc::trackable
         Citylist(XML_Helper* helper);
 
         //! Copy constructor
-        Citylist (const Citylist &c);
+        Citylist (const Citylist &c, bool sync_ids = false);
 
     private:
         //! A callback for loading City objects into the list of cities.

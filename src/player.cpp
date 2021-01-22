@@ -4,7 +4,7 @@
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2005 Bryan Duff
 // Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2017,
-// 2020 Ben Asselstine
+// 2020, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -125,7 +125,7 @@ Player::Player(Glib::ustring name, guint32 armyset, Gdk::RGBA color, int width,
     d_triumphs = new Triumphs();
 }
 
-Player::Player(const Player& player)
+Player::Player(const Player& player, bool sync_ids)
     :sigc::trackable(player), d_color(player.d_color), d_name(player.d_name),
     d_armyset(player.d_armyset), d_gold(player.d_gold), d_dead(player.d_dead),
     d_immortal(player.d_immortal), d_type(player.d_type), d_id(player.d_id),
@@ -139,7 +139,7 @@ Player::Player(const Player& player)
   for (Stacklist::iterator it = player.d_stacklist->begin();
        it != player.d_stacklist->end(); ++it)
     {
-      Stack* mine = new Stack(**it, true);
+      Stack* mine = new Stack(**it, !sync_ids);
       // change the stack's loyalty
       mine->setPlayer(this);
       d_stacklist->add(mine);

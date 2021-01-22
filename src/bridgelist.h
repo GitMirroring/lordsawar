@@ -38,7 +38,7 @@ class Bridgelist : public LocationList<Bridge*>, public sigc::trackable
 	static Glib::ustring d_tag; 
 
         //! Makes a copy of the bridgelist.
-        Bridgelist* copy () {return new Bridgelist (*this);}
+        Bridgelist* copy () {return new Bridgelist (*this, true);}
 
 	// Methods that operate on the class data but do not modify the class.
 
@@ -94,7 +94,7 @@ class Bridgelist : public LocationList<Bridge*>, public sigc::trackable
         Bridgelist(XML_Helper* helper);
 
         //! Copy constructor
-        Bridgelist (const Bridgelist &b);
+        Bridgelist (const Bridgelist &b, bool sync_ids = false);
 
     private:
         //! Callback for loading Bridge objects into the list of bridges.

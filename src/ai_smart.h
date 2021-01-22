@@ -2,7 +2,7 @@
 // Copyright (C) 2004, 2005 Ulf Lorenz
 // Copyright (C) 2005, 2006 Andrea Paternesi
 // Copyright (C) 2006 Vibhu Rishi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -84,7 +84,7 @@ class AI_Smart : public RealPlayer
 		 int width, int height, int player_no = -1);
 
         //! Copy constructor.
-        AI_Smart(const Player&);
+        AI_Smart(const Player&, bool sync_ids = false);
         //! Loading constructor. See XML_Helper for an explanation.
         AI_Smart(XML_Helper* helper);
 	//! Destructor.

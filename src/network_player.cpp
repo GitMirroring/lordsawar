@@ -1,4 +1,5 @@
-// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
+// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2017, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -66,8 +67,8 @@ NetworkPlayer::NetworkPlayer(Glib::ustring name, guint32 armyset, Gdk::RGBA colo
 {
 }
 
-NetworkPlayer::NetworkPlayer(const Player& player)
-    :Player(player), d_connected(false)
+NetworkPlayer::NetworkPlayer(const Player& player, bool sync_ids)
+    :Player(player, sync_ids), d_connected(false)
 {
     d_type = Player::NETWORKED;
     d_abort_requested = false;

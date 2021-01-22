@@ -1676,8 +1676,8 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
         EditorAction_EditCity *action =
           new EditorAction_EditCity (LwRectangle (c->getPos ()));
 	CityEditorDialog d(*window, c, d_create_scenario_names);
-	int response = d.run();
-	if (response == Gtk::RESPONSE_ACCEPT)
+	bool changed = d.run();
+        if (changed)
           {
             addUndo (action);
             needs_saving = true;
@@ -1694,13 +1694,14 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
         EditorAction_EditRuin *action =
           new EditorAction_EditRuin (LwRectangle (r->getPos ()));
 	RuinEditorDialog d(*window, r, d_create_scenario_names);
-	int response = d.run();
-	if (response == Gtk::RESPONSE_ACCEPT)
+	if (d.run())
           {
             addUndo (action);
             needs_saving = true;
             update_window_title();
           }
+        else if (d.get_changed ())
+          addUndo (action);
         else
           delete action;
 	redraw();
@@ -1710,8 +1711,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
         EditorAction_EditSignpost *action =
           new EditorAction_EditSignpost (LwRectangle (si->getPos ()));
 	SignpostEditorDialog d(*window, si, d_create_scenario_names);
-	int response = d.run();
-	if (response == Gtk::RESPONSE_ACCEPT)
+	if (d.run())
           {
             addUndo (action);
             needs_saving = true;
@@ -1725,8 +1725,8 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
         EditorAction_EditTemple *action =
           new EditorAction_EditTemple (LwRectangle (t->getPos ()));
 	TempleEditorDialog d(*window, t, d_create_scenario_names);
-	int response = d.run();
-	if (response == Gtk::RESPONSE_ACCEPT)
+        bool changed = d.run ();
+	if (changed)
           {
             addUndo (action);
             needs_saving = true;
@@ -1838,17 +1838,12 @@ void MainWindow::on_edit_items_activated()
 {
   EditorAction_Items *action = new EditorAction_Items (game_scenario);
   ItemlistDialog d(*window);
-  int response = d.run_and_hide();
-  if (response == Gtk::RESPONSE_ACCEPT)
+  d.run_and_hide();
+  if (d.item_was_changed ())
     {
-      if (d.item_was_changed ())
-        {
-          addUndo (action);
-          needs_saving = true;
-          update_window_title();
-        }
-      else
-        delete action;
+      addUndo (action);
+      needs_saving = true;
+      update_window_title();
     }
   else
     delete action;
@@ -2993,6 +2988,7 @@ EditorAction* MainWindow::executeAction (EditorAction *action)
               dynamic_cast<EditorAction_Players*>(action);
             out = new EditorAction_Players (game_scenario);
             doReloadScenario (a);
+            fill_players ();
             break;
           }
       case EditorAction::ITEMS:
@@ -3187,13 +3183,14 @@ void MainWindow::doReloadScenario (EditorAction_Save *action)
       (Playerlist::getInstance ()->getPlayer ((guint32) old_activeplayer));
   game_scenario =
     action->getScenario ()->getGameScenario ();
-  action->clearScenario ();
+  game_scenario->setUnique (true);
   File::copy (action->getScenarioFilename (),
               game_scenario->getConfigurationFile(true));
   game_scenario->setDirectory (olddir);
   game_scenario->setBaseName (oldname);
   game_scenario->setExtension (oldext);
   GameMap::getInstance ()->applyTileStyles (0, 0, d_height, d_width, false);
+  smallmap->resize();
   redraw ();
 }
 
@@ -3215,58 +3212,49 @@ void MainWindow::doChangeMap (EditorAction_ChangeMap *action)
         {
           Citylist *cities = Citylist::getInstance ();
           City *old_city = cities->getById (city->getId ());
-          std::replace (cities->begin (), cities->end (), old_city, city);
-          delete old_city;
+          cities->replace (old_city, city);
         }
       else if (Ruin *ruin = dynamic_cast<Ruin*>(object))
         {
           Ruinlist *ruins = Ruinlist::getInstance ();
           Ruin *old_ruin = ruins->getById (ruin->getId ());
-          std::replace (ruins->begin (), ruins->end (), old_ruin, ruin);
-          delete old_ruin;
+          ruins->replace (old_ruin, ruin);
         }
       else if (Temple *temple = dynamic_cast<Temple*>(object))
         {
           Templelist *temples = Templelist::getInstance ();
           Temple *old_temple = temples->getById (temple->getId ());
-          std::replace (temples->begin (), temples->end (), old_temple, temple);
-          delete old_temple;
+          temples->replace (old_temple, temple);
         }
       else if (Port *port = dynamic_cast<Port*>(object))
         {
           Portlist *ports = Portlist::getInstance ();
           Port *old_port = ports->getById (port->getId ());
-          std::replace (ports->begin (), ports->end (), old_port, port);
-          delete old_port;
+          ports->replace (old_port, port);
         }
       else if (Stone *stone = dynamic_cast<Stone*>(object))
         {
           Stonelist *stones = Stonelist::getInstance ();
           Stone *old_stone = stones->getById (stone->getId ());
-          std::replace (stones->begin (), stones->end (), old_stone, stone);
-          delete old_stone;
+          stones->replace (old_stone, stone);
         }
       else if (Signpost *signpost = dynamic_cast<Signpost*>(object))
         {
           Signpostlist *signposts = Signpostlist::getInstance ();
           Signpost *old_signpost = signposts->getById (signpost->getId ());
-          std::replace (signposts->begin (), signposts->end (), old_signpost,
-                        signpost);
-          delete old_signpost;
+          signposts->replace (old_signpost, signpost);
         }
       else if (Road *road = dynamic_cast<Road*>(object))
         {
           Roadlist *roads = Roadlist::getInstance ();
           Road *old_road = roads->getById (road->getId ());
-          std::replace (roads->begin (), roads->end (), old_road, road);
-          delete old_road;
+          roads->replace (old_road, road);
         }
       else if (Bridge *bridge = dynamic_cast<Bridge*>(object))
         {
           Bridgelist *bridges = Bridgelist::getInstance ();
           Bridge *old_bridge = bridges->getById (bridge->getId ());
-          std::replace (bridges->begin (), bridges->end (), old_bridge, bridge);
-          delete old_bridge;
+          bridges->replace (old_bridge, bridge);
         }
       else if (Stack *stack = dynamic_cast<Stack*>(object))
         {

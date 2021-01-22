@@ -91,7 +91,7 @@ GameScenario::GameScenario(Glib::ustring name,Glib::ustring comment,
 			   GameScenario::PlayMode playmode)
  : TarFile("", name, MAP_EXT), d_name(name),d_comment(comment), d_copyright(""),
     d_license(""), d_playmode(playmode), inhibit_autosave_removal(false),
-    loaded_game_filename("")
+    loaded_game_filename(""), d_unique (true)
 {
     Armysetlist::getInstance();
     Tilesetlist::getInstance();
@@ -108,7 +108,7 @@ GameScenario::GameScenario(Glib::ustring savegame, bool& broken)
  : TarFile (File::get_dirname (savegame), File::get_basename (savegame, false),
             File::get_extension (savegame)),
     d_playmode(GameScenario::HOTSEAT), inhibit_autosave_removal(false),
-    loaded_game_filename("")
+    loaded_game_filename(""), d_unique (true)
 {
   Tar_Helper t(savegame, std::ios::in, broken);
   load_tick.emit ();
@@ -148,12 +148,12 @@ GameScenario::GameScenario(Glib::ustring savegame, bool& broken)
     }
 }
 
-GameScenario::GameScenario (const GameScenario &g)
+GameScenario::GameScenario (const GameScenario &g, bool unique)
  : GameScenarioOptions (g), TarFile (g), d_name (g.d_name),
     d_comment (g.d_comment), d_copyright (g.d_copyright),
     d_license (g.d_license), d_playmode (g.d_playmode), d_id (g.d_id),
     inhibit_autosave_removal (g.inhibit_autosave_removal),
-    loaded_game_filename (g.loaded_game_filename)
+    loaded_game_filename (g.loaded_game_filename), d_unique (unique)
 {
 }
 
@@ -702,10 +702,10 @@ bool GameScenario::loadWithHelper(XML_Helper& helper)
   return broken;
 }
 
-
 GameScenario::~GameScenario()
 {
-  cleanup();
+  if (d_unique)
+    cleanup();
   if (Configuration::s_autosave_policy == 1 && 
       inhibit_autosave_removal == false)
     {

@@ -64,11 +64,11 @@ Signpostlist::~Signpostlist()
   d_id.clear();
 }
 
-Signpostlist::Signpostlist (const Signpostlist &s)
+Signpostlist::Signpostlist (const Signpostlist &s, bool sync_ids)
  : LocationList<Signpost*> (), sigc::trackable (s)
 {
   for (auto signpost : s)
-    push_back (new Signpost (*signpost));
+    add (new Signpost (*signpost, sync_ids));
 }
 
 Signpostlist::Signpostlist(XML_Helper* helper)

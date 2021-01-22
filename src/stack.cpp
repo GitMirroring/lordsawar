@@ -48,21 +48,21 @@ Glib::ustring Stack::d_tag = "stack";
 #define debug(x)
 
 Stack::Stack(Player* player, Vector<int> pos)
-    : UniquelyIdentified(), Movable(pos), Ownable(player), d_defending(false), 
+    : UniquelyIdentified(), Movable(pos), OwnerId(player), d_defending(false), 
     d_parked(false), d_deleting(false)
 {
     d_path = new Path();
 }
 
 Stack::Stack(guint32 id, Player* player, Vector<int> pos)
-    : UniquelyIdentified(id), Movable(pos), Ownable(player), 
+    : UniquelyIdentified(id), Movable(pos), OwnerId(player), 
     d_defending(false), d_parked(false), d_deleting(false)
 {
     d_path = new Path();
 }
 
 Stack::Stack(const Stack& s, bool uniq)
-    : UniquelyIdentified(s, !uniq), Movable(s), Ownable(s), std::list<Army*>(),
+    : UniquelyIdentified(s, !uniq), Movable(s), OwnerId(s), std::list<Army*>(),
     sigc::trackable(s), d_defending(s.d_defending), d_parked(s.d_parked), 
     d_deleting(false)
 {
@@ -83,7 +83,7 @@ Stack::Stack(const Stack& s, bool uniq)
 }
 
 Stack::Stack(XML_Helper* helper)
-  : UniquelyIdentified(helper), Movable(helper), Ownable(helper), 
+  : UniquelyIdentified(helper), Movable(helper), OwnerId(helper), 
     d_deleting(false)
 {
   helper->getData(d_defending, "defending");
@@ -107,7 +107,7 @@ Stack::~Stack()
 void Stack::setPlayer(Player* p)
 {
   // we need to change the armies' loyalties as well!!
-  setOwner(p);
+  setOwnerId(p->getId ());
   for (iterator it = begin(); it != end(); ++it)
     (*it)->setOwner(p);
 }
@@ -522,8 +522,8 @@ bool Stack::save(XML_Helper* helper) const
   retval &= helper->saveData("id", d_id);
   retval &= helper->saveData("x", getPos().x);
   retval &= helper->saveData("y", getPos().y);
-  if (d_owner)
-    retval &= helper->saveData("owner", d_owner->getId());
+  if (isOwnerIdSet ())
+    retval &= helper->saveData("owner", d_owner_id);
   else
     retval &= helper->saveData("owner", -1);
   retval &= helper->saveData("defending", d_defending);
@@ -553,7 +553,7 @@ bool Stack::load(Glib::ustring tag, XML_Helper* helper)
   if (tag == Army::d_tag)
     {
       Army* a = new Army(helper);
-      a->setOwner(d_owner);
+      a->setOwner(getOwner ());
       push_back(a);
       return true;
     }
@@ -561,7 +561,7 @@ bool Stack::load(Glib::ustring tag, XML_Helper* helper)
   if (tag == Hero::d_hero_tag)
     {
       Hero* h = new Hero(helper);
-      h->setOwner(d_owner);
+      h->setOwner(getOwner ());
       push_back(h);
 
       return true;

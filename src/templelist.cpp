@@ -71,11 +71,11 @@ Templelist::~Templelist()
   d_id.clear();
 }
 
-Templelist::Templelist (const Templelist &t)
+Templelist::Templelist (const Templelist &t, bool sync_ids)
  : LocationList<Temple*> (), sigc::trackable (t)
 {
   for (auto temple : t)
-    push_back (new Temple (*temple));
+    add (new Temple (*temple, sync_ids));
 }
 
 Templelist::Templelist(XML_Helper* helper)

@@ -2,7 +2,7 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2004, 2006 Andrea Paternesi
 // Copyright (C) 2004 John Farrell
-// Copyright (C) 2006, 2007, 2008, 2009, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2014, 2015, 2017, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -62,9 +62,9 @@ AI_Fast::AI_Fast(Glib::ustring name, guint32 armyset, Gdk::RGBA color, int width
 {
 }
 
-AI_Fast::AI_Fast(const Player& player)
-    :RealPlayer(player), d_join(true), d_maniac(false), d_analysis(0), 
-    d_diplomacy(0)
+AI_Fast::AI_Fast(const Player& player, bool sync_ids)
+    :RealPlayer(player, sync_ids), d_join(true), d_maniac(false),
+    d_analysis(0), d_diplomacy(0)
 {
     d_type = AI_FAST;
 }

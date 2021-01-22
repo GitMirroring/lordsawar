@@ -64,11 +64,11 @@ Bridgelist::~Bridgelist()
   d_id.clear();
 }
 
-Bridgelist::Bridgelist (const Bridgelist &b)
+Bridgelist::Bridgelist (const Bridgelist &b, bool sync_ids)
  : LocationList<Bridge*> (), sigc::trackable (b)
 {
   for (auto bridge : b)
-    push_back (new Bridge (*bridge));
+    add (new Bridge (*bridge, sync_ids));
 }
 
 Bridgelist::Bridgelist(XML_Helper* helper)

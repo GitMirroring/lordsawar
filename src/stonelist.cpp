@@ -64,11 +64,11 @@ Stonelist::~Stonelist()
   d_object.clear();
   d_id.clear();
 }
-Stonelist::Stonelist (const Stonelist &s)
+Stonelist::Stonelist (const Stonelist &s, bool sync_ids)
  : LocationList<Stone*> (), sigc::trackable (s)
 {
   for (auto stone : s)
-    push_back (new Stone (*stone));
+    add (new Stone (*stone, sync_ids));
 }
 
 Stonelist::Stonelist(XML_Helper* helper)

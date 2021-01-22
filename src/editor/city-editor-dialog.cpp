@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -49,7 +49,9 @@ CityEditorDialog::CityEditorDialog(Gtk::Window &parent, City *cit, CreateScenari
 {
   city = cit;
   d_randomizer = randomizer;
+  d_changed = false;
 
+  xml->get_widget("notebook", notebook);
   xml->get_widget("capital_switch", capital_switch);
   capital_switch->set_active(city->isCapital());
   capital_switch->property_active ().signal_changed ().connect (method (on_capital_changed));
@@ -62,7 +64,6 @@ CityEditorDialog::CityEditorDialog(Gtk::Window &parent, City *cit, CreateScenari
   income_spinbutton->set_value(city->getGold());
   income_spinbutton->signal_insert_text().connect
     (sigc::hide(sigc::hide(method(on_income_text_changed))));
-  income_spinbutton->signal_changed().connect (method (on_income_changed));
 
   xml->get_widget("burned_switch", burned_switch);
   burned_switch->set_active(city->isBurnt());
@@ -168,6 +169,7 @@ CityEditorDialog::~CityEditorDialog ()
       const ArmyProdBase *a = (*i)[army_columns.army];
       delete a;
     }
+   notebook->property_show_tabs () = false;
 }
 
 void CityEditorDialog::change_city_ownership()
@@ -189,10 +191,11 @@ void CityEditorDialog::change_city_ownership()
     }
 }
 
-int CityEditorDialog::run()
+bool CityEditorDialog::run()
 {
   dialog->show_all();
-  return dialog->run();
+  dialog->run();
+  return d_changed;
 }
 
 void CityEditorDialog::on_add_clicked()
@@ -203,7 +206,10 @@ void CityEditorDialog::on_add_clicked()
 
   const ArmyProto *army = d.get_selected_army();
   if (army)
-    add_army(new ArmyProdBase(*army));
+    {
+      d_changed = true;
+      add_army(new ArmyProdBase(*army));
+    }
   update_armies ();
 }
 
@@ -212,6 +218,7 @@ void CityEditorDialog::on_remove_clicked()
   Gtk::TreeIter i = army_treeview->get_selection()->get_selected();
   if (i)
     {
+      d_changed = true;
       const ArmyProdBase *a = (*i)[army_columns.army];
       delete a;
       (*i)[army_columns.army] = NULL;
@@ -224,6 +231,7 @@ void CityEditorDialog::on_remove_clicked()
 
 void CityEditorDialog::on_randomize_armies_clicked()
 {
+  d_changed = true;
   const ArmyProdBase *army;
   army_list->clear();
   city->setRandomArmytypes(true, 1);
@@ -308,7 +316,7 @@ void CityEditorDialog::set_button_sensitivity()
 }
 
 void CityEditorDialog::cell_data_strength(Gtk::CellRenderer *renderer,
-				     const Gtk::TreeIter& i)
+                                          const Gtk::TreeIter& i)
 {
   dynamic_cast<Gtk::CellRendererSpin*>(renderer)->property_adjustment()
     = Gtk::Adjustment::create((*i)[army_columns.strength],
@@ -319,18 +327,19 @@ void CityEditorDialog::cell_data_strength(Gtk::CellRenderer *renderer,
 }
 
 void CityEditorDialog::on_strength_edited(const Glib::ustring &path,
-				   const Glib::ustring &new_text)
+                                          const Glib::ustring &new_text)
 {
   int str = atoi(new_text.c_str());
   if (str < (int)MIN_STRENGTH_FOR_ARMY_UNITS ||
       str > (int)MAX_STRENGTH_FOR_ARMY_UNITS)
     return;
+  d_changed = true;
   (*army_list->get_iter(Gtk::TreePath(path)))[army_columns.strength] = str;
   update_armies ();
 }
 
 void CityEditorDialog::cell_data_moves(Gtk::CellRenderer *renderer,
-				  const Gtk::TreeIter& i)
+                                       const Gtk::TreeIter& i)
 {
   dynamic_cast<Gtk::CellRendererSpin*>(renderer)->property_adjustment()
     = Gtk::Adjustment::create((*i)[army_columns.moves],
@@ -341,18 +350,19 @@ void CityEditorDialog::cell_data_moves(Gtk::CellRenderer *renderer,
 }
 
 void CityEditorDialog::on_moves_edited(const Glib::ustring &path,
-				   const Glib::ustring &new_text)
+                                       const Glib::ustring &new_text)
 {
   int moves = atoi(new_text.c_str());
   if (moves < (int)MIN_MOVES_FOR_ARMY_UNITS ||
       moves > (int)MAX_MOVES_FOR_ARMY_UNITS)
     return;
+  d_changed = true;
   (*army_list->get_iter(Gtk::TreePath(path)))[army_columns.moves] = moves;
   update_armies ();
 }
 
 void CityEditorDialog::cell_data_turns(Gtk::CellRenderer *renderer,
-				   const Gtk::TreeIter& i)
+                                       const Gtk::TreeIter& i)
 {
   dynamic_cast<Gtk::CellRendererSpin*>(renderer)->property_adjustment()
     = Gtk::Adjustment::create((*i)[army_columns.duration],
@@ -363,12 +373,13 @@ void CityEditorDialog::cell_data_turns(Gtk::CellRenderer *renderer,
 }
 
 void CityEditorDialog::on_turns_edited(const Glib::ustring &path,
-				   const Glib::ustring &new_text)
+                                       const Glib::ustring &new_text)
 {
   int turns = atoi(new_text.c_str());
   if (turns < (int)MIN_PRODUCTION_TURNS_FOR_ARMY_UNITS ||
       turns > (int)MAX_PRODUCTION_TURNS_FOR_ARMY_UNITS)
     return;
+  d_changed = true;
   (*army_list->get_iter(Gtk::TreePath(path)))[army_columns.duration] = turns;
   update_armies ();
 }
@@ -389,6 +400,7 @@ void CityEditorDialog::on_upkeep_edited(const Glib::ustring &path,
   if (upkeep < (int) MIN_UPKEEP_FOR_ARMY_UNITS ||
       upkeep > (int) MAX_UPKEEP_FOR_ARMY_UNITS)
     return;
+  d_changed = true;
   (*army_list->get_iter(Gtk::TreePath(path)))[army_columns.upkeep] = upkeep;
   update_armies ();
 }
@@ -429,6 +441,7 @@ void CityEditorDialog::on_player_changed()
     burned_switch->set_active (false);
   burned_switch->set_sensitive (!neutral);
   change_city_ownership ();
+  d_changed = true;
   update_buttons();
 }
 
@@ -445,6 +458,7 @@ void CityEditorDialog::update_buttons ()
 
 void CityEditorDialog::on_burned_changed ()
 {
+  d_changed = true;
   city->setBurnt (burned_switch->get_active ());
   if (city->isBurnt ())
     {
@@ -458,6 +472,7 @@ void CityEditorDialog::on_burned_changed ()
 
 void CityEditorDialog::on_capital_changed ()
 {
+  d_changed = true;
   Player *player = get_selected_player();
   // make sure player doesn't have other capitals
   Citylist* cl = Citylist::getInstance();
@@ -481,11 +496,13 @@ void CityEditorDialog::on_capital_changed ()
 
 void CityEditorDialog::on_name_changed ()
 {
+  d_changed = true;
   city->setName (String::utrim (name_entry->get_text ()));
 }
 
 void CityEditorDialog::on_income_changed ()
 {
+  d_changed = true;
   city->setGold(income_spinbutton->get_value_as_int());
 }
 
@@ -497,11 +514,13 @@ void CityEditorDialog::on_income_text_changed ()
 
 void CityEditorDialog::on_build_production_changed ()
 {
+  d_changed = true;
   city->setBuildProduction(build_production_switch->get_active ());
 }
 
 void CityEditorDialog::on_description_changed ()
 {
+  d_changed = true;
   Glib::ustring desc =
     String::utrim (description_textview->get_buffer ()->get_text ());
   city->setDescription (desc);

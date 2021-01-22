@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,7 +36,9 @@ class RuinEditorDialog: public LwEditorDialog
                      CreateScenarioRandomize *randomize);
     ~RuinEditorDialog() {}
 
-    int run();
+    bool get_changed () const {return d_changed;}
+
+    bool run();
     
  private:
     Gtk::Entry *name_entry;
@@ -53,6 +55,7 @@ class RuinEditorDialog: public LwEditorDialog
     Gtk::Button *reward_button;
     Ruin *ruin;
     CreateScenarioRandomize *d_randomizer;
+    bool d_changed;
 
     void set_keeper_name();
     void set_reward_name();

@@ -27,7 +27,7 @@
 #include <sigc++/trackable.h>
 #include <sigc++/signal.h>
 
-#include "Ownable.h"
+#include "OwnerId.h"
 #include "armybase.h"
 #include "UniquelyIdentified.h"
 
@@ -64,7 +64,7 @@ class ArmyProdBase;
   * Maybe these three purposes will be split up into three or more classes 
   * in the future.
   */
-class Army :public ArmyBase, public UniquelyIdentified, public Ownable, public sigc::trackable
+class Army :public ArmyBase, public UniquelyIdentified, public OwnerId, public sigc::trackable
 {
     public:
 

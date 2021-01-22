@@ -60,6 +60,11 @@ template<class T> class LocationList : public std::list<T>
 	    d_object[pos] = t;
 	  }
     }
+  void replace (T o, T n)
+    {
+      subtract (o);
+      add (n);
+    }
   void subtract(T t)
     {
       this->erase(std::find(this->begin(), this->end(), t));

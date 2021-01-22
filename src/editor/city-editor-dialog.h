@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,12 +35,14 @@ class CityEditorDialog: public LwEditorDialog
     CityEditorDialog(Gtk::Window &parent, City *city, CreateScenarioRandomize *randomizer);
     ~CityEditorDialog();
 
-    int run();
+    bool run();
 
  private:
     City *city;
+    bool d_changed;
     CreateScenarioRandomize *d_randomizer;
     Gtk::ComboBoxText *player_combobox;
+    Gtk::Notebook *notebook;
     Gtk::Switch *capital_switch;
     Gtk::Entry *name_entry;
     Gtk::SpinButton *income_spinbutton;

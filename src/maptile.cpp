@@ -291,7 +291,7 @@ Maptile::Maptile (const Maptile &m, bool sync_id)
 void Maptile::copy (Maptile *m, bool sync_ids)
 {
   d_index = m->d_index;
-  d_building  = m->d_building;
+  d_building = m->d_building;
   d_tilestyle_id = m->d_tilestyle_id;
   d_tileStyle = NULL;
 

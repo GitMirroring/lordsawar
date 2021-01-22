@@ -3,7 +3,7 @@
 // Copyright (C) 2003 Marek Publicewicz
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2005 Bryan Duff
-// Copyright (C) 2006-2011, 2014, 2015, 2017, 2020 Ben Asselstine
+// Copyright (C) 2006-2011, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -179,7 +179,7 @@ class Player: public sigc::trackable
 		int height, Type type, int player_no = -1);
 
         //! Copy constructor.
-        Player(const Player&);
+        Player(const Player&, bool sync_ids = false);
 
         //! Constructor for loading. See XML_Helper for documentation.
         Player(XML_Helper* helper);

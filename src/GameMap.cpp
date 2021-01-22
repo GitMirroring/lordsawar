@@ -2864,7 +2864,7 @@ std::list<UniquelyIdentified*> GameMap::copyObjects(std::list<LwRectangle> rects
         {
           auto it = 
             std::find (road_ids.begin (), road_ids.end (), road->getId ());
-          if (it != road_ids.end ())
+          if (it == road_ids.end ())
             {
               Road *new_road = new Road (*road, true);
               objects.push_back (new_road);
@@ -2878,7 +2878,7 @@ std::list<UniquelyIdentified*> GameMap::copyObjects(std::list<LwRectangle> rects
           auto it = 
             std::find (bridge_ids.begin (), bridge_ids.end (),
                        bridge->getId ());
-          if (it != bridge_ids.end ())
+          if (it == bridge_ids.end ())
             {
               Bridge *new_bridge = new Bridge (*bridge, true);
               objects.push_back (new_bridge);
@@ -2891,7 +2891,7 @@ std::list<UniquelyIdentified*> GameMap::copyObjects(std::list<LwRectangle> rects
         {
           auto it = 
             std::find (port_ids.begin (), port_ids.end (), port->getId ());
-          if (it != port_ids.end ())
+          if (it == port_ids.end ())
             {
               Port *new_port = new Port (*port, true);
               objects.push_back (new_port);
@@ -2904,7 +2904,7 @@ std::list<UniquelyIdentified*> GameMap::copyObjects(std::list<LwRectangle> rects
         {
           auto it = 
             std::find (stone_ids.begin (), stone_ids.end (), stone->getId ());
-          if (it != stone_ids.end ())
+          if (it == stone_ids.end ())
             {
               Stone *new_stone = new Stone (*stone, true);
               objects.push_back (new_stone);
@@ -2917,7 +2917,7 @@ std::list<UniquelyIdentified*> GameMap::copyObjects(std::list<LwRectangle> rects
         {
           auto it = 
             std::find (city_ids.begin (), city_ids.end (), city->getId ());
-          if (it != city_ids.end ())
+          if (it == city_ids.end ())
             {
               City *new_city = new City (*city, true);
               objects.push_back (new_city);
@@ -2931,7 +2931,7 @@ std::list<UniquelyIdentified*> GameMap::copyObjects(std::list<LwRectangle> rects
           auto it = 
             std::find (temple_ids.begin (), temple_ids.end (),
                        temple->getId ());
-          if (it != temple_ids.end ())
+          if (it == temple_ids.end ())
             {
               Temple *new_temple = new Temple (*temple, true);
               objects.push_back (new_temple);
@@ -2944,7 +2944,7 @@ std::list<UniquelyIdentified*> GameMap::copyObjects(std::list<LwRectangle> rects
         {
           auto it = 
             std::find (ruin_ids.begin (), ruin_ids.end (), ruin->getId ());
-          if (it != ruin_ids.end ())
+          if (it == ruin_ids.end ())
             {
               Ruin *new_ruin = new Ruin (*ruin, true);
               objects.push_back (new_ruin);
@@ -2958,7 +2958,7 @@ std::list<UniquelyIdentified*> GameMap::copyObjects(std::list<LwRectangle> rects
           auto it = 
             std::find (signpost_ids.begin (), signpost_ids.end (),
                        signpost->getId ());
-          if (it != signpost_ids.end ())
+          if (it == signpost_ids.end ())
             {
               Signpost *new_signpost = new Signpost (*signpost, true);
               objects.push_back (new_signpost);
