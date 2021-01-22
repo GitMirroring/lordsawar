@@ -1091,9 +1091,15 @@ void MainWindow::on_edit_players_activated()
 
 void MainWindow::on_edit_map_info_activated()
 {
+    EditorAction_Properties *action =
+      new EditorAction_Properties (game_scenario->getName (),
+                                   game_scenario->getComment (),
+                                   game_scenario->getCopyright (),
+                                   game_scenario->getLicense ());
     MapInfoDialog d(*window, game_scenario);
     if (d.run())
       {
+        addUndo (action);
         game_scenario->setName (d.getName ());
         game_scenario->setComment (d.getDescription ());
         game_scenario->setCopyright (d.getCopyright ());
@@ -1101,6 +1107,8 @@ void MainWindow::on_edit_map_info_activated()
         needs_saving = true;
         update_window_title();
       }
+    else
+      delete action;
 }
 
 void MainWindow::on_edit_shieldset_activated()
