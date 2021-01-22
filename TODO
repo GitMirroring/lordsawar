@@ -50,3 +50,5 @@ switch from gstreamermm to gstreamer
 are ai players limited by gold? do they just keep making more armies despite having 0gp treasury?
 
 editor needs to be able to handle tilesets with two different water tiles and so on.  we can only select the first 'water'.
+
+when the game is done, offer a replay. (idea of Timirtdinov Leonid)
