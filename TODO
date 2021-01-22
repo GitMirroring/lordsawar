@@ -48,3 +48,5 @@ the military advisor is very medieval sounding , might want to make it more neut
 switch from gstreamermm to gstreamer
 
 are ai players limited by gold? do they just keep making more armies despite having 0gp treasury?
+
+editor needs to be able to handle tilesets with two different water tiles and so on.  we can only select the first 'water'.
