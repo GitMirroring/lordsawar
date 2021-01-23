@@ -1674,7 +1674,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
     else if (City *c = dynamic_cast<City *>(object))
     {
         EditorAction_EditCity *action =
-          new EditorAction_EditCity (LwRectangle (c->getPos ()));
+          new EditorAction_EditCity (c->getArea ());
 	CityEditorDialog d(*window, c, d_create_scenario_names);
 	bool changed = d.run();
         if (changed)
@@ -1692,7 +1692,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
     else if (Ruin *r = dynamic_cast<Ruin *>(object))
     {
         EditorAction_EditRuin *action =
-          new EditorAction_EditRuin (LwRectangle (r->getPos ()));
+          new EditorAction_EditRuin (LwRectangle (r->getArea ()));
 	RuinEditorDialog d(*window, r, d_create_scenario_names);
 	if (d.run())
           {
@@ -1723,7 +1723,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
     else if (Temple *t = dynamic_cast<Temple *>(object))
     {
         EditorAction_EditTemple *action =
-          new EditorAction_EditTemple (LwRectangle (t->getPos ()));
+          new EditorAction_EditTemple (LwRectangle (t->getArea ()));
 	TempleEditorDialog d(*window, t, d_create_scenario_names);
         bool changed = d.run ();
 	if (changed)
@@ -1771,8 +1771,13 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
 
         if (tag == "bag")
           {
-            EditorAction_EditBackpack *action =
-              new EditorAction_EditBackpack (LwRectangle (b->getPos ()));
+            EditorAction_ChangeMap *action;
+            if (b->empty () == true)
+              action = new EditorAction_Backpack (LwRectangle (b->getPos ()));
+            else
+              action =
+                new EditorAction_EditBackpack (LwRectangle (b->getPos ()));
+
             BackpackEditorDialog d(*window, b);
             if (d.run())
               {
@@ -1810,7 +1815,6 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
                   delete action;
               }
           }
-
       }
 }
 
@@ -2284,25 +2288,51 @@ int MainWindow::get_pointer_index()
 
 void MainWindow::on_bag_selected(Vector<int> tile)
 {
-  MapBackpack *bag = 
-    GameMap::getInstance()->getTile(tile)->getBackpack();
-  BackpackEditorDialog d(*window, dynamic_cast<Backpack*>(bag));
+  MapBackpack *b = GameMap::getBackpack (tile);
+  EditorAction_ChangeMap *action = NULL;
+  if (b->empty () == true)
+    action = new EditorAction_Backpack (LwRectangle (b->getPos ()));
+  else
+    action = new EditorAction_EditBackpack (LwRectangle (b->getPos ()));
+  BackpackEditorDialog d(*window, b);
   if (d.run())
     {
+      addUndo (action);
       redraw ();
       needs_saving = true;
       update_window_title();
+    }
+  else
+    {
+      if (action)
+        delete action;
     }
 }
 
 void MainWindow::on_flag_selected(Vector<int> tile)
 {
+  MapBackpack *b = GameMap::getBackpack (tile);
+  EditorAction_EditFlag *action = NULL;
+  if (b->getPlantedItem () == NULL)
+    addUndo (new EditorAction_Flag (LwRectangle (b->getPos ())));
+  else
+    {
+      LwRectangle rect = LwRectangle (b->getPos ());
+      action = new EditorAction_EditFlag (rect);
+    }
   PlantedStandardEditorDialog d(*window, tile);
   if (d.run())
     {
+      if (action)
+        addUndo (action);
       redraw ();
       needs_saving = true;
       update_window_title();
+    }
+  else
+    {
+      if (action)
+        delete action;
     }
 }
 
@@ -3157,6 +3187,14 @@ EditorAction* MainWindow::executeAction (EditorAction *action)
             fill_players();
             break;
           }
+      case EditorAction::BACKPACK:
+          {
+            EditorAction_Backpack *a =
+              dynamic_cast<EditorAction_Backpack*>(action);
+            out = new EditorAction_Backpack (a->getArea ());
+            doChangeMap (a);
+            break;
+          }
       }
     return out;
 }
@@ -3212,61 +3250,132 @@ void MainWindow::doChangeMap (EditorAction_ChangeMap *action)
         {
           Citylist *cities = Citylist::getInstance ();
           City *old_city = cities->getById (city->getId ());
-          cities->replace (old_city, city);
+          if (old_city)
+            cities->replace (old_city, city);
+          else
+            cities->add (city);
         }
       else if (Ruin *ruin = dynamic_cast<Ruin*>(object))
         {
           Ruinlist *ruins = Ruinlist::getInstance ();
           Ruin *old_ruin = ruins->getById (ruin->getId ());
-          ruins->replace (old_ruin, ruin);
+          if (old_ruin)
+            ruins->replace (old_ruin, ruin);
+          else
+            ruins->add (ruin);
         }
       else if (Temple *temple = dynamic_cast<Temple*>(object))
         {
           Templelist *temples = Templelist::getInstance ();
           Temple *old_temple = temples->getById (temple->getId ());
-          temples->replace (old_temple, temple);
+          if (old_temple)
+            temples->replace (old_temple, temple);
+          else
+            temples->add (temple);
         }
       else if (Port *port = dynamic_cast<Port*>(object))
         {
           Portlist *ports = Portlist::getInstance ();
           Port *old_port = ports->getById (port->getId ());
-          ports->replace (old_port, port);
+          if (old_port)
+            ports->replace (old_port, port);
+          else
+            ports->add  (port);
         }
       else if (Stone *stone = dynamic_cast<Stone*>(object))
         {
           Stonelist *stones = Stonelist::getInstance ();
           Stone *old_stone = stones->getById (stone->getId ());
-          stones->replace (old_stone, stone);
+          if (old_stone)
+            stones->replace (old_stone, stone);
+          else
+            stones->add (stone);
         }
       else if (Signpost *signpost = dynamic_cast<Signpost*>(object))
         {
           Signpostlist *signposts = Signpostlist::getInstance ();
           Signpost *old_signpost = signposts->getById (signpost->getId ());
-          signposts->replace (old_signpost, signpost);
+          if (old_signpost)
+            signposts->replace (old_signpost, signpost);
+          else
+            signposts->add (signpost);
         }
       else if (Road *road = dynamic_cast<Road*>(object))
         {
           Roadlist *roads = Roadlist::getInstance ();
           Road *old_road = roads->getById (road->getId ());
-          roads->replace (old_road, road);
+          if (old_road)
+            roads->replace (old_road, road);
+          else
+            roads->add (road);
         }
       else if (Bridge *bridge = dynamic_cast<Bridge*>(object))
         {
           Bridgelist *bridges = Bridgelist::getInstance ();
           Bridge *old_bridge = bridges->getById (bridge->getId ());
-          bridges->replace (old_bridge, bridge);
+          if (old_bridge)
+            bridges->replace (old_bridge, bridge);
+          else
+            bridges->add (bridge);
         }
       else if (Stack *stack = dynamic_cast<Stack*>(object))
         {
           Player *p = stack->getOwner ();
           Stacklist *stacks = p->getStacklist ();
           Stack *old_stack = stacks->getStackById (stack->getId ());
-          std::replace (stacks->begin (), stacks->end (), old_stack, stack);
-          delete old_stack;
+          if (old_stack)
+            stacks->flRemove (old_stack);
+          GameMap::getInstance ()->putStack (stack, true);
         }
     }
   action->clearObjects ();
 
+  //we need citiesin this rect that lack a building tile
+  std::list <Vector<int>> points = 
+    GameMap::getInstance ()->getPoints (action->getRectangles ());
+      
+  for (auto pos : points)
+    {
+      Maptile *mtile = GameMap::getInstance ()->getTile (pos);
+      City *city = Citylist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::CITY && city)
+        Citylist::getInstance ()->subtract (city);
+      Ruin *ruin = Ruinlist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::RUIN && ruin)
+        Ruinlist::getInstance ()->subtract (ruin);
+      Temple *temple = Templelist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::TEMPLE && temple)
+        Templelist::getInstance ()->subtract (temple);
+      Port *port = Portlist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::PORT && port)
+        Portlist::getInstance ()->subtract (port);
+      Road *road = Roadlist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::ROAD && road)
+        Roadlist::getInstance ()->subtract (road);
+      Bridge *bridge = Bridgelist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::BRIDGE && bridge)
+        Bridgelist::getInstance ()->subtract (bridge);
+      Stone *stone = Stonelist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::STONE && stone)
+        Stonelist::getInstance ()->subtract (stone);
+      Signpost *signpost = Signpostlist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::SIGNPOST && signpost)
+        Signpostlist::getInstance ()->subtract (signpost);
+      //remove stacks that don't have a stacktile reference
+      for (auto p : *Playerlist::getInstance ())
+        {
+          std::list<Stack *> stacks_to_delete;
+          for (auto s : *p->getStacklist ())
+            if (!GameMap::getStacks (s->getPos ())->contains (s->getId ()))
+              stacks_to_delete.push_back (s);
+          for (auto s : stacks_to_delete)
+            {
+              p->getStacklist ()->on_stack_died (s);
+              p->getStacklist ()->flRemove (s);
+            }
+        }
+    }
+  smallmap->resize();
   redraw ();
 }
 

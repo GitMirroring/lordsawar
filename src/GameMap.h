@@ -1300,17 +1300,19 @@ class GameMap: public sigc::trackable
 
         /** Add the given stack to the map.
          *
-         * @param s A pointer to the stack to add to the map.
+         * @param s     A pointer to the stack to add to the map.
+         * @param owner if true, is added to the stacklist of the owner of the
+         *              stack
          *
          * \note This method doesn't do any checking if the stack can be 
          * added to the given position or not.  Callers are expected to do
          * this check beforehand.
          *
-         * \note The Stack is added to the Stacklist of the 
+         * \note When owner is false the Stack is added to the Stacklist of the 
          * Playerlist::getActiveplayer().
          * @return Always returns True.
          */
-	bool putStack(Stack *s);
+	bool putStack(Stack *s, bool owner = false);
 
         /** Remove the given stack from the map.
          *

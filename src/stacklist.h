@@ -2,7 +2,7 @@
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
 // Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2021 Ben Asselstine
 // Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -209,6 +209,13 @@ class Stacklist : public std::list<Stack*>, public sigc::trackable
 	//! Erase a stack from the list, given the stack id.
         bool flRemove(guint32 id);
 
+	//! Callback for when a stack has been killed, or disbanded.
+        /**
+         * this is needed to be public so that we can update d_id from
+         * the editor without setting up signals.
+         */
+	void on_stack_died (Stack *stack);
+
 	// Signals
 
 	//! The stack in the stacklist has been grouped or ungrouped.
@@ -300,9 +307,6 @@ class Stacklist : public std::list<Stack*>, public sigc::trackable
 
 	//! Callback for when a stack halts.
 	void on_stack_stops_moving (Stack *s);
-
-	//! Callback for when a stack has been killed, or disbanded.
-	void on_stack_died (Stack *stack);
 
 	//! Callback for when a stack has been grouped or ungrouped.
 	void on_stack_grouped (Stack *stack, bool grouped);

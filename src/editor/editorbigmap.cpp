@@ -479,7 +479,7 @@ void EditorBigMap::change_map_under_cursor()
               EditorAction_City *action = new EditorAction_City (rect);
               undo_map.emit (action);
               GameMap::getInstance()->putNewCity(tile);
-              changed_tiles = LwRectangle (tile);
+              changed_tiles = rect;
             }
         }
       break;
@@ -510,7 +510,7 @@ void EditorBigMap::change_map_under_cursor()
               EditorAction_Ruin *action = new EditorAction_Ruin (rect);
               undo_map.emit (action);
               GameMap::getInstance()->putNewRuin(tile);
-              changed_tiles = LwRectangle (tile);
+              changed_tiles = rect;
             }
         }
       break;
@@ -543,7 +543,7 @@ void EditorBigMap::change_map_under_cursor()
               EditorAction_Temple *action = new EditorAction_Temple (rect);
               undo_map.emit (action);
               GameMap::getInstance()->putNewTemple(tile);
-              changed_tiles = LwRectangle (tile);
+              changed_tiles = rect;
             }
         }
       break;

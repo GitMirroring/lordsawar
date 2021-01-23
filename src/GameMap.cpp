@@ -2240,9 +2240,12 @@ Location *GameMap::getLocation(Vector<int> tile)
   return NULL;
 }
 	
-bool GameMap::putStack(Stack *s)
+bool GameMap::putStack(Stack *s, bool owner)
 {
-  Playerlist::getActiveplayer()->addStack(s);
+  if (!owner)
+    Playerlist::getActiveplayer()->addStack(s);
+  else
+    s->getOwner ()->addStack (s);
   getStacks(s->getPos())->add(s);
   updateShips(s->getPos());
   updateTowers (s->getPos());
@@ -2921,7 +2924,7 @@ std::list<UniquelyIdentified*> GameMap::copyObjects(std::list<LwRectangle> rects
             {
               City *new_city = new City (*city, true);
               objects.push_back (new_city);
-              city_ids.push_back (stone->getId ());
+              city_ids.push_back (city->getId ());
             }
         }
 
@@ -2971,7 +2974,7 @@ std::list<UniquelyIdentified*> GameMap::copyObjects(std::list<LwRectangle> rects
         {
           auto it = 
             std::find (stack_ids.begin (), stack_ids.end (), stack->getId ());
-          if (it != stack_ids.end ())
+          if (it == stack_ids.end ())
             {
               Stack *new_stack = new Stack (*stack, false); //opposite land
               objects.push_back (new_stack);

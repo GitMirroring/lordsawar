@@ -137,6 +137,8 @@ class EditorAction
                 ASSIGN_CAPITALS = 45,
                 /** Change active player */
                 ACTIVE_PLAYER = 46,
+                /** A new backpack has been placed on the map */
+                BACKPACK = 47,
         };
 
 	//! Default constructor.
@@ -995,5 +997,28 @@ class EditorAction_ActivePlayer: public EditorAction
 
     private:
         guint32 d_id;
+};
+
+//-----------------------------------------------------------------------------
+
+//! A record of a backpack being added to the map.
+/**
+ * The purpose of the EditorAction_Backpack class is to record when a backpack
+ * is placed on the map.  This is only for new backpack objects.
+ *
+ */
+class EditorAction_Backpack: public EditorAction_ChangeMap
+{
+    public:
+	//! Make a new backpack action
+	/**
+         * Populate the backpack action with a rectangle of the its position.
+         */
+        EditorAction_Backpack (LwRectangle r)
+          : EditorAction_ChangeMap (BACKPACK, r, false) {};
+	//! Destroy a backpack action.
+        ~EditorAction_Backpack () {};
+
+        Glib::ustring getActionName () const {return _("Backpack");}
 };
 #endif //EDITOR_ACTIONS_H
