@@ -72,16 +72,10 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
         //! The game is over and this is the winner.
         Player *getWinningPlayer() const;
 
-        //! take a copy of the active and viewing player ids.
-        std::pair<int, int> stash () const;
-
 	// Methods that operate on the class data and modify the class.
 
         //! Sets the active player to the next player in the order.
         void nextPlayer();
-
-        //! set the active and viewing player according to the pair.
-        void unstash (std::pair<int, int> p);
 
         /** 
 	 * Checks if a player is alive and has no cities left. If not then 
@@ -308,10 +302,12 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
         static void deleteInstance();
 
         //! Returns the active player (the Player whose turn it is).
-        static Player* getActiveplayer() {return d_activeplayer;}
+        static Player* getActiveplayer()
+          {return getInstance ()->d_activeplayer;}
 
         //! Returns the viewing player (the Player who is looking at maps).
-	static Player *getViewingplayer() {return viewingplayer;}
+	static Player *getViewingplayer()
+          {return getInstance ()->viewingplayer;}
 
         //! Replace the current playerlist with another.
         static void reset (Playerlist *p);
@@ -352,16 +348,17 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
         void updateViewingPlayer ();
 
         Glib::ustring get_title(int rank);
+
         // DATA
-
-	//! The pointer to the player whose turn it is in the list.
-        static Player* d_activeplayer;
-
-	//! The player that the smallmap and bigmap are being viewed as.
-	static Player *viewingplayer;
 
 	//! The pointer to the neutral player in the list.
         Player* d_neutral;
+
+	//! The pointer to the player whose turn it is in the list.
+        Player* d_activeplayer;
+
+	//! The player that the smallmap and bigmap are being viewed as.
+        Player* viewingplayer;
 
 	typedef std::map<guint32, Player*> IdMap;
 	IdMap d_id;

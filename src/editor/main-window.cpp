@@ -955,8 +955,6 @@ bool MainWindow::load_map ()
       current_save_filename = chooser.get_filename();
       chooser.hide();
 
-      std::pair<int,int> stash = Playerlist::getInstance ()->stash ();
-
       bool broken = false;
       Scenario *s = new Scenario (game_scenario);
       if (game_scenario)
@@ -969,8 +967,6 @@ bool MainWindow::load_map ()
           Scenario::reset (s);
           game_scenario = s->getGameScenario ();
           delete s;
-
-          Playerlist::getInstance ()->unstash (stash);
 
           TimedMessageDialog dialog
             (*window,String::ucompose(_("Could not load map %1."),
@@ -2199,8 +2195,6 @@ bool MainWindow::import_map ()
       Glib::ustring filename = chooser.get_filename();
       chooser.hide();
 
-      std::pair<int,int> stash = Playerlist::getInstance ()->stash ();
-
       bool broken = false;
       Scenario *s = new Scenario (game_scenario);
 
@@ -2215,7 +2209,6 @@ bool MainWindow::import_map ()
           game_scenario = s->getGameScenario ();
           delete s;
 
-          Playerlist::getInstance ()->unstash (stash);
           TimedMessageDialog dialog
             (*window, String::ucompose(_("Could not load game %1."),
                                        filename), 0);
@@ -3263,10 +3256,8 @@ void MainWindow::doReloadScenario (EditorAction_Save *action)
   Glib::ustring oldname =
     File::get_basename (game_scenario->getConfigurationFile (true));
   Glib::ustring oldext = game_scenario->getExtension ();
-  std::pair<int,int> stash = Playerlist::getInstance ()->stash ();
   delete game_scenario;
   Scenario::reset (action->getScenario ());
-  Playerlist::getInstance ()->unstash (stash);
   game_scenario =
     action->getScenario ()->getGameScenario ();
   game_scenario->setUnique (true);

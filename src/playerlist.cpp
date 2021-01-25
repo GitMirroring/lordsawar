@@ -51,8 +51,6 @@
 
 Glib::ustring Playerlist::d_tag = "playerlist";
 Playerlist* Playerlist::s_instance = 0;
-Player* Playerlist::d_activeplayer = 0;
-Player* Playerlist::viewingplayer = 0;
 
 Playerlist* Playerlist::getInstance()
 {
@@ -82,14 +80,13 @@ void Playerlist::deleteInstance()
 }
 
 Playerlist::Playerlist()
-    :d_neutral(0)
+    :d_neutral(0), d_activeplayer (0), viewingplayer (0)
 {
-    d_activeplayer = 0;
-    viewingplayer = 0;
 }
 
 Playerlist::Playerlist (const Playerlist &plist, bool sync_ids)
- : std::list<Player*> (), sigc::trackable (plist)
+ : std::list<Player*> (), sigc::trackable (plist),
+    d_neutral(0), d_activeplayer (0), viewingplayer (0)
 {
   for (auto p : plist)
     {
@@ -113,6 +110,10 @@ Playerlist::Playerlist (const Playerlist &plist, bool sync_ids)
         }
       if (plist.getNeutral () == p)
         d_neutral = back ();
+      if (plist.getViewingplayer () == p)
+        viewingplayer = back ();
+      if (plist.getActiveplayer () == p)
+        d_activeplayer = back ();
       d_id[back ()->getId ()] = back ();
     }
 }
@@ -253,14 +254,13 @@ Player* Playerlist::getFirstLiving() const
 
 bool Playerlist::save(XML_Helper* helper) const
 {
-    //to prevent segfaults
-    if (!d_activeplayer)
-        d_activeplayer = (*begin());
-
     bool retval = true;
 
     retval &= helper->openTag(Playerlist::d_tag);
-    retval &= helper->saveData("active", d_activeplayer->getId());
+    if (d_activeplayer)
+      retval &= helper->saveData("active", d_activeplayer->getId());
+    else
+      retval &= helper->saveData("active", d_neutral->getId ());
     retval &= helper->saveData("neutral", d_neutral->getId());
 
     for (const_iterator it = begin(); it != end(); ++it)
@@ -1040,25 +1040,4 @@ void Playerlist::reset (Playerlist *p)
 {
   delete s_instance;
   s_instance = p;
-}
-
-std::pair<int, int> Playerlist::stash () const
-{
-  int old_viewingplayer = -1;
-  if (getViewingplayer ())
-    old_viewingplayer = getViewingplayer ()->getId ();
-  int old_activeplayer = -1;
-  if (getActiveplayer ())
-    old_activeplayer = getActiveplayer ()->getId ();
-  return std::pair<int,int>(old_activeplayer, old_viewingplayer);
-}
-
-void Playerlist::unstash (std::pair<int, int> p)
-{
-  int old_activeplayer = p.first;
-  int old_viewingplayer = p.second;
-  if (old_viewingplayer >= -1)
-    setViewingplayer (getPlayer ((guint32) old_viewingplayer));
-  if (old_activeplayer >= -1)
-    setActiveplayer (getPlayer ((guint32) old_activeplayer));
 }
