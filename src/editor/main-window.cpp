@@ -1115,13 +1115,14 @@ void MainWindow::on_edit_players_activated()
 {
     EditorAction_Players *action = new EditorAction_Players (game_scenario);
     PlayersDialog d(*window, d_create_scenario_names);
-    Player *active = Playerlist::getActiveplayer();
+    int active = Playerlist::getActiveplayer()->getId ();
     bool changed = d.run();
     if (changed)
       {
         addUndo (action);
-	if (Playerlist::getInstance()->getPlayer(active->getId()))
-	  Playerlist::getInstance()->setActiveplayer(active);
+        Player *player = Playerlist::getInstance()->getPlayer(active);
+        if (player)
+	  Playerlist::getInstance()->setActiveplayer(player);
         else
           Playerlist::getInstance()->setActiveplayer
             (Playerlist::getInstance ()->getNeutral ());
@@ -2281,18 +2282,9 @@ void MainWindow::on_switch_sets_activated()
 
 void MainWindow::on_player_toggled(PlayerItem item)
 {
-  guint32 id = 0;
-  if (Playerlist::getActiveplayer ())
-    id = Playerlist::getActiveplayer ()->getId ();
-  EditorAction_ActivePlayer *action = new EditorAction_ActivePlayer (id);
   Player *p = Playerlist::getInstance()->getPlayer(item.player_id);
   if (p)
-    {
-      addUndo (action);
-      Playerlist::getInstance()->setActiveplayer(p);
-    }
-  else
-    delete action;
+    Playerlist::getInstance()->setActiveplayer(p);
   fill_players();
 }
 
@@ -3221,18 +3213,6 @@ UndoAction* MainWindow::executeAction (UndoAction *action2)
               dynamic_cast<EditorAction_AssignCapitals*>(action);
             out = new EditorAction_AssignCapitals (game_scenario);
             doReloadScenario (a);
-            break;
-          }
-      case EditorAction::ACTIVE_PLAYER:
-          {
-            EditorAction_ActivePlayer *a =
-              dynamic_cast<EditorAction_ActivePlayer*>(action);
-            guint32 id = Playerlist::getActiveplayer ()->getId ();
-            out = new EditorAction_ActivePlayer (id);
-            Player *p = Playerlist::getInstance ()->getPlayer (a->getId ());
-            if (p)
-              Playerlist::getInstance()->setActiveplayer (p);
-            fill_players();
             break;
           }
       case EditorAction::BACKPACK:

@@ -136,12 +136,10 @@ class EditorAction: public UndoAction
                 RAND_UNNAMED_SIGNS = 44,
                 /** Players have cities assigned as capitals */
                 ASSIGN_CAPITALS = 45,
-                /** Change active player */
-                ACTIVE_PLAYER = 46,
                 /** A new backpack has been placed on the map */
-                BACKPACK = 47,
+                BACKPACK = 46,
                 /** stop drag that created many aggregated EditorActions */
-                BLANK = 48,
+                BLANK = 47,
         };
 
 	//! Default constructor.
@@ -974,34 +972,6 @@ class EditorAction_AssignCapitals: public EditorAction_Save
           :EditorAction_Save(EditorAction::ASSIGN_CAPITALS, g) {}
         ~EditorAction_AssignCapitals () {}
         Glib::ustring getActionName () const {return _("Assign Capital Cities");}
-};
-
-//-----------------------------------------------------------------------------
-
-//! A record of the active player changing in the editor.
-/**
- * The purpose of the EditorAction_ActivePlayer class is to record when the
- * active player changes in the editor.  This relates to the row of shield
- * toggle buttons.
- */
-class EditorAction_ActivePlayer: public EditorAction
-{
-    public:
-	//! Make a new active-player action
-	/**
-         * Populate the active-player action with the player id.
-         */
-        EditorAction_ActivePlayer (guint32 id)
-          :EditorAction(EditorAction::ACTIVE_PLAYER), d_id (id) {}
-	//! Destroy an active-player action.
-        ~EditorAction_ActivePlayer () {}
-
-        Glib::ustring getActionName () const {return _("Select Player");}
-
-        guint32 getId () const {return d_id;}
-
-    private:
-        guint32 d_id;
 };
 
 //-----------------------------------------------------------------------------
