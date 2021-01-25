@@ -25,8 +25,8 @@
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<< x << std::endl<<std::flush;}
 #define debug(x)
 
-ArmySetEditorAction::ArmySetEditorAction(Type type)
-    :d_type(type)
+ArmySetEditorAction::ArmySetEditorAction(Type type, UndoAction::AggregateType aggregate)
+    :UndoAction (aggregate), d_type(type)
 {
 }
 

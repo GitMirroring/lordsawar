@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "defs.h"
+#include "undo-action.h"
 
 class Shieldset;
 
@@ -31,7 +32,7 @@ class Shieldset;
  * editor.
  */
 
-class ShieldSetEditorAction
+class ShieldSetEditorAction: public UndoAction
 {
     public:
 
@@ -50,7 +51,9 @@ class ShieldSetEditorAction
         };
 
 	//! Default constructor.
-        ShieldSetEditorAction(Type type) : d_type(type) {}
+        ShieldSetEditorAction(Type type,
+                              UndoAction::AggregateType a = UndoAction::AGGREGATE_NONE)
+          : UndoAction (a), d_type(type) {}
 
 	//! Destructor.
         virtual ~ShieldSetEditorAction() {}

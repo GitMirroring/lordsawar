@@ -1,4 +1,4 @@
-//  Copyright (C) 2017, 2020 Ben Asselstine
+//  Copyright (C) 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,11 +38,11 @@ public:
     int run();
     void hide() {dialog->hide();}
 
-    bool get_needs_saving() const {return d_needs_saving;}
+    bool get_changed () const {return d_changed;}
 
 private:
     //data
-    bool d_needs_saving;
+    bool d_changed;
     TarFile *d_tarfile;
     Gtk::Button *d_next_turn_button;
     Gtk::Button *d_city_defeated_button;

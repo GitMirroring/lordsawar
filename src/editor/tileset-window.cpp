@@ -54,12 +54,14 @@
 #include "TarFileMaskedImage.h"
 #include "TarFileImage.h"
 
-const int UNDO_LIMIT = 100;
 #define method(x) sigc::mem_fun(*this, &TileSetWindow::x)
 
 TileSetWindow::TileSetWindow(Glib::ustring load_filename)
 {
-  needs_saving = false;
+  tileset_modified = load_filename == "";
+  new_tileset_needs_saving = load_filename == "";
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_tileset = NULL;
     Glib::RefPtr<Gtk::Builder> xml =
       BuilderCache::editor_get("tileset-window.ui");
@@ -422,7 +424,8 @@ bool TileSetWindow::make_new_tileset ()
 
   tiles_treeview->set_cursor (Gtk::TreePath ("0"));
   connect_signals ();
-  needs_saving = true;
+  tileset_modified = false;
+  new_tileset_needs_saving = true;
   update ();
   return true;
 }
@@ -459,7 +462,8 @@ bool TileSetWindow::load_tileset ()
       chooser.hide();
       if (ok)
         {
-          needs_saving = false;
+          new_tileset_needs_saving = false;
+          tileset_modified = false;
           update_window_title();
           ret = true;
         }
@@ -519,7 +523,8 @@ bool TileSetWindow::save_current_tileset_file_as ()
             }
           else
             {
-              needs_saving = false;
+              new_tileset_needs_saving = false;
+              tileset_modified = false;
               d_tileset->created (filename);
               Glib::ustring dir =
                 File::add_slash_if_necessary (File::get_dirname (filename));
@@ -562,7 +567,8 @@ bool TileSetWindow::save_current_tileset_file (Glib::ustring filename)
     {
       if (Tilesetlist::getInstance()->reload(d_tileset->getId()))
         refresh_tiles();
-      needs_saving = false;
+      new_tileset_needs_saving = false;
+      tileset_modified = false;
       update_window_title();
       tileset_saved.emit(d_tileset->getId());
     }
@@ -590,7 +596,7 @@ void TileSetWindow::on_save_tileset_activated()
 
 bool TileSetWindow::quit()
 {
-  if (needs_saving)
+  if (tileset_modified || new_tileset_needs_saving)
     {
       EditorQuitDialog d (*window);
       int response = d.run_and_hide();
@@ -937,7 +943,8 @@ void TileSetWindow::on_tile_name_changed()
       row[tiles_columns.name] = tile_name_entry->get_text();
       Tile *t = row[tiles_columns.tile];
       TileSetEditorAction_Name *action =
-        new TileSetEditorAction_Name (getCurIndex (), t->getName ());
+        new TileSetEditorAction_Name (getCurIndex (), t->getName (),
+                                      tile_name_entry->get_position ());
       addUndo (action);
       t->setName(tile_name_entry->get_text());
 
@@ -1179,7 +1186,7 @@ void TileSetWindow::on_remove_tilestyleset_clicked()
 
 void TileSetWindow::dirty ()
 {
-  needs_saving = true;
+  tileset_modified = true;
   update_window_title ();
   update_menuitems ();
 }
@@ -1645,7 +1652,7 @@ bool TileSetWindow::load_tileset (Glib::ustring filename)
 void TileSetWindow::update_window_title()
 {
   Glib::ustring title = "";
-  if (needs_saving)
+  if (tileset_modified || new_tileset_needs_saving)
     title += "*";
   title += d_tileset->getName();
   title += " - ";
@@ -1789,7 +1796,7 @@ void TileSetWindow::show_remove_file_error(Tileset *t, Gtk::Window &d, Glib::ust
 TileSetWindow::~TileSetWindow()
 {
   notebook->property_show_tabs () = false;
-  clearUndoAndRedo ();
+  delete umgr;
   delete window;
 }
 
@@ -1803,7 +1810,7 @@ void TileSetWindow::on_tutorial_video_activated()
 
 bool TileSetWindow::check_discard (Glib::ustring msg)
 {
-  if (needs_saving)
+  if (tileset_modified || new_tileset_needs_saving)
     {
       EditorSaveChangesDialog d (*window, msg);
       int response = d.run_and_hide();
@@ -1967,44 +1974,23 @@ bool TileSetWindow::isValidName ()
 
 void TileSetWindow::on_edit_undo_activated ()
 {
-  TileSetEditorAction *a = undos.front ();
-  undos.pop_front ();
-  TileSetEditorAction *redo = executeAction (a);
-  if (redo)
-    {
-      redos.push_front (redo);
-      if (redos.size () > UNDO_LIMIT)
-        delete redos.back ();
-    }
-  delete a;
-  if (undos.empty ())
-    needs_saving = false;
+  umgr->undo ();
+  if (umgr->undoEmpty () && !new_tileset_needs_saving)
+    tileset_modified = false;
   update ();
 }
       
 void TileSetWindow::on_edit_redo_activated ()
 {
-  needs_saving = true;
-  TileSetEditorAction *a = redos.front ();
-  redos.pop_front ();
-  TileSetEditorAction *undo = executeAction (a);
-  delete a;
-  undos.push_front (undo);
-  if (undos.size () > UNDO_LIMIT)
-    delete undos.back ();
+  tileset_modified = true;
+  umgr->redo ();
   update ();
 }
 
 void TileSetWindow::update_menuitems ()
 {
-  edit_redo_menuitem->set_sensitive (redos.empty () == false);
-  edit_undo_menuitem->set_sensitive (undos.empty () == false);
-  if (undos.empty () == false)
-    edit_undo_menuitem->set_label
-      (String::ucompose (_("Undo %1"), undos.front ()->getActionName ()));
-  if (redos.empty () == false)
-    edit_redo_menuitem->set_label
-      (String::ucompose (_("Redo %1"), redos.front ()->getActionName ()));
+  umgr->updateMenuItems (edit_undo_menuitem, edit_redo_menuitem);
+
   if (get_selected_tile())
     preview_tile_menuitem->set_sensitive(true);
   else
@@ -2033,10 +2019,11 @@ Tile* TileSetWindow::getTileByIndex (TileSetEditorAction_TileIndex *i)
   return t;
 }
 
-TileSetEditorAction*
-TileSetWindow::executeAction (TileSetEditorAction *action)
+UndoAction*
+TileSetWindow::executeAction (UndoAction *action2)
 {
-  TileSetEditorAction *out = NULL;
+  TileSetEditorAction *action = dynamic_cast<TileSetEditorAction*>(action2);
+  UndoAction *out = NULL;
 
     switch (action->getType ())
       {
@@ -2062,7 +2049,8 @@ TileSetWindow::executeAction (TileSetEditorAction *action)
             TileSetEditorAction_Name *a =
               dynamic_cast<TileSetEditorAction_Name*>(action);
             out = new TileSetEditorAction_Name
-              (a->getIndex (), getTileByIndex (a)->getName ());
+              (a->getIndex (), getTileByIndex (a)->getName (),
+               tile_name_entry->get_position ());
             getTileByIndex (a)->setName (a->getName ());
             Gtk::TreeModel::iterator iterrow = 
               tiles_treeview->get_model ()->get_iter
@@ -2072,6 +2060,8 @@ TileSetWindow::executeAction (TileSetEditorAction *action)
                 Gtk::TreeModel::Row row = *iterrow;
                 row[tiles_columns.name] = a->getName ();
               }
+            tile_name_entry->set_text (a->getName ());
+            tile_name_entry->set_position (a->getCursorPosition ());
           }
         break;
       case TileSetEditorAction::TYPE:
@@ -2399,19 +2389,12 @@ bool TileSetWindow::connect_signals ()
 
 void TileSetWindow::clearUndoAndRedo ()
 {
-  for (auto a : redos)
-    delete a;
-  redos.clear ();
-  for (auto a : undos)
-    delete a;
-  undos.clear ();
+  umgr->clear ();
 }
 
 void TileSetWindow::addUndo (TileSetEditorAction *a)
 {
-  undos.push_front (a);
-  if (undos.size () > UNDO_LIMIT)
-    delete undos.back ();
+  umgr->add (a);
 }
 /*
  some test cases

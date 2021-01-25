@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2010, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ SmallmapEditorDialog::SmallmapEditorDialog(Gtk::Window &parent)
     setup_pointer_radiobuttons(xml);
     setup_terrain_radiobuttons();
     pointer_radiobutton->set_active(true);
-    d_needs_saving = false;
+    d_changed = false;
     road_start_point = Vector<int>(-1,-1);
     road_finish_point = Vector<int>(-1,-1);
     update_road_buttons ();
@@ -86,7 +86,7 @@ bool SmallmapEditorDialog::run()
     on_pointer_radiobutton_toggled();
     on_terrain_radiobutton_toggled();
     dialog->run();
-    return d_needs_saving;
+    return d_changed;
 }
 
 void SmallmapEditorDialog::on_map_changed(Cairo::RefPtr<Cairo::Surface> map)
@@ -349,7 +349,7 @@ void SmallmapEditorDialog::on_road_can_be_created(bool create_road)
       
 void SmallmapEditorDialog::on_map_edited()
 {
-  d_needs_saving = true;
+  d_changed = true;
   if (get_terrain() == Tile::WATER)
     smallmap->resize();
   smallmap->check_road();

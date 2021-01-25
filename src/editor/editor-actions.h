@@ -25,6 +25,7 @@
 #include "rectangle.h"
 #include "maptile.h"
 #include "Tile.h"
+#include "undo-action.h"
 
 //! A record of an event in the shieldset editor
 /** 
@@ -39,7 +40,7 @@ class Cityset;
 class Shieldset;
 class Armyset;
 
-class EditorAction
+class EditorAction: public UndoAction
 {
     public:
 
@@ -139,16 +140,17 @@ class EditorAction
                 ACTIVE_PLAYER = 46,
                 /** A new backpack has been placed on the map */
                 BACKPACK = 47,
+                /** stop drag that created many aggregated EditorActions */
+                BLANK = 48,
         };
 
 	//! Default constructor.
-        EditorAction(Type type) : d_type (type) {}
+        EditorAction(Type type,
+                     UndoAction::AggregateType a = UndoAction::AGGREGATE_NONE)
+          : UndoAction (a), d_type (type) {}
 
 	//! Destructor.
         virtual ~EditorAction() {}
-
-        //! Get the name of this action for the undo/redo menuitem.
-        virtual Glib::ustring getActionName () const {return "";}
 
         //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}
@@ -245,8 +247,8 @@ class EditorAction_ScenarioMedia: public EditorAction_Save
 class EditorAction_ChangeMap: public EditorAction
 {
     public:
-        EditorAction_ChangeMap (Type t, LwRectangle r, bool grow);
-        EditorAction_ChangeMap (Type t, LwRectangle r1, LwRectangle r2, bool grow);
+        EditorAction_ChangeMap (Type t, LwRectangle r, bool grow, bool agg, bool only_maptiles);
+        EditorAction_ChangeMap (Type t, LwRectangle r1, LwRectangle r2, bool grow, bool agg, bool only_maptiles);
         ~EditorAction_ChangeMap ();
 
         LwRectangle getArea () const {return rects.front ();}
@@ -254,8 +256,10 @@ class EditorAction_ChangeMap: public EditorAction
         std::list<Maptile *> getMaptiles () const {return maptiles;}
         std::list<UniquelyIdentified *> getObjects () const {return objects;}
         void clearObjects ();
+        bool getOnlyMaptiles () const {return d_only_maptiles;}
     private:
         std::list<LwRectangle> rects;
+        bool d_only_maptiles;
         std::list<Maptile *> maptiles;
         std::list<UniquelyIdentified *> objects;
 };
@@ -281,7 +285,7 @@ class EditorAction_Terrain: public EditorAction_ChangeMap
          * Populate the terrain action with the area modified.
          */
         EditorAction_Terrain (Tile::Type t, LwRectangle r)
-          : EditorAction_ChangeMap (TERRAIN, r, true), d_tile (t) {};
+          : EditorAction_ChangeMap (TERRAIN, r, true, true, true), d_tile (t) {};
 	//! Destroy a terrain action.
         ~EditorAction_Terrain () {};
 
@@ -307,7 +311,7 @@ class EditorAction_Erase: public EditorAction_ChangeMap
          * Populate the erase action with the region that was erased.
          */
         EditorAction_Erase (LwRectangle r)
-          : EditorAction_ChangeMap (ERASE, r, false) {};
+          : EditorAction_ChangeMap (ERASE, r, false, true, false) {};
 	//! Destroy an erase action.
         ~EditorAction_Erase () {};
 
@@ -330,7 +334,7 @@ class EditorAction_Move: public EditorAction_ChangeMap
          * Populate the move action with the source and destination regions.
          */
         EditorAction_Move (LwRectangle r1, LwRectangle r2)
-          : EditorAction_ChangeMap (MOVE, r1, r2, false) {};
+          : EditorAction_ChangeMap (MOVE, r1, r2, false, false, false) {};
 	//! Destroy a move action.
         ~EditorAction_Move () {};
 
@@ -353,7 +357,7 @@ class EditorAction_Stack: public EditorAction_ChangeMap
          * Populate the stack action with a rectangle of the stack's position.
          */
         EditorAction_Stack (LwRectangle r)
-          : EditorAction_ChangeMap (STACK, r, false) {};
+          : EditorAction_ChangeMap (STACK, r, false, false, false) {};
 	//! Destroy a stack action.
         ~EditorAction_Stack() {};
 
@@ -377,7 +381,7 @@ class EditorAction_City: public EditorAction_ChangeMap
          * The dimensions need to be set to the city width.
          */
         EditorAction_City (LwRectangle r)
-          : EditorAction_ChangeMap (CITY, r, true) {};
+          : EditorAction_ChangeMap (CITY, r, true, false, false) {};
 	//! Destroy a city action.
         ~EditorAction_City () {};
 
@@ -401,7 +405,7 @@ class EditorAction_Ruin: public EditorAction_ChangeMap
          * The dimensions need to be set to the ruin width.
          */
         EditorAction_Ruin (LwRectangle r)
-          : EditorAction_ChangeMap (RUIN, r, true) {};
+          : EditorAction_ChangeMap (RUIN, r, true, false, false) {};
 	//! Destroy a ruin action.
         ~EditorAction_Ruin () {};
 
@@ -425,7 +429,7 @@ class EditorAction_Temple: public EditorAction_ChangeMap
          * The dimensions need to be set to the temple width.
          */
         EditorAction_Temple (LwRectangle r)
-          : EditorAction_ChangeMap (TEMPLE, r, true) {};
+          : EditorAction_ChangeMap (TEMPLE, r, true, false, false) {};
 	//! Destroy a temple action.
         ~EditorAction_Temple () {};
 
@@ -448,7 +452,7 @@ class EditorAction_Stone: public EditorAction_ChangeMap
          * Populate the stone action with a rectangle of the its position.
          */
         EditorAction_Stone (LwRectangle r)
-          : EditorAction_ChangeMap (STONE, r, true) {};
+          : EditorAction_ChangeMap (STONE, r, true, true, false) {};
 	//! Destroy a stone action.
         ~EditorAction_Stone () {};
 
@@ -471,7 +475,7 @@ class EditorAction_Signpost: public EditorAction_ChangeMap
          * Populate the signpost action with a rectangle of the its position.
          */
         EditorAction_Signpost (LwRectangle r)
-          : EditorAction_ChangeMap (SIGNPOST, r, true) {};
+          : EditorAction_ChangeMap (SIGNPOST, r, true, false, false) {};
 	//! Destroy a signpost action.
         ~EditorAction_Signpost () {};
 
@@ -494,7 +498,7 @@ class EditorAction_Port: public EditorAction_ChangeMap
          * Populate the port action with a rectangle of the its position.
          */
         EditorAction_Port (LwRectangle r)
-          : EditorAction_ChangeMap (PORT, r, true) {};
+          : EditorAction_ChangeMap (PORT, r, true, false, false) {};
 	//! Destroy a port action.
         ~EditorAction_Port () {};
 
@@ -517,7 +521,7 @@ class EditorAction_Road: public EditorAction_ChangeMap
          * Populate the road action with a rectangle of the its position.
          */
         EditorAction_Road (LwRectangle r)
-          : EditorAction_ChangeMap (ROAD, r, true) {};
+          : EditorAction_ChangeMap (ROAD, r, true, true, false) {};
 	//! Destroy a road action.
         ~EditorAction_Road () {};
 
@@ -540,7 +544,7 @@ class EditorAction_Bridge: public EditorAction_ChangeMap
          * Populate the bridge action with a rectangle of the its position.
          */
         EditorAction_Bridge (LwRectangle r)
-          : EditorAction_ChangeMap (BRIDGE, r, true) {};
+          : EditorAction_ChangeMap (BRIDGE, r, true, false, false) {};
 	//! Destroy a bridge action.
         ~EditorAction_Bridge () {};
 
@@ -563,7 +567,7 @@ class EditorAction_Flag: public EditorAction_ChangeMap
          * Populate the flag action with a rectangle of the its position.
          */
         EditorAction_Flag (LwRectangle r)
-          : EditorAction_ChangeMap (FLAG, r, false) {};
+          : EditorAction_ChangeMap (FLAG, r, false, false, false) {};
 	//! Destroy a flag action.
         ~EditorAction_Flag () {};
 
@@ -587,7 +591,7 @@ class EditorAction_EditFlag: public EditorAction_ChangeMap
          * Populate the edit-flag action with a rectangle of the its position.
          */
         EditorAction_EditFlag (LwRectangle r)
-          : EditorAction_ChangeMap (EDIT_FLAG, r, false) {};
+          : EditorAction_ChangeMap (EDIT_FLAG, r, false, false, false) {};
 	//! Destroy an edit-flag action.
         ~EditorAction_EditFlag () {};
 
@@ -611,7 +615,7 @@ class EditorAction_EditStack: public EditorAction_ChangeMap
          * Populate the edit-stack  action with a rectangle of the its position.
          */
         EditorAction_EditStack (LwRectangle r)
-          : EditorAction_ChangeMap (EDIT_STACK, r, false) {};
+          : EditorAction_ChangeMap (EDIT_STACK, r, false, false, false) {};
 	//! Destroy an edit-stack action.
         ~EditorAction_EditStack () {};
 
@@ -635,7 +639,7 @@ class EditorAction_EditCity: public EditorAction_ChangeMap
          * Populate the edit-city action with a rectangle of the its position.
          */
         EditorAction_EditCity (LwRectangle r)
-          : EditorAction_ChangeMap (EDIT_CITY, r, false) {};
+          : EditorAction_ChangeMap (EDIT_CITY, r, false, false, false) {};
 	//! Destroy an edit-city action.
         ~EditorAction_EditCity () {};
 
@@ -659,7 +663,7 @@ class EditorAction_EditRuin: public EditorAction_ChangeMap
          * Populate the edit-ruin action with a rectangle of the its position.
          */
         EditorAction_EditRuin (LwRectangle r)
-          : EditorAction_ChangeMap (EDIT_RUIN, r, false) {};
+          : EditorAction_ChangeMap (EDIT_RUIN, r, false, false, false) {};
 	//! Destroy an edit-ruin action.
         ~EditorAction_EditRuin () {};
 
@@ -683,7 +687,7 @@ class EditorAction_EditTemple: public EditorAction_ChangeMap
          * Populate the edit-temple action with a rectangle of the its position.
          */
         EditorAction_EditTemple (LwRectangle r)
-          : EditorAction_ChangeMap (EDIT_TEMPLE, r, false) {};
+          : EditorAction_ChangeMap (EDIT_TEMPLE, r, false, false, false) {};
 	//! Destroy an edit-temple action.
         ~EditorAction_EditTemple () {};
 
@@ -707,7 +711,7 @@ class EditorAction_EditStone: public EditorAction_ChangeMap
          * Populate the edit-stone action with a rectangle of the its position.
          */
         EditorAction_EditStone (LwRectangle r)
-          : EditorAction_ChangeMap (EDIT_STONE, r, false) {};
+          : EditorAction_ChangeMap (EDIT_STONE, r, false, false, false) {};
 	//! Destroy an edit-stone action.
         ~EditorAction_EditStone () {};
 
@@ -732,7 +736,7 @@ class EditorAction_EditSignpost: public EditorAction_ChangeMap
          * position.
          */
         EditorAction_EditSignpost (LwRectangle r)
-          : EditorAction_ChangeMap (EDIT_SIGNPOST, r, false) {};
+          : EditorAction_ChangeMap (EDIT_SIGNPOST, r, false, false, false) {};
 	//! Destroy an edit-signpost action.
         ~EditorAction_EditSignpost () {};
 
@@ -756,7 +760,7 @@ class EditorAction_EditBackpack: public EditorAction_ChangeMap
          * position.
          */
         EditorAction_EditBackpack (LwRectangle r)
-          : EditorAction_ChangeMap (EDIT_BACKPACK, r, false) {};
+          : EditorAction_ChangeMap (EDIT_BACKPACK, r, false, false, false) {};
 	//! Destroy an edit-backpack action.
         ~EditorAction_EditBackpack () {};
 
@@ -779,7 +783,7 @@ class EditorAction_EditRoad: public EditorAction_ChangeMap
          * position.
          */
         EditorAction_EditRoad (LwRectangle r)
-          : EditorAction_ChangeMap (EDIT_ROAD, r, false) {};
+          : EditorAction_ChangeMap (EDIT_ROAD, r, false, false, false) {};
 	//! Destroy an edit-road action.
         ~EditorAction_EditRoad () {};
 
@@ -818,11 +822,12 @@ class EditorAction_Rewards: public EditorAction_Save
         ~EditorAction_Rewards () {}
         Glib::ustring getActionName () const {return _("Rewards");}
 };
-class EditorAction_Smooth: public EditorAction_Save
+class EditorAction_Smooth: public EditorAction_ChangeMap
 {
     public:
-        EditorAction_Smooth (GameScenario *g)
-          :EditorAction_Save(EditorAction::SMOOTH, g) {}
+        EditorAction_Smooth (LwRectangle r)
+          :EditorAction_ChangeMap(EditorAction::SMOOTH, r, false, false,
+                                  true) {}
         ~EditorAction_Smooth () {}
         Glib::ustring getActionName () const {return _("Smooth Map");}
 };
@@ -1015,10 +1020,20 @@ class EditorAction_Backpack: public EditorAction_ChangeMap
          * Populate the backpack action with a rectangle of the its position.
          */
         EditorAction_Backpack (LwRectangle r)
-          : EditorAction_ChangeMap (BACKPACK, r, false) {};
+          : EditorAction_ChangeMap (BACKPACK, r, false, false, false) {};
 	//! Destroy a backpack action.
         ~EditorAction_Backpack () {};
 
         Glib::ustring getActionName () const {return _("Backpack");}
+};
+
+class EditorAction_Blank: public EditorAction
+{
+    public:
+        EditorAction_Blank ()
+          : EditorAction (BLANK, UndoAction::AGGREGATE_BLANK) {};
+        ~EditorAction_Blank () {};
+
+        Glib::ustring getActionName () const {return "";}
 };
 #endif //EDITOR_ACTIONS_H

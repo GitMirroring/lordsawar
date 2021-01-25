@@ -52,8 +52,9 @@ EditorAction_Save::~EditorAction_Save ()
         
 //-----------------------------------------------------------------------------
 //EditorAction_ChangeMap
-EditorAction_ChangeMap::EditorAction_ChangeMap (Type t, LwRectangle r, bool grow)
-: EditorAction (t), rects (std::list<LwRectangle>())
+EditorAction_ChangeMap::EditorAction_ChangeMap (Type t, LwRectangle r, bool grow, bool agg, bool only_maptiles)
+: EditorAction (t, agg ? AGGREGATE_BLANK : AGGREGATE_NONE),
+  rects (std::list<LwRectangle>()), d_only_maptiles (only_maptiles)
 {
   rects.push_back (r);
   LwRectangle rr = r;
@@ -62,7 +63,8 @@ EditorAction_ChangeMap::EditorAction_ChangeMap (Type t, LwRectangle r, bool grow
   std::list<LwRectangle> grown_rr;
   grown_rr.push_back (rr);
 
-  objects = GameMap::getInstance ()->copyObjects (grown_rr);
+  if (!only_maptiles)
+    objects = GameMap::getInstance ()->copyObjects (grown_rr);
   maptiles = GameMap::getInstance ()->copyMaptiles (grown_rr);
 }
 
@@ -71,8 +73,9 @@ void EditorAction_ChangeMap::clearObjects ()
   objects = std::list<UniquelyIdentified*>();
 }
 
-EditorAction_ChangeMap::EditorAction_ChangeMap (Type t, LwRectangle r1, LwRectangle r2, bool grow)
-: EditorAction (t), rects (std::list<LwRectangle>())
+EditorAction_ChangeMap::EditorAction_ChangeMap (Type t, LwRectangle r1, LwRectangle r2, bool grow, bool agg, bool only_maptiles)
+: EditorAction (t, agg ? AGGREGATE_BLANK : AGGREGATE_NONE),
+  rects (std::list<LwRectangle>()), d_only_maptiles (only_maptiles)
 {
   rects.push_back (r1);
   rects.push_back (r2);
@@ -89,7 +92,8 @@ EditorAction_ChangeMap::EditorAction_ChangeMap (Type t, LwRectangle r1, LwRectan
   grown_rr.push_back (rr1);
   grown_rr.push_back (rr2);
 
-  objects = GameMap::getInstance ()->copyObjects (grown_rr);
+  if (!only_maptiles)
+    objects = GameMap::getInstance ()->copyObjects (grown_rr);
   maptiles = GameMap::getInstance ()->copyMaptiles (grown_rr);
 }
 

@@ -25,6 +25,7 @@
 #include "armybase.h"
 #include "hero.h"
 #include "defs.h"
+#include "undo-action.h"
 class Armyset;
 
 //! A record of an event in the armyset editor
@@ -34,7 +35,7 @@ class Armyset;
  * The idea is to record changes to the model.
  */
 
-class ArmySetEditorAction
+class ArmySetEditorAction: public UndoAction
 {
     public:
 
@@ -96,7 +97,7 @@ class ArmySetEditorAction
         };
 
 	//! Default constructor.
-        ArmySetEditorAction(Type type);
+        ArmySetEditorAction(Type type, UndoAction::AggregateType aggregate = UndoAction::AGGREGATE_NONE);
 
 	//! Destructor.
         virtual ~ArmySetEditorAction() {};
@@ -227,8 +228,8 @@ class ArmySetEditorAction_ClearImage: public ArmySetEditorAction_Save
 class ArmySetEditorAction_ArmyIndex: public ArmySetEditorAction
 {
     public:
-        ArmySetEditorAction_ArmyIndex (Type t, guint32 i)
-          : ArmySetEditorAction (t), d_index (i) {}
+        ArmySetEditorAction_ArmyIndex (Type t, guint32 i, bool agg = false)
+          : ArmySetEditorAction (t, agg ? UndoAction::AGGREGATE_DELAY : UndoAction::AGGREGATE_NONE), d_index (i) {}
         ~ArmySetEditorAction_ArmyIndex () {}
 
         guint32 getIndex () {return d_index;}
@@ -248,20 +249,23 @@ class ArmySetEditorAction_Name: public ArmySetEditorAction_ArmyIndex
     public:
 	//! Make a new name action
 	/**
-         * Populate the action with the name of the army type.
-         * Also supply the index of the army type whose name we're modifying.
+         * Populate the action with the index of the army type whose name
+         * we're modifying, the name, and the position of the cursor in the
+         * entry.
          */
-        ArmySetEditorAction_Name (guint32 i, Glib::ustring n)
-          : ArmySetEditorAction_ArmyIndex (NAME, i), d_name (n) {};
+        ArmySetEditorAction_Name (guint32 i, Glib::ustring n, int p)
+          : ArmySetEditorAction_ArmyIndex (NAME, i, true), d_name (n),
+         d_cursor_pos (p) {};
 	//! Destroy a name action.
         ~ArmySetEditorAction_Name () {};
 
         Glib::ustring getActionName () const {return _("Name");}
-
         Glib::ustring getName () {return d_name;}
+        int getCursorPosition () {return d_cursor_pos;}
 
     private:
         Glib::ustring d_name;
+        int d_cursor_pos;
 };
 
 //-----------------------------------------------------------------------------
@@ -280,13 +284,14 @@ class ArmySetEditorAction_Description: public ArmySetEditorAction_ArmyIndex
          * Populate the action with the description of the army type.
          */
         ArmySetEditorAction_Description (guint32 i, Glib::ustring d)
-          : ArmySetEditorAction_ArmyIndex (DESCRIPTION, i), d_description (d) {};
+          : ArmySetEditorAction_ArmyIndex (DESCRIPTION, i, true),
+          d_description (d) {};
 	//! Destroy a description action.
-        ~ArmySetEditorAction_Description () {};
+        ~ArmySetEditorAction_Description () {}
 
         Glib::ustring getActionName () const {return _("Description");}
 
-        Glib::ustring getDescription () {return d_description;}
+        Glib::ustring getDescription () const {return d_description;}
 
     private:
         Glib::ustring d_description;
@@ -441,7 +446,7 @@ class ArmySetEditorAction_Turns : public ArmySetEditorAction_ArmyIndex
          * Populate the turns action with the number of turns.
          */
         ArmySetEditorAction_Turns (guint32 i, guint32 t)
-          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::TURNS, i),
+          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::TURNS, i, true),
           d_turns (t) {}
 	//! Destroy a turns action
         ~ArmySetEditorAction_Turns () {}
@@ -470,7 +475,7 @@ class ArmySetEditorAction_Cost : public ArmySetEditorAction_ArmyIndex
          * Populate the cost action with the number of gold pieces.
          */
         ArmySetEditorAction_Cost (guint32 i, guint32 c)
-          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::COST, i),
+          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::COST, i, true),
           d_cost (c) {}
 	//! Destroy a cost action
         ~ArmySetEditorAction_Cost () {}
@@ -499,7 +504,7 @@ class ArmySetEditorAction_Upkeep : public ArmySetEditorAction_ArmyIndex
          * Populate the upkeep action with the number of gold pieces.
          */
         ArmySetEditorAction_Upkeep (guint32 i, guint32 u)
-          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::UPKEEP, i),
+          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::UPKEEP, i, true),
           d_upkeep (u) {}
 	//! Destroy a upkeep action
         ~ArmySetEditorAction_Upkeep () {}
@@ -527,8 +532,8 @@ class ArmySetEditorAction_NewCost : public ArmySetEditorAction_ArmyIndex
          * Populate the new-cost action with the number of gold pieces.
          */
         ArmySetEditorAction_NewCost (guint32 i, guint32 c)
-          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::NEW_COST, i),
-          d_cost (c) {}
+          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::NEW_COST, i,
+                                          true), d_cost (c) {}
 	//! Destroy a new-cost action
         ~ArmySetEditorAction_NewCost () {}
 
@@ -544,7 +549,7 @@ class ArmySetEditorAction_NewCost : public ArmySetEditorAction_ArmyIndex
 //! A record of an army type's stat being modified
 /**
  * The purpose of the ArmySetEditorAction_Stat class is to record
- * when an army type's stat is modified. 
+ * when an army type's stat is modified.  e.g. strength, moves, sight.
  *
  */
 class ArmySetEditorAction_Stat : public ArmySetEditorAction_ArmyIndex
@@ -555,7 +560,7 @@ class ArmySetEditorAction_Stat : public ArmySetEditorAction_ArmyIndex
          * Populate the stat action with the type of stat and the value.
          */
         ArmySetEditorAction_Stat (guint32 i, ArmyBase::Stat s, guint32 v)
-          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::STAT, i),
+          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::STAT, i, true),
           d_stat(s), d_value(v) {};
 	//! Destroy a stat action
         ~ArmySetEditorAction_Stat () {};
@@ -598,7 +603,7 @@ class ArmySetEditorAction_Id : public ArmySetEditorAction_ArmyIndex
          * Populate the id action with the numeric id.
          */
         ArmySetEditorAction_Id (guint32 i, guint32 id)
-          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::ID, i),
+          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::ID, i, true),
           d_id (id) {}
 	//! Destroy an id action
         ~ArmySetEditorAction_Id () {}
@@ -870,7 +875,7 @@ class ArmySetEditorAction_Exp : public ArmySetEditorAction_ArmyIndex
          * Populate the exp action with the number of experience points.
          */
         ArmySetEditorAction_Exp (guint32 i, guint32 x)
-          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::EXP, i),
+          :ArmySetEditorAction_ArmyIndex (ArmySetEditorAction::EXP, i, true),
           d_exp (x) {}
 	//! Destroy an exp action
         ~ArmySetEditorAction_Exp () {}

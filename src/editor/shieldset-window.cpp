@@ -49,13 +49,15 @@
 
 Glib::ustring no_shield_msg = N_("No image set");
 Glib::ustring no_tartan_msg = N_("No image set");
-const int UNDO_LIMIT = 100;
 
 #define method(x) sigc::mem_fun(*this, &ShieldSetWindow::x)
 
 ShieldSetWindow::ShieldSetWindow(Glib::ustring load_filename)
 {
-  needs_saving = false;
+  shieldset_modified = load_filename == "";
+  new_shieldset_needs_saving = load_filename == "";
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_shieldset = NULL;
     Glib::RefPtr<Gtk::Builder> xml =
       BuilderCache::editor_get("shieldset-window.ui");
@@ -146,17 +148,12 @@ ShieldSetWindow::ShieldSetWindow(Glib::ustring load_filename)
 
 void ShieldSetWindow::clearUndoAndRedo ()
 {
-  for (auto a : redos)
-    delete a;
-  redos.clear ();
-  for (auto a : undos)
-    delete a;
-  undos.clear ();
+  umgr->clear ();
 }
 
 ShieldSetWindow::~ShieldSetWindow()
 {
-  clearUndoAndRedo ();
+  delete umgr;
   delete window;
 }
 
@@ -230,7 +227,8 @@ bool ShieldSetWindow::make_new_shieldset ()
 
   update_shield_panel();
   shields_treeview->set_cursor (Gtk::TreePath ("0"));
-  needs_saving = true;
+  shieldset_modified = false;
+  new_shieldset_needs_saving = true;
   clearUndoAndRedo ();
   update ();
   return true;
@@ -243,7 +241,7 @@ void ShieldSetWindow::on_new_shieldset_activated()
 
 bool ShieldSetWindow::check_discard (Glib::ustring msg)
 {
-  if (needs_saving)
+  if (shieldset_modified || new_shieldset_needs_saving)
     {
       EditorSaveChangesDialog d (*window, msg);
       int response = d.run_and_hide();
@@ -300,7 +298,8 @@ bool ShieldSetWindow::load_shieldset ()
       chooser.hide();
       if (ok)
         {
-          needs_saving = false;
+          shieldset_modified = false;
+          new_shieldset_needs_saving = false;
           update_window_title();
           ret = true;
         }
@@ -567,7 +566,8 @@ bool ShieldSetWindow::save_current_shieldset_file_as ()
             }
           else
             {
-              needs_saving = false;
+              shieldset_modified = false;
+              new_shieldset_needs_saving = false;
               d_shieldset->created (filename);
               Glib::ustring dir =
                 File::add_slash_if_necessary (File::get_dirname (filename));
@@ -610,7 +610,8 @@ bool ShieldSetWindow::save_current_shieldset_file (Glib::ustring filename)
     {
       if (Shieldsetlist::getInstance()->reload(d_shieldset->getId()))
         refresh_shields();
-      needs_saving = false;
+      shieldset_modified = false;
+      new_shieldset_needs_saving = false;
       update_window_title();
       shieldset_saved.emit(d_shieldset->getId());
     }
@@ -665,7 +666,7 @@ void ShieldSetWindow::on_edit_shieldset_info_activated()
       d_shieldset->setMediumHeight (d.getMediumHeight ());
       d_shieldset->setLargeWidth (d.getLargeWidth ());
       d_shieldset->setLargeHeight (d.getLargeHeight ());
-      needs_saving = true;
+      shieldset_modified = true;
       update ();
     }
 }
@@ -854,7 +855,7 @@ bool ShieldSetWindow::load_shieldset(Glib::ustring filename)
 
 bool ShieldSetWindow::quit()
 {
-  if (needs_saving)
+  if (shieldset_modified || new_shieldset_needs_saving)
     {
       EditorQuitDialog d (*window);
       int response = d.run_and_hide();
@@ -954,7 +955,7 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
               d_shieldset->uninstantiateSameNamedImages
                 (ss->getMaskedImage()->getName ());
               d_shieldset->setHeightsAndWidthsFromImages(ss);
-              needs_saving = true;
+              shieldset_modified = true;
             }
           else
             {
@@ -988,7 +989,7 @@ void ShieldSetWindow::on_player_color_changed()
       s->setColor(player_colorbutton->get_rgba ());
       update_shield_panel();
       update_menuitems ();
-      needs_saving = true;
+      shieldset_modified = true;
       update_window_title();
     }
 }
@@ -1005,7 +1006,7 @@ void ShieldSetWindow::add_shield_to_treeview (Shield *shield)
 void ShieldSetWindow::update_window_title()
 {
   Glib::ustring title = "";
-  if (needs_saving)
+  if (shieldset_modified || new_shieldset_needs_saving)
     title += "*";
   title += d_shieldset->getName();
   title += " - ";
@@ -1037,7 +1038,7 @@ void ShieldSetWindow::on_edit_copy_shields_activated()
           w->getTartanMaskedImage (Tartan::Type (k))->copy (d_shieldset, mim);
         }
     }
-  needs_saving = true;
+  shieldset_modified = true;
   bool broken = false;
   d_shieldset->instantiateImages (false, broken);
   update ();
@@ -1106,7 +1107,7 @@ void ShieldSetWindow::process_shieldstyle(ShieldStyle *ss, Gtk::FileChooserDialo
       ss->getMaskedImage ()->uninstantiateImages ();
       ss->getMaskedImage ()->load (d_shieldset, newname);
       ss->getMaskedImage ()->instantiateImages ();
-      needs_saving = true;
+      shieldset_modified = true;
       update ();
     }
   else
@@ -1173,7 +1174,7 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
               d_shieldset->uninstantiateSameNamedImages
                 (shield->getTartanMaskedImage(type)->getName ());
 
-              needs_saving = true;
+              shieldset_modified = true;
             }
           else
             {
@@ -1211,7 +1212,7 @@ void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk:
       mim->uninstantiateImages ();
       mim->load (d_shieldset, newname);
       mim->instantiateImages ();
-      needs_saving = true;
+      shieldset_modified = true;
       update ();
     }
   else
@@ -1237,44 +1238,22 @@ void ShieldSetWindow::on_tutorial_video_activated()
 
 void ShieldSetWindow::on_edit_undo_activated ()
 {
-  ShieldSetEditorAction *a = undos.front ();
-  undos.pop_front ();
-  ShieldSetEditorAction *redo = executeAction (a);
-  if (redo)
-    {
-      redos.push_front (redo);
-      if (redos.size () > UNDO_LIMIT)
-        delete redos.back ();
-    }
-  delete a;
-  if (undos.empty ())
-    needs_saving = false;
+  umgr->undo ();
+  if (umgr->undoEmpty () && !new_shieldset_needs_saving)
+    shieldset_modified = false;
   update ();
 }
       
 void ShieldSetWindow::on_edit_redo_activated ()
 {
-  needs_saving = true;
-  ShieldSetEditorAction *a = redos.front ();
-  redos.pop_front ();
-  ShieldSetEditorAction *undo = executeAction (a);
-  delete a;
-  undos.push_front (undo);
-  if (undos.size () > UNDO_LIMIT)
-    delete undos.back ();
+  shieldset_modified = true;
+  umgr->redo ();
   update ();
 }
 
 void ShieldSetWindow::update_menuitems ()
 {
-  edit_redo_menuitem->set_sensitive (redos.empty () == false);
-  edit_undo_menuitem->set_sensitive (undos.empty () == false);
-  if (undos.empty () == false)
-    edit_undo_menuitem->set_label
-      (String::ucompose (_("Undo %1"), undos.front ()->getActionName ()));
-  if (redos.empty () == false)
-    edit_redo_menuitem->set_label
-      (String::ucompose (_("Redo %1"), redos.front ()->getActionName ()));
+  umgr->updateMenuItems (edit_undo_menuitem, edit_redo_menuitem);
 }
 
 void ShieldSetWindow::update ()
@@ -1352,10 +1331,11 @@ bool ShieldSetWindow::doReloadShieldset (ShieldSetEditorAction_Save *action)
   return false;
 }
 
-ShieldSetEditorAction*
-ShieldSetWindow::executeAction (ShieldSetEditorAction *action)
+UndoAction *
+ShieldSetWindow::executeAction (UndoAction *action2)
 {
-  ShieldSetEditorAction *out = NULL;
+  ShieldSetEditorAction *action = dynamic_cast<ShieldSetEditorAction*>(action2);
+  UndoAction *out = NULL;
 
     switch (action->getType ())
       {
@@ -1437,9 +1417,7 @@ void ShieldSetWindow::disconnect_signals ()
     
 void ShieldSetWindow::addUndo (ShieldSetEditorAction *a)
 {
-  undos.push_front (a);
-  if (undos.size () > UNDO_LIMIT)
-    delete undos.back ();
+  umgr->add (a);
 }
 /*
  some test cases

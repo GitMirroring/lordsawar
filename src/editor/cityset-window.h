@@ -25,6 +25,7 @@
 #include <sigc++/trackable.h>
 #include <gtkmm.h>
 #include "cityset-editor-actions.h"
+#include "undo-mgr.h"
 
 #include "cityset.h"
 
@@ -47,9 +48,9 @@ class CitySetWindow: public sigc::trackable
     Gtk::Window* window;
     Glib::ustring current_save_filename;
     Cityset *d_cityset; //current cityset
-    bool needs_saving;
-    std::list<CitySetEditorAction *> undos;
-    std::list<CitySetEditorAction *> redos;
+    bool cityset_modified;
+    bool new_cityset_needs_saving;
+    UndoMgr *umgr;
     Gtk::MenuItem *new_cityset_menuitem;
     Gtk::MenuItem *load_cityset_menuitem;
     Gtk::MenuItem *save_cityset_menuitem;
@@ -122,7 +123,7 @@ class CitySetWindow: public sigc::trackable
     void clearUndoAndRedo ();
     void update_menuitems ();
     void update ();
-    CitySetEditorAction* executeAction (CitySetEditorAction *action);
+    UndoAction* executeAction (UndoAction *action);
     void doReloadCityset (CitySetEditorAction_Save *action);
     void addUndo(CitySetEditorAction *a);
 };

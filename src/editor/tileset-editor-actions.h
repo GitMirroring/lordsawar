@@ -25,6 +25,7 @@
 #include "SmallTile.h"
 #include "tilestyle.h"
 #include "defs.h"
+#include "undo-action.h"
 
 class Tileset;
 
@@ -34,7 +35,7 @@ class Tileset;
  * editor.
  */
 
-class TileSetEditorAction
+class TileSetEditorAction: public UndoAction
 {
 public:
 
@@ -64,7 +65,9 @@ public:
     };
 
     //! Default constructor.
-    TileSetEditorAction(Type type): d_type (type) {}
+    TileSetEditorAction(Type type, bool agg = false)
+     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                   UndoAction::AGGREGATE_NONE), d_type (type) {}
 
     //! Destructor.
     virtual ~TileSetEditorAction() {}
@@ -126,8 +129,8 @@ class TileSetEditorAction_Properties: public TileSetEditorAction
 class TileSetEditorAction_TileIndex: public TileSetEditorAction
 {
     public:
-        TileSetEditorAction_TileIndex (Type t, guint32 i)
-          : TileSetEditorAction (t), d_index (i) {}
+        TileSetEditorAction_TileIndex (Type t, guint32 i, bool agg = false)
+          : TileSetEditorAction (t, agg), d_index (i) {}
         ~TileSetEditorAction_TileIndex () {}
 
         guint32 getIndex () {return d_index;}
@@ -151,17 +154,20 @@ class TileSetEditorAction_Name: public TileSetEditorAction_TileIndex
          * Populate the action with the name of the tile.
          * Also supply the index of the tile whose name we're modifying.
          */
-        TileSetEditorAction_Name (guint32 i, Glib::ustring n)
-          : TileSetEditorAction_TileIndex (NAME, i), d_name (n) {}
+        TileSetEditorAction_Name (guint32 i, Glib::ustring n, int p)
+          : TileSetEditorAction_TileIndex (NAME, i, true), d_name (n),
+         d_cursor_pos (p) {}
 	//! Destroy a name action.
         ~TileSetEditorAction_Name () {}
 
         Glib::ustring getActionName () const {return _("Name");}
 
         Glib::ustring getName () {return d_name;}
+        int getCursorPosition () {return d_cursor_pos;}
 
     private:
         Glib::ustring d_name;
+        int d_cursor_pos;
 };
 
 //-----------------------------------------------------------------------------
@@ -240,7 +246,7 @@ class TileSetEditorAction_Moves: public TileSetEditorAction_TileIndex
          * Also supply the index of the tile whose moves we're modifying.
          */
         TileSetEditorAction_Moves (guint32 i, guint32 mp)
-          : TileSetEditorAction_TileIndex (MOVES, i), d_moves (mp) {}
+          : TileSetEditorAction_TileIndex (MOVES, i, true), d_moves (mp) {}
 	//! Destroy a moves action.
         ~TileSetEditorAction_Moves () {}
 

@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2012, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2010, 2012, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class SmallmapEditorDialog: public LwEditorDialog
     
  private:
     EditableSmallMap* smallmap;
-    bool d_needs_saving;
+    bool d_changed;
 
     Gtk::Image *smallmap_image;
     Gtk::Box *modes_hbox;

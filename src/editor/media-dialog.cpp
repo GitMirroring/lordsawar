@@ -1,4 +1,4 @@
-//  Copyright (C) 2017, 2020 Ben Asselstine
+//  Copyright (C) 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ MediaDialog::MediaDialog(Gtk::Window &parent, TarFile *tarfile)
  : LwEditorDialog(parent, "media-dialog.ui")
 {
   d_tarfile = tarfile;
-  d_needs_saving = false;
+  d_changed = false;
   xml->get_widget("next_turn_button", d_next_turn_button);
   d_next_turn_button->signal_clicked().connect
     (method(on_next_turn_button_activated));
@@ -185,7 +185,7 @@ void MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
             {
               im->load (t, newname);
               im->instantiateImages ();
-              d_needs_saving = true;
+              d_changed = true;
               fill_in_buttons();
             }
           else
@@ -207,7 +207,7 @@ void MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
           if (t->removeFileInCfgFile(imgname))
             {
               ScenarioMedia::getInstance()->uninstantiateSameNamedImages (imgname);
-              d_needs_saving = true;
+              d_changed = true;
               fill_in_buttons();
             }
           else
@@ -246,7 +246,7 @@ void MediaDialog::on_masked_image_button_activated(TarFileMaskedImage *omim, Tar
         {
           mim->load (t, newname);
           mim->instantiateImages ();
-          d_needs_saving = true;
+          d_changed = true;
           fill_in_buttons();
         }
       else
@@ -268,7 +268,7 @@ void MediaDialog::on_masked_image_button_activated(TarFileMaskedImage *omim, Tar
           if (t->removeFileInCfgFile(imgname))
             {
               ScenarioMedia::getInstance()->uninstantiateSameNamedImages (imgname);
-              d_needs_saving = true;
+              d_changed = true;
               fill_in_buttons();
             }
           else
@@ -334,7 +334,7 @@ void MediaDialog::on_sound_button_activated(sigc::slot<Glib::ustring> getName, s
           if (success)
             {
               setName(newname);
-              d_needs_saving = true;
+              d_changed = true;
               fill_in_buttons();
             }
           else
@@ -356,7 +356,7 @@ void MediaDialog::on_sound_button_activated(sigc::slot<Glib::ustring> getName, s
           if (t->removeFileInCfgFile(sndname + ".ogg"))
             {
               setName ("");
-              d_needs_saving = true;
+              d_changed = true;
               fill_in_buttons();
             }
           else

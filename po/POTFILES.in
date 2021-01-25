@@ -150,6 +150,8 @@ src/templelist.cpp
 src/network-connection.cpp
 src/road.cpp
 src/tilestyle.cpp
+src/setlist.cpp
+src/setlist.h
 src/armysetlist.cpp
 src/setlist.h
 src/bridgelist.cpp
@@ -283,8 +285,10 @@ src/editor/armyset-info-dialog.cpp
 src/editor/cityset-info-dialog.cpp
 src/editor/armyset-window.cpp
 src/editor/armyset-editor-actions.cpp
+src/editor/armyset-editor-actions.h
 src/editor/cityset-window.cpp
 src/editor/cityset-editor-actions.cpp
+src/editor/cityset-editor-actions.h
 src/editor/rewardlist-dialog.cpp
 src/editor/select-item-dialog.cpp
 src/editor/players-dialog.cpp
@@ -294,6 +298,9 @@ src/editor/smallmap-editor-dialog.cpp
 src/editor/city-editor-dialog.cpp
 src/editor/main-window.cpp
 src/editor/editor-actions.cpp
+src/editor/editor-actions.h
+src/editor/undo-action.cpp
+src/editor/undo-mgr.cpp
 src/editor/temple-editor-dialog.cpp
 src/editor/tileset-info-dialog.cpp
 src/editor/tile-preview-dialog.cpp
@@ -307,6 +314,7 @@ src/editor/map-info-dialog.cpp
 src/editor/reward-editor-dialog.cpp
 src/editor/tileset-window.cpp
 src/editor/tileset-editor-actions.cpp
+src/editor/tileset-editor-actions.h
 src/editor/tilestyle-organizer-dialog.cpp
 src/editor/stack-editor-dialog.cpp
 src/editor/hero-editor-dialog.cpp

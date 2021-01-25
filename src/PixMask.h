@@ -1,4 +1,4 @@
-// Copyright (C) 2009-2012, 2014, 2015, 2017, 2020 Ben Asselstine
+// Copyright (C) 2009-2012, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class PixMask
      void blit_centered(Cairo::RefPtr<Cairo::Surface> pixmap, Vector<int> pos);
       //blit a tile's worth of imagery from this pixmask to a pixmap.
      void blit(Vector<int> tile, int ts, Cairo::RefPtr<Cairo::Surface> pixmap, Vector<int> dest = Vector<int>(0,0));
-
+     void reset_scale () {unscaled_width = width; unscaled_height = height;}
      Vector<int> get_dim() const;
      Vector<int> get_unscaled_dim() const;
 

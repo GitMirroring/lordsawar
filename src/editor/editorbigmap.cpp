@@ -106,6 +106,14 @@ void EditorBigMap::mouse_button_event(MouseButtonEvent e)
       mouse_state = NONE;
       change_map_under_cursor();
     }
+  else if (e.button == MouseButtonEvent::LEFT_BUTTON &&
+           e.state == MouseButtonEvent::RELEASED &&
+           (pointer == TERRAIN || pointer == ERASE || pointer == STONE ||
+            pointer == ROAD))
+    {
+      undo_map.emit (new EditorAction_Blank ());
+      mouse_state = NONE;
+    }
   else if (e.button == MouseButtonEvent::RIGHT_BUTTON
            && e.state == MouseButtonEvent::PRESSED)
     bring_up_details();
@@ -134,7 +142,7 @@ void EditorBigMap::mouse_motion_event(MouseMotionEvent e)
     
     // drag with right mouse button
     if (e.pressed[MouseMotionEvent::RIGHT_BUTTON]
-	&& (mouse_state == NONE || mouse_state == DRAGGING))
+	&& (mouse_state == NONE || mouse_state == MAP_DRAGGING))
     {
 	Vector<int> delta = -(mouse_pos - prev_mouse_pos);
 
@@ -166,12 +174,17 @@ void EditorBigMap::mouse_motion_event(MouseMotionEvent e)
 
 	draw(redraw_buffer);
 	redraw = false;
-	mouse_state = DRAGGING;
+	mouse_state = MAP_DRAGGING;
     }
     else if (e.pressed[MouseMotionEvent::LEFT_BUTTON] &&
              (mouse_state == NONE || mouse_state == MOVE_DRAGGING) &&
              pointer == MOVE)
       mouse_state = MOVE_DRAGGING;
+    else if (e.pressed[MouseMotionEvent::LEFT_BUTTON] &&
+             (mouse_state == NONE || mouse_state == TERRAIN_DRAGGING) &&
+             (pointer == TERRAIN || pointer == ROAD || pointer == STONE ||
+              pointer == ERASE))
+      mouse_state = TERRAIN_DRAGGING;
 
     if (redraw && pointer != POINTER)
 	draw();
@@ -963,17 +976,45 @@ void EditorBigMap::after_draw()
 
         case CITY:
           pic = ImageCache::getInstance()->getCityPic(0, Playerlist::getInstance()->getActiveplayer(), GameMap::getInstance()->getCitysetId());
-          blit (pic, buffer, pos, GameMap::getCityset()->get_scale ());
+            {
+              PixMask *copy = pic->copy ();
+              guint32 ts = GameMap::getInstance ()->getUnscaledTileSize ();
+              PixMask::scale (copy,
+                              ts * GameMap::getCityset ()->getCityTileWidth (),
+                              ts * GameMap::getCityset ()->getCityTileWidth ());
+              copy->reset_scale ();
+              blit (copy, buffer, pos, GameMap::getCityset()->get_scale ());
+              delete copy;
+            }
           break;
 
         case RUIN:
           pic = ImageCache::getInstance()->getRuinPic(0, GameMap::getInstance()->getCitysetId());
-          blit (pic, buffer, pos, GameMap::getCityset()->get_scale ());
+            {
+              PixMask *copy = pic->copy ();
+              guint32 ts = GameMap::getInstance ()->getUnscaledTileSize ();
+              PixMask::scale (copy,
+                              ts * GameMap::getCityset ()->getRuinTileWidth (),
+                              ts * GameMap::getCityset ()->getRuinTileWidth ());
+              copy->reset_scale ();
+              blit (copy, buffer, pos, GameMap::getCityset()->get_scale ());
+              delete copy;
+            }
           break;
 
         case TEMPLE:
           pic = ImageCache::getInstance()->getTemplePic(0, GameMap::getInstance()->getCitysetId());
-          blit (pic, buffer, pos, GameMap::getCityset()->get_scale ());
+            {
+              PixMask *copy = pic->copy ();
+              guint32 ts = GameMap::getInstance ()->getUnscaledTileSize ();
+              PixMask::scale
+                (copy,
+                 ts * GameMap::getCityset ()->getTempleTileWidth (),
+                 ts * GameMap::getCityset ()->getTempleTileWidth ());
+              copy->reset_scale ();
+              blit (copy, buffer, pos, GameMap::getCityset()->get_scale ());
+              delete copy;
+            }
           break;
 
         case SIGNPOST:

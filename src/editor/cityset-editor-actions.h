@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "defs.h"
+#include "undo-action.h"
 
 class Cityset;
 
@@ -31,7 +32,7 @@ class Cityset;
  * editor.
  */
 
-class CitySetEditorAction
+class CitySetEditorAction: public UndoAction
 {
     public:
 
@@ -52,7 +53,7 @@ class CitySetEditorAction
         };
 
 	//! Default constructor.
-        CitySetEditorAction(Type type);
+        CitySetEditorAction(Type type, UndoAction::AggregateType aggregate = UndoAction::AGGREGATE_NONE);
 
 	//! Destructor.
         virtual ~CitySetEditorAction() {}

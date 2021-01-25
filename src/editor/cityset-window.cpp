@@ -46,11 +46,13 @@
 #include "TarFileImage.h"
 
 #define method(x) sigc::mem_fun(*this, &CitySetWindow::x)
-const int UNDO_LIMIT = 100;
 
 CitySetWindow::CitySetWindow(Glib::ustring load_filename)
 {
-  needs_saving = false;
+  cityset_modified = load_filename == "";
+  new_cityset_needs_saving = load_filename == "";
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_cityset = NULL;
     Glib::RefPtr<Gtk::Builder> xml =
       BuilderCache::editor_get("cityset-window.ui");
@@ -247,7 +249,8 @@ bool CitySetWindow::make_new_cityset ()
   connect_signals ();
 
   update_cityset_panel();
-  needs_saving = true;
+  cityset_modified = false;
+  new_cityset_needs_saving = true;
   clearUndoAndRedo ();
   update ();
   return true;
@@ -361,7 +364,8 @@ bool CitySetWindow::save_current_cityset_file_as ()
             }
           else
             {
-              needs_saving = false;
+              cityset_modified = false;
+              new_cityset_needs_saving = false;
               d_cityset->created (filename);
               Glib::ustring dir =
                 File::add_slash_if_necessary (File::get_dirname (filename));
@@ -398,7 +402,8 @@ bool CitySetWindow::save_current_cityset_file (Glib::ustring filename)
     {
       if (Citysetlist::getInstance()->reload(d_cityset->getId()))
         update_cityset_panel();
-      needs_saving = false;
+      new_cityset_needs_saving = false;
+      cityset_modified = false;
       update_window_title();
       cityset_saved.emit(d_cityset->getId());
     }
@@ -443,7 +448,7 @@ void CitySetWindow::on_edit_cityset_info_activated()
       d_cityset->setCopyright (d.getCopyright ());
       d_cityset->setLicense (d.getLicense ());
       d_cityset->setTileSize (d.getTileSize ());
-      needs_saving = true;
+      cityset_modified = true;
       update ();
     }
 }
@@ -495,7 +500,8 @@ bool CitySetWindow::load_cityset ()
       chooser.hide();
       if (ok)
         {
-          needs_saving = false;
+          cityset_modified = false;
+          new_cityset_needs_saving = false;
           update_window_title();
           ret = true;
         }
@@ -547,7 +553,7 @@ bool CitySetWindow::load_cityset(Glib::ustring filename)
 
 bool CitySetWindow::quit()
 {
-  if (needs_saving)
+  if (cityset_modified || new_cityset_needs_saving)
     {
       EditorQuitDialog d (*window);
       int response = d.run_and_hide();
@@ -610,7 +616,7 @@ void CitySetWindow::on_city_tile_width_changed()
     new CitySetEditorAction_CityWidth (d_cityset->getCityTileWidth ());
   addUndo (action);
   d_cityset->setCityTileWidth(city_tile_width_spinbutton->get_value());
-  needs_saving = true;
+  cityset_modified = true;
   update ();
 }
 
@@ -628,7 +634,7 @@ void CitySetWindow::on_ruin_tile_width_changed()
     new CitySetEditorAction_RuinWidth (d_cityset->getRuinTileWidth ());
   addUndo (action);
   d_cityset->setRuinTileWidth(ruin_tile_width_spinbutton->get_value());
-  needs_saving = true;
+  cityset_modified = true;
   update_window_title();
 }
 
@@ -646,7 +652,7 @@ void CitySetWindow::on_temple_tile_width_changed()
     new CitySetEditorAction_TempleWidth (d_cityset->getTempleTileWidth ());
   addUndo (action);
   d_cityset->setTempleTileWidth(temple_tile_width_spinbutton->get_value());
-  needs_saving = true;
+  cityset_modified = true;
   update_window_title();
 }
 
@@ -695,7 +701,7 @@ Glib::ustring CitySetWindow::change_image(Glib::ustring msg, TarFileImage *im,
         {
           addUndo (action);
           newfile = newname;
-          needs_saving = true;
+          cityset_modified = true;
           update ();
         }
       else
@@ -712,7 +718,7 @@ Glib::ustring CitySetWindow::change_image(Glib::ustring msg, TarFileImage *im,
       if (d_cityset->removeFileInCfgFile(imgname))
         {
           addUndo (action);
-          needs_saving = true;
+          cityset_modified = true;
           update ();
           cleared = true;
           newfile = "";
@@ -729,7 +735,7 @@ Glib::ustring CitySetWindow::change_image(Glib::ustring msg, TarFileImage *im,
 void CitySetWindow::update_window_title()
 {
   Glib::ustring title = "";
-  if (needs_saving)
+  if (cityset_modified || new_cityset_needs_saving)
     title += "*";
   title += d_cityset->getName();
   title += " - ";
@@ -760,7 +766,7 @@ void CitySetWindow::show_remove_file_error(Gtk::Dialog &d, Glib::ustring file)
 CitySetWindow::~CitySetWindow()
 {
   notebook->property_show_tabs () = false;
-  clearUndoAndRedo ();
+  delete umgr;
   delete window;
 }
 
@@ -773,7 +779,7 @@ void CitySetWindow::on_tutorial_video_activated()
 
 bool CitySetWindow::check_discard (Glib::ustring msg)
 {
-  if (needs_saving)
+  if (cityset_modified || new_cityset_needs_saving)
     {
       EditorSaveChangesDialog d (*window, msg);
       int response = d.run_and_hide();
@@ -942,50 +948,29 @@ guint32 CitySetWindow::getDefaultImageTileWidth ()
 
 void CitySetWindow::on_edit_undo_activated ()
 {
-  CitySetEditorAction *a = undos.front ();
-  undos.pop_front ();
-  CitySetEditorAction *redo = executeAction (a);
-  if (redo)
-    {
-      redos.push_front (redo);
-      if (redos.size () > UNDO_LIMIT)
-        delete redos.back ();
-    }
-  delete a;
-  if (undos.empty ())
-    needs_saving = false;
+  umgr->undo ();
+  if (umgr->undoEmpty () && !new_cityset_needs_saving)
+    cityset_modified = false;
   update ();
 }
       
 void CitySetWindow::on_edit_redo_activated ()
 {
-  needs_saving = true;
-  CitySetEditorAction *a = redos.front ();
-  redos.pop_front ();
-  CitySetEditorAction *undo = executeAction (a);
-  delete a;
-  undos.push_front (undo);
-  if (undos.size () > UNDO_LIMIT)
-    delete undos.back ();
+  cityset_modified = true;
+  umgr->redo ();
   update ();
 }
 
 void CitySetWindow::update_menuitems ()
 {
-  edit_redo_menuitem->set_sensitive (redos.empty () == false);
-  edit_undo_menuitem->set_sensitive (undos.empty () == false);
-  if (undos.empty () == false)
-    edit_undo_menuitem->set_label
-      (String::ucompose (_("Undo %1"), undos.front ()->getActionName ()));
-  if (redos.empty () == false)
-    edit_redo_menuitem->set_label
-      (String::ucompose (_("Redo %1"), redos.front ()->getActionName ()));
+  umgr->updateMenuItems (edit_undo_menuitem, edit_redo_menuitem);
 }
 
-CitySetEditorAction*
-CitySetWindow::executeAction (CitySetEditorAction *action)
+UndoAction*
+CitySetWindow::executeAction (UndoAction *action2)
 {
-  CitySetEditorAction *out = NULL;
+  CitySetEditorAction *action = dynamic_cast<CitySetEditorAction*>(action2);
+  UndoAction *out = NULL;
 
     switch (action->getType ())
       {
@@ -1093,19 +1078,12 @@ void CitySetWindow::update ()
 
 void CitySetWindow::clearUndoAndRedo ()
 {
-  for (auto a : redos)
-    delete a;
-  redos.clear ();
-  for (auto a : undos)
-    delete a;
-  undos.clear ();
+  umgr->clear ();
 }
 
 void CitySetWindow::addUndo (CitySetEditorAction *a)
 {
-  undos.push_front (a);
-  if (undos.size () > UNDO_LIMIT)
-    delete undos.back ();
+  umgr->add (a);
 }
 /*
  some test cases

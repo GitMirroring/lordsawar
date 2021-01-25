@@ -29,6 +29,7 @@
 #include "armyset.h"
 #include "shield.h"
 #include "armyset-editor-actions.h"
+#include "undo-mgr.h"
 
 //! Armyset Editor.  Edit an Armyset.
 class ArmySetWindow: public sigc::trackable
@@ -50,9 +51,9 @@ class ArmySetWindow: public sigc::trackable
     Armyset *d_armyset; //current armyset
     ArmyProto *d_army; //current army
     ArmySetEditorAction_Reorder *d_reorder_action;
-    bool needs_saving;
-    std::list<ArmySetEditorAction *> undos;
-    std::list<ArmySetEditorAction *> redos;
+    bool armyset_modified;
+    bool new_armyset_needs_saving;
+    UndoMgr *umgr;
     Gtk::Image *white_image;
     Gtk::Image *green_image;
     Gtk::Image *yellow_image;
@@ -128,7 +129,7 @@ class ArmySetWindow: public sigc::trackable
     Gtk::MenuItem *help_about_menuitem;
     Gtk::MenuItem *tutorial_menuitem;
     Gtk::Button *make_same_button;
-    Gtk::Notebook *notebook;
+    //Gtk::Notebook *notebook;
 
     class ArmiesColumns: public Gtk::TreeModelColumnRecord {
     public:
@@ -221,7 +222,7 @@ class ArmySetWindow: public sigc::trackable
     void on_army_moved ();
     void update_menuitems ();
     void update ();
-    ArmySetEditorAction* executeAction (ArmySetEditorAction *action);
+    UndoAction* executeAction (UndoAction *action);
     ArmyProto* getArmyByIndex (ArmySetEditorAction_ArmyIndex *a);
     void doReloadArmyset (ArmySetEditorAction_Save *action);
     void clearUndoAndRedo ();

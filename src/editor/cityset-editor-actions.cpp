@@ -25,8 +25,8 @@
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<< x << std::endl<<std::flush;}
 #define debug(x)
 
-CitySetEditorAction::CitySetEditorAction(Type type)
-    :d_type(type)
+CitySetEditorAction::CitySetEditorAction(Type type, UndoAction::AggregateType aggregate)
+ : UndoAction (aggregate), d_type(type)
 {
 }
 
@@ -77,7 +77,8 @@ CitySetEditorAction_ClearImage::CitySetEditorAction_ClearImage(Cityset *c)
 //CitySetEditorAction_CityWidth
 
 CitySetEditorAction_CityWidth::CitySetEditorAction_CityWidth(guint32 w)
- :CitySetEditorAction (CitySetEditorAction::CITY_TILE_WIDTH), d_city_width (w)
+ :CitySetEditorAction (CitySetEditorAction::CITY_TILE_WIDTH,
+                       UndoAction::AGGREGATE_DELAY), d_city_width (w)
 {
 }
 
@@ -85,7 +86,8 @@ CitySetEditorAction_CityWidth::CitySetEditorAction_CityWidth(guint32 w)
 //CitySetEditorAction_RuinWidth
 
 CitySetEditorAction_RuinWidth::CitySetEditorAction_RuinWidth(guint32 w)
- :CitySetEditorAction (CitySetEditorAction::RUIN_TILE_WIDTH), d_ruin_width (w)
+ :CitySetEditorAction (CitySetEditorAction::RUIN_TILE_WIDTH,
+                       UndoAction::AGGREGATE_DELAY), d_ruin_width (w)
 {
 }
 
@@ -93,7 +95,7 @@ CitySetEditorAction_RuinWidth::CitySetEditorAction_RuinWidth(guint32 w)
 //CitySetEditorAction_TempleWidth
 
 CitySetEditorAction_TempleWidth::CitySetEditorAction_TempleWidth(guint32 w)
- :CitySetEditorAction (CitySetEditorAction::TEMPLE_TILE_WIDTH),
-    d_temple_width (w)
+ :CitySetEditorAction (CitySetEditorAction::TEMPLE_TILE_WIDTH,
+                       UndoAction::AGGREGATE_DELAY), d_temple_width (w)
 {
 }

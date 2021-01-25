@@ -26,7 +26,8 @@ libeditutil_la_SOURCES = \
 	editor-save-changes-dialog.cpp editor-save-changes-dialog.h \
 	lw-editor-dialog.cpp lw-editor-dialog.h \
 	past-chooser.cpp past-chooser.h \
-	image-file-filter.cpp image-file-filter.h
+	image-file-filter.cpp image-file-filter.h \
+	undo-action.cpp undo-action.h undo-mgr.cpp undo-mgr.h
 
 libshieldsetwindow_la_SOURCES = \
 	shieldset-window.cpp shieldset-window.h \

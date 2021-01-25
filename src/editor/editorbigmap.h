@@ -96,7 +96,10 @@ class EditorBigMap: public BigMap
     Vector<int> moving_objects_from;
 
     enum {
-	NONE, DRAGGING, MOVE_DRAGGING
+	NONE,
+        MAP_DRAGGING,     /* right-click, moving map view */
+        MOVE_DRAGGING,    /* left-click moving an object like a city */
+        TERRAIN_DRAGGING, /* left-click placing down grass, etc. */
     } mouse_state;
 
     MapBackpack *moving_bag;

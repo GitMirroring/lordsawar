@@ -116,13 +116,16 @@ double MainWindow::maximum_zoom_scale = 3.0;
 
 MainWindow::MainWindow(Glib::ustring load_filename)
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme() = false;
   d_load_filename = load_filename;
   bigmap = NULL;
   smallmap = NULL;
   game_scenario = NULL;
   d_create_scenario_names = NULL;
-  needs_saving = false;
+  new_scenario_needs_saving = load_filename == "";
+  scenario_modified = load_filename == "";
   road_editor_tip = NULL;
   unmaximized_box = Gtk::Allocation(0,0,1,1);
   Glib::RefPtr<Gtk::Builder> xml = 
@@ -366,7 +369,7 @@ MainWindow::~MainWindow()
   delete window;
   SmallMap::s_quick = false;
   BigMap::s_show_hidden_ruins = false;
-  clearUndoAndRedo ();
+  delete umgr;
 }
 
 void MainWindow::setup_pointer_radiobutton(Glib::RefPtr<Gtk::Builder> xml,
@@ -910,7 +913,8 @@ void MainWindow::on_new_map_activated()
         }
       Playerlist::getInstance()->setActiveplayer(Playerlist::getInstance()->getNeutral());
       fill_players ();
-      needs_saving = true;
+      scenario_modified = false;
+      new_scenario_needs_saving = true;
       clearUndoAndRedo ();
       update_window_title();
     }
@@ -959,10 +963,11 @@ void MainWindow::on_load_map_activated()
             return;
           }
 
+        new_scenario_needs_saving = false;
         clearUndoAndRedo ();
 	init_map_state();
 	bigmap->screen_size_changed(bigmap_image->get_allocation()); 
-        needs_saving = false;
+        scenario_modified = false;
         update_window_title();
         fill_players();
     }
@@ -983,8 +988,9 @@ bool MainWindow::activate_save_map ()
         }
       else
         {
+          new_scenario_needs_saving = false;
           game_scenario->moved (current_save_filename);
-          needs_saving = false;
+          scenario_modified = false;
           update_window_title ();
         }
       return success;
@@ -1025,8 +1031,9 @@ bool MainWindow::activate_save_map_as ()
         }
       else
         {
+          new_scenario_needs_saving = false;
           game_scenario->moved (current_save_filename);
-          needs_saving = false;
+          scenario_modified = false;
           update_window_title ();
         }
     }
@@ -1035,7 +1042,7 @@ bool MainWindow::activate_save_map_as ()
 
 bool MainWindow::quit()
 {
-  if (needs_saving)
+  if (scenario_modified || new_scenario_needs_saving)
     {
       EditorQuitDialog d (*window);
       int response = d.run_and_hide ();
@@ -1081,7 +1088,7 @@ void MainWindow::on_edit_players_activated()
         else
           Playerlist::getInstance()->setActiveplayer
             (Playerlist::getInstance ()->getNeutral ());
-	needs_saving = true;
+	scenario_modified = true;
         update_window_title();
 	fill_players();
       }
@@ -1104,7 +1111,7 @@ void MainWindow::on_edit_map_info_activated()
         game_scenario->setComment (d.getDescription ());
         game_scenario->setCopyright (d.getCopyright ());
         game_scenario->setLicense (d.getLicense ());
-        needs_saving = true;
+        scenario_modified = true;
         update_window_title();
       }
     else
@@ -1141,7 +1148,7 @@ void MainWindow::on_shieldset_saved(guint32 id)
     {
       active_shieldset_saved_in_editor = true;
       doReloadShieldset ();
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title();
     }
 }
@@ -1174,7 +1181,7 @@ void MainWindow::on_armyset_saved(guint32 id)
     {
       active_armyset_saved_in_editor = true;
       doReloadArmyset (id);
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title();
     }
 }
@@ -1208,7 +1215,7 @@ void MainWindow::on_cityset_saved(guint32 id)
     {
       active_cityset_saved_in_editor = true;
       doReloadCityset ();
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title();
     }
 }
@@ -1226,7 +1233,7 @@ void MainWindow::on_edit_smallmap_activated()
   if (changed)
     {
       addUndo (action);
-      needs_saving = true;
+      scenario_modified = true;
     }
   else
     delete action;
@@ -1262,7 +1269,7 @@ void MainWindow::on_tileset_saved(guint32 id)
     {
       active_tileset_saved_in_editor = true;
       doReloadTileset (id);
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title();
     }
 }
@@ -1549,7 +1556,7 @@ void MainWindow::on_bigmap_tiles_changed (LwRectangle r)
 {
   if (r.w > 0 && r.h > 0)
     {
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title ();
     }
 }
@@ -1662,7 +1669,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
 	if (response == Gtk::RESPONSE_ACCEPT)
           {
             addUndo (action);
-            needs_saving = true;
+            scenario_modified = true;
             update_window_title();
           }
         else
@@ -1680,7 +1687,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
         if (changed)
           {
             addUndo (action);
-            needs_saving = true;
+            scenario_modified = true;
             update_window_title();
           }
         else
@@ -1697,7 +1704,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
 	if (d.run())
           {
             addUndo (action);
-            needs_saving = true;
+            scenario_modified = true;
             update_window_title();
           }
         else if (d.get_changed ())
@@ -1714,7 +1721,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
 	if (d.run())
           {
             addUndo (action);
-            needs_saving = true;
+            scenario_modified = true;
             update_window_title();
           }
         else
@@ -1729,7 +1736,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
 	if (changed)
           {
             addUndo (action);
-            needs_saving = true;
+            scenario_modified = true;
             update_window_title();
           }
         else
@@ -1757,7 +1764,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
       if (d.run ())
         {
           addUndo (action);
-          needs_saving = true;
+          scenario_modified = true;
           update_window_title();
         }
       else
@@ -1783,7 +1790,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
               {
                 addUndo (action);
                 redraw ();
-                needs_saving = true;
+                scenario_modified = true;
                 update_window_title();
               }
             else
@@ -1806,7 +1813,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
                 if (action)
                   addUndo (action);
                 redraw ();
-                needs_saving = true;
+                scenario_modified = true;
                 update_window_title();
               }
             else
@@ -1820,21 +1827,23 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
 
 void MainWindow::on_smooth_map_activated()
 {
-  EditorAction_Smooth *action = new EditorAction_Smooth (game_scenario);
+  EditorAction_Smooth *action =
+    new EditorAction_Smooth (LwRectangle (0, 0, GameMap::getWidth (),
+                                          GameMap::getHeight ()));
   addUndo (action);
   GameMap::getInstance()->applyTileStyles(0, 0, GameMap::getHeight(), 
 					  GameMap::getWidth(), true);
   redraw();
-  needs_saving = true;
+  scenario_modified = true;
   update_window_title ();
 }
 
 void MainWindow::on_smooth_screen_activated()
 {
-  EditorAction_Smooth *action = new EditorAction_Smooth (game_scenario);
+  EditorAction_Smooth *action = new EditorAction_Smooth (bigmap->get_view ());
   addUndo (action);
   bigmap->smooth_view();
-  needs_saving = true;
+  scenario_modified = true;
   update_window_title ();
 }
 
@@ -1846,7 +1855,7 @@ void MainWindow::on_edit_items_activated()
   if (d.item_was_changed ())
     {
       addUndo (action);
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title();
     }
   else
@@ -1860,7 +1869,7 @@ void MainWindow::on_edit_rewards_activated()
   if (d.run())
     {
       addUndo (action);
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title();
     }
   else
@@ -1873,7 +1882,7 @@ void MainWindow::randomize_city(City *c)
   if (name != "")
     c->setName(name);
   c->setRandomArmytypes(true, 1);
-  needs_saving = true;
+  scenario_modified = true;
   update_window_title();
 }
 
@@ -1920,7 +1929,7 @@ void MainWindow::randomize_ruin(Ruin *r)
       Location *l = r;
       RenamableLocation *renamable_ruin = static_cast<RenamableLocation*>(l);
       renamable_ruin->setName(name);
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title();
     }
 }
@@ -1976,7 +1985,7 @@ void MainWindow::on_random_all_temples_activated()
 	  RenamableLocation *renamable_temple = 
 	    static_cast<RenamableLocation*>(l);
 	  renamable_temple->setName(name);
-          needs_saving = true;
+          scenario_modified = true;
           update_window_title();
 	}
     }
@@ -2004,7 +2013,7 @@ void MainWindow::on_random_unnamed_temples_activated()
 	      RenamableLocation *renamable_temple = 
 		static_cast<RenamableLocation*>(l);
 	      renamable_temple->setName(name);
-              needs_saving = true;
+              scenario_modified = true;
               update_window_title();
 	    }
 	}
@@ -2027,7 +2036,7 @@ void MainWindow::randomize_signpost(Signpost *signpost)
   if (name != "")
     {
       signpost->setName(name);
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title();
     }
 }
@@ -2169,7 +2178,7 @@ void MainWindow::on_import_map_activated()
       init_map_state();
       bigmap->screen_size_changed(bigmap_image->get_allocation()); 
       fill_players();
-      needs_saving = false;
+      scenario_modified = false;
       update_window_title();
     }
 }
@@ -2190,7 +2199,7 @@ void MainWindow::on_switch_sets_activated()
   if (response == Gtk::RESPONSE_ACCEPT && d.get_set_changed ())
     {
       addUndo (action);
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title();
       ImageCache::getInstance()->reset();
       bigmap->screen_size_changed(bigmap_image->get_allocation()); 
@@ -2265,7 +2274,7 @@ void MainWindow::fill_players()
 void MainWindow::update_window_title()
 {
   Glib::ustring title = "";
-  if (needs_saving)
+  if (scenario_modified || new_scenario_needs_saving)
     title += "*";
   title += game_scenario->getName();
   title += " - ";
@@ -2299,7 +2308,7 @@ void MainWindow::on_bag_selected(Vector<int> tile)
     {
       addUndo (action);
       redraw ();
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title();
     }
   else
@@ -2326,7 +2335,7 @@ void MainWindow::on_flag_selected(Vector<int> tile)
       if (action)
         addUndo (action);
       redraw ();
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title();
     }
   else
@@ -2363,7 +2372,7 @@ void MainWindow::on_remove_all_stacks_activated()
       for (auto p: *Playerlist::getInstance())
         p->clearStacklist();
       redraw();
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title ();
     }
 }
@@ -2376,7 +2385,7 @@ void MainWindow::on_edit_fight_order_activated()
   if (d.get_modified())
     {
       addUndo (action);
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title ();
     }
   else
@@ -2392,7 +2401,7 @@ bool MainWindow::on_bigmap_scrolled(GdkEventScroll* event)
 
 void MainWindow::on_road_edited(Vector<int> pos, int type)
 {
-  needs_saving = true;
+  scenario_modified = true;
   update_window_title();
   close_road_editor_tip ();
   Road *road = new Road (pos, Road::Type(type));
@@ -2483,10 +2492,10 @@ void MainWindow::on_edit_scenario_media_activated()
     new EditorAction_ScenarioMedia (game_scenario);
   MediaDialog d (*window, game_scenario);
   d.run();
-  if (d.get_needs_saving())
+  if (d.get_changed ())
     {
       addUndo (action);
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title ();
     }
   else
@@ -2558,7 +2567,7 @@ bool MainWindow::assign_capital_cities ()
                   (c, Playerlist::getInstance()->getNeutral());
             }
         }
-      needs_saving = true;
+      scenario_modified = true;
       update_window_title ();
     }
 
@@ -2590,7 +2599,7 @@ bool MainWindow::assign_capital_cities ()
           change_city_ownership(capital, p);
           capital->setCapital(true);
           capital->setCapitalOwner(p);
-          needs_saving = true;
+          scenario_modified = true;
           update_window_title ();
         }
     }
@@ -2716,14 +2725,7 @@ void MainWindow::update_menuitems ()
   random_assign_capital_cities_menuitem->set_sensitive
     (Citylist::getInstance ()->empty () == false && needs_capitals);
 
-  edit_redo_menuitem->set_sensitive (redos.empty () == false);
-  edit_undo_menuitem->set_sensitive (undos.empty () == false);
-  if (undos.empty () == false)
-    edit_undo_menuitem->set_label
-      (String::ucompose (_("Undo %1"), undos.front ()->getActionName ()));
-  if (redos.empty () == false)
-    edit_redo_menuitem->set_label
-      (String::ucompose (_("Redo %1"), redos.front ()->getActionName ()));
+  umgr->updateMenuItems (edit_undo_menuitem, edit_redo_menuitem);
 }
 
 void MainWindow::set_default_bigmap_zoom ()
@@ -2748,57 +2750,40 @@ void MainWindow::on_tutorial_activated()
 
 void MainWindow::on_edit_undo_activated ()
 {
-  EditorAction *a = undos.front ();
-  undos.pop_front ();
-  EditorAction *redo = executeAction (a);
-  if (redo)
-    {
-      redos.push_front (redo);
-      if (redos.size () > UNDO_LIMIT)
-        delete redos.back ();
-    }
-  delete a;
-  if (undos.empty ())
-    needs_saving = false;
+  umgr->undo ();
+  if (umgr->undoEmpty () && !new_scenario_needs_saving)
+    scenario_modified = false;
   update_window_title ();
   update_menuitems ();
+  smallmap->resize();
+  redraw ();
 }
 
 void MainWindow::on_edit_redo_activated ()
 {
-  needs_saving = true;
-  EditorAction *a = redos.front ();
-  redos.pop_front ();
-  EditorAction *undo = executeAction (a);
-  delete a;
-  undos.push_front (undo);
-  if (undos.size () > UNDO_LIMIT)
-    delete undos.back ();
+  scenario_modified = true;
+  umgr->redo ();
   update_window_title ();
   update_menuitems ();
+  smallmap->resize();
+  redraw ();
 }
 
 void MainWindow::addUndo(EditorAction *a)
 {
-  undos.push_front (a);
-  if (undos.size () > UNDO_LIMIT)
-    delete undos.back ();
+  umgr->add (a);
   update_menuitems ();
 }
 
 void MainWindow::clearUndoAndRedo ()
 {
-  for (auto a : redos)
-    delete a;
-  redos.clear ();
-  for (auto a : undos)
-    delete a;
-  undos.clear ();
+  umgr->clear ();
 }
 
-EditorAction* MainWindow::executeAction (EditorAction *action)
+UndoAction* MainWindow::executeAction (UndoAction *action2)
 {
-  EditorAction *out = NULL;
+  EditorAction *action = dynamic_cast<EditorAction*>(action2);
+  UndoAction *out = NULL;
 
     switch (action->getType ())
       {
@@ -3041,8 +3026,8 @@ EditorAction* MainWindow::executeAction (EditorAction *action)
           {
             EditorAction_Smooth *a =
               dynamic_cast<EditorAction_Smooth*>(action);
-            out = new EditorAction_Smooth (game_scenario);
-            doReloadScenario (a);
+            out = new EditorAction_Smooth (a->getArea ());
+            doChangeMap (a);
             break;
           }
       case EditorAction::SWITCH_SETS:
@@ -3195,6 +3180,9 @@ EditorAction* MainWindow::executeAction (EditorAction *action)
             doChangeMap (a);
             break;
           }
+      case EditorAction::BLANK:
+        out = new EditorAction_Blank ();
+        break;
       }
     return out;
 }
@@ -3228,8 +3216,6 @@ void MainWindow::doReloadScenario (EditorAction_Save *action)
   game_scenario->setBaseName (oldname);
   game_scenario->setExtension (oldext);
   GameMap::getInstance ()->applyTileStyles (0, 0, d_height, d_width, false);
-  smallmap->resize();
-  redraw ();
 }
 
 void MainWindow::doChangeMap (EditorAction_ChangeMap *action)
@@ -3242,6 +3228,9 @@ void MainWindow::doChangeMap (EditorAction_ChangeMap *action)
       Maptile *maptile = GameMap::getInstance ()->getTile (m->getPos ());
       maptile->copy (m, true);
     }
+
+  if (action->getOnlyMaptiles ())
+    return;
 
   // then the objects
   for (auto object : action->getObjects ())
@@ -3375,8 +3364,6 @@ void MainWindow::doChangeMap (EditorAction_ChangeMap *action)
             }
         }
     }
-  smallmap->resize();
-  redraw ();
 }
 
 void MainWindow::on_got_undo_action (EditorAction *action)

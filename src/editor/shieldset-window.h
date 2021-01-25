@@ -28,6 +28,7 @@
 #include "shieldset.h"
 #include "shieldstyle.h"
 #include "shieldset-editor-actions.h"
+#include "undo-mgr.h"
 
 class Shield;
 //! Shieldset Editor.  Edit an Shieldset.
@@ -45,13 +46,13 @@ class ShieldSetWindow: public sigc::trackable
     sigc::signal<void, guint32> shieldset_saved;
 
  private:
-    bool needs_saving;
+    bool shieldset_modified;
+    bool new_shieldset_needs_saving;
     Gtk::Window* window;
     Glib::ustring current_save_filename;
     Shieldset *d_shieldset; //current shieldset
     Shield *d_shield; //current shield
-    std::list<ShieldSetEditorAction *> undos;
-    std::list<ShieldSetEditorAction *> redos;
+    UndoMgr *umgr;
     Gtk::TreeView *shields_treeview;
     Gtk::Image *small_image;
     Gtk::Image *medium_image;
@@ -145,7 +146,7 @@ class ShieldSetWindow: public sigc::trackable
     void clearUndoAndRedo ();
     bool doReloadShieldset (ShieldSetEditorAction_Save *action);
 
-    ShieldSetEditorAction *executeAction (ShieldSetEditorAction *a);
+    UndoAction *executeAction (UndoAction *a);
     void executeColor (ShieldSetEditorAction_Color *a);
     int getCurIndex ();
     void disconnect_signals ();

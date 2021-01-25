@@ -29,6 +29,7 @@
 #include "map-tip-position.h"
 #include "editorbigmap.h"
 #include "editor-actions.h"
+#include "undo-mgr.h"
 
 class EditorBigMap;
 class SmallMap;
@@ -117,7 +118,8 @@ class MainWindow: public sigc::trackable
     Gtk::FlowBox *terrain_tile_style_grid;
     Gtk::Image *smallmap_image;
     Glib::ustring current_save_filename;
-    bool needs_saving;
+    bool scenario_modified;
+    bool new_scenario_needs_saving;
     Gtk::FlowBox *terrain_type_table;
     Gtk::Label *mouse_position_label;
     Gtk::RadioToolButton *pointer_radiobutton;
@@ -300,11 +302,10 @@ class MainWindow: public sigc::trackable
     std::list<Army*> battle_calculator_attackers;
     std::list<Army*> battle_calculator_defenders;
     Gtk::Allocation unmaximized_box;
-    std::list<EditorAction *> undos;
-    std::list<EditorAction *> redos;
+    UndoMgr *umgr;
     void addUndo(EditorAction *a);
     void clearUndoAndRedo ();
-    EditorAction* executeAction (EditorAction *action);
+    UndoAction* executeAction (UndoAction *action);
     void doReloadScenario (EditorAction_Save *action);
     void doChangeMap (EditorAction_ChangeMap *action);
     void on_got_undo_action (EditorAction *action);

@@ -29,6 +29,7 @@
 #include "tileset.h"
 #include "PixMask.h"
 #include "tileset-editor-actions.h"
+#include "undo-mgr.h"
 
 //! Tileset Editor.  Edit an Tileset.
 class TileSetWindow: public sigc::trackable
@@ -51,10 +52,9 @@ class TileSetWindow: public sigc::trackable
     Glib::ustring current_save_filename;
     Tileset *d_tileset; //current tileset
     Tile *d_tile; //current tile
-    bool needs_saving;
-    std::list<TileSetEditorAction *> undos;
-    std::list<TileSetEditorAction *> redos;
-    Gtk::Entry *name_entry;
+    bool tileset_modified;
+    bool new_tileset_needs_saving;
+    UndoMgr *umgr;
     Gtk::TreeView *tiles_treeview;
     Gtk::Button *add_tile_button;
     Gtk::Button *remove_tile_button;
@@ -226,7 +226,7 @@ class TileSetWindow: public sigc::trackable
     void update_menuitems ();
     void update ();
     Tile* getTileByIndex (TileSetEditorAction_TileIndex *i);
-    TileSetEditorAction* executeAction (TileSetEditorAction *action);
+    UndoAction* executeAction (UndoAction *action);
     int getCurIndex ();
     bool doReloadTileset (TileSetEditorAction_Save *action);
     void disconnect_signals ();
