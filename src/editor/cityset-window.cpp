@@ -334,7 +334,8 @@ bool CitySetWindow::save_current_cityset_file_as ()
       Gtk::FileChooserDialog chooser(*window, _("Choose a Name"),
                                      Gtk::FILE_CHOOSER_ACTION_SAVE);
       Glib::RefPtr<Gtk::FileFilter> lwc_filter = Gtk::FileFilter::create();
-      lwc_filter->set_name(_("LordsAWar City Sets (*.lwc)"));
+      lwc_filter->set_name(String::ucompose (_("LordsAWar City Sets (*%1)"),
+                                             SHIELDSET_EXT));
       lwc_filter->add_pattern("*" + CITYSET_EXT);
       chooser.add_filter(lwc_filter);
       chooser.set_current_folder(File::getSetDir(CITYSET_EXT, false));
@@ -482,9 +483,15 @@ bool CitySetWindow::load_cityset ()
   Gtk::FileChooserDialog chooser(*window,
 				 _("Choose a City Set to Open"));
   Glib::RefPtr<Gtk::FileFilter> lwc_filter = Gtk::FileFilter::create();
-  lwc_filter->set_name(_("LordsAWar City Sets (*.lwc)"));
+  lwc_filter->set_name(String::ucompose (_("LordsAWar City Sets (*%1)"),
+                                         CITYSET_EXT));
   lwc_filter->add_pattern("*" + CITYSET_EXT);
   chooser.add_filter(lwc_filter);
+  Glib::RefPtr<Gtk::FileFilter> all_filter = Gtk::FileFilter::create();
+  all_filter->set_name(_("All Files"));
+  all_filter->add_pattern("*.*");
+  chooser.add_filter(all_filter);
+  chooser.set_filter (lwc_filter);
   chooser.set_current_folder(File::getSetDir(Cityset::file_extension, false));
 
   chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);

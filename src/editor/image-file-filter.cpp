@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,10 +30,15 @@ ImageFileFilter* ImageFileFilter::s_instance = 0;
 void ImageFileFilter::add (Gtk::FileChooserDialog *d)
 {
   Glib::RefPtr<Gtk::FileFilter> filter = Gtk::FileFilter::create();
-  filter->set_name(_("Image files (*.png, *.svg)"));
+  filter->set_name(_("Image Files (*.png, *.svg)"));
   filter->add_pattern("*.png");
   filter->add_pattern("*.svg");
   d->add_filter(filter);
+  Glib::RefPtr<Gtk::FileFilter> all_filter = Gtk::FileFilter::create();
+  all_filter->set_name(_("All Files"));
+  all_filter->add_pattern("*.*");
+  d->add_filter(all_filter);
+  d->set_filter (filter);
 }
 
 ImageFileFilter * ImageFileFilter::getInstance()

@@ -72,11 +72,16 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
         //! The game is over and this is the winner.
         Player *getWinningPlayer() const;
 
+        //! take a copy of the active and viewing player ids.
+        std::pair<int, int> stash () const;
 
 	// Methods that operate on the class data and modify the class.
 
         //! Sets the active player to the next player in the order.
         void nextPlayer();
+
+        //! set the active and viewing player according to the pair.
+        void unstash (std::pair<int, int> p);
 
         /** 
 	 * Checks if a player is alive and has no cities left. If not then 

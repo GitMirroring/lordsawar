@@ -1041,3 +1041,24 @@ void Playerlist::reset (Playerlist *p)
   delete s_instance;
   s_instance = p;
 }
+
+std::pair<int, int> Playerlist::stash () const
+{
+  int old_viewingplayer = -1;
+  if (getViewingplayer ())
+    old_viewingplayer = getViewingplayer ()->getId ();
+  int old_activeplayer = -1;
+  if (getActiveplayer ())
+    old_activeplayer = getActiveplayer ()->getId ();
+  return std::pair<int,int>(old_activeplayer, old_viewingplayer);
+}
+
+void Playerlist::unstash (std::pair<int, int> p)
+{
+  int old_activeplayer = p.first;
+  int old_viewingplayer = p.second;
+  if (old_viewingplayer >= -1)
+    setViewingplayer (getPlayer ((guint32) old_viewingplayer));
+  if (old_activeplayer >= -1)
+    setActiveplayer (getPlayer ((guint32) old_activeplayer));
+}

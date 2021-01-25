@@ -444,9 +444,15 @@ bool TileSetWindow::load_tileset ()
   Gtk::FileChooserDialog chooser(*window,
 				 _("Choose a Tile Set to Open"));
   Glib::RefPtr<Gtk::FileFilter> lwt_filter = Gtk::FileFilter::create();
-  lwt_filter->set_name(_("LordsAWar Tile Sets (*.lwt)"));
+  lwt_filter->set_name(String::ucompose (_("LordsAWar Tile Sets (*%1)"),
+                                         TILESET_EXT));
   lwt_filter->add_pattern("*" + TILESET_EXT);
   chooser.add_filter(lwt_filter);
+  Glib::RefPtr<Gtk::FileFilter> all_filter = Gtk::FileFilter::create();
+  all_filter->set_name(_("All Files"));
+  all_filter->add_pattern("*.*");
+  chooser.add_filter(all_filter);
+  chooser.set_filter (lwt_filter);
   chooser.set_current_folder(File::getSetDir(Tileset::file_extension, false));
 
   chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -493,7 +499,8 @@ bool TileSetWindow::save_current_tileset_file_as ()
       Gtk::FileChooserDialog chooser(*window, _("Choose a Name"),
                                      Gtk::FILE_CHOOSER_ACTION_SAVE);
       Glib::RefPtr<Gtk::FileFilter> lwt_filter = Gtk::FileFilter::create();
-      lwt_filter->set_name(_("LordsAWar Tile Sets (*.lwt)"));
+      lwt_filter->set_name(String::ucompose (_("LordsAWar Tile Sets (*%1)"),
+                                             TILESET_EXT));
       lwt_filter->add_pattern("*" + TILESET_EXT);
       chooser.add_filter(lwt_filter);
       chooser.set_current_folder(File::getSetDir(TILESET_EXT, false));

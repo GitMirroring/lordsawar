@@ -139,11 +139,16 @@ class MainWindow: public sigc::trackable
     bool on_smallmap_mouse_motion_event(GdkEventMotion *e);
     
     void on_new_map_activated();
+    bool make_new_map ();
     void on_load_map_activated();
-    bool activate_save_map ();
+    bool load_map ();
+    void on_save_map_activated ();
+    bool save_map ();
     void on_import_map_activated();
+    bool import_map ();
     void on_validate_activated();
-    bool activate_save_map_as ();
+    void on_save_map_as_activated ();
+    bool save_map_as ();
 
 
     void on_quit_activated();
@@ -322,6 +327,8 @@ class MainWindow: public sigc::trackable
     void doReloadArmyset (guint32 id);
     void doReloadCityset ();
     void doReloadShieldset ();
+    bool check_discard (Glib::ustring msg);
+    bool check_save_valid ();
 };
 
 #endif

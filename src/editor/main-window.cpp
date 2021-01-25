@@ -105,6 +105,7 @@
 #include "scenario-list.h"
 #include "CreateScenario.h"
 #include "Scenario.h"
+#include "editor-save-changes-dialog.h"
 
 const int UNDO_LIMIT = 100;
 #define method(x) sigc::mem_fun(*this, &MainWindow::x)
@@ -228,10 +229,10 @@ MainWindow::MainWindow(Glib::ustring load_filename)
     load_map_menuitem->signal_activate().connect (method(on_load_map_activated));
     xml->get_widget("save_map_menuitem", save_map_menuitem);
     save_map_menuitem->signal_activate().connect
-      (sigc::hide_return(method(activate_save_map)));
+      (method(on_save_map_activated));
     xml->get_widget("save_map_as_menuitem", save_map_as_menuitem);
     save_map_as_menuitem->signal_activate().connect
-      (sigc::hide_return(method(activate_save_map_as)));
+      (method(on_save_map_as_activated));
     xml->get_widget("import_map_from_sav_menuitem", import_map_from_sav_menuitem);
     import_map_from_sav_menuitem->signal_activate().connect
       (method(on_import_map_activated));
@@ -775,11 +776,6 @@ void MainWindow::clear_map_state()
       delete smallmap;
       smallmap = NULL;
     }
-  if (game_scenario)
-    {
-      delete game_scenario;
-      game_scenario = NULL;
-    }
   if (d_create_scenario_names)
     {
       delete d_create_scenario_names;
@@ -876,15 +872,17 @@ bool MainWindow::on_smallmap_mouse_motion_event(GdkEventMotion *e)
     return true;
 }
 
-void MainWindow::on_new_map_activated()
+bool MainWindow::make_new_map ()
 {
-  current_save_filename = "";
-
+  Glib::ustring msg = _("Save these changes before making a new Scenario?");
+  if (check_discard (msg) == false)
+    return false;
   NewMapDialog d(*window);
   d.run();
 
   if (d.map_set)
     {
+      current_save_filename = "";
       if (d.map.fill_style == -1)
         set_random_map (d.map.width, d.map.height,
                         d.map.grass, d.map.water, d.map.swamp, d.map.forest,
@@ -918,71 +916,109 @@ void MainWindow::on_new_map_activated()
       clearUndoAndRedo ();
       update_window_title();
     }
+  return d.map_set;
+}
+
+void MainWindow::on_new_map_activated()
+{
+  make_new_map ();
+}
+
+bool MainWindow::load_map ()
+{
+  bool ret = false;
+  Glib::ustring msg = _("Save these changes before opening a new Scenario?");
+  if (check_discard (msg) == false)
+    return ret;
+  Gtk::FileChooserDialog chooser(*window, _("Choose Scenario to Load"));
+  Glib::RefPtr<Gtk::FileFilter> map_filter = Gtk::FileFilter::create();
+  map_filter->set_name(String::ucompose(_("LordsAWar Scenarios (*%1)"), MAP_EXT));
+  map_filter->add_pattern("*" + MAP_EXT);
+  chooser.add_filter(map_filter);
+  Glib::RefPtr<Gtk::FileFilter> all_filter = Gtk::FileFilter::create();
+  all_filter->set_name(_("All Files"));
+  all_filter->add_pattern("*.*");
+  chooser.add_filter(all_filter);
+  chooser.set_filter (map_filter);
+  chooser.set_current_folder(File::getUserMapDir());
+
+  chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  chooser.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
+  chooser.set_default_response(Gtk::RESPONSE_ACCEPT);
+
+  chooser.show_all();
+  int res = chooser.run();
+
+  if (res == Gtk::RESPONSE_ACCEPT)
+    {
+      Glib::ustring old_save_filename = current_save_filename;
+      current_save_filename = chooser.get_filename();
+      chooser.hide();
+
+      std::pair<int,int> stash = Playerlist::getInstance ()->stash ();
+
+      bool broken = false;
+      Scenario *s = new Scenario (game_scenario);
+      if (game_scenario)
+        delete game_scenario;
+      game_scenario = new GameScenario(current_save_filename, broken);
+
+      if (broken)
+        {
+          delete game_scenario;
+          Scenario::reset (s);
+          game_scenario = s->getGameScenario ();
+          delete s;
+
+          Playerlist::getInstance ()->unstash (stash);
+
+          TimedMessageDialog dialog
+            (*window,String::ucompose(_("Could not load map %1."),
+                                      current_save_filename), 0);
+          dialog.run_and_hide();
+          current_save_filename = old_save_filename;
+          return false;
+        }
+      clear_map_state();
+      delete s;
+      game_scenario->setDirectory(File::get_dirname(current_save_filename));
+      Playerlist::getInstance()->syncNeutral();
+      if (d_create_scenario_names)
+        delete d_create_scenario_names;
+      d_create_scenario_names = new CreateScenarioRandomize();
+
+      clearUndoAndRedo ();
+      init_map_state();
+      bigmap->screen_size_changed(bigmap_image->get_allocation()); 
+      new_scenario_needs_saving = false;
+      scenario_modified = false;
+      update_window_title();
+      fill_players();
+      return true;
+    }
+  return false;
 }
 
 void MainWindow::on_load_map_activated()
 {
-    Gtk::FileChooserDialog chooser(*window, _("Choose Map to Load"));
-    Glib::RefPtr<Gtk::FileFilter> map_filter = Gtk::FileFilter::create();
-    map_filter->set_name(_("LordsAWar Maps (*.map)"));
-    map_filter->add_pattern("*.map");
-    chooser.add_filter(map_filter);
-    chooser.set_current_folder(File::getUserMapDir());
-
-    chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    chooser.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
-    chooser.set_default_response(Gtk::RESPONSE_ACCEPT);
-	
-    chooser.show_all();
-    int res = chooser.run();
-    
-    if (res == Gtk::RESPONSE_ACCEPT)
-    {
-	current_save_filename = chooser.get_filename();
-	chooser.hide();
-
-	clear_map_state();
-
-	bool broken;
-	if (game_scenario)
-	  delete game_scenario;
-	game_scenario = new GameScenario(current_save_filename, broken);
-        game_scenario->setDirectory(File::get_dirname(current_save_filename));
-        Playerlist::getInstance()->syncNeutral();
-	if (d_create_scenario_names)
-	  delete d_create_scenario_names;
-	d_create_scenario_names = new CreateScenarioRandomize();
-
-	if (broken)
-          {
-            TimedMessageDialog dialog
-              (*window,String::ucompose(_("Could not load map %1."),
-                                        current_save_filename), 0);
-            dialog.run_and_hide();
-            current_save_filename = "";
-            return;
-          }
-
-        new_scenario_needs_saving = false;
-        clearUndoAndRedo ();
-	init_map_state();
-	bigmap->screen_size_changed(bigmap_image->get_allocation()); 
-        scenario_modified = false;
-        update_window_title();
-        fill_players();
-    }
+  load_map ();
 }
 
-bool MainWindow::activate_save_map ()
+void MainWindow::on_save_map_activated ()
+{
+  save_map ();
+}
+
+bool MainWindow::save_map ()
 {
   if (current_save_filename.empty ())
-    return activate_save_map_as ();
+    return save_map_as ();
   else
     {
       bool success = game_scenario->saveGame (current_save_filename, MAP_EXT);
       if (!success)
         {
-          TimedMessageDialog dialog (*window, _("Map was not saved!"), 0);
+          TimedMessageDialog dialog (*window, _("Scenario was not saved!"), 0);
           dialog.run_and_hide ();
           on_validate_activated ();
         }
@@ -997,12 +1033,17 @@ bool MainWindow::activate_save_map ()
     }
 }
 
-bool MainWindow::activate_save_map_as ()
+void MainWindow::on_save_map_as_activated ()
+{
+  save_map_as ();
+}
+
+bool MainWindow::save_map_as ()
 {
   Gtk::FileChooserDialog chooser (*window, _("Choose a Name"),
                                   Gtk::FILE_CHOOSER_ACTION_SAVE);
   Glib::RefPtr<Gtk::FileFilter> map_filter = Gtk::FileFilter::create ();
-  map_filter->set_name (_("LordsAWar Maps (*.map)"));
+  map_filter->set_name (String::ucompose (_("LordsAWar Scenarios (*%1)"), MAP_EXT));
   map_filter->add_pattern ("*" + MAP_EXT);
   chooser.add_filter (map_filter);
   chooser.set_current_folder (File::getUserMapDir ());
@@ -1024,7 +1065,7 @@ bool MainWindow::activate_save_map_as ()
       bool success = game_scenario->saveGame (current_save_filename, MAP_EXT);
       if (!success)
         {
-          TimedMessageDialog dialog (*window, _("Map was not saved!"), 0);
+          TimedMessageDialog dialog (*window, _("Scenario was not saved!"), 0);
           dialog.run_and_hide ();
           on_validate_activated ();
           current_save_filename = old_save_filename;
@@ -1052,7 +1093,7 @@ bool MainWindow::quit()
 
       else if (response == Gtk::RESPONSE_ACCEPT) // save and quit
         {
-          if (activate_save_map () == false)
+          if (save_map () == false)
             return false;
         }
       game_scenario->clean_tmp_dir ();
@@ -2128,13 +2169,22 @@ void MainWindow::clear_save_file_of_scenario_specific_data()
       }
 }
 
-void MainWindow::on_import_map_activated()
+bool MainWindow::import_map ()
 {
+  Glib::ustring msg = _("Save these changes before importing a game?");
+  if (check_discard (msg) == false)
+    return false;
   Gtk::FileChooserDialog chooser(*window, _("Choose Game to Load Map from"));
   Glib::RefPtr<Gtk::FileFilter> sav_filter = Gtk::FileFilter::create();
-  sav_filter->set_name(_("LordsAWar Saved Games (*.sav)"));
+  sav_filter->set_name(String::ucompose (_("LordsAWar Saved Games (*%1)"), 
+                                         SAVE_EXT));
   sav_filter->add_pattern("*" + SAVE_EXT);
   chooser.add_filter(sav_filter);
+  Glib::RefPtr<Gtk::FileFilter> all_filter = Gtk::FileFilter::create();
+  all_filter->set_name(_("All Files"));
+  all_filter->add_pattern("*.*");
+  chooser.add_filter(all_filter);
+  chooser.set_filter (sav_filter);
   chooser.set_current_folder(File::getSavePath());
 
   chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -2149,23 +2199,33 @@ void MainWindow::on_import_map_activated()
       Glib::ustring filename = chooser.get_filename();
       chooser.hide();
 
-      clear_map_state();
+      std::pair<int,int> stash = Playerlist::getInstance ()->stash ();
 
-      bool broken;
+      bool broken = false;
+      Scenario *s = new Scenario (game_scenario);
+
       if (game_scenario)
         delete game_scenario;
       game_scenario = new GameScenario(filename, broken);
-      game_scenario->setDirectory(File::get_dirname(filename));
 
       if (broken)
         {
+          delete game_scenario;
+          Scenario::reset (s);
+          game_scenario = s->getGameScenario ();
+          delete s;
+
+          Playerlist::getInstance ()->unstash (stash);
           TimedMessageDialog dialog
             (*window, String::ucompose(_("Could not load game %1."),
                                        filename), 0);
           dialog.run_and_hide();
-          current_save_filename = "";
-          return;
+          return false;
         }
+      clear_map_state();
+      delete s;
+      game_scenario->setDirectory(File::get_dirname(filename));
+      Playerlist::getInstance()->syncNeutral();
 
       if (d_create_scenario_names)
         delete d_create_scenario_names;
@@ -2178,9 +2238,18 @@ void MainWindow::on_import_map_activated()
       init_map_state();
       bigmap->screen_size_changed(bigmap_image->get_allocation()); 
       fill_players();
+      current_save_filename = "";
       scenario_modified = false;
+      new_scenario_needs_saving = true;
       update_window_title();
+      return true;
     }
+  return false;
+}
+
+void MainWindow::on_import_map_activated()
+{
+  import_map ();
 }
       
 void MainWindow::redraw(bool center)
@@ -2504,7 +2573,8 @@ void MainWindow::on_edit_scenario_media_activated()
 
 Glib::ustring MainWindow::getDefaultMapFilename()
 {
-  return File::add_slash_if_necessary(File::getCacheDir()) + "current.map";
+  return File::add_slash_if_necessary(File::getCacheDir()) + "current" +
+    MAP_EXT;
 }
     
 void MainWindow::change_city_ownership(City *city, Player *player)
@@ -3193,20 +3263,10 @@ void MainWindow::doReloadScenario (EditorAction_Save *action)
   Glib::ustring oldname =
     File::get_basename (game_scenario->getConfigurationFile (true));
   Glib::ustring oldext = game_scenario->getExtension ();
-  int old_viewingplayer = -1;
-  if (Playerlist::getViewingplayer ())
-    old_viewingplayer = Playerlist::getViewingplayer ()->getId ();
-  int old_activeplayer = -1;
-  if (Playerlist::getActiveplayer ())
-    old_activeplayer = Playerlist::getActiveplayer ()->getId ();
+  std::pair<int,int> stash = Playerlist::getInstance ()->stash ();
   delete game_scenario;
   Scenario::reset (action->getScenario ());
-  if (old_viewingplayer >= -1)
-    Playerlist::getInstance()->setViewingplayer
-      (Playerlist::getInstance ()->getPlayer ((guint32) old_viewingplayer));
-  if (old_activeplayer >= -1)
-    Playerlist::getInstance()->setActiveplayer
-      (Playerlist::getInstance ()->getPlayer ((guint32) old_activeplayer));
+  Playerlist::getInstance ()->unstash (stash);
   game_scenario =
     action->getScenario ()->getGameScenario ();
   game_scenario->setUnique (true);
@@ -3454,3 +3514,51 @@ void MainWindow::doReloadShieldset ()
   redraw();
 }
 
+bool MainWindow::check_discard (Glib::ustring msg)
+{
+  if (scenario_modified || new_scenario_needs_saving)
+    {
+      EditorSaveChangesDialog d (*window, msg);
+      int response = d.run_and_hide();
+
+      if (response == Gtk::RESPONSE_CANCEL) // we don't want to new
+        return false;
+
+      else if (response == Gtk::RESPONSE_ACCEPT) // save it
+        {
+          if (check_save_valid ())
+            {
+              bool saved = false;
+              if (game_scenario->getDirectory ().empty () == false)
+                  saved = save_map_as ();
+              else
+                {
+                  if (save_map ())
+                    saved = true;
+                }
+              if (!saved)
+                return false;
+            }
+          else
+            return false;
+        }
+    }
+  return true;
+}
+
+bool MainWindow::check_save_valid ()
+{
+  std::list<Glib::ustring> errors;
+  std::list<Glib::ustring> warnings;
+  if (game_scenario->validate (errors, warnings) == false)
+    {
+      TimedMessageDialog
+        dialog(*window,
+               _("The Scenario is invalid.  Do you want to proceed?"), 0);
+      dialog.add_cancel_button ();
+      dialog.run_and_hide();
+      if (dialog.get_response () == Gtk::RESPONSE_CANCEL)
+        return false;
+    }
+  return true;
+}

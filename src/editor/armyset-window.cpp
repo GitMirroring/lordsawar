@@ -342,9 +342,15 @@ bool ArmySetWindow::load_armyset ()
   Gtk::FileChooserDialog chooser(*window,
 				 _("Choose an Army Set to Open"));
   Glib::RefPtr<Gtk::FileFilter> lwa_filter = Gtk::FileFilter::create();
-  lwa_filter->set_name(_("LordsAWar Army Sets (*.lwa)"));
+  lwa_filter->set_name(String::ucompose (_("LordsAWar Army Sets (*%1)"),
+                                         ARMYSET_EXT));
   lwa_filter->add_pattern("*" + ARMYSET_EXT);
   chooser.add_filter(lwa_filter);
+  Glib::RefPtr<Gtk::FileFilter> all_filter = Gtk::FileFilter::create();
+  all_filter->set_name(_("All Files"));
+  all_filter->add_pattern("*.*");
+  chooser.add_filter(all_filter);
+  chooser.set_filter (lwa_filter);
   chooser.set_current_folder(File::getSetDir(Armyset::file_extension, false));
 
   chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -476,7 +482,8 @@ bool ArmySetWindow::save_current_armyset_file_as ()
       Gtk::FileChooserDialog chooser(*window, _("Choose a Name"),
                                      Gtk::FILE_CHOOSER_ACTION_SAVE);
       Glib::RefPtr<Gtk::FileFilter> lwa_filter = Gtk::FileFilter::create();
-      lwa_filter->set_name(_("LordsAWar Army Sets (*.lwa)"));
+      lwa_filter->set_name(String::ucompose(_("LordsAWar Army Sets (*%1)"),
+                                            ARMYSET_EXT));
       lwa_filter->add_pattern("*" + ARMYSET_EXT);
       chooser.add_filter(lwa_filter);
       chooser.set_current_folder(File::getSetDir(ARMYSET_EXT, false));
