@@ -99,12 +99,6 @@ class ArmySetEditorAction: public UndoAction
 	//! Default constructor.
         ArmySetEditorAction(Type type, UndoAction::AggregateType aggregate = UndoAction::AGGREGATE_NONE);
 
-	//! Destructor.
-        virtual ~ArmySetEditorAction() {};
-
-        //! Get the name of this action for the undo/redo menuitem.
-        virtual Glib::ustring getActionName () const {return "";}
-
         //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}
 

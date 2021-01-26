@@ -36,7 +36,7 @@ class CitySetEditorAction: public UndoAction
 {
     public:
 
-	//! An CitySet Editor Action can be one of the following kinds.
+	//! A CitySet Editor Action can be one of the following kinds.
         enum Type {
 	        /** Modify description/copyright/license. */
                 CHANGE_PROPERTIES = 1,
@@ -54,12 +54,6 @@ class CitySetEditorAction: public UndoAction
 
 	//! Default constructor.
         CitySetEditorAction(Type type, UndoAction::AggregateType aggregate = UndoAction::AGGREGATE_NONE);
-
-	//! Destructor.
-        virtual ~CitySetEditorAction() {}
-
-        //! Get the name of this action for the undo/redo menuitem.
-        virtual Glib::ustring getActionName () const {return "";}
 
         //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}

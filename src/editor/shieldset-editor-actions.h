@@ -36,7 +36,7 @@ class ShieldSetEditorAction: public UndoAction
 {
     public:
 
-	//! An ShieldSet Editor Action can be one of the following kinds.
+	//! A ShieldSet Editor Action can be one of the following kinds.
         enum Type {
 	        /** Modify a player's shield colour. */
                 CHANGE_COLOR = 1,
@@ -54,12 +54,6 @@ class ShieldSetEditorAction: public UndoAction
         ShieldSetEditorAction(Type type,
                               UndoAction::AggregateType a = UndoAction::AGGREGATE_NONE)
           : UndoAction (a), d_type(type) {}
-
-	//! Destructor.
-        virtual ~ShieldSetEditorAction() {}
-
-        //! Get the name of this action for the undo/redo menuitem.
-        virtual Glib::ustring getActionName () const {return "";}
 
         //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}

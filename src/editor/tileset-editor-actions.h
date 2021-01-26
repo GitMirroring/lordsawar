@@ -39,7 +39,7 @@ class TileSetEditorAction: public UndoAction
 {
 public:
 
-    //! An TileSet Editor Action can be one of the following kinds.
+    //! A TileSet Editor Action can be one of the following kinds.
     enum Type {
       CHANGE_PROPERTIES = 1,
       NAME = 2,
@@ -68,12 +68,6 @@ public:
     TileSetEditorAction(Type type, bool agg = false)
      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
                    UndoAction::AGGREGATE_NONE), d_type (type) {}
-
-    //! Destructor.
-    virtual ~TileSetEditorAction() {}
-
-    //! Get the name of this action for the undo/redo menuitem.
-    virtual Glib::ustring getActionName () const {return "";}
 
     //! Returns the Action::Type for this action.
     Type getType() const {return d_type;}
@@ -140,7 +134,7 @@ class TileSetEditorAction_TileIndex: public TileSetEditorAction
 
 //-----------------------------------------------------------------------------
 
-//! A record of an tile's name being changed
+//! A record of a tile's name being changed
 /**
  * The purpose of the TileSetEditorAction_Name class is to record
  * when we change the tile's name.  This happens letter by letter.
@@ -172,7 +166,7 @@ class TileSetEditorAction_Name: public TileSetEditorAction_TileIndex
 
 //-----------------------------------------------------------------------------
 
-//! A record of an tile's type being changed
+//! A record of a tile's type being changed
 /**
  * The purpose of the TileSetEditorAction_Type class is to record
  * when we change the tile's type.  e.g. grass, water, forest, etc.
@@ -201,7 +195,7 @@ class TileSetEditorAction_Type: public TileSetEditorAction_TileIndex
 
 //-----------------------------------------------------------------------------
 
-//! A record of an tile's pattern being changed
+//! A record of a tile's pattern being changed
 /**
  * The purpose of the TileSetEditorAction_Pattern class is to record
  * when we change the tile's pattern.  e.g. solid, stippled, etc.
@@ -230,7 +224,7 @@ class TileSetEditorAction_Pattern: public TileSetEditorAction_TileIndex
 
 //-----------------------------------------------------------------------------
 
-//! A record of an tile's moves being changed
+//! A record of a tile's moves being changed
 /**
  * The purpose of the TileSetEditorAction_Moves class is to record
  * when we change the tile's moves.  e.g. how many movement points it takes
