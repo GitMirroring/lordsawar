@@ -69,6 +69,7 @@ libeditor_la_SOURCES =\
 	main-window.cpp main-window.h \
 	editor-actions.cpp editor-actions.h \
 	signpost-editor-dialog.cpp signpost-editor-dialog.h \
+	signpost-editor-actions.h \
 	temple-editor-dialog.cpp temple-editor-dialog.h \
 	ruin-editor-dialog.cpp ruin-editor-dialog.h \
 	stack-editor-dialog.cpp stack-editor-dialog.h \

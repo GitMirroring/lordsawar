@@ -23,6 +23,7 @@
 #include <gtkmm.h>
 
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 
 class Signpost;
 class CreateScenarioRandomize;
@@ -32,19 +33,30 @@ class SignpostEditorDialog: public LwEditorDialog
 {
  public:
     SignpostEditorDialog(Gtk::Window &parent, Signpost *signpost, CreateScenarioRandomize *randomizer);
-    ~SignpostEditorDialog() {}
+    ~SignpostEditorDialog();
 
     bool run();
     
  private:
     Gtk::TextView *sign_textview;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
+    Gtk::Button *randomize_button;
     Signpost *signpost;
     bool d_changed;
-    Gtk::Button *randomize_button;
+    Glib::ustring d_orig_message;
     CreateScenarioRandomize *d_randomizer;
+    UndoMgr *umgr;
     
     void on_randomize_clicked();
     void on_sign_changed ();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action2);
 };
 
 #endif
