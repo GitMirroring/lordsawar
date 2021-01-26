@@ -99,7 +99,6 @@ class ArmySetEditorAction: public UndoAction
 	//! Default constructor.
         ArmySetEditorAction(Type type, UndoAction::AggregateType aggregate = UndoAction::AGGREGATE_NONE);
 
-        //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}
 
     protected:

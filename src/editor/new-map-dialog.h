@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 
 #include "Tile.h"
 #include "game-parameters.h"
+#include "undo-mgr.h"
+#include "new-map-actions.h"
 
 //! Scenario editor.  Edit parameters to make a new map.
 class NewMapDialog: public LwEditorDialog
@@ -36,23 +38,6 @@ class NewMapDialog: public LwEditorDialog
 
     void run();
 
-    struct Map
-      {
-        int fill_style;
-        int width, height;
-        int grass, water, swamp, forest, hills, mountains;
-        int cities, ruins, temples;
-        int signposts, stones;
-        Glib::ustring tileset;
-        Glib::ustring shieldset;
-        Glib::ustring cityset;
-        Glib::ustring armyset;
-        bool generate_roads;
-        bool random_names;
-        int num_players;
-        int stone_road_chance;
-      };
-
     Map map;
     
     bool map_set;
@@ -61,7 +46,7 @@ class NewMapDialog: public LwEditorDialog
     void tick_progress (double p);
 
  private:
-  
+    UndoMgr *umgr;
     Gtk::Box *dialog_vbox;
     Gtk::ComboBox *map_size_combobox;
     Gtk::SpinButton *width_spinbutton;
@@ -90,6 +75,8 @@ class NewMapDialog: public LwEditorDialog
     Gtk::SpinButton *num_players_spinbutton;
     Gtk::SpinButton *stone_road_spinbutton;
     Gtk::Notebook *notebook;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     enum { MAP_SIZE_NORMAL = 0, MAP_SIZE_SMALL, MAP_SIZE_TINY, 
       MAP_SIZE_CUSTOM };
@@ -97,6 +84,7 @@ class NewMapDialog: public LwEditorDialog
     void on_fill_style_changed();
     void on_map_size_changed();
     void on_random_roads_toggled ();
+    void on_random_names_toggled ();
     void update_button ();
     void add_fill_style(Tile::Type tile_type);
 
@@ -116,6 +104,40 @@ class NewMapDialog: public LwEditorDialog
     ProgressModelColumns progress_columns;
     Glib::RefPtr<Gtk::ListStore> progress_liststore;
     Gtk::TreeModel::Row progress_row;
+    UndoAction * executeAction (UndoAction*action);
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    void on_grass_changed ();
+    void on_water_changed ();
+    void on_swamp_changed ();
+    void on_forest_changed ();
+    void on_hills_changed ();
+    void on_mountains_changed ();
+    void on_cities_changed ();
+    void on_ruins_changed ();
+    void on_temples_changed ();
+    void on_signposts_changed ();
+    void on_stones_changed ();
+    void on_width_changed ();
+    void on_height_changed ();
+    void on_tileset_changed ();
+    void on_armyset_changed ();
+    void on_cityset_changed ();
+    void on_shieldset_changed ();
+    void on_players_changed ();
+    void on_stone_road_chance_changed ();
+    void update ();
+    void populate_tileset_armyset_and_cityset(guint32 tilesize);
+    int selected_tileset_id; //row number in combobox
+    int selected_armyset_id; //row number in combobox
+    int selected_shieldset_id; //row number in combobox
+    int selected_cityset_id; //row number in combobox
+    int selected_map_size_id; //row number in combobox
+    int selected_tile_size_id; //row number in combobox
+    int selected_fill_style_id; //row number in combobox
 };
 
 #endif

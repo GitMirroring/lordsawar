@@ -150,7 +150,6 @@ class EditorAction: public UndoAction
 	//! Destructor.
         virtual ~EditorAction() {}
 
-        //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}
 
     protected:

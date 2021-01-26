@@ -548,7 +548,7 @@ void MainWindow::show_initial_map()
   else
     {
       set_filled_map(112, 156, Tile::WATER, "default", "default", "default",
-		     "default");
+		     "default", MAX_PLAYERS);
       setup_terrain_radiobuttons();
       remove_tile_style_buttons();
       setup_tile_style_buttons(Tile::GRASS);
@@ -557,7 +557,7 @@ void MainWindow::show_initial_map()
   set_default_bigmap_zoom ();
 }
 
-void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ustring tileset, Glib::ustring shieldset, Glib::ustring cityset, Glib::ustring armyset)
+void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ustring tileset, Glib::ustring shieldset, Glib::ustring cityset, Glib::ustring armyset, guint32  num_players)
 {
     clear_map_state();
     d_width = width;
@@ -597,6 +597,8 @@ void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ust
                                         ssl->getColor(ss->getId (), i),
                                         width, height, Player::HUMAN, i);
         Playerlist::getInstance()->add(human);
+        if (i >= num_players - 1)
+          break;
       }
 
     Glib::ustring name =
@@ -633,6 +635,8 @@ void MainWindow::set_random_map(int width, int height,
     d->setup_progress_bar ();
     clear_map_state();
 
+    if (game_scenario)
+      delete game_scenario;
     GameMap::deleteInstance();
     GameMap::setWidth(width);
     GameMap::setHeight(height);
@@ -695,9 +699,6 @@ void MainWindow::set_random_map(int width, int height,
     GameMap::getInstance()->fill(&gen);
 
     Itemlist::createStandardInstance();
-    // sets up the lists
-    if (game_scenario)
-      delete game_scenario;
     Glib::ustring scenario_name =
       ScenarioList::getInstance ()->findFreeName (_("Untitled"));
     game_scenario = new GameScenario(scenario_name, _("No description"));
@@ -895,7 +896,7 @@ bool MainWindow::make_new_map ()
       else
         set_filled_map(d.map.width, d.map.height, d.map.fill_style, 
                        d.map.tileset, d.map.shieldset, d.map.cityset,
-                       d.map.armyset);
+                       d.map.armyset, d.map.num_players);
       if (d.map.num_players)
         {
           for (int i = 0; i < d.map.num_players; i++)

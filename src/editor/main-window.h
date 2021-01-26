@@ -236,7 +236,8 @@ class MainWindow: public sigc::trackable
     void init_maps();
     void set_filled_map(int width, int height, int fill_style, 
 			Glib::ustring tileset, Glib::ustring shieldset, 
-			Glib::ustring cityset, Glib::ustring armyset);
+			Glib::ustring cityset, Glib::ustring armyset,
+                        guint32 num_players);
     void set_random_map(int width, int height,
 			int grass, int water, int swamp, int forest,
 			int hills, int mountains, int cities, int ruins,

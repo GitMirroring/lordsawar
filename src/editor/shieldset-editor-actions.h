@@ -55,7 +55,6 @@ class ShieldSetEditorAction: public UndoAction
                               UndoAction::AggregateType a = UndoAction::AGGREGATE_NONE)
           : UndoAction (a), d_type(type) {}
 
-        //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}
 
     protected:

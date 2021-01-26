@@ -55,7 +55,6 @@ class CitySetEditorAction: public UndoAction
 	//! Default constructor.
         CitySetEditorAction(Type type, UndoAction::AggregateType aggregate = UndoAction::AGGREGATE_NONE);
 
-        //! Returns the Action::Type for this action.
         Type getType() const {return d_type;}
 
     protected:

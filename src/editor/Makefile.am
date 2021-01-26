@@ -77,7 +77,7 @@ libeditor_la_SOURCES =\
 	players-dialog.cpp players-dialog.h \
 	city-editor-dialog.cpp city-editor-dialog.h \
 	map-info-dialog.cpp map-info-dialog.h \
-	new-map-dialog.cpp new-map-dialog.h \
+	new-map-dialog.cpp new-map-dialog.h new-map-actions.h \
 	switch-sets-dialog.cpp switch-sets-dialog.h \
 	editorbigmap.cpp editorbigmap.h \
 	editablesmallmap.cpp editablesmallmap.h \

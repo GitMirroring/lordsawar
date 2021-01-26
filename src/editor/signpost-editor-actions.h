@@ -21,10 +21,6 @@
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
-#include "Tile.h"
-#include "SmallTile.h"
-#include "tilestyle.h"
-#include "defs.h"
 #include "undo-action.h"
 
 //! A record of an event in the signpost editor
@@ -50,7 +46,6 @@ public:
     //! Destructor.
     virtual ~SignpostEditorAction() {}
 
-    //! Returns the Action::Type for this action.
     Type getType() const {return d_type;}
 
 protected:

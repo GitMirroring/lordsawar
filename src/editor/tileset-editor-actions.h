@@ -69,7 +69,6 @@ public:
      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
                    UndoAction::AGGREGATE_NONE), d_type (type) {}
 
-    //! Returns the Action::Type for this action.
     Type getType() const {return d_type;}
 
 protected:
