@@ -26,12 +26,15 @@
 #include "ucompose.hpp"
 #include "defs.h"
 #include "File.h"
+#include "tileset-info-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &TileSetInfoDialog::x)
 
 TileSetInfoDialog::TileSetInfoDialog(Gtk::Window &parent, Tileset *s)
  : LwEditorDialog(parent, "tileset-info-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_tileset = s;
   dialog->set_title(_("Tile Set Properties"));
 
@@ -41,45 +44,42 @@ TileSetInfoDialog::TileSetInfoDialog(Gtk::Window &parent, Tileset *s)
   xml->get_widget("name_entry", name_entry);
   xml->get_widget("size_spinbutton", size_spinbutton);
   xml->get_widget("fit_button", fit_button);
-
-  size_spinbutton->set_value ((double)s->getTileSize ());
-  size_spinbutton->signal_changed().connect (method(on_size_changed));
-  fit_button->signal_clicked().connect (method(on_fit_pressed));
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
 
   name_entry->set_text (d_tileset->getName ());
   location_label->property_label () =
     d_tileset->getDirectory ().empty () ? "" :
     d_tileset->getConfigurationFile (true);
 
-  name_entry->signal_changed().connect (method(on_name_changed));
-
   xml->get_widget("copyright_textview", copyright_textview);
-  copyright_textview->get_buffer()->set_text(d_tileset->getCopyright());
-  copyright_textview->get_buffer()->signal_changed().connect
-    (method(on_copyright_changed));
   xml->get_widget("license_textview", license_textview);
-  license_textview->get_buffer()->set_text(d_tileset->getLicense());
-  license_textview->get_buffer()->signal_changed().connect
-    (method(on_license_changed));
   xml->get_widget("description_textview", description_textview);
-  description_textview->get_buffer()->set_text(d_tileset->getInfo());
-  description_textview->get_buffer()->signal_changed().connect
-    (method(on_description_changed));
   xml->get_widget("notebook", notebook);
-  on_name_changed ();
   d_name = d_tileset->getName ();
   d_description = d_tileset->getInfo ();
   d_copyright = d_tileset->getCopyright ();
   d_license = d_tileset->getLicense ();
   d_tilesize = d_tileset->getTileSize ();
+  d_orig_name = d_name;
+  d_orig_description = d_description;
+  d_orig_copyright = d_copyright;
+  d_orig_license = d_license;
+  d_orig_tilesize = d_tilesize;
   d_changed = false;
+  connect_signals ();
+  update ();
+  update_name ();
 }
 
-void TileSetInfoDialog::on_name_changed()
+void TileSetInfoDialog::update_name ()
 {
-  d_changed = true;
   Glib::ustring oldname = d_tileset->getName ();
+  guint32 oldsize = d_tileset->getTileSize ();
   d_tileset->setName (String::utrim (name_entry->get_text ()));
+  d_tileset->setTileSize (d_tilesize);
   close_button->set_sensitive (File::sanify (d_tileset->getName ()) != "");
 
   Glib::ustring file =
@@ -89,52 +89,180 @@ void TileSetInfoDialog::on_name_changed()
   else
     status_label->set_text ("");
   d_tileset->setName (oldname);
+  d_tileset->setTileSize (oldsize);
   d_name = String::utrim (name_entry->get_text ());
+}
+
+void TileSetInfoDialog::on_name_changed()
+{
+  umgr->add (new TileSetInfoAction_Name (d_name, name_entry->get_position ()));
+  d_changed = true;
+  update_name ();
 }
 
 bool TileSetInfoDialog::run()
 {
-  dialog->show_all();
   dialog->run();
   dialog->hide ();
+  if (d_orig_description == d_description &&
+      d_orig_copyright == d_copyright &&
+      d_orig_license == d_license &&
+      d_orig_name == d_name &&
+      d_orig_tilesize == d_tilesize)
+    return false;
   return d_changed;
 }
 
 void TileSetInfoDialog::on_copyright_changed ()
 {
+  umgr->add (new TileSetInfoAction_Copyright (d_copyright));
   d_changed = true;
   d_copyright = copyright_textview->get_buffer()->get_text();
 }
 
 void TileSetInfoDialog::on_license_changed ()
 {
+  umgr->add (new TileSetInfoAction_License (d_license));
   d_changed = true;
   d_license = license_textview->get_buffer()->get_text();
 }
 
 void TileSetInfoDialog::on_description_changed ()
 {
+  umgr->add (new TileSetInfoAction_Description (d_description));
   d_changed = true;
   d_description = description_textview->get_buffer()->get_text();
 }
 
 TileSetInfoDialog::~TileSetInfoDialog()
 {
+  delete umgr;
   notebook->property_show_tabs () = false;
 }
 
 void TileSetInfoDialog::on_size_changed()
 {
+  umgr->add (new TileSetInfoAction_TileSize (d_tilesize));
   d_changed = true;
   d_tilesize = size_spinbutton->get_value ();
-  on_name_changed ();
+  update_name ();
 }
 
 void TileSetInfoDialog::on_fit_pressed()
 {
+  umgr->add (new TileSetInfoAction_TileSize (d_tilesize));
   d_changed = true;
   guint32 ts = 0;
   d_tileset->calculate_preferred_tile_size (ts);
   size_spinbutton->set_value (ts);
-  on_name_changed ();
+  update_name ();
+}
+
+UndoAction* TileSetInfoDialog::executeAction (UndoAction *action2)
+{
+  TileSetInfoAction *action = dynamic_cast<TileSetInfoAction*>(action2);
+  UndoAction *out = NULL;
+
+    switch (action->getType ())
+      {
+      case TileSetInfoAction::DESCRIPTION:
+          {
+            TileSetInfoAction_Description *a =
+              dynamic_cast<TileSetInfoAction_Description*>(action);
+            out = new TileSetInfoAction_Description (d_description);
+            d_description = a->getMessage ();
+          } 
+        break;
+      case TileSetInfoAction::COPYRIGHT:
+          {
+            TileSetInfoAction_Copyright *a =
+              dynamic_cast<TileSetInfoAction_Copyright*>(action);
+            out = new TileSetInfoAction_Copyright (d_copyright);
+            d_copyright = a->getMessage ();
+          } 
+        break;
+      case TileSetInfoAction::LICENSE:
+          {
+            TileSetInfoAction_License *a =
+              dynamic_cast<TileSetInfoAction_License*>(action);
+            out = new TileSetInfoAction_License (d_license);
+            d_license = a->getMessage ();
+          } 
+        break;
+      case TileSetInfoAction::NAME:
+          {
+            TileSetInfoAction_Name *a = dynamic_cast<TileSetInfoAction_Name*>(action);
+            out = new TileSetInfoAction_Name
+              (d_name, name_entry->get_position ());
+            d_name = a->getName ();
+            disconnect_signals ();
+            name_entry->set_text (d_name);
+            name_entry->set_position (a->getCursorPosition ());
+            connect_signals ();
+          }
+        break;
+      case TileSetInfoAction::TILE_SIZE:
+          {
+            TileSetInfoAction_TileSize *a =
+              dynamic_cast<TileSetInfoAction_TileSize*>(action);
+            out = new TileSetInfoAction_TileSize (d_tilesize);
+            d_tilesize = a->getTileSize ();
+            update_name ();
+          } 
+        break;
+      }
+    return out;
+}
+
+void TileSetInfoDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+}
+
+void TileSetInfoDialog::on_redo_activated ()
+{
+  d_changed = true;
+  umgr->redo ();
+  update ();
+}
+
+void TileSetInfoDialog::update ()
+{
+  disconnect_signals ();
+  description_textview->get_buffer()->set_text(d_description);
+  copyright_textview->get_buffer()->set_text(d_copyright);
+  license_textview->get_buffer()->set_text(d_license);
+  if (name_entry->get_text () != d_name)
+    name_entry->set_text (d_name);
+  size_spinbutton->set_value (d_tilesize);
+  connect_signals ();
+}
+
+void TileSetInfoDialog::connect_signals ()
+{
+  connections.push_back
+    (description_textview->get_buffer()->signal_changed().connect
+     (method(on_description_changed)));
+  connections.push_back
+    (copyright_textview->get_buffer()->signal_changed().connect
+     (method(on_copyright_changed)));
+  connections.push_back
+    (license_textview->get_buffer()->signal_changed().connect
+     (method(on_license_changed)));
+  connections.push_back
+    (name_entry->signal_changed().connect (method(on_name_changed)));
+  connections.push_back
+    (size_spinbutton->signal_changed().connect (method(on_size_changed)));
+  connections.push_back
+    (fit_button->signal_clicked().connect (method(on_fit_pressed)));
+}
+
+void TileSetInfoDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
 }

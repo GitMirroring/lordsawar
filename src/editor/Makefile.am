@@ -51,7 +51,7 @@ libcitysetwindow_la_SOURCES = \
 libtilesetwindow_la_SOURCES = \
 	tileset-window.cpp tileset-window.h \
 	tileset-editor-actions.cpp tileset-editor-actions.h \
-	tileset-info-dialog.cpp tileset-info-dialog.h \
+	tileset-info-dialog.cpp tileset-info-dialog.h tileset-info-actions.h \
 	tile-preview-dialog.cpp tile-preview-dialog.h \
 	tile-preview-scene.cpp tile-preview-scene.h \
 	tileset-selector-editor-dialog.cpp tileset-selector-editor-dialog.h \
