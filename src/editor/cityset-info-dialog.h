@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include "cityset.h"
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 
 //! Cityset Editor.  Edit the description of the Cityset.
 class CitySetInfoDialog: public LwEditorDialog
@@ -41,12 +42,18 @@ class CitySetInfoDialog: public LwEditorDialog
 
  private:
     Cityset *d_cityset;
+    UndoMgr *umgr;
     bool d_changed;
     Glib::ustring d_name;
     Glib::ustring d_description;
     Glib::ustring d_copyright;
     Glib::ustring d_license;
     guint32 d_tilesize;
+    Glib::ustring d_orig_name;
+    Glib::ustring d_orig_description;
+    Glib::ustring d_orig_copyright;
+    Glib::ustring d_orig_license;
+    guint32 d_orig_tilesize;
     Gtk::Entry *name_entry;
     Gtk::TextView *copyright_textview;
     Gtk::TextView *license_textview;
@@ -56,6 +63,8 @@ class CitySetInfoDialog: public LwEditorDialog
     Gtk::Label *location_label;
     Gtk::Notebook *notebook;
     Gtk::Button *fit_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
     Gtk::SpinButton *size_spinbutton;
 
     void on_name_changed();
@@ -64,6 +73,14 @@ class CitySetInfoDialog: public LwEditorDialog
     void on_description_changed ();
     void on_size_changed();
     void on_fit_pressed();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    void update ();
+    UndoAction* executeAction (UndoAction* action);
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update_name ();
 };
 
 #endif

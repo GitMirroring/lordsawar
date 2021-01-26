@@ -44,7 +44,7 @@ libarmysetwindow_la_SOURCES = \
 
 libcitysetwindow_la_SOURCES = \
 	cityset-window.cpp cityset-window.h  \
-	cityset-info-dialog.cpp cityset-info-dialog.h \
+	cityset-info-dialog.cpp cityset-info-dialog.h cityset-info-actions.h \
 	cityset-editor-actions.cpp cityset-editor-actions.h \
 	image-editor-dialog.cpp image-editor-dialog.h 
 

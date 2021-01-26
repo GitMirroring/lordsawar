@@ -25,12 +25,15 @@
 #include "ucompose.hpp"
 #include "defs.h"
 #include "File.h"
+#include "cityset-info-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &CitySetInfoDialog::x)
 
 CitySetInfoDialog::CitySetInfoDialog(Gtk::Window &parent, Cityset *c)
  : LwEditorDialog(parent, "cityset-info-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_cityset = c;
   dialog->set_title(_("City Set Properties"));
 
@@ -40,45 +43,40 @@ CitySetInfoDialog::CitySetInfoDialog(Gtk::Window &parent, Cityset *c)
   xml->get_widget("name_entry", name_entry);
   xml->get_widget("size_spinbutton", size_spinbutton);
   xml->get_widget("fit_button", fit_button);
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
 
-  size_spinbutton->set_value ((double)c->getTileSize ());
-  size_spinbutton->signal_changed().connect (method(on_size_changed));
-  fit_button->signal_clicked().connect (method(on_fit_pressed));
-
-  name_entry->set_text (d_cityset->getName ());
   location_label->property_label () =
     d_cityset->getDirectory ().empty () ? "" :
     d_cityset->getConfigurationFile (true);
 
-  name_entry->signal_changed().connect (method(on_name_changed));
-
   xml->get_widget("copyright_textview", copyright_textview);
-  copyright_textview->get_buffer()->set_text(d_cityset->getCopyright());
-  copyright_textview->get_buffer()->signal_changed().connect
-    (method(on_copyright_changed));
   xml->get_widget("license_textview", license_textview);
-  license_textview->get_buffer()->set_text(d_cityset->getLicense());
-  license_textview->get_buffer()->signal_changed().connect
-    (method(on_license_changed));
   xml->get_widget("description_textview", description_textview);
-  description_textview->get_buffer()->set_text(d_cityset->getInfo());
-  description_textview->get_buffer()->signal_changed().connect
-    (method(on_description_changed));
   xml->get_widget("notebook", notebook);
-  on_name_changed ();
   d_name = d_cityset->getName ();
   d_description = d_cityset->getInfo ();
   d_copyright = d_cityset->getCopyright ();
   d_license = d_cityset->getLicense ();
   d_tilesize = d_cityset->getTileSize ();
+  d_orig_name = d_name;
+  d_orig_description = d_description;
+  d_orig_copyright = d_copyright;
+  d_orig_license = d_license;
+  d_orig_tilesize = d_tilesize;
+  update ();
+  update_name ();
   d_changed = false;
 }
 
-void CitySetInfoDialog::on_name_changed()
+void CitySetInfoDialog::update_name ()
 {
-  d_changed = true;
   Glib::ustring oldname = d_cityset->getName ();
+  guint32 oldsize = d_cityset->getTileSize ();
   d_cityset->setName (String::utrim (name_entry->get_text ()));
+  d_cityset->setTileSize (d_tilesize);
   close_button->set_sensitive (File::sanify (d_cityset->getName ()) != "");
 
   Glib::ustring file =
@@ -88,31 +86,47 @@ void CitySetInfoDialog::on_name_changed()
   else
     status_label->set_text ("");
   d_cityset->setName (oldname);
+  d_cityset->setTileSize (oldsize);
   d_name = String::utrim (name_entry->get_text ());
+}
+
+void CitySetInfoDialog::on_name_changed()
+{
+  umgr->add (new CitySetInfoAction_Name (d_name, name_entry->get_position ()));
+  d_changed = true;
+  update_name ();
 }
 
 bool CitySetInfoDialog::run()
 {
-  dialog->show_all();
   dialog->run();
   dialog->hide ();
+  if (d_orig_description == d_description &&
+      d_orig_copyright == d_copyright &&
+      d_orig_license == d_license &&
+      d_orig_name == d_name &&
+      d_orig_tilesize == d_tilesize)
+    return false;
   return d_changed;
 }
 
 void CitySetInfoDialog::on_copyright_changed ()
 {
+  umgr->add (new CitySetInfoAction_Copyright (d_copyright));
   d_changed = true;
   d_copyright = copyright_textview->get_buffer()->get_text();
 }
 
 void CitySetInfoDialog::on_license_changed ()
 {
+  umgr->add (new CitySetInfoAction_License (d_license));
   d_changed = true;
   d_license = license_textview->get_buffer()->get_text();
 }
 
 void CitySetInfoDialog::on_description_changed ()
 {
+  umgr->add (new CitySetInfoAction_Description (d_description));
   d_changed = true;
   d_description = description_textview->get_buffer()->get_text();
 }
@@ -124,16 +138,127 @@ CitySetInfoDialog::~CitySetInfoDialog()
 
 void CitySetInfoDialog::on_size_changed()
 {
+  umgr->add (new CitySetInfoAction_TileSize (d_tilesize));
   d_changed = true;
   d_tilesize = size_spinbutton->get_value ();
-  on_name_changed ();
+  update_name ();
 }
 
 void CitySetInfoDialog::on_fit_pressed()
 {
+  umgr->add (new CitySetInfoAction_TileSize (d_tilesize));
   d_changed = true;
   guint32 ts = 0;
   d_cityset->calculate_preferred_tile_size (ts);
   size_spinbutton->set_value (ts);
-  on_name_changed ();
+  update_name ();
+}
+
+UndoAction* CitySetInfoDialog::executeAction (UndoAction *action2)
+{
+  CitySetInfoAction *action = dynamic_cast<CitySetInfoAction*>(action2);
+  UndoAction *out = NULL;
+
+    switch (action->getType ())
+      {
+      case CitySetInfoAction::DESCRIPTION:
+          {
+            CitySetInfoAction_Description *a =
+              dynamic_cast<CitySetInfoAction_Description*>(action);
+            out = new CitySetInfoAction_Description (d_description);
+            d_description = a->getMessage ();
+          } 
+        break;
+      case CitySetInfoAction::COPYRIGHT:
+          {
+            CitySetInfoAction_Copyright *a =
+              dynamic_cast<CitySetInfoAction_Copyright*>(action);
+            out = new CitySetInfoAction_Copyright (d_copyright);
+            d_copyright = a->getMessage ();
+          } 
+        break;
+      case CitySetInfoAction::LICENSE:
+          {
+            CitySetInfoAction_License *a =
+              dynamic_cast<CitySetInfoAction_License*>(action);
+            out = new CitySetInfoAction_License (d_license);
+            d_license = a->getMessage ();
+          } 
+        break;
+      case CitySetInfoAction::NAME:
+          {
+            CitySetInfoAction_Name *a = dynamic_cast<CitySetInfoAction_Name*>(action);
+            out = new CitySetInfoAction_Name
+              (d_name, name_entry->get_position ());
+            d_name = a->getName ();
+            disconnect_signals ();
+            name_entry->set_text (d_name);
+            name_entry->set_position (a->getCursorPosition ());
+            connect_signals ();
+          }
+        break;
+      case CitySetInfoAction::TILE_SIZE:
+          {
+            CitySetInfoAction_TileSize *a =
+              dynamic_cast<CitySetInfoAction_TileSize*>(action);
+            out = new CitySetInfoAction_TileSize (d_tilesize);
+            d_tilesize = a->getTileSize ();
+            update_name ();
+          } 
+        break;
+      }
+    return out;
+}
+
+void CitySetInfoDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+}
+
+void CitySetInfoDialog::on_redo_activated ()
+{
+  d_changed = true;
+  umgr->redo ();
+  update ();
+}
+
+void CitySetInfoDialog::update ()
+{
+  disconnect_signals ();
+  description_textview->get_buffer()->set_text(d_description);
+  copyright_textview->get_buffer()->set_text(d_copyright);
+  license_textview->get_buffer()->set_text(d_license);
+  if (name_entry->get_text () != d_name)
+    name_entry->set_text (d_name);
+  size_spinbutton->set_value (d_tilesize);
+  connect_signals ();
+}
+
+void CitySetInfoDialog::connect_signals ()
+{
+  connections.push_back
+    (description_textview->get_buffer()->signal_changed().connect
+     (method(on_description_changed)));
+  connections.push_back
+    (copyright_textview->get_buffer()->signal_changed().connect
+     (method(on_copyright_changed)));
+  connections.push_back
+    (license_textview->get_buffer()->signal_changed().connect
+     (method(on_license_changed)));
+  connections.push_back
+    (name_entry->signal_changed().connect (method(on_name_changed)));
+  connections.push_back
+    (size_spinbutton->signal_changed().connect (method(on_size_changed)));
+  connections.push_back
+    (fit_button->signal_clicked().connect (method(on_fit_pressed)));
+}
+
+void CitySetInfoDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
 }
