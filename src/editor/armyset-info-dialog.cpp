@@ -26,6 +26,7 @@
 #include "ucompose.hpp"
 #include "defs.h"
 #include "File.h"
+#include "armyset-info-actions.h"
 
 
 #define method(x) sigc::mem_fun(*this, &ArmySetInfoDialog::x)
@@ -33,6 +34,8 @@
 ArmySetInfoDialog::ArmySetInfoDialog(Gtk::Window &parent, Armyset *armyset)
  : LwEditorDialog(parent, "armyset-info-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_armyset = armyset;
   dialog->set_title(_("Army Set Properties"));
 
@@ -44,42 +47,38 @@ ArmySetInfoDialog::ArmySetInfoDialog(Gtk::Window &parent, Armyset *armyset)
     d_armyset->getConfigurationFile (true);
 
   xml->get_widget("name_entry", name_entry);
-  name_entry->set_text(armyset->getName());
-  name_entry->signal_changed().connect (method (on_name_changed));
-
   xml->get_widget("copyright_textview", copyright_textview);
-  copyright_textview->get_buffer()->set_text(d_armyset->getCopyright());
-  copyright_textview->get_buffer()->signal_changed().connect
-    (method(on_copyright_changed));
   xml->get_widget("license_textview", license_textview);
-  license_textview->get_buffer()->set_text(d_armyset->getLicense());
-  license_textview->get_buffer()->signal_changed().connect
-    (method(on_license_changed));
   xml->get_widget("description_textview", description_textview);
-  description_textview->get_buffer()->set_text(d_armyset->getInfo());
-  description_textview->get_buffer()->signal_changed().connect
-    (method(on_description_changed));
   xml->get_widget("notebook", notebook);
   xml->get_widget("size_spinbutton", size_spinbutton);
   xml->get_widget("fit_button", fit_button);
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
 
-  size_spinbutton->set_value ((double)armyset->getTileSize ());
-  size_spinbutton->signal_changed().connect (method(on_size_changed));
-  fit_button->signal_clicked().connect (method(on_fit_pressed));
-  on_name_changed ();
   d_name = d_armyset->getName ();
   d_description = d_armyset->getInfo ();
   d_copyright = d_armyset->getCopyright ();
   d_license = d_armyset->getLicense ();
   d_tilesize = d_armyset->getTileSize ();
+  d_orig_description = d_description;
+  d_orig_copyright = d_copyright;
+  d_orig_license = d_license;
+  d_orig_tilesize = d_tilesize;
+  connect_signals ();
+  update ();
+  update_name ();
   d_changed = false;
 }
 
-void ArmySetInfoDialog::on_name_changed()
+void ArmySetInfoDialog::update_name ()
 {
-  d_changed = true;
   Glib::ustring oldname = d_armyset->getName ();
+  guint32 oldsize = d_armyset->getTileSize ();
   d_armyset->setName (String::utrim (name_entry->get_text ()));
+  d_armyset->setTileSize (d_tilesize);
   close_button->set_sensitive (File::sanify (d_armyset->getName ()) != "");
 
   Glib::ustring file =
@@ -89,52 +88,180 @@ void ArmySetInfoDialog::on_name_changed()
   else
     status_label->set_text ("");
   d_armyset->setName (oldname);
+  d_armyset->setTileSize (oldsize);
   d_name = String::utrim (name_entry->get_text ());
+}
+
+void ArmySetInfoDialog::on_name_changed()
+{
+  umgr->add (new ArmySetInfoAction_Name (d_name, name_entry->get_position ()));
+  d_changed = true;
+  update_name ();
 }
 
 bool ArmySetInfoDialog::run()
 {
-  dialog->show_all();
   dialog->run();
   dialog->hide ();
+  if (d_orig_description == d_description &&
+      d_orig_copyright == d_copyright &&
+      d_orig_license == d_license &&
+      d_orig_name == d_name &&
+      d_orig_tilesize == d_tilesize)
+    return false;
   return d_changed;
 }
 
 void ArmySetInfoDialog::on_copyright_changed ()
 {
+  umgr->add (new ArmySetInfoAction_Copyright (d_copyright));
   d_changed = true;
   d_copyright = copyright_textview->get_buffer()->get_text();
 }
 
 void ArmySetInfoDialog::on_license_changed ()
 {
+  umgr->add (new ArmySetInfoAction_License (d_license));
   d_changed = true;
   d_license = license_textview->get_buffer()->get_text();
 }
 
 void ArmySetInfoDialog::on_description_changed ()
 {
+  umgr->add (new ArmySetInfoAction_Description (d_description));
   d_changed = true;
   d_description = description_textview->get_buffer()->get_text();
 }
 
 ArmySetInfoDialog::~ArmySetInfoDialog()
 {
+  delete umgr;
   notebook->property_show_tabs () = false;
 }
 
 void ArmySetInfoDialog::on_size_changed()
 {
+  umgr->add (new ArmySetInfoAction_TileSize (d_tilesize));
   d_changed = true;
   d_tilesize = size_spinbutton->get_value ();
-  on_name_changed ();
+  update_name ();
 }
 
 void ArmySetInfoDialog::on_fit_pressed()
 {
+  umgr->add (new ArmySetInfoAction_TileSize (d_tilesize));
   d_changed = true;
   guint32 ts = 0;
   d_armyset->calculate_preferred_tile_size (ts);
   size_spinbutton->set_value (ts);
-  on_name_changed ();
+  update_name ();
+}
+
+UndoAction* ArmySetInfoDialog::executeAction (UndoAction *action2)
+{
+  ArmySetInfoAction *action = dynamic_cast<ArmySetInfoAction*>(action2);
+  UndoAction *out = NULL;
+
+    switch (action->getType ())
+      {
+      case ArmySetInfoAction::DESCRIPTION:
+          {
+            ArmySetInfoAction_Description *a =
+              dynamic_cast<ArmySetInfoAction_Description*>(action);
+            out = new ArmySetInfoAction_Description (d_description);
+            d_description = a->getMessage ();
+          } 
+        break;
+      case ArmySetInfoAction::COPYRIGHT:
+          {
+            ArmySetInfoAction_Copyright *a =
+              dynamic_cast<ArmySetInfoAction_Copyright*>(action);
+            out = new ArmySetInfoAction_Copyright (d_copyright);
+            d_copyright = a->getMessage ();
+          } 
+        break;
+      case ArmySetInfoAction::LICENSE:
+          {
+            ArmySetInfoAction_License *a =
+              dynamic_cast<ArmySetInfoAction_License*>(action);
+            out = new ArmySetInfoAction_License (d_license);
+            d_license = a->getMessage ();
+          } 
+        break;
+      case ArmySetInfoAction::NAME:
+          {
+            ArmySetInfoAction_Name *a = dynamic_cast<ArmySetInfoAction_Name*>(action);
+            out = new ArmySetInfoAction_Name
+              (d_name, name_entry->get_position ());
+            d_name = a->getName ();
+            disconnect_signals ();
+            name_entry->set_text (d_name);
+            name_entry->set_position (a->getCursorPosition ());
+            connect_signals ();
+          }
+        break;
+      case ArmySetInfoAction::TILE_SIZE:
+          {
+            ArmySetInfoAction_TileSize *a =
+              dynamic_cast<ArmySetInfoAction_TileSize*>(action);
+            out = new ArmySetInfoAction_TileSize (d_tilesize);
+            d_tilesize = a->getTileSize ();
+            update_name ();
+          } 
+        break;
+      }
+    return out;
+}
+
+void ArmySetInfoDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+}
+
+void ArmySetInfoDialog::on_redo_activated ()
+{
+  d_changed = true;
+  umgr->redo ();
+  update ();
+}
+
+void ArmySetInfoDialog::update ()
+{
+  disconnect_signals ();
+  description_textview->get_buffer()->set_text(d_description);
+  copyright_textview->get_buffer()->set_text(d_copyright);
+  license_textview->get_buffer()->set_text(d_license);
+  if (name_entry->get_text () != d_name)
+    name_entry->set_text (d_name);
+  size_spinbutton->set_value (d_tilesize);
+  connect_signals ();
+}
+
+void ArmySetInfoDialog::connect_signals ()
+{
+  connections.push_back
+    (description_textview->get_buffer()->signal_changed().connect
+     (method(on_description_changed)));
+  connections.push_back
+    (copyright_textview->get_buffer()->signal_changed().connect
+     (method(on_copyright_changed)));
+  connections.push_back
+    (license_textview->get_buffer()->signal_changed().connect
+     (method(on_license_changed)));
+  connections.push_back
+    (name_entry->signal_changed().connect (method(on_name_changed)));
+  connections.push_back
+    (size_spinbutton->signal_changed().connect (method(on_size_changed)));
+  connections.push_back
+    (fit_button->signal_clicked().connect (method(on_fit_pressed)));
+}
+
+void ArmySetInfoDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
 }

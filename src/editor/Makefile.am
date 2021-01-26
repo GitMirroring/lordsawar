@@ -36,7 +36,7 @@ libshieldsetwindow_la_SOURCES = \
 
 libarmysetwindow_la_SOURCES = \
 	armyset-window.cpp armyset-window.h  \
-	armyset-info-dialog.cpp armyset-info-dialog.h \
+	armyset-info-dialog.cpp armyset-info-dialog.h armyset-info-actions.h \
 	armyset-editor-actions.cpp armyset-editor-actions.h \
 	armyset-selector-editor-dialog.cpp armyset-selector-editor-dialog.h \
 	tar-file-masked-image-editor-dialog.cpp tar-file-masked-image-editor-dialog.h \
