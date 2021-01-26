@@ -22,6 +22,7 @@
 
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 
 class GameScenario;
 
@@ -40,6 +41,7 @@ class MapInfoDialog: public LwEditorDialog
     Glib::ustring getLicense () const {return d_license;}
     
  private:
+    UndoMgr *umgr;
     bool d_changed;
     Glib::ustring d_name;
     Glib::ustring d_description;
@@ -65,11 +67,25 @@ class MapInfoDialog: public LwEditorDialog
     Gtk::Label *items_label;
     Gtk::Label *rewards_label;
     Gtk::Label *bags_label;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
+    Glib::ustring d_orig_description;
+    Glib::ustring d_orig_copyright;
+    Glib::ustring d_orig_license;
+    Glib::ustring d_orig_name;
 
     void on_name_changed();
     void on_copyright_changed ();
     void on_license_changed ();
     void on_description_changed ();
+
+    UndoAction* executeAction (UndoAction *action);
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void connect_signals ();
+    void disconnect_signals ();
+    void update ();
+    std::list<sigc::connection> connections;
 };
 
 #endif

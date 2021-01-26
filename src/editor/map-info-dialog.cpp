@@ -39,30 +39,27 @@
 #include "Itemlist.h"
 #include "rewardlist.h"
 #include "GameMap.h"
+#include "map-info-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &MapInfoDialog::x)
 
 MapInfoDialog::MapInfoDialog(Gtk::Window &parent, GameScenario *g)
  : LwEditorDialog(parent, "map-info-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_changed = false;
   game_scenario = g;
 
   xml->get_widget("name_entry", name_entry);
   name_entry->set_text(game_scenario->getName());
-  name_entry->signal_changed().connect (method(on_name_changed));
   xml->get_widget("description_textview", description_textview);
-  description_textview->get_buffer()->set_text(game_scenario->getComment());
-  description_textview->get_buffer()->signal_changed().connect
-    (method(on_description_changed));
   xml->get_widget("copyright_textview", copyright_textview);
-  copyright_textview->get_buffer()->set_text(game_scenario->getCopyright());
-  copyright_textview->get_buffer()->signal_changed().connect
-    (method(on_copyright_changed));
   xml->get_widget("license_textview", license_textview);
-  license_textview->get_buffer()->set_text(game_scenario->getLicense());
-  license_textview->get_buffer()->signal_changed().connect
-    (method(on_license_changed));
+  xml->get_widget ("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget ("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
   xml->get_widget ("notebook", notebook);
   xml->get_widget ("cities_label", cities_label);
   xml->get_widget ("ruins_label", ruins_label);
@@ -116,42 +113,151 @@ MapInfoDialog::MapInfoDialog(Gtk::Window &parent, GameScenario *g)
   d_description = g->getComment ();
   d_copyright = g->getCopyright ();
   d_license = g->getLicense ();
+  d_orig_description = d_description;
+  d_orig_copyright = d_copyright;
+  d_orig_license = d_license;
+  d_orig_name = d_name;
+  connect_signals ();
+  update ();
 }
 
 bool MapInfoDialog::run()
 {
-  dialog->show_all();
   dialog->run();
   dialog->hide ();
+  if (d_orig_description == d_description &&
+      d_orig_copyright == d_copyright &&
+      d_orig_license == d_license &&
+      d_orig_name == d_name)
+    return false;
   return d_changed;
 }
 
 void MapInfoDialog::on_name_changed()
 {
+  umgr->add (new MapInfoAction_Name (d_name, name_entry->get_position ()));
   d_changed = true;
   d_name = String::utrim (name_entry->get_text ());
 }
 
 void MapInfoDialog::on_copyright_changed ()
 {
+  umgr->add (new MapInfoAction_Copyright (d_copyright));
   d_changed = true;
   d_copyright = copyright_textview->get_buffer()->get_text();
 }
 
 void MapInfoDialog::on_license_changed ()
 {
+  umgr->add (new MapInfoAction_License (d_license));
   d_changed = true;
   d_license = license_textview->get_buffer()->get_text();
 }
 
 void MapInfoDialog::on_description_changed ()
 {
+  umgr->add (new MapInfoAction_Description (d_description));
   d_changed = true;
   d_description = description_textview->get_buffer()->get_text();
 }
 
 MapInfoDialog::~MapInfoDialog()
 {
+  delete umgr;
   notebook->property_show_tabs () = false;
 }
 
+UndoAction* MapInfoDialog::executeAction (UndoAction *action2)
+{
+  MapInfoAction *action = dynamic_cast<MapInfoAction*>(action2);
+  UndoAction *out = NULL;
+
+    switch (action->getType ())
+      {
+      case MapInfoAction::DESCRIPTION:
+          {
+            MapInfoAction_Description *a =
+              dynamic_cast<MapInfoAction_Description*>(action);
+            out = new MapInfoAction_Description (d_description);
+            d_description = a->getMessage ();
+          } 
+        break;
+      case MapInfoAction::COPYRIGHT:
+          {
+            MapInfoAction_Copyright *a =
+              dynamic_cast<MapInfoAction_Copyright*>(action);
+            out = new MapInfoAction_Copyright (d_copyright);
+            d_copyright = a->getMessage ();
+          } 
+        break;
+      case MapInfoAction::LICENSE:
+          {
+            MapInfoAction_License *a =
+              dynamic_cast<MapInfoAction_License*>(action);
+            out = new MapInfoAction_License (d_license);
+            d_license = a->getMessage ();
+          } 
+        break;
+      case MapInfoAction::NAME:
+          {
+            MapInfoAction_Name *a = dynamic_cast<MapInfoAction_Name*>(action);
+            out = new MapInfoAction_Name
+              (d_name, name_entry->get_position ());
+            d_name = a->getName ();
+            disconnect_signals ();
+            name_entry->set_text (d_name);
+            name_entry->set_position (a->getCursorPosition ());
+            connect_signals ();
+          }
+        break;
+      }
+    return out;
+}
+
+void MapInfoDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+}
+
+void MapInfoDialog::on_redo_activated ()
+{
+  d_changed = true;
+  umgr->redo ();
+  update ();
+}
+
+void MapInfoDialog::update ()
+{
+  disconnect_signals ();
+  description_textview->get_buffer()->set_text(d_description);
+  copyright_textview->get_buffer()->set_text(d_copyright);
+  license_textview->get_buffer()->set_text(d_license);
+  if (name_entry->get_text () != d_name)
+    name_entry->set_text (d_name);
+  connect_signals ();
+}
+
+void MapInfoDialog::connect_signals ()
+{
+  connections.push_back
+    (description_textview->get_buffer()->signal_changed().connect
+     (method(on_description_changed)));
+  connections.push_back
+    (copyright_textview->get_buffer()->signal_changed().connect
+     (method(on_copyright_changed)));
+  connections.push_back
+    (license_textview->get_buffer()->signal_changed().connect
+     (method(on_license_changed)));
+  connections.push_back
+    (name_entry->signal_changed().connect (method(on_name_changed)));
+}
+
+void MapInfoDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
