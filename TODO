@@ -60,3 +60,5 @@ figure out how to do undo for textviews
 undo doesn't play well with createscenariorandomize (names don't get pushed back)
 
 a stat tab in tileset, armyset info dialogs
+
+preview army type in armyset editor.  pick tileset/shieldset/cityset.
