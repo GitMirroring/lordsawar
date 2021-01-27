@@ -325,3 +325,24 @@ void TarFileMaskedImage::uninstantiate (Glib::ustring name, std::vector<TarFileM
     if (i->getName () == name)
       i->clear ();
 }
+
+void TarFileMaskedImage::copyFrames (TarFileMaskedImage *dst)
+{
+  dst->clear (true);
+  dst->orientation = orientation;
+  dst->name = name;
+  dst->file_on_disk = file_on_disk;
+  dst->scale_dimension = scale_dimension;
+  dst->dimension = dimension;
+  if (image)
+    dst->image = image->copy ();
+  else
+    dst->image = NULL;
+
+  dst->calculated_number_of_frames = calculated_number_of_frames;
+
+  for (int i = 0; i < frames.size (); i++)
+    dst->frames[i] =
+      std::pair<PixMask*,PixMask*>(frames[i].first->copy (),
+                                   frames[i].second->copy ());
+}

@@ -40,7 +40,8 @@ libarmysetwindow_la_SOURCES = \
 	armyset-editor-actions.cpp armyset-editor-actions.h \
 	armyset-selector-editor-dialog.cpp armyset-selector-editor-dialog.h \
 	tar-file-masked-image-editor-dialog.cpp tar-file-masked-image-editor-dialog.h \
-	image-editor-dialog.cpp image-editor-dialog.h 
+	tar-file-masked-image-editor-actions.h \
+	image-editor-dialog.cpp image-editor-dialog.h image-editor-actions.h
 
 libcitysetwindow_la_SOURCES = \
 	cityset-window.cpp cityset-window.h  \

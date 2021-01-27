@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include "shield.h"
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 
 class TarFileMaskedImage;
 
@@ -56,7 +57,10 @@ class TarFileMaskedImageEditorDialog: public LwEditorDialog
 
  private:
     TarFileMaskedImage *d_mim;
+    UndoMgr *umgr;
     Glib::ustring d_target_filename;
+    Glib::ustring d_orig_target_filename;
+    guint32 d_shield_row;
     double d_ratio;
     Gtk::Button *imagebutton;
     Gtk::Image *image_white;
@@ -71,6 +75,8 @@ class TarFileMaskedImageEditorDialog: public LwEditorDialog
     Shieldset * d_shieldset;
     Gtk::ComboBoxText *shield_theme_combobox;
     Gtk::Button *clear_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
     void on_shieldset_changed();
     void on_image_chosen(Gtk::FileChooserDialog *d);
     void show_image();
@@ -79,6 +85,14 @@ class TarFileMaskedImageEditorDialog: public LwEditorDialog
     Gtk::FileChooserDialog* image_filechooser(bool clear);
     void setup_shield_theme_combobox(Gtk::Box *box);
     bool load_image ();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
+    bool checkDimensions (Glib::ustring filename);
 };
 
 #endif

@@ -201,11 +201,7 @@ void ImageEditorDialog::on_imagebutton_clicked ()
         ImageFileFilter::getInstance ()->showErrorDialog (d);
       else
         {
-          bool broken = false;
-          PixMask *p = PixMask::create (d->get_filename (), broken);
-          if (p)
-            delete p;
-          if (broken)
+          if (PixMask::checkFormat (d->get_filename ()))
             {
               TimedMessageDialog
                 td(*d,

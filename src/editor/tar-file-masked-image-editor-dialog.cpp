@@ -34,6 +34,7 @@
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
 #include "TarFileMaskedImage.h"
+#include "tar-file-masked-image-editor-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &TarFileMaskedImageEditorDialog::x)
 
@@ -42,6 +43,8 @@ const int TarFileMaskedImageEditorDialog::MAX_IMAGES_WIDTH = 1000;
 TarFileMaskedImageEditorDialog::TarFileMaskedImageEditorDialog(Gtk::Window &parent, TarFileMaskedImage *mi, double ratio, Shieldset *shieldset)
  : LwEditorDialog(parent, "tar-file-masked-image-editor-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_mim = mi;
   d_shieldset = shieldset;
   d_ratio = ratio;
@@ -57,19 +60,24 @@ TarFileMaskedImageEditorDialog::TarFileMaskedImageEditorDialog(Gtk::Window &pare
   xml->get_widget("image_black", image_black);
   xml->get_widget("image_neutral", image_neutral);
   xml->get_widget("clear_button", clear_button);
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
 
   Gtk::Box *box;
   xml->get_widget("shieldset_box", box);
   setup_shield_theme_combobox(box);
 
-  d_target_filename = "";
-  update_panel();
-  image_neutral->property_visible () = 
-    d_mim->getMaskOrientation() == TarFileMaskedImage::HORIZONTAL_MASK;
+  d_target_filename = d_mim->getName ();
+  d_orig_target_filename = d_target_filename;
+  connect_signals ();
+  update ();
 }
 
 TarFileMaskedImageEditorDialog::~TarFileMaskedImageEditorDialog()
 {
+  delete umgr;
 }
 
 bool TarFileMaskedImageEditorDialog::load_image ()
@@ -87,6 +95,8 @@ int TarFileMaskedImageEditorDialog::run()
   show_image();
   shield_theme_combobox->show_all ();
   int response = dialog->run();
+  if (d_orig_target_filename == d_target_filename)
+    d_target_filename = "";
   if (response != Gtk::RESPONSE_ACCEPT)
     d_target_filename = "";
 
@@ -104,6 +114,7 @@ void TarFileMaskedImageEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
   if (selected_filename.empty())
     return;
 
+  umgr->add (new TarFileMaskedImageEditorAction_Set (d_mim, d_target_filename));
   d_target_filename = selected_filename;
   load_image ();
   update_panel ();
@@ -112,8 +123,7 @@ void TarFileMaskedImageEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
 
 void TarFileMaskedImageEditorDialog::update_panel()
 {
-  Glib::ustring f = d_target_filename.empty () ?
-    d_mim->getName () :File::get_basename (d_target_filename, true);
+  Glib::ustring f = File::get_basename (d_target_filename, true);
   if (f.empty () == false)
     imagebutton->set_label (f);
   else
@@ -122,23 +132,24 @@ void TarFileMaskedImageEditorDialog::update_panel()
       show_image ();
     }
   clear_button->set_visible (d_mim->getImage () != NULL);
+  image_neutral->property_visible () = 
+    d_mim->getMaskOrientation() == TarFileMaskedImage::HORIZONTAL_MASK;
 }
 
 void TarFileMaskedImageEditorDialog::show_image()
 {
+  image_white->clear();
+  image_green->clear();
+  image_yellow->clear();
+  image_light_blue->clear();
+  image_red->clear();
+  image_dark_blue->clear();
+  image_orange->clear();
+  image_black->clear();
+  image_neutral->clear();
+  image_white->show ();
   if (d_mim->getImage() == NULL)
-    {
-      image_white->clear();
-      image_green->clear();
-      image_yellow->clear();
-      image_light_blue->clear();
-      image_red->clear();
-      image_dark_blue->clear();
-      image_orange->clear();
-      image_black->clear();
-      image_neutral->clear();
-      return;
-    }
+    return;
 
   Vector<int> dim = d_mim->getImageDimensions ();
   if (dim.x * MAX_PLAYERS  > MAX_IMAGES_WIDTH)
@@ -151,22 +162,22 @@ void TarFileMaskedImageEditorDialog::show_image()
     {
       Gtk::Image *image = NULL;
       switch (i)
-	{
-	case Shield::WHITE: image = image_white; break;
-	case Shield::GREEN: image = image_green; break;
-	case Shield::YELLOW: image = image_yellow; break;
-	case Shield::LIGHT_BLUE: image = image_light_blue; break;
-	case Shield::RED: image = image_red; break;
-	case Shield::DARK_BLUE: image = image_dark_blue; break;
-	case Shield::ORANGE: image = image_orange; break;
-	case Shield::BLACK: image = image_black; break;
-	case Shield::NEUTRAL: 
-          image = image_neutral;
-          if (d_mim->getMaskOrientation() == TarFileMaskedImage::VERTICAL_MASK)
-            continue;
-          break;
-	default : break;
-	}
+        {
+        case Shield::WHITE: image = image_white; break;
+        case Shield::GREEN: image = image_green; break;
+        case Shield::YELLOW: image = image_yellow; break;
+        case Shield::LIGHT_BLUE: image = image_light_blue; break;
+        case Shield::RED: image = image_red; break;
+        case Shield::DARK_BLUE: image = image_dark_blue; break;
+        case Shield::ORANGE: image = image_orange; break;
+        case Shield::BLACK: image = image_black; break;
+        case Shield::NEUTRAL: 
+                            image = image_neutral;
+                            if (d_mim->getMaskOrientation() == TarFileMaskedImage::VERTICAL_MASK)
+                              continue;
+                            break;
+        default : break;
+        }
 
       if (d_shieldset == NULL)
         {
@@ -177,12 +188,12 @@ void TarFileMaskedImageEditorDialog::show_image()
       PixMask *p;
       switch (d_mim->getMaskOrientation ())
         {
-          case TarFileMaskedImage::HORIZONTAL_MASK:
-            p = d_mim->applyMask (colour);
-            break;
-          case TarFileMaskedImage::VERTICAL_MASK:
-            p = d_mim->applyMask (i, colour);
-            break;
+        case TarFileMaskedImage::HORIZONTAL_MASK:
+          p = d_mim->applyMask (colour);
+          break;
+        case TarFileMaskedImage::VERTICAL_MASK:
+          p = d_mim->applyMask (i, colour);
+          break;
         }
       PixMask::scale (p, dim.x, dim.y); //idk if we need this
       if (d_ratio > 0)
@@ -213,23 +224,51 @@ Gtk::FileChooserDialog* TarFileMaskedImageEditorDialog::image_filechooser(bool c
   return d;
 }
 
+bool TarFileMaskedImageEditorDialog::checkDimensions (Glib::ustring filename)
+{
+  bool success = false;
+  bool broken = false;
+  PixMask *p = PixMask::create (filename, broken);
+  if (broken)
+    return success;
+  switch (d_mim->getMaskOrientation ())
+    {
+    case TarFileMaskedImage::HORIZONTAL_MASK: //mask is to the side
+      success = (p->get_unscaled_width () / 2) == p->get_unscaled_height ();
+      break;
+    case TarFileMaskedImage::VERTICAL_MASK: //mask is underneath
+      success = p->get_unscaled_width () % (p->get_unscaled_height () / 2) == 0;
+      break;
+    }
+  delete p;
+  return success;
+}
+
 void TarFileMaskedImageEditorDialog::on_imagebutton_clicked ()
 {
-  Gtk::FileChooserDialog *d = image_filechooser(d_mim->getImage () == NULL);
+  Gtk::FileChooserDialog *d = image_filechooser(d_mim->getImage () != NULL);
   int response = d->run();
   if (response == Gtk::RESPONSE_ACCEPT && d->get_filename() != "")
     {
       if (ImageFileFilter::getInstance ()->hasInvalidExt (d->get_filename ()))
-        {
-          ImageFileFilter::getInstance()->showErrorDialog (d);
-          d_target_filename = "";
-        }
+        ImageFileFilter::getInstance()->showErrorDialog (d);
       else
         {
           if (PixMask::checkFormat (d->get_filename ()))
             {
-              PastChooser::getInstance()->set_dir(d);
-              on_image_chosen (d);
+              if (checkDimensions (d->get_filename ()))
+                {
+                  PastChooser::getInstance()->set_dir(d);
+                  on_image_chosen (d);
+                }
+              else
+                {
+                  TimedMessageDialog
+                    td(*d,
+                       String::ucompose(_("The image has bad dimensions:\n%1"),
+                                        d->get_filename ()), 0);
+                  td.run_and_hide ();
+                }
             }
           else
             {
@@ -238,12 +277,15 @@ void TarFileMaskedImageEditorDialog::on_imagebutton_clicked ()
                    String::ucompose(_("Couldn't make sense of the image:\n%1"),
                                     d->get_filename ()), 0);
               td.run_and_hide ();
-              d_target_filename = "";
             }
         }
     }
-  else if (response == Gtk::RESPONSE_REJECT && d_mim->getImage () == NULL)
-    clear_button->activate ();
+  else if (response == Gtk::RESPONSE_REJECT)
+    {
+      d_target_filename = "";
+      d_mim->clear ();
+      clear_button->activate ();
+    }
   d->hide();
   delete d;
 }
@@ -267,13 +309,82 @@ void TarFileMaskedImageEditorDialog::setup_shield_theme_combobox(Gtk::Box *box)
     }
 
   shield_theme_combobox->set_active(default_id);
-  shield_theme_combobox->signal_changed().connect (method(on_shieldset_changed));
+  d_shield_row = default_id;
 
   box->set_center_widget (*shield_theme_combobox);
 }
 
 void TarFileMaskedImageEditorDialog::on_shieldset_changed()
 {
+  umgr->add (new TarFileMaskedImageEditorAction_Shield (d_shield_row));
   show_image();
+  d_shield_row = shield_theme_combobox->get_active_row_number ();
 }
 
+
+void TarFileMaskedImageEditorDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  update ();
+  return;
+}
+
+void TarFileMaskedImageEditorDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  update ();
+}
+
+void TarFileMaskedImageEditorDialog::update ()
+{
+  disconnect_signals ();
+  show_image ();
+  update_panel ();
+  shield_theme_combobox->set_active (d_shield_row);
+  connect_signals ();
+}
+
+void TarFileMaskedImageEditorDialog::connect_signals ()
+{
+  connections.push_back
+    (shield_theme_combobox->signal_changed().connect
+     (method(on_shieldset_changed)));
+}
+
+void TarFileMaskedImageEditorDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+UndoAction *TarFileMaskedImageEditorDialog::executeAction (UndoAction *action2)
+{
+  TarFileMaskedImageEditorAction *action =
+    dynamic_cast<TarFileMaskedImageEditorAction*>(action2);
+  UndoAction *out = NULL;
+
+    switch (action->getType ())
+      {
+      case TarFileMaskedImageEditorAction::SET:
+          {
+            TarFileMaskedImageEditorAction_Set *a =
+              dynamic_cast<TarFileMaskedImageEditorAction_Set*>(action);
+            out = new TarFileMaskedImageEditorAction_Set (d_mim,
+                                                          d_target_filename);
+            a->getTarFileMaskedImage ()->copyFrames (d_mim);
+            d_target_filename = a->getFileName ();
+          } 
+        break;
+      case TarFileMaskedImageEditorAction::SHIELD:
+          {
+            TarFileMaskedImageEditorAction_Shield *a =
+              dynamic_cast<TarFileMaskedImageEditorAction_Shield*>(action);
+            out = new TarFileMaskedImageEditorAction_Shield
+              (shield_theme_combobox->get_active_row_number ());
+            d_shield_row = a->getShield ();
+          }
+        break;
+      }
+    return out;
+}

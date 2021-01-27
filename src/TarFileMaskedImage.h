@@ -176,6 +176,8 @@ public:
   //! copy this to DEST in T
   bool copy (TarFile *t, TarFileMaskedImage *dest);
 
+  void copyFrames (TarFileMaskedImage *dest);
+
   //! uninstantiate all images named NAME in IMAGES
   static void uninstantiate (Glib::ustring name, std::vector<TarFileMaskedImage*> images);
 private:
