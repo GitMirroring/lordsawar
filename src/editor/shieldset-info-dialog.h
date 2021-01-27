@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include "shieldset.h"
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 
 //! Shieldset Info Editor.  Change the name/description/etc of the Shieldset.
 class ShieldSetInfoDialog: public LwEditorDialog
@@ -45,6 +46,7 @@ class ShieldSetInfoDialog: public LwEditorDialog
     guint32 getLargeHeight () const {return d_large_height;}
 
  private:
+    UndoMgr *umgr;
     Shieldset *d_shieldset;
     bool d_changed;
     Glib::ustring d_name;
@@ -57,6 +59,16 @@ class ShieldSetInfoDialog: public LwEditorDialog
     guint32 d_medium_height;
     guint32 d_large_width;
     guint32 d_large_height;
+    Glib::ustring d_orig_name;
+    Glib::ustring d_orig_description;
+    Glib::ustring d_orig_copyright;
+    Glib::ustring d_orig_license;
+    guint32 d_orig_small_width;
+    guint32 d_orig_small_height;
+    guint32 d_orig_medium_width;
+    guint32 d_orig_medium_height;
+    guint32 d_orig_large_width;
+    guint32 d_orig_large_height;
     Gtk::Entry *name_entry;
     Gtk::TextView *copyright_textview;
     Gtk::TextView *license_textview;
@@ -73,6 +85,8 @@ class ShieldSetInfoDialog: public LwEditorDialog
     Gtk::SpinButton *large_width_spinbutton;
     Gtk::SpinButton *large_height_spinbutton;
     Gtk::Button *fit_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     void on_name_changed();
     void on_copyright_changed ();
@@ -85,6 +99,14 @@ class ShieldSetInfoDialog: public LwEditorDialog
     void on_large_width_changed ();
     void on_large_height_changed ();
     void on_fit_pressed ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    void update ();
+    UndoAction* executeAction (UndoAction* action);
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update_name ();
 };
 
 #endif
