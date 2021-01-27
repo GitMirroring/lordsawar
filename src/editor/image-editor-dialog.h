@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include <gtkmm.h>
 #include "PixMask.h"
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 
 class TarFileImage;
 
@@ -45,16 +46,20 @@ class ImageEditorDialog: public LwEditorDialog
     void set_title(Glib::ustring s) {dialog->set_title(s);}
 
  private:
+    UndoMgr *umgr;
     double d_ratio;
     guint32 d_num_frames;
     guint32 d_active_frame;
     Glib::ustring d_target_filename;
+    Glib::ustring d_orig_target_filename;
     std::vector<PixMask*> frames;
 
     sigc::connection heartbeat;
     Gtk::Button *imagebutton;
     Gtk::Image *image;
     Gtk::Button *clear_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     void on_image_chosen(Gtk::FileChooserDialog *d);
     void show_image();
@@ -63,6 +68,13 @@ class ImageEditorDialog: public LwEditorDialog
     Gtk::FileChooserDialog* image_filechooser(bool clear);
     void update_imagebutton_label (Glib::ustring filename);
     bool load_frames (Glib::ustring filename);
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif

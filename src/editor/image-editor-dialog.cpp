@@ -32,47 +32,52 @@
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
 #include "TarFileImage.h"
+#include "image-editor-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &ImageEditorDialog::x)
 
 ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, double ratio)
  : LwEditorDialog(parent, "image-editor-dialog.ui"), d_ratio (ratio),
     d_num_frames (im->getNumberOfFrames ()), d_active_frame (0),
-    d_target_filename ("")
+    d_target_filename (im->getName ()),
+    d_orig_target_filename (d_target_filename)
 {
-
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   xml->get_widget("imagebutton", imagebutton);
-  imagebutton->signal_clicked().connect (method(on_imagebutton_clicked));
 
   xml->get_widget("image", image);
   xml->get_widget("clear_button", clear_button);
-  update_imagebutton_label (im->getName ());
+  xml->get_widget("undo_button", undo_button);
+  xml->get_widget("redo_button", redo_button);
 
+  clear_button->set_visible (!im->getName ().empty ());
   if (im->getName ().empty () == false)
-    clear_button->set_visible (true);
-  else
-    return;
-
-  for (guint32 i = 0; i < d_num_frames; i++)
     {
-      if (d_ratio > 0)
+      for (guint32 i = 0; i < d_num_frames; i++)
         {
-          int font_size = FontSize::getInstance ()->get_height ();
-          double new_height = font_size * d_ratio;
-          int new_width =
-            ImageCache::calculate_width_from_adjusted_height (im->getImage (i),
-                                                              new_height);
-          PixMask *ff = im->getImage (i)->copy ();
-          PixMask::scale (ff, new_width, new_height);
-          frames.push_back(ff);
+          if (d_ratio > 0)
+            {
+              int font_size = FontSize::getInstance ()->get_height ();
+              double new_height = font_size * d_ratio;
+              int new_width =
+                ImageCache::calculate_width_from_adjusted_height
+                (im->getImage (i), new_height);
+              PixMask *ff = im->getImage (i)->copy ();
+              PixMask::scale (ff, new_width, new_height);
+              frames.push_back(ff);
+            }
+          else
+            frames.push_back(im->getImage (i)->copy ());
         }
-      else
-        frames.push_back(im->getImage (i)->copy ());
     }
+  update ();
 }
+      
 
 ImageEditorDialog::~ImageEditorDialog()
 {
+  delete umgr;
   for (auto f : frames)
     delete f;
 }
@@ -91,6 +96,8 @@ bool ImageEditorDialog::load_frames (Glib::ustring filename)
   bool broken = false;
   for (auto f : frames)
     delete f;
+  if (filename == "")
+    return true;
   frames = disassemble_row(filename, d_num_frames, broken);
   if (!broken)
     {
@@ -118,6 +125,8 @@ int ImageEditorDialog::run()
   if (response != Gtk::RESPONSE_ACCEPT)
     d_target_filename = "";
 
+  if (d_orig_target_filename == d_target_filename)
+    d_target_filename = "";
   return response;
 }
 
@@ -132,6 +141,7 @@ void ImageEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
   if (filename.empty())
     return;
 
+  umgr->add (new ImageEditorAction_Set (d_target_filename, frames));
   d_target_filename = filename;
 
   update_imagebutton_label (d_target_filename);
@@ -216,4 +226,67 @@ void ImageEditorDialog::on_imagebutton_clicked ()
     }
   d->hide();
   delete d;
+}
+
+void ImageEditorDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  update ();
+  return;
+}
+
+void ImageEditorDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  update ();
+}
+
+void ImageEditorDialog::update ()
+{
+  disconnect_signals ();
+  update_imagebutton_label (d_target_filename);
+  show_image ();
+  connect_signals ();
+}
+
+void ImageEditorDialog::connect_signals ()
+{
+  connections.push_back
+    (imagebutton->signal_clicked().connect (method(on_imagebutton_clicked)));
+  connections.push_back
+    (undo_button->signal_activate ().connect (method (on_undo_activated)));
+  connections.push_back
+    (redo_button->signal_activate ().connect (method (on_redo_activated)));
+}
+
+void ImageEditorDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+UndoAction *ImageEditorDialog::executeAction (UndoAction *action2)
+{
+  ImageEditorAction *action = dynamic_cast<ImageEditorAction*>(action2);
+  UndoAction *out = NULL;
+
+    switch (action->getType ())
+      {
+      case ImageEditorAction::SET:
+          {
+            ImageEditorAction_Set *a =
+              dynamic_cast<ImageEditorAction_Set*>(action);
+            out = new ImageEditorAction_Set (d_target_filename, frames);
+            d_target_filename = a->getFile ();
+            heartbeat.disconnect ();
+            for (auto f : frames)
+              delete f;
+            frames.clear ();
+            for (auto f : a->getFrames ())
+              frames.push_back (f->copy ());
+          } 
+        break;
+      }
+    return out;
 }
