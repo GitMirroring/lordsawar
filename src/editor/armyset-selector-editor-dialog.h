@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@
 #include "armyset.h"
 #include "lw-editor-dialog.h"
 #include "shield.h"
+#include "undo-mgr.h"
+#include "TarFileMaskedImage.h"
 
 class TarFileMaskedImage;
 
@@ -39,11 +41,14 @@ class ArmysetSelectorEditorDialog: public LwEditorDialog
     bool run();
 
  private:
+    UndoMgr *umgr;
     bool d_changed;
     Gtk::ComboBoxText *owner_combobox;
     Gtk::RadioButton *large_selector_radiobutton;
     Gtk::RadioButton *small_selector_radiobutton;
     Gtk::Button *selector_imagebutton;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
     Gtk::ComboBoxText *shield_theme_combobox;
     Gtk::Grid *preview_table;
     Armyset *d_armyset;
@@ -52,6 +57,9 @@ class ArmysetSelectorEditorDialog: public LwEditorDialog
     std::list<Glib::RefPtr<Gdk::Pixbuf> > selectors;
     sigc::connection heartbeat;
     std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator frame;
+    bool d_large;
+    guint32 d_shield_row;
+    guint32 d_owner_row;
 
     void on_shieldset_changed();
     void on_owner_changed();
@@ -67,10 +75,19 @@ class ArmysetSelectorEditorDialog: public LwEditorDialog
     bool loadSelector();
     void clearSelector();
     void fill_imagebutton ();
+    TarFileMaskedImage * get_selector ();
     Glib::ustring get_selector_filename ();
     void set_selector_filename (Glib::ustring f);
     Gtk::FileChooserDialog* image_filechooser(bool clear);
     Shield::Colour get_selected_colour ();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
+    bool checkDimensions (Glib::ustring filename, TarFileMaskedImage::MaskOrientation o);
 };
 
 #endif

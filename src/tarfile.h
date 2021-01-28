@@ -43,6 +43,7 @@ public:
     Glib::ustring getConfigurationFile(bool master = false) const;
 
     Glib::ustring getFileFromConfigurationFile(Glib::ustring file);
+    bool contains (Glib::ustring ar, bool &broken);
     bool replaceFileInCfgFile(Glib::ustring file, Glib::ustring new_file, Glib::ustring &out);
     bool addFileInCfgFile(Glib::ustring new_file, Glib::ustring &out);
     bool removeFileInCfgFile(Glib::ustring file);

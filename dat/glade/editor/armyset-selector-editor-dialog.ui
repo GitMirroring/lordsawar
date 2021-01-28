@@ -20,6 +20,45 @@
             <property name="can-focus">False</property>
             <property name="layout-style">end</property>
             <child>
+              <object class="GtkButton" id="undo_button">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="focus-on-click">False</property>
+                <property name="receives-default">False</property>
+                <property name="opacity">0</property>
+                <property name="relief">none</property>
+                <child>
+                  <placeholder/>
+                </child>
+                <accelerator key="z" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="redo_button">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="focus-on-click">False</property>
+                <property name="receives-default">False</property>
+                <property name="opacity">0</property>
+                <property name="relief">none</property>
+                <child>
+                  <placeholder/>
+                </child>
+                <accelerator key="z" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
+                <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkButton" id="close_button">
                 <property name="label">gtk-close</property>
                 <property name="visible">True</property>
@@ -34,7 +73,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">0</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>

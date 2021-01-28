@@ -85,6 +85,22 @@ bool TarFile::removeFileInCfgFile(Glib::ustring file)
   return !broken;
 }
 
+bool TarFile::contains (Glib::ustring ar, bool &broken)
+{
+  bool found = false;
+  Glib::ustring infile = d_tmp_filename;
+  if (infile == "")
+    infile = getConfigurationFile();
+  Tar_Helper t(infile, std::ios::in, broken);
+  if (broken == false)
+    {
+      std::list<Glib::ustring> files = t.getFilenames ();
+      found = std::find (files.begin (), files.end (), ar) != files.end ();
+      t.Close();
+    }
+  return found;
+}
+
 bool TarFile::replaceFileInCfgFile(Glib::ustring file, Glib::ustring new_file, Glib::ustring &out)
 {
   bool broken = false;

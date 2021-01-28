@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -33,12 +33,15 @@
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
 #include "TarFileMaskedImage.h"
+#include "armyset-selector-editor-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &ArmysetSelectorEditorDialog::x)
 
 ArmysetSelectorEditorDialog::ArmysetSelectorEditorDialog(Gtk::Window &parent, Armyset *armyset)
  : LwEditorDialog(parent, "armyset-selector-editor-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_changed = false;
 
   Gtk::Box *box;
@@ -56,20 +59,23 @@ ArmysetSelectorEditorDialog::ArmysetSelectorEditorDialog(Gtk::Window &parent, Ar
   xml->get_widget("preview_table", preview_table);
 
   xml->get_widget("large_selector_radiobutton", large_selector_radiobutton);
-  large_selector_radiobutton->signal_toggled().connect (method(on_button_toggle));
   xml->get_widget("small_selector_radiobutton", small_selector_radiobutton);
-  small_selector_radiobutton->signal_toggled().connect (method(on_button_toggle));
   xml->get_widget("selector_imagebutton", selector_imagebutton);
-  selector_imagebutton->signal_clicked().connect (method(on_selector_imagebutton_clicked));
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
 
-  show_preview_selectors();
-  update_selector_panel();
+  d_large = false;
+  connect_signals ();
+  update ();
 }
 
 void ArmysetSelectorEditorDialog::on_button_toggle ()
 {
-  show_preview_selectors();
-  update_selector_panel();
+  umgr->add (new ArmySetSelectorEditorAction_Size (d_large));
+  d_large = large_selector_radiobutton->get_active ();
+  update ();
 }
 
 bool ArmysetSelectorEditorDialog::run()
@@ -92,10 +98,11 @@ void ArmysetSelectorEditorDialog::setup_owner_combobox(Gtk::Box *box)
     }
 
   owner_combobox->set_active(0);
-  owner_combobox->signal_changed().connect (method(on_owner_changed));
+  d_owner_row = 0;
 
   box->set_center_widget (*owner_combobox);
 }
+
 void ArmysetSelectorEditorDialog::setup_shield_theme_combobox(Gtk::Box *box)
 {
   // fill in shield themes combobox
@@ -115,14 +122,15 @@ void ArmysetSelectorEditorDialog::setup_shield_theme_combobox(Gtk::Box *box)
     }
 
   shield_theme_combobox->set_active(default_id);
-  shield_theme_combobox->signal_changed().connect (method(on_shieldset_changed));
-
+  d_shield_row = default_id;
   box->set_center_widget (*shield_theme_combobox);
 }
 
 void ArmysetSelectorEditorDialog::on_shieldset_changed()
 {
-  show_preview_selectors();
+  umgr->add (new ArmySetSelectorEditorAction_Shield (d_shield_row));
+  d_shield_row = shield_theme_combobox->get_active_row_number ();
+  update ();
 }
 
 bool ArmysetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
@@ -130,37 +138,49 @@ bool ArmysetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
   bool broken = false;
   if (PixMask::checkFormat (d->get_filename ()))
     {
-      Glib::ustring imgname = get_selector_filename ();
-      Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty() == true)
-        success =
-          d_armyset->addFileInCfgFile(d->get_filename(), newname);
-      else
-        success =
-          d_armyset->replaceFileInCfgFile(imgname, d->get_filename(), newname);
-      if (success)
+      if (checkDimensions (d->get_filename (),
+                           TarFileMaskedImage::VERTICAL_MASK))
         {
-          set_selector_filename (newname);
-          d_changed = true;
-          show_preview_selectors ();
-          update_selector_panel();
+          Glib::ustring imgname = get_selector_filename ();
+          Glib::ustring newname = "";
+          bool success = false;
+          if (imgname.empty() == true)
+            success =
+              d_armyset->addFileInCfgFile(d->get_filename(), newname);
+          else
+            success =
+              d_armyset->replaceFileInCfgFile(imgname, d->get_filename(),
+                                              newname);
+          if (success)
+            {
+              set_selector_filename (newname);
+              d_changed = true;
+              update ();
+            }
+          else
+            {
+              Glib::ustring errmsg = Glib::strerror(errno);
+              TimedMessageDialog
+                td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
+                                        d->get_filename (),
+                                        d_armyset->getConfigurationFile(),
+                                        errmsg), 0);
+              td.run_and_hide ();
+              broken = true;
+            }
         }
       else
         {
-          Glib::ustring errmsg = Glib::strerror(errno);
-          TimedMessageDialog
-            td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
-                                    d->get_filename (),
-                                    d_armyset->getConfigurationFile(),
-                                    errmsg), 0);
+          TimedMessageDialog td
+            (*d, String::ucompose(_("The dimensions of the image are bad:\n%1"),
+                                  d->get_filename ()), 0);
           td.run_and_hide ();
           broken = true;
         }
     }
   else
     {
-       TimedMessageDialog
+      TimedMessageDialog
         td(*d, String::ucompose(_("Couldn't make sense of the image:\n%1"),
                                 d->get_filename ()), 0);
       td.run_and_hide ();
@@ -187,7 +207,6 @@ void ArmysetSelectorEditorDialog::clearSelector()
   if (heartbeat.connected())
     heartbeat.disconnect();
 
-       
   for (std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator lit = selectors.begin();
        lit != selectors.end(); ++lit)
     (*lit).clear();
@@ -303,38 +322,45 @@ Gtk::FileChooserDialog* ArmysetSelectorEditorDialog::image_filechooser(bool clea
   return d;
 }
 
-Glib::ustring ArmysetSelectorEditorDialog::get_selector_filename ()
+TarFileMaskedImage * ArmysetSelectorEditorDialog::get_selector ()
 {
   Shield::Colour c = get_selected_colour ();
   if (large_selector_radiobutton->get_active() == true)
-    return d_armyset->getSelector(true,c)->getName ();
+    return d_armyset->getSelector(true,c);
   else if (small_selector_radiobutton->get_active() == true)
-    return d_armyset->getSelector(false, c)->getName ();
-  return "";
+    return d_armyset->getSelector(false, c);
+  return NULL;
+}
+
+Glib::ustring ArmysetSelectorEditorDialog::get_selector_filename ()
+{
+  return get_selector ()->getName ();
 }
 
 void ArmysetSelectorEditorDialog::set_selector_filename (Glib::ustring f)
 {
   Shield::Colour c = get_selected_colour ();
-  if (large_selector_radiobutton->get_active() == true)
+  if (large_selector_radiobutton->get_active () == true)
     {
       if (f.empty () == false)
         {
-          d_armyset->getSelector(true,c)->load (d_armyset, f);
-          d_armyset->getSelector(true,c)->instantiateImages ();
+          d_armyset->getSelector (true, c)->load (d_armyset, f);
+          d_armyset->getSelector (true, c)->instantiateImages ();
         }
       delete large_selector;
-      large_selector = new TarFileMaskedImage (*d_armyset->getSelector(true, c));
+      large_selector =
+        new TarFileMaskedImage (*d_armyset->getSelector (true, c));
     }
   else if (small_selector_radiobutton->get_active() == true)
     {
       if (f.empty () == false)
         {
-          d_armyset->getSelector(false,c)->load (d_armyset, f);
-          d_armyset->getSelector(false,c)->instantiateImages ();
+          d_armyset->getSelector (false, c)->load (d_armyset, f);
+          d_armyset->getSelector (false, c)->instantiateImages ();
         }
       delete small_selector;
-      small_selector = new TarFileMaskedImage (*d_armyset->getSelector(true, c));
+      small_selector =
+        new TarFileMaskedImage (*d_armyset->getSelector (false, c));
     }
   return ;
 }
@@ -358,20 +384,34 @@ void ArmysetSelectorEditorDialog::on_selector_imagebutton_clicked ()
           if (d->get_filename() != filename)
             {
               PastChooser::getInstance()->set_dir(d);
-              on_image_chosen (d);
+              Glib::ustring archive_member = get_selector_filename ();
+              ArmySetSelectorEditorAction_Set *action =
+                new ArmySetSelectorEditorAction_Set (d_armyset,
+                                                     get_selected_colour (),
+                                                     d_large, archive_member);
+              if (on_image_chosen (d) == false) //false means not broken
+                umgr->add (action);
+              else
+                delete action;
             }
         }
     }
   else if (response == Gtk::RESPONSE_REJECT && f != "")
     {
+      Glib::ustring archive_member = get_selector_filename ();
+      ArmySetSelectorEditorAction_Set *action =
+        new ArmySetSelectorEditorAction_Set (d_armyset, get_selected_colour (),
+                                             d_large, archive_member);
       if (d_armyset->removeFileInCfgFile(f))
         {
+          umgr->add (action);
           d_changed = true;
           d_armyset->uninstantiateSameNamedImages (f);
-          update_selector_panel ();
+          update ();
         }
       else
         {
+          delete action;
           Glib::ustring errmsg = Glib::strerror(errno);
           TimedMessageDialog
             td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
@@ -386,6 +426,7 @@ void ArmysetSelectorEditorDialog::on_selector_imagebutton_clicked ()
 
 ArmysetSelectorEditorDialog::~ArmysetSelectorEditorDialog()
 {
+  delete umgr;
   if (small_selector)
     delete small_selector;
   if (large_selector)
@@ -394,11 +435,151 @@ ArmysetSelectorEditorDialog::~ArmysetSelectorEditorDialog()
 
 void ArmysetSelectorEditorDialog::on_owner_changed()
 {
-  update_selector_panel ();
-  show_preview_selectors();
+  umgr->add (new ArmySetSelectorEditorAction_Owner (d_owner_row));
+  d_owner_row = owner_combobox->get_active_row_number ();
+  update ();
 }
 
 Shield::Colour ArmysetSelectorEditorDialog::get_selected_colour ()
 {
   return Shield::Colour (owner_combobox->get_active_row_number ());
+}
+
+void ArmysetSelectorEditorDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  update ();
+  return;
+}
+
+void ArmysetSelectorEditorDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  update ();
+}
+
+void ArmysetSelectorEditorDialog::update ()
+{
+  disconnect_signals ();
+  shield_theme_combobox->set_active (d_shield_row);
+  owner_combobox->set_active (d_owner_row);
+  large_selector_radiobutton->set_active (d_large);
+  small_selector_radiobutton->set_active (!d_large);
+  show_preview_selectors();
+  update_selector_panel();
+  connect_signals ();
+}
+
+void ArmysetSelectorEditorDialog::connect_signals ()
+{
+  connections.push_back
+    (owner_combobox->signal_changed().connect (method(on_owner_changed)));
+  connections.push_back
+    (shield_theme_combobox->signal_changed().connect
+     (method(on_shieldset_changed)));
+  connections.push_back
+    (large_selector_radiobutton->signal_toggled().connect
+     (method(on_button_toggle)));
+  connections.push_back
+    (small_selector_radiobutton->signal_toggled().connect
+     (method(on_button_toggle)));
+  connections.push_back
+    (selector_imagebutton->signal_clicked().connect
+     (method(on_selector_imagebutton_clicked)));
+}
+
+void ArmysetSelectorEditorDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+bool ArmysetSelectorEditorDialog::checkDimensions (Glib::ustring filename, TarFileMaskedImage::MaskOrientation o)
+{
+  bool success = false;
+  bool broken = false;
+  PixMask *p = PixMask::create (filename, broken);
+  if (broken)
+    return success;
+  switch (o)
+    {
+    case TarFileMaskedImage::HORIZONTAL_MASK: //mask is to the side
+      success = (p->get_unscaled_width () / 2) == p->get_unscaled_height ();
+      break;
+    case TarFileMaskedImage::VERTICAL_MASK: //mask is underneath
+      success = p->get_unscaled_width () % (p->get_unscaled_height () / 2) == 0;
+      break;
+    }
+  delete p;
+  return success;
+}
+
+UndoAction *ArmysetSelectorEditorDialog::executeAction (UndoAction *action2)
+{
+  ArmySetSelectorEditorAction *action =
+    dynamic_cast<ArmySetSelectorEditorAction*>(action2);
+  UndoAction *out = NULL;
+
+  heartbeat.disconnect();
+  switch (action->getType ())
+    {
+    case ArmySetSelectorEditorAction::SET:
+        {
+          ArmySetSelectorEditorAction_Set *a =
+            dynamic_cast<ArmySetSelectorEditorAction_Set*>(action);
+          TarFileMaskedImage *im =
+            d_armyset->getSelector (a->getLarge (), a->getOwner ());
+          out =
+            new ArmySetSelectorEditorAction_Set (d_armyset,
+                                                 a->getOwner (),
+                                                 a->getLarge (),
+                                                 im->getName ());
+          if (a->getArchiveMember ().empty ())
+            im->clear ();
+          else
+            {
+              Glib::ustring ar = a->getArchiveMember ();
+              Glib::ustring file = a->getFileName ();
+              bool broken = false;
+              Glib::ustring newbasename = "";
+              bool present = d_armyset->contains (ar, broken);
+              if (present)
+                d_armyset->replaceFileInCfgFile (ar, file, newbasename);
+              else
+                d_armyset->addFileInCfgFile (file, newbasename);
+
+              get_selector ()->load (d_armyset, newbasename);
+              get_selector ()->instantiateImages ();
+            }
+        }
+      break;
+    case ArmySetSelectorEditorAction::SHIELD:
+        {
+          ArmySetSelectorEditorAction_Shield *a =
+            dynamic_cast<ArmySetSelectorEditorAction_Shield*>(action);
+          out = new ArmySetSelectorEditorAction_Shield
+            (shield_theme_combobox->get_active_row_number ());
+          d_shield_row = a->getShield ();
+        }
+      break;
+    case ArmySetSelectorEditorAction::OWNER:
+        {
+          ArmySetSelectorEditorAction_Owner *a =
+            dynamic_cast<ArmySetSelectorEditorAction_Owner*>(action);
+          out = new ArmySetSelectorEditorAction_Owner
+            (owner_combobox->get_active_row_number ());
+          d_owner_row = a->getOwner ();
+        }
+      break;
+    case ArmySetSelectorEditorAction::SIZE:
+        {
+          ArmySetSelectorEditorAction_Size *a =
+            dynamic_cast<ArmySetSelectorEditorAction_Size*>(action);
+          out = new ArmySetSelectorEditorAction_Size (d_large);
+          d_large = a->getLarge ();
+        }
+      break;
+    }
+  return out;
 }

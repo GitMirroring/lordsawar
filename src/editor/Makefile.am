@@ -39,6 +39,7 @@ libarmysetwindow_la_SOURCES = \
 	armyset-info-dialog.cpp armyset-info-dialog.h armyset-info-actions.h \
 	armyset-editor-actions.cpp armyset-editor-actions.h \
 	armyset-selector-editor-dialog.cpp armyset-selector-editor-dialog.h \
+	armyset-selector-editor-actions.h \
 	tar-file-masked-image-editor-dialog.cpp tar-file-masked-image-editor-dialog.h \
 	tar-file-masked-image-editor-actions.h \
 	image-editor-dialog.cpp image-editor-dialog.h image-editor-actions.h

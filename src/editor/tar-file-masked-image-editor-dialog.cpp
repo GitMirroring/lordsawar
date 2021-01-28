@@ -321,7 +321,6 @@ void TarFileMaskedImageEditorDialog::on_shieldset_changed()
   d_shield_row = shield_theme_combobox->get_active_row_number ();
 }
 
-
 void TarFileMaskedImageEditorDialog::on_undo_activated ()
 {
   umgr->undo ();

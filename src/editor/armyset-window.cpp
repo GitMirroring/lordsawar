@@ -712,18 +712,11 @@ void ArmySetWindow::on_edit_bag_picture_activated()
     {
       ArmySetEditorAction_AddImage *action =
         new ArmySetEditorAction_AddImage (d_armyset);
-      Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty () == true)
-        success = d_armyset->addFileInCfgFile(d.get_filename(), newname);
-      else
-        success =
-          d_armyset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
+      bool success = d.installFile (d_armyset, d_armyset->getBag (),
+                                    d.get_filename ());
       if (success)
         {
           addUndo (action);
-          d_armyset->getBag ()->setName(newname);
-          d_armyset->getBag ()->instantiateImages();
           armyset_modified = true;
           update_window_title ();
           update_menuitems ();
@@ -738,7 +731,7 @@ void ArmySetWindow::on_edit_bag_picture_activated()
     {
       ArmySetEditorAction_ClearImage *action =
         new ArmySetEditorAction_ClearImage (d_armyset);
-      if (d_armyset->removeFileInCfgFile(imgname))
+      if (d.uninstallFile (d_armyset, d_armyset->getBag ()))
         {
           addUndo (action);
           armyset_modified = true;
