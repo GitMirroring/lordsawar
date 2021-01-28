@@ -73,7 +73,6 @@ ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, doub
     }
   update ();
 }
-      
 
 ImageEditorDialog::~ImageEditorDialog()
 {
@@ -201,7 +200,7 @@ void ImageEditorDialog::on_imagebutton_clicked ()
         ImageFileFilter::getInstance ()->showErrorDialog (d);
       else
         {
-          if (PixMask::checkFormat (d->get_filename ()))
+          if (PixMask::checkFormat (d->get_filename ()) == false)
             {
               TimedMessageDialog
                 td(*d,
@@ -285,4 +284,24 @@ UndoAction *ImageEditorDialog::executeAction (UndoAction *action2)
         break;
       }
     return out;
+}
+
+bool ImageEditorDialog::installFile (TarFile *t, TarFileImage *im, Glib::ustring filename)
+{
+  Glib::ustring newname;
+  bool success = false;
+  if (d_orig_target_filename.empty () == true)
+    success = t->addFileInCfgFile (filename, newname);
+  else
+    success =
+      t->replaceFileInCfgFile (d_orig_target_filename, filename, newname);
+  im->setName(newname);
+  im->instantiateImages();
+  return success;
+}
+
+bool ImageEditorDialog::uninstallFile (TarFile *t, TarFileImage *im)
+{
+  im->clear ();
+  return t->removeFileInCfgFile(d_orig_target_filename);
 }

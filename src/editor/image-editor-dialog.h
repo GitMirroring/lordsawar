@@ -26,6 +26,7 @@
 #include "undo-mgr.h"
 
 class TarFileImage;
+class TarFile;
 
 //! general picture editor.
 /**
@@ -45,6 +46,8 @@ class ImageEditorDialog: public LwEditorDialog
 
     void set_title(Glib::ustring s) {dialog->set_title(s);}
 
+    bool installFile (TarFile *t, TarFileImage *im, Glib::ustring filename);
+    bool uninstallFile (TarFile *t, TarFileImage *im);
  private:
     UndoMgr *umgr;
     double d_ratio;
