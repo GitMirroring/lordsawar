@@ -338,3 +338,30 @@ bool PixMask::checkFormat (Glib::ustring file)
     delete p;
   return !broken;
 }
+
+bool PixMask::checkDimension (Glib::ustring file, DimensionType t)
+{
+  bool broken = false;
+  PixMask *p = PixMask::create (file, broken);
+  if (broken)
+    return false;
+  bool match;
+  switch (t)
+    {
+    case DIMENSION_ANY:
+      match = true;
+      break;
+    case DIMENSION_SAME_HEIGHT_AND_WIDTH:
+      match = p->get_unscaled_width () == p->get_unscaled_height ();
+      break;
+    case DIMENSION_WIDTH_IS_TWO_HEIGHT:
+      match = p->get_unscaled_width () == p->get_unscaled_height () * 2;
+      break;
+    case DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT:
+      match = p->get_unscaled_width () % (p->get_unscaled_height () / 2) == 0;
+      break;
+    }
+  if (p)
+    delete p;
+  return match;
+}
