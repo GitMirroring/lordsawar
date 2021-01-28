@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Ben Asselstine
+// Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include <gtkmm.h>
 #include "vector.h"
+#include "PixMask.h"
 
 class PixMask;
 class Tar_Helper;
@@ -53,10 +54,11 @@ public:
   //! Default Constructor
   /**
    * @param o the orientation of the mask
+   * @param d the general shape the backing image must have
    * we get the tar file from the load method later on.
    *
    */
-  TarFileMaskedImage (MaskOrientation o = VERTICAL_MASK);
+  TarFileMaskedImage (MaskOrientation o, PixMask::DimensionType d);
 
   //! Copy Constructor
   TarFileMaskedImage (const TarFileMaskedImage &i);
@@ -105,6 +107,9 @@ public:
 
   //! Return the dimensions of the images in the backing image
   Vector<int> getImageDimensions () const  {return dimension;}
+
+  //! Does the image in file F have the correct dimensions for this?
+  bool checkDimension (Glib::ustring f);
 
   //! Set the basename of the image (archive member in the tar file)
   void setImageName (Glib::ustring n) {name = n;}
@@ -199,6 +204,9 @@ private:
 
   //! The original dimensions of the images in the backing image
   Vector<int> dimension;
+
+  //! The general shape that the backing images must be
+  PixMask::DimensionType dimension_type;
 
   //! The backing image, the whole image as loaded from file_on_disk.
   PixMask *image;

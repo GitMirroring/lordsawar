@@ -1,4 +1,4 @@
-//  Copyright (C) 2017, 2020 Ben Asselstine
+//  Copyright (C) 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -33,10 +33,15 @@ Glib::ustring Tartan::d_tartan_tag = "tartan";
 
 Tartan::Tartan(XML_Helper* helper)
 {
-  d_left_mimage = new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+  d_left_mimage =
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
   d_center_mimage =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
-  d_right_mimage = new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+  d_right_mimage =
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
 
   d_left_mimage->load_name (helper, "left_image");
   d_center_mimage->load_name (helper, "center_image");
@@ -45,7 +50,6 @@ Tartan::Tartan(XML_Helper* helper)
 
 Tartan::Tartan(const Tartan& t)
 {
-
   d_left_mimage = new TarFileMaskedImage (*t.d_left_mimage);
   d_center_mimage = new TarFileMaskedImage (*t.d_center_mimage);
   d_right_mimage = new TarFileMaskedImage (*t.d_right_mimage);
@@ -53,10 +57,15 @@ Tartan::Tartan(const Tartan& t)
 
 Tartan::Tartan()
 {
-  d_left_mimage = new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+  d_left_mimage =
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
   d_center_mimage =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
-  d_right_mimage = new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+  d_right_mimage =
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
 }
 
 Tartan::~Tartan()

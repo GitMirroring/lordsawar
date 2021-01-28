@@ -40,7 +40,7 @@ ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, doub
  : LwEditorDialog(parent, "image-editor-dialog.ui"), d_ratio (ratio),
     d_num_frames (im->getNumberOfFrames ()), d_active_frame (0),
     d_target_filename (im->getName ()),
-    d_orig_target_filename (d_target_filename)
+    d_orig_target_filename (d_target_filename), d_im (im)
 {
   umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
   umgr->execute ().connect (method (executeAction));
@@ -210,8 +210,19 @@ void ImageEditorDialog::on_imagebutton_clicked ()
             }
           else
             {
-              PastChooser::getInstance()->set_dir(d);
-              on_image_chosen (d);
+              if (d_im->checkDimension (d->get_filename ()) == false)
+                {
+                  TimedMessageDialog
+                    td(*d,
+                       String::ucompose(_("Bad dimensions in image:\n%1"),
+                                        d->get_filename ()), 0);
+                  td.run_and_hide ();
+                }
+              else
+                {
+                  PastChooser::getInstance()->set_dir(d);
+                  on_image_chosen (d);
+                }
             }
         }
     }

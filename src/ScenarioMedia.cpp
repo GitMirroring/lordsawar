@@ -59,21 +59,27 @@ ScenarioMedia::ScenarioMedia()
     d_victory_name(""), d_back_name ("")
 {
   d_hero_newlevel[0] =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
   d_hero_newlevel[1] =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
-  d_next_turn = new TarFileImage (1);
-  d_city_defeated = new TarFileImage (1);
-  d_winning = new TarFileImage (1);
-  d_hero[0] = new TarFileImage (1);
-  d_hero[1] = new TarFileImage (1);
-  d_ruin_success = new TarFileImage (1);
-  d_ruin_defeat = new TarFileImage (1);
-  d_parley_offered = new TarFileImage (1);
-  d_parley_refused = new TarFileImage (1);
-  d_medal[0] = new TarFileImage (MEDAL_TYPES);
-  d_medal[1] = new TarFileImage (MEDAL_TYPES);
-  d_commentator = new TarFileImage (1);
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+  d_next_turn = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_city_defeated = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_winning = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_hero[0] = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_hero[1] = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_ruin_success = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_ruin_defeat = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_parley_offered = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_parley_refused = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_medal[0] =
+    new TarFileImage (MEDAL_TYPES,
+                      PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_medal[1] =
+    new TarFileImage (MEDAL_TYPES,
+                      PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_commentator = new TarFileImage (1, PixMask::DIMENSION_ANY);
 }
 
 ScenarioMedia::ScenarioMedia(const ScenarioMedia &m)
@@ -109,21 +115,27 @@ ScenarioMedia::ScenarioMedia(XML_Helper *helper)
     d_victory_name(""), d_back_name ("")
 {
   d_hero_newlevel[0] =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
   d_hero_newlevel[1] =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
-  d_next_turn = new TarFileImage (1);
-  d_city_defeated = new TarFileImage (1);
-  d_winning = new TarFileImage (1);
-  d_hero[0] = new TarFileImage (1);
-  d_hero[1] = new TarFileImage (1);
-  d_ruin_success = new TarFileImage (1);
-  d_ruin_defeat = new TarFileImage (1);
-  d_parley_offered = new TarFileImage (1);
-  d_parley_refused = new TarFileImage (1);
-  d_medal[0] = new TarFileImage (3);
-  d_medal[1] = new TarFileImage (3);
-  d_commentator = new TarFileImage (1);
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+  d_next_turn = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_city_defeated = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_winning = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_hero[0] = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_hero[1] = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_ruin_success = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_ruin_defeat = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_parley_offered = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_parley_refused = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_medal[0] =
+    new TarFileImage (MEDAL_TYPES,
+                      PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_medal[1] =
+    new TarFileImage (MEDAL_TYPES,
+                      PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_commentator = new TarFileImage (1, PixMask::DIMENSION_ANY);
   d_next_turn->load_name (helper, "next_turn_image");
   d_city_defeated->load_name (helper, "city_defeated_image");
   d_winning->load_name (helper, "winning_image");

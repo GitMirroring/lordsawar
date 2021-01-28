@@ -1,6 +1,7 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
+// 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -51,25 +52,37 @@ Glib::ustring Tileset::file_extension = TILESET_EXT;
 Tileset::Tileset(guint32 id, Glib::ustring name)
 	: Set(TILESET_EXT, id, name, DEFAULT_TILE_SIZE)
 {
-  d_selector[0] = new TarFileMaskedImage ();
-  d_selector[1] = new TarFileMaskedImage ();
-  d_flag = new TarFileMaskedImage ();
-  d_fog = new TarFileImage (FOG_TYPES);
-  d_road = new TarFileImage (ROAD_TYPES);
-  d_stone = new TarFileImage (STONE_TYPES);
-  d_bridge = new TarFileImage (BRIDGE_TYPES);
-  d_explosion = new TarFileImage (1);
+  d_selector[0] =
+    new TarFileMaskedImage
+    (TarFileMaskedImage::VERTICAL_MASK,
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+  d_selector[1] =
+    new TarFileMaskedImage
+    (TarFileMaskedImage::VERTICAL_MASK,
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+  d_flag =
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+  d_fog = new TarFileImage (FOG_TYPES,
+                            PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_road = new TarFileImage (ROAD_TYPES,
+                             PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_stone = new TarFileImage (STONE_TYPES,
+                              PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_bridge = new TarFileImage (BRIDGE_TYPES,
+                               PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_explosion = new TarFileImage (1, PixMask::DIMENSION_SAME_HEIGHT_AND_WIDTH);
 
   d_road_color.set_rgba(164.0/255.0,84.0/255.0,0);
   d_ruin_color.set_rgba(1,1,1);
   d_temple_color.set_rgba(1,1,1);
 
-  d_all_movebonus = new TarFileImage (1);
-  d_water_movebonus = new TarFileImage (1);
-  d_forest_movebonus = new TarFileImage (1);
-  d_hills_movebonus = new TarFileImage (1);
-  d_mountains_movebonus = new TarFileImage (1);
-  d_swamp_movebonus = new TarFileImage (1);
+  d_all_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_water_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_forest_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_hills_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_mountains_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_swamp_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
 }
 
 Tileset::Tileset (const Tileset& t)
@@ -108,20 +121,30 @@ Tileset::Tileset (const Tileset& t)
 Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
 	:Set(TILESET_EXT, helper, directory)
 {
-  d_selector[0] = new TarFileMaskedImage ();
-  d_selector[1] = new TarFileMaskedImage ();
-  d_flag = new TarFileMaskedImage ();
-  d_fog = new TarFileImage (FOG_TYPES);
-  d_road = new TarFileImage (ROAD_TYPES);
-  d_stone = new TarFileImage (STONE_TYPES);
-  d_bridge = new TarFileImage (BRIDGE_TYPES);
-  d_explosion = new TarFileImage (1);
-  d_all_movebonus = new TarFileImage (1);
-  d_water_movebonus = new TarFileImage (1);
-  d_forest_movebonus = new TarFileImage (1);
-  d_hills_movebonus = new TarFileImage (1);
-  d_mountains_movebonus = new TarFileImage (1);
-  d_swamp_movebonus = new TarFileImage (1);
+  d_selector[0] = new TarFileMaskedImage
+    (TarFileMaskedImage::VERTICAL_MASK,
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+  d_selector[1] = new TarFileMaskedImage
+    (TarFileMaskedImage::VERTICAL_MASK,
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+  d_flag = new TarFileMaskedImage
+    (TarFileMaskedImage::VERTICAL_MASK,
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+  d_fog = new TarFileImage (FOG_TYPES,
+                            PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_road = new TarFileImage (ROAD_TYPES,
+                             PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_stone = new TarFileImage (STONE_TYPES,
+                              PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_bridge = new TarFileImage (BRIDGE_TYPES,
+                               PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_explosion = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_all_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_water_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_forest_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_hills_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_mountains_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_swamp_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
   guint32 ts;
   helper->getData(ts, "tilesize");
   setTileSize(ts);

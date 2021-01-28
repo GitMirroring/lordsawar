@@ -224,26 +224,6 @@ Gtk::FileChooserDialog* TarFileMaskedImageEditorDialog::image_filechooser(bool c
   return d;
 }
 
-bool TarFileMaskedImageEditorDialog::checkDimensions (Glib::ustring filename)
-{
-  bool success = false;
-  bool broken = false;
-  PixMask *p = PixMask::create (filename, broken);
-  if (broken)
-    return success;
-  switch (d_mim->getMaskOrientation ())
-    {
-    case TarFileMaskedImage::HORIZONTAL_MASK: //mask is to the side
-      success = (p->get_unscaled_width () / 2) == p->get_unscaled_height ();
-      break;
-    case TarFileMaskedImage::VERTICAL_MASK: //mask is underneath
-      success = p->get_unscaled_width () % (p->get_unscaled_height () / 2) == 0;
-      break;
-    }
-  delete p;
-  return success;
-}
-
 void TarFileMaskedImageEditorDialog::on_imagebutton_clicked ()
 {
   Gtk::FileChooserDialog *d = image_filechooser(d_mim->getImage () != NULL);
@@ -256,7 +236,7 @@ void TarFileMaskedImageEditorDialog::on_imagebutton_clicked ()
         {
           if (PixMask::checkFormat (d->get_filename ()))
             {
-              if (checkDimensions (d->get_filename ()))
+              if (d_mim->checkDimension (d->get_filename ()))
                 {
                   PastChooser::getInstance()->set_dir(d);
                   on_image_chosen (d);
@@ -265,7 +245,7 @@ void TarFileMaskedImageEditorDialog::on_imagebutton_clicked ()
                 {
                   TimedMessageDialog
                     td(*d,
-                       String::ucompose(_("The image has bad dimensions:\n%1"),
+                       String::ucompose(_("Bad dimensions in image:\n%1"),
                                         d->get_filename ()), 0);
                   td.run_and_hide ();
                 }

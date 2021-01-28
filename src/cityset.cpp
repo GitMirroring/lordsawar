@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2008, 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -41,13 +41,18 @@ Glib::ustring Cityset::file_extension = CITYSET_EXT;
 Cityset::Cityset(guint32 id, Glib::ustring name)
  : Set(CITYSET_EXT, id, name, DEFAULT_CITY_TILE_SIZE)
 {
-  d_port = new TarFileImage (1);
-  d_sign = new TarFileImage (1);
-  d_temple = new TarFileImage (TEMPLE_TYPES);
-  d_ruin = new TarFileImage (RUIN_TYPES);
-  d_tower = new TarFileImage (MAX_PLAYERS);
-  d_city = new TarFileImage (MAX_PLAYERS + 1);
-  d_rcity = new TarFileImage (MAX_PLAYERS);
+  d_port = new TarFileImage (1, PixMask::DIMENSION_SAME_HEIGHT_AND_WIDTH);
+  d_sign = new TarFileImage (1, PixMask::DIMENSION_SAME_HEIGHT_AND_WIDTH);
+  d_temple = new TarFileImage (TEMPLE_TYPES,
+                               PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_ruin = new TarFileImage (RUIN_TYPES,
+                             PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_tower = new TarFileImage (MAX_PLAYERS,
+                              PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_city = new TarFileImage (MAX_PLAYERS + 1,
+                              PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_rcity = new TarFileImage (MAX_PLAYERS,
+                              PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
 
   d_city_tile_width = 2;
   d_temple_tile_width = 1;
@@ -73,13 +78,18 @@ Cityset::Cityset(const Cityset& c)
 Cityset::Cityset(XML_Helper *helper, Glib::ustring directory)
  : Set(CITYSET_EXT, helper, directory)
 {
-  d_port = new TarFileImage (1);
-  d_sign = new TarFileImage (1);
-  d_temple = new TarFileImage (TEMPLE_TYPES);
-  d_ruin = new TarFileImage (RUIN_TYPES);
-  d_tower = new TarFileImage (MAX_PLAYERS);
-  d_city = new TarFileImage (MAX_PLAYERS + 1);
-  d_rcity = new TarFileImage (MAX_PLAYERS);
+  d_port = new TarFileImage (1, PixMask::DIMENSION_SAME_HEIGHT_AND_WIDTH);
+  d_sign = new TarFileImage (1, PixMask::DIMENSION_SAME_HEIGHT_AND_WIDTH);
+  d_temple = new TarFileImage (TEMPLE_TYPES,
+                              PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_ruin = new TarFileImage (RUIN_TYPES,
+                              PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_tower = new TarFileImage (MAX_PLAYERS,
+                              PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_city = new TarFileImage (MAX_PLAYERS + 1,
+                              PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+  d_rcity = new TarFileImage (MAX_PLAYERS,
+                              PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
   guint32 ts;
   helper->getData(ts, "tilesize");
   setTileSize(ts);

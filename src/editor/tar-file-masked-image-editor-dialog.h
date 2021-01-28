@@ -92,7 +92,6 @@ class TarFileMaskedImageEditorDialog: public LwEditorDialog
     void disconnect_signals ();
     std::list<sigc::connection> connections;
     UndoAction *executeAction (UndoAction *action);
-    bool checkDimensions (Glib::ustring filename);
 };
 
 #endif

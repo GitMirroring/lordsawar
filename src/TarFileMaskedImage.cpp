@@ -26,17 +26,17 @@
 #include "player.h"
 #include "ucompose.hpp"
 
-TarFileMaskedImage::TarFileMaskedImage (MaskOrientation o)
+TarFileMaskedImage::TarFileMaskedImage (MaskOrientation o, PixMask::DimensionType d)
  : orientation (o), tarfile (NULL), name (""), file_on_disk (""),
     scale_dimension (Vector<int>(-1,-1)), dimension (Vector<int>(-1,-1)),
-    image (NULL), calculated_number_of_frames (0)
+    dimension_type (d), image (NULL), calculated_number_of_frames (0)
 {
 }
 
 TarFileMaskedImage::TarFileMaskedImage (const TarFileMaskedImage &i)
  : orientation (i.orientation), tarfile (i.tarfile), name (i.name),
     file_on_disk (i.file_on_disk), scale_dimension (i.scale_dimension),
-    dimension (i.dimension), image (NULL),
+    dimension (i.dimension), dimension_type (i.dimension_type), image (NULL),
     calculated_number_of_frames (i.calculated_number_of_frames)
 {
   frames.clear ();
@@ -341,8 +341,13 @@ void TarFileMaskedImage::copyFrames (TarFileMaskedImage *dst)
 
   dst->calculated_number_of_frames = calculated_number_of_frames;
 
-  for (int i = 0; i < frames.size (); i++)
+  for (guint32 i = 0; i < frames.size (); i++)
     dst->frames[i] =
       std::pair<PixMask*,PixMask*>(frames[i].first->copy (),
                                    frames[i].second->copy ());
+}
+
+bool TarFileMaskedImage::checkDimension (Glib::ustring f)
+{
+  return PixMask::checkDimension (f, dimension_type);
 }

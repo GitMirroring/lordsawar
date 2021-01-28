@@ -55,6 +55,7 @@ class ImageEditorDialog: public LwEditorDialog
     guint32 d_active_frame;
     Glib::ustring d_target_filename;
     Glib::ustring d_orig_target_filename;
+    TarFileImage *d_im;
     std::vector<PixMask*> frames;
 
     sigc::connection heartbeat;

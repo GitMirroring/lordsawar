@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -33,7 +33,9 @@ Glib::ustring ShieldStyle::d_tag = "shieldstyle";
 ShieldStyle::ShieldStyle(ShieldStyle::Type type)
  : d_type (type)
 {
-  d_mimage = new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+  d_mimage =
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
 }
         
 ShieldStyle::~ShieldStyle()
@@ -49,7 +51,9 @@ ShieldStyle::ShieldStyle(const ShieldStyle &s)
 
 ShieldStyle::ShieldStyle(XML_Helper* helper)
 {
-  d_mimage = new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+  d_mimage =
+    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
   Glib::ustring type_str;
   helper->getData(type_str, "type");
   d_type = shieldStyleTypeFromString(type_str);

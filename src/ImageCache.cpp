@@ -159,9 +159,11 @@ ImageCache::ImageCache()
     medalcache((sigc::ptr_fun(&MedalPixMaskCacheItem::generate)))
 {
     d_hero_newlevel[0] =
-      new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+      new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                              PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
     d_hero_newlevel[1] =
-      new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK);
+      new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+                              PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
 
     loadDiplomacyImages();
     loadCursorImages();
@@ -180,62 +182,66 @@ ImageCache::ImageCache()
     loadWaypointImages(); //only for game.  not for editors.
     loadGameButtonImages(); //only for game.  not for editors.
 
-    d_next_turn = new TarFileImage (1);
+    d_next_turn = new TarFileImage (1, PixMask::DIMENSION_ANY);
     d_next_turn->loadFromFile
       (ScenarioMedia::getDefaultNextTurnImageFilename ());
     d_next_turn->instantiateImages ();
 
-    d_city_defeated = new TarFileImage (1);
+    d_city_defeated = new TarFileImage (1, PixMask::DIMENSION_ANY);
     d_city_defeated->loadFromFile
       (ScenarioMedia::getDefaultCityDefeatedImageFilename ());
     d_city_defeated->instantiateImages ();
 
-    d_winning = new TarFileImage (1);
+    d_winning = new TarFileImage (1, PixMask::DIMENSION_ANY);
     d_winning->loadFromFile
       (ScenarioMedia::getDefaultWinningImageFilename ());
     d_winning->instantiateImages ();
 
-    d_hero[0] = new TarFileImage (1);
+    d_hero[0] = new TarFileImage (1, PixMask::DIMENSION_ANY);
     d_hero[0]->loadFromFile
       (ScenarioMedia::getDefaultMaleHeroImageFilename ());
     d_hero[0]->instantiateImages ();
 
-    d_hero[1] = new TarFileImage (1);
+    d_hero[1] = new TarFileImage (1, PixMask::DIMENSION_ANY);
     d_hero[1]->loadFromFile
       (ScenarioMedia::getDefaultFemaleHeroImageFilename ());
     d_hero[1]->instantiateImages ();
 
-    d_ruin_success = new TarFileImage (1);
+    d_ruin_success = new TarFileImage (1, PixMask::DIMENSION_ANY);
     d_ruin_success->loadFromFile
       (ScenarioMedia::getDefaultRuinSuccessImageFilename ());
     d_ruin_success->instantiateImages ();
 
-    d_ruin_defeat = new TarFileImage (1);
+    d_ruin_defeat = new TarFileImage (1, PixMask::DIMENSION_ANY);
     d_ruin_defeat->loadFromFile
       (ScenarioMedia::getDefaultRuinDefeatImageFilename ());
     d_ruin_defeat->instantiateImages ();
 
-    d_parley_offered = new TarFileImage (1);
+    d_parley_offered = new TarFileImage (1, PixMask::DIMENSION_ANY);
     d_parley_offered->loadFromFile
       (ScenarioMedia::getDefaultParleyOfferedImageFilename ());
     d_parley_offered->instantiateImages ();
 
-    d_parley_refused = new TarFileImage (1);
+    d_parley_refused = new TarFileImage (1, PixMask::DIMENSION_ANY);
     d_parley_refused->loadFromFile
       (ScenarioMedia::getDefaultParleyRefusedImageFilename ());
     d_parley_refused->instantiateImages ();
 
-    d_medal[0] = new TarFileImage (MEDAL_TYPES);
+    d_medal[0] =
+      new TarFileImage (MEDAL_TYPES,
+                        PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
     d_medal[0]->loadFromFile
       (ScenarioMedia::getDefaultSmallMedalsImageFilename ());
     d_medal[0]->instantiateImages ();
 
-    d_medal[1] = new TarFileImage (MEDAL_TYPES);
+    d_medal[1] =
+      new TarFileImage (MEDAL_TYPES,
+                        PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
     d_medal[1]->loadFromFile
       (ScenarioMedia::getDefaultBigMedalsImageFilename ());
     d_medal[1]->instantiateImages ();
 
-    d_commentator = new TarFileImage (1);
+    d_commentator = new TarFileImage (1, PixMask::DIMENSION_ANY);
     d_commentator->loadFromFile
       (ScenarioMedia::getDefaultCommentatorImageFilename ());
     d_commentator->instantiateImages ();

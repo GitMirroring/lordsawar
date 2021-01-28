@@ -1,4 +1,5 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
+//  2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -47,15 +48,26 @@ Glib::ustring Armyset::file_extension = ARMYSET_EXT;
 Armyset::Armyset(guint32 id, Glib::ustring name)
  : Set(ARMYSET_EXT, id, name, DEFAULT_ARMY_TILE_SIZE)
 {
-  d_stackship = new TarFileMaskedImage ();
-  d_standard = new TarFileMaskedImage ();
-  d_bag = new TarFileImage (1);
+  d_stackship =
+    new TarFileMaskedImage
+    (TarFileMaskedImage::VERTICAL_MASK,
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+  d_standard =
+    new TarFileMaskedImage 
+    (TarFileMaskedImage::VERTICAL_MASK,
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+  d_bag = new TarFileImage (1, PixMask::DIMENSION_SAME_HEIGHT_AND_WIDTH);
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
-      d_selector[0][i] = new TarFileMaskedImage ();
-      d_selector[1][i] = new TarFileMaskedImage ();
+      d_selector[0][i] =
+        new TarFileMaskedImage
+        (TarFileMaskedImage::VERTICAL_MASK,
+         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+      d_selector[1][i] =
+        new TarFileMaskedImage
+        (TarFileMaskedImage::VERTICAL_MASK,
+         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
     }
-
 }
 
 void Armyset::read_selector_name (XML_Helper *helper, Shield::Colour c, bool large)
@@ -86,13 +98,21 @@ void Armyset::read_selector_name (XML_Helper *helper, Shield::Colour c, bool lar
 Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
  : Set(ARMYSET_EXT, helper, directory)
 {
-  d_stackship = new TarFileMaskedImage ();
-  d_standard = new TarFileMaskedImage ();
-  d_bag = new TarFileImage (1);
+  d_stackship = new TarFileMaskedImage
+    (TarFileMaskedImage::VERTICAL_MASK,
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+  d_standard = new TarFileMaskedImage
+    (TarFileMaskedImage::VERTICAL_MASK,
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+  d_bag = new TarFileImage (1, PixMask::DIMENSION_SAME_HEIGHT_AND_WIDTH);
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
-      d_selector[0][i] = new TarFileMaskedImage ();
-      d_selector[1][i] = new TarFileMaskedImage ();
+      d_selector[0][i] = new TarFileMaskedImage
+        (TarFileMaskedImage::VERTICAL_MASK,
+         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+      d_selector[1][i] = new TarFileMaskedImage
+        (TarFileMaskedImage::VERTICAL_MASK,
+         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
     }
 
   guint32 ts;

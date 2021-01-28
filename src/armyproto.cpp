@@ -1,7 +1,8 @@
 // Copyright (C) 2000, 2001, 2003 Michael Bartl
 // Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -47,14 +48,20 @@ ArmyProto::ArmyProto()
     d_gender(Hero::NONE)
 {
   for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
-    d_mimage[c] = new TarFileMaskedImage(TarFileMaskedImage::HORIZONTAL_MASK);
+    d_mimage[c] =
+      new TarFileMaskedImage
+      (TarFileMaskedImage::HORIZONTAL_MASK,
+       PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
 }
 
 ArmyProto::ArmyProto(XML_Helper* helper)
   :ArmyProtoBase(helper), d_defends_ruins(false), d_awardable(false)
 {
   for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
-    d_mimage[c] = new TarFileMaskedImage(TarFileMaskedImage::HORIZONTAL_MASK);
+    d_mimage[c] =
+      new TarFileMaskedImage
+      (TarFileMaskedImage::HORIZONTAL_MASK,
+       PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
   helper->getData(d_id, "id");
   d_mimage[Shield::WHITE]->load_name (helper, "image_white");
   d_mimage[Shield::GREEN]->load_name (helper, "image_green");

@@ -24,16 +24,17 @@
 #include "gui/image-helpers.h"
 #include "File.h"
 
-TarFileImage::TarFileImage (guint32 n)
+TarFileImage::TarFileImage (guint32 n, PixMask::DimensionType d)
  : tarfile (NULL), name (""), file_on_disk (""),
     scale_dimension (Vector<int>(-1,-1)), dimension (Vector<int>(-1,-1)),
-    image (NULL), number_of_frames (n)
+    dimension_type (d), image (NULL), number_of_frames (n)
 {
 }
 
 TarFileImage::TarFileImage (const TarFileImage &i)
  : tarfile (i.tarfile), name (i.name), file_on_disk (i.file_on_disk),
-    scale_dimension (i.scale_dimension), dimension (i.dimension), image (NULL),
+    scale_dimension (i.scale_dimension), dimension (i.dimension),
+    dimension_type (i.dimension_type), image (NULL),
     number_of_frames (i.number_of_frames)
 {
   if (i.image)
@@ -190,4 +191,9 @@ void TarFileImage::uninstantiate (Glib::ustring name, std::vector<TarFileImage*>
   for (auto i : images)
     if (i->getName () == name)
       i->clear ();
+}
+
+bool TarFileImage::checkDimension (Glib::ustring f)
+{
+  return PixMask::checkDimension (f, dimension_type);
 }
