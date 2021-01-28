@@ -166,7 +166,6 @@ int MediaDialog::run()
 void MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
 {
   TarFile *t = d_tarfile;
-  Glib::ustring imgname = im->getName ();
   ImageEditorDialog d (*dialog, oim, 0);
   int response = d.run();
 
@@ -174,17 +173,9 @@ void MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
     {
       if (d.get_filename () != "")
         {
-          Glib::ustring newname = "";
-          bool success = false;
-          if (im->getName() == "")
-            success = t->addFileInCfgFile(d.get_filename (), newname);
-          else
-            success = t->replaceFileInCfgFile(imgname, d.get_filename (),
-                                              newname);
+          bool success = d.installFile (t, im, d.get_filename ());
           if (success)
             {
-              im->load (t, newname);
-              im->instantiateImages ();
               d_changed = true;
               fill_in_buttons();
             }
@@ -202,25 +193,23 @@ void MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
     }
   else if (response == Gtk::RESPONSE_REJECT)
     {
-      if (imgname.empty () == false)
+      Glib::ustring imgname = im->getName ();
+      if (d.uninstallFile (t, im))
         {
-          if (t->removeFileInCfgFile(imgname))
-            {
-              ScenarioMedia::getInstance()->uninstantiateSameNamedImages (imgname);
-              d_changed = true;
-              fill_in_buttons();
-            }
-          else
-            {
-              Glib::ustring errmsg = Glib::strerror(errno);
-              TimedMessageDialog
-                td(*d.get_dialog (),
-                   String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
-                                    imgname,
-                                    t->getConfigurationFile(),
-                                    errmsg), 0);
-              td.run_and_hide ();
-            }
+          ScenarioMedia::getInstance()->uninstantiateSameNamedImages (imgname);
+          d_changed = true;
+          fill_in_buttons();
+        }
+      else
+        {
+          Glib::ustring errmsg = Glib::strerror(errno);
+          TimedMessageDialog
+            td(*d.get_dialog (),
+               String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
+                                imgname,
+                                t->getConfigurationFile(),
+                                errmsg), 0);
+          td.run_and_hide ();
         }
     }
   d.hide();

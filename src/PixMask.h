@@ -36,7 +36,8 @@ class PixMask
          DIMENSION_ANY,
          DIMENSION_SAME_HEIGHT_AND_WIDTH,
          DIMENSION_WIDTH_IS_TWO_HEIGHT,
-         DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT
+         DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT,
+         DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT,
        };
      Cairo::RefPtr<Cairo::Surface> get_pixmap() {return pixmap;};
      Cairo::RefPtr<Cairo::Surface> get_mask() {return mask;};

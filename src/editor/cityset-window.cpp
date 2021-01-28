@@ -698,16 +698,11 @@ Glib::ustring CitySetWindow::change_image(Glib::ustring msg, TarFileImage *im,
       CitySetEditorAction_AddImage *action =
         new CitySetEditorAction_AddImage (d_cityset);
       Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty () == true)
-        success = d_cityset->addFileInCfgFile(d.get_filename(), newname);
-      else
-        success =
-          d_cityset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
+      bool success = d.installFile (d_cityset, im, d.get_filename ());
       if (success)
         {
           addUndo (action);
-          newfile = newname;
+          newfile = im->getName ();
           cityset_modified = true;
           update ();
         }
@@ -719,10 +714,9 @@ Glib::ustring CitySetWindow::change_image(Glib::ustring msg, TarFileImage *im,
     }
   else if (response == Gtk::RESPONSE_REJECT)
     {
-          
       CitySetEditorAction_ClearImage *action =
         new CitySetEditorAction_ClearImage (d_cityset);
-      if (d_cityset->removeFileInCfgFile(imgname))
+      if (d.uninstallFile (d_cityset, im))
         {
           addUndo (action);
           cityset_modified = true;

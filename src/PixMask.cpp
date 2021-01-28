@@ -360,6 +360,9 @@ bool PixMask::checkDimension (Glib::ustring file, DimensionType t)
     case DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT:
       match = p->get_unscaled_width () % (p->get_unscaled_height () / 2) == 0;
       break;
+    case DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT:
+      match = p->get_unscaled_width () % p->get_unscaled_height () == 0;
+      break;
     }
   if (p)
     delete p;

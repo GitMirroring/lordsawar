@@ -1373,20 +1373,12 @@ void TileSetWindow::on_roads_picture_activated()
   if (response == Gtk::RESPONSE_ACCEPT && d.get_filename() != "")
     {
       TileSetEditorAction_Roads *action =
-        new TileSetEditorAction_Roads (d_tileset);
-      Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty() == true)
-        success =
-          d_tileset->addFileInCfgFile(d.get_filename(), newname);
-      else
-        success =
-          d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
+         new TileSetEditorAction_Roads (d_tileset);
+      bool success =
+        d.installFile (d_tileset, d_tileset->getRoad (), d.get_filename ());
       if (success)
         {
           addUndo (action);
-          d_tileset->getRoad()->load (d_tileset, newname);
-          d_tileset->getRoad()->instantiateImages ();
           dirty ();
         }
       else
@@ -1399,7 +1391,8 @@ void TileSetWindow::on_roads_picture_activated()
     {
       TileSetEditorAction_Roads *action =
         new TileSetEditorAction_Roads (d_tileset);
-      if (d_tileset->removeFileInCfgFile(imgname))
+      bool success = d.uninstallFile (d_tileset, d_tileset->getRoad ());
+      if (success)
         {
           addUndo (action);
           d_tileset->uninstantiateSameNamedImages (imgname);
@@ -1424,19 +1417,11 @@ void TileSetWindow::on_stones_picture_activated()
     {
       TileSetEditorAction_Stones *action =
         new TileSetEditorAction_Stones (d_tileset);
-      Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty() == true)
-        success =
-          d_tileset->addFileInCfgFile(d.get_filename(), newname);
-      else
-        success =
-          d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
+      bool success =
+        d.installFile (d_tileset, d_tileset->getStone(), d.get_filename ());
       if (success)
         {
           addUndo (action);
-          d_tileset->getStone()->load (d_tileset, newname);
-          d_tileset->getStone()->instantiateImages ();
           dirty ();
         }
       else
@@ -1449,7 +1434,8 @@ void TileSetWindow::on_stones_picture_activated()
     {
       TileSetEditorAction_Stones *action =
         new TileSetEditorAction_Stones (d_tileset);
-      if (d_tileset->removeFileInCfgFile(imgname))
+      bool success = d.uninstallFile (d_tileset, d_tileset->getStone ());
+      if (success)
         {
           addUndo (action);
           d_tileset->uninstantiateSameNamedImages (imgname);
@@ -1474,19 +1460,11 @@ void TileSetWindow::on_bridges_picture_activated()
     {
       TileSetEditorAction_Bridges *action =
         new TileSetEditorAction_Bridges (d_tileset);
-      Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty () == true)
-        success =
-          d_tileset->addFileInCfgFile(d.get_filename(), newname);
-      else
-        success =
-          d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
+      bool success =
+        d.installFile (d_tileset, d_tileset->getBridge (), d.get_filename ());
       if (success)
         {
           addUndo (action);
-          d_tileset->getBridge ()->load (d_tileset, newname);
-          d_tileset->getBridge ()->instantiateImages ();
           dirty ();
         }
       else
@@ -1499,7 +1477,8 @@ void TileSetWindow::on_bridges_picture_activated()
     {
       TileSetEditorAction_Bridges *action =
         new TileSetEditorAction_Bridges (d_tileset);
-      if (d_tileset->removeFileInCfgFile(imgname))
+      bool success = d.uninstallFile (d_tileset, d_tileset->getBridge ());
+      if (success)
         {
           addUndo (action);
           d_tileset->uninstantiateSameNamedImages (imgname);
@@ -1524,18 +1503,11 @@ void TileSetWindow::on_fog_picture_activated()
     {
       TileSetEditorAction_Fog *action =
         new TileSetEditorAction_Fog (d_tileset);
-      Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty () == true)
-        success = d_tileset->addFileInCfgFile(d.get_filename(), newname);
-      else
-        success =
-          d_tileset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
+      bool success =
+        d.installFile (d_tileset, d_tileset->getFog (), d.get_filename ());
       if (success)
         {
           addUndo (action);
-          d_tileset->getFog ()->load(d_tileset, newname);
-          d_tileset->getFog ()->instantiateImages ();
           dirty ();
         }
       else
@@ -1548,7 +1520,8 @@ void TileSetWindow::on_fog_picture_activated()
     {
       TileSetEditorAction_Fog *action =
         new TileSetEditorAction_Fog (d_tileset);
-      if (d_tileset->removeFileInCfgFile(imgname))
+      bool success = d.uninstallFile (d_tileset, d_tileset->getFog ());
+      if (success)
         {
           addUndo (action);
           d_tileset->uninstantiateSameNamedImages (imgname);
