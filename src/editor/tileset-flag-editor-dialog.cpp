@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2012, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2012, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -33,12 +33,15 @@
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
 #include "TarFileMaskedImage.h"
+#include "tileset-flag-editor-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &TilesetFlagEditorDialog::x)
 
 TilesetFlagEditorDialog::TilesetFlagEditorDialog(Gtk::Window &parent, Tileset *tileset)
  : LwEditorDialog(parent, "tileset-flag-editor-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_changed = false;
   d_tileset = tileset;
 
@@ -46,13 +49,16 @@ TilesetFlagEditorDialog::TilesetFlagEditorDialog(Gtk::Window &parent, Tileset *t
   xml->get_widget("shieldset_box", box);
   setup_shield_theme_combobox(box);
   xml->get_widget("preview_table", preview_table);
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
 
   xml->get_widget("flag_imagebutton", flag_imagebutton);
-  flag_imagebutton->signal_clicked().connect
-    (method(on_flag_imagebutton_clicked));
 
   d_flags = new TarFileMaskedImage (*d_tileset->getFlags ());
-  update_flag_panel();
+  connect_signals ();
+  update ();
 }
 
 bool TilesetFlagEditorDialog::run()
@@ -82,14 +88,16 @@ void TilesetFlagEditorDialog::setup_shield_theme_combobox(Gtk::Box *box)
     }
 
   shield_theme_combobox->set_active(default_id);
-  shield_theme_combobox->signal_changed().connect (method(on_shieldset_changed));
+  d_shield_row = default_id;
 
   box->set_center_widget (*shield_theme_combobox);
 }
 
 void TilesetFlagEditorDialog::on_shieldset_changed()
 {
-  show_preview_flags();
+  umgr->add (new TileSetFlagEditorAction_Shield (d_shield_row));
+  d_shield_row = shield_theme_combobox->get_active_row_number ();
+  update ();
 }
 
 bool TilesetFlagEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
@@ -97,30 +105,42 @@ bool TilesetFlagEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
   bool broken = false;
   if (PixMask::checkFormat (d->get_filename ()))
     {
-      Glib::ustring imgname = d_tileset->getFlags()->getName();
-      Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty() == true)
-        success =
-          d_tileset->addFileInCfgFile(d->get_filename(), newname);
-      else
-        success =
-          d_tileset->replaceFileInCfgFile(imgname, d->get_filename(), newname);
-      if (success)
+      if (d_tileset->getFlags ()->checkDimension (d->get_filename ()))
         {
-          d_tileset->getFlags ()->load (d_tileset, newname);
-          d_tileset->getFlags ()->instantiateImages ();
-          d_changed = true;
-          update_flag_panel();
+          Glib::ustring imgname = d_tileset->getFlags()->getName();
+          Glib::ustring newname = "";
+          bool success = false;
+          if (imgname.empty() == true)
+            success =
+              d_tileset->addFileInCfgFile(d->get_filename(), newname);
+          else
+            success =
+              d_tileset->replaceFileInCfgFile(imgname, d->get_filename(), newname);
+          if (success)
+            {
+              d_tileset->getFlags ()->load (d_tileset, newname);
+              d_tileset->getFlags ()->instantiateImages ();
+              d_changed = true;
+              update ();
+            }
+          else
+            {
+              Glib::ustring errmsg = Glib::strerror(errno);
+              TimedMessageDialog
+                td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
+                                        d->get_filename (),
+                                        d_tileset->getConfigurationFile(),
+                                        errmsg), 0);
+              td.run_and_hide ();
+              broken = true;
+            }
         }
       else
         {
           Glib::ustring errmsg = Glib::strerror(errno);
           TimedMessageDialog
-            td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
-                                    d->get_filename (),
-                                    d_tileset->getConfigurationFile(),
-                                    errmsg), 0);
+            td(*d, String::ucompose(_("Bad dimensions in image:\n%1"),
+                                    d->get_filename ()), 0);
           td.run_and_hide ();
           broken = true;
         }
@@ -133,7 +153,7 @@ bool TilesetFlagEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
       td.run_and_hide ();
       broken = true;
     }
-  return broken;
+  return !broken;
 }
 
 void TilesetFlagEditorDialog::show_preview_flags()
@@ -292,22 +312,33 @@ void TilesetFlagEditorDialog::on_flag_imagebutton_clicked ()
           if (d->get_filename() != filename)
             {
               PastChooser::getInstance()->set_dir(d);
-              on_image_chosen (d);
+              Glib::ustring archive_member = d_tileset->getFlags()->getName ();
+              TileSetFlagEditorAction_Set *action =
+                new TileSetFlagEditorAction_Set (d_tileset, archive_member);
+              if (on_image_chosen (d) == false)
+                umgr->add (action);
+              else
+                delete action;
             }
         }
     }
   else if (response == Gtk::RESPONSE_REJECT && f != "")
     {
+      Glib::ustring archive_member = d_tileset->getFlags()->getName ();
+      TileSetFlagEditorAction_Set *action =
+        new TileSetFlagEditorAction_Set (d_tileset, archive_member);
       if (d_tileset->removeFileInCfgFile(f))
         {
+          umgr->add (action);
           d_changed = true;
           d_tileset->uninstantiateSameNamedImages (f);
           d_flags->clear ();
           clearFlag ();
-          update_flag_panel();
+          update ();
         }
       else
         {
+          delete action;
           Glib::ustring errmsg = Glib::strerror(errno);
           TimedMessageDialog
             td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
@@ -323,5 +354,97 @@ void TilesetFlagEditorDialog::on_flag_imagebutton_clicked ()
 
 TilesetFlagEditorDialog::~TilesetFlagEditorDialog ()
 {
+  delete umgr;
   delete d_flags;
+}
+
+void TilesetFlagEditorDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+  return;
+}
+
+void TilesetFlagEditorDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  d_changed = true;
+  update ();
+}
+
+void TilesetFlagEditorDialog::update ()
+{
+  disconnect_signals ();
+  shield_theme_combobox->set_active (d_shield_row);
+  update_flag_panel ();
+  connect_signals ();
+}
+
+void TilesetFlagEditorDialog::connect_signals ()
+{
+  connections.push_back
+    (shield_theme_combobox->signal_changed().connect
+     (method(on_shieldset_changed)));
+  connections.push_back
+    (flag_imagebutton->signal_clicked().connect
+     (method(on_flag_imagebutton_clicked)));
+}
+
+void TilesetFlagEditorDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+UndoAction *TilesetFlagEditorDialog::executeAction (UndoAction *action2)
+{
+  TileSetFlagEditorAction *action =
+    dynamic_cast<TileSetFlagEditorAction*>(action2);
+  UndoAction *out = NULL;
+
+  heartbeat.disconnect ();
+  switch (action->getType ())
+    {
+    case TileSetFlagEditorAction::SET:
+        {
+          TileSetFlagEditorAction_Set *a =
+            dynamic_cast<TileSetFlagEditorAction_Set*>(action);
+          TarFileMaskedImage *im = d_tileset->getFlags ();
+          out = new TileSetFlagEditorAction_Set (d_tileset, im->getName ());
+          if (a->getArchiveMember ().empty ())
+            im->clear ();
+          else
+            {
+              Glib::ustring ar = a->getArchiveMember ();
+              Glib::ustring file = a->getFileName ();
+              bool broken = false;
+              Glib::ustring newbasename = "";
+              bool present = d_tileset->contains (ar, broken);
+              if (present)
+                d_tileset->replaceFileInCfgFile (ar, file, newbasename);
+              else
+                d_tileset->addFileInCfgFile (file, newbasename);
+
+               d_tileset->getFlags ()->load (d_tileset, newbasename);
+               d_tileset->getFlags ()->instantiateImages ();
+               if (d_flags)
+                 delete d_flags;
+               d_flags = new TarFileMaskedImage (*d_tileset->getFlags ());
+            }
+        }
+      break;
+    case TileSetFlagEditorAction::SHIELD:
+        {
+          TileSetFlagEditorAction_Shield *a =
+            dynamic_cast<TileSetFlagEditorAction_Shield*>(action);
+          out = new TileSetFlagEditorAction_Shield
+            (shield_theme_combobox->get_active_row_number ());
+          d_shield_row = a->getShield ();
+        }
+      break;
+    }
+  return out;
 }

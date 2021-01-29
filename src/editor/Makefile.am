@@ -59,6 +59,7 @@ libtilesetwindow_la_SOURCES = \
 	tileset-selector-editor-dialog.cpp tileset-selector-editor-dialog.h \
 	tileset-selector-editor-actions.h \
 	tileset-flag-editor-dialog.cpp tileset-flag-editor-dialog.h \
+	tileset-flag-editor-actions.h \
 	tileset-explosion-picture-editor-dialog.cpp \
 	tileset-explosion-picture-editor-dialog.h \
 	tileset-explosion-picture-editor-actions.h \

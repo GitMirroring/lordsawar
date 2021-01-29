@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include <gtkmm.h>
 #include "tileset.h"
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 class TarFileMaskedImage;
 
 //! Tileset flag editor.
@@ -37,11 +38,15 @@ class TilesetFlagEditorDialog: public LwEditorDialog
     bool run();
 
  private:
+    UndoMgr *umgr;
     bool d_changed;
+    guint32 d_shield_row;
     TarFileMaskedImage *d_flags;
     Gtk::Button *flag_imagebutton;
     Gtk::ComboBoxText *shield_theme_combobox;
     Gtk::Grid *preview_table;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
     Tileset *d_tileset;
     std::map< guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >* > flags;
     sigc::connection heartbeat;
@@ -59,6 +64,14 @@ class TilesetFlagEditorDialog: public LwEditorDialog
     void on_heartbeat();
     Gtk::FileChooserDialog* image_filechooser(bool clear);
     void on_flag_imagebutton_clicked ();
+
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif
