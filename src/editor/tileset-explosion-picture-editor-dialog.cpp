@@ -86,30 +86,43 @@ bool TilesetExplosionPictureEditorDialog::on_image_chosen(Gtk::FileChooserDialog
   d_explosion = PixMask::create (d->get_filename (), broken);
   if (!broken)
     {
-      Glib::ustring imgname = d_tileset->getExplosion()->getName();
-      Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty() == true)
-        success =
-          d_tileset->addFileInCfgFile(d->get_filename(), newname);
-      else
-        success =
-          d_tileset->replaceFileInCfgFile(imgname, d->get_filename(), newname);
-      if (success)
+      if (d_explosion->checkDimension (d->get_filename ()))
         {
-          d_tileset->getExplosion ()->load (d_tileset, newname);
-          d_tileset->getExplosion ()->instantiateImages ();
-          d_changed = true;
-          update ();
+          Glib::ustring imgname = d_tileset->getExplosion()->getName();
+          Glib::ustring newname = "";
+          bool success = false;
+          if (imgname.empty() == true)
+            success =
+              d_tileset->addFileInCfgFile(d->get_filename(), newname);
+          else
+            success =
+              d_tileset->replaceFileInCfgFile(imgname, d->get_filename(),
+                                              newname);
+          if (success)
+            {
+              d_tileset->getExplosion ()->load (d_tileset, newname);
+              d_tileset->getExplosion ()->instantiateImages ();
+              d_changed = true;
+              update ();
+            }
+          else
+            {
+              Glib::ustring errmsg = Glib::strerror(errno);
+              TimedMessageDialog
+                td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
+                                        d->get_filename (),
+                                        d_tileset->getConfigurationFile(),
+                                        errmsg), 0);
+              td.run_and_hide ();
+              broken = true;
+            }
         }
       else
         {
           Glib::ustring errmsg = Glib::strerror(errno);
           TimedMessageDialog
-            td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
-                                    d->get_filename (),
-                                    d_tileset->getConfigurationFile(),
-                                    errmsg), 0);
+            td(*d, String::ucompose(_("Bad dimensions in image:\n%1"),
+                                    d->get_filename ()), 0);
           td.run_and_hide ();
           broken = true;
         }
@@ -269,7 +282,7 @@ void TilesetExplosionPictureEditorDialog::on_explosion_imagebutton_clicked ()
               TileSetExplosionPictureEditorAction_Set *action =
                 new TileSetExplosionPictureEditorAction_Set (d_tileset,
                                                              archive_member);
-              if (on_image_chosen (d))
+              if (on_image_chosen (d) == false)
                 umgr->add (action);
               else
                 delete action;
