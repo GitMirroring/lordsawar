@@ -385,7 +385,7 @@ void TilesetSelectorEditorDialog::on_selector_imagebutton_clicked ()
               TileSetSelectorEditorAction_Set *action =
                 new TileSetSelectorEditorAction_Set (d_tileset,
                                                      d_large, archive_member);
-              if (on_image_chosen (d))
+              if (on_image_chosen (d) == false)
                 umgr->add (action);
               else
                 delete action;
