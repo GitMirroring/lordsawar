@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2010, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,25 +21,37 @@
 
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 class Tileset;
 
 class TilesetSmallmapBuildingColorsDialog: public LwEditorDialog
 {
  public:
     TilesetSmallmapBuildingColorsDialog(Gtk::Window &parent, Tileset *tileset);
-    ~TilesetSmallmapBuildingColorsDialog() {}
+    ~TilesetSmallmapBuildingColorsDialog();
 
     bool get_changed () {return d_changed;}
  private:
+    UndoMgr *umgr;
     bool d_changed;
     Tileset *d_tileset;
     Gtk::ColorButton *road_colorbutton;
     Gtk::ColorButton *ruin_colorbutton;
     Gtk::ColorButton *temple_colorbutton;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     void on_road_color_chosen();
     void on_ruin_color_chosen();
     void on_temple_color_chosen();
+
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif

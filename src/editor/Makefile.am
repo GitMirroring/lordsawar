@@ -66,6 +66,7 @@ libtilesetwindow_la_SOURCES = \
 	tilestyle-organizer-dialog.cpp tilestyle-organizer-dialog.h \
 	tileset-smallmap-building-colors-dialog.cpp \
 	tileset-smallmap-building-colors-dialog.h\
+	tileset-smallmap-building-colors-actions.h\
 	tileset-move-bonus-image-dialog.cpp tileset-move-bonus-image-dialog.h \
 	image-editor-dialog.cpp image-editor-dialog.h
 
