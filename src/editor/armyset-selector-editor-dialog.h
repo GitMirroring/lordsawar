@@ -87,7 +87,6 @@ class ArmysetSelectorEditorDialog: public LwEditorDialog
     void disconnect_signals ();
     std::list<sigc::connection> connections;
     UndoAction *executeAction (UndoAction *action);
-    bool checkDimensions (Glib::ustring filename, TarFileMaskedImage::MaskOrientation o);
 };
 
 #endif
