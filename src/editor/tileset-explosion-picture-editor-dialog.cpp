@@ -86,7 +86,7 @@ bool TilesetExplosionPictureEditorDialog::on_image_chosen(Gtk::FileChooserDialog
   d_explosion = PixMask::create (d->get_filename (), broken);
   if (!broken)
     {
-      if (d_explosion->checkDimension (d->get_filename ()))
+      if (d_tileset->getExplosion ()->checkDimension (d->get_filename ()))
         {
           Glib::ustring imgname = d_tileset->getExplosion()->getName();
           Glib::ustring newname = "";
