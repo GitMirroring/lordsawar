@@ -113,9 +113,15 @@ void TilesetSmallmapBuildingColorsDialog::update ()
 
 void TilesetSmallmapBuildingColorsDialog::connect_signals ()
 {
-  road_colorbutton->signal_color_set().connect (method(on_road_color_chosen));
-  temple_colorbutton->signal_color_set().connect (method(on_temple_color_chosen));
-  ruin_colorbutton->signal_color_set().connect (method(on_ruin_color_chosen));
+  connections.push_back
+    (road_colorbutton->signal_color_set().connect
+     (method(on_road_color_chosen)));
+  connections.push_back
+    (temple_colorbutton->signal_color_set().connect
+     (method(on_temple_color_chosen)));
+  connections.push_back
+    (ruin_colorbutton->signal_color_set().connect
+     (method(on_ruin_color_chosen)));
 }
 
 void TilesetSmallmapBuildingColorsDialog::disconnect_signals ()
