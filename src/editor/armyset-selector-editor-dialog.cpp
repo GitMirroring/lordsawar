@@ -66,7 +66,7 @@ ArmysetSelectorEditorDialog::ArmysetSelectorEditorDialog(Gtk::Window &parent, Ar
   xml->get_widget("redo_button", redo_button);
   redo_button->signal_activate ().connect (method (on_redo_activated));
 
-  d_large = false;
+  d_large = true;
   connect_signals ();
   update ();
 }
@@ -138,8 +138,7 @@ bool ArmysetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
   bool broken = false;
   if (PixMask::checkFormat (d->get_filename ()))
     {
-      if (checkDimensions (d->get_filename (),
-                           TarFileMaskedImage::VERTICAL_MASK))
+      if (get_selector()->checkDimension (d->get_filename ()))
         {
           Glib::ustring imgname = get_selector_filename ();
           Glib::ustring newname = "";
@@ -172,7 +171,7 @@ bool ArmysetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
       else
         {
           TimedMessageDialog td
-            (*d, String::ucompose(_("The dimensions of the image are bad:\n%1"),
+            (*d, String::ucompose(_("Bad dimensions in image:\n%1"),
                                   d->get_filename ()), 0);
           td.run_and_hide ();
           broken = true;
@@ -448,6 +447,8 @@ Shield::Colour ArmysetSelectorEditorDialog::get_selected_colour ()
 void ArmysetSelectorEditorDialog::on_undo_activated ()
 {
   umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
   update ();
   return;
 }
@@ -455,6 +456,7 @@ void ArmysetSelectorEditorDialog::on_undo_activated ()
 void ArmysetSelectorEditorDialog::on_redo_activated ()
 {
   umgr->redo ();
+  d_changed = true;
   update ();
 }
 
@@ -463,8 +465,10 @@ void ArmysetSelectorEditorDialog::update ()
   disconnect_signals ();
   shield_theme_combobox->set_active (d_shield_row);
   owner_combobox->set_active (d_owner_row);
-  large_selector_radiobutton->set_active (d_large);
-  small_selector_radiobutton->set_active (!d_large);
+  if (d_large)
+    large_selector_radiobutton->set_active (d_large);
+  else
+    small_selector_radiobutton->set_active (!d_large);
   show_preview_selectors();
   update_selector_panel();
   connect_signals ();
@@ -481,9 +485,6 @@ void ArmysetSelectorEditorDialog::connect_signals ()
     (large_selector_radiobutton->signal_toggled().connect
      (method(on_button_toggle)));
   connections.push_back
-    (small_selector_radiobutton->signal_toggled().connect
-     (method(on_button_toggle)));
-  connections.push_back
     (selector_imagebutton->signal_clicked().connect
      (method(on_selector_imagebutton_clicked)));
 }
@@ -493,26 +494,6 @@ void ArmysetSelectorEditorDialog::disconnect_signals ()
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();
-}
-
-bool ArmysetSelectorEditorDialog::checkDimensions (Glib::ustring filename, TarFileMaskedImage::MaskOrientation o)
-{
-  bool success = false;
-  bool broken = false;
-  PixMask *p = PixMask::create (filename, broken);
-  if (broken)
-    return success;
-  switch (o)
-    {
-    case TarFileMaskedImage::HORIZONTAL_MASK: //mask is to the side
-      success = (p->get_unscaled_width () / 2) == p->get_unscaled_height ();
-      break;
-    case TarFileMaskedImage::VERTICAL_MASK: //mask is underneath
-      success = p->get_unscaled_width () % (p->get_unscaled_height () / 2) == 0;
-      break;
-    }
-  delete p;
-  return success;
 }
 
 UndoAction *ArmysetSelectorEditorDialog::executeAction (UndoAction *action2)
