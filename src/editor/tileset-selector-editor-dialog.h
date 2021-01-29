@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include <gtkmm.h>
 #include "tileset.h"
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 
 class TarFileMaskedImage;
 
@@ -39,17 +40,22 @@ class TilesetSelectorEditorDialog: public LwEditorDialog
 
  private:
     bool d_changed;
+    UndoMgr *umgr;
     Gtk::RadioButton *large_selector_radiobutton;
     Gtk::RadioButton *small_selector_radiobutton;
     Gtk::Button *selector_imagebutton;
     Gtk::ComboBoxText *shield_theme_combobox;
     Gtk::Grid *preview_table;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
     Tileset *d_tileset;
     TarFileMaskedImage *small_selector;
     TarFileMaskedImage *large_selector;
     std::map< guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >* > selectors;
     sigc::connection heartbeat;
     std::map<guint32, std::list<Glib::RefPtr<Gdk::Pixbuf> >::iterator> frame;
+    bool d_large;
+    guint32 d_shield_row;
 
     void on_shieldset_changed();
     bool on_image_chosen(Gtk::FileChooserDialog *d);
@@ -67,6 +73,13 @@ class TilesetSelectorEditorDialog: public LwEditorDialog
     void set_selector_filename (Glib::ustring f);
     void clear_selector_image ();
     Gtk::FileChooserDialog* image_filechooser(bool clear);
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif

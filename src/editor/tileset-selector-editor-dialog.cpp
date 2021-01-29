@@ -33,12 +33,15 @@
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
 #include "TarFileMaskedImage.h"
+#include "tileset-selector-editor-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &TilesetSelectorEditorDialog::x)
 
 TilesetSelectorEditorDialog::TilesetSelectorEditorDialog(Gtk::Window &parent, Tileset *tileset)
  : LwEditorDialog(parent, "tileset-selector-editor-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_changed = false;
   d_tileset = tileset;
   small_selector = new TarFileMaskedImage (*d_tileset->getSelector(false));
@@ -50,20 +53,23 @@ TilesetSelectorEditorDialog::TilesetSelectorEditorDialog(Gtk::Window &parent, Ti
   xml->get_widget("preview_table", preview_table);
 
   xml->get_widget("large_selector_radiobutton", large_selector_radiobutton);
-  large_selector_radiobutton->signal_toggled().connect (method(on_button_toggle));
   xml->get_widget("small_selector_radiobutton", small_selector_radiobutton);
-  small_selector_radiobutton->signal_toggled().connect (method(on_button_toggle));
   xml->get_widget("selector_imagebutton", selector_imagebutton);
-  selector_imagebutton->signal_clicked().connect (method(on_selector_imagebutton_clicked));
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
 
-  show_preview_selectors();
-  update_selector_panel();
+  d_large = false;
+  connect_signals ();
+  update ();
 }
 
 void TilesetSelectorEditorDialog::on_button_toggle ()
 {
-  show_preview_selectors();
-  update_selector_panel();
+  umgr->add (new TileSetSelectorEditorAction_Size (d_large));
+  d_large = large_selector_radiobutton->get_active ();
+  update ();
 }
 
 bool TilesetSelectorEditorDialog::run()
@@ -93,14 +99,16 @@ void TilesetSelectorEditorDialog::setup_shield_theme_combobox(Gtk::Box *box)
     }
 
   shield_theme_combobox->set_active(default_id);
-  shield_theme_combobox->signal_changed().connect (method(on_shieldset_changed));
+  d_shield_row = default_id;
 
   box->set_center_widget (*shield_theme_combobox);
 }
 
 void TilesetSelectorEditorDialog::on_shieldset_changed()
 {
-  show_preview_selectors();
+  umgr->add (new TileSetSelectorEditorAction_Shield (d_shield_row));
+  d_shield_row = shield_theme_combobox->get_active_row_number ();
+  update ();
 }
 
 bool TilesetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
@@ -108,30 +116,41 @@ bool TilesetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
   bool broken = false;
   if (PixMask::checkFormat (d->get_filename ()))
     {
-      Glib::ustring imgname = get_selector_filename ();
-      Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty() == true)
-        success =
-          d_tileset->addFileInCfgFile(d->get_filename(), newname);
-      else
-        success =
-          d_tileset->replaceFileInCfgFile(imgname, d->get_filename(), newname);
-      if (success)
+      if (d_tileset->getSelector (d_large)->checkDimension (d->get_filename ()))
         {
-          set_selector_filename (newname);
-          d_changed = true;
-          show_preview_selectors ();
-          update_selector_panel();
+          Glib::ustring imgname = get_selector_filename ();
+          Glib::ustring newname = "";
+          bool success = false;
+          if (imgname.empty() == true)
+            success = d_tileset->addFileInCfgFile(d->get_filename(), newname);
+          else
+            success = d_tileset->replaceFileInCfgFile (imgname,
+                                                       d->get_filename(),
+                                                       newname);
+          if (success)
+            {
+              set_selector_filename (newname);
+              d_changed = true;
+              update ();
+            }
+          else
+            {
+              Glib::ustring errmsg = Glib::strerror(errno);
+              TimedMessageDialog
+                td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
+                                        d->get_filename (),
+                                        d_tileset->getConfigurationFile(),
+                                        errmsg), 0);
+              td.run_and_hide ();
+              broken = true;
+            }
         }
       else
         {
           Glib::ustring errmsg = Glib::strerror(errno);
           TimedMessageDialog
-            td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
-                                    d->get_filename (),
-                                    d_tileset->getConfigurationFile(),
-                                    errmsg), 0);
+            td(*d, String::ucompose(_("Bad dimensions in image:\n%1"),
+                                    d->get_filename ()), 0);
           td.run_and_hide ();
           broken = true;
         }
@@ -362,20 +381,33 @@ void TilesetSelectorEditorDialog::on_selector_imagebutton_clicked ()
           if (d->get_filename() != filename)
             {
               PastChooser::getInstance()->set_dir(d);
-              on_image_chosen (d);
+              Glib::ustring archive_member = get_selector_filename ();
+              TileSetSelectorEditorAction_Set *action =
+                new TileSetSelectorEditorAction_Set (d_tileset,
+                                                     d_large, archive_member);
+              if (on_image_chosen (d))
+                umgr->add (action);
+              else
+                delete action;
             }
         }
     }
   else if (response == Gtk::RESPONSE_REJECT && f != "")
     {
+      Glib::ustring archive_member = get_selector_filename ();
+      TileSetSelectorEditorAction_Set *action =
+        new TileSetSelectorEditorAction_Set (d_tileset, d_large,
+                                             archive_member);
       if (d_tileset->removeFileInCfgFile(f))
         {
+          umgr->add (action);
           d_changed = true;
           d_tileset->uninstantiateSameNamedImages (f);
-          update_selector_panel ();
+          update ();
         }
       else
         {
+          delete action;
           Glib::ustring errmsg = Glib::strerror(errno);
           TimedMessageDialog
             td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
@@ -390,8 +422,114 @@ void TilesetSelectorEditorDialog::on_selector_imagebutton_clicked ()
 
 TilesetSelectorEditorDialog::~TilesetSelectorEditorDialog()
 {
+  delete umgr;
   if (small_selector)
     delete small_selector;
   if (large_selector)
     delete large_selector;
+}
+
+void TilesetSelectorEditorDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+  return;
+}
+
+void TilesetSelectorEditorDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  d_changed = true;
+  update ();
+}
+
+void TilesetSelectorEditorDialog::update ()
+{
+  disconnect_signals ();
+  shield_theme_combobox->set_active (d_shield_row);
+  if (d_large)
+    large_selector_radiobutton->set_active (d_large);
+  else
+    small_selector_radiobutton->set_active (!d_large);
+  show_preview_selectors();
+  update_selector_panel();
+  connect_signals ();
+}
+
+void TilesetSelectorEditorDialog::connect_signals ()
+{
+  connections.push_back
+    (shield_theme_combobox->signal_changed().connect
+     (method(on_shieldset_changed)));
+  connections.push_back
+    (large_selector_radiobutton->signal_toggled().connect
+     (method(on_button_toggle)));
+  connections.push_back
+    (selector_imagebutton->signal_clicked().connect
+     (method(on_selector_imagebutton_clicked)));
+}
+
+void TilesetSelectorEditorDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+UndoAction *TilesetSelectorEditorDialog::executeAction (UndoAction *action2)
+{
+  TileSetSelectorEditorAction *action =
+    dynamic_cast<TileSetSelectorEditorAction*>(action2);
+  UndoAction *out = NULL;
+
+  heartbeat.disconnect();
+  switch (action->getType ())
+    {
+    case TileSetSelectorEditorAction::SET:
+        {
+          TileSetSelectorEditorAction_Set *a =
+            dynamic_cast<TileSetSelectorEditorAction_Set*>(action);
+          TarFileMaskedImage *im = d_tileset->getSelector (d_large);
+          out = new TileSetSelectorEditorAction_Set (d_tileset, a->getLarge (),
+                                                     im->getName ());
+          if (a->getArchiveMember ().empty ())
+            im->clear ();
+          else
+            {
+              Glib::ustring ar = a->getArchiveMember ();
+              Glib::ustring file = a->getFileName ();
+              bool broken = false;
+              Glib::ustring newbasename = "";
+              bool present = d_tileset->contains (ar, broken);
+              if (present)
+                d_tileset->replaceFileInCfgFile (ar, file, newbasename);
+              else
+                d_tileset->addFileInCfgFile (file, newbasename);
+
+              d_tileset->getSelector (d_large)->load (d_tileset, newbasename);
+              d_tileset->getSelector (d_large)->instantiateImages ();
+            }
+        }
+      break;
+    case TileSetSelectorEditorAction::SHIELD:
+        {
+          TileSetSelectorEditorAction_Shield *a =
+            dynamic_cast<TileSetSelectorEditorAction_Shield*>(action);
+          out = new TileSetSelectorEditorAction_Shield
+            (shield_theme_combobox->get_active_row_number ());
+          d_shield_row = a->getShield ();
+        }
+      break;
+    case TileSetSelectorEditorAction::SIZE:
+        {
+          TileSetSelectorEditorAction_Size *a =
+            dynamic_cast<TileSetSelectorEditorAction_Size*>(action);
+          out = new TileSetSelectorEditorAction_Size (d_large);
+          d_large = a->getLarge ();
+        }
+      break;
+    }
+  return out;
 }
