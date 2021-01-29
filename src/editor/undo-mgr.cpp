@@ -135,6 +135,15 @@ bool UndoMgr::isGrouped (UndoAction *l, UndoAction *r, bool bottom)
     return true;
   if (l->getAggregate () != r->getAggregate ())
     return false;
+
+  if (l == NULL && r->getAggregate () == UndoAction::AGGREGATE_NONE)
+    return true;
+  if (l->getAggregate () == UndoAction::AGGREGATE_NONE && r == NULL)
+    return true;
+  if (l->getAggregate () == UndoAction::AGGREGATE_NONE &&
+      r->getAggregate () == UndoAction::AGGREGATE_NONE)
+    return false;
+
   Glib::ustring leftaction = l->getActionName ();
   Glib::ustring rightaction = r->getActionName ();
 
