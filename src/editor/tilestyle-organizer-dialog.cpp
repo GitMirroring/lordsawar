@@ -29,12 +29,15 @@
 #include "ImageCache.h"
 #include "timing.h"
 #include "font-size.h"
+#include "tilestyle-organizer-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &TileStyleOrganizerDialog::x)
 
 TileStyleOrganizerDialog::TileStyleOrganizerDialog(Gtk::Window &parent, Tile *tile)
  : LwEditorDialog(parent, "tilestyle-organizer-dialog.ui")
 {
+    umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+    umgr->execute ().connect (method (executeAction));
     d_tile = tile;
     std::vector<Gtk::TargetEntry> targets;
     targets.push_back(Gtk::TargetEntry("LordsawarTilestyleType", Gtk::TARGET_SAME_APP));
@@ -44,11 +47,14 @@ TileStyleOrganizerDialog::TileStyleOrganizerDialog(Gtk::Window &parent, Tile *ti
     xml->get_widget("unsorted_iconview", unsorted_iconview);
     xml->get_widget("category_label", category_label);
     xml->get_widget("unsorted_label", unsorted_label);
+    xml->get_widget("undo_button", undo_button);
+    undo_button->signal_activate ().connect (method (on_undo_activated));
+    xml->get_widget("redo_button", redo_button);
+    redo_button->signal_activate ().connect (method (on_redo_activated));
 
     categories_list = Gtk::ListStore::create (categories_columns);
     categories_iconview->set_model(categories_list); 
     categories_iconview->set_pixbuf_column(categories_columns.image);
-    categories_iconview->signal_selection_changed().connect(method(on_category_selected));
     categories_iconview->enable_model_drag_dest(targets, Gdk::ACTION_MOVE);
     categories_iconview->signal_drag_data_received().connect
       (method(on_categories_drop_drag_data_received));
@@ -64,8 +70,6 @@ TileStyleOrganizerDialog::TileStyleOrganizerDialog(Gtk::Window &parent, Tile *ti
     category_iconview->signal_drag_data_received().connect
       (method(on_category_drop_drag_data_received));
 
-    category_iconview->signal_selection_changed().connect
-      (sigc::bind(method(on_selection_made), category_iconview));
     category_iconview->signal_drag_begin().connect
       (sigc::bind(sigc::hide<0>(method(on_drag_begin)), category_iconview));
     unsorted_list = Gtk::ListStore::create (tilestyle_columns);
@@ -81,8 +85,6 @@ TileStyleOrganizerDialog::TileStyleOrganizerDialog(Gtk::Window &parent, Tile *ti
       (method(on_unsorted_drop_drag_data_received));
     unsorted_iconview->signal_drag_begin().connect
       (sigc::bind(sigc::hide<0>(method(on_drag_begin)), unsorted_iconview));
-    unsorted_iconview->signal_selection_changed().connect
-      (sigc::bind(method(on_selection_made), unsorted_iconview));
 
     if (d_tile->front())
       if (d_tile->front()->front())
@@ -98,6 +100,7 @@ TileStyleOrganizerDialog::TileStyleOrganizerDialog(Gtk::Window &parent, Tile *ti
     categories_iconview->select_path(Gtk::TreeModel::Path("0"));
     inhibit_select = false;
     d_changed = false;
+    update ();
 }
       
 void TileStyleOrganizerDialog::on_category_drag_data_get(const Glib::RefPtr<Gdk::DragContext> &drag_context, Gtk::SelectionData &data)
@@ -267,6 +270,7 @@ void TileStyleOrganizerDialog::on_categories_drop_drag_data_received(const Glib:
     {
       std::string idstr;
       std::istringstream ids(selection_data.get_data_as_string());
+      std::list<std::pair<guint, TileStyle::Type> > changes;
       while (1)
         {
           idstr = "";
@@ -287,11 +291,18 @@ void TileStyleOrganizerDialog::on_categories_drop_drag_data_received(const Glib:
           if (style)
             {
               guint32 type = row[categories_columns.type];
+              changes.push_back
+                (std::pair<guint32, TileStyle::Type>(style->getId (),
+                                                     style->getType ()));
               style->setType(TileStyle::Type(type));
-              if (get_selected_category() != -1)
-                fill_category(get_selected_category());
-              fill_category(TileStyle::UNKNOWN);
+              update ();
             }
+        }
+      if (changes.empty () == false)
+        {
+          TileStyleOrganizerAction_Move *action =
+            new TileStyleOrganizerAction_Move (changes);
+          umgr->add (action);
         }
     }
 
@@ -309,6 +320,7 @@ void TileStyleOrganizerDialog::on_category_drop_drag_data_received(const Glib::R
     {
       std::string idstr;
       std::istringstream ids(selection_data.get_data_as_string());
+      std::list<std::pair<guint, TileStyle::Type> > changes;
       while (1)
         {
           idstr = "";
@@ -324,11 +336,19 @@ void TileStyleOrganizerDialog::on_category_drop_drag_data_received(const Glib::R
               int type = get_selected_category();
               if (type != -1)
                 {
+                  changes.push_back
+                    (std::pair<guint32, TileStyle::Type>(id,
+                                                         style->getType ()));
                   style->setType(TileStyle::Type(type));
-                  fill_category(type);
-                  fill_category(TileStyle::UNKNOWN);
+                  update ();
                 }
             }
+        }
+      if (changes.empty () == false)
+        {
+          TileStyleOrganizerAction_Move *action =
+            new TileStyleOrganizerAction_Move (changes);
+          umgr->add (action);
         }
     }
   context->drag_finish (false, false, time);
@@ -345,6 +365,7 @@ void TileStyleOrganizerDialog::on_unsorted_drop_drag_data_received(const Glib::R
     {
       std::string idstr;
       std::istringstream ids(selection_data.get_data_as_string());
+      std::list<std::pair<guint, TileStyle::Type> > changes;
       while (1)
         {
           idstr = "";
@@ -357,12 +378,17 @@ void TileStyleOrganizerDialog::on_unsorted_drop_drag_data_received(const Glib::R
           TileStyle *style = d_tile->getTileStyle(id);
           if (style)
             {
+              changes.push_back
+                (std::pair<guint32, TileStyle::Type>(id, style->getType ()));
               style->setType(TileStyle::UNKNOWN);
-              fill_category(TileStyle::UNKNOWN);
-              int type = get_selected_category();
-              if (type != -1)
-                fill_category(TileStyle::Type(type));
+              update ();
             }
+        }
+      if (changes.empty () == false)
+        {
+          TileStyleOrganizerAction_Move *action =
+            new TileStyleOrganizerAction_Move (changes);
+          umgr->add (action);
         }
     }
   context->drag_finish (false, false, time);
@@ -431,4 +457,73 @@ bool TileStyleOrganizerDialog::run()
 {
   dialog->run();
   return d_changed;
+}
+
+void TileStyleOrganizerDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+  return;
+}
+
+void TileStyleOrganizerDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  d_changed = true;
+  update ();
+}
+
+void TileStyleOrganizerDialog::update ()
+{
+  disconnect_signals ();
+  on_category_selected();
+  fill_category(TileStyle::UNKNOWN);
+  connect_signals ();
+}
+
+void TileStyleOrganizerDialog::connect_signals ()
+{
+  connections.push_back
+    (categories_iconview->signal_selection_changed().connect
+     (method(on_category_selected)));
+  connections.push_back
+    (category_iconview->signal_selection_changed().connect
+     (sigc::bind(method(on_selection_made), category_iconview)));
+  connections.push_back
+    (unsorted_iconview->signal_selection_changed().connect
+      (sigc::bind(method(on_selection_made), unsorted_iconview)));
+}
+
+void TileStyleOrganizerDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+UndoAction *TileStyleOrganizerDialog::executeAction (UndoAction *action2)
+{
+  TileStyleOrganizerAction *action =
+    dynamic_cast<TileStyleOrganizerAction*>(action2);
+  UndoAction *out = NULL;
+
+  switch (action->getType ())
+    {
+    case TileStyleOrganizerAction::MOVE:
+        {
+          TileStyleOrganizerAction_Move *a =
+            dynamic_cast<TileStyleOrganizerAction_Move*>(action);
+          out = new TileStyleOrganizerAction_Move
+            (d_tile->getAllTileStyleTypes ());
+          for (auto j : a->getTileStyleTypes ())
+            {
+              TileStyle *ts = d_tile->getTileStyle (j.first);
+              ts->setType (j.second);
+            }
+        }
+      break;
+    }
+  return out;
 }

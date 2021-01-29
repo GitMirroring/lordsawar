@@ -1,6 +1,6 @@
 // Copyright (C) 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,9 +17,10 @@
 //  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
 //  02110-1301, USA.
 
+#include <iostream>
+#include <list>
 #include "Tile.h"
 #include "SmallTile.h"
-#include <iostream>
 #include "File.h"
 #include "tileset.h"
 #include "tarhelper.h"
@@ -323,5 +324,15 @@ Tile* Tile::get_default_swamp()
 {
   return new Tile(Tile::SWAMP, Tile::tileTypeToFriendlyName(Tile::SWAMP), 8, 
                   SmallTile::get_default_swamp());
+}
+        
+std::list<std::pair<guint32, TileStyle::Type> >Tile::getAllTileStyleTypes () const
+{
+  std::list<std::pair<guint32, TileStyle::Type> > result;
+  for (const_iterator i = begin(); i != end(); ++i)
+    for (auto j: **i)
+      result.push_back (std::pair<guint32, TileStyle::Type> (j->getId (), 
+                                                             j->getType ()));
+  return result;
 }
 // End of file

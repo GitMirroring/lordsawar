@@ -152,6 +152,8 @@ class Tile : public std::list<TileStyleSet*>
 
         std::list<TileStyle*> getTileStyles(TileStyle::Type type) const;
 
+        std::list<std::pair<guint32, TileStyle::Type> >getAllTileStyleTypes () const;
+
         TileStyle* getTileStyle(guint32 id) const;
 
 	// Methods the operate on the class data and modify the class

@@ -64,6 +64,7 @@ libtilesetwindow_la_SOURCES = \
 	tileset-explosion-picture-editor-dialog.h \
 	tileset-explosion-picture-editor-actions.h \
 	tilestyle-organizer-dialog.cpp tilestyle-organizer-dialog.h \
+	tilestyle-organizer-actions.h \
 	tileset-smallmap-building-colors-dialog.cpp \
 	tileset-smallmap-building-colors-dialog.h\
 	tileset-smallmap-building-colors-actions.h\

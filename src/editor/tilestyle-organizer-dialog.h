@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include <sigc++/signal.h>
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 
 class Tile;
 class TileStyle;
@@ -72,6 +73,7 @@ class TileStyleOrganizerDialog: public LwEditorDialog
   Glib::RefPtr<Gtk::ListStore> category_list;
   Glib::RefPtr<Gtk::ListStore> unsorted_list;
  private:
+    UndoMgr *umgr;
     Tile *d_tile;
     bool d_changed;
     Gtk::IconView *categories_iconview;
@@ -79,6 +81,8 @@ class TileStyleOrganizerDialog: public LwEditorDialog
     Gtk::IconView *unsorted_iconview;
     Gtk::Label *category_label;
     Gtk::Label *unsorted_label;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     void add_category(guint32 type);
     void fill_in_categories();
@@ -106,6 +110,13 @@ class TileStyleOrganizerDialog: public LwEditorDialog
     bool inhibit_select;
     sigc::connection selection_timeout_handler;
     bool expire_selection();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif
