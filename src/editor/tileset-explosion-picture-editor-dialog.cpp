@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2011, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2011, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,25 +34,27 @@
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
 #include "TarFileImage.h"
+#include "tileset-explosion-picture-editor-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &TilesetExplosionPictureEditorDialog::x)
 
 TilesetExplosionPictureEditorDialog::TilesetExplosionPictureEditorDialog(Gtk::Window &parent, Tileset *tileset)
  : LwEditorDialog(parent, "tileset-explosion-picture-editor-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_changed = false;
   d_tileset = tileset;
 
   xml->get_widget("explosion_imagebutton", explosion_imagebutton);
-  explosion_imagebutton->signal_clicked().connect
-    (method(on_explosion_imagebutton_clicked));
 
   xml->get_widget("large_explosion_radiobutton", large_explosion_radiobutton);
-  large_explosion_radiobutton->signal_toggled().connect (method(on_large_toggled));
   xml->get_widget("small_explosion_radiobutton", small_explosion_radiobutton);
-  small_explosion_radiobutton->signal_toggled().connect (method(on_small_toggled));
-
   xml->get_widget("scene_image", scene_image);
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
 
   Glib::ustring imgname = d_tileset->getExplosion()->getName();
   if (imgname.empty() == false)
@@ -64,7 +66,10 @@ TilesetExplosionPictureEditorDialog::TilesetExplosionPictureEditorDialog(Gtk::Wi
     }
   else
     d_explosion = NULL;
-  on_large_toggled();
+
+  d_large = false;
+  connect_signals ();
+  update ();
 }
 
 bool TilesetExplosionPictureEditorDialog::run()
@@ -95,7 +100,7 @@ bool TilesetExplosionPictureEditorDialog::on_image_chosen(Gtk::FileChooserDialog
           d_tileset->getExplosion ()->load (d_tileset, newname);
           d_tileset->getExplosion ()->instantiateImages ();
           d_changed = true;
-          update_panel ();
+          update ();
         }
       else
         {
@@ -120,14 +125,11 @@ bool TilesetExplosionPictureEditorDialog::on_image_chosen(Gtk::FileChooserDialog
   return broken;
 }
 
-void TilesetExplosionPictureEditorDialog::on_large_toggled()
+void TilesetExplosionPictureEditorDialog::on_button_toggle()
 {
-  update_panel();
-}
-
-void TilesetExplosionPictureEditorDialog::on_small_toggled()
-{
-  update_panel();
+  umgr->add (new TileSetExplosionPictureEditorAction_Size (d_large));
+  d_large = large_explosion_radiobutton->get_active ();
+  update ();
 }
 
 void TilesetExplosionPictureEditorDialog::update_panel()
@@ -262,14 +264,28 @@ void TilesetExplosionPictureEditorDialog::on_explosion_imagebutton_clicked ()
           if (d->get_filename() != filename)
             {
               PastChooser::getInstance()->set_dir(d);
-              on_image_chosen (d);
+              Glib::ustring archive_member =
+                d_tileset->getExplosion ()->getName ();
+              TileSetExplosionPictureEditorAction_Set *action =
+                new TileSetExplosionPictureEditorAction_Set (d_tileset,
+                                                             archive_member);
+              if (on_image_chosen (d))
+                umgr->add (action);
+              else
+                delete action;
             }
         }
     }
   else if (response == Gtk::RESPONSE_REJECT && f != "")
     {
+      Glib::ustring archive_member =
+        d_tileset->getExplosion ()->getName ();
+      TileSetExplosionPictureEditorAction_Set *action =
+        new TileSetExplosionPictureEditorAction_Set (d_tileset,
+                                                     archive_member);
       if (d_tileset->removeFileInCfgFile(f))
         {
+          umgr->add (action);
           d_changed = true;
           d_tileset->uninstantiateSameNamedImages (f);
           if (d_explosion)
@@ -277,10 +293,11 @@ void TilesetExplosionPictureEditorDialog::on_explosion_imagebutton_clicked ()
               delete d_explosion;
               d_explosion = NULL;
             }
-          update_panel ();
+          update ();
         }
       else
         {
+          delete action;
           Glib::ustring errmsg = Glib::strerror(errno);
           TimedMessageDialog
             td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
@@ -295,6 +312,100 @@ void TilesetExplosionPictureEditorDialog::on_explosion_imagebutton_clicked ()
 
 TilesetExplosionPictureEditorDialog::~TilesetExplosionPictureEditorDialog ()
 {
+  delete umgr;
   if (d_explosion)
     delete d_explosion;
+}
+
+void TilesetExplosionPictureEditorDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+  return;
+}
+
+void TilesetExplosionPictureEditorDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  d_changed = true;
+  update ();
+}
+
+void TilesetExplosionPictureEditorDialog::update ()
+{
+  disconnect_signals ();
+  if (d_large)
+    large_explosion_radiobutton->set_active (d_large);
+  else
+    small_explosion_radiobutton->set_active (!d_large);
+  update_panel ();
+  connect_signals ();
+}
+
+void TilesetExplosionPictureEditorDialog::connect_signals ()
+{
+  connections.push_back
+    (large_explosion_radiobutton->signal_toggled().connect
+     (method(on_button_toggle)));
+  connections.push_back
+    (explosion_imagebutton->signal_clicked().connect
+     (method(on_explosion_imagebutton_clicked)));
+}
+
+void TilesetExplosionPictureEditorDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+UndoAction *TilesetExplosionPictureEditorDialog::executeAction (UndoAction *action2)
+{
+  TileSetExplosionPictureEditorAction *action =
+    dynamic_cast<TileSetExplosionPictureEditorAction*>(action2);
+  UndoAction *out = NULL;
+
+  switch (action->getType ())
+    {
+    case TileSetExplosionPictureEditorAction::SET:
+        {
+          TileSetExplosionPictureEditorAction_Set *a =
+            dynamic_cast<TileSetExplosionPictureEditorAction_Set*>(action);
+          TarFileImage *im = d_tileset->getExplosion ();
+          out = new TileSetExplosionPictureEditorAction_Set (d_tileset,
+                                                             im->getName ());
+          if (a->getArchiveMember ().empty ())
+            im->clear ();
+          else
+            {
+              Glib::ustring ar = a->getArchiveMember ();
+              Glib::ustring file = a->getFileName ();
+              bool broken = false;
+              Glib::ustring newbasename = "";
+              bool present = d_tileset->contains (ar, broken);
+              if (present)
+                d_tileset->replaceFileInCfgFile (ar, file, newbasename);
+              else
+                d_tileset->addFileInCfgFile (file, newbasename);
+
+              d_tileset->getExplosion ()->load (d_tileset, newbasename);
+              d_tileset->getExplosion ()->instantiateImages ();
+              if (d_explosion)
+                delete d_explosion;
+              d_explosion = PixMask::create (file, broken);
+            }
+        }
+      break;
+    case TileSetExplosionPictureEditorAction::SIZE:
+        {
+          TileSetExplosionPictureEditorAction_Size *a =
+            dynamic_cast<TileSetExplosionPictureEditorAction_Size*>(action);
+          out = new TileSetExplosionPictureEditorAction_Size (d_large);
+          d_large = a->getLarge ();
+        }
+      break;
+    }
+  return out;
 }

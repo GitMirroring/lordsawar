@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2010, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include <gtkmm.h>
 #include "tileset.h"
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 
 class TilePreviewScene;
 
@@ -37,17 +38,20 @@ class TilesetExplosionPictureEditorDialog: public LwEditorDialog
     bool run();
 
  private:
+    UndoMgr *umgr;
     bool d_changed;
+    bool d_large;
     Gtk::RadioButton *large_explosion_radiobutton;
     Gtk::RadioButton *small_explosion_radiobutton;
     Gtk::Button *explosion_imagebutton;
     Gtk::Image *scene_image;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
     Tileset *d_tileset;
     PixMask *d_explosion;
 
     bool on_image_chosen(Gtk::FileChooserDialog *d);
-    void on_large_toggled();
-    void on_small_toggled();
+    void on_button_toggle();
     void show_explosion_image();
     void update_panel();
 
@@ -56,6 +60,13 @@ class TilesetExplosionPictureEditorDialog: public LwEditorDialog
     Gtk::FileChooserDialog* image_filechooser(bool clear);
     void on_explosion_imagebutton_clicked ();
 
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif
