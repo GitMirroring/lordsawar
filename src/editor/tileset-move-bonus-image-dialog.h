@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
+#include "tileset-move-bonus-image-actions.h"
 class Tileset;
 class PixMask;
 class TarFileImage;
@@ -33,6 +35,7 @@ class TilesetMoveBonusImageDialog: public LwEditorDialog
 
     bool get_changed () {return d_changed;}
  private:
+    UndoMgr *umgr;
     bool d_changed;
     Tileset *d_tileset;
     Gtk::Notebook *notebook;
@@ -42,6 +45,8 @@ class TilesetMoveBonusImageDialog: public LwEditorDialog
     Gtk::Button *hills_imagechooser_button;
     Gtk::Button *mountains_imagechooser_button;
     Gtk::Button *swamp_imagechooser_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     Gtk::Image *all_image;
     Gtk::Image *water_image;
@@ -64,7 +69,22 @@ class TilesetMoveBonusImageDialog: public LwEditorDialog
     void update_button_names ();
     void update_preview ();
 
-    void on_image_button_clicked (TarFileImage *im);
+    void doUpdateImage (TileSetMoveBonusImageAction_Set *action, TarFileImage *im);
+    UndoAction *createAction (TarFileImage *im);
+    bool on_image_button_clicked (TarFileImage *im);
+    void on_all_image_button_clicked (TarFileImage *im);
+    void on_water_image_button_clicked (TarFileImage *im);
+    void on_forest_image_button_clicked (TarFileImage *im);
+    void on_hills_image_button_clicked (TarFileImage *im);
+    void on_mountains_image_button_clicked (TarFileImage *im);
+    void on_swamp_image_button_clicked (TarFileImage *im);
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif

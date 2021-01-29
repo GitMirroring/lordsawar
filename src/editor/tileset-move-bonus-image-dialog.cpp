@@ -37,33 +37,17 @@
 TilesetMoveBonusImageDialog::TilesetMoveBonusImageDialog(Gtk::Window &parent, Tileset *tileset)
  : LwEditorDialog(parent, "tileset-move-bonus-image-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_tileset = tileset;
 
   xml->get_widget("all_imagechooser_button", all_imagechooser_button);
-  all_imagechooser_button->signal_clicked ().connect
-    (sigc::bind (method (on_image_button_clicked),
-                 d_tileset->getAllMoveBonus ()));
   xml->get_widget("water_imagechooser_button", water_imagechooser_button);
-  water_imagechooser_button->signal_clicked ().connect
-    (sigc::bind (method (on_image_button_clicked),
-                 d_tileset->getWaterMoveBonus ()));
   xml->get_widget("forest_imagechooser_button", forest_imagechooser_button);
-  forest_imagechooser_button->signal_clicked ().connect
-    (sigc::bind (method (on_image_button_clicked),
-                 d_tileset->getForestMoveBonus ()));
   xml->get_widget("hills_imagechooser_button", hills_imagechooser_button);
-  hills_imagechooser_button->signal_clicked ().connect
-    (sigc::bind (method (on_image_button_clicked),
-                 d_tileset->getHillsMoveBonus ()));
   xml->get_widget("mountains_imagechooser_button",
                   mountains_imagechooser_button);
-  mountains_imagechooser_button->signal_clicked ().connect
-    (sigc::bind (method (on_image_button_clicked),
-                 d_tileset->getMountainsMoveBonus ()));
   xml->get_widget("swamp_imagechooser_button", swamp_imagechooser_button);
-  swamp_imagechooser_button->signal_clicked ().connect
-    (sigc::bind (method (on_image_button_clicked),
-                 d_tileset->getSwampMoveBonus ()));
 
   xml->get_widget("notebook", notebook);
 
@@ -85,14 +69,19 @@ TilesetMoveBonusImageDialog::TilesetMoveBonusImageDialog(Gtk::Window &parent, Ti
   xml->get_widget("hills_mountains_swamp_image", hills_mountains_swamp_image);
   xml->get_widget("forest_hills_mountains_swamp_image", 
                   forest_hills_mountains_swamp_image);
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
 
   d_changed = false;
-  update_button_names ();
-  update_preview ();
+  connect_signals ();
+  update ();
 }
 
 TilesetMoveBonusImageDialog::~TilesetMoveBonusImageDialog ()
 {
+  delete umgr;
   notebook->property_show_tabs () = false;
 }
 
@@ -230,8 +219,69 @@ void TilesetMoveBonusImageDialog::update_preview ()
   delete p;
 }
 
-void TilesetMoveBonusImageDialog::on_image_button_clicked (TarFileImage *im)
+void TilesetMoveBonusImageDialog::on_all_image_button_clicked (TarFileImage *im)
 {
+  TileSetMoveBonusImageAction_All *action =
+    new TileSetMoveBonusImageAction_All (d_tileset, im->getName ());
+  if (on_image_button_clicked (im))
+    umgr->add (action);
+  else
+    delete action;
+}
+
+void TilesetMoveBonusImageDialog::on_water_image_button_clicked (TarFileImage *im)
+{
+  TileSetMoveBonusImageAction_Water *action =
+    new TileSetMoveBonusImageAction_Water (d_tileset, im->getName ());
+  if (on_image_button_clicked (im))
+    umgr->add (action);
+  else
+    delete action;
+}
+
+void TilesetMoveBonusImageDialog::on_forest_image_button_clicked (TarFileImage *im)
+{
+  TileSetMoveBonusImageAction_Forest *action =
+    new TileSetMoveBonusImageAction_Forest (d_tileset, im->getName ());
+  if (on_image_button_clicked (im))
+    umgr->add (action);
+  else
+    delete action;
+}
+
+void TilesetMoveBonusImageDialog::on_hills_image_button_clicked (TarFileImage *im)
+{
+  TileSetMoveBonusImageAction_Hills *action =
+    new TileSetMoveBonusImageAction_Hills (d_tileset, im->getName ());
+  if (on_image_button_clicked (im))
+    umgr->add (action);
+  else
+    delete action;
+}
+
+void TilesetMoveBonusImageDialog::on_mountains_image_button_clicked (TarFileImage *im)
+{
+  TileSetMoveBonusImageAction_Mountains *action =
+    new TileSetMoveBonusImageAction_Mountains (d_tileset, im->getName ());
+  if (on_image_button_clicked (im))
+    umgr->add (action);
+  else
+    delete action;
+}
+
+void TilesetMoveBonusImageDialog::on_swamp_image_button_clicked (TarFileImage *im)
+{
+  TileSetMoveBonusImageAction_Swamp *action =
+    new TileSetMoveBonusImageAction_Swamp (d_tileset, im->getName ());
+  if (on_image_button_clicked (im))
+    umgr->add (action);
+  else
+    delete action;
+}
+
+bool TilesetMoveBonusImageDialog::on_image_button_clicked (TarFileImage *im)
+{
+  bool ret = false;
   TarFile *t = d_tileset;
   Glib::ustring imgname = im->getName ();
   ImageEditorDialog d (*dialog, im, 0);
@@ -241,20 +291,12 @@ void TilesetMoveBonusImageDialog::on_image_button_clicked (TarFileImage *im)
     {
       if (d.get_filename () != "")
         {
-          Glib::ustring newname = "";
-          bool success = false;
-          if (im->getName() == "")
-            success = t->addFileInCfgFile(d.get_filename (), newname);
-          else
-            success = t->replaceFileInCfgFile(imgname, d.get_filename (),
-                                              newname);
+          bool success = d.installFile (d_tileset, im, d.get_filename ());
           if (success)
             {
-              im->load (d_tileset, newname);
-              im->instantiateImages ();
               d_changed = true;
-              update_button_names ();
-              update_preview ();
+              update ();
+              ret = true;
             }
           else
             {
@@ -272,12 +314,11 @@ void TilesetMoveBonusImageDialog::on_image_button_clicked (TarFileImage *im)
     {
       if (imgname.empty () == false)
         {
-          if (t->removeFileInCfgFile(imgname))
+          if (d.uninstallFile (d_tileset, im))
             {
-              im->clear();
               d_changed = true;
-              update_button_names ();
-              update_preview ();
+              update ();
+              ret = true;
             }
           else
             {
@@ -293,4 +334,158 @@ void TilesetMoveBonusImageDialog::on_image_button_clicked (TarFileImage *im)
         }
     }
   d.hide();
+  return ret;
+}
+
+void TilesetMoveBonusImageDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+  return;
+}
+
+void TilesetMoveBonusImageDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  d_changed = true;
+  update ();
+}
+
+void TilesetMoveBonusImageDialog::update ()
+{
+  disconnect_signals ();
+  update_button_names ();
+  update_preview ();
+  connect_signals ();
+}
+
+void TilesetMoveBonusImageDialog::connect_signals ()
+{
+  connections.push_back
+    (all_imagechooser_button->signal_clicked ().connect
+     (sigc::bind (method (on_all_image_button_clicked),
+                  d_tileset->getAllMoveBonus ())));
+  connections.push_back
+    (water_imagechooser_button->signal_clicked ().connect
+     (sigc::bind (method (on_water_image_button_clicked),
+                  d_tileset->getWaterMoveBonus ())));
+  connections.push_back
+    (forest_imagechooser_button->signal_clicked ().connect
+     (sigc::bind (method (on_forest_image_button_clicked),
+                  d_tileset->getForestMoveBonus ())));
+  connections.push_back
+    (hills_imagechooser_button->signal_clicked ().connect
+     (sigc::bind (method (on_hills_image_button_clicked),
+                  d_tileset->getHillsMoveBonus ())));
+  connections.push_back
+    (mountains_imagechooser_button->signal_clicked ().connect
+     (sigc::bind (method (on_mountains_image_button_clicked),
+                  d_tileset->getMountainsMoveBonus ())));
+  connections.push_back
+    (swamp_imagechooser_button->signal_clicked ().connect
+     (sigc::bind (method (on_swamp_image_button_clicked),
+                  d_tileset->getSwampMoveBonus ())));
+}
+
+void TilesetMoveBonusImageDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+UndoAction *TilesetMoveBonusImageDialog::executeAction (UndoAction *action2)
+{
+  TileSetMoveBonusImageAction *action =
+    dynamic_cast<TileSetMoveBonusImageAction*>(action2);
+  UndoAction *out = NULL;
+
+  switch (action->getType ())
+    {
+    case TileSetMoveBonusImageAction::ALL:
+        {
+          TileSetMoveBonusImageAction_All *a =
+            dynamic_cast<TileSetMoveBonusImageAction_All*>(action);
+          TarFileImage *im = d_tileset->getAllMoveBonus ();
+          out = new TileSetMoveBonusImageAction_All (d_tileset,
+                                                     im->getName ());
+          doUpdateImage (a, im);
+        }
+      break;
+    case TileSetMoveBonusImageAction::WATER:
+        {
+          TileSetMoveBonusImageAction_Water *a =
+            dynamic_cast<TileSetMoveBonusImageAction_Water*>(action);
+          TarFileImage *im = d_tileset->getWaterMoveBonus ();
+          out = new TileSetMoveBonusImageAction_Water (d_tileset,
+                                                       im->getName ());
+          doUpdateImage (a, im);
+        }
+      break;
+    case TileSetMoveBonusImageAction::FOREST:
+        {
+          TileSetMoveBonusImageAction_Forest *a =
+            dynamic_cast<TileSetMoveBonusImageAction_Forest*>(action);
+          TarFileImage *im = d_tileset->getForestMoveBonus ();
+          out = new TileSetMoveBonusImageAction_Forest (d_tileset,
+                                                        im->getName ());
+          doUpdateImage (a, im);
+        }
+      break;
+    case TileSetMoveBonusImageAction::HILLS:
+        {
+          TileSetMoveBonusImageAction_Hills *a =
+            dynamic_cast<TileSetMoveBonusImageAction_Hills*>(action);
+          TarFileImage *im = d_tileset->getHillsMoveBonus ();
+          out = new TileSetMoveBonusImageAction_Hills (d_tileset,
+                                                       im->getName ());
+          doUpdateImage (a, im);
+        }
+      break;
+    case TileSetMoveBonusImageAction::MOUNTAINS:
+        {
+          TileSetMoveBonusImageAction_Mountains *a =
+            dynamic_cast<TileSetMoveBonusImageAction_Mountains*>(action);
+          TarFileImage *im = d_tileset->getMountainsMoveBonus ();
+          out =
+            new TileSetMoveBonusImageAction_Mountains (d_tileset,
+                                                       im->getName ());
+          doUpdateImage (a, im);
+        }
+      break;
+    case TileSetMoveBonusImageAction::SWAMP:
+        {
+          TileSetMoveBonusImageAction_Swamp *a =
+            dynamic_cast<TileSetMoveBonusImageAction_Swamp*>(action);
+          TarFileImage *im = d_tileset->getSwampMoveBonus ();
+          out = new TileSetMoveBonusImageAction_Swamp (d_tileset,
+                                                       im->getName ());
+          doUpdateImage (a, im);
+        }
+      break;
+    }
+  return out;
+}
+
+void TilesetMoveBonusImageDialog::doUpdateImage (TileSetMoveBonusImageAction_Set *a, TarFileImage *im)
+{
+  if (a->getArchiveMember ().empty ())
+    im->clear ();
+  else
+    {
+      Glib::ustring ar = a->getArchiveMember ();
+      Glib::ustring file = a->getFileName ();
+      bool broken = false;
+      Glib::ustring newbasename = "";
+      bool present = d_tileset->contains (ar, broken);
+      if (present)
+        d_tileset->replaceFileInCfgFile (ar, file, newbasename);
+      else
+        d_tileset->addFileInCfgFile (file, newbasename);
+
+      im->load (d_tileset, newbasename);
+      im->instantiateImages ();
+    }
 }
