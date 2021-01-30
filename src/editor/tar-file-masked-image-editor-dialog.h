@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "undo-mgr.h"
 
 class TarFileMaskedImage;
+class TarFile;
 
 //! Tar File Masked Picture Editor
 /**
@@ -46,7 +47,7 @@ class TarFileMaskedImageEditorDialog: public LwEditorDialog
 {
  public:
     static const int MAX_IMAGES_WIDTH;
-    TarFileMaskedImageEditorDialog(Gtk::Window &parent, TarFileMaskedImage *mi, double ratio, Shieldset *shieldset = NULL);
+    TarFileMaskedImageEditorDialog(Gtk::Window &parent, TarFileMaskedImage *mi, double ratio, Glib::ustring empty_str, Shieldset *shieldset = NULL);
     ~TarFileMaskedImageEditorDialog();
 
     void set_title(Glib::ustring t) {dialog->set_title(t);}
@@ -54,12 +55,15 @@ class TarFileMaskedImageEditorDialog: public LwEditorDialog
     Glib::ustring get_filename() {return d_target_filename;}
     int run();
     void hide();
+    bool installFile (TarFile *t, TarFileMaskedImage *im, Glib::ustring file);
+    bool uninstallFile (TarFile *t, TarFileMaskedImage *im);
 
  private:
     TarFileMaskedImage *d_mim;
     UndoMgr *umgr;
     Glib::ustring d_target_filename;
     Glib::ustring d_orig_target_filename;
+    Glib::ustring d_empty_str;
     guint32 d_shield_row;
     double d_ratio;
     Gtk::Button *imagebutton;

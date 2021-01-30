@@ -585,7 +585,8 @@ void ArmySetWindow::on_edit_ship_picture_activated()
 {
   Glib::ustring imgname = d_armyset->getShip()->getName();
   TarFileMaskedImageEditorDialog d(*window, d_armyset->getShip(),
-                                   EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
+                                   EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE,
+                                   "");
   d.set_title(_("Select a Ship image"));
   int response = d.run();
   if (response == Gtk::RESPONSE_ACCEPT && d.get_filename() != "")
@@ -593,16 +594,11 @@ void ArmySetWindow::on_edit_ship_picture_activated()
       ArmySetEditorAction_AddImage *action =
         new ArmySetEditorAction_AddImage (d_armyset);
       Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty () == true)
-        success = d_armyset->addFileInCfgFile (d.get_filename(), newname);
-      else
-        success =
-          d_armyset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
+      bool success = d.installFile (d_armyset, d_armyset->getShip (),
+                                    d.get_filename ());
       if (success)
         {
           addUndo (action);
-          d_armyset->getShip ()->load (d_armyset, newname);
           armyset_modified = true;
           update_window_title ();
           update_menuitems ();
@@ -617,7 +613,7 @@ void ArmySetWindow::on_edit_ship_picture_activated()
     {
       ArmySetEditorAction_ClearImage *action =
         new ArmySetEditorAction_ClearImage (d_armyset);
-      if (d_armyset->removeFileInCfgFile(imgname))
+      if (d.uninstallFile (d_armyset, d_armyset->getShip ()))
         {
           addUndo (action);
           armyset_modified = true;
@@ -653,7 +649,8 @@ void ArmySetWindow::on_edit_standard_picture_activated()
 {
   Glib::ustring imgname = d_armyset->getStandard()->getName();
   TarFileMaskedImageEditorDialog d(*window, d_armyset->getStandard(),
-                                   EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
+                                   EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE,
+                                   "");
   d.set_title(_("Select a Hero Flag image"));
   int response = d.run();
   if (response == Gtk::RESPONSE_ACCEPT && d.get_filename() != "")
@@ -661,16 +658,11 @@ void ArmySetWindow::on_edit_standard_picture_activated()
       ArmySetEditorAction_AddImage *action =
         new ArmySetEditorAction_AddImage (d_armyset);
       Glib::ustring newname = "";
-      bool success = false;
-      if (imgname.empty () == true)
-        success = d_armyset->addFileInCfgFile(d.get_filename(), newname);
-      else
-        success =
-          d_armyset->replaceFileInCfgFile(imgname, d.get_filename(), newname);
+      bool success = d.installFile (d_armyset, d_armyset->getStandard (),
+                                    d.get_filename ());
       if (success)
         {
           addUndo (action);
-          d_armyset->getStandard()->load (d_armyset, newname);
           armyset_modified = true;
           update_window_title ();
           update_menuitems ();
@@ -685,7 +677,7 @@ void ArmySetWindow::on_edit_standard_picture_activated()
     {
       ArmySetEditorAction_ClearImage *action =
         new ArmySetEditorAction_ClearImage (d_armyset);
-      if (d_armyset->removeFileInCfgFile(imgname))
+      if (d.uninstallFile (d_armyset, d_armyset->getStandard ()))
         {
           addUndo (action);
           armyset_modified = true;
@@ -1015,7 +1007,8 @@ void ArmySetWindow::on_image_changed(Shield::Colour c)
       ArmyProto *a = row[armies_columns.army];
       Glib::ustring imgname = a->getMaskedImage(c)->getName();
       TarFileMaskedImageEditorDialog d(*window, a->getMaskedImage (c),
-                                       EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE);
+                                       EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE,
+                                       "");
       d.set_title(String::ucompose(_("Select a %1 Army image"),
                                    Shield::colourToFriendlyName(c)));
       int response = d.run();
@@ -1024,20 +1017,14 @@ void ArmySetWindow::on_image_changed(Shield::Colour c)
           ArmySetEditorAction_AddImage *action = new
             ArmySetEditorAction_AddImage (d_armyset);
           Glib::ustring newname = "";
-          bool success = false;
-          if (imgname.empty () == true)
-            success =
-              d_armyset->addFileInCfgFile(d.get_filename(), newname);
-          else
-            success =
-              d_armyset->replaceFileInCfgFile(imgname, d.get_filename(),
-                                              newname);
+          bool success = d.installFile (d_armyset, a->getMaskedImage (c),
+                                        d.get_filename ());
           if (success)
             {
               addUndo (action);
               instantiateOthers (a, c, newname);
-              a->getMaskedImage(c)->setName (newname);
-              a->instantiateImage (d_armyset->getConfigurationFile (), c);
+              //a->getMaskedImage(c)->setName (newname);
+              //a->instantiateImage (d_armyset->getConfigurationFile (), c);
               fill_army_images (a);
 
               armyset_modified = true;
@@ -1054,7 +1041,7 @@ void ArmySetWindow::on_image_changed(Shield::Colour c)
         {
           ArmySetEditorAction_ClearImage *action = new
             ArmySetEditorAction_ClearImage (d_armyset);
-          if (d_armyset->removeFileInCfgFile(imgname))
+          if (d.uninstallFile (d_armyset, a->getMaskedImage (c)))
             {
               addUndo (action);
               armyset_modified = true;

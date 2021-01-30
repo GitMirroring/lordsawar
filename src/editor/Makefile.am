@@ -104,7 +104,7 @@ libeditor_la_SOURCES =\
 	road-editor-tip.cpp road-editor-tip.h \
 	stone-editor-dialog.cpp stone-editor-dialog.h \
 	battle-calculator-dialog.cpp battle-calculator-dialog.h \
-	media-dialog.cpp media-dialog.h \
+	media-dialog.cpp media-dialog.h media-actions.h \
 	validation-dialog.cpp validation-dialog.h \
 	heroes-dialog.cpp heroes-dialog.h \
 	keeper-editor-dialog.cpp keeper-editor-dialog.h \

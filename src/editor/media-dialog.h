@@ -23,6 +23,7 @@
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
 #include "PixMask.h"
+#include "undo-mgr.h"
 
 class TarFile;
 class Shieldset;
@@ -42,6 +43,7 @@ public:
 
 private:
     //data
+    UndoMgr *umgr;
     bool d_changed;
     TarFile *d_tarfile;
     Gtk::Button *d_next_turn_button;
@@ -65,6 +67,8 @@ private:
     Gtk::Button *d_victory_button;
     Gtk::Button *d_back_button;
     Gtk::Notebook *notebook;
+    Gtk::Button *d_undo_button;
+    Gtk::Button *d_redo_button;
 
     //callbacks
     void on_next_turn_button_activated();
@@ -92,9 +96,16 @@ private:
     void fill_in_buttons();
     void fill_image_button(Gtk::Button *button, Glib::ustring name);
     void fill_sound_button(Gtk::Button *button, Glib::ustring name);
-    void on_image_button_activated(TarFileImage *oim, TarFileImage *im);
-    void on_masked_image_button_activated(TarFileMaskedImage *omim, TarFileMaskedImage *mim, Shieldset *ss);
+    bool on_image_button_activated(TarFileImage *oim, TarFileImage *im);
+    bool on_masked_image_button_activated(TarFileMaskedImage *omim, TarFileMaskedImage *mim, Shieldset *ss);
     void on_sound_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<Glib::ustring> getDefaultFilename, sigc::slot<void, Glib::ustring> setName);
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif

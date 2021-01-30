@@ -35,19 +35,21 @@
 #include "timed-message-dialog.h"
 #include "TarFileMaskedImage.h"
 #include "tar-file-masked-image-editor-actions.h"
+#include "tarfile.h"
 
 #define method(x) sigc::mem_fun(*this, &TarFileMaskedImageEditorDialog::x)
 
 const int TarFileMaskedImageEditorDialog::MAX_IMAGES_WIDTH = 1000;
 
-TarFileMaskedImageEditorDialog::TarFileMaskedImageEditorDialog(Gtk::Window &parent, TarFileMaskedImage *mi, double ratio, Shieldset *shieldset)
+TarFileMaskedImageEditorDialog::TarFileMaskedImageEditorDialog(Gtk::Window &parent, TarFileMaskedImage *mi, double ratio, Glib::ustring empty_str, Shieldset *shieldset)
  : LwEditorDialog(parent, "tar-file-masked-image-editor-dialog.ui")
 {
   umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
   umgr->execute ().connect (method (executeAction));
-  d_mim = mi;
-  d_shieldset = shieldset;
+  d_mim = new TarFileMaskedImage (*mi);
   d_ratio = ratio;
+  d_empty_str = empty_str;
+  d_shieldset = shieldset;
   xml->get_widget("imagebutton", imagebutton);
   imagebutton->signal_clicked().connect (method(on_imagebutton_clicked));
   xml->get_widget("image_white", image_white);
@@ -78,6 +80,7 @@ TarFileMaskedImageEditorDialog::TarFileMaskedImageEditorDialog(Gtk::Window &pare
 TarFileMaskedImageEditorDialog::~TarFileMaskedImageEditorDialog()
 {
   delete umgr;
+  delete d_mim;
 }
 
 bool TarFileMaskedImageEditorDialog::load_image ()
@@ -128,7 +131,10 @@ void TarFileMaskedImageEditorDialog::update_panel()
     imagebutton->set_label (f);
   else
     {
-      imagebutton->set_label (_("No image set"));
+      if (d_empty_str.empty () == true)
+        imagebutton->set_label (_("No image set"));
+      else
+        imagebutton->set_label (d_empty_str);
       show_image ();
     }
   clear_button->set_visible (d_mim->getImage () != NULL);
@@ -366,4 +372,25 @@ UndoAction *TarFileMaskedImageEditorDialog::executeAction (UndoAction *action2)
         break;
       }
     return out;
+}
+
+bool TarFileMaskedImageEditorDialog::installFile (TarFile *t, TarFileMaskedImage *im, Glib::ustring filename)
+{
+  Glib::ustring newname;
+  bool success = false;
+  if (d_orig_target_filename.empty () == true)
+    success = t->addFileInCfgFile (filename, newname);
+  else
+    success =
+      t->replaceFileInCfgFile (d_orig_target_filename, filename, newname);
+  im->setName(newname);
+  im->load (t, newname);
+  im->instantiateImages();
+  return success;
+}
+
+bool TarFileMaskedImageEditorDialog::uninstallFile (TarFile *t, TarFileMaskedImage *im)
+{
+  im->clear ();
+  return t->removeFileInCfgFile(d_orig_target_filename);
 }

@@ -37,7 +37,7 @@ class TarFile;
 class ImageEditorDialog: public LwEditorDialog
 {
  public:
-    ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, double ratio);
+    ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, double ratio, Glib::ustring empty_str = "");
     ~ImageEditorDialog();
 
     Glib::ustring get_filename() {return d_target_filename;}
@@ -55,6 +55,7 @@ class ImageEditorDialog: public LwEditorDialog
     guint32 d_active_frame;
     Glib::ustring d_target_filename;
     Glib::ustring d_orig_target_filename;
+    Glib::ustring d_empty_str;
     TarFileImage *d_im;
     std::vector<PixMask*> frames;
 

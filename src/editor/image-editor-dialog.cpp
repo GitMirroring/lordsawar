@@ -36,11 +36,12 @@
 
 #define method(x) sigc::mem_fun(*this, &ImageEditorDialog::x)
 
-ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, double ratio)
+ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, double ratio, Glib::ustring empty_str)
  : LwEditorDialog(parent, "image-editor-dialog.ui"), d_ratio (ratio),
     d_num_frames (im->getNumberOfFrames ()), d_active_frame (0),
     d_target_filename (im->getName ()),
-    d_orig_target_filename (d_target_filename), d_im (im)
+    d_orig_target_filename (d_target_filename), d_empty_str (empty_str),
+    d_im (new TarFileImage (*im))
 {
   umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
   umgr->execute ().connect (method (executeAction));
@@ -52,7 +53,8 @@ ImageEditorDialog::ImageEditorDialog(Gtk::Window &parent, TarFileImage *im, doub
   xml->get_widget("redo_button", redo_button);
 
   clear_button->set_visible (!im->getName ().empty ());
-  if (im->getName ().empty () == false)
+  //if (im->getName ().empty () == false)
+  if (im->getBackingImage () != NULL)
     {
       for (guint32 i = 0; i < d_num_frames; i++)
         {
@@ -79,6 +81,7 @@ ImageEditorDialog::~ImageEditorDialog()
   delete umgr;
   for (auto f : frames)
     delete f;
+  delete d_im;
 }
 
 void ImageEditorDialog::update_imagebutton_label (Glib::ustring filename)
@@ -87,7 +90,12 @@ void ImageEditorDialog::update_imagebutton_label (Glib::ustring filename)
   if (f.empty () == false)
     imagebutton->set_label (f);
   else
-    imagebutton->set_label (_("No image set"));
+    {
+      if (d_empty_str.empty () == true)
+        imagebutton->set_label (_("No image set"));
+      else
+        imagebutton->set_label (d_empty_str);
+    }
 }
 
 bool ImageEditorDialog::load_frames (Glib::ustring filename)
@@ -307,7 +315,7 @@ bool ImageEditorDialog::installFile (TarFile *t, TarFileImage *im, Glib::ustring
     success =
       t->replaceFileInCfgFile (d_orig_target_filename, filename, newname);
   im->setName(newname);
-  im->load (t, newname);
+  bool b = im->load (t, newname);
   im->instantiateImages();
   return success;
 }

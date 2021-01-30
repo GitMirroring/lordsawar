@@ -36,72 +36,45 @@
 #include "timed-message-dialog.h"
 #include "TarFileMaskedImage.h"
 #include "TarFileImage.h"
+#include "media-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &MediaDialog::x)
 
 MediaDialog::MediaDialog(Gtk::Window &parent, TarFile *tarfile)
  : LwEditorDialog(parent, "media-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_tarfile = tarfile;
   d_changed = false;
   xml->get_widget("next_turn_button", d_next_turn_button);
-  d_next_turn_button->signal_clicked().connect
-    (method(on_next_turn_button_activated));
   xml->get_widget("city_defeated_button", d_city_defeated_button);
-  d_city_defeated_button->signal_clicked().connect
-    (method(on_city_defeated_button_activated));
   xml->get_widget("winning_button", d_winning_button);
-  d_winning_button->signal_clicked().connect
-    (method(on_winning_button_activated));
   xml->get_widget("hero_male_button", d_hero_male_button);
-  d_hero_male_button->signal_clicked().connect
-    (method(on_hero_male_button_activated));
   xml->get_widget("hero_female_button", d_hero_female_button);
-  d_hero_female_button->signal_clicked().connect
-    (method(on_hero_female_button_activated));
   xml->get_widget("ruin_success_button", d_ruin_success_button);
-  d_ruin_success_button->signal_clicked().connect
-    (method(on_ruin_success_button_activated));
   xml->get_widget("ruin_defeat_button", d_ruin_defeat_button);
-  d_ruin_defeat_button->signal_clicked().connect
-    (method(on_ruin_defeat_button_activated));
   xml->get_widget("hero_newlevel_male_button", d_hero_newlevel_male_button);
-  d_hero_newlevel_male_button->signal_clicked().connect
-    (method(on_hero_newlevel_male_button_activated));
   xml->get_widget("hero_newlevel_female_button", d_hero_newlevel_female_button);
-  d_hero_newlevel_female_button->signal_clicked().connect
-    (method(on_hero_newlevel_female_button_activated));
   xml->get_widget("parley_offered_button", d_parley_offered_button);
-  d_parley_offered_button->signal_clicked().connect
-    (method(on_parley_offered_button_activated));
   xml->get_widget("parley_refused_button", d_parley_refused_button);
-  d_parley_refused_button->signal_clicked().connect
-    (method(on_parley_refused_button_activated));
   xml->get_widget("small_medals_button", d_small_medals_button);
-  d_small_medals_button->signal_clicked().connect
-    (method(on_small_medals_button_activated));
   xml->get_widget("big_medals_button", d_big_medals_button);
-  d_big_medals_button->signal_clicked().connect
-    (method(on_big_medals_button_activated));
   xml->get_widget("commentator_button", d_commentator_button);
-  d_commentator_button->signal_clicked().connect
-    (method(on_commentator_button_activated));
   xml->get_widget("bless_button", d_bless_button);
-  d_bless_button->signal_clicked().connect(method(on_bless_button_activated));
   xml->get_widget("hero_button", d_hero_button);
-  d_hero_button->signal_clicked().connect(method(on_hero_button_activated));
   xml->get_widget("battle_button", d_battle_button);
-  d_battle_button->signal_clicked().connect(method(on_battle_button_activated));
   xml->get_widget("defeat_button", d_defeat_button);
-  d_defeat_button->signal_clicked().connect(method(on_defeat_button_activated));
   xml->get_widget("victory_button", d_victory_button);
-  d_victory_button->signal_clicked().connect
-    (method(on_victory_button_activated));
   xml->get_widget("back_button", d_back_button);
-  d_back_button->signal_clicked().connect(method(on_back_button_activated));
   xml->get_widget ("notebook", notebook);
+  xml->get_widget("undo_button", d_undo_button);
+  d_undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", d_redo_button);
+  d_redo_button->signal_activate ().connect (method (on_redo_activated));
 
-  fill_in_buttons();
+  connect_signals ();
+  update ();
 }
 
 void MediaDialog::fill_image_button(Gtk::Button *button, Glib::ustring name)
@@ -163,10 +136,12 @@ int MediaDialog::run()
   return response;
 }
 
-void MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
+bool MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
 {
+  bool ret = false;
   TarFile *t = d_tarfile;
-  ImageEditorDialog d (*dialog, oim, 0);
+  ImageEditorDialog d (*dialog, im->getName () != "" ? im : oim, 0,
+                       _("override default"));
   int response = d.run();
 
   if (response == Gtk::RESPONSE_ACCEPT)
@@ -177,7 +152,8 @@ void MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
           if (success)
             {
               d_changed = true;
-              fill_in_buttons();
+              update ();
+              ret = true;
             }
           else
             {
@@ -198,7 +174,8 @@ void MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
         {
           ScenarioMedia::getInstance()->uninstantiateSameNamedImages (imgname);
           d_changed = true;
-          fill_in_buttons();
+          update ();
+          ret = true;
         }
       else
         {
@@ -213,30 +190,28 @@ void MediaDialog::on_image_button_activated(TarFileImage *oim, TarFileImage *im)
         }
     }
   d.hide();
+  return ret;
 }
 
-void MediaDialog::on_masked_image_button_activated(TarFileMaskedImage *omim, TarFileMaskedImage *mim, Shieldset *ss)
+bool MediaDialog::on_masked_image_button_activated(TarFileMaskedImage *omim, TarFileMaskedImage *mim, Shieldset *ss)
 {
+  bool ret = false;
   TarFile *t = d_tarfile;
   Glib::ustring imgname = mim->getName ();
 
-  TarFileMaskedImageEditorDialog d (*dialog, omim, 0, ss);
+  TarFileMaskedImageEditorDialog d (*dialog, omim,
+                                    //mim->getName () == "" ? omim : mim,
+                                    0, _("override default"), ss);
   int response = d.run();
 
   if (response == Gtk::RESPONSE_ACCEPT && d.get_filename () != "")
     {
-      Glib::ustring newname = "";
-      bool success = false;
-      if (mim->getName() == "")
-        success = t->addFileInCfgFile(d.get_filename (), newname);
-      else
-        success = t->replaceFileInCfgFile(imgname, d.get_filename (), newname);
+      bool success = d.installFile (t, mim, d.get_filename ());
       if (success)
         {
-          mim->load (t, newname);
-          mim->instantiateImages ();
           d_changed = true;
-          fill_in_buttons();
+          update ();
+          ret = true;
         }
       else
         {
@@ -254,11 +229,12 @@ void MediaDialog::on_masked_image_button_activated(TarFileMaskedImage *omim, Tar
     {
       if (imgname.empty () == false)
         {
-          if (t->removeFileInCfgFile(imgname))
+          if (d.uninstallFile (t, mim))
             {
               ScenarioMedia::getInstance()->uninstantiateSameNamedImages (imgname);
               d_changed = true;
-              fill_in_buttons();
+              ret = true;
+              update ();
             }
           else
             {
@@ -273,6 +249,7 @@ void MediaDialog::on_masked_image_button_activated(TarFileMaskedImage *omim, Tar
         }
     }
   d.hide();
+  return ret;
 }
 
 void MediaDialog::on_sound_button_activated(sigc::slot<Glib::ustring> getName, sigc::slot<Glib::ustring> getDefaultFilename, sigc::slot<void, Glib::ustring> setName)
@@ -368,118 +345,211 @@ void MediaDialog::on_next_turn_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getNextTurnImage (),
-                             sm->getNextTurnImage ());
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile, sm->getNextTurnImage ()->getName (),
+                              sm->getNextTurnImage ());
+  if (on_image_button_activated (ic->getNextTurnImage (),
+                                 sm->getNextTurnImage ()))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_city_defeated_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getCityDefeatedImage (),
-                             sm->getCityDefeatedImage ());
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile,
+                              sm->getCityDefeatedImage ()->getName (),
+                              sm->getCityDefeatedImage ());
+  if (on_image_button_activated (ic->getCityDefeatedImage (),
+                             sm->getCityDefeatedImage ()))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_winning_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getWinningImage (),
-                             sm->getWinningImage ());
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile,
+                              sm->getWinningImage ()->getName (),
+                              sm->getWinningImage ());
+  if (on_image_button_activated (ic->getWinningImage (),
+                                 sm->getWinningImage ()))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_hero_male_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getHeroOfferedImage (Hero::MALE),
-                             sm->getHeroOfferedImage (false));
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile,
+                              sm->getHeroOfferedImage (false)->getName (),
+                              sm->getHeroOfferedImage (false));
+  if (on_image_button_activated (ic->getHeroOfferedImage (Hero::MALE),
+                                 sm->getHeroOfferedImage (false)))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_hero_female_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getHeroOfferedImage (Hero::MALE),
-                             sm->getHeroOfferedImage (true));
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile,
+                              sm->getHeroOfferedImage (true)->getName (),
+                              sm->getHeroOfferedImage (true));
+  if (on_image_button_activated (ic->getHeroOfferedImage (Hero::MALE),
+                                 sm->getHeroOfferedImage (true)))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_ruin_success_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getRuinSuccessImage (),
-                             sm->getRuinSuccessImage ());
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile,
+                              sm->getRuinSuccessImage ()->getName (),
+                              sm->getRuinSuccessImage ());
+  if (on_image_button_activated (ic->getRuinSuccessImage (),
+                                 sm->getRuinSuccessImage ()))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_ruin_defeat_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getRuinDefeatImage (),
-                             sm->getRuinDefeatImage ());
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile,
+                              sm->getRuinDefeatImage ()->getName (),
+                              sm->getRuinDefeatImage ());
+  if (on_image_button_activated (ic->getRuinDefeatImage (),
+                                 sm->getRuinDefeatImage ()))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_hero_newlevel_male_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   TarFileMaskedImage *omim =
-    ImageCache::getInstance ()->getHeroNewLevelMaskedImage(false);
-  TarFileMaskedImage *mim = sm->getHeroNewLevelMaskedImage(false);
+    ImageCache::getInstance ()->getHeroNewLevelMaskedImage (false);
+  TarFileMaskedImage *mim = sm->getHeroNewLevelMaskedImage (false);
+  MediaAction_MaskedImageSet *action =
+    new MediaAction_MaskedImageSet (d_tarfile, mim->getName (), mim);
   guint32 pid = Playerlist::getActiveplayer()->getId();
-  on_masked_image_button_activated (omim, mim,
-                                    Shieldsetlist::getInstance()->get(pid));
+  if (on_masked_image_button_activated (omim, mim,
+                                        Shieldsetlist::getInstance()->get(pid)))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_hero_newlevel_female_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   TarFileMaskedImage *omim =
-    ImageCache::getInstance ()->getHeroNewLevelMaskedImage(true);
-  TarFileMaskedImage *mim = sm->getHeroNewLevelMaskedImage(true);
+    ImageCache::getInstance ()->getHeroNewLevelMaskedImage (true);
+  TarFileMaskedImage *mim = sm->getHeroNewLevelMaskedImage (true);
+  MediaAction_MaskedImageSet *action =
+    new MediaAction_MaskedImageSet (d_tarfile, mim->getName (), mim);
   guint32 pid = Playerlist::getActiveplayer()->getId();
-  on_masked_image_button_activated (omim, mim,
-                                    Shieldsetlist::getInstance()->get(pid));
+  if (on_masked_image_button_activated (omim, mim,
+                                        Shieldsetlist::getInstance()->get(pid)))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_parley_offered_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getParleyOfferedImage (),
-                             sm->getParleyOfferedImage ());
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile,
+                              sm->getParleyOfferedImage ()->getName (),
+                              sm->getParleyOfferedImage ());
+  if (on_image_button_activated (ic->getParleyOfferedImage (),
+                                 sm->getParleyOfferedImage ()))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_parley_refused_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getParleyRefusedImage (),
-                             sm->getParleyRefusedImage ());
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile,
+                              sm->getParleyRefusedImage ()->getName (),
+                              sm->getParleyRefusedImage ());
+  if (on_image_button_activated (ic->getParleyRefusedImage (),
+                                 sm->getParleyRefusedImage ()))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_small_medals_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getMedalImage (false),
-                             sm->getMedalImage (false));
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile,
+                              sm->getMedalImage (false)->getName (),
+                              sm->getMedalImage (false));
+  if (on_image_button_activated (ic->getMedalImage (false),
+                             sm->getMedalImage (false)))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_big_medals_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getMedalImage (true),
-                             sm->getMedalImage (true));
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile,
+                              sm->getMedalImage (true)->getName (),
+                              sm->getMedalImage (true));
+  if (on_image_button_activated (ic->getMedalImage (true),
+                                 sm->getMedalImage (true)))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_commentator_button_activated()
 {
   ScenarioMedia *sm = ScenarioMedia::getInstance();
   ImageCache *ic = ImageCache::getInstance ();
-  on_image_button_activated (ic->getCommentatorImage (),
-                             sm->getCommentatorImage ());
+  MediaAction_ImageSet *action =
+    new MediaAction_ImageSet (d_tarfile,
+                              sm->getCommentatorImage ()->getName (),
+                              sm->getCommentatorImage ());
+  if (on_image_button_activated (ic->getCommentatorImage (),
+                                 sm->getCommentatorImage ()))
+    umgr->add (action);
+  else
+    delete action;
 }
 
 void MediaDialog::on_bless_button_activated()
@@ -538,5 +608,156 @@ void MediaDialog::on_back_button_activated()
 
 MediaDialog::~MediaDialog()
 {
+  delete umgr;
   notebook->property_show_tabs () = false;
+}
+
+void MediaDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+  return;
+}
+
+void MediaDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  d_changed = true;
+  update ();
+}
+
+void MediaDialog::update ()
+{
+  disconnect_signals ();
+  fill_in_buttons ();
+  connect_signals ();
+}
+
+void MediaDialog::connect_signals ()
+{
+  connections.push_back
+    (d_battle_button->signal_clicked().connect(method(on_battle_button_activated)));
+  connections.push_back
+    (d_next_turn_button->signal_clicked().connect
+     (method(on_next_turn_button_activated)));
+  connections.push_back
+    (d_city_defeated_button->signal_clicked().connect
+     (method(on_city_defeated_button_activated)));
+  connections.push_back
+    (d_winning_button->signal_clicked().connect
+     (method(on_winning_button_activated)));
+  connections.push_back
+    (d_hero_male_button->signal_clicked().connect
+     (method(on_hero_male_button_activated)));
+  connections.push_back
+    (d_hero_female_button->signal_clicked().connect
+     (method(on_hero_female_button_activated)));
+  connections.push_back
+    (d_ruin_success_button->signal_clicked().connect
+     (method(on_ruin_success_button_activated)));
+  connections.push_back
+    (d_ruin_defeat_button->signal_clicked().connect
+     (method(on_ruin_defeat_button_activated)));
+  connections.push_back
+    (d_hero_newlevel_male_button->signal_clicked().connect
+     (method(on_hero_newlevel_male_button_activated)));
+  connections.push_back
+    (d_hero_newlevel_female_button->signal_clicked().connect
+     (method(on_hero_newlevel_female_button_activated)));
+  connections.push_back
+    (d_parley_offered_button->signal_clicked().connect
+     (method(on_parley_offered_button_activated)));
+  connections.push_back
+    (d_parley_refused_button->signal_clicked().connect
+     (method(on_parley_refused_button_activated)));
+  connections.push_back
+    (d_small_medals_button->signal_clicked().connect
+     (method(on_small_medals_button_activated)));
+  connections.push_back
+    (d_big_medals_button->signal_clicked().connect
+     (method(on_big_medals_button_activated)));
+  connections.push_back
+    (d_commentator_button->signal_clicked().connect
+     (method(on_commentator_button_activated)));
+  connections.push_back
+    (d_bless_button->signal_clicked().connect(method(on_bless_button_activated)));
+  connections.push_back
+    (d_hero_button->signal_clicked().connect(method(on_hero_button_activated)));
+  connections.push_back
+    (d_defeat_button->signal_clicked().connect(method(on_defeat_button_activated)));
+  connections.push_back
+    (d_victory_button->signal_clicked().connect
+     (method(on_victory_button_activated)));
+  connections.push_back
+    (d_back_button->signal_clicked().connect(method(on_back_button_activated)));
+}
+
+void MediaDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+UndoAction *MediaDialog::executeAction (UndoAction *action2)
+{
+  MediaAction *action =
+    dynamic_cast<MediaAction*>(action2);
+  UndoAction *out = NULL;
+
+  switch (action->getType ())
+    {
+    case MediaAction::IMAGE_SET:
+        {
+          MediaAction_ImageSet *a = dynamic_cast<MediaAction_ImageSet*>(action);
+          TarFileImage *im = a->getImage ();
+          out = new MediaAction_ImageSet (d_tarfile, im->getName (), im);
+          if (a->getArchiveMember ().empty ())
+            im->clear ();
+          else
+            {
+              Glib::ustring ar = a->getArchiveMember ();
+              Glib::ustring file = a->getFileName ();
+              bool broken = false;
+              Glib::ustring newbasename = "";
+              bool present = d_tarfile->contains (ar, broken);
+              if (present)
+                d_tarfile->replaceFileInCfgFile (ar, file, newbasename);
+              else
+                d_tarfile->addFileInCfgFile (file, newbasename);
+
+              a->getImage ()->load (d_tarfile, newbasename);
+              a->getImage ()->instantiateImages ();
+            }
+        }
+      break;
+    case MediaAction::MASKED_IMAGE_SET:
+        {
+          MediaAction_MaskedImageSet *a =
+            dynamic_cast<MediaAction_MaskedImageSet*>(action);
+          TarFileMaskedImage *im = a->getImage ();
+          out = new MediaAction_MaskedImageSet (d_tarfile, im->getName (), im);
+          if (a->getArchiveMember ().empty ())
+            im->clear ();
+          else
+            {
+              Glib::ustring ar = a->getArchiveMember ();
+              Glib::ustring file = a->getFileName ();
+              bool broken = false;
+              Glib::ustring newbasename = "";
+              bool present = d_tarfile->contains (ar, broken);
+              if (present)
+                d_tarfile->replaceFileInCfgFile (ar, file, newbasename);
+              else
+                d_tarfile->addFileInCfgFile (file, newbasename);
+
+              a->getImage ()->load (d_tarfile, newbasename);
+              a->getImage ()->instantiateImages ();
+            }
+        }
+      break;
+    }
+  return out;
 }
