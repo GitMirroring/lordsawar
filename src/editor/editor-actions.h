@@ -27,10 +27,10 @@
 #include "Tile.h"
 #include "undo-action.h"
 
-//! A record of an event in the shieldset editor
+//! A record of an event in the scenario builder
 /** 
- * The purpose of these classes is to implement undo/redo in the shieldset
- * editor.
+ * The purpose of these classes is to implement undo/redo in the scenario
+ * builder.
  */
 
 class Scenario;
