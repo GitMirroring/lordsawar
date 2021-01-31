@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,17 +36,25 @@
 #include "CreateScenarioRandomize.h"
 #include "heroes-dialog.h"
 #include "font-size.h"
+#include "players-editor-actions.h"
+#include "herotemplates.h"
 
 #define method(x) sigc::mem_fun(*this, &PlayersDialog::x)
 
 PlayersDialog::PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *random)
   : LwEditorDialog(parent, "players-dialog.ui")
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_random = random;
   d_changed = false;
 
   xml->get_widget("randomize_gold_button", randomize_gold_button);
   randomize_gold_button->signal_clicked().connect (method(on_randomize_gold_pressed));
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_clicked ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_clicked ().connect (method (on_redo_activated));
   xml->get_widget("players_grid", players_grid);
   int px = FontSize::getInstance ()->get_height () / 2;
   players_grid->property_row_spacing () = px;
@@ -55,19 +63,19 @@ PlayersDialog::PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *rando
   players_grid->override_background_color(white);
 
   // add default players
-  default_player_names.push_back(random->getPlayerName(Shield::WHITE));
-  default_player_names.push_back(random->getPlayerName(Shield::GREEN));
-  default_player_names.push_back(random->getPlayerName(Shield::YELLOW));
-  default_player_names.push_back(random->getPlayerName(Shield::LIGHT_BLUE));
-  default_player_names.push_back(random->getPlayerName(Shield::ORANGE));
-  default_player_names.push_back(random->getPlayerName(Shield::DARK_BLUE));
-  default_player_names.push_back(random->getPlayerName(Shield::RED));
-  default_player_names.push_back(random->getPlayerName(Shield::BLACK));
+  default_player_names.push_back (random->getPlayerName(Shield::WHITE));
+  default_player_names.push_back (random->getPlayerName(Shield::GREEN));
+  default_player_names.push_back (random->getPlayerName(Shield::YELLOW));
+  default_player_names.push_back (random->getPlayerName(Shield::LIGHT_BLUE));
+  default_player_names.push_back (random->getPlayerName(Shield::ORANGE));
+  default_player_names.push_back (random->getPlayerName(Shield::DARK_BLUE));
+  default_player_names.push_back (random->getPlayerName(Shield::RED));
+  default_player_names.push_back (random->getPlayerName(Shield::BLACK));
 
   Playerlist *pl = Playerlist::getInstance();
 
   // merge defined players with predefined
-  std::vector<Player *> players_to_add(default_player_names.size(), 0);
+  std::vector<Player *> players_to_add (default_player_names.size(), 0);
   for (Playerlist::iterator j = pl->begin(); j != pl->end(); ++j)
     {
       Player *player = *j;
@@ -91,6 +99,13 @@ PlayersDialog::PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *rando
 	add_player(j, *current_name, gold, NULL);
 	++current_name;
       }
+  connect_signals ();
+  update ();
+}
+
+PlayersDialog::~PlayersDialog()
+{
+  delete umgr;
 }
 
 GameParameters::Player PlayersDialog::to_player (int row)
@@ -126,41 +141,36 @@ bool PlayersDialog::run()
   return d_changed;
 }
 
-Gtk::Entry * PlayersDialog::add_entry_for_player_name(int row,
-                                                      Glib::ustring name)
+Gtk::Entry * PlayersDialog::add_entry_for_player_name (Glib::ustring name)
 {
   Gtk::Entry *e = Gtk::manage (new Gtk::Entry ());
   e->set_text (name);
   e->property_hexpand () = true;
-  e->signal_changed ().connect(sigc::bind (method (on_player_name_changed), row));
   player_name_entries.push_back (e);
   return e;
 }
 
-Gtk::Button* PlayersDialog::add_button_for_player_heroes (int row)
+Gtk::Button* PlayersDialog::add_button_for_player_heroes ()
 {
   Gtk::Button *b = Gtk::manage (new Gtk::Button());
   b->set_label (_("Heroes"));
-  b->signal_clicked ().connect(sigc::bind (method (on_player_heroes_clicked), row));
+  b->set_focus_on_click (false);
   int px = FontSize::getInstance ()->get_height ();
   b->property_margin_right () = px;
   player_heroes_buttons.push_back (b);
   return b;
 }
 
-Gtk::SpinButton* PlayersDialog::add_spinbutton_for_player_gold(int row,
-                                                               int gold)
+Gtk::SpinButton* PlayersDialog::add_spinbutton_for_player_gold(int gold)
 {
   Gtk::SpinButton *b = Gtk::manage (new Gtk::SpinButton());
   b->set_adjustment (Gtk::Adjustment::create (0, 0, 10000));
   b->set_value (gold);
-  b->signal_changed ().connect(sigc::bind (method (on_player_gold_changed), row));
-  b->signal_insert_text().connect (sigc::bind(method(on_player_gold_edited), row));
   player_gold_spinbuttons.push_back (b);
   return b;
 }
 
-Gtk::ComboBoxText* PlayersDialog::add_combo_for_player_type (int row, Player *p)
+Gtk::ComboBoxText* PlayersDialog::add_combo_for_player_type (Player *p)
 {
   Gtk::ComboBoxText *c = Gtk::manage (new Gtk::ComboBoxText ());
 
@@ -180,7 +190,6 @@ Gtk::ComboBoxText* PlayersDialog::add_combo_for_player_type (int row, Player *p)
         default: c->set_active (0); break;
         }
     }
-  c->signal_changed ().connect(sigc::bind (method (on_player_type_changed), row));
   int px = FontSize::getInstance ()->get_height ();
   c->property_margin_left () = px;
   player_type_comboboxes.push_back (c);
@@ -189,15 +198,20 @@ Gtk::ComboBoxText* PlayersDialog::add_combo_for_player_type (int row, Player *p)
 
 void PlayersDialog::add_player(int row, Glib::ustring name, int gold, Player *p)
 {
-  players_grid->attach (*add_combo_for_player_type (row, p), 0, row + 1);
-  players_grid->attach (*add_entry_for_player_name (row, name), 1, row + 1);
-  players_grid->attach (*add_spinbutton_for_player_gold (row, gold), 2, row + 1);
-  players_grid->attach (*add_button_for_player_heroes (row), 3, row + 1);
+  players_grid->attach (*add_combo_for_player_type (p), 0, row + 1);
+  players_grid->attach (*add_entry_for_player_name (name), 1, row + 1);
+  players_grid->attach (*add_spinbutton_for_player_gold (gold), 2, row + 1);
+  players_grid->attach (*add_button_for_player_heroes (), 3, row + 1);
   sensitize_row (row);
 }
 
 void PlayersDialog::on_player_type_changed (int row)
 {
+  int oldtype = -1;
+  Player *p = Playerlist::getInstance ()->getPlayer (row);
+  if (p)
+    oldtype = p->getType ();
+  umgr->add (new PlayersEditorAction_Type (row, oldtype));
   sensitize_row (row);
   d_changed = true;
   update_player (row);
@@ -205,33 +219,52 @@ void PlayersDialog::on_player_type_changed (int row)
 
 void PlayersDialog::on_player_name_changed (int row)
 {
-  d_changed = true;
-  update_player (row);
-}
-
-void PlayersDialog::on_player_gold_changed (int row)
-{
+  Glib::ustring oldname = "";
+  Player *p = Playerlist::getInstance ()->getPlayer (row);
+  if (p)
+    oldname = p->getName ();
+  umgr->add (new PlayersEditorAction_Name
+             (row, oldname, player_name_entries[row]->get_position () + 1));
   d_changed = true;
   update_player (row);
 }
 
 void PlayersDialog::on_player_gold_edited (const Glib::ustring &text, int *p, int row)
 {
+  guint32 oldgp = 0;
+  Player *player = Playerlist::getInstance ()->getPlayer (row);
+  if (player)
+    oldgp = player->getGold ();
+  umgr->add (new PlayersEditorAction_Gold (row, oldgp));
   (void) p;
   (void) text;
   d_changed = true;
+  player_gold_spinbuttons[row]->set_value (atoi (player_gold_spinbuttons[row]->get_text ().c_str ()));
   update_player (row);
 }
 
 void PlayersDialog::on_player_heroes_clicked (int row)
 {
+  PlayersEditorAction_Heroes *action =
+    new PlayersEditorAction_Heroes
+    (row, HeroTemplates::getInstance ()->getHeroes (row));
   HeroesDialog d (*dialog, row, player_name_entries[row]->get_text ());
   if (d.run ())
-    d_changed = true;
+    {
+      umgr->add (action);
+      d_changed = true;
+    }
+  else
+    delete action;
 }
 
 void PlayersDialog::on_randomize_gold_pressed()
 {
+  std::list<guint32> gp;
+  for (guint32 i = 0; i < player_gold_spinbuttons.size (); i++)
+    gp.push_back (guint32(player_gold_spinbuttons[i]->get_value ()));
+
+  umgr->add (new PlayersEditorAction_RandomizeGold (gp));
   d_changed = true;
   for (guint32 i = 0; i < player_type_comboboxes.size (); i++)
     {
@@ -252,4 +285,245 @@ void PlayersDialog::sensitize_row (int i)
   player_name_entries[i]->property_sensitive () = sens;
   player_heroes_buttons[i]->property_sensitive () = sens;
   player_gold_spinbuttons[i]->property_sensitive () = sens;
+}
+
+void PlayersDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+  return;
+}
+
+void PlayersDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  d_changed = true;
+  update ();
+}
+
+void PlayersDialog::update ()
+{
+  disconnect_signals ();
+  for (auto p : *Playerlist::getInstance ())
+    {
+      if (p == Playerlist::getInstance ()->getNeutral ())
+        continue;
+      auto c = player_type_comboboxes[p->getId ()];
+      switch (p->getType ())
+        {
+        case Player::HUMAN: c->set_active (1); break;
+        case Player::AI_FAST: c->set_active (2); break;
+        case Player::AI_SMART: c->set_active (3); break;
+        default: c->set_active (0); break;
+        }
+      if (player_name_entries[p->getId ()]->get_text () != p->getName ())
+        player_name_entries[p->getId ()]->set_text (p->getName ());
+      player_gold_spinbuttons[p->getId ()]->set_value (p->getGold ());
+      sensitize_row (p->getId ());
+    }
+  connect_signals ();
+}
+
+void PlayersDialog::connect_signals ()
+{
+  int row = 0;
+  for (auto c : player_type_comboboxes)
+    {
+      connections.push_back
+        (c->signal_changed ().connect
+         (sigc::bind (method (on_player_type_changed), row)));
+      row++;
+    }
+
+  row = 0;
+  for (auto e : player_name_entries)
+    {
+      connections.push_back
+        (e->signal_changed ().connect
+         (sigc::bind (method (on_player_name_changed), row)));
+      row++;
+    }
+
+  row = 0;
+  for (auto g : player_gold_spinbuttons)
+    {
+      connections.push_back
+        (g->signal_insert_text().connect
+         (sigc::bind(method(on_player_gold_edited), row)));
+      row++;
+    }
+
+  row = 0;
+  for (auto h : player_heroes_buttons)
+    {
+      connections.push_back
+        (h->signal_clicked ().connect
+         (sigc::bind (method (on_player_heroes_clicked), row)));
+      row++;
+    }
+}
+
+void PlayersDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+UndoAction *PlayersDialog::executeAction (UndoAction *action2)
+{
+  PlayersEditorAction *action =
+    dynamic_cast<PlayersEditorAction*>(action2);
+  UndoAction *out = NULL;
+
+  switch (action->getType ())
+    {
+      case PlayersEditorAction::TYPE:
+          {
+            PlayersEditorAction_Type *a =
+              dynamic_cast<PlayersEditorAction_Type*>(action);
+
+            int type = -1;
+            Player *p = Playerlist::getInstance ()->getPlayer (a->getIndex ());
+            if (p)
+              type = p->getType ();
+
+            int row = a->getIndex ();
+            out = new PlayersEditorAction_Type (row, type);
+            disconnect_signals ();
+            switch (a->getPlayerType ())
+              {
+              case -1:
+                player_type_comboboxes[row]->set_active (0);
+                break;
+              case 0:
+                player_type_comboboxes[row]->set_active (1);
+                break;
+              case 1:
+                player_type_comboboxes[row]->set_active (2);
+                break;
+              case 2:
+                player_type_comboboxes[row]->set_active (2);
+                break;
+              case 4:
+                player_type_comboboxes[row]->set_active (3);
+                break;
+              case 8:
+                player_type_comboboxes[row]->set_active (0);
+                break;
+              }
+            update_player (a->getIndex ());
+            connect_signals ();
+          }
+        break;
+      case PlayersEditorAction::NAME:
+          {
+            PlayersEditorAction_Name *a =
+              dynamic_cast<PlayersEditorAction_Name*>(action);
+            int row = a->getIndex ();
+            Glib::ustring oldname = "";
+            Player *p = Playerlist::getInstance ()->getPlayer (row);
+            if (p)
+              oldname = p->getName ();
+            out = new PlayersEditorAction_Name
+              (row, oldname, player_name_entries[row]->get_position ());
+            if (p)
+              p->setName (a->getName ());
+            disconnect_signals ();
+            player_name_entries[row]->set_text (a->getName ());
+            player_name_entries[row]->set_position (a->getCursorPosition ());
+            connect_signals ();
+          } 
+        break;
+      case PlayersEditorAction::GOLD:
+          {
+            PlayersEditorAction_Gold *a =
+              dynamic_cast<PlayersEditorAction_Gold*>(action);
+
+            guint32 gp = 0;
+            Player *p = Playerlist::getInstance ()->getPlayer (a->getIndex ());
+            if (p)
+              gp = p->getGold ();
+            out = new PlayersEditorAction_Gold (a->getIndex (), gp);
+            if (p)
+              p->setGold (a->getGold ());
+          }
+        break;
+      case PlayersEditorAction::RANDOMIZE_GOLD:
+          {
+            PlayersEditorAction_RandomizeGold *a =
+              dynamic_cast<PlayersEditorAction_RandomizeGold*>(action);
+            std::list<guint32> gp;
+            for (guint32 i = 0; i < player_gold_spinbuttons.size (); i++)
+              gp.push_back (guint32(player_gold_spinbuttons[i]->get_value ()));
+            out = new PlayersEditorAction_RandomizeGold (gp);
+            int row = 0;
+            disconnect_signals ();
+            for (auto g : a->getPlayersGold ())
+              {
+                player_gold_spinbuttons[row]->set_value (g);
+                Player *p = Playerlist::getInstance ()->getPlayer (row);
+                if (p)
+                  p->setGold (g);
+                row++;
+              }
+            connect_signals ();
+          }
+        break;
+      case PlayersEditorAction::HEROES:
+          {
+            PlayersEditorAction_Heroes *a =
+              dynamic_cast<PlayersEditorAction_Heroes*>(action);
+            out = new PlayersEditorAction_Heroes
+              (a->getIndex (),
+               HeroTemplates::getInstance ()->getHeroes (a->getIndex ()));
+            HeroTemplates::getInstance ()->replaceHeroes (a->getIndex (),
+                                                          a->getHeroes ());
+            a->clearHeroes ();
+          }
+        break;
+    }
+  /*
+    case PlayersEditorAction::SET:
+        {
+          PlayersEditorAction_Set *a =
+            dynamic_cast<PlayersEditorAction_Set*>(action);
+          TarFileImage *im = d_tileset->getExplosion ();
+          out = new PlayersEditorAction_Set (d_tileset,
+                                                             im->getName ());
+          if (a->getArchiveMember ().empty ())
+            im->clear ();
+          else
+            {
+              Glib::ustring ar = a->getArchiveMember ();
+              Glib::ustring file = a->getFileName ();
+              bool broken = false;
+              Glib::ustring newbasename = "";
+              bool present = d_tileset->contains (ar, broken);
+              if (present)
+                d_tileset->replaceFileInCfgFile (ar, file, newbasename);
+              else
+                d_tileset->addFileInCfgFile (file, newbasename);
+
+              d_tileset->getExplosion ()->load (d_tileset, newbasename);
+              d_tileset->getExplosion ()->instantiateImages ();
+              if (d_explosion)
+                delete d_explosion;
+              d_explosion = PixMask::create (file, broken);
+            }
+        }
+      break;
+    case PlayersEditorAction::SIZE:
+        {
+          PlayersEditorAction_Size *a =
+            dynamic_cast<PlayersEditorAction_Size*>(action);
+          out = new PlayersEditorAction_Size (d_large);
+          d_large = a->getLarge ();
+        }
+      break;
+    }
+    */
+  return out;
 }

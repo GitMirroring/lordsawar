@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
 #include "game-parameters.h"
+#include "undo-mgr.h"
 
 class Player;
 class CreateScenarioRandomize;
@@ -33,15 +34,18 @@ class PlayersDialog: public LwEditorDialog
 {
  public:
     PlayersDialog(Gtk::Window &parent, CreateScenarioRandomize *randomizer);
-    ~PlayersDialog() {}
+    ~PlayersDialog();
 
     bool run();
 
  private:
     bool d_changed;
+    UndoMgr *umgr;
     Gtk::Grid *players_grid;
 
     Gtk::Button *randomize_gold_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     typedef std::vector<Glib::ustring> player_name_seq;
     player_name_seq default_player_names;
@@ -56,18 +60,24 @@ class PlayersDialog: public LwEditorDialog
 
     void update_player (int row);
 
-    Gtk::ComboBoxText* add_combo_for_player_type (int row, Player *p);
-    Gtk::Entry* add_entry_for_player_name(int row, Glib::ustring name);
-    Gtk::SpinButton* add_spinbutton_for_player_gold(int row, int gold);
-    Gtk::Button* add_button_for_player_heroes(int row);
+    Gtk::ComboBoxText* add_combo_for_player_type (Player *p);
+    Gtk::Entry* add_entry_for_player_name (Glib::ustring name);
+    Gtk::SpinButton* add_spinbutton_for_player_gold (int gold);
+    Gtk::Button* add_button_for_player_heroes ();
 
     void on_player_type_changed (int row);
     void on_player_name_changed (int row);
-    void on_player_gold_changed (int row);
     void on_player_gold_edited (const Glib::ustring &text, int *p, int row);
     void on_player_heroes_clicked (int row);
     void sensitize_row (int i);
     GameParameters::Player to_player (int row);
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif

@@ -81,7 +81,7 @@ libeditor_la_SOURCES =\
 	ruin-editor-dialog.cpp ruin-editor-dialog.h \
 	stack-editor-dialog.cpp stack-editor-dialog.h \
 	select-army-dialog.cpp select-army-dialog.h \
-	players-dialog.cpp players-dialog.h \
+	players-dialog.cpp players-dialog.h players-editor-actions.h \
 	city-editor-dialog.cpp city-editor-dialog.h \
 	map-info-dialog.cpp map-info-dialog.h map-info-actions.h \
 	new-map-dialog.cpp new-map-dialog.h new-map-actions.h \
