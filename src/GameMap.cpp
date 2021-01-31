@@ -3002,3 +3002,147 @@ LwRectangle GameMap::getBoundingBox (Vector<int> pos)
   else
     return LwRectangle (pos);
 }
+
+void GameMap::updateMaptiles (std::list<Maptile *> maptiles)
+{
+  for (auto m : maptiles)
+    {
+      Maptile *maptile = GameMap::getInstance ()->getTile (m->getPos ());
+      maptile->copy (m, true);
+    }
+}
+
+void GameMap::updateObjects (std::list<UniquelyIdentified*> objects, std::list<LwRectangle> rects)
+{
+  // then the objects
+  for (auto object : objects)
+    {
+      if (City *city = dynamic_cast<City*>(object))
+        {
+          Citylist *cities = Citylist::getInstance ();
+          City *old_city = cities->getById (city->getId ());
+          if (old_city)
+            cities->replace (old_city, city);
+          else
+            cities->add (city);
+        }
+      else if (Ruin *ruin = dynamic_cast<Ruin*>(object))
+        {
+          Ruinlist *ruins = Ruinlist::getInstance ();
+          Ruin *old_ruin = ruins->getById (ruin->getId ());
+          if (old_ruin)
+            ruins->replace (old_ruin, ruin);
+          else
+            ruins->add (ruin);
+        }
+      else if (Temple *temple = dynamic_cast<Temple*>(object))
+        {
+          Templelist *temples = Templelist::getInstance ();
+          Temple *old_temple = temples->getById (temple->getId ());
+          if (old_temple)
+            temples->replace (old_temple, temple);
+          else
+            temples->add (temple);
+        }
+      else if (Port *port = dynamic_cast<Port*>(object))
+        {
+          Portlist *ports = Portlist::getInstance ();
+          Port *old_port = ports->getById (port->getId ());
+          if (old_port)
+            ports->replace (old_port, port);
+          else
+            ports->add  (port);
+        }
+      else if (Stone *stone = dynamic_cast<Stone*>(object))
+        {
+          Stonelist *stones = Stonelist::getInstance ();
+          Stone *old_stone = stones->getById (stone->getId ());
+          if (old_stone)
+            stones->replace (old_stone, stone);
+          else
+            stones->add (stone);
+        }
+      else if (Signpost *signpost = dynamic_cast<Signpost*>(object))
+        {
+          Signpostlist *signposts = Signpostlist::getInstance ();
+          Signpost *old_signpost = signposts->getById (signpost->getId ());
+          if (old_signpost)
+            signposts->replace (old_signpost, signpost);
+          else
+            signposts->add (signpost);
+        }
+      else if (Road *road = dynamic_cast<Road*>(object))
+        {
+          Roadlist *roads = Roadlist::getInstance ();
+          Road *old_road = roads->getById (road->getId ());
+          if (old_road)
+            roads->replace (old_road, road);
+          else
+            roads->add (road);
+        }
+      else if (Bridge *bridge = dynamic_cast<Bridge*>(object))
+        {
+          Bridgelist *bridges = Bridgelist::getInstance ();
+          Bridge *old_bridge = bridges->getById (bridge->getId ());
+          if (old_bridge)
+            bridges->replace (old_bridge, bridge);
+          else
+            bridges->add (bridge);
+        }
+      else if (Stack *stack = dynamic_cast<Stack*>(object))
+        {
+          Player *p = stack->getOwner ();
+          Stacklist *stacks = p->getStacklist ();
+          Stack *old_stack = stacks->getStackById (stack->getId ());
+          if (old_stack)
+            stacks->flRemove (old_stack);
+          GameMap::getInstance ()->putStack (stack, true);
+        }
+    }
+
+  //we need cities in this rect that lack a building tile
+  std::list <Vector<int>> points = GameMap::getInstance ()->getPoints (rects);
+
+  for (auto pos : points)
+    {
+      Maptile *mtile = GameMap::getInstance ()->getTile (pos);
+      City *city = Citylist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::CITY && city)
+        Citylist::getInstance ()->subtract (city);
+      Ruin *ruin = Ruinlist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::RUIN && ruin)
+        Ruinlist::getInstance ()->subtract (ruin);
+      Temple *temple = Templelist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::TEMPLE && temple)
+        Templelist::getInstance ()->subtract (temple);
+      Port *port = Portlist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::PORT && port)
+        Portlist::getInstance ()->subtract (port);
+      Road *road = Roadlist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::ROAD && road)
+        Roadlist::getInstance ()->subtract (road);
+      Bridge *bridge = Bridgelist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::BRIDGE && bridge)
+        Bridgelist::getInstance ()->subtract (bridge);
+      Stone *stone = Stonelist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::STONE &&
+          mtile->getBuilding () != Maptile::ROAD && stone)
+        Stonelist::getInstance ()->subtract (stone);
+      Signpost *signpost = Signpostlist::getInstance ()->getObjectAt (pos);
+      if (mtile->getBuilding () != Maptile::SIGNPOST && signpost)
+        Signpostlist::getInstance ()->subtract (signpost);
+      //remove stacks that don't have a stacktile reference
+      for (auto p : *Playerlist::getInstance ())
+        {
+          std::list<Stack *> stacks_to_delete;
+          for (auto s : *p->getStacklist ())
+            if (!GameMap::getStacks (s->getPos ())->contains (s->getId ()))
+              stacks_to_delete.push_back (s);
+          for (auto s : stacks_to_delete)
+            {
+              p->getStacklist ()->on_stack_died (s);
+              p->getStacklist ()->flRemove (s);
+            }
+        }
+    }
+}

@@ -31,17 +31,42 @@
 #include "playerlist.h"
 #include "tilesetlist.h"
 #include "font-size.h"
+#include "smallmap-editor-actions.h"
+#include "maptile.h"
+#include "city.h"
+#include "citylist.h"
+#include "road.h"
+#include "roadlist.h"
+#include "stacktile.h"
+#include "port.h"
+#include "portlist.h"
+#include "bridge.h"
+#include "bridgelist.h"
+#include "stone.h"
+#include "stonelist.h"
+#include "signpost.h"
+#include "signpostlist.h"
+#include "citylist.h"
+#include "ruin.h"
+#include "ruinlist.h"
+#include "temple.h"
+#include "templelist.h"
+#include "stack.h"
+#include "stacklist.h"
+#include "player.h"
 
 #define method(x) sigc::mem_fun(*this, &SmallmapEditorDialog::x)
 
 SmallmapEditorDialog::SmallmapEditorDialog(Gtk::Window &parent)
  : LwEditorDialog(parent, "smallmap-editor-dialog.ui")
 {
+    umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+    umgr->execute ().connect (method (executeAction));
     xml->get_widget("smallmap_image", smallmap_image);
     smallmap_image->signal_event().connect (sigc::hide(method(on_smallmap_exposed)));
 
-
     smallmap = new EditableSmallMap();
+    smallmap->undo_map.connect(method (on_got_undo));
     smallmap->map_changed.connect(sigc::hide(method(on_map_changed)));
     smallmap->road_start_placed.connect (method(on_road_start_placed));
     smallmap->road_finish_placed.connect (method(on_road_finish_placed));
@@ -49,20 +74,30 @@ SmallmapEditorDialog::SmallmapEditorDialog(Gtk::Window &parent)
     smallmap->map_edited.connect (method(on_map_edited));
 
     xml->get_widget("map_eventbox", map_eventbox);
-    map_eventbox->add_events(Gdk::BUTTON_PRESS_MASK | Gdk::POINTER_MOTION_MASK);
-    map_eventbox->signal_button_press_event().connect(method(on_map_mouse_button_event));
-    map_eventbox->signal_motion_notify_event().connect(method(on_map_mouse_motion_event));
+    map_eventbox->add_events (Gdk::BUTTON_PRESS_MASK |
+                              Gdk::BUTTON_RELEASE_MASK |
+                              Gdk::POINTER_MOTION_MASK);
+    map_eventbox->signal_button_press_event().connect
+     (method(on_map_mouse_button_event));
+    map_eventbox->signal_button_release_event().connect
+     (method(on_map_mouse_button_event));
+    map_eventbox->signal_motion_notify_event().connect
+     (method(on_map_mouse_motion_event));
     xml->get_widget("modes_hbox", modes_hbox);
     xml->get_widget("terrain_type_table", terrain_type_table);
     xml->get_widget("building_types_hbox", building_types_hbox);
     xml->get_widget("road_start_radiobutton", road_start_radiobutton);
-    road_start_radiobutton->signal_toggled().connect(method(on_road_start_toggled));
     xml->get_widget("road_finish_radiobutton", road_finish_radiobutton);
-    road_finish_radiobutton->signal_toggled().connect(method(on_road_finish_toggled));
     xml->get_widget("create_road_button", create_road_button);
-    create_road_button->signal_clicked().connect(method(on_create_road_clicked));
+    create_road_button->signal_clicked().connect
+     (method(on_create_road_clicked));
     xml->get_widget("clear_points_button", clear_points_button);
-    clear_points_button->signal_clicked().connect(method(on_clear_points_clicked));
+    clear_points_button->signal_clicked().connect
+     (sigc::bind(method(on_clear_points_clicked), true));
+    xml->get_widget("undo_button", undo_button);
+    undo_button->signal_activate ().connect (method (on_undo_activated));
+    xml->get_widget("redo_button", redo_button);
+    redo_button->signal_activate ().connect (method (on_redo_activated));
 
     setup_pointer_radiobuttons(xml);
     setup_terrain_radiobuttons();
@@ -70,7 +105,8 @@ SmallmapEditorDialog::SmallmapEditorDialog(Gtk::Window &parent)
     d_changed = false;
     road_start_point = Vector<int>(-1,-1);
     road_finish_point = Vector<int>(-1,-1);
-    update_road_buttons ();
+    connect_signals ();
+    update (true);
 }
 
 void SmallmapEditorDialog::hide()
@@ -99,11 +135,11 @@ void SmallmapEditorDialog::on_map_changed(Cairo::RefPtr<Cairo::Surface> map)
 
 bool SmallmapEditorDialog::on_map_mouse_button_event(GdkEventButton *e)
 {
-    if (e->type != GDK_BUTTON_PRESS)
+    if (e->type != GDK_BUTTON_PRESS && e->type != GDK_BUTTON_RELEASE)
 	return true;	// useless event
-    
+
     smallmap->mouse_button_event(to_input_event(e));
-    
+
     return true;
 }
 
@@ -113,22 +149,27 @@ bool SmallmapEditorDialog::on_map_mouse_motion_event(GdkEventMotion *e)
     return true;
 }
 
-    
 void SmallmapEditorDialog::on_create_road_clicked()
 {
+  umgr->add (new SmallmapEditorAction_BuildRoads (GameMap::get_boundary (),
+                                                  road_start_point,
+                                                  road_finish_point));
   if (smallmap->create_road())
-    on_clear_points_clicked();
+    on_clear_points_clicked(false);
 }
-    
-void SmallmapEditorDialog::on_clear_points_clicked()
+
+void SmallmapEditorDialog::on_clear_points_clicked(bool act)
 {
+  if (act)
+    umgr->add (new SmallmapEditorAction_ClearRoad (road_start_point,
+                                                   road_finish_point));
   road_start_point = Vector<int>(-1,-1);
   road_finish_point = Vector<int>(-1,-1);
   smallmap->clear_road();
   pointer_radiobutton->set_active();
   update_road_buttons ();
 }
-    
+
 void SmallmapEditorDialog::on_road_start_toggled()
 {
   smallmap->set_pointer(EditableSmallMap::PICK_NEW_ROAD_START, 1, 
@@ -266,7 +307,7 @@ void SmallmapEditorDialog::on_pointer_radiobutton_toggled()
 {
     EditableSmallMap::Pointer pointer = EditableSmallMap::POINTER;
     int size = 1;
-    
+
     for (std::vector<PointerItem>::iterator i = pointer_items.begin(),
 	     end = pointer_items.end(); i != end; ++i)
     {
@@ -277,7 +318,7 @@ void SmallmapEditorDialog::on_pointer_radiobutton_toggled()
 	    break;
 	}
     }
-    
+
     if (smallmap)
 	smallmap->set_pointer(pointer, size, get_terrain());
 
@@ -325,6 +366,9 @@ bool SmallmapEditorDialog::on_smallmap_exposed()
 
 void SmallmapEditorDialog::on_road_start_placed(Vector<int> pos)
 {
+  SmallmapEditorAction_ClearRoad *action =
+    new SmallmapEditorAction_ClearRoad (road_start_point, road_finish_point);
+  umgr->add (action);
   Glib::ustring s = String::ucompose("%1,%2", pos.x, pos.y);
   road_start_point = pos;
   pointer_radiobutton->set_active();
@@ -334,6 +378,9 @@ void SmallmapEditorDialog::on_road_start_placed(Vector<int> pos)
 
 void SmallmapEditorDialog::on_road_finish_placed(Vector<int> pos)
 {
+  SmallmapEditorAction_ClearRoad *action =
+    new SmallmapEditorAction_ClearRoad (road_start_point, road_finish_point);
+  umgr->add (action);
   Glib::ustring s = String::ucompose("%1,%2", pos.x, pos.y);
   road_finish_point = pos;
   pointer_radiobutton->set_active();
@@ -346,7 +393,7 @@ void SmallmapEditorDialog::on_road_can_be_created(bool create_road)
   update_road_buttons ();
   create_road_button->set_sensitive(create_road);
 }
-      
+
 void SmallmapEditorDialog::on_map_edited()
 {
   d_changed = true;
@@ -397,4 +444,154 @@ void SmallmapEditorDialog::update_road_buttons ()
     road_finish_radiobutton->set_label
       (String::ucompose (_("%1, %2"), road_finish_point.x,
                          road_finish_point.y));
+}
+
+SmallmapEditorDialog::~SmallmapEditorDialog ()
+{
+  delete smallmap;
+  delete umgr;
+}
+
+void SmallmapEditorDialog::on_got_undo (UndoAction *action)
+{
+  umgr->add (action);
+}
+
+void SmallmapEditorDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+  return;
+}
+
+void SmallmapEditorDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  d_changed = true;
+  update ();
+}
+
+void SmallmapEditorDialog::update (bool first)
+{
+  disconnect_signals ();
+  if (!first)
+    {
+      smallmap->resize ();
+      smallmap->update ();
+    }
+  update_road_buttons ();
+  connect_signals ();
+}
+
+void SmallmapEditorDialog::connect_signals ()
+{
+  connections.push_back
+    (road_start_radiobutton->signal_toggled().connect
+     (method(on_road_start_toggled)));
+  connections.push_back
+    (road_finish_radiobutton->signal_toggled().connect
+     (method(on_road_finish_toggled)));
+}
+
+void SmallmapEditorDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+UndoAction *SmallmapEditorDialog::executeAction (UndoAction *action2)
+{
+  SmallmapEditorAction *action =
+    dynamic_cast<SmallmapEditorAction*>(action2);
+  UndoAction *out = NULL;
+
+  switch (action->getType ())
+    {
+    case SmallmapEditorAction::TERRAIN:
+        {
+          SmallmapEditorAction_Terrain *a =
+            dynamic_cast<SmallmapEditorAction_Terrain*>(action);
+          out = new SmallmapEditorAction_Terrain (get_terrain (),
+                                                  a->getArea ());
+          doChangeMap (a);
+        }
+      break;
+    case SmallmapEditorAction::ERASE:
+        {
+          SmallmapEditorAction_Erase *a =
+            dynamic_cast<SmallmapEditorAction_Erase*>(action);
+          out = new SmallmapEditorAction_Erase (a->getArea ());
+          doChangeMap (a);
+        }
+      break;
+    case SmallmapEditorAction::CITY:
+        {
+          SmallmapEditorAction_City *a =
+            dynamic_cast<SmallmapEditorAction_City*>(action);
+          out = new SmallmapEditorAction_City (a->getArea ());
+          doChangeMap (a);
+        }
+      break;
+    case SmallmapEditorAction::RUIN:
+        {
+          SmallmapEditorAction_Ruin *a =
+            dynamic_cast<SmallmapEditorAction_Ruin*>(action);
+          out = new SmallmapEditorAction_Ruin (a->getArea ());
+          doChangeMap (a);
+        }
+      break;
+    case SmallmapEditorAction::TEMPLE:
+        {
+          SmallmapEditorAction_Temple *a =
+            dynamic_cast<SmallmapEditorAction_Temple*>(action);
+          out = new SmallmapEditorAction_Temple (a->getArea ());
+          doChangeMap (a);
+        }
+      break;
+    case SmallmapEditorAction::BUILD_ROAD:
+        {
+          SmallmapEditorAction_BuildRoads *a =
+            dynamic_cast<SmallmapEditorAction_BuildRoads*>(action);
+          out = new SmallmapEditorAction_BuildRoads (GameMap::get_boundary (),
+                                                     road_start_point,
+                                                     road_finish_point);
+          doChangeMap (a);
+          road_start_point = a->getSrc ();
+          road_finish_point = a->getDest ();
+          smallmap->setRoadStart (road_start_point);
+          smallmap->setRoadFinish (road_finish_point);
+        }
+      break;
+    case SmallmapEditorAction::CLEAR_ROAD:
+        {
+          SmallmapEditorAction_ClearRoad *a =
+            dynamic_cast<SmallmapEditorAction_ClearRoad*>(action);
+          out = new SmallmapEditorAction_ClearRoad (road_start_point,
+                                                    road_finish_point);
+          road_start_point = a->getSrc ();
+          road_finish_point = a->getDest();
+          smallmap->setRoadStart (road_start_point);
+          smallmap->setRoadFinish (road_finish_point);
+        }
+      break;
+    case SmallmapEditorAction::BLANK:
+      out = new SmallmapEditorAction_Blank ();
+      break;
+    }
+  return out;
+}
+
+void SmallmapEditorDialog::doChangeMap (SmallmapEditorAction_ChangeMap *action)
+{
+  GameMap::getInstance ()->updateMaptiles (action->getMaptiles ());
+
+  if (action->getOnlyMaptiles ())
+    return;
+
+  GameMap::getInstance ()->updateObjects (action->getObjects (),
+                                          action->getRectangles ());
+  action->clearObjects ();
 }

@@ -255,3 +255,10 @@ void UndoMgr::updateMenuItems (Gtk::MenuItem *undo, Gtk::MenuItem *redo)
   if (redoEmpty () == false)
     redo->set_label (String::ucompose (_("Redo %1"), getRedoName ()));
 }
+
+void UndoMgr::dump ()
+{
+  printf ("showing undo stack of %d items\n", undos.size ());
+  for (auto l : undos)
+    printf (" '%s'\n", l->getActionName ().c_str ());
+}

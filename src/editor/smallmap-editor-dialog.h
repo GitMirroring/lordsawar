@@ -25,18 +25,21 @@
 #include "vector.h"
 #include "editablesmallmap.h"
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
+#include "smallmap-editor-actions.h"
 
 class SmallmapEditorDialog: public LwEditorDialog
 {
  public:
     SmallmapEditorDialog(Gtk::Window &parent);
-    ~SmallmapEditorDialog() {delete smallmap;}
+    ~SmallmapEditorDialog();
 
     bool run();
     void hide();
     
  private:
     EditableSmallMap* smallmap;
+    UndoMgr *umgr;
     bool d_changed;
 
     Gtk::Image *smallmap_image;
@@ -49,6 +52,8 @@ class SmallmapEditorDialog: public LwEditorDialog
     Gtk::Button *clear_points_button;
     Gtk::RadioButton *pointer_radiobutton;
     Gtk::EventBox *map_eventbox;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
     Vector<int> road_start_point;
     Vector<int> road_finish_point;
 
@@ -76,7 +81,7 @@ class SmallmapEditorDialog: public LwEditorDialog
     void on_road_start_toggled();
     void on_road_finish_toggled();
     void on_create_road_clicked();
-    void on_clear_points_clicked();
+    void on_clear_points_clicked(bool act = true);
     void on_terrain_radiobutton_toggled();
     void on_pointer_radiobutton_toggled();
     bool on_smallmap_exposed();
@@ -95,6 +100,16 @@ class SmallmapEditorDialog: public LwEditorDialog
     void update_terrain_buttons();
     void update_road_buttons ();
     Tile::Type get_terrain();
+
+    void on_got_undo (UndoAction *action);
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update (bool first = false);
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
+    void doChangeMap (SmallmapEditorAction_ChangeMap *action);
 };
 
 #endif

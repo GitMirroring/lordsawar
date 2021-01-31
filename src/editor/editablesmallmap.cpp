@@ -1,4 +1,4 @@
-// Copyright (C) 2010, 2014, 2017, 2020 Ben Asselstine
+// Copyright (C) 2010, 2014, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "RoadPathCalculator.h"
 #include "path.h"
 #include "font-size.h"
+#include "smallmap-editor-actions.h"
 
 #include "editablesmallmap.h"
 
@@ -73,23 +74,23 @@ void EditableSmallMap::change_map(Vector<int> tile)
           int offset = (erase_size - 1) / 2;
           Vector<int> box = tile - Vector<int>(offset, offset);
           LwRectangle r(box.x, box.y, erase_size, erase_size);
+          SmallmapEditorAction_Erase *action = 
+            new SmallmapEditorAction_Erase (GameMap::get_boundary ());
           bool erased = GameMap::getInstance()->eraseTiles(r);
           if (erased)
-            map_edited.emit();
+            {
+              undo_map.emit (action);
+              map_edited.emit();
+            }
+          else
+            delete action;
         }
       break;
     case TERRAIN:
         {
-          Maptile *maptile = GameMap::getInstance()->getTile(tile);
-          // don't change terrain to water if there is a building underneath
-          if (maptile->getBuilding() != Maptile::NONE && 
-              pointer_terrain == Tile::WATER)
-            break;
-          // don't change the terrain to anything else than grass if there is
-          // a city
-          if (maptile->getBuilding() == Maptile::CITY && 
-              pointer_terrain != Tile::GRASS)
-            break;
+          undo_map.emit
+            (new SmallmapEditorAction_Terrain (pointer_terrain,
+                                               get_cursor_rectangle (tile)));
 
           LwRectangle tiles = GameMap::getInstance()->putTerrain
             (get_cursor_rectangle(tile), pointer_terrain, -1, true);
@@ -98,16 +99,54 @@ void EditableSmallMap::change_map(Vector<int> tile)
         }
       break;
     case CITY:
-      GameMap::getInstance()->putNewCity(tile);
-      map_edited.emit();
+        {
+          GameMap *gm = GameMap::getInstance ();
+          Cityset *cs = GameMap::getCityset();
+          bool city_placeable =
+            gm->canPutBuilding (Maptile::CITY, cs->getCityTileWidth(), tile);
+          if (city_placeable)
+            {
+              LwRectangle rect = LwRectangle (tile);
+              rect.dim =
+                Vector<int>(cs->getCityTileWidth (), cs->getCityTileWidth ());
+              undo_map.emit (new SmallmapEditorAction_City (rect));
+              GameMap::getInstance()->putNewCity(tile);
+              map_edited.emit();
+            }
+        }
       break;
     case RUIN:
-      GameMap::getInstance()->putNewRuin(tile);
-      map_edited.emit();
+        {
+          GameMap *gm = GameMap::getInstance ();
+          Cityset *cs = GameMap::getCityset();
+          bool ruin_placeable =
+            gm->canPutBuilding (Maptile::RUIN, cs->getRuinTileWidth(), tile);
+          if (ruin_placeable)
+            {
+              LwRectangle rect = LwRectangle (tile);
+              rect.dim =
+                Vector<int>(cs->getRuinTileWidth (), cs->getRuinTileWidth ());
+              GameMap::getInstance()->putNewRuin(tile);
+              map_edited.emit();
+            }
+        }
       break;
     case TEMPLE: 
-      GameMap::getInstance()->putNewTemple(tile);
-      map_edited.emit();
+        {
+          GameMap *gm = GameMap::getInstance ();
+          Cityset *cs = GameMap::getCityset();
+          bool temple_placeable =
+            gm->canPutBuilding (Maptile::TEMPLE, cs->getTempleTileWidth(),
+                                tile);
+          if (temple_placeable)
+            {
+              LwRectangle rect = LwRectangle (tile);
+              rect.dim = Vector<int>(cs->getTempleTileWidth (),
+                                     cs->getTempleTileWidth ());
+              GameMap::getInstance()->putNewTemple(tile);
+              map_edited.emit();
+            }
+        }
       break;
     case PICK_NEW_ROAD_START: 
       if (GameMap::getInstance()->getTile(tile)->getType() != Tile::WATER)
@@ -134,15 +173,19 @@ void EditableSmallMap::change_map(Vector<int> tile)
 void EditableSmallMap::mouse_button_event(MouseButtonEvent e)
 {
 
-  if (e.button == MouseButtonEvent::LEFT_BUTTON
-      && e.state == MouseButtonEvent::PRESSED)
-    change_map(mapFromScreen(e.pos));
+  if (e.button == MouseButtonEvent::LEFT_BUTTON &&
+      e.state == MouseButtonEvent::PRESSED)
+    change_map (mapFromScreen(e.pos));
+  else if (e.button == MouseButtonEvent::LEFT_BUTTON &&
+           e.state == MouseButtonEvent::RELEASED &&
+           pointer == TERRAIN)
+    undo_map.emit (new SmallmapEditorAction_Blank ());
 }
 
 void EditableSmallMap::mouse_motion_event(MouseMotionEvent e)
 {
-  if (e.pressed[MouseMotionEvent::LEFT_BUTTON])
-    change_map(mapFromScreen(e.pos));
+  if (e.pressed[MouseMotionEvent::LEFT_BUTTON] && pointer == TERRAIN)
+    change_map (mapFromScreen(e.pos));
 }
 
     
@@ -268,11 +311,34 @@ bool EditableSmallMap::create_road()
   map_edited.emit();
   return success;
 }
-    
+
+void EditableSmallMap::update ()
+{
+  LwRectangle r = LwRectangle(0,0,GameMap::getWidth(), GameMap::getHeight());
+  redraw_tiles(r);
+  draw();
+  map_changed.emit(surface, Gdk::Rectangle(0, 0, get_width(), get_height()));
+  map_edited.emit();
+}
+
 void EditableSmallMap::clear_road()
 {
   road_start = Vector<int>(-1,-1);
   road_finish = Vector<int>(-1,-1);
   draw();
+  check_road();
+}
+    
+void EditableSmallMap::setRoadFinish (Vector<int> p)
+{
+  road_finish = p;
+  draw ();
+  check_road();
+}
+
+void EditableSmallMap::setRoadStart (Vector<int> p)
+{
+  road_start = p;
+  draw ();
   check_road();
 }

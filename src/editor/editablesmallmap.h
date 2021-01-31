@@ -1,4 +1,4 @@
-// Copyright (C) 2010, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2010, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "overviewmap.h"
 
 #include "input-events.h"
+#include "undo-action.h"
 
 //! Draw a miniature map graphic and let it be changeable.
 /**
@@ -65,6 +66,10 @@ public:
 
     // Methods that operate on the class data and modify the class.
  
+    void setRoadFinish (Vector<int> p);
+
+    void setRoadStart (Vector<int> p);
+
     //! Realize the given mouse button event.
     void mouse_button_event(MouseButtonEvent e);
 
@@ -77,6 +82,9 @@ public:
     //! check to see if the road can be made.
     bool check_road();
 
+    //! a hack to force a redraw
+    void update ();
+
     // Signals
 
     // Emitted after a call to EditableSmallMap::Draw.
@@ -88,6 +96,7 @@ public:
     sigc::signal<void, Vector<int> > road_finish_placed;
     sigc::signal<void, bool> road_can_be_created;
     sigc::signal<void> map_edited;
+    sigc::signal<void, UndoAction *> undo_map;
 
 private:
 

@@ -1420,6 +1420,11 @@ class GameMap: public sigc::trackable
 
         std::list<UniquelyIdentified*> copyObjects(std::list<LwRectangle> rects);
         std::list<Maptile*> copyMaptiles (std::list<LwRectangle> rects);
+
+        void updateMaptiles (std::list<Maptile *> maptiles);
+        void updateObjects (std::list<UniquelyIdentified*> objects,
+                            std::list<LwRectangle> rects);
+
         static int calculateTilesPerOverviewMapTile(int width, int height);
         static int calculateTilesPerOverviewMapTile();
         //! Replace the current GameMap with another.

@@ -64,6 +64,8 @@ class UndoMgr: public sigc::trackable
 
         sigc::signal<UndoAction*, UndoAction*> execute ()
           {return execute_signal;}
+
+        void dump ();
     private:
         double d_delay;
         guint32 d_limit;
