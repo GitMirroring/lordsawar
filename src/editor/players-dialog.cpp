@@ -485,45 +485,5 @@ UndoAction *PlayersDialog::executeAction (UndoAction *action2)
           }
         break;
     }
-  /*
-    case PlayersEditorAction::SET:
-        {
-          PlayersEditorAction_Set *a =
-            dynamic_cast<PlayersEditorAction_Set*>(action);
-          TarFileImage *im = d_tileset->getExplosion ();
-          out = new PlayersEditorAction_Set (d_tileset,
-                                                             im->getName ());
-          if (a->getArchiveMember ().empty ())
-            im->clear ();
-          else
-            {
-              Glib::ustring ar = a->getArchiveMember ();
-              Glib::ustring file = a->getFileName ();
-              bool broken = false;
-              Glib::ustring newbasename = "";
-              bool present = d_tileset->contains (ar, broken);
-              if (present)
-                d_tileset->replaceFileInCfgFile (ar, file, newbasename);
-              else
-                d_tileset->addFileInCfgFile (file, newbasename);
-
-              d_tileset->getExplosion ()->load (d_tileset, newbasename);
-              d_tileset->getExplosion ()->instantiateImages ();
-              if (d_explosion)
-                delete d_explosion;
-              d_explosion = PixMask::create (file, broken);
-            }
-        }
-      break;
-    case PlayersEditorAction::SIZE:
-        {
-          PlayersEditorAction_Size *a =
-            dynamic_cast<PlayersEditorAction_Size*>(action);
-          out = new PlayersEditorAction_Size (d_large);
-          d_large = a->getLarge ();
-        }
-      break;
-    }
-    */
   return out;
 }
