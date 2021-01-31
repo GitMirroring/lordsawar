@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 #include <list>
 
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
+#include "heroes-editor-actions.h"
 
 class HeroProto;
 
@@ -52,11 +54,14 @@ class HeroesDialog: public LwEditorDialog
 
     void cell_data_name(Gtk::CellRenderer *renderer, const Gtk::TreeIter& i);
 
+    UndoMgr *umgr;
     bool d_changed;
     bool d_player_id;
     Gtk::TreeView *treeview;
     Gtk::Button *add_button;
     Gtk::Button *remove_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     Gtk::Entry *name_entry;
     Gtk::ComboBoxText *gender_combobox;
@@ -77,6 +82,13 @@ class HeroesDialog: public LwEditorDialog
     void connect_signals ();
     void disconnect_signals ();
     std::vector<sigc::connection> connections;
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    UndoAction *executeAction (UndoAction *action);
+    void clear_heroes();
+    HeroProto* getHeroByIndex (HeroesEditorAction_Index *a);
+    int getCurIndex ();
 };
 
 #endif

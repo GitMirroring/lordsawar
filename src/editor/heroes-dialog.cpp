@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "ucompose.hpp"
 #include "heroproto.h"
 #include "playerlist.h"
+#include "heroes-editor-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &HeroesDialog::x)
 
@@ -34,6 +35,8 @@ HeroesDialog::HeroesDialog(Gtk::Window &parent, guint32 player_id, Glib::ustring
  : LwEditorDialog(parent, "heroes-dialog.ui"),
     name_column(_("Name"), name_renderer)
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   d_changed = false;
   d_player_id = player_id;
   xml->get_widget("treeview", treeview);
@@ -69,10 +72,15 @@ HeroesDialog::HeroesDialog(Gtk::Window &parent, guint32 player_id, Glib::ustring
   add_button->signal_clicked().connect (method (on_add_pressed));
   xml->get_widget("remove_button", remove_button);
   remove_button->signal_clicked().connect (method (on_remove_pressed));
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
   
-  treeview->get_selection()->signal_changed().connect(method(on_hero_selected));
-  treeview->set_cursor (Gtk::TreePath ("0"));
-  update_panel ();
+  if (hero_list->children().size () > 0)
+    treeview->set_cursor (Gtk::TreePath ("0"));
+  connect_signals ();
+  update ();
 }
 
 bool HeroesDialog::run()
@@ -84,6 +92,8 @@ bool HeroesDialog::run()
 
 void HeroesDialog::on_add_pressed ()
 {
+  umgr->add (new HeroesEditorAction_Add
+             (HeroTemplates::getInstance ()->copy ()));
   Gtk::TreeIter i = hero_list->append();
   (*i)[hero_columns.name] = _("Unnamed Hero");
   HeroProto *hero = new HeroProto;
@@ -93,6 +103,7 @@ void HeroesDialog::on_add_pressed ()
   (*i)[hero_columns.hero] = hero;
   treeview->get_selection ()->select (i);
   update_hero_templates ();
+  treeview->scroll_to_row (treeview->get_model ()->get_path (i));
 }
 
 void HeroesDialog::on_remove_pressed ()
@@ -102,6 +113,8 @@ void HeroesDialog::on_remove_pressed ()
 
   if (iterrow)
     {
+      umgr->add (new HeroesEditorAction_Remove
+                 (HeroTemplates::getInstance ()->copy ()));
       Gtk::TreeModel::Row row = *iterrow;
       HeroProto *h = row[hero_columns.hero];
       hero_list->erase(iterrow);
@@ -112,6 +125,7 @@ void HeroesDialog::on_remove_pressed ()
 
 void HeroesDialog::fill_heroes ()
 {
+  clear_heroes ();
   std::vector<HeroProto *> heroes =
     HeroTemplates::getInstance ()->getHeroes (d_player_id);
   for (auto h : heroes)
@@ -148,8 +162,7 @@ HeroProto* HeroesDialog::get_selected_hero ()
 
 void HeroesDialog::on_hero_selected ()
 {
-  update_panel ();
-  update_buttons ();
+  update ();
 }
 
 void HeroesDialog::update_hero_templates ()
@@ -164,13 +177,32 @@ void HeroesDialog::update_hero_templates ()
   HeroTemplates::getInstance ()->replaceHeroes (d_player_id, heroes);
 }
 
-HeroesDialog::~HeroesDialog ()
+void HeroesDialog::clear_heroes ()
 {
   for (auto i : hero_list->children ())
     {
       HeroProto *hero = (*i)[hero_columns.hero];
       delete hero;
     }
+  hero_list->clear ();
+}
+
+HeroesDialog::~HeroesDialog ()
+{
+  clear_heroes ();
+  delete umgr;
+}
+
+int HeroesDialog::getCurIndex ()
+{
+  int idx = -1;
+  Gtk::TreeIter i = treeview->get_selection()->get_selected();
+  if (i)
+    {
+      auto path = treeview->get_model ()->get_path (i);
+      idx = atoi (path.to_string ().c_str ());
+    }
+  return idx;
 }
 
 void HeroesDialog::on_name_changed ()
@@ -178,6 +210,9 @@ void HeroesDialog::on_name_changed ()
   HeroProto *hero = get_selected_hero ();
   if (hero)
     {
+      umgr->add (new HeroesEditorAction_Name (getCurIndex (),
+                                              hero->getName (),
+                                              name_entry->get_position () + 1));
       Glib::RefPtr<Gtk::TreeSelection> selection = treeview->get_selection();
       Gtk::TreeModel::iterator iterrow = selection->get_selected();
       if (iterrow) 
@@ -195,6 +230,8 @@ void HeroesDialog::on_gender_changed ()
   HeroProto *hero = get_selected_hero ();
   if (hero)
     {
+      umgr->add (new HeroesEditorAction_Gender
+                 (getCurIndex (), Hero::Gender(hero->getGender ())));
       if (gender_combobox->get_active_row_number () == 0)
         hero->setGender (Hero::MALE);
       else
@@ -205,11 +242,11 @@ void HeroesDialog::on_gender_changed ()
 
 void HeroesDialog::update_panel ()
 {
-  disconnect_signals ();
   HeroProto *hero = get_selected_hero ();
   if (hero)
     {
-      name_entry->set_text (hero->getName ());
+      if (name_entry->get_text () != hero->getName ())
+        name_entry->set_text (hero->getName ());
       switch (hero->getGender ())
         {
         case Hero::MALE:
@@ -226,15 +263,17 @@ void HeroesDialog::update_panel ()
       gender_combobox->set_active (0);
     }
   panel_box->set_sensitive (hero != NULL);
-  connect_signals ();
 }
 
 void HeroesDialog::connect_signals ()
 {
   connections.push_back
-    (gender_combobox->signal_changed().connect (method (on_gender_changed)));
+    (gender_combobox->signal_changed ().connect (method (on_gender_changed)));
   connections.push_back
-    (name_entry->signal_changed().connect (method (on_name_changed)));
+    (name_entry->signal_changed ().connect (method (on_name_changed)));
+  connections.push_back
+    (treeview->get_selection ()->signal_changed ().connect
+     (method (on_hero_selected)));
 }
 
 void HeroesDialog::disconnect_signals ()
@@ -242,4 +281,105 @@ void HeroesDialog::disconnect_signals ()
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();
+}
+
+void HeroesDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  update_hero_templates ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+  return;
+}
+
+void HeroesDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  update_hero_templates ();
+  d_changed = true;
+  update ();
+}
+
+void HeroesDialog::update ()
+{
+  disconnect_signals ();
+  update_panel ();
+  update_buttons ();
+  connect_signals ();
+}
+
+HeroProto* HeroesDialog::getHeroByIndex (HeroesEditorAction_Index *a)
+{
+  auto path = Gtk::TreePath (String::ucompose ("%1", a->getIndex ()));
+  auto iterrow = treeview->get_model ()->get_iter (path);
+  Gtk::TreeModel::Row row = *iterrow;
+  HeroProto *hero = row[hero_columns.hero];
+  return hero;
+}
+
+UndoAction *HeroesDialog::executeAction (UndoAction *action2)
+{
+  HeroesEditorAction *action = dynamic_cast<HeroesEditorAction*>(action2);
+  UndoAction *out = NULL;
+
+  switch (action->getType ())
+    {
+      case HeroesEditorAction::GENDER:
+          {
+            HeroesEditorAction_Gender *a =
+              dynamic_cast<HeroesEditorAction_Gender*>(action);
+            out = new HeroesEditorAction_Gender
+              (a->getIndex (), Hero::Gender (getHeroByIndex (a)->getGender ()));
+
+            getHeroByIndex (a)->setGender (a->getGender ());
+          }
+        break;
+      case HeroesEditorAction::NAME:
+          {
+            HeroesEditorAction_Name *a =
+              dynamic_cast<HeroesEditorAction_Name*>(action);
+            out = new HeroesEditorAction_Name
+              (a->getIndex (), getHeroByIndex (a)->getName (),
+               name_entry->get_position ());
+
+            getHeroByIndex (a)->setName (a->getName ());
+            auto iterrow = treeview->get_model ()->get_iter
+              (String::ucompose ("%1", a->getIndex ()));
+            if (iterrow)
+              {
+                Gtk::TreeModel::Row row = *iterrow;
+                row[hero_columns.name] = a->getName ();
+              }
+            disconnect_signals ();
+            name_entry->set_text (a->getName ());
+            name_entry->set_position (a->getCursorPosition ());
+            connect_signals ();
+          } 
+        break;
+      case HeroesEditorAction::ADD:
+          {
+            HeroesEditorAction_Add *a =
+              dynamic_cast<HeroesEditorAction_Add*>(action);
+            out = new HeroesEditorAction_Add
+              (HeroTemplates::getInstance ()->copy ());
+            HeroTemplates::reset (a->getHeroes ());
+            a->clearHeroes ();
+            fill_heroes ();
+
+          }
+        break;
+      case HeroesEditorAction::REMOVE:
+          {
+            HeroesEditorAction_Remove *a =
+              dynamic_cast<HeroesEditorAction_Remove*>(action);
+            out = new HeroesEditorAction_Remove
+              (HeroTemplates::getInstance ()->copy ());
+            HeroTemplates::reset (a->getHeroes ());
+            a->clearHeroes ();
+            fill_heroes ();
+          }
+        break;
+    }
+  return out;
 }
