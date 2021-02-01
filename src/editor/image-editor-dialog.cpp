@@ -315,7 +315,7 @@ bool ImageEditorDialog::installFile (TarFile *t, TarFileImage *im, Glib::ustring
     success =
       t->replaceFileInCfgFile (d_orig_target_filename, filename, newname);
   im->setName(newname);
-  bool b = im->load (t, newname);
+  im->load (t, newname);
   im->instantiateImages();
   return success;
 }
