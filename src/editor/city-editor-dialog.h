@@ -22,6 +22,8 @@
 
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
+#include "city-editor-actions.h"
 
 class CreateScenarioRandomize;
 class City;
@@ -39,6 +41,7 @@ class CityEditorDialog: public LwEditorDialog
 
  private:
     City *city;
+    UndoMgr *umgr;
     bool d_changed;
     CreateScenarioRandomize *d_randomizer;
     Gtk::ComboBoxText *player_combobox;
@@ -78,6 +81,8 @@ class CityEditorDialog: public LwEditorDialog
     Gtk::TreeViewColumn duration_column;
     Gtk::CellRendererSpin upkeep_renderer;
     Gtk::TreeViewColumn upkeep_column;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
 
     void on_add_clicked();
@@ -88,7 +93,7 @@ class CityEditorDialog: public LwEditorDialog
     void on_selection_changed();
     void on_player_changed();
     Player *get_selected_player();
-    void change_city_ownership();
+    void change_city_ownership(Player *p);
 
     void add_army(const ArmyProdBase *a);
     void set_button_sensitivity();
@@ -104,13 +109,25 @@ class CityEditorDialog: public LwEditorDialog
     void on_burned_changed ();
     void on_capital_changed ();
     void on_name_changed ();
-    void on_income_changed ();
     void on_income_text_changed ();
     void on_build_production_changed ();
     void on_description_changed ();
 
     void update_armies ();
 
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
+    const ArmyProdBase* getProdBaseByIndex (CityEditorAction_Index *a);
+    int getCurIndex ();
+    void replaceProdBase (int i, ArmyProdBase *a);
+    void replaceProdBases (CityEditorAction_City *a);
+    void fill_armies ();
+    void clear_armies ();
 };
 
 #endif
