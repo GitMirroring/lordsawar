@@ -261,4 +261,7 @@ void UndoMgr::dump ()
   printf ("showing undo stack of %d items\n", undos.size ());
   for (auto l : undos)
     printf (" '%s'\n", l->getActionName ().c_str ());
+  printf ("showing redo stack of %d items\n", redos.size ());
+  for (auto l : redos)
+    printf (" '%s'\n", l->getActionName ().c_str ());
 }
