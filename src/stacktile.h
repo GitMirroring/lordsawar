@@ -123,6 +123,8 @@ public:
     //! Return the first stack on this tile.
     Stack *getStack() const;
 
+    void dump () const;
+
     //! Return true if this tile contains the given stack id.
     bool contains(guint32 stack_id) const;
 

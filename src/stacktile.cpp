@@ -328,3 +328,10 @@ void StackTile::group()
   for (auto p : *Playerlist::getInstance())
     p->setActivestack(0);
 }
+
+void StackTile::dump () const
+{
+  printf ("listing %lu entries on the stacktile at %d,%d\n", size (), tile.x, tile.y);
+  for (const_iterator it = begin(); it != end(); ++it)
+    printf (" %d, %d\n", (*it).player_id, (*it).stack_id);
+}
