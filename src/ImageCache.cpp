@@ -1719,7 +1719,15 @@ int SelectorPixMaskCacheItem::comp(const SelectorPixMaskCacheItem &item) const
 PixMask *FlagPixMaskCacheItem::generate(const FlagPixMaskCacheItem &i)
 {
   Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
+
+  //when size is zero
   Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
+  /**
+   * if you're here and i.size is zero it means:
+   * bigmap tried to lookup the number of stacks belonging to a player on
+   * a tile, and it got nothing
+   * so the ownership stuff has been messed up
+   */
   // size of stack starts at 1, but we need the index, which starts at 0
   return ts->getFlags ()->applyMask (i.size - 1, p);
 }
