@@ -108,8 +108,7 @@ void ShieldSetInfoDialog::update_name ()
 
 void ShieldSetInfoDialog::on_name_changed()
 {
-  umgr->add (new ShieldSetInfoAction_Name
-             (d_name, name_entry->get_position ()));
+  umgr->add (new ShieldSetInfoAction_Name (d_name));
   d_changed = true;
   update_name ();
 }
@@ -248,13 +247,8 @@ UndoAction* ShieldSetInfoDialog::executeAction (UndoAction *action2)
       case ShieldSetInfoAction::NAME:
           {
             ShieldSetInfoAction_Name *a = dynamic_cast<ShieldSetInfoAction_Name*>(action);
-            out = new ShieldSetInfoAction_Name
-              (d_name, name_entry->get_position ());
+            out = new ShieldSetInfoAction_Name (d_name);
             d_name = a->getName ();
-            disconnect_signals ();
-            name_entry->set_text (d_name);
-            name_entry->set_position (a->getCursorPosition ());
-            connect_signals ();
           }
         break;
       case ShieldSetInfoAction::SMALL_WIDTH:

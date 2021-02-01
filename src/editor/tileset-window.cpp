@@ -950,8 +950,7 @@ void TileSetWindow::on_tile_name_changed()
       row[tiles_columns.name] = tile_name_entry->get_text();
       Tile *t = row[tiles_columns.tile];
       TileSetEditorAction_Name *action =
-        new TileSetEditorAction_Name (getCurIndex (), t->getName (),
-                                      tile_name_entry->get_position ());
+        new TileSetEditorAction_Name (getCurIndex (), t->getName ());
       addUndo (action);
       t->setName(tile_name_entry->get_text());
 
@@ -2029,8 +2028,7 @@ TileSetWindow::executeAction (UndoAction *action2)
             TileSetEditorAction_Name *a =
               dynamic_cast<TileSetEditorAction_Name*>(action);
             out = new TileSetEditorAction_Name
-              (a->getIndex (), getTileByIndex (a)->getName (),
-               tile_name_entry->get_position ());
+              (a->getIndex (), getTileByIndex (a)->getName ());
             getTileByIndex (a)->setName (a->getName ());
             Gtk::TreeModel::iterator iterrow = 
               tiles_treeview->get_model ()->get_iter
@@ -2040,8 +2038,6 @@ TileSetWindow::executeAction (UndoAction *action2)
                 Gtk::TreeModel::Row row = *iterrow;
                 row[tiles_columns.name] = a->getName ();
               }
-            tile_name_entry->set_text (a->getName ());
-            tile_name_entry->set_position (a->getCursorPosition ());
           }
         break;
       case TileSetEditorAction::TYPE:

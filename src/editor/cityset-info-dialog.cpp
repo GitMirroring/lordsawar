@@ -92,7 +92,7 @@ void CitySetInfoDialog::update_name ()
 
 void CitySetInfoDialog::on_name_changed()
 {
-  umgr->add (new CitySetInfoAction_Name (d_name, name_entry->get_position ()));
+  umgr->add (new CitySetInfoAction_Name (d_name));
   d_changed = true;
   update_name ();
 }
@@ -188,13 +188,8 @@ UndoAction* CitySetInfoDialog::executeAction (UndoAction *action2)
       case CitySetInfoAction::NAME:
           {
             CitySetInfoAction_Name *a = dynamic_cast<CitySetInfoAction_Name*>(action);
-            out = new CitySetInfoAction_Name
-              (d_name, name_entry->get_position ());
+            out = new CitySetInfoAction_Name (d_name);
             d_name = a->getName ();
-            disconnect_signals ();
-            name_entry->set_text (d_name);
-            name_entry->set_position (a->getCursorPosition ());
-            connect_signals ();
           }
         break;
       case CitySetInfoAction::TILE_SIZE:

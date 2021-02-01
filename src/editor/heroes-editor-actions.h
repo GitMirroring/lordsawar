@@ -68,19 +68,16 @@ class HeroesEditorAction_Index: public HeroesEditorAction
 class HeroesEditorAction_Name: public HeroesEditorAction_Index
 {
     public:
-        HeroesEditorAction_Name (guint32 i, Glib::ustring n, int p)
-          : HeroesEditorAction_Index (NAME, i, true), d_name (n),
-         d_cursor_pos (p) {}
+        HeroesEditorAction_Name (guint32 i, Glib::ustring n)
+          : HeroesEditorAction_Index (NAME, i, true), d_name (n) {}
         ~HeroesEditorAction_Name () {}
 
         Glib::ustring getActionName () const {return "Name";}
 
         Glib::ustring getName () {return d_name;}
-        int getCursorPosition () {return d_cursor_pos;}
 
     private:
         Glib::ustring d_name;
-        int d_cursor_pos;
 };
 
 class HeroesEditorAction_Gender: public HeroesEditorAction_Index

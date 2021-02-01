@@ -87,16 +87,14 @@ class MapInfoAction_License: public MapInfoAction_Message
 class MapInfoAction_Name: public MapInfoAction
 {
     public:
-        MapInfoAction_Name (Glib::ustring n, int p)
-          : MapInfoAction (NAME), d_name (n), d_cursor_pos (p) {};
+        MapInfoAction_Name (Glib::ustring n)
+          : MapInfoAction (NAME), d_name (n) {};
         ~MapInfoAction_Name () {};
 
         Glib::ustring getActionName () const {return "Name";}
         Glib::ustring getName () {return d_name;}
-        int getCursorPosition () {return d_cursor_pos;}
 
     private:
         Glib::ustring d_name;
-        int d_cursor_pos;
 };
 #endif //MAP_INFO_ACTIONS_H

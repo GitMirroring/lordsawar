@@ -94,7 +94,7 @@ void ArmySetInfoDialog::update_name ()
 
 void ArmySetInfoDialog::on_name_changed()
 {
-  umgr->add (new ArmySetInfoAction_Name (d_name, name_entry->get_position ()));
+  umgr->add (new ArmySetInfoAction_Name (d_name));
   d_changed = true;
   update_name ();
 }
@@ -190,14 +190,10 @@ UndoAction* ArmySetInfoDialog::executeAction (UndoAction *action2)
         break;
       case ArmySetInfoAction::NAME:
           {
-            ArmySetInfoAction_Name *a = dynamic_cast<ArmySetInfoAction_Name*>(action);
-            out = new ArmySetInfoAction_Name
-              (d_name, name_entry->get_position ());
+            ArmySetInfoAction_Name *a =
+              dynamic_cast<ArmySetInfoAction_Name*>(action);
+            out = new ArmySetInfoAction_Name (d_name);
             d_name = a->getName ();
-            disconnect_signals ();
-            name_entry->set_text (d_name);
-            name_entry->set_position (a->getCursorPosition ());
-            connect_signals ();
           }
         break;
       case ArmySetInfoAction::TILE_SIZE:
@@ -234,8 +230,7 @@ void ArmySetInfoDialog::update ()
   description_textview->get_buffer()->set_text(d_description);
   copyright_textview->get_buffer()->set_text(d_copyright);
   license_textview->get_buffer()->set_text(d_license);
-  if (name_entry->get_text () != d_name)
-    name_entry->set_text (d_name);
+  name_entry->set_text (d_name);
   size_spinbutton->set_value (d_tilesize);
   connect_signals ();
 }

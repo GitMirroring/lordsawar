@@ -78,6 +78,6 @@ class UndoMgr: public sigc::trackable
         bool isGrouped (UndoAction *l, UndoAction *r, bool top = false);
         guint32 countUndoBlocks (std::list<UndoAction*> list, bool top = false);
         static Glib::ustring getActionName (std::list<UndoAction*> list);
-
 };
+
 #endif //UNDO_MGR_H

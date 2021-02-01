@@ -94,17 +94,15 @@ class ShieldSetInfoAction_License: public ShieldSetInfoAction_Message
 class ShieldSetInfoAction_Name: public ShieldSetInfoAction
 {
     public:
-        ShieldSetInfoAction_Name (Glib::ustring n, int p)
-          : ShieldSetInfoAction (NAME), d_name (n), d_cursor_pos (p) {};
+        ShieldSetInfoAction_Name (Glib::ustring n)
+          : ShieldSetInfoAction (NAME), d_name (n) {};
         ~ShieldSetInfoAction_Name () {};
 
         Glib::ustring getActionName () const {return "Name";}
         Glib::ustring getName () {return d_name;}
-        int getCursorPosition () {return d_cursor_pos;}
 
     private:
         Glib::ustring d_name;
-        int d_cursor_pos;
 };
 
 class ShieldSetInfoAction_Size: public ShieldSetInfoAction

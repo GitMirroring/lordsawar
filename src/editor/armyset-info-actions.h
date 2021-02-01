@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "undo-action.h"
+#include "undo-mgr.h"
 
 class ArmySetInfoAction: public UndoAction
 {
@@ -88,17 +89,16 @@ class ArmySetInfoAction_License: public ArmySetInfoAction_Message
 class ArmySetInfoAction_Name: public ArmySetInfoAction
 {
     public:
-        ArmySetInfoAction_Name (Glib::ustring n, int p)
-          : ArmySetInfoAction (NAME), d_name (n), d_cursor_pos (p) {};
+        ArmySetInfoAction_Name (Glib::ustring n)
+          : ArmySetInfoAction (NAME), d_name (n)
+          {}
         ~ArmySetInfoAction_Name () {};
 
         Glib::ustring getActionName () const {return "Name";}
         Glib::ustring getName () {return d_name;}
-        int getCursorPosition () {return d_cursor_pos;}
 
     private:
         Glib::ustring d_name;
-        int d_cursor_pos;
 };
 
 class ArmySetInfoAction_TileSize: public ArmySetInfoAction

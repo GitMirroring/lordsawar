@@ -246,19 +246,16 @@ class ArmySetEditorAction_Name: public ArmySetEditorAction_ArmyIndex
          * we're modifying, the name, and the position of the cursor in the
          * entry.
          */
-        ArmySetEditorAction_Name (guint32 i, Glib::ustring n, int p)
-          : ArmySetEditorAction_ArmyIndex (NAME, i, true), d_name (n),
-         d_cursor_pos (p) {};
+        ArmySetEditorAction_Name (guint32 i, Glib::ustring n)
+          : ArmySetEditorAction_ArmyIndex (NAME, i, true), d_name (n) {};
 	//! Destroy a name action.
         ~ArmySetEditorAction_Name () {};
 
         Glib::ustring getActionName () const {return _("Name");}
         Glib::ustring getName () {return d_name;}
-        int getCursorPosition () {return d_cursor_pos;}
 
     private:
         Glib::ustring d_name;
-        int d_cursor_pos;
 };
 
 //-----------------------------------------------------------------------------

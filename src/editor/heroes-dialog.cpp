@@ -211,8 +211,7 @@ void HeroesDialog::on_name_changed ()
   if (hero)
     {
       umgr->add (new HeroesEditorAction_Name (getCurIndex (),
-                                              hero->getName (),
-                                              name_entry->get_position () + 1));
+                                              hero->getName ()));
       Glib::RefPtr<Gtk::TreeSelection> selection = treeview->get_selection();
       Gtk::TreeModel::iterator iterrow = selection->get_selected();
       if (iterrow) 
@@ -340,8 +339,7 @@ UndoAction *HeroesDialog::executeAction (UndoAction *action2)
             HeroesEditorAction_Name *a =
               dynamic_cast<HeroesEditorAction_Name*>(action);
             out = new HeroesEditorAction_Name
-              (a->getIndex (), getHeroByIndex (a)->getName (),
-               name_entry->get_position ());
+              (a->getIndex (), getHeroByIndex (a)->getName ());
 
             getHeroByIndex (a)->setName (a->getName ());
             auto iterrow = treeview->get_model ()->get_iter
@@ -351,10 +349,6 @@ UndoAction *HeroesDialog::executeAction (UndoAction *action2)
                 Gtk::TreeModel::Row row = *iterrow;
                 row[hero_columns.name] = a->getName ();
               }
-            disconnect_signals ();
-            name_entry->set_text (a->getName ());
-            name_entry->set_position (a->getCursorPosition ());
-            connect_signals ();
           } 
         break;
       case HeroesEditorAction::ADD:

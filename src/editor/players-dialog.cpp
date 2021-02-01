@@ -223,8 +223,7 @@ void PlayersDialog::on_player_name_changed (int row)
   Player *p = Playerlist::getInstance ()->getPlayer (row);
   if (p)
     oldname = p->getName ();
-  umgr->add (new PlayersEditorAction_Name
-             (row, oldname, player_name_entries[row]->get_position () + 1));
+  umgr->add (new PlayersEditorAction_Name (row, oldname));
   d_changed = true;
   update_player (row);
 }
@@ -427,14 +426,9 @@ UndoAction *PlayersDialog::executeAction (UndoAction *action2)
             Player *p = Playerlist::getInstance ()->getPlayer (row);
             if (p)
               oldname = p->getName ();
-            out = new PlayersEditorAction_Name
-              (row, oldname, player_name_entries[row]->get_position ());
+            out = new PlayersEditorAction_Name (row, oldname);
             if (p)
               p->setName (a->getName ());
-            disconnect_signals ();
-            player_name_entries[row]->set_text (a->getName ());
-            player_name_entries[row]->set_position (a->getCursorPosition ());
-            connect_signals ();
           } 
         break;
       case PlayersEditorAction::GOLD:

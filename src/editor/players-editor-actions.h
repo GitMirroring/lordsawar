@@ -67,18 +67,15 @@ class PlayersEditorAction_PlayerIndex: public PlayersEditorAction
 class PlayersEditorAction_Name: public PlayersEditorAction_PlayerIndex
 {
     public:
-        PlayersEditorAction_Name (guint32 i, Glib::ustring n, int p)
-          : PlayersEditorAction_PlayerIndex (NAME, i, true), d_name (n),
-         d_cursor_pos (p) {}
+        PlayersEditorAction_Name (guint32 i, Glib::ustring n)
+          : PlayersEditorAction_PlayerIndex (NAME, i, true), d_name (n) {}
         ~PlayersEditorAction_Name () {}
 
         Glib::ustring getActionName () const {return "Name";}
         Glib::ustring getName () {return d_name;}
-        int getCursorPosition () {return d_cursor_pos;}
 
     private:
         Glib::ustring d_name;
-        int d_cursor_pos;
 };
 
 class PlayersEditorAction_Type : public PlayersEditorAction_PlayerIndex

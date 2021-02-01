@@ -95,7 +95,7 @@ void TileSetInfoDialog::update_name ()
 
 void TileSetInfoDialog::on_name_changed()
 {
-  umgr->add (new TileSetInfoAction_Name (d_name, name_entry->get_position ()));
+  umgr->add (new TileSetInfoAction_Name (d_name));
   d_changed = true;
   update_name ();
 }
@@ -192,13 +192,8 @@ UndoAction* TileSetInfoDialog::executeAction (UndoAction *action2)
       case TileSetInfoAction::NAME:
           {
             TileSetInfoAction_Name *a = dynamic_cast<TileSetInfoAction_Name*>(action);
-            out = new TileSetInfoAction_Name
-              (d_name, name_entry->get_position ());
+            out = new TileSetInfoAction_Name (d_name);
             d_name = a->getName ();
-            disconnect_signals ();
-            name_entry->set_text (d_name);
-            name_entry->set_position (a->getCursorPosition ());
-            connect_signals ();
           }
         break;
       case TileSetInfoAction::TILE_SIZE:

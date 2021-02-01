@@ -135,7 +135,7 @@ bool MapInfoDialog::run()
 
 void MapInfoDialog::on_name_changed()
 {
-  umgr->add (new MapInfoAction_Name (d_name, name_entry->get_position ()));
+  umgr->add (new MapInfoAction_Name (d_name));
   d_changed = true;
   d_name = String::utrim (name_entry->get_text ());
 }
@@ -201,13 +201,8 @@ UndoAction* MapInfoDialog::executeAction (UndoAction *action2)
       case MapInfoAction::NAME:
           {
             MapInfoAction_Name *a = dynamic_cast<MapInfoAction_Name*>(action);
-            out = new MapInfoAction_Name
-              (d_name, name_entry->get_position ());
+            out = new MapInfoAction_Name (d_name);
             d_name = a->getName ();
-            disconnect_signals ();
-            name_entry->set_text (d_name);
-            name_entry->set_position (a->getCursorPosition ());
-            connect_signals ();
           }
         break;
       }

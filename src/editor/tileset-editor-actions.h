@@ -147,20 +147,17 @@ class TileSetEditorAction_Name: public TileSetEditorAction_TileIndex
          * Populate the action with the name of the tile.
          * Also supply the index of the tile whose name we're modifying.
          */
-        TileSetEditorAction_Name (guint32 i, Glib::ustring n, int p)
-          : TileSetEditorAction_TileIndex (NAME, i, true), d_name (n),
-         d_cursor_pos (p) {}
+        TileSetEditorAction_Name (guint32 i, Glib::ustring n)
+          : TileSetEditorAction_TileIndex (NAME, i, true), d_name (n) {}
 	//! Destroy a name action.
         ~TileSetEditorAction_Name () {}
 
         Glib::ustring getActionName () const {return _("Name");}
 
         Glib::ustring getName () {return d_name;}
-        int getCursorPosition () {return d_cursor_pos;}
 
     private:
         Glib::ustring d_name;
-        int d_cursor_pos;
 };
 
 //-----------------------------------------------------------------------------

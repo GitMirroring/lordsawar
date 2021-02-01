@@ -946,8 +946,7 @@ void ArmySetWindow::on_name_changed()
       Gtk::TreeModel::Row row = *iterrow;
       ArmyProto *a = row[armies_columns.army];
       ArmySetEditorAction_Name *action =
-        new ArmySetEditorAction_Name (getCurIndex (), a->getName (),
-                                      name_entry->get_position () + 1);
+        new ArmySetEditorAction_Name (getCurIndex (), a->getName ());
       addUndo (action);
       a->setName(name_entry->get_text());
       row[armies_columns.name] = name_entry->get_text();
@@ -1961,8 +1960,7 @@ ArmySetWindow::executeAction (UndoAction *action2)
             ArmySetEditorAction_Name *a =
               dynamic_cast<ArmySetEditorAction_Name*>(action);
             out = new ArmySetEditorAction_Name
-              (a->getIndex (), getArmyByIndex (a)->getName (),
-               name_entry->get_position ());
+              (a->getIndex (), getArmyByIndex (a)->getName ());
             getArmyByIndex (a)->setName (a->getName ());
             Gtk::TreeModel::iterator iterrow = 
               armies_treeview->get_model ()->get_iter
@@ -1972,8 +1970,6 @@ ArmySetWindow::executeAction (UndoAction *action2)
                 Gtk::TreeModel::Row row = *iterrow;
                 row[armies_columns.name] = a->getName ();
               }
-            name_entry->set_text (a->getName ());
-            name_entry->set_position (a->getCursorPosition ());
             break;
           } 
       case ArmySetEditorAction::DESCRIPTION:

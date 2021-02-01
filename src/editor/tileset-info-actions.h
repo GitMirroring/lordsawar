@@ -88,17 +88,15 @@ class TileSetInfoAction_License: public TileSetInfoAction_Message
 class TileSetInfoAction_Name: public TileSetInfoAction
 {
     public:
-        TileSetInfoAction_Name (Glib::ustring n, int p)
-          : TileSetInfoAction (NAME), d_name (n), d_cursor_pos (p) {};
+        TileSetInfoAction_Name (Glib::ustring n)
+          : TileSetInfoAction (NAME), d_name (n) {};
         ~TileSetInfoAction_Name () {};
 
         Glib::ustring getActionName () const {return "Name";}
         Glib::ustring getName () {return d_name;}
-        int getCursorPosition () {return d_cursor_pos;}
 
     private:
         Glib::ustring d_name;
-        int d_cursor_pos;
 };
 
 class TileSetInfoAction_TileSize: public TileSetInfoAction

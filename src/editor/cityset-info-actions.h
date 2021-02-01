@@ -88,17 +88,15 @@ class CitySetInfoAction_License: public CitySetInfoAction_Message
 class CitySetInfoAction_Name: public CitySetInfoAction
 {
     public:
-        CitySetInfoAction_Name (Glib::ustring n, int p)
-          : CitySetInfoAction (NAME), d_name (n), d_cursor_pos (p) {};
+        CitySetInfoAction_Name (Glib::ustring n)
+          : CitySetInfoAction (NAME), d_name (n) {};
         ~CitySetInfoAction_Name () {};
 
         Glib::ustring getActionName () const {return "Name";}
         Glib::ustring getName () {return d_name;}
-        int getCursorPosition () {return d_cursor_pos;}
 
     private:
         Glib::ustring d_name;
-        int d_cursor_pos;
 };
 
 class CitySetInfoAction_TileSize: public CitySetInfoAction
