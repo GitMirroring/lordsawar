@@ -21,6 +21,7 @@
 #define RECTANGLE_H
 
 #include "vector.h"
+#include <list>
 
 //! A general purpose rectangle.
 class LwRectangle
@@ -64,9 +65,17 @@ public:
 
     Vector<int> pos, dim; // position and dimensions
 
-    // accessors - sometimes it's easier with .x instead of .pos.x
-    int &x, &y, &w, &h;
-};
+    std::list<Vector<int> > getPoints ()
+      {
+        std::list<Vector<int> > points;
+        for (int i = 0; i < w; i++)
+          for (int j = 0; j < h; j++)
+            points.push_back (Vector<int>(x, y) + Vector<int> (i, j));
+        return points;
+      }
+        // accessors - sometimes it's easier with .x instead of .pos.x
+        int &x, &y, &w, &h;
+      };
 
 inline bool operator==(const LwRectangle &lhs, const LwRectangle &rhs)
 {
