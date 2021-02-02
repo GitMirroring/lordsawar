@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
 #include "vector.h"
+#include "undo-mgr.h"
 
 class Keeper;
 class ArmyChooserButton;
@@ -41,6 +42,7 @@ class KeeperEditorDialog: public LwEditorDialog
     Keeper *get_keeper () {return d_keeper;}
     
  private:
+    UndoMgr *umgr;
     bool d_changed;
     Vector<int> d_pos;
     Keeper *d_keeper;
@@ -48,12 +50,22 @@ class KeeperEditorDialog: public LwEditorDialog
     ArmyChooserButton *keeper_button;
     Gtk::Button *randomize_button;
     Gtk::Entry *name_entry;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     void on_randomize_clicked();
     void on_name_changed ();
     void fill_in_keeper_info ();
 
     void on_keeper_selected (const ArmyProto *a);
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction* executeAction (UndoAction *action);
 };
 
 #endif

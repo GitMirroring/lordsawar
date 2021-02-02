@@ -109,6 +109,7 @@ libeditor_la_SOURCES =\
 	validation-dialog.cpp validation-dialog.h \
 	heroes-dialog.cpp heroes-dialog.h \
 	keeper-editor-dialog.cpp keeper-editor-dialog.h \
+	keeper-editor-actions.h \
 	army-chooser-button.cpp army-chooser-button.h
 
 localedir = $(datadir)/locale
