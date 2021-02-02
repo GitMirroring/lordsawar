@@ -44,6 +44,7 @@ SignpostEditorDialog::SignpostEditorDialog(Gtk::Window &parent, Signpost *s, Cre
 
   xml->get_widget("sign_textview", sign_textview);
   sign_textview->get_buffer()->set_text(s->getName());
+  umgr->addCursor (sign_textview);
   xml->get_widget("randomize_button", randomize_button);
   randomize_button->signal_clicked().connect(method(on_randomize_clicked));
   xml->get_widget("undo_button", undo_button);
@@ -62,7 +63,8 @@ void SignpostEditorDialog::on_sign_changed ()
 {
   d_changed = true;
   SignpostEditorAction_Message *action =
-    new SignpostEditorAction_Message (signpost->getName ());
+    new SignpostEditorAction_Message (signpost->getName (), umgr,
+                                      sign_textview);
   umgr->add (action);
   signpost->setName(sign_textview->get_buffer()->get_text());
 }
@@ -80,7 +82,8 @@ void SignpostEditorDialog::on_randomize_clicked()
   Glib::ustring existing_name = sign_textview->get_buffer()->get_text();
   bool dynamic = ((Rnd::rand() % d_randomizer->getNumSignposts()) == 0);
   SignpostEditorAction_Message *action =
-    new SignpostEditorAction_Message (signpost->getName ());
+    new SignpostEditorAction_Message (signpost->getName (), umgr,
+                                      sign_textview);
   umgr->add (action);
   if (existing_name == DEFAULT_SIGNPOST)
     {
@@ -123,11 +126,13 @@ void SignpostEditorDialog::update ()
 {
   disconnect_signals ();
   sign_textview->get_buffer()->set_text(signpost->getName());
+  umgr->setCursors ();
   connect_signals ();
 }
 
 void SignpostEditorDialog::connect_signals ()
 {
+  umgr->connect_signals ();
   connections.push_back
     (sign_textview->get_buffer()->signal_changed().connect
      (method(on_sign_changed)));
@@ -135,6 +140,7 @@ void SignpostEditorDialog::connect_signals ()
 
 void SignpostEditorDialog::disconnect_signals ()
 {
+  umgr->disconnect_signals ();
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();
@@ -151,7 +157,8 @@ UndoAction *SignpostEditorDialog::executeAction (UndoAction *action2)
           {
             SignpostEditorAction_Message *a =
               dynamic_cast<SignpostEditorAction_Message*>(action);
-            out = new SignpostEditorAction_Message (signpost->getName ());
+            out = new SignpostEditorAction_Message (signpost->getName (), umgr,
+                                                    sign_textview);
             signpost->setName (a->getMessage ());
             break;
           } 

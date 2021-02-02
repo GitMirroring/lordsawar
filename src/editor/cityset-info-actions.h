@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "undo-action.h"
+class UndoMgr;
 
 class CitySetInfoAction: public UndoAction
 {
@@ -45,11 +46,12 @@ protected:
     Type d_type;
 };
 
-class CitySetInfoAction_Message: public CitySetInfoAction
+class CitySetInfoAction_Message: public CitySetInfoAction, public UndoCursor
 {
     public:
-        CitySetInfoAction_Message (Type t, Glib::ustring m)
-          : CitySetInfoAction (t), d_message (m) {}
+        CitySetInfoAction_Message (Type t, Glib::ustring m, UndoMgr *u,
+                                   Gtk::TextView *v)
+          : CitySetInfoAction (t), UndoCursor (u, v), d_message (m) {}
         Glib::ustring getMessage () {return d_message;}
     private:
         Glib::ustring d_message;
@@ -58,8 +60,9 @@ class CitySetInfoAction_Message: public CitySetInfoAction
 class CitySetInfoAction_Description: public CitySetInfoAction_Message
 {
     public:
-        CitySetInfoAction_Description (Glib::ustring m)
-          : CitySetInfoAction_Message (DESCRIPTION, m) {}
+        CitySetInfoAction_Description (Glib::ustring m, UndoMgr *u,
+                                       Gtk::TextView *v)
+          : CitySetInfoAction_Message (DESCRIPTION, m, u, v) {}
         ~CitySetInfoAction_Description () {}
 
         Glib::ustring getActionName () const {return "Description";}
@@ -68,8 +71,9 @@ class CitySetInfoAction_Description: public CitySetInfoAction_Message
 class CitySetInfoAction_Copyright: public CitySetInfoAction_Message
 {
     public:
-        CitySetInfoAction_Copyright (Glib::ustring m)
-          : CitySetInfoAction_Message (COPYRIGHT, m) {}
+        CitySetInfoAction_Copyright (Glib::ustring m, UndoMgr *u,
+                                     Gtk::TextView *v)
+          : CitySetInfoAction_Message (COPYRIGHT, m, u, v) {}
         ~CitySetInfoAction_Copyright () {}
 
         Glib::ustring getActionName () const {return "Copyright";}
@@ -78,19 +82,20 @@ class CitySetInfoAction_Copyright: public CitySetInfoAction_Message
 class CitySetInfoAction_License: public CitySetInfoAction_Message
 {
     public:
-        CitySetInfoAction_License (Glib::ustring m)
-          : CitySetInfoAction_Message (LICENSE, m) {}
+        CitySetInfoAction_License (Glib::ustring m, UndoMgr *u,
+                                   Gtk::TextView *v)
+          : CitySetInfoAction_Message (LICENSE, m, u, v) {}
         ~CitySetInfoAction_License () {}
 
         Glib::ustring getActionName () const {return "License";}
 };
 
-class CitySetInfoAction_Name: public CitySetInfoAction
+class CitySetInfoAction_Name: public CitySetInfoAction, public UndoCursor
 {
     public:
-        CitySetInfoAction_Name (Glib::ustring n)
-          : CitySetInfoAction (NAME), d_name (n) {};
-        ~CitySetInfoAction_Name () {};
+        CitySetInfoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
+          : CitySetInfoAction (NAME), UndoCursor (u, e), d_name (n) {}
+        ~CitySetInfoAction_Name () {}
 
         Glib::ustring getActionName () const {return "Name";}
         Glib::ustring getName () {return d_name;}

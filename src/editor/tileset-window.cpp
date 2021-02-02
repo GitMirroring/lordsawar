@@ -72,6 +72,7 @@ TileSetWindow::TileSetWindow(Glib::ustring load_filename)
 
     xml->get_widget("tiles_treeview", tiles_treeview);
     xml->get_widget("tile_name_entry", tile_name_entry);
+    umgr->addCursor (tile_name_entry);
 
     Gtk::Box *type_combo_container;
     xml->get_widget("type_combo_container", type_combo_container);
@@ -950,7 +951,8 @@ void TileSetWindow::on_tile_name_changed()
       row[tiles_columns.name] = tile_name_entry->get_text();
       Tile *t = row[tiles_columns.tile];
       TileSetEditorAction_Name *action =
-        new TileSetEditorAction_Name (getCurIndex (), t->getName ());
+        new TileSetEditorAction_Name (getCurIndex (), t->getName (), umgr,
+                                      tile_name_entry);
       addUndo (action);
       t->setName(tile_name_entry->get_text());
 
@@ -1986,6 +1988,7 @@ void TileSetWindow::update ()
   update_tilestyleset_buttons ();
   update_tilestyleset_panel ();
   update_tilestyle_panel ();
+  umgr->setCursors ();
   connect_signals ();
 }
 
@@ -2028,7 +2031,8 @@ TileSetWindow::executeAction (UndoAction *action2)
             TileSetEditorAction_Name *a =
               dynamic_cast<TileSetEditorAction_Name*>(action);
             out = new TileSetEditorAction_Name
-              (a->getIndex (), getTileByIndex (a)->getName ());
+              (a->getIndex (), getTileByIndex (a)->getName (), umgr,
+               tile_name_entry);
             getTileByIndex (a)->setName (a->getName ());
             Gtk::TreeModel::iterator iterrow = 
               tiles_treeview->get_model ()->get_iter
@@ -2320,6 +2324,7 @@ void TileSetWindow::on_moves_changed()
 
 void TileSetWindow::disconnect_signals ()
 {
+  umgr->disconnect_signals ();
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();
@@ -2327,6 +2332,7 @@ void TileSetWindow::disconnect_signals ()
 
 bool TileSetWindow::connect_signals ()
 {
+  umgr->connect_signals ();
   connections.push_back
     (tile_name_entry->signal_changed().connect (method(on_tile_name_changed)));
   connections.push_back

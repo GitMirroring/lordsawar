@@ -24,6 +24,7 @@
 
 #include "undo-action.h"
 #include "city.h"
+#include "undo-mgr.h"
 
 //! A record of an event in the city editor
 /** 
@@ -77,18 +78,14 @@ class CityEditorAction_City: public CityEditorAction
         City *d_city;
 };
 
-class CityEditorAction_Name : public CityEditorAction_City
+class CityEditorAction_Name : public CityEditorAction_City, public UndoCursor
 {
     public:
-        CityEditorAction_Name (City *c, int pos)
-          :CityEditorAction_City (NAME, c, true), d_pos (pos) {}
+        CityEditorAction_Name (City *c, UndoMgr *u, Gtk::Entry *e)
+          :CityEditorAction_City (NAME, c, true), UndoCursor (u, e) {}
         ~CityEditorAction_Name () {}
 
         Glib::ustring getActionName () const {return "Name";}
-
-        int getPosition () const {return d_pos;}
-    private:
-        int d_pos;
 };
 class CityEditorAction_Income : public CityEditorAction_City
 {

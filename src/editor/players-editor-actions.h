@@ -24,6 +24,7 @@
 
 #include "undo-action.h"
 #include "heroproto.h"
+#include "undo-mgr.h"
 
 //! A record of an event in the players dialog
 /** 
@@ -64,11 +65,13 @@ class PlayersEditorAction_PlayerIndex: public PlayersEditorAction
     private:
         guint32 d_index;
 };
-class PlayersEditorAction_Name: public PlayersEditorAction_PlayerIndex
+class PlayersEditorAction_Name: public PlayersEditorAction_PlayerIndex, public UndoCursor
 {
     public:
-        PlayersEditorAction_Name (guint32 i, Glib::ustring n)
-          : PlayersEditorAction_PlayerIndex (NAME, i, true), d_name (n) {}
+        PlayersEditorAction_Name (guint32 i, Glib::ustring n, UndoMgr *m,
+                                  Gtk::Entry *e)
+          : PlayersEditorAction_PlayerIndex (NAME, i, true), UndoCursor (m, e),
+          d_name (n) {}
         ~PlayersEditorAction_Name () {}
 
         Glib::ustring getActionName () const {return "Name";}

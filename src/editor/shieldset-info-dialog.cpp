@@ -42,6 +42,7 @@ ShieldSetInfoDialog::ShieldSetInfoDialog(Gtk::Window &parent, Shieldset *s)
   xml->get_widget("status_label", status_label);
   xml->get_widget("location_label", location_label);
   xml->get_widget("name_entry", name_entry);
+  umgr->addCursor (name_entry);
   xml->get_widget("small_width_spinbutton", small_width_spinbutton);
   xml->get_widget("small_height_spinbutton", small_height_spinbutton);
   xml->get_widget("medium_width_spinbutton", medium_width_spinbutton);
@@ -62,8 +63,11 @@ ShieldSetInfoDialog::ShieldSetInfoDialog(Gtk::Window &parent, Shieldset *s)
     d_shieldset->getConfigurationFile (true);
 
   xml->get_widget("copyright_textview", copyright_textview);
+  umgr->addCursor (copyright_textview);
   xml->get_widget("license_textview", license_textview);
+  umgr->addCursor (license_textview);
   xml->get_widget("description_textview", description_textview);
+  umgr->addCursor (description_textview);
   xml->get_widget("notebook", notebook);
   d_name = d_shieldset->getName ();
   d_description = d_shieldset->getInfo ();
@@ -108,7 +112,7 @@ void ShieldSetInfoDialog::update_name ()
 
 void ShieldSetInfoDialog::on_name_changed()
 {
-  umgr->add (new ShieldSetInfoAction_Name (d_name));
+  umgr->add (new ShieldSetInfoAction_Name (d_name, umgr, name_entry));
   d_changed = true;
   update_name ();
 }
@@ -133,21 +137,24 @@ bool ShieldSetInfoDialog::run()
 
 void ShieldSetInfoDialog::on_copyright_changed ()
 {
-  umgr->add (new ShieldSetInfoAction_Copyright (d_copyright));
+  umgr->add (new ShieldSetInfoAction_Copyright (d_copyright, umgr,
+                                                copyright_textview));
   d_changed = true;
   d_copyright = copyright_textview->get_buffer()->get_text();
 }
 
 void ShieldSetInfoDialog::on_license_changed ()
 {
-  umgr->add (new ShieldSetInfoAction_License (d_license));
+  umgr->add (new ShieldSetInfoAction_License (d_license, umgr,
+                                              license_textview));
   d_changed = true;
   d_license = license_textview->get_buffer()->get_text();
 }
 
 void ShieldSetInfoDialog::on_description_changed ()
 {
-  umgr->add (new ShieldSetInfoAction_Description (d_description));
+  umgr->add (new ShieldSetInfoAction_Description (d_description, umgr,
+                                                  description_textview));
   d_changed = true;
   d_description = description_textview->get_buffer()->get_text();
 }
@@ -224,7 +231,8 @@ UndoAction* ShieldSetInfoDialog::executeAction (UndoAction *action2)
           {
             ShieldSetInfoAction_Description *a =
               dynamic_cast<ShieldSetInfoAction_Description*>(action);
-            out = new ShieldSetInfoAction_Description (d_description);
+            out = new ShieldSetInfoAction_Description (d_description, umgr,
+                                                       description_textview);
             d_description = a->getMessage ();
           } 
         break;
@@ -232,7 +240,8 @@ UndoAction* ShieldSetInfoDialog::executeAction (UndoAction *action2)
           {
             ShieldSetInfoAction_Copyright *a =
               dynamic_cast<ShieldSetInfoAction_Copyright*>(action);
-            out = new ShieldSetInfoAction_Copyright (d_copyright);
+            out = new ShieldSetInfoAction_Copyright (d_copyright, umgr,
+                                                     copyright_textview);
             d_copyright = a->getMessage ();
           } 
         break;
@@ -240,14 +249,15 @@ UndoAction* ShieldSetInfoDialog::executeAction (UndoAction *action2)
           {
             ShieldSetInfoAction_License *a =
               dynamic_cast<ShieldSetInfoAction_License*>(action);
-            out = new ShieldSetInfoAction_License (d_license);
+            out = new ShieldSetInfoAction_License (d_license, umgr,
+                                                   license_textview);
             d_license = a->getMessage ();
           } 
         break;
       case ShieldSetInfoAction::NAME:
           {
             ShieldSetInfoAction_Name *a = dynamic_cast<ShieldSetInfoAction_Name*>(action);
-            out = new ShieldSetInfoAction_Name (d_name);
+            out = new ShieldSetInfoAction_Name (d_name, umgr, name_entry);
             d_name = a->getName ();
           }
         break;
@@ -345,11 +355,13 @@ void ShieldSetInfoDialog::update ()
   medium_height_spinbutton->set_value (d_medium_height);
   large_width_spinbutton->set_value (d_large_width);
   large_height_spinbutton->set_value (d_large_height);
+  umgr->setCursors ();
   connect_signals ();
 }
 
 void ShieldSetInfoDialog::connect_signals ()
 {
+  umgr->connect_signals ();
   connections.push_back
     (description_textview->get_buffer()->signal_changed().connect
      (method(on_description_changed)));
@@ -385,6 +397,7 @@ void ShieldSetInfoDialog::connect_signals ()
 
 void ShieldSetInfoDialog::disconnect_signals ()
 {
+  umgr->disconnect_signals ();
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();

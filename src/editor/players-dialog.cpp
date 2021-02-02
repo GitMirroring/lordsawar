@@ -146,6 +146,7 @@ Gtk::Entry * PlayersDialog::add_entry_for_player_name (Glib::ustring name)
   Gtk::Entry *e = Gtk::manage (new Gtk::Entry ());
   e->set_text (name);
   e->property_hexpand () = true;
+  umgr->addCursor (e);
   player_name_entries.push_back (e);
   return e;
 }
@@ -223,7 +224,8 @@ void PlayersDialog::on_player_name_changed (int row)
   Player *p = Playerlist::getInstance ()->getPlayer (row);
   if (p)
     oldname = p->getName ();
-  umgr->add (new PlayersEditorAction_Name (row, oldname));
+  umgr->add (new PlayersEditorAction_Name (row, oldname, umgr,
+                                           player_name_entries[row]));
   d_changed = true;
   update_player (row);
 }
@@ -317,16 +319,17 @@ void PlayersDialog::update ()
         case Player::AI_SMART: c->set_active (3); break;
         default: c->set_active (0); break;
         }
-      if (player_name_entries[p->getId ()]->get_text () != p->getName ())
-        player_name_entries[p->getId ()]->set_text (p->getName ());
+      player_name_entries[p->getId ()]->set_text (p->getName ());
       player_gold_spinbuttons[p->getId ()]->set_value (p->getGold ());
       sensitize_row (p->getId ());
     }
+  umgr->setCursors ();
   connect_signals ();
 }
 
 void PlayersDialog::connect_signals ()
 {
+  umgr->connect_signals ();
   int row = 0;
   for (auto c : player_type_comboboxes)
     {
@@ -366,6 +369,7 @@ void PlayersDialog::connect_signals ()
 
 void PlayersDialog::disconnect_signals ()
 {
+  umgr->disconnect_signals ();
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();
@@ -426,7 +430,8 @@ UndoAction *PlayersDialog::executeAction (UndoAction *action2)
             Player *p = Playerlist::getInstance ()->getPlayer (row);
             if (p)
               oldname = p->getName ();
-            out = new PlayersEditorAction_Name (row, oldname);
+            out = new PlayersEditorAction_Name (row, oldname, umgr,
+                                                player_name_entries[row]);
             if (p)
               p->setName (a->getName ());
           } 

@@ -26,6 +26,7 @@
 #include "hero.h"
 #include "defs.h"
 #include "undo-action.h"
+#include "undo-mgr.h"
 class Armyset;
 
 //! A record of an event in the armyset editor
@@ -237,7 +238,7 @@ class ArmySetEditorAction_ArmyIndex: public ArmySetEditorAction
  * when we change the army's name.  This happens letter by letter.
  *
  */
-class ArmySetEditorAction_Name: public ArmySetEditorAction_ArmyIndex
+class ArmySetEditorAction_Name: public ArmySetEditorAction_ArmyIndex, public UndoCursor
 {
     public:
 	//! Make a new name action
@@ -246,8 +247,9 @@ class ArmySetEditorAction_Name: public ArmySetEditorAction_ArmyIndex
          * we're modifying, the name, and the position of the cursor in the
          * entry.
          */
-        ArmySetEditorAction_Name (guint32 i, Glib::ustring n)
-          : ArmySetEditorAction_ArmyIndex (NAME, i, true), d_name (n) {};
+        ArmySetEditorAction_Name (guint32 i, Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
+          : ArmySetEditorAction_ArmyIndex (NAME, i, true),
+          UndoCursor (u, e), d_name (n) {};
 	//! Destroy a name action.
         ~ArmySetEditorAction_Name () {};
 
@@ -266,16 +268,17 @@ class ArmySetEditorAction_Name: public ArmySetEditorAction_ArmyIndex
  * when we change the army's description.  This happens letter by letter.
  *
  */
-class ArmySetEditorAction_Description: public ArmySetEditorAction_ArmyIndex
+class ArmySetEditorAction_Description: public ArmySetEditorAction_ArmyIndex, public UndoCursor
 {
     public:
 	//! Make a new description action
 	/**
          * Populate the action with the description of the army type.
          */
-        ArmySetEditorAction_Description (guint32 i, Glib::ustring d)
+        ArmySetEditorAction_Description (guint32 i, Glib::ustring d, UndoMgr *u,
+                                         Gtk::TextView *v)
           : ArmySetEditorAction_ArmyIndex (DESCRIPTION, i, true),
-          d_description (d) {};
+          UndoCursor (u, v), d_description (d) {};
 	//! Destroy a description action.
         ~ArmySetEditorAction_Description () {}
 

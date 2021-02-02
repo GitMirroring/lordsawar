@@ -23,6 +23,8 @@
 #include <sigc++/trackable.h>
 #include "undo-action.h"
 
+class UndoMgr;
+
 class TileSetInfoAction: public UndoAction
 {
 public:
@@ -45,11 +47,12 @@ protected:
     Type d_type;
 };
 
-class TileSetInfoAction_Message: public TileSetInfoAction
+class TileSetInfoAction_Message: public TileSetInfoAction, public UndoCursor
 {
     public:
-        TileSetInfoAction_Message (Type t, Glib::ustring m)
-          : TileSetInfoAction (t), d_message (m) {}
+        TileSetInfoAction_Message (Type t, Glib::ustring m,
+                                   UndoMgr *u, Gtk::TextView *v)
+          : TileSetInfoAction (t), UndoCursor (u, v), d_message (m) {}
         Glib::ustring getMessage () {return d_message;}
     private:
         Glib::ustring d_message;
@@ -58,8 +61,9 @@ class TileSetInfoAction_Message: public TileSetInfoAction
 class TileSetInfoAction_Description: public TileSetInfoAction_Message
 {
     public:
-        TileSetInfoAction_Description (Glib::ustring m)
-          : TileSetInfoAction_Message (DESCRIPTION, m) {}
+        TileSetInfoAction_Description (Glib::ustring m, UndoMgr *u, 
+                                       Gtk::TextView *v)
+          : TileSetInfoAction_Message (DESCRIPTION, m, u, v) {}
         ~TileSetInfoAction_Description () {}
 
         Glib::ustring getActionName () const {return "Description";}
@@ -68,8 +72,9 @@ class TileSetInfoAction_Description: public TileSetInfoAction_Message
 class TileSetInfoAction_Copyright: public TileSetInfoAction_Message
 {
     public:
-        TileSetInfoAction_Copyright (Glib::ustring m)
-          : TileSetInfoAction_Message (COPYRIGHT, m) {}
+        TileSetInfoAction_Copyright (Glib::ustring m, UndoMgr *u, 
+                                     Gtk::TextView *v)
+          : TileSetInfoAction_Message (COPYRIGHT, m, u, v) {}
         ~TileSetInfoAction_Copyright () {}
 
         Glib::ustring getActionName () const {return "Copyright";}
@@ -78,19 +83,20 @@ class TileSetInfoAction_Copyright: public TileSetInfoAction_Message
 class TileSetInfoAction_License: public TileSetInfoAction_Message
 {
     public:
-        TileSetInfoAction_License (Glib::ustring m)
-          : TileSetInfoAction_Message (LICENSE, m) {}
+        TileSetInfoAction_License (Glib::ustring m, UndoMgr *u, 
+                                   Gtk::TextView *v)
+          : TileSetInfoAction_Message (LICENSE, m, u, v) {}
         ~TileSetInfoAction_License () {}
 
         Glib::ustring getActionName () const {return "License";}
 };
 
-class TileSetInfoAction_Name: public TileSetInfoAction
+class TileSetInfoAction_Name: public TileSetInfoAction, public UndoCursor
 {
     public:
-        TileSetInfoAction_Name (Glib::ustring n)
-          : TileSetInfoAction (NAME), d_name (n) {};
-        ~TileSetInfoAction_Name () {};
+        TileSetInfoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
+          : TileSetInfoAction (NAME), UndoCursor (u, e), d_name (n) {}
+        ~TileSetInfoAction_Name () {}
 
         Glib::ustring getActionName () const {return "Name";}
         Glib::ustring getName () {return d_name;}

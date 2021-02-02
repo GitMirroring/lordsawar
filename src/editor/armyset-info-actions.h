@@ -46,11 +46,11 @@ protected:
     Type d_type;
 };
 
-class ArmySetInfoAction_Message: public ArmySetInfoAction
+class ArmySetInfoAction_Message: public ArmySetInfoAction, public UndoCursor
 {
     public:
-        ArmySetInfoAction_Message (Type t, Glib::ustring m)
-          : ArmySetInfoAction (t), d_message (m) {}
+        ArmySetInfoAction_Message (Type t, Glib::ustring m, UndoMgr *u, Gtk::TextView *v)
+          : ArmySetInfoAction (t), UndoCursor (u, v), d_message (m) {}
         Glib::ustring getMessage () {return d_message;}
     private:
         Glib::ustring d_message;
@@ -59,8 +59,9 @@ class ArmySetInfoAction_Message: public ArmySetInfoAction
 class ArmySetInfoAction_Description: public ArmySetInfoAction_Message
 {
     public:
-        ArmySetInfoAction_Description (Glib::ustring m)
-          : ArmySetInfoAction_Message (DESCRIPTION, m) {}
+        ArmySetInfoAction_Description (Glib::ustring m, UndoMgr *u, Gtk::TextView *v)
+          : ArmySetInfoAction_Message (DESCRIPTION, m, u, v)
+          {}
         ~ArmySetInfoAction_Description () {}
 
         Glib::ustring getActionName () const {return "Description";}
@@ -69,8 +70,9 @@ class ArmySetInfoAction_Description: public ArmySetInfoAction_Message
 class ArmySetInfoAction_Copyright: public ArmySetInfoAction_Message
 {
     public:
-        ArmySetInfoAction_Copyright (Glib::ustring m)
-          : ArmySetInfoAction_Message (COPYRIGHT, m) {}
+        ArmySetInfoAction_Copyright (Glib::ustring m, UndoMgr *u,
+                                     Gtk::TextView *v)
+          : ArmySetInfoAction_Message (COPYRIGHT, m, u, v) {}
         ~ArmySetInfoAction_Copyright () {}
 
         Glib::ustring getActionName () const {return "Copyright";}
@@ -79,18 +81,19 @@ class ArmySetInfoAction_Copyright: public ArmySetInfoAction_Message
 class ArmySetInfoAction_License: public ArmySetInfoAction_Message
 {
     public:
-        ArmySetInfoAction_License (Glib::ustring m)
-          : ArmySetInfoAction_Message (LICENSE, m) {}
+        ArmySetInfoAction_License (Glib::ustring m, UndoMgr *u,
+                                   Gtk::TextView *v)
+          : ArmySetInfoAction_Message (LICENSE, m, u, v) {}
         ~ArmySetInfoAction_License () {}
 
         Glib::ustring getActionName () const {return "License";}
 };
 
-class ArmySetInfoAction_Name: public ArmySetInfoAction
+class ArmySetInfoAction_Name: public ArmySetInfoAction, public UndoCursor
 {
     public:
-        ArmySetInfoAction_Name (Glib::ustring n)
-          : ArmySetInfoAction (NAME), d_name (n)
+        ArmySetInfoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
+          : ArmySetInfoAction (NAME), UndoCursor (u, e), d_name (n)
           {}
         ~ArmySetInfoAction_Name () {};
 

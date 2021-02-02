@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "undo-action.h"
+#include "undo-mgr.h"
 
 class MapInfoAction: public UndoAction
 {
@@ -44,11 +45,12 @@ protected:
     Type d_type;
 };
 
-class MapInfoAction_Message: public MapInfoAction
+class MapInfoAction_Message: public MapInfoAction, public UndoCursor
 {
     public:
-        MapInfoAction_Message (Type t, Glib::ustring m)
-          : MapInfoAction (t), d_message (m) {}
+        MapInfoAction_Message (Type t, Glib::ustring m, UndoMgr *u,
+                               Gtk::TextView *v)
+          : MapInfoAction (t), UndoCursor (u, v), d_message (m) {}
         Glib::ustring getMessage () {return d_message;}
     private:
         Glib::ustring d_message;
@@ -57,8 +59,9 @@ class MapInfoAction_Message: public MapInfoAction
 class MapInfoAction_Description: public MapInfoAction_Message
 {
     public:
-        MapInfoAction_Description (Glib::ustring m)
-          : MapInfoAction_Message (DESCRIPTION, m) {}
+        MapInfoAction_Description (Glib::ustring m, UndoMgr *u,
+                                   Gtk::TextView *v)
+          : MapInfoAction_Message (DESCRIPTION, m, u, v) {}
         ~MapInfoAction_Description () {}
 
         Glib::ustring getActionName () const {return "Description";}
@@ -67,8 +70,9 @@ class MapInfoAction_Description: public MapInfoAction_Message
 class MapInfoAction_Copyright: public MapInfoAction_Message
 {
     public:
-        MapInfoAction_Copyright (Glib::ustring m)
-          : MapInfoAction_Message (COPYRIGHT, m) {}
+        MapInfoAction_Copyright (Glib::ustring m, UndoMgr *u,
+                                 Gtk::TextView *v)
+          : MapInfoAction_Message (COPYRIGHT, m, u, v) {}
         ~MapInfoAction_Copyright () {}
 
         Glib::ustring getActionName () const {return "Copyright";}
@@ -77,19 +81,20 @@ class MapInfoAction_Copyright: public MapInfoAction_Message
 class MapInfoAction_License: public MapInfoAction_Message
 {
     public:
-        MapInfoAction_License (Glib::ustring m)
-          : MapInfoAction_Message (LICENSE, m) {}
+        MapInfoAction_License (Glib::ustring m, UndoMgr *u,
+                               Gtk::TextView *v)
+          : MapInfoAction_Message (LICENSE, m, u, v) {}
         ~MapInfoAction_License () {}
 
         Glib::ustring getActionName () const {return "License";}
 };
 
-class MapInfoAction_Name: public MapInfoAction
+class MapInfoAction_Name: public MapInfoAction, public UndoCursor
 {
     public:
-        MapInfoAction_Name (Glib::ustring n)
-          : MapInfoAction (NAME), d_name (n) {};
-        ~MapInfoAction_Name () {};
+        MapInfoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
+          : MapInfoAction (NAME), UndoCursor (u, e), d_name (n) {}
+        ~MapInfoAction_Name () {}
 
         Glib::ustring getActionName () const {return "Name";}
         Glib::ustring getName () {return d_name;}

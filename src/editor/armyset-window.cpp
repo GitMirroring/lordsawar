@@ -77,9 +77,11 @@ ArmySetWindow::ArmySetWindow(Glib::ustring load_filename)
   xml->get_widget("black_image", black_image);
   xml->get_widget("neutral_image", neutral_image);
   xml->get_widget("name_entry", name_entry);
+  umgr->addCursor (name_entry);
   xml->get_widget("armies_treeview", armies_treeview);
   xml->get_widget("armies_scrolledwindow", armies_scrolledwindow);
   xml->get_widget("description_textview", description_textview);
+  umgr->addCursor (description_textview);
   xml->get_widget("white_image_button", white_image_button);
   xml->get_widget("green_image_button", green_image_button);
   xml->get_widget("yellow_image_button", yellow_image_button);
@@ -199,11 +201,10 @@ ArmySetWindow::ArmySetWindow(Glib::ustring load_filename)
   connect_signals ();
   if (load_filename != "")
     current_save_filename = load_filename;
-  update_army_panel();
-  update_armyset_buttons();
 
   if (load_filename.empty() == false)
     load_armyset (load_filename);
+  connect_signals ();
   update ();
   d_reorder_action = NULL;
 }
@@ -224,7 +225,6 @@ ArmySetWindow::update_armyset_buttons ()
 void
 ArmySetWindow::update_army_panel ()
 {
-  disconnect_signals ();
   //if nothing selected in the treeview, then we don't show anything in
   //the army panel
   if (armies_treeview->get_selection()->get_selected() == 0)
@@ -289,7 +289,6 @@ ArmySetWindow::update_army_panel ()
       ArmyProto *a = row[armies_columns.army];
       fill_army_info (a);
     }
-  connect_signals ();
 }
 
 void ArmySetWindow::on_new_armyset_activated()
@@ -527,8 +526,7 @@ bool ArmySetWindow::save_current_armyset_file_as ()
                   armyset_saved.emit(d_armyset->getId());
                 }
               refresh_armies ();
-              update_army_panel ();
-              update_window_title ();
+              update ();
             }
         }
       chooser.hide ();
@@ -553,10 +551,9 @@ bool ArmySetWindow::save_current_armyset_file (Glib::ustring filename)
     {
       if (Armysetlist::getInstance()->reload(d_armyset->getId()))
         refresh_armies();
-      update_army_panel ();
       new_armyset_needs_saving = false;
       armyset_modified = false;
-      update_window_title ();
+      update ();
       armyset_saved.emit(d_armyset->getId());
     }
   else
@@ -795,8 +792,7 @@ void ArmySetWindow::addArmyType(guint32 army_type)
 
 void ArmySetWindow::on_army_selected()
 {
-  update_armyset_buttons();
-  update_army_panel();
+  update ();
   armies_treeview->queue_draw();
 }
 
@@ -946,7 +942,8 @@ void ArmySetWindow::on_name_changed()
       Gtk::TreeModel::Row row = *iterrow;
       ArmyProto *a = row[armies_columns.army];
       ArmySetEditorAction_Name *action =
-        new ArmySetEditorAction_Name (getCurIndex (), a->getName ());
+        new ArmySetEditorAction_Name (getCurIndex (), a->getName (), umgr,
+                                      name_entry);
       addUndo (action);
       a->setName(name_entry->get_text());
       row[armies_columns.name] = name_entry->get_text();
@@ -967,7 +964,7 @@ void ArmySetWindow::on_description_changed()
       ArmyProto *a = row[armies_columns.army];
       ArmySetEditorAction_Description *action =
         new ArmySetEditorAction_Description
-        (getCurIndex (), a->getDescription ());
+        (getCurIndex (), a->getDescription (), umgr, description_textview);
       addUndo (action);
       a->setDescription(description_textview->get_buffer()->get_text());
       armyset_modified = true;
@@ -1899,10 +1896,13 @@ void ArmySetWindow::update_menuitems ()
 
 void ArmySetWindow::update ()
 {
+  disconnect_signals ();
   update_window_title ();
   update_army_panel ();
   update_armyset_buttons();
   update_menuitems ();
+  umgr->setCursors ();
+  connect_signals ();
 }
 
 ArmyProto* ArmySetWindow::getArmyByIndex (ArmySetEditorAction_ArmyIndex *i)
@@ -1960,7 +1960,8 @@ ArmySetWindow::executeAction (UndoAction *action2)
             ArmySetEditorAction_Name *a =
               dynamic_cast<ArmySetEditorAction_Name*>(action);
             out = new ArmySetEditorAction_Name
-              (a->getIndex (), getArmyByIndex (a)->getName ());
+              (a->getIndex (), getArmyByIndex (a)->getName (), umgr,
+               name_entry);
             getArmyByIndex (a)->setName (a->getName ());
             Gtk::TreeModel::iterator iterrow = 
               armies_treeview->get_model ()->get_iter
@@ -1977,7 +1978,8 @@ ArmySetWindow::executeAction (UndoAction *action2)
             ArmySetEditorAction_Description *a =
               dynamic_cast<ArmySetEditorAction_Description*>(action);
             out = new ArmySetEditorAction_Description
-              (a->getIndex (), getArmyByIndex (a)->getDescription ());
+              (a->getIndex (), getArmyByIndex (a)->getDescription (), umgr,
+               description_textview);
             getArmyByIndex (a)->setDescription (a->getDescription ());
             break;
           } 
@@ -2266,6 +2268,7 @@ void ArmySetWindow::on_drag_end ()
 
 void ArmySetWindow::disconnect_signals ()
 {
+  umgr->disconnect_signals ();
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();
@@ -2273,6 +2276,7 @@ void ArmySetWindow::disconnect_signals ()
 
 void ArmySetWindow::connect_signals ()
 {
+  umgr->connect_signals ();
   connections.push_back
     (make_same_button->signal_clicked().connect (method(on_make_same_clicked)));
   connections.push_back

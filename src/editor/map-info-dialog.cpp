@@ -53,9 +53,13 @@ MapInfoDialog::MapInfoDialog(Gtk::Window &parent, GameScenario *g)
 
   xml->get_widget("name_entry", name_entry);
   name_entry->set_text(game_scenario->getName());
+  umgr->addCursor (name_entry);
   xml->get_widget("description_textview", description_textview);
+  umgr->addCursor (description_textview);
   xml->get_widget("copyright_textview", copyright_textview);
+  umgr->addCursor (copyright_textview);
   xml->get_widget("license_textview", license_textview);
+  umgr->addCursor (license_textview);
   xml->get_widget ("undo_button", undo_button);
   undo_button->signal_activate ().connect (method (on_undo_activated));
   xml->get_widget ("redo_button", redo_button);
@@ -135,28 +139,31 @@ bool MapInfoDialog::run()
 
 void MapInfoDialog::on_name_changed()
 {
-  umgr->add (new MapInfoAction_Name (d_name));
+  umgr->add (new MapInfoAction_Name (d_name, umgr, name_entry));
   d_changed = true;
   d_name = String::utrim (name_entry->get_text ());
 }
 
 void MapInfoDialog::on_copyright_changed ()
 {
-  umgr->add (new MapInfoAction_Copyright (d_copyright));
+  umgr->add (new MapInfoAction_Copyright (d_copyright, umgr,
+                                          copyright_textview));
   d_changed = true;
   d_copyright = copyright_textview->get_buffer()->get_text();
 }
 
 void MapInfoDialog::on_license_changed ()
 {
-  umgr->add (new MapInfoAction_License (d_license));
+  umgr->add (new MapInfoAction_License (d_license, umgr,
+                                        license_textview));
   d_changed = true;
   d_license = license_textview->get_buffer()->get_text();
 }
 
 void MapInfoDialog::on_description_changed ()
 {
-  umgr->add (new MapInfoAction_Description (d_description));
+  umgr->add (new MapInfoAction_Description (d_description, umgr,
+                                            description_textview));
   d_changed = true;
   d_description = description_textview->get_buffer()->get_text();
 }
@@ -178,7 +185,8 @@ UndoAction* MapInfoDialog::executeAction (UndoAction *action2)
           {
             MapInfoAction_Description *a =
               dynamic_cast<MapInfoAction_Description*>(action);
-            out = new MapInfoAction_Description (d_description);
+            out = new MapInfoAction_Description (d_description, umgr,
+                                                 description_textview);
             d_description = a->getMessage ();
           } 
         break;
@@ -186,7 +194,8 @@ UndoAction* MapInfoDialog::executeAction (UndoAction *action2)
           {
             MapInfoAction_Copyright *a =
               dynamic_cast<MapInfoAction_Copyright*>(action);
-            out = new MapInfoAction_Copyright (d_copyright);
+            out = new MapInfoAction_Copyright (d_copyright, umgr,
+                                               copyright_textview);
             d_copyright = a->getMessage ();
           } 
         break;
@@ -194,14 +203,15 @@ UndoAction* MapInfoDialog::executeAction (UndoAction *action2)
           {
             MapInfoAction_License *a =
               dynamic_cast<MapInfoAction_License*>(action);
-            out = new MapInfoAction_License (d_license);
+            out = new MapInfoAction_License (d_license, umgr,
+                                             license_textview);
             d_license = a->getMessage ();
           } 
         break;
       case MapInfoAction::NAME:
           {
             MapInfoAction_Name *a = dynamic_cast<MapInfoAction_Name*>(action);
-            out = new MapInfoAction_Name (d_name);
+            out = new MapInfoAction_Name (d_name, umgr, name_entry);
             d_name = a->getName ();
           }
         break;
@@ -232,11 +242,13 @@ void MapInfoDialog::update ()
   license_textview->get_buffer()->set_text(d_license);
   if (name_entry->get_text () != d_name)
     name_entry->set_text (d_name);
+  umgr->setCursors ();
   connect_signals ();
 }
 
 void MapInfoDialog::connect_signals ()
 {
+  umgr->connect_signals ();
   connections.push_back
     (description_textview->get_buffer()->signal_changed().connect
      (method(on_description_changed)));
@@ -252,6 +264,7 @@ void MapInfoDialog::connect_signals ()
 
 void MapInfoDialog::disconnect_signals ()
 {
+  umgr->disconnect_signals ();
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();

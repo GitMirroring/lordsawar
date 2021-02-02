@@ -58,6 +58,7 @@ HeroesDialog::HeroesDialog(Gtk::Window &parent, guint32 player_id, Glib::ustring
   treeview->append_column(name_column);
 
   xml->get_widget("name_entry", name_entry);
+  umgr->addCursor (name_entry);
 
   Gtk::Box *box;
   xml->get_widget("gender_box", box);
@@ -210,8 +211,8 @@ void HeroesDialog::on_name_changed ()
   HeroProto *hero = get_selected_hero ();
   if (hero)
     {
-      umgr->add (new HeroesEditorAction_Name (getCurIndex (),
-                                              hero->getName ()));
+      umgr->add (new HeroesEditorAction_Name (getCurIndex (), hero->getName (),
+                                              umgr, name_entry));
       Glib::RefPtr<Gtk::TreeSelection> selection = treeview->get_selection();
       Gtk::TreeModel::iterator iterrow = selection->get_selected();
       if (iterrow) 
@@ -266,6 +267,7 @@ void HeroesDialog::update_panel ()
 
 void HeroesDialog::connect_signals ()
 {
+  umgr->connect_signals ();
   connections.push_back
     (gender_combobox->signal_changed ().connect (method (on_gender_changed)));
   connections.push_back
@@ -277,6 +279,7 @@ void HeroesDialog::connect_signals ()
 
 void HeroesDialog::disconnect_signals ()
 {
+  umgr->disconnect_signals ();
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();
@@ -305,6 +308,7 @@ void HeroesDialog::update ()
   disconnect_signals ();
   update_panel ();
   update_buttons ();
+  umgr->setCursors ();
   connect_signals ();
 }
 
@@ -339,7 +343,8 @@ UndoAction *HeroesDialog::executeAction (UndoAction *action2)
             HeroesEditorAction_Name *a =
               dynamic_cast<HeroesEditorAction_Name*>(action);
             out = new HeroesEditorAction_Name
-              (a->getIndex (), getHeroByIndex (a)->getName ());
+              (a->getIndex (), getHeroByIndex (a)->getName (), umgr,
+               name_entry);
 
             getHeroByIndex (a)->setName (a->getName ());
             auto iterrow = treeview->get_model ()->get_iter

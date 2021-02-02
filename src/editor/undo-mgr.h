@@ -65,6 +65,15 @@ class UndoMgr: public sigc::trackable
         sigc::signal<UndoAction*, UndoAction*> execute ()
           {return execute_signal;}
 
+        void addCursor (Gtk::Entry *entry);
+        void addCursor (Gtk::TextView *textview);
+        void connect_signals ();
+        void disconnect_signals ();
+        int getPos (Gtk::Entry *e);
+        void setPos (Gtk::Entry *e);
+        int getPos (Gtk::TextView *t);
+        void setCursors ();
+        void setPos (Gtk::TextView *t);
         void dump ();
     private:
         double d_delay;
@@ -78,6 +87,31 @@ class UndoMgr: public sigc::trackable
         bool isGrouped (UndoAction *l, UndoAction *r, bool top = false);
         guint32 countUndoBlocks (std::list<UndoAction*> list, bool top = false);
         static Glib::ustring getActionName (std::list<UndoAction*> list);
+
+        void connect (Gtk::Entry *entry);
+        void connect (Gtk::TextView *textview);
+        void updateEntry(Gtk::Entry *entry);
+        void updateTextView(Gtk::TextView *textview);
+        // the two previous positions, where second is farther back in time
+        // than the first
+        std::map<Gtk::Entry *, std::pair<int,int> > entries;
+        std::map<Gtk::TextView *, std::pair<int,int> > textviews;
+        std::map<Gtk::Object *, int> unwound_pos;
+        std::list<sigc::connection> connections;
 };
 
+class UndoCursor
+{
+public:
+    UndoCursor (UndoMgr *umgr, Gtk::Entry *e)
+      :d_pos (umgr->getPos (e)), d_object (e) {}
+    UndoCursor (UndoMgr *umgr, Gtk::TextView *t)
+      :d_pos (umgr->getPos (t)), d_object (t) {}
+    ~UndoCursor () {}
+    int getPos () const {return d_pos;}
+    Gtk::Object *getObject () const {return d_object;}
+private:
+    int d_pos;
+    Gtk::Object *d_object;
+};
 #endif //UNDO_MGR_H

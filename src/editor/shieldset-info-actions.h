@@ -23,6 +23,8 @@
 #include <sigc++/trackable.h>
 #include "undo-action.h"
 
+class UndoMgr;
+
 class ShieldSetInfoAction: public UndoAction
 {
 public:
@@ -51,11 +53,12 @@ protected:
     Type d_type;
 };
 
-class ShieldSetInfoAction_Message: public ShieldSetInfoAction
+class ShieldSetInfoAction_Message: public ShieldSetInfoAction, public UndoCursor
 {
     public:
-        ShieldSetInfoAction_Message (Type t, Glib::ustring m)
-          : ShieldSetInfoAction (t), d_message (m) {}
+        ShieldSetInfoAction_Message (Type t, Glib::ustring m, UndoMgr *u,
+                                     Gtk::TextView *v)
+          : ShieldSetInfoAction (t), UndoCursor (u, v), d_message (m) {}
         Glib::ustring getMessage () {return d_message;}
     private:
         Glib::ustring d_message;
@@ -64,8 +67,9 @@ class ShieldSetInfoAction_Message: public ShieldSetInfoAction
 class ShieldSetInfoAction_Description: public ShieldSetInfoAction_Message
 {
     public:
-        ShieldSetInfoAction_Description (Glib::ustring m)
-          : ShieldSetInfoAction_Message (DESCRIPTION, m) {}
+        ShieldSetInfoAction_Description (Glib::ustring m, UndoMgr *u,
+                                         Gtk::TextView *v)
+          : ShieldSetInfoAction_Message (DESCRIPTION, m, u, v) {}
         ~ShieldSetInfoAction_Description () {}
 
         Glib::ustring getActionName () const {return "Description";}
@@ -74,8 +78,9 @@ class ShieldSetInfoAction_Description: public ShieldSetInfoAction_Message
 class ShieldSetInfoAction_Copyright: public ShieldSetInfoAction_Message
 {
     public:
-        ShieldSetInfoAction_Copyright (Glib::ustring m)
-          : ShieldSetInfoAction_Message (COPYRIGHT, m) {}
+        ShieldSetInfoAction_Copyright (Glib::ustring m, UndoMgr *u,
+                                       Gtk::TextView *v)
+          : ShieldSetInfoAction_Message (COPYRIGHT, m, u, v) {}
         ~ShieldSetInfoAction_Copyright () {}
 
         Glib::ustring getActionName () const {return "Copyright";}
@@ -84,19 +89,20 @@ class ShieldSetInfoAction_Copyright: public ShieldSetInfoAction_Message
 class ShieldSetInfoAction_License: public ShieldSetInfoAction_Message
 {
     public:
-        ShieldSetInfoAction_License (Glib::ustring m)
-          : ShieldSetInfoAction_Message (LICENSE, m) {}
+        ShieldSetInfoAction_License (Glib::ustring m, UndoMgr *u,
+                                     Gtk::TextView *v)
+          : ShieldSetInfoAction_Message (LICENSE, m, u, v) {}
         ~ShieldSetInfoAction_License () {}
 
         Glib::ustring getActionName () const {return "License";}
 };
 
-class ShieldSetInfoAction_Name: public ShieldSetInfoAction
+class ShieldSetInfoAction_Name: public ShieldSetInfoAction, public UndoCursor
 {
     public:
-        ShieldSetInfoAction_Name (Glib::ustring n)
-          : ShieldSetInfoAction (NAME), d_name (n) {};
-        ~ShieldSetInfoAction_Name () {};
+        ShieldSetInfoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
+          : ShieldSetInfoAction (NAME), UndoCursor (u, e), d_name (n) {}
+        ~ShieldSetInfoAction_Name () {}
 
         Glib::ustring getActionName () const {return "Name";}
         Glib::ustring getName () {return d_name;}

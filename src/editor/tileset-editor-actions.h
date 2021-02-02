@@ -26,6 +26,7 @@
 #include "tilestyle.h"
 #include "defs.h"
 #include "undo-action.h"
+#include "undo-mgr.h"
 
 class Tileset;
 
@@ -139,7 +140,7 @@ class TileSetEditorAction_TileIndex: public TileSetEditorAction
  * when we change the tile's name.  This happens letter by letter.
  *
  */
-class TileSetEditorAction_Name: public TileSetEditorAction_TileIndex
+class TileSetEditorAction_Name: public TileSetEditorAction_TileIndex, public UndoCursor
 {
     public:
 	//! Make a new name action
@@ -147,8 +148,10 @@ class TileSetEditorAction_Name: public TileSetEditorAction_TileIndex
          * Populate the action with the name of the tile.
          * Also supply the index of the tile whose name we're modifying.
          */
-        TileSetEditorAction_Name (guint32 i, Glib::ustring n)
-          : TileSetEditorAction_TileIndex (NAME, i, true), d_name (n) {}
+        TileSetEditorAction_Name (guint32 i, Glib::ustring n, UndoMgr *u,
+                                  Gtk::Entry *e)
+          : TileSetEditorAction_TileIndex (NAME, i, true), UndoCursor (u, e),
+          d_name (n) {}
 	//! Destroy a name action.
         ~TileSetEditorAction_Name () {}
 

@@ -36,6 +36,11 @@ void UndoMgr::undo ()
   std::list<UndoAction*> group = popGroup (&undos);
   for (auto action : group)
     {
+      if (dynamic_cast<UndoCursor*>(action))
+        {
+          UndoCursor *c = dynamic_cast<UndoCursor*>(action);
+          unwound_pos[c->getObject ()] = c->getPos ();
+        }
       UndoAction *redo = execute_signal.emit (action);
       redo->setTime (action->getTime ());
       redo_group.push_back (redo);
@@ -56,6 +61,11 @@ void UndoMgr::redo ()
   std::list<UndoAction*> group = popGroup (&redos, true);
   for (auto action : group)
     {
+      if (dynamic_cast<UndoCursor*>(action))
+        {
+          UndoCursor *c = dynamic_cast<UndoCursor*>(action);
+          unwound_pos[c->getObject ()] = c->getPos ();
+        }
       UndoAction *undo = execute_signal.emit (action);
       undo->setTime (action->getTime ());
       undo_group.push_back (undo);
@@ -258,10 +268,133 @@ void UndoMgr::updateMenuItems (Gtk::MenuItem *undo, Gtk::MenuItem *redo)
 
 void UndoMgr::dump ()
 {
-  printf ("showing undo stack of %d items\n", undos.size ());
+  printf ("showing undo stack of %lu items\n", undos.size ());
   for (auto l : undos)
     printf (" '%s'\n", l->getActionName ().c_str ());
-  printf ("showing redo stack of %d items\n", redos.size ());
+  printf ("showing redo stack of %lu items\n", redos.size ());
   for (auto l : redos)
     printf (" '%s'\n", l->getActionName ().c_str ());
+}
+
+void UndoMgr::connect (Gtk::Entry *entry)
+{
+  connections.push_back
+    (entry->property_cursor_position ().signal_changed ().connect
+     (sigc::bind (sigc::mem_fun (this, &UndoMgr::updateEntry), entry)));
+}
+
+void UndoMgr::connect (Gtk::TextView *textview)
+{
+  connections.push_back
+    (textview->get_buffer ()->property_cursor_position ().signal_changed ().connect
+     (sigc::bind (sigc::mem_fun (this, &UndoMgr::updateTextView), textview)));
+}
+
+void UndoMgr::addCursor (Gtk::Entry *entry)
+{
+  entries[entry] = std::pair<int, int>(-1, -1);
+}
+
+void UndoMgr::addCursor (Gtk::TextView *textview)
+{
+  textviews[textview] = std::pair<int, int>(-1, -1);
+}
+
+void UndoMgr::updateEntry(Gtk::Entry *entry)
+{
+  auto it = entries.find (entry);
+  if (it == entries.end ())
+    return;
+  std::pair<int,int> p = (*it).second;
+
+  p.second = p.first;
+  p.first = entry->get_position ();
+  entries[entry] = p;
+}
+
+void UndoMgr::updateTextView(Gtk::TextView *textview)
+{
+  auto it = textviews.find (textview);
+  if (it == textviews.end ())
+    return;
+  std::pair<int,int> p = (*it).second;
+
+  p.second = p.first;
+  p.first = textview->get_buffer ()->property_cursor_position ().get_value ();
+  textviews[textview] = p;
+}
+
+void UndoMgr::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+void UndoMgr::connect_signals ()
+{
+  for (auto l : entries)
+    connect (l.first);
+  for (auto l : textviews)
+    connect (l.first);
+}
+
+int UndoMgr::getPos (Gtk::Entry *e)
+{
+  auto it = entries.find (e);
+  if (it == entries.end ())
+    return 0;
+  std::pair<int,int> p = (*it).second;
+  int pos = 0;
+  if (p.second != -1)
+    pos = p.second;
+  else if (p.first != -1)
+    pos = p.first;
+  return pos;
+}
+
+int UndoMgr::getPos (Gtk::TextView *t)
+{
+  auto it = textviews.find (t);
+  if (it == textviews.end ())
+    return 0;
+  std::pair<int,int> p = (*it).second;
+  int pos = 0;
+  if (p.second != -1)
+    pos = p.second;
+  else if (p.first != -1)
+    pos = p.first;
+  return pos;
+}
+
+void UndoMgr::setPos (Gtk::Entry *e)
+{
+  auto it = unwound_pos.find (e);
+  if (it == unwound_pos.end ())
+    return;
+  e->set_position (unwound_pos[e]);
+  updateEntry (e);
+  updateEntry (e);
+}
+
+void UndoMgr::setPos (Gtk::TextView *t)
+{
+  auto it = unwound_pos.find (t);
+  if (it == unwound_pos.end ())
+    return;
+  int p = unwound_pos[t];
+  t->get_buffer ()->place_cursor (t->get_buffer ()->get_iter_at_offset (p));
+  updateTextView (t);
+  updateTextView (t);
+}
+
+void UndoMgr::setCursors ()
+{
+  for (auto l : unwound_pos)
+    {
+      if (dynamic_cast<Gtk::Entry*>(l.first))
+        setPos (dynamic_cast<Gtk::Entry*>(l.first));
+      else if (dynamic_cast<Gtk::TextView*>(l.first))
+        setPos (dynamic_cast<Gtk::TextView*>(l.first));
+    }
 }

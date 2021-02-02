@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "undo-action.h"
+#include "undo-mgr.h"
 
 //! A record of an event in the signpost editor
 /** 
@@ -61,15 +62,17 @@ protected:
  * when we change the text changes.  This happens letter by letter.
  *
  */
-class SignpostEditorAction_Message: public SignpostEditorAction
+class SignpostEditorAction_Message: public SignpostEditorAction, public UndoCursor
 {
     public:
 	//! Make a new message action
 	/**
          * Populate the action with the sign's message.
          */
-        SignpostEditorAction_Message (Glib::ustring m)
-          : SignpostEditorAction (MESSAGE, true), d_message (m) {}
+        SignpostEditorAction_Message (Glib::ustring m, UndoMgr *u,
+                                      Gtk::TextView *v)
+          : SignpostEditorAction (MESSAGE, true), UndoCursor (u, v),
+          d_message (m) {}
 	//! Destroy a message action.
         ~SignpostEditorAction_Message () {}
 

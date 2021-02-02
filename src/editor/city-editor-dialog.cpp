@@ -59,6 +59,7 @@ CityEditorDialog::CityEditorDialog(Gtk::Window &parent, City *cit, CreateScenari
   xml->get_widget("capital_switch", capital_switch);
 
   xml->get_widget("name_entry", name_entry);
+  umgr->addCursor (name_entry);
 
   xml->get_widget("undo_button", undo_button);
   undo_button->signal_activate ().connect (method (on_undo_activated));
@@ -546,7 +547,7 @@ void CityEditorDialog::on_capital_changed ()
 
 void CityEditorDialog::on_name_changed ()
 {
-  umgr->add (new CityEditorAction_Name (city, name_entry->get_position ()));
+  umgr->add (new CityEditorAction_Name (city, umgr, name_entry));
   d_changed = true;
   city->setName (String::utrim (name_entry->get_text ()));
 }
@@ -626,11 +627,13 @@ void CityEditorDialog::update ()
                                                 fs)->to_pixbuf();
     }
   update_buttons();
+  umgr->setCursors ();
   connect_signals ();
 }
 
 void CityEditorDialog::connect_signals ()
 {
+  umgr->connect_signals ();
   connections.push_back
     (name_entry->signal_changed ().connect (method (on_name_changed)));
   connections.push_back
@@ -662,6 +665,7 @@ void CityEditorDialog::connect_signals ()
 
 void CityEditorDialog::disconnect_signals ()
 {
+  umgr->disconnect_signals ();
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();
@@ -709,8 +713,7 @@ UndoAction *CityEditorDialog::executeAction (UndoAction *action2)
         {
           CityEditorAction_Name *a =
             dynamic_cast<CityEditorAction_Name*>(action);
-          out = new CityEditorAction_Name (city,
-                                           name_entry->get_position ());
+          out = new CityEditorAction_Name (city, umgr, name_entry);
           city->setName (a->getCity ()->getName ());
         }
       break;

@@ -24,6 +24,7 @@
 #include "undo-action.h"
 #include "heroproto.h"
 #include "herotemplates.h"
+#include "undo-mgr.h"
 
 //! A record of an event in the heroes editor
 /** 
@@ -65,11 +66,13 @@ class HeroesEditorAction_Index: public HeroesEditorAction
         guint32 d_index;
 };
 
-class HeroesEditorAction_Name: public HeroesEditorAction_Index
+class HeroesEditorAction_Name: public HeroesEditorAction_Index, public UndoCursor
 {
     public:
-        HeroesEditorAction_Name (guint32 i, Glib::ustring n)
-          : HeroesEditorAction_Index (NAME, i, true), d_name (n) {}
+        HeroesEditorAction_Name (guint32 i, Glib::ustring n, UndoMgr *u,
+                                 Gtk::Entry *e)
+          : HeroesEditorAction_Index (NAME, i, true), UndoCursor (u, e),
+          d_name (n) {}
         ~HeroesEditorAction_Name () {}
 
         Glib::ustring getActionName () const {return "Name";}

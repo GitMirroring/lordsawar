@@ -47,9 +47,14 @@ ArmySetInfoDialog::ArmySetInfoDialog(Gtk::Window &parent, Armyset *armyset)
     d_armyset->getConfigurationFile (true);
 
   xml->get_widget("name_entry", name_entry);
+  umgr->addCursor (name_entry);
+
   xml->get_widget("copyright_textview", copyright_textview);
+  umgr->addCursor (copyright_textview);
   xml->get_widget("license_textview", license_textview);
+  umgr->addCursor (license_textview);
   xml->get_widget("description_textview", description_textview);
+  umgr->addCursor (description_textview);
   xml->get_widget("notebook", notebook);
   xml->get_widget("size_spinbutton", size_spinbutton);
   xml->get_widget("fit_button", fit_button);
@@ -94,7 +99,8 @@ void ArmySetInfoDialog::update_name ()
 
 void ArmySetInfoDialog::on_name_changed()
 {
-  umgr->add (new ArmySetInfoAction_Name (d_name));
+  auto a = new ArmySetInfoAction_Name (d_name, umgr, name_entry);
+  umgr->add (a);
   d_changed = true;
   update_name ();
 }
@@ -114,21 +120,23 @@ bool ArmySetInfoDialog::run()
 
 void ArmySetInfoDialog::on_copyright_changed ()
 {
-  umgr->add (new ArmySetInfoAction_Copyright (d_copyright));
+  umgr->add (new ArmySetInfoAction_Copyright (d_copyright, umgr,
+                                              copyright_textview));
   d_changed = true;
   d_copyright = copyright_textview->get_buffer()->get_text();
 }
 
 void ArmySetInfoDialog::on_license_changed ()
 {
-  umgr->add (new ArmySetInfoAction_License (d_license));
+  umgr->add (new ArmySetInfoAction_License (d_license, umgr, license_textview));
   d_changed = true;
   d_license = license_textview->get_buffer()->get_text();
 }
 
 void ArmySetInfoDialog::on_description_changed ()
 {
-  umgr->add (new ArmySetInfoAction_Description (d_description));
+  umgr->add (new ArmySetInfoAction_Description (d_description, umgr,
+                                                description_textview));
   d_changed = true;
   d_description = description_textview->get_buffer()->get_text();
 }
@@ -168,7 +176,8 @@ UndoAction* ArmySetInfoDialog::executeAction (UndoAction *action2)
           {
             ArmySetInfoAction_Description *a =
               dynamic_cast<ArmySetInfoAction_Description*>(action);
-            out = new ArmySetInfoAction_Description (d_description);
+            out = new ArmySetInfoAction_Description (d_description, umgr,
+                                                     description_textview);
             d_description = a->getMessage ();
           } 
         break;
@@ -176,7 +185,8 @@ UndoAction* ArmySetInfoDialog::executeAction (UndoAction *action2)
           {
             ArmySetInfoAction_Copyright *a =
               dynamic_cast<ArmySetInfoAction_Copyright*>(action);
-            out = new ArmySetInfoAction_Copyright (d_copyright);
+            out = new ArmySetInfoAction_Copyright (d_copyright, umgr,
+                                                   copyright_textview);
             d_copyright = a->getMessage ();
           } 
         break;
@@ -184,7 +194,8 @@ UndoAction* ArmySetInfoDialog::executeAction (UndoAction *action2)
           {
             ArmySetInfoAction_License *a =
               dynamic_cast<ArmySetInfoAction_License*>(action);
-            out = new ArmySetInfoAction_License (d_license);
+            out = new ArmySetInfoAction_License (d_license, umgr,
+                                                 license_textview);
             d_license = a->getMessage ();
           } 
         break;
@@ -192,7 +203,7 @@ UndoAction* ArmySetInfoDialog::executeAction (UndoAction *action2)
           {
             ArmySetInfoAction_Name *a =
               dynamic_cast<ArmySetInfoAction_Name*>(action);
-            out = new ArmySetInfoAction_Name (d_name);
+            out = new ArmySetInfoAction_Name (d_name, umgr, name_entry);
             d_name = a->getName ();
           }
         break;
@@ -232,11 +243,13 @@ void ArmySetInfoDialog::update ()
   license_textview->get_buffer()->set_text(d_license);
   name_entry->set_text (d_name);
   size_spinbutton->set_value (d_tilesize);
+  umgr->setCursors ();
   connect_signals ();
 }
 
 void ArmySetInfoDialog::connect_signals ()
 {
+  umgr->connect_signals ();
   connections.push_back
     (description_textview->get_buffer()->signal_changed().connect
      (method(on_description_changed)));
@@ -256,6 +269,7 @@ void ArmySetInfoDialog::connect_signals ()
 
 void ArmySetInfoDialog::disconnect_signals ()
 {
+  umgr->disconnect_signals ();
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();
