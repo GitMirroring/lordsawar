@@ -22,7 +22,9 @@
 
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
+#include "undo-action.h"
 
+class UndoMgr;
 class Ruin;
 class Stack;
 class CreateScenarioRandomize;
@@ -34,13 +36,14 @@ class RuinEditorDialog: public LwEditorDialog
  public:
     RuinEditorDialog(Gtk::Window &parent, Ruin *ruin, 
                      CreateScenarioRandomize *randomize);
-    ~RuinEditorDialog() {}
+    ~RuinEditorDialog();
 
     bool get_changed () const {return d_changed;}
 
     bool run();
     
  private:
+    UndoMgr *umgr;
     Gtk::Entry *name_entry;
     Gtk::Entry *description_entry;
     Gtk::SpinButton *type_spinbutton;
@@ -53,12 +56,15 @@ class RuinEditorDialog: public LwEditorDialog
     Gtk::Box *new_keeper_hbox;
     Gtk::Switch *random_reward_switch;
     Gtk::Button *reward_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
     Ruin *ruin;
     CreateScenarioRandomize *d_randomizer;
     bool d_changed;
+    bool d_random_reward_active;
 
-    void set_keeper_name();
-    void set_reward_name();
+    void update_keeper_name();
+    void update_reward_name();
 
     void on_keeper_clicked();
     void on_hidden_toggled();
@@ -72,6 +78,13 @@ class RuinEditorDialog: public LwEditorDialog
     void on_type_text_changed ();
     void update_hidden_status ();
     void on_hidden_ruin_player_changed ();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction* executeAction (UndoAction *action);
 };
 
 #endif

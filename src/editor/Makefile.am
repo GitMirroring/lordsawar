@@ -78,7 +78,7 @@ libeditor_la_SOURCES =\
 	signpost-editor-dialog.cpp signpost-editor-dialog.h \
 	signpost-editor-actions.h \
 	temple-editor-dialog.cpp temple-editor-dialog.h \
-	ruin-editor-dialog.cpp ruin-editor-dialog.h \
+	ruin-editor-dialog.cpp ruin-editor-dialog.h ruin-editor-actions.h \
 	stack-editor-dialog.cpp stack-editor-dialog.h \
 	select-army-dialog.cpp select-army-dialog.h \
 	players-dialog.cpp players-dialog.h players-editor-actions.h \
