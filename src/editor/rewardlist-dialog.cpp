@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ void RewardlistDialog::on_add_clicked()
   if (d.get_reward())
     {
       d_changed = true;
-      Reward *reward = d.get_reward();
+      Reward *reward = Reward::copy (d.get_reward());
       Gtk::TreeIter i = rewards_list->append();
       (*i)[rewards_columns.name] = reward->getName();
       (*i)[rewards_columns.reward] = reward;
@@ -173,7 +173,7 @@ void RewardlistDialog::on_edit_clicked()
             std::find (Rewardlist::getInstance ()->begin (),
                        Rewardlist::getInstance ()->end (), reward);
           delete reward;
-	  reward = d.get_reward();
+	  reward = Reward::copy (d.get_reward());
           *i = reward;
 	  (*iterrow)[rewards_columns.name] = reward->getName();
 	  (*iterrow)[rewards_columns.reward] = reward;

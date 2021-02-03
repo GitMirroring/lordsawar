@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
+#include "reward.h"
 
 class Reward;
 class Item;
@@ -37,16 +39,20 @@ class RewardEditorDialog: public LwEditorDialog
                        Reward *r);
     ~RewardEditorDialog();
 
-    int run();
+    bool run();
 
-    Reward *get_reward() {return reward;}
+    Reward *get_reward() {return d_reward;}
     
  private:
+    bool d_changed;
+    UndoMgr *umgr;
     Player *d_player;
-    Reward *reward;
-    Item *item;
-    ArmyProto *ally;
-    Ruin *hidden_ruin;
+    Reward *d_reward;
+    Reward_Gold *d_gold_reward;
+    Reward_Allies *d_allies_reward;
+    Reward_Item *d_item_reward;
+    Reward_Map *d_map_reward;
+    Reward_Ruin *d_ruin_reward;
     bool d_hidden_ruins;
     Gtk::ComboBox *reward_type_combobox;
     Gtk::Notebook *notebook;
@@ -64,22 +70,40 @@ class RewardEditorDialog: public LwEditorDialog
     Gtk::Button *randomize_map_button;
     Gtk::Button *randomize_hidden_ruin_button;
     Gtk::Button *hidden_ruin_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     void on_randomize_gold_clicked();
     void on_item_clicked();
     void on_clear_item_clicked();
     void on_randomize_item_clicked();
-    void set_item_name();
+    void update_item_name();
     void on_ally_selected(const ArmyProto *a);
     void on_randomize_allies_clicked();
     void on_randomize_map_clicked();
     void on_hidden_ruin_clicked();
     void on_randomize_hidden_ruin_clicked();
     void on_clear_hidden_ruin_clicked();
-    void set_hidden_ruin_name();
+    void update_hidden_ruin_name();
+    void on_map_x_text_changed();
+    void on_map_y_text_changed();
+    void on_map_width_text_changed();
+    void on_map_height_text_changed();
+    void on_num_allies_text_changed();
+    void on_gold_text_changed ();
+    void setup_rewards (Reward *r);
+    bool switch_reward_type (Reward::Type t);
 
     void fill_in_reward_info();
-    void on_reward_type_changed();
+    void on_type_changed();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void connect_signals ();
+    void disconnect_signals ();
+    void update ();
+    std::list<sigc::connection> connections;
+    UndoAction* executeAction (UndoAction *action);
+    Reward::Type row_to_reward_type (int row);
 
 };
 

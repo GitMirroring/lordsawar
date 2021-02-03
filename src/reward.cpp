@@ -215,6 +215,12 @@ guint32 Reward_Gold::getRandomSageGoldPieces()
   return 600 + (Rnd::rand() % 1500);
 }
 
+Reward_Allies::Reward_Allies()
+    :Reward(Reward::ALLIES), 
+    d_army (NULL), d_army_set (0), d_army_type (0), d_count(1)
+{
+}
+
 Reward_Allies::Reward_Allies(guint32 army_type, guint32 army_set, guint32 count)
     :Reward(Reward::ALLIES), 
     d_army (Armysetlist::getInstance()->getArmy (army_set, army_type)),
@@ -326,6 +332,19 @@ bool Reward_Allies::addAllies(Player *p, Location *l, const Army *army, guint32 
   return true;
 }
 
+void Reward_Allies::clearAllies ()
+{
+  d_count = 0;
+  d_army = NULL;
+  d_army_type = 0;
+  d_army_set = 0;
+}
+
+void Reward_Allies::setArmy (const ArmyProto *a)
+{
+  d_army = a;
+}
+
 Reward_Allies::~Reward_Allies()
 {
 }
@@ -345,6 +364,11 @@ Reward_Item::Reward_Item(Item *item)
     d_item = new Item (*item);
   else
     d_item = NULL;
+}
+
+Reward_Item::Reward_Item()
+    :Reward(Reward::ITEM), d_item (NULL)
+{
 }
 
 bool Reward_Item::loadItem(Glib::ustring tag, XML_Helper* helper)
@@ -402,7 +426,16 @@ Reward_Item::~Reward_Item()
 }
 
 Reward_Ruin::Reward_Ruin(Ruin *ruin)
-    :Reward(Reward::RUIN), d_ruin_pos(ruin->getPos())
+    :Reward(Reward::RUIN)
+{
+  if (ruin)
+    d_ruin_pos = ruin->getPos ();
+  else
+    d_ruin_pos = Vector<int>(-1, -1);
+}
+
+Reward_Ruin::Reward_Ruin()
+    :Reward(Reward::RUIN), d_ruin_pos (Vector<int>(-1,-1))
 {
 }
 

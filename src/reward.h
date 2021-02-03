@@ -217,6 +217,10 @@ class Reward_Gold : public Reward
 	//! Return the number of gold pieces associated with this reward.
 	guint32 getGold() const {return d_gold;}
 
+	// Set Methods
+
+        //! Make this reward provide GP amount of gold.
+        void setGold (guint32 gp) {d_gold = gp;}
 
 	// Methods that operate on the class data but do not modify the class.
 
@@ -268,6 +272,9 @@ class Reward_Allies: public Reward
 	 */
         Reward_Allies(guint32 army_type, guint32 army_set, guint32 count);
 
+        //! Alternative constructor.  Make an empty allies reward.
+        Reward_Allies();
+
 	//! Make a new reward of allies from another one.
 	Reward_Allies(const Reward_Allies& orig, bool sync_id = false);
 
@@ -285,6 +292,16 @@ class Reward_Allies: public Reward
 	//! Return the number allies that this reward will create.
 	guint32 getNoOfAllies() const {return d_count;}
 
+	// Set Methods
+
+        //! Make this reward give back N allies.
+        void setNoOfAllies (guint32 n) {d_count = n;}
+
+        //! Erase the allies.
+        void clearAllies ();
+
+        //! Make the reward give out this kind of ally
+        void setArmy (const ArmyProto *a);
 
 	// Methods that operate on the class data and do not modify the class.
 
@@ -370,6 +387,9 @@ class Reward_Item: public Reward
 	 */
         Reward_Item (Item *item);
 
+        //! Alternative constructor.
+        Reward_Item ();
+
 	//! Loading constructor.
 	/**
 	 * Make a new reward item by loading it from an opened saved-game file.
@@ -396,6 +416,10 @@ class Reward_Item: public Reward
 	//! Get the Item object associated with this reward.
 	Item *getItem() const {return d_item;}
 
+        // Set Methods
+
+        //! Set the item for this reward.
+        void setItem (Item*i) {d_item = i;}
 
 	// Methods that operate on the class data but do not modify the class.
 
@@ -446,6 +470,9 @@ class Reward_Ruin: public Reward
 	 */
         Reward_Ruin(Ruin *ruin);
 
+        //~ Alternative constructor.
+        Reward_Ruin ();
+
 	//! Loading constructor.
 	/**
 	 * Make a new Reward_Ruin by loading it from an opened saved-game file.
@@ -471,6 +498,14 @@ class Reward_Ruin: public Reward
 	//! Return the Ruin object associated with this Reward_Ruin.
 	Ruin* getRuin() const 
 	  {return Ruinlist::getInstance()->getObjectAt(d_ruin_pos);}
+
+	// Set Methods
+
+        //! Make this reward reveal a ruin at POS.
+        void setRuinPos (Vector<int> pos) {d_ruin_pos = pos;}
+
+        //! Make this reward not point to a ruin.
+        void clearRuin () {d_ruin_pos = Vector<int>(-1, -1);}
 
 	// Methods that operate on the class data but do not modify the class.
 

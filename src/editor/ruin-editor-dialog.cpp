@@ -40,6 +40,7 @@
 #include "keeper.h"
 #include "undo-mgr.h"
 #include "ruin-editor-actions.h"
+#include "reward-editor-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &RuinEditorDialog::x)
 
@@ -70,7 +71,12 @@ RuinEditorDialog::RuinEditorDialog(Gtk::Window &parent, Ruin *r, CreateScenarioR
 
   for (Playerlist::iterator i = Playerlist::getInstance()->begin(),
        end = Playerlist::getInstance()->end(); i != end; ++i)
-    player_combobox->append((*i)->getName());
+    {
+      if ((*i) != Playerlist::getInstance ()->getNeutral ())
+        player_combobox->append((*i)->getName());
+      else
+        player_combobox->append(_("Hero's player"));
+    }
 
   Gtk::Alignment *alignment;
   xml->get_widget("player_alignment", alignment);
@@ -122,6 +128,8 @@ void RuinEditorDialog::on_hidden_toggled()
 {
   umgr->add (new RuinEditorAction_OnlySeenBy (ruin));
   ruin->setHidden(hidden_switch->get_active());
+  if (hidden_switch->get_active ())
+    ruin->setOwner (Playerlist::getInstance ()->getNeutral ());
   update ();
 }
 
@@ -213,44 +221,39 @@ void RuinEditorDialog::on_new_reward_toggled()
 
 void RuinEditorDialog::on_reward_clicked()
 {
-  umgr->add (new RuinEditorAction_Reward (ruin));
-  //d_changed = true;
-  //this is a dog's breakfast right here.  wow.
-  //ruin rewards are not in the rewards list, so we have to push it on
-  //and off.
-  //but the edit in the reward list editor can make it go away,
-  //so we have to be careful about dangling pointers.
+  RuinEditorAction_Reward *action = new RuinEditorAction_Reward (ruin);
   if (ruin->getReward ())
     {
-      Reward *copy = Reward::copy (ruin->getReward ());
-      Rewardlist::getInstance ()->push_front (copy);
-      RewardlistDialog d(*dialog, true, true);
-      bool changed = d.run();
-      if (changed)
-        d_changed = true;
-      if (d.get_reward())
+      Player *neutral = Playerlist::getInstance()->getNeutral();
+      RewardEditorDialog d (*dialog, neutral, true, ruin->getReward ());
+      if (d.run ())
         {
-          d_changed = true;
-          ruin->setReward (Reward::copy (d.get_reward ()));
-          //if (d.get_reward () != Rewardlist::getInstance ()->front ())
-          //Rewardlist::getInstance()->deleteReward
-          //(Rewardlist::getInstance()->front ());
-          Rewardlist::getInstance()->deleteReward (d.get_reward ());
+          if (d.get_reward ())
+            {
+              umgr->add (action);
+              ruin->setReward (Reward::copy (d.get_reward ()));
+              d_changed = true;
+            }
+          else
+            {
+              if (ruin->getReward () != NULL)
+                {
+                  umgr->add (action);
+                  ruin->setReward (NULL);
+                  d_changed = true;
+                }
+              else
+                delete action;
+            }
         }
       else
-        {
-          if (ruin->getReward () != NULL)
-            d_changed = true;
-          ruin->setReward (NULL);
-          Rewardlist::getInstance()->deleteReward
-            (Rewardlist::getInstance()->front ());
-          random_reward_switch->set_active (true);
-        }
+        delete action;
     }
   else
     {
       RewardlistDialog d(*dialog, true, false);
       bool changed = d.run();
+      umgr->add (action);
       if (changed)
         d_changed = true;
       if (d.get_reward ())
@@ -260,7 +263,9 @@ void RuinEditorDialog::on_reward_clicked()
           Rewardlist::getInstance()->deleteReward (d.get_reward ());
         }
       else
-        random_reward_switch->set_active (true);
+        {
+          ruin->setReward (NULL);
+        }
     }
 
   update ();
@@ -460,6 +465,7 @@ RuinEditorDialog::executeAction (UndoAction *action2)
               dynamic_cast<RuinEditorAction_OnlySeenBy*>(action);
             out = new RuinEditorAction_OnlySeenBy (ruin);
             ruin->setHidden (a->getRuin ()->isHidden ());
+            ruin->setOwner (a->getRuin ()->getOwner ());
           }
         break;
       case RuinEditorAction::ONLY_SEEN_PLAYER:
@@ -487,6 +493,11 @@ RuinEditorDialog::executeAction (UndoAction *action2)
             disconnect_signals ();
             random_reward_switch->set_active (a->getActive ());
             d_random_reward_active = a->getActive ();
+            Reward *reward = a->getRuin ()->getReward ();
+            if (!reward)
+              ruin->setReward (reward);
+            else
+              ruin->setReward (Reward::copy (reward));
             connect_signals ();
           }
         break;

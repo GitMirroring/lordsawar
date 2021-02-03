@@ -92,6 +92,7 @@ libeditor_la_SOURCES =\
 	smallmap-editor-actions.cpp smallmap-editor-actions.h \
 	itemlist-dialog.cpp itemlist-dialog.h \
 	reward-editor-dialog.cpp reward-editor-dialog.h \
+       	reward-editor-actions.h \
 	select-item-dialog.cpp select-item-dialog.h \
 	rewardlist-dialog.cpp rewardlist-dialog.h \
 	select-hidden-ruin-dialog.cpp select-hidden-ruin-dialog.h \
