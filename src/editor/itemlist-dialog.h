@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 
 #include "Itemlist.h"
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
+#include "itemlist-editor-actions.h"
 
 class ArmyProto;
 class ArmyChooserButton;
@@ -36,6 +38,7 @@ class ItemlistDialog: public LwEditorDialog
     bool item_was_changed () const {return d_changed;}
 
  private:
+    UndoMgr *umgr;
     bool d_changed;
     Glib::ustring current_save_filename;
     Itemlist *d_itemlist; //current itemlist
@@ -80,6 +83,8 @@ class ItemlistDialog: public LwEditorDialog
     Gtk::SpinButton *num_defenders_spinbutton;
     Gtk::Switch *plantable_switch;
     std::vector<sigc::connection> connections;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
 
     class ItemsColumns: public Gtk::TreeModelColumnRecord {
@@ -100,6 +105,7 @@ class ItemlistDialog: public LwEditorDialog
     void update_itemlist_buttons();
 
     void fill_item_info(ItemProto *item);
+    void clear_item_info();
 
     //callbacks
     void on_name_changed();
@@ -126,7 +132,8 @@ class ItemlistDialog: public LwEditorDialog
     void on_sinks_ships_toggled();
     void on_banish_worms_toggled();
     void on_burn_bridge_toggled();
-    void on_uses_changed();
+    void on_uses_text_changed ();
+    void on_uses_changed ();
     void on_kill_army_type_selected (const ArmyProto *a);
     void on_capture_keeper_toggled();
     void on_pickup_bags_toggled();
@@ -152,6 +159,14 @@ class ItemlistDialog: public LwEditorDialog
     void connect_signals ();
     void disconnect_signals ();
     void load_widgets ();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    ItemProto* getItemByIndex (ItemListEditorAction_Index *a);
+    UndoAction *executeAction (UndoAction *action);
+    int getCurIndex ();
+    ItemProto* getCurItem ();
+    void fill_items ();
 };
 
 #endif

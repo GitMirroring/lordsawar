@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.2 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkAdjustment" id="adjustment1">
     <property name="upper">100</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="adjustment2">
     <property name="lower">1</property>
     <property name="upper">100</property>
     <property name="value">1</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="adjustment3">
     <property name="lower">1</property>
     <property name="upper">32</property>
     <property name="value">1</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="adjustment4">
     <property name="lower">1</property>
     <property name="upper">16</property>
     <property name="value">1</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="adjustment5">
     <property name="lower">1</property>
     <property name="upper">32</property>
     <property name="value">1</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
   </object>
   <object class="GtkListStore" id="liststore1">
     <columns>
@@ -71,38 +71,36 @@
     </data>
   </object>
   <object class="GtkDialog" id="dialog">
-    <property name="can_focus">False</property>
-    <property name="border_width">6</property>
+    <property name="can-focus">False</property>
+    <property name="border-width">6</property>
     <property name="title" translatable="yes">Item Details</property>
     <property name="modal">True</property>
-    <property name="window_position">mouse</property>
-    <property name="destroy_with_parent">True</property>
-    <property name="type_hint">dialog</property>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
+    <property name="window-position">mouse</property>
+    <property name="destroy-with-parent">True</property>
+    <property name="type-hint">dialog</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">18</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
             <child>
-              <object class="GtkButton" id="select_button">
-                <property name="label">gtk-close</property>
+              <object class="GtkButton" id="undo_button">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="has_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="has_default">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
+                <property name="can-focus">False</property>
+                <property name="focus-on-click">False</property>
+                <property name="receives-default">False</property>
+                <property name="opacity">0</property>
+                <property name="relief">none</property>
+                <child>
+                  <placeholder/>
+                </child>
+                <accelerator key="z" signal="activate" modifiers="GDK_CONTROL_MASK"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -110,45 +108,83 @@
                 <property name="position">0</property>
               </packing>
             </child>
+            <child>
+              <object class="GtkButton" id="redo_button">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="focus-on-click">False</property>
+                <property name="receives-default">False</property>
+                <property name="opacity">0</property>
+                <property name="relief">none</property>
+                <child>
+                  <placeholder/>
+                </child>
+                <accelerator key="z" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
+                <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="select_button">
+                <property name="label">gtk-close</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="has-focus">True</property>
+                <property name="can-default">True</property>
+                <property name="has-default">True</property>
+                <property name="receives-default">True</property>
+                <property name="use-underline">True</property>
+                <property name="use-stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="pack_type">end</property>
+            <property name="pack-type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
         <child>
           <object class="GtkBox" id="contents_vbox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="orientation">vertical</property>
             <property name="spacing">12</property>
             <child>
               <object class="GtkBox" id="vbox1">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkBox" id="hbox1">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <child>
                       <object class="GtkBox" id="itemlist_vbox">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <property name="spacing">6</property>
                         <child>
                           <object class="GtkScrolledWindow" id="scrolledwindow1">
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="hscrollbar_policy">never</property>
-                            <property name="shadow_type">in</property>
+                            <property name="can-focus">True</property>
+                            <property name="hscrollbar-policy">never</property>
+                            <property name="shadow-type">in</property>
                             <child>
                               <object class="GtkTreeView" id="items_treeview">
                                 <property name="visible">True</property>
-                                <property name="can_focus">True</property>
+                                <property name="can-focus">True</property>
                                 <child internal-child="selection">
                                   <object class="GtkTreeSelection" id="aaaa"/>
                                 </child>
@@ -164,16 +200,16 @@
                         <child>
                           <object class="GtkBox" id="itemlist_button_hbox">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can-focus">False</property>
                             <property name="halign">center</property>
                             <property name="spacing">8</property>
                             <child>
                               <object class="GtkButton" id="add_item_button">
                                 <property name="label">gtk-add</property>
                                 <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="receives_default">False</property>
-                                <property name="use_stock">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="receives-default">False</property>
+                                <property name="use-stock">True</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -185,9 +221,9 @@
                               <object class="GtkButton" id="remove_item_button">
                                 <property name="label">gtk-remove</property>
                                 <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="receives_default">False</property>
-                                <property name="use_stock">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="receives-default">False</property>
+                                <property name="use-stock">True</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -212,50 +248,51 @@
                     <child>
                       <object class="GtkBox" id="item_vbox">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <property name="spacing">12</property>
                         <child>
                           <object class="GtkAlignment" id="alignment1">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="left_padding">12</property>
+                            <property name="can-focus">False</property>
+                            <property name="left-padding">12</property>
                             <child>
                               <object class="GtkBox" id="vbox4">
                                 <property name="visible">True</property>
-                                <property name="can_focus">False</property>
+                                <property name="can-focus">False</property>
                                 <property name="orientation">vertical</property>
                                 <child>
                                   <object class="GtkScrolledWindow">
-                                    <property name="height_request">333</property>
+                                    <property name="height-request">333</property>
                                     <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="hscrollbar_policy">never</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="hscrollbar-policy">never</property>
                                     <child>
                                       <object class="GtkViewport">
                                         <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
+                                        <property name="can-focus">False</property>
                                         <child>
                                           <object class="GtkBox">
                                             <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
+                                            <property name="can-focus">False</property>
                                             <property name="orientation">vertical</property>
                                             <child>
+                                              <!-- n-columns=3 n-rows=3 -->
                                               <object class="GtkGrid">
                                                 <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="margin_bottom">12</property>
-                                                <property name="column_homogeneous">True</property>
+                                                <property name="can-focus">False</property>
+                                                <property name="margin-bottom">12</property>
+                                                <property name="column-homogeneous">True</property>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Name</property>
                                                         <attributes>
@@ -271,14 +308,14 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <child>
                                                           <object class="GtkEntry" id="name_entry">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="invisible_char">●</property>
-                                                            <property name="primary_icon_activatable">False</property>
-                                                            <property name="secondary_icon_activatable">False</property>
+                                                            <property name="can-focus">True</property>
+                                                            <property name="invisible-char">●</property>
+                                                            <property name="primary-icon-activatable">False</property>
+                                                            <property name="secondary-icon-activatable">False</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">True</property>
@@ -295,20 +332,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">0</property>
-                                                    <property name="top_attach">0</property>
+                                                    <property name="left-attach">0</property>
+                                                    <property name="top-attach">0</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Number of Uses</property>
                                                         <attributes>
@@ -324,18 +361,18 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSpinButton" id="uses_spinbutton">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="invisible_char">●</property>
-                                                            <property name="width_chars">5</property>
+                                                            <property name="can-focus">True</property>
+                                                            <property name="invisible-char">●</property>
+                                                            <property name="width-chars">5</property>
                                                             <property name="text" translatable="yes">0</property>
                                                             <property name="xalign">1</property>
-                                                            <property name="primary_icon_activatable">False</property>
-                                                            <property name="secondary_icon_activatable">False</property>
+                                                            <property name="primary-icon-activatable">False</property>
+                                                            <property name="secondary-icon-activatable">False</property>
                                                             <property name="adjustment">adjustment1</property>
                                                           </object>
                                                           <packing>
@@ -353,9 +390,30 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">1</property>
-                                                    <property name="top_attach">0</property>
+                                                    <property name="left-attach">1</property>
+                                                    <property name="top-attach">0</property>
                                                   </packing>
+                                                </child>
+                                                <child>
+                                                  <placeholder/>
+                                                </child>
+                                                <child>
+                                                  <placeholder/>
+                                                </child>
+                                                <child>
+                                                  <placeholder/>
+                                                </child>
+                                                <child>
+                                                  <placeholder/>
+                                                </child>
+                                                <child>
+                                                  <placeholder/>
+                                                </child>
+                                                <child>
+                                                  <placeholder/>
+                                                </child>
+                                                <child>
+                                                  <placeholder/>
                                                 </child>
                                               </object>
                                               <packing>
@@ -365,23 +423,24 @@
                                               </packing>
                                             </child>
                                             <child>
+                                              <!-- n-columns=3 n-rows=9 -->
                                               <object class="GtkGrid">
                                                 <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="margin_top">12</property>
-                                                <property name="margin_bottom">12</property>
-                                                <property name="row_spacing">48</property>
-                                                <property name="column_spacing">24</property>
+                                                <property name="can-focus">False</property>
+                                                <property name="margin-top">12</property>
+                                                <property name="margin-bottom">12</property>
+                                                <property name="row-spacing">48</property>
+                                                <property name="column-spacing">24</property>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">+1 to Hero's Strength</property>
                                                         <attributes>
@@ -397,12 +456,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="add1str_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                             <property name="halign">center</property>
                                                           </object>
                                                           <packing>
@@ -420,20 +479,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">0</property>
-                                                    <property name="top_attach">0</property>
+                                                    <property name="left-attach">0</property>
+                                                    <property name="top-attach">0</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">+2 to Hero's Strength</property>
                                                         <attributes>
@@ -449,12 +508,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="add2str_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -471,20 +530,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">1</property>
-                                                    <property name="top_attach">0</property>
+                                                    <property name="left-attach">1</property>
+                                                    <property name="top-attach">0</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">+3 to Hero's Strength</property>
                                                         <attributes>
@@ -500,12 +559,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="add3str_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -522,20 +581,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">2</property>
-                                                    <property name="top_attach">0</property>
+                                                    <property name="left-attach">2</property>
+                                                    <property name="top-attach">0</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">+1 to Stack's Strength</property>
                                                         <attributes>
@@ -551,12 +610,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="add1stack_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -573,20 +632,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">0</property>
-                                                    <property name="top_attach">1</property>
+                                                    <property name="left-attach">0</property>
+                                                    <property name="top-attach">1</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">+2 to Stack's Strength</property>
                                                         <attributes>
@@ -602,12 +661,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="add2stack_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -624,20 +683,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">1</property>
-                                                    <property name="top_attach">1</property>
+                                                    <property name="left-attach">1</property>
+                                                    <property name="top-attach">1</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">+3 to Stack's Strength</property>
                                                         <attributes>
@@ -653,12 +712,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="add3stack_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -675,20 +734,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">2</property>
-                                                    <property name="top_attach">1</property>
+                                                    <property name="left-attach">2</property>
+                                                    <property name="top-attach">1</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Stack Can Fly</property>
                                                         <attributes>
@@ -704,12 +763,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="flystack_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -726,20 +785,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">0</property>
-                                                    <property name="top_attach">2</property>
+                                                    <property name="left-attach">0</property>
+                                                    <property name="top-attach">2</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Double Movement of Stack</property>
                                                         <attributes>
@@ -755,12 +814,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="doublemovestack_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -777,20 +836,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">1</property>
-                                                    <property name="top_attach">2</property>
+                                                    <property name="left-attach">1</property>
+                                                    <property name="top-attach">2</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">+2 Gold Per City</property>
                                                         <attributes>
@@ -806,12 +865,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="add2goldpercity_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -828,20 +887,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">2</property>
-                                                    <property name="top_attach">2</property>
+                                                    <property name="left-attach">2</property>
+                                                    <property name="top-attach">2</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">+3 Gold Per City</property>
                                                         <attributes>
@@ -857,12 +916,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="add3goldpercity_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -879,20 +938,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">0</property>
-                                                    <property name="top_attach">3</property>
+                                                    <property name="left-attach">0</property>
+                                                    <property name="top-attach">3</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">+4 Gold Per City</property>
                                                         <attributes>
@@ -908,12 +967,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="add4goldpercity_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -930,20 +989,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">1</property>
-                                                    <property name="top_attach">3</property>
+                                                    <property name="left-attach">1</property>
+                                                    <property name="top-attach">3</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">+5 Gold Per City</property>
                                                         <attributes>
@@ -959,12 +1018,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="add5goldpercity_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -981,20 +1040,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">2</property>
-                                                    <property name="top_attach">3</property>
+                                                    <property name="left-attach">2</property>
+                                                    <property name="top-attach">3</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Steal % Gold from Enemy</property>
                                                         <attributes>
@@ -1010,13 +1069,13 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <property name="spacing">6</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="steals_gold_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1027,14 +1086,14 @@
                                                         <child>
                                                           <object class="GtkSpinButton" id="steal_percent_spinbutton">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="invisible_char">●</property>
+                                                            <property name="can-focus">True</property>
+                                                            <property name="invisible-char">●</property>
                                                             <property name="text" translatable="yes">0</property>
                                                             <property name="xalign">1</property>
-                                                            <property name="primary_icon_activatable">False</property>
-                                                            <property name="secondary_icon_activatable">False</property>
+                                                            <property name="primary-icon-activatable">False</property>
+                                                            <property name="secondary-icon-activatable">False</property>
                                                             <property name="adjustment">adjustment2</property>
-                                                            <property name="climb_rate">1</property>
+                                                            <property name="climb-rate">1</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1051,20 +1110,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">0</property>
-                                                    <property name="top_attach">4</property>
+                                                    <property name="left-attach">0</property>
+                                                    <property name="top-attach">4</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Sink Enemy Ships</property>
                                                         <attributes>
@@ -1080,12 +1139,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="sinks_ships_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1102,20 +1161,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">1</property>
-                                                    <property name="top_attach">4</property>
+                                                    <property name="left-attach">1</property>
+                                                    <property name="top-attach">4</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Burn Bridge</property>
                                                         <attributes>
@@ -1131,12 +1190,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="burn_bridge_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1153,20 +1212,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">0</property>
-                                                    <property name="top_attach">5</property>
+                                                    <property name="left-attach">0</property>
+                                                    <property name="top-attach">5</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Capture Ruin Keeper</property>
                                                         <attributes>
@@ -1182,12 +1241,12 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="capture_keeper_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1204,20 +1263,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">1</property>
-                                                    <property name="top_attach">5</property>
+                                                    <property name="left-attach">1</property>
+                                                    <property name="top-attach">5</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Disease City
 (Number of Army Units)</property>
@@ -1235,13 +1294,13 @@
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <property name="spacing">6</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="disease_city_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1252,14 +1311,14 @@
                                                         <child>
                                                           <object class="GtkSpinButton" id="disease_armies_percent_spinbutton">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="invisible_char">●</property>
+                                                            <property name="can-focus">True</property>
+                                                            <property name="invisible-char">●</property>
                                                             <property name="text" translatable="yes">0</property>
                                                             <property name="xalign">1</property>
-                                                            <property name="primary_icon_activatable">False</property>
-                                                            <property name="secondary_icon_activatable">False</property>
+                                                            <property name="primary-icon-activatable">False</property>
+                                                            <property name="secondary-icon-activatable">False</property>
                                                             <property name="adjustment">adjustment3</property>
-                                                            <property name="climb_rate">1</property>
+                                                            <property name="climb-rate">1</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1276,20 +1335,20 @@
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">0</property>
-                                                    <property name="top_attach">6</property>
+                                                    <property name="left-attach">0</property>
+                                                    <property name="top-attach">6</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Pick Up
 Bags</property>
@@ -1307,12 +1366,12 @@ Bags</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="pickup_bags_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1329,20 +1388,20 @@ Bags</property>
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">1</property>
-                                                    <property name="top_attach">6</property>
+                                                    <property name="left-attach">1</property>
+                                                    <property name="top-attach">6</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Add Movement
 Points</property>
@@ -1360,13 +1419,13 @@ Points</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <property name="spacing">6</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="add_mp_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1377,14 +1436,14 @@ Points</property>
                                                         <child>
                                                           <object class="GtkSpinButton" id="add_mp_spinbutton">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="invisible_char">●</property>
+                                                            <property name="can-focus">True</property>
+                                                            <property name="invisible-char">●</property>
                                                             <property name="text" translatable="yes">1</property>
                                                             <property name="xalign">1</property>
-                                                            <property name="primary_icon_activatable">False</property>
-                                                            <property name="secondary_icon_activatable">False</property>
+                                                            <property name="primary-icon-activatable">False</property>
+                                                            <property name="secondary-icon-activatable">False</property>
                                                             <property name="adjustment">adjustment4</property>
-                                                            <property name="climb_rate">1</property>
+                                                            <property name="climb-rate">1</property>
                                                             <property name="value">1</property>
                                                           </object>
                                                           <packing>
@@ -1402,20 +1461,20 @@ Points</property>
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">2</property>
-                                                    <property name="top_attach">6</property>
+                                                    <property name="left-attach">2</property>
+                                                    <property name="top-attach">6</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Teleport to City</property>
                                                         <attributes>
@@ -1431,12 +1490,12 @@ Points</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="teleport_to_city_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1453,20 +1512,20 @@ Points</property>
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">2</property>
-                                                    <property name="top_attach">5</property>
+                                                    <property name="left-attach">2</property>
+                                                    <property name="top-attach">5</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Summon Monster</property>
                                                         <attributes>
@@ -1482,12 +1541,12 @@ Points</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="summon_monster_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1505,13 +1564,13 @@ Points</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkButton" id="summon_army_type_button">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="receives_default">True</property>
+                                                            <property name="can-focus">True</property>
+                                                            <property name="receives-default">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1529,12 +1588,12 @@ Points</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="orientation">vertical</property>
                                                         <child>
                                                           <object class="GtkComboBox" id="building_type_to_summon_on_combobox">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">False</property>
+                                                            <property name="can-focus">False</property>
                                                             <property name="halign">center</property>
                                                             <property name="model">liststore1</property>
                                                             <child>
@@ -1559,20 +1618,20 @@ Points</property>
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">1</property>
-                                                    <property name="top_attach">7</property>
+                                                    <property name="left-attach">1</property>
+                                                    <property name="top-attach">7</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Raise Defenders in City</property>
                                                         <attributes>
@@ -1588,12 +1647,12 @@ Points</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="raise_defenders_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1611,13 +1670,13 @@ Points</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkButton" id="defender_army_type_button">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="receives_default">True</property>
+                                                            <property name="can-focus">True</property>
+                                                            <property name="receives-default">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1635,18 +1694,18 @@ Points</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <property name="orientation">vertical</property>
                                                         <child>
                                                           <object class="GtkSpinButton" id="num_defenders_spinbutton">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="invisible_char">●</property>
+                                                            <property name="can-focus">True</property>
+                                                            <property name="invisible-char">●</property>
                                                             <property name="text" translatable="yes">0</property>
                                                             <property name="xalign">1</property>
-                                                            <property name="primary_icon_activatable">False</property>
-                                                            <property name="secondary_icon_activatable">False</property>
+                                                            <property name="primary-icon-activatable">False</property>
+                                                            <property name="secondary-icon-activatable">False</property>
                                                             <property name="adjustment">adjustment5</property>
                                                           </object>
                                                           <packing>
@@ -1664,20 +1723,20 @@ Points</property>
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">2</property>
-                                                    <property name="top_attach">7</property>
+                                                    <property name="left-attach">2</property>
+                                                    <property name="top-attach">7</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Kill All Units Of
 Giant Worms</property>
@@ -1695,12 +1754,12 @@ Giant Worms</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="banish_worms_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1718,13 +1777,13 @@ Giant Worms</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="orientation">vertical</property>
                                                         <child>
                                                           <object class="GtkButton" id="kill_army_type_button">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="receives_default">True</property>
+                                                            <property name="can-focus">True</property>
+                                                            <property name="receives-default">True</property>
                                                             <property name="halign">center</property>
                                                           </object>
                                                           <packing>
@@ -1742,20 +1801,20 @@ Giant Worms</property>
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">0</property>
-                                                    <property name="top_attach">7</property>
+                                                    <property name="left-attach">0</property>
+                                                    <property name="top-attach">7</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="valign">end</property>
                                                         <property name="label" translatable="yes">Persuade Neutral City</property>
                                                         <attributes>
@@ -1771,12 +1830,12 @@ Giant Worms</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="persuade_neutral_city_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1793,20 +1852,20 @@ Giant Worms</property>
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">2</property>
-                                                    <property name="top_attach">4</property>
+                                                    <property name="left-attach">2</property>
+                                                    <property name="top-attach">4</property>
                                                   </packing>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
+                                                    <property name="can-focus">False</property>
                                                     <property name="orientation">vertical</property>
                                                     <property name="spacing">6</property>
                                                     <child>
                                                       <object class="GtkLabel">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="label" translatable="yes">Destination for Vectored
 Army Units when Planted</property>
                                                         <property name="justify">center</property>
@@ -1823,12 +1882,12 @@ Army Units when Planted</property>
                                                     <child>
                                                       <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
+                                                        <property name="can-focus">False</property>
                                                         <property name="halign">center</property>
                                                         <child>
                                                           <object class="GtkSwitch" id="plantable_switch">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
+                                                            <property name="can-focus">True</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -1845,8 +1904,8 @@ Army Units when Planted</property>
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="left_attach">0</property>
-                                                    <property name="top_attach">8</property>
+                                                    <property name="left-attach">0</property>
+                                                    <property name="top-attach">8</property>
                                                   </packing>
                                                 </child>
                                                 <child>

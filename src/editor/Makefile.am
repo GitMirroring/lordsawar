@@ -90,7 +90,7 @@ libeditor_la_SOURCES =\
 	editablesmallmap.cpp editablesmallmap.h \
 	smallmap-editor-dialog.cpp smallmap-editor-dialog.h \
 	smallmap-editor-actions.cpp smallmap-editor-actions.h \
-	itemlist-dialog.cpp itemlist-dialog.h \
+	itemlist-dialog.cpp itemlist-dialog.h itemlist-editor-actions.h \
 	reward-editor-dialog.cpp reward-editor-dialog.h \
        	reward-editor-actions.h \
 	select-item-dialog.cpp select-item-dialog.h \
