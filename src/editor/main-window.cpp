@@ -1704,8 +1704,7 @@ void MainWindow::popup_dialog_for_object(UniquelyIdentified *object, Glib::ustri
         EditorAction_EditStack *action =
           new EditorAction_EditStack (LwRectangle (s->getPos ()));
 	StackEditorDialog d(*window, s);
-	int response = d.run();
-	if (response == Gtk::RESPONSE_ACCEPT)
+	if (d.run())
           {
             addUndo (action);
             scenario_modified = true;

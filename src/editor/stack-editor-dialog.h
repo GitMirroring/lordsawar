@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
+#include "stack-editor-actions.h"
 
 class Stack;
 class Army;
@@ -32,13 +34,14 @@ class StackEditorDialog: public LwEditorDialog
 {
  public:
     StackEditorDialog(Gtk::Window &parent, Stack *stack, int min_size = 1);
-    ~StackEditorDialog() {}
+    ~StackEditorDialog();
 
-    int run();
+    bool run();
 
  private:
+    UndoMgr *umgr;
+    bool d_changed;
     Gtk::ComboBoxText *player_combobox;
-
     Gtk::TreeView *army_treeview;
 
     class ArmyColumns: public Gtk::TreeModelColumnRecord {
@@ -66,6 +69,8 @@ class StackEditorDialog: public LwEditorDialog
     Gtk::Button *copy_button;
     Gtk::Button *edit_hero_button;
     Gtk::Switch *fortified_switch;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     Stack *stack;
     int min_size;
@@ -88,7 +93,19 @@ class StackEditorDialog: public LwEditorDialog
     void on_upkeep_edited(const Glib::ustring &path, const Glib::ustring &new_text);
 
     Player *get_selected_player();
-    void update_armies ();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void update ();
+    void disconnect_signals ();
+    void connect_signals ();
+    std::list<sigc::connection> connections;
+    void fill_armies ();
+    UndoAction *executeAction (UndoAction *action);
+    Army* getArmyByIndex (StackEditorAction_Index *a);
+    bool changeOwnership (Player *old_player, Player *new_player);
+    int getCurIndex ();
+    Army* getCurArmy ();
+    void populate_stack_with_armies (Stack *s);
 };
 
 #endif

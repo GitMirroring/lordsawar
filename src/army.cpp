@@ -51,6 +51,8 @@ Army::Army(const Army& a, bool sync_id, Player *owner)
     d_number_hasbeenhit(a.d_number_hasbeenhit), 
     d_visitedTemples(a.d_visitedTemples)
 {
+  if (!owner)
+    setOwnerId (a.getOwnerId ());
   for(int i = 0; i < 3; i++)
     d_medal_bonus[i] = a.d_medal_bonus[i];
 }
