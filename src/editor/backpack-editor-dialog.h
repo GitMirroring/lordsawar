@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
 #include "Backpack.h"
+#include "undo-mgr.h"
+#include "backpack-editor-actions.h"
 
 class Item;
 
@@ -30,12 +32,13 @@ class BackpackEditorDialog: public LwEditorDialog
 {
  public:
     BackpackEditorDialog(Gtk::Window &parent, Backpack *backpack);
-    ~BackpackEditorDialog() {}
+    ~BackpackEditorDialog();
 
     bool run();
     void hide();
     
  private:
+    UndoMgr *umgr;
     bool d_changed;
     Backpack *backpack;
 
@@ -43,6 +46,8 @@ class BackpackEditorDialog: public LwEditorDialog
     Gtk::Button *remove_button;
     Gtk::Button *add_button;
     Gtk::Button *edit_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     class ItemColumns: public Gtk::TreeModelColumnRecord {
     public:
@@ -64,6 +69,16 @@ class BackpackEditorDialog: public LwEditorDialog
     void add_item(Item *item);
     void fill_bag();
     void update_buttons ();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    void update ();
+    Item *getCurItem ();
+    int getCurIndex ();
+    Item* getItemByIndex (BackpackEditorAction_Index *a);
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif
