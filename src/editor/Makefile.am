@@ -98,7 +98,7 @@ libeditor_la_SOURCES =\
 	select-hidden-ruin-dialog.cpp select-hidden-ruin-dialog.h \
 	RenamableLocation.cpp RenamableLocation.h  \
 	backpack-editor-dialog.cpp backpack-editor-dialog.h \
-	item-editor-dialog.cpp item-editor-dialog.h \
+	item-editor-dialog.cpp item-editor-dialog.h item-editor-actions.h \
 	planted-standard-editor-dialog.cpp planted-standard-editor-dialog.h \
 	hero-editor-dialog.cpp hero-editor-dialog.h hero-editor-actions.h \
 	editor-splash-window.cpp editor-splash-window.h \
