@@ -94,7 +94,7 @@ libeditor_la_SOURCES =\
 	reward-editor-dialog.cpp reward-editor-dialog.h \
        	reward-editor-actions.h \
 	select-item-dialog.cpp select-item-dialog.h \
-	rewardlist-dialog.cpp rewardlist-dialog.h \
+	rewardlist-dialog.cpp rewardlist-dialog.h rewardlist-editor-actions.h \
 	select-hidden-ruin-dialog.cpp select-hidden-ruin-dialog.h \
 	RenamableLocation.cpp RenamableLocation.h  \
 	backpack-editor-dialog.cpp backpack-editor-dialog.h \

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 
 #include "rewardlist.h"
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
+#include "rewardlist-editor-actions.h"
 
 //! Scenario editor.  Manages Reward objects in the Rewardlist.
 class RewardlistDialog: public LwEditorDialog
@@ -35,6 +37,7 @@ class RewardlistDialog: public LwEditorDialog
     Reward *get_reward () {return d_reward;}
 
  private:
+    UndoMgr *umgr;
     bool d_changed;
     bool d_select;
     bool d_clear;
@@ -45,6 +48,8 @@ class RewardlistDialog: public LwEditorDialog
     Gtk::Button *edit_button;
     Gtk::Button *clear_button;
     Gtk::Button *close_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 
     class RewardsColumns: public Gtk::TreeModelColumnRecord {
     public:
@@ -65,6 +70,17 @@ class RewardlistDialog: public LwEditorDialog
     void on_remove_clicked();
     void on_edit_clicked();
     void on_reward_selected();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    void update ();
+    UndoAction *executeAction (UndoAction *action);
+    void fill_rewards();
+    int getCurIndex ();
+    Reward* getCurReward ();
+    Reward* getRewardByIndex (RewardlistEditorAction_Index *a);
 };
 
 #endif
