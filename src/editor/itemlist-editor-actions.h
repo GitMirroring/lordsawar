@@ -84,7 +84,7 @@ class ItemListEditorAction_Save : public ItemListEditorAction
 {
     public:
         ItemListEditorAction_Save (Type t, Itemlist *i)
-          :ItemListEditorAction (t, true), d_itemlist (i) {}
+          :ItemListEditorAction (t, false), d_itemlist (i) {}
         ~ItemListEditorAction_Save ()
           {
             delete d_itemlist;

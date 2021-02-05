@@ -102,7 +102,7 @@ class HeroesEditorAction_Save : public HeroesEditorAction
 {
     public:
         HeroesEditorAction_Save (Type t, HeroTemplates *h)
-          :HeroesEditorAction (t, true), d_heroes (h) {}
+          :HeroesEditorAction (t, false), d_heroes (h) {}
         ~HeroesEditorAction_Save ()
           {
             delete d_heroes;

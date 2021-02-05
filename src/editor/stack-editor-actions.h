@@ -166,7 +166,7 @@ class StackEditorAction_Save : public StackEditorAction
 {
     public:
         StackEditorAction_Save (Type t, Stack *s)
-          :StackEditorAction (t, true), d_stack (s) {}
+          :StackEditorAction (t, false), d_stack (s) {}
         ~StackEditorAction_Save ()
           {
             delete d_stack;
