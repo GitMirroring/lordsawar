@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,47 +27,71 @@
 #include "hero.h"
 #include "backpack-editor-dialog.h"
 #include "Backpack.h"
+#include "hero-editor-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &HeroEditorDialog::x)
 
 HeroEditorDialog::HeroEditorDialog(Gtk::Window &parent, Hero *hero)
  : LwEditorDialog(parent, "hero-editor-dialog.ui")
 {
+  d_changed = false;
   d_hero = hero;
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
 
   xml->get_widget("edit_backpack_button", edit_backpack_button);
   edit_backpack_button->signal_clicked().connect (method(on_edit_backpack_clicked));
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
   xml->get_widget("gender_combobox", gender_combobox);
   xml->get_widget("name_entry", name_entry);
-  name_entry->set_text(d_hero->getName());
-  gender_combobox->set_active(d_hero->getGender()-1);
-  gender_combobox->signal_changed ().connect (method (on_gender_changed));
-  name_entry->signal_changed ().connect (method (on_name_changed));
-  update_buttons ();
+  umgr->addCursor (name_entry);
+  connect_signals ();
+  update ();
 }
 
-int HeroEditorDialog::run()
+HeroEditorDialog::~HeroEditorDialog()
+{
+  delete umgr;
+}
+
+bool HeroEditorDialog::run()
 {
   dialog->show_all();
-  return dialog->run ();
+  dialog->run ();
+  return d_changed;
 }
 
 void HeroEditorDialog::on_edit_backpack_clicked()
 {
+  HeroEditorAction_Backpack *action =
+    new HeroEditorAction_Backpack (d_hero->getBackpack ());
   BackpackEditorDialog d(*dialog, d_hero->getBackpack());
-  d.run();
+  if (d.run())
+    {
+      umgr->add (action);
+      d_changed = true;
+    }
+  else
+    delete action;
   update_buttons ();
   return;
 }
 
 void HeroEditorDialog::on_name_changed ()
 {
+  umgr->add (new HeroEditorAction_Name (d_hero->getName (), umgr, name_entry));
   d_hero->setName (String::utrim (name_entry->get_text ()));
+  d_changed = true;
 }
 
 void HeroEditorDialog::on_gender_changed ()
 {
+  umgr->add (new HeroEditorAction_Gender (Hero::Gender (d_hero->getGender ())));
   d_hero->setGender(Hero::Gender(gender_combobox->get_active_row_number()+1));
+  d_changed = true;
 }
 
 void HeroEditorDialog::update_buttons ()
@@ -77,4 +101,87 @@ void HeroEditorDialog::update_buttons ()
                                  "Carrying %1 items",
                                  d_hero->getBackpack()->size ()),
                        d_hero->getBackpack()->size ()));
+}
+
+void HeroEditorDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+}
+
+void HeroEditorDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  d_changed = true;
+  update ();
+}
+
+void HeroEditorDialog::update ()
+{
+  disconnect_signals ();
+  name_entry->set_text(d_hero->getName());
+  gender_combobox->set_active(d_hero->getGender()-1);
+  update_buttons ();
+  umgr->setCursors ();
+  connect_signals ();
+}
+
+void HeroEditorDialog::connect_signals ()
+{
+  umgr->connect_signals ();
+  connections.push_back
+    (gender_combobox->signal_changed ().connect (method (on_gender_changed)));
+  connections.push_back
+    (name_entry->signal_changed ().connect (method (on_name_changed)));
+}
+
+void HeroEditorDialog::disconnect_signals ()
+{
+  umgr->disconnect_signals ();
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+UndoAction *HeroEditorDialog::executeAction (UndoAction *action2)
+{
+  HeroEditorAction *action = dynamic_cast<HeroEditorAction*>(action2);
+  UndoAction *out = NULL;
+
+  switch (action->getType ())
+    {
+      case HeroEditorAction::NAME:
+          {
+            HeroEditorAction_Name *a =
+              dynamic_cast<HeroEditorAction_Name*>(action);
+            out = new HeroEditorAction_Name (d_hero->getName (), umgr,
+                                             name_entry);
+
+            d_hero->setName (a->getName ());
+          } 
+        break;
+      case HeroEditorAction::GENDER:
+          {
+            HeroEditorAction_Gender *a =
+              dynamic_cast<HeroEditorAction_Gender*>(action);
+            out = new HeroEditorAction_Gender
+              (Hero::Gender (d_hero->getGender ()));
+
+            d_hero->setGender (a->getGender ());
+          }
+        break;
+      case HeroEditorAction::BACKPACK:
+          {
+            HeroEditorAction_Backpack *a =
+              dynamic_cast<HeroEditorAction_Backpack*>(action);
+            out = new HeroEditorAction_Backpack (d_hero->getBackpack ());
+
+            d_hero->getBackpack ()->removeAllFromBackpack ();
+            d_hero->getBackpack ()->add (a->getBackpack ());
+          }
+        break;
+    }
+  return out;
 }

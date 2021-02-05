@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 
 class Hero;
 
@@ -29,20 +30,31 @@ class HeroEditorDialog: public LwEditorDialog
 {
  public:
     HeroEditorDialog(Gtk::Window &parent, Hero *hero);
-    ~HeroEditorDialog() {}
+    ~HeroEditorDialog();
 
-    int run();
+    bool run();
     
  private:
+    UndoMgr *umgr;
+    bool d_changed;
     Hero *d_hero;
     Gtk::Entry *name_entry;
     Gtk::ComboBox *gender_combobox;
     Gtk::Button *edit_backpack_button;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
 	
     void on_edit_backpack_clicked ();
     void on_name_changed ();
     void on_gender_changed ();
     void update_buttons ();
+    void update ();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif
