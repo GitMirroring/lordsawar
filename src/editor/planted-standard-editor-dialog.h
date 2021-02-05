@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
 #include "vector.h"
+#include "undo-mgr.h"
 
 class MapBackpack;
 class Item;
@@ -30,24 +31,33 @@ class PlantedStandardEditorDialog: public LwEditorDialog
 {
  public:
     PlantedStandardEditorDialog(Gtk::Window &parent, Vector<int> tile);
-    ~PlantedStandardEditorDialog() {}
+    ~PlantedStandardEditorDialog();
 
     bool run();
     void hide();
     
  private:
-
+    UndoMgr *umgr;
     bool d_changed;
     Item *d_item;
     MapBackpack *d_map_backpack;
     Gtk::ComboBoxText *owner_combobox;
     Gtk::ComboBoxText *orig_owner_combobox;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
     Gtk::Entry *name_entry;
     Gtk::Label *bonus_label;
 
     void on_owner_changed ();
     void on_orig_owner_changed ();
     void on_name_changed ();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    void update ();
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif

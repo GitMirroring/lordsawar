@@ -100,6 +100,7 @@ libeditor_la_SOURCES =\
 	backpack-editor-dialog.cpp backpack-editor-dialog.h \
 	item-editor-dialog.cpp item-editor-dialog.h item-editor-actions.h \
 	planted-standard-editor-dialog.cpp planted-standard-editor-dialog.h \
+	planted-standard-editor-actions.h \
 	hero-editor-dialog.cpp hero-editor-dialog.h hero-editor-actions.h \
 	editor-splash-window.cpp editor-splash-window.h \
 	fight-order-editor-dialog.cpp fight-order-editor-dialog.h \
