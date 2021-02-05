@@ -37,6 +37,14 @@ class Temple : public NamedLocation
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag; 
 
+	//! The kind of temple.
+        enum Type
+          {
+            //! A columned temple.
+            TEMPLE = 0, 
+            //! A henge, e.g. of stones
+            HENGE = 1,
+          };
 	//! Default constructor.
         /**
          * @param pos          The location of the temple on the game map.

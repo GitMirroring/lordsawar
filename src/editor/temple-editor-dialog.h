@@ -22,6 +22,7 @@
 
 #include <gtkmm.h>
 #include "lw-editor-dialog.h"
+#include "undo-mgr.h"
 
 class CreateScenarioRandomize;
 
@@ -32,17 +33,20 @@ class TempleEditorDialog: public LwEditorDialog
 {
  public:
     TempleEditorDialog(Gtk::Window &parent, Temple *temple, CreateScenarioRandomize *randomizer);
-    ~TempleEditorDialog() {}
+    ~TempleEditorDialog();
 
     bool run();
     
  private:
+    UndoMgr *umgr;
     Gtk::Entry *name_entry;
     Gtk::Entry *description_entry;
     Gtk::SpinButton *type_spinbutton;
     Temple *temple;
     Gtk::Button *randomize_name_button;
     CreateScenarioRandomize *d_randomizer;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
     bool d_changed;
 
     void on_randomize_name_clicked();
@@ -50,6 +54,13 @@ class TempleEditorDialog: public LwEditorDialog
     void on_name_changed ();
     void on_type_changed ();
     void on_type_text_changed ();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    void update ();
+    UndoAction *executeAction (UndoAction *action);
 };
 
 #endif
