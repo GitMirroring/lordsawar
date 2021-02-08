@@ -86,6 +86,7 @@ libeditor_la_SOURCES =\
 	map-info-dialog.cpp map-info-dialog.h map-info-actions.h \
 	new-map-dialog.cpp new-map-dialog.h new-map-actions.h \
 	switch-sets-dialog.cpp switch-sets-dialog.h \
+	switch-sets-editor-actions.h \
 	editorbigmap.cpp editorbigmap.h \
 	editablesmallmap.cpp editablesmallmap.h \
 	smallmap-editor-dialog.cpp smallmap-editor-dialog.h \
