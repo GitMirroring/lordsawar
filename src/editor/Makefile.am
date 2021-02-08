@@ -105,6 +105,7 @@ libeditor_la_SOURCES =\
 	hero-editor-dialog.cpp hero-editor-dialog.h hero-editor-actions.h \
 	editor-splash-window.cpp editor-splash-window.h \
 	fight-order-editor-dialog.cpp fight-order-editor-dialog.h \
+	fight-order-editor-actions.h \
 	road-editor-tip.cpp road-editor-tip.h \
 	stone-editor-dialog.cpp stone-editor-dialog.h \
 	battle-calculator-dialog.cpp battle-calculator-dialog.h \

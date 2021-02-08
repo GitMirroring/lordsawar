@@ -1,4 +1,4 @@
-//  Copyright (C) 2015 Ben Asselstine
+//  Copyright (C) 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include <gtkmm.h>
 #include <list>
 
+#include "undo-mgr.h"
 #include "lw-editor-dialog.h"
 class Stack;
 class Player;
@@ -31,16 +32,19 @@ class FightOrderEditorDialog: public LwEditorDialog
 {
  public:
     FightOrderEditorDialog(Gtk::Window &parent);
-    ~FightOrderEditorDialog() {}
+    ~FightOrderEditorDialog();
 
     void hide();
-    int run();
-    bool get_modified() {return modified;}
+    bool run();
 
  private:
+    UndoMgr *umgr;
     Gtk::TreeView *armies_treeview;
     Gtk::Button *make_same_button;
     Gtk::ComboBoxText *player_combobox;
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
+    int owner_row;
 
     class ArmiesColumns: public Gtk::TreeModelColumnRecord {
     public:
@@ -53,7 +57,7 @@ class FightOrderEditorDialog: public LwEditorDialog
     };
     const ArmiesColumns armies_columns;
     Glib::RefPtr<Gtk::ListStore> armies_list;
-    bool modified;
+    bool d_changed;
 
     void addArmyType(guint32 army_type, Player *player);
     void on_make_same_button_clicked();
@@ -61,6 +65,15 @@ class FightOrderEditorDialog: public LwEditorDialog
     Player* get_selected_player();
     void fill_armies(Player *player);
     void on_army_reordered ();
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void disconnect_signals ();
+    void connect_signals ();
+    std::list<sigc::connection> connections;
+    void update ();
+    UndoAction *executeAction (UndoAction *action);
+    std::list<guint32> get_fight_order (guint32 id);
+    std::list<std::list<guint32> >get_all_fight_orders ();
 };
 
 #endif

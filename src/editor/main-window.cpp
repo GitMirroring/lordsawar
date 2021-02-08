@@ -2435,8 +2435,7 @@ void MainWindow::on_edit_fight_order_activated()
 {
   EditorAction_FightOrder *action = new EditorAction_FightOrder (game_scenario);
   FightOrderEditorDialog d(*window);
-  d.run();
-  if (d.get_modified())
+  if (d.run())
     {
       addUndo (action);
       scenario_modified = true;

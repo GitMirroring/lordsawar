@@ -1,4 +1,4 @@
-//  Copyright (C) 2015, 2020 Ben Asselstine
+//  Copyright (C) 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,32 +27,37 @@
 #include "ImageCache.h"
 #include "playerlist.h"
 #include "font-size.h"
+#include "fight-order-editor-actions.h"
 
 #define method(x) sigc::mem_fun(*this, &FightOrderEditorDialog::x)
 
 FightOrderEditorDialog::FightOrderEditorDialog(Gtk::Window &parent)
  : LwEditorDialog(parent, "fight-order-editor-dialog.ui")
 {
-  modified = false;
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
+  d_changed = false;
   armies_list = Gtk::ListStore::create(armies_columns);
   xml->get_widget("treeview", armies_treeview);
   armies_treeview->set_model(armies_list);
   armies_treeview->append_column("", armies_columns.image);
   armies_treeview->append_column("", armies_columns.name);
   armies_treeview->set_reorderable(true);
-  armies_treeview->signal_drag_end().connect(sigc::hide(method(on_army_reordered)));
-  fill_armies(Playerlist::getActiveplayer());
 
   player_combobox = new Gtk::ComboBoxText;
+  int counter = 0;
   for (Playerlist::iterator i = Playerlist::getInstance()->begin(),
-       end = Playerlist::getInstance()->end(); i != end; ++i)
+       end = Playerlist::getInstance()->end(); i != end; ++i, counter++)
     {
       player_combobox->append((*i)->getName());
       if (*i == Playerlist::getActiveplayer())
-        player_combobox->set_active_text((*i)->getName());
+        {
+          player_combobox->set_active_text((*i)->getName());
+          owner_row = counter;
+          player_combobox->set_active (counter);
+        }
     }
 
-  player_combobox->signal_changed().connect (method(on_player_changed));
   Gtk::Alignment *alignment;
   xml->get_widget("players_alignment", alignment);
   alignment->add(*Gtk::manage(player_combobox));
@@ -60,7 +65,19 @@ FightOrderEditorDialog::FightOrderEditorDialog(Gtk::Window &parent)
 
   xml->get_widget("make_same_button", make_same_button);
   make_same_button->signal_clicked().connect (method (on_make_same_button_clicked));
-  make_same_button->set_sensitive(Playerlist::getInstance()->size() != 1);
+
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
+
+  connect_signals ();
+  update ();
+}
+
+FightOrderEditorDialog::~FightOrderEditorDialog()
+{
+  delete umgr;
 }
 
 void FightOrderEditorDialog::hide()
@@ -68,15 +85,11 @@ void FightOrderEditorDialog::hide()
   dialog->hide();
 }
 
-int FightOrderEditorDialog::run()
+bool FightOrderEditorDialog::run()
 {
     dialog->show();
-    int response = dialog->run();
-
-    if (response == Gtk::RESPONSE_ACCEPT)
-      {
-      }
-    return response;
+    dialog->run();
+    return d_changed;
 }
 
 void FightOrderEditorDialog::addArmyType(guint32 army_type, Player *player)
@@ -95,13 +108,29 @@ void FightOrderEditorDialog::addArmyType(guint32 army_type, Player *player)
 
 void FightOrderEditorDialog::on_make_same_button_clicked()
 {
+  FightOrderEditorAction_MakeSame *action =
+    new FightOrderEditorAction_MakeSame (owner_row, get_all_fight_orders ());
+  bool modified = false;
   Player *player = get_selected_player();
   for (Playerlist::iterator i = Playerlist::getInstance()->begin(),
        end = Playerlist::getInstance()->end(); i != end; ++i)
     {
       if ((*i) != player)
-        (*i)->setFightOrder(player->getFightOrder());
+        {
+          if (player->getFightOrder () != (*i)->getFightOrder ())
+            {
+              (*i)->setFightOrder(player->getFightOrder());
+              modified = true;
+            }
+        }
     }
+  if (modified)
+    {
+      umgr->add (action);
+      d_changed = true;
+    }
+  else
+    delete action;
 }
 
 Player *FightOrderEditorDialog::get_selected_player()
@@ -120,8 +149,9 @@ Player *FightOrderEditorDialog::get_selected_player()
 
 void FightOrderEditorDialog::on_player_changed()
 {
-  Player *player = get_selected_player();
-  fill_armies(player);
+  umgr->add (new FightOrderEditorAction_Owner (owner_row));
+  owner_row = player_combobox->get_active_row_number ();
+  update ();
 }
 
 void FightOrderEditorDialog::fill_armies(Player *player)
@@ -136,10 +166,116 @@ void FightOrderEditorDialog::fill_armies(Player *player)
 void FightOrderEditorDialog::on_army_reordered ()
 {
   Player *player = get_selected_player();
+  umgr->add (new FightOrderEditorAction_Order (player->getId (),
+                                               player->getFightOrder ()));
   std::list<guint32> fight_order;
   for (Gtk::TreeIter i = armies_list->children().begin(),
        end = armies_list->children().end(); i != end; ++i) 
     fight_order.push_back((*i)[armies_columns.army_type]);
   player->setFightOrder(fight_order);
-  modified = true;
+  d_changed = true;
+}
+
+void FightOrderEditorDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  if (umgr->undoEmpty ())
+    d_changed = false;
+  update ();
+}
+
+void FightOrderEditorDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  d_changed = true;
+  update ();
+}
+
+void FightOrderEditorDialog::update ()
+{
+  disconnect_signals ();
+  player_combobox->set_active (owner_row);
+  fill_armies (get_selected_player ());
+  make_same_button->set_sensitive(Playerlist::getInstance()->size() != 1);
+  connect_signals ();
+}
+
+void FightOrderEditorDialog::connect_signals ()
+{
+  connections.push_back
+    (player_combobox->signal_changed().connect (method(on_player_changed)));
+  connections.push_back
+    (armies_treeview->signal_drag_end().connect
+     (sigc::hide(method(on_army_reordered))));
+}
+
+void FightOrderEditorDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+std::list<guint32> FightOrderEditorDialog::get_fight_order (guint32 id)
+{
+  Player *p = Playerlist::getInstance ()->getPlayer (id);
+  return p->getFightOrder ();
+}
+
+std::list<std::list<guint32> >FightOrderEditorDialog::get_all_fight_orders ()
+{
+  std::list<std::list<guint32> > orders;
+  for (auto p : *Playerlist::getInstance ())
+    orders.push_back (p->getFightOrder ());
+  return orders;
+}
+
+UndoAction *FightOrderEditorDialog::executeAction (UndoAction *action2)
+{
+  FightOrderEditorAction *action =
+    dynamic_cast<FightOrderEditorAction*>(action2);
+  UndoAction *out = NULL;
+
+  switch (action->getType ())
+    {
+      case FightOrderEditorAction::ORDER:
+          {
+            FightOrderEditorAction_Order *a =
+              dynamic_cast<FightOrderEditorAction_Order*>(action);
+            out = new FightOrderEditorAction_Order
+              (a->getPlayerId (), get_fight_order (a->getPlayerId ()));
+
+            Player *p =
+              Playerlist::getInstance ()->getPlayer (a->getPlayerId ());
+            p->setFightOrder (a->getFightOrder ());
+          } 
+        break;
+      case FightOrderEditorAction::MAKE_SAME:
+          {
+            FightOrderEditorAction_MakeSame *a =
+              dynamic_cast<FightOrderEditorAction_MakeSame*>(action);
+            out = new FightOrderEditorAction_MakeSame
+              (owner_row, get_all_fight_orders ());
+
+            owner_row = a->getRow ();
+            guint32 id = 0;
+            for (auto o : a->getFightOrders ())
+              {
+                Player *p = Playerlist::getInstance ()->getPlayer (id);
+                p->setFightOrder (o);
+                id++;
+              }
+          }
+        break;
+      case FightOrderEditorAction::OWNER:
+          {
+            FightOrderEditorAction_Owner *a =
+              dynamic_cast<FightOrderEditorAction_Owner*>(action);
+            out = new FightOrderEditorAction_Owner (owner_row);
+
+            owner_row = a->getRow ();
+          }
+        break;
+    }
+  return out;
 }
