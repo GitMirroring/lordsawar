@@ -266,16 +266,6 @@ void UndoMgr::updateMenuItems (Gtk::MenuItem *undo, Gtk::MenuItem *redo)
     redo->set_label (String::ucompose (_("Redo %1"), getRedoName ()));
 }
 
-void UndoMgr::dump ()
-{
-  printf ("showing undo stack of %lu items\n", undos.size ());
-  for (auto l : undos)
-    printf (" '%s'\n", l->getActionName ().c_str ());
-  printf ("showing redo stack of %lu items\n", redos.size ());
-  for (auto l : redos)
-    printf (" '%s'\n", l->getActionName ().c_str ());
-}
-
 void UndoMgr::connect (Gtk::Entry *entry)
 {
   connections.push_back

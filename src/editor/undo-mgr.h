@@ -74,7 +74,6 @@ class UndoMgr: public sigc::trackable
         int getPos (Gtk::TextView *t);
         void setCursors ();
         void setPos (Gtk::TextView *t);
-        void dump ();
     private:
         double d_delay;
         guint32 d_limit;
