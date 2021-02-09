@@ -1253,15 +1253,18 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
       ItemProto *i = it.second;
       if (i->getBonus (ItemProto::BANISH_WORMS) &&
           i->hasArmyTypeToKill () == false)
-        errors.push_back(String::ucompose (_("%1 doesn't have an army type specified for Kill All Units Of Giant Worms"), i->getName ()));
+        errors.push_back(String::ucompose (_("The item \"%1\" doesn't have an army type specified for Kill All Units Of Giant Worms"), i->getName ()));
 
       if (i->getBonus (ItemProto::SUMMON_MONSTER) &&
           i->hasArmyTypeToSummon () == false)
-        errors.push_back(String::ucompose (_("%1 doesn't have an army type specified for Summon Monster"), i->getName ()));
+        errors.push_back(String::ucompose (_("The item \"%1\" doesn't have an army type specified for Summon Monster"), i->getName ()));
 
       if (i->getBonus (ItemProto::RAISE_DEFENDERS) &&
           i->hasArmyTypeToRaise () == false)
-        errors.push_back(String::ucompose (_("%1 doesn't have an army type specified for Raise Defenders In City"), i->getName ()));
+        errors.push_back(String::ucompose (_("The item \"%1\" doesn't have an army type specified for Raise Defenders In City"), i->getName ()));
+
+      if (i->getBonus () == 0)
+        warnings.push_back (String::ucompose (_("The item \"%1\" lacks a bonus"), i->getName ()));
     }
 
   if (errors.size() ==  0)
@@ -1618,4 +1621,3 @@ void GameScenario::support_backward_compatibility()
     (FileCompat::GAMESCENARIO, "0.2.0", "0.2.1",
      sigc::ptr_fun(&GameScenario::upgrade));
 }
-
