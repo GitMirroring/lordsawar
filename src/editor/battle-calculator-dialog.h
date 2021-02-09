@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Ben Asselstine
+//  Copyright (C) 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 #include <list>
 #include "lw-editor-dialog.h"
 #include "fight.h"
+#include "undo-mgr.h"
+#include "battle-calculator-actions.h"
 
 class Stack;
 class Army;
@@ -37,16 +39,19 @@ class BattleCalculatorDialog: public LwEditorDialog
 {
  public:
     BattleCalculatorDialog(Gtk::Window &parent, std::list<Army*> &attackers, std::list<Army *> &defenders);
-    ~BattleCalculatorDialog() {}
+    ~BattleCalculatorDialog();
 
     int run();
     
  private:
+    UndoMgr *umgr;
     Gtk::ComboBoxText *terrain_combobox;
     Gtk::ComboBoxText *attacker_player_combobox;
     Gtk::ComboBoxText *defender_player_combobox;
     Gtk::ComboBox *die_sides_combobox;
 
+    Gtk::Button *undo_button;
+    Gtk::Button *redo_button;
     Gtk::TreeView *attackers_treeview;
     Gtk::TreeView *defenders_treeview;
     
@@ -83,6 +88,12 @@ class BattleCalculatorDialog: public LwEditorDialog
     Gtk::Button *fight_button;
     Gtk::Button *fight100_button;
     int min_size;
+    int sides_row;
+    int terrain_row;
+    bool fortified_active;
+    bool city_active;
+    int attacker_owner_row;
+    int defender_owner_row;
 
     void on_attacker_add_clicked();
     void on_attacker_remove_clicked();
@@ -106,6 +117,9 @@ class BattleCalculatorDialog: public LwEditorDialog
     void cell_data_defender_strength(Gtk::CellRenderer *renderer, const Gtk::TreeIter& i);
     void on_defender_strength_edited(const Glib::ustring &path, const Glib::ustring &new_text);
     void on_city_toggled();
+    void on_terrain_changed();
+    void on_sides_changed();
+    void on_fortified_changed();
     void on_fight_clicked();
     void on_fight100_clicked();
 
@@ -116,6 +130,20 @@ class BattleCalculatorDialog: public LwEditorDialog
 
     std::list<Army *> &d_attackers;
     std::list<Army *> &d_defenders;
+    void on_undo_activated ();
+    void on_redo_activated ();
+    void connect_signals ();
+    void disconnect_signals ();
+    std::list<sigc::connection> connections;
+    void update ();
+    UndoAction *executeAction (UndoAction *action);
+    void replaceArmies (BattleCalculatorAction_Armies *a, std::list<Army*> &armies);
+    void replaceAttackers (BattleCalculatorAction_Armies *a, std::list<Army*> &armies);
+    void replaceDefenders (BattleCalculatorAction_Armies *a, std::list<Army*> &armies);
+    Army *getDefenderByIndex (BattleCalculatorAction_Index *a);
+    Army *getAttackerByIndex (BattleCalculatorAction_Index *a);
+    void fill_defenders ();
+    void fill_attackers ();
 };
 
 #endif

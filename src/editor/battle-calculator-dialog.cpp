@@ -1,4 +1,4 @@
-//  Copyright (C) 2017, 2020 Ben Asselstine
+//  Copyright (C) 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 #include "tileset.h"
 #include "fight.h"
 #include "font-size.h"
+#include "battle-calculator-actions.h"
 
 #include "select-army-dialog.h"
 
@@ -49,12 +50,13 @@ BattleCalculatorDialog::BattleCalculatorDialog(Gtk::Window &parent, std::list<Ar
     defender_strength_column(_("Strength"), defender_strength_renderer),
     d_attackers(attackers), d_defenders(defenders)
 {
+  umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
+  umgr->execute ().connect (method (executeAction));
   attacker_player_combobox = NULL;
   attacker_player_combobox = manage(new Gtk::ComboBoxText);
   for (auto p : *Playerlist::getInstance())
     attacker_player_combobox->append(p->getName());
-  attacker_player_combobox->set_active(0);
-  attacker_player_combobox->signal_changed().connect (method(on_attacker_player_changed));
+  attacker_owner_row = 0;
   Gtk::Box *box1;
   xml->get_widget("attacker_hbox", box1);
   box1->pack_start(*attacker_player_combobox, Gtk::PACK_SHRINK);
@@ -63,8 +65,7 @@ BattleCalculatorDialog::BattleCalculatorDialog(Gtk::Window &parent, std::list<Ar
   defender_player_combobox = manage(new Gtk::ComboBoxText);
   for (auto p : *Playerlist::getInstance())
     defender_player_combobox->append(p->getName());
-  defender_player_combobox->set_active(0);
-  defender_player_combobox->signal_changed().connect (method(on_defender_player_changed));
+  defender_owner_row = 0;
   Gtk::Box *box2;
   xml->get_widget("defender_hbox", box2);
   box2->pack_start(*defender_player_combobox, Gtk::PACK_SHRINK);
@@ -76,7 +77,6 @@ BattleCalculatorDialog::BattleCalculatorDialog(Gtk::Window &parent, std::list<Ar
   attackers_treeview->append_column("", combatant_columns.image);
 
   attacker_strength_renderer.property_editable() = true;
-  attacker_strength_renderer.signal_edited().connect(method(on_attacker_strength_edited));
   attacker_strength_column.set_cell_data_func(attacker_strength_renderer, method(cell_data_attacker_strength));
   attackers_treeview->append_column(attacker_strength_column);
   attackers_treeview->append_column(_("Augmented Str"), combatant_columns.augmented_strength);
@@ -91,7 +91,6 @@ BattleCalculatorDialog::BattleCalculatorDialog(Gtk::Window &parent, std::list<Ar
   defenders_treeview->append_column("", combatant_columns.image);
 
   defender_strength_renderer.property_editable() = true;
-  defender_strength_renderer.signal_edited().connect(method(on_defender_strength_edited));
   defender_strength_column.set_cell_data_func(defender_strength_renderer, method(cell_data_defender_strength));
   defenders_treeview->append_column(defender_strength_column);
   defenders_treeview->append_column(_("Augmented Str"), combatant_columns.augmented_strength);
@@ -99,7 +98,8 @@ BattleCalculatorDialog::BattleCalculatorDialog(Gtk::Window &parent, std::list<Ar
   for (guint32 i = 0; i < attackers_treeview->get_n_columns(); i++)
     defenders_treeview->get_column(i)->set_expand();
   xml->get_widget("fortified_switch", fortified_switch);
-
+  fortified_active =
+    d_defenders.empty () ? false : d_defenders.front ()->getFortified ();
   xml->get_widget("attacker_add_button", attacker_add_button);
   xml->get_widget("attacker_remove_button", attacker_remove_button);
   xml->get_widget("attacker_copy_button", attacker_copy_button);
@@ -110,7 +110,6 @@ BattleCalculatorDialog::BattleCalculatorDialog(Gtk::Window &parent, std::list<Ar
   attacker_copy_button->signal_clicked().connect(method(on_attacker_copy_clicked));
   attacker_edit_hero_button->signal_clicked().connect(method(on_attacker_edit_hero_clicked));
 
-  attackers_treeview->get_selection()->signal_changed().connect(method(on_attacker_selection_changed));
 
   xml->get_widget("defender_add_button", defender_add_button);
   xml->get_widget("defender_remove_button", defender_remove_button);
@@ -122,27 +121,49 @@ BattleCalculatorDialog::BattleCalculatorDialog(Gtk::Window &parent, std::list<Ar
   defender_copy_button->signal_clicked().connect(method(on_defender_copy_clicked));
   defender_edit_hero_button->signal_clicked().connect(method(on_defender_edit_hero_clicked));
 
-  defenders_treeview->get_selection()->signal_changed().connect(method(on_defender_selection_changed));
   xml->get_widget("fight_button", fight_button);
   fight_button->signal_clicked().connect(method(on_fight_clicked));
   xml->get_widget("fight100_button", fight100_button);
   fight100_button->signal_clicked().connect(method(on_fight100_clicked));
 
+  xml->get_widget("undo_button", undo_button);
+  undo_button->signal_activate ().connect (method (on_undo_activated));
+  xml->get_widget("redo_button", redo_button);
+  redo_button->signal_activate ().connect (method (on_redo_activated));
   xml->get_widget("city_switch", city_switch);
-  city_switch->property_active().signal_changed().connect(method(on_city_toggled));
+  city_active = false;
   xml->get_widget("terrain_box", terrain_box);
   terrain_combobox = manage(new Gtk::ComboBoxText);
   Tileset *tileset = GameMap::getTileset();
   for (auto t : *tileset)
     terrain_combobox->append(t->getName());
-  terrain_combobox->set_active(0);
+  terrain_row = 0;
   terrain_box->pack_start(*terrain_combobox, Gtk::PACK_SHRINK);
   xml->get_widget("die_sides_combobox", die_sides_combobox);
+  sides_row = 0;
+  fill_attackers ();
+  fill_defenders ();
+  connect_signals ();
+  update ();
+}
+
+BattleCalculatorDialog::~BattleCalculatorDialog()
+{
+  delete umgr;
+}
+
+void BattleCalculatorDialog::fill_attackers ()
+{
+  attackers_list->clear ();
   for (auto a : d_attackers)
     add_attacker_army (a, false);
+}
+
+void BattleCalculatorDialog::fill_defenders ()
+{
+  defenders_list->clear ();
   for (auto a : d_defenders)
     add_defender_army (a, false);
-  set_button_sensitivity();
 }
 
 int BattleCalculatorDialog::run()
@@ -170,6 +191,7 @@ void BattleCalculatorDialog::on_attacker_copy_clicked()
   Gtk::TreeIter i = attackers_treeview->get_selection()->get_selected();
   if (i)
     {
+      umgr->add (new BattleCalculatorAction_AttackerCopy (d_attackers));
       Player *player = get_attacker_player();
       Army *army = (*i)[combatant_columns.army];
       Army *new_army = new Army(*army, player);
@@ -190,6 +212,7 @@ void BattleCalculatorDialog::on_attacker_add_clicked()
   const ArmyProto *army = d.get_selected_army();
   if (army)
     {
+      umgr->add (new BattleCalculatorAction_AttackerAdd (d_attackers));
       if (army->isHero() == true)
         {
           HeroProto *hp = new HeroProto(*army);
@@ -201,17 +224,21 @@ void BattleCalculatorDialog::on_attacker_add_clicked()
         add_attacker_army(new Army(*army, player), true);
     }
 }
-    
 
 void BattleCalculatorDialog::on_attacker_edit_hero_clicked()
 {
   Gtk::TreeIter i = attackers_treeview->get_selection()->get_selected();
   if (i)
     {
+      BattleCalculatorAction_AttackerHeroDetails *action =
+        new BattleCalculatorAction_AttackerHeroDetails (d_attackers);
       Army *army = (*i)[combatant_columns.army];
       Hero *hero = dynamic_cast<Hero*>(army);
       HeroEditorDialog d(*dialog, hero);
-      d.run();
+      if (d.run())
+        umgr->add (action);
+      else
+        delete action;
     }
 }
 
@@ -220,6 +247,7 @@ void BattleCalculatorDialog::on_attacker_remove_clicked()
   Gtk::TreeIter i = attackers_treeview->get_selection()->get_selected();
   if (i)
     {
+      umgr->add (new BattleCalculatorAction_AttackerRemove (d_attackers));
       Army *army = (*i)[combatant_columns.army];
       d_attackers.erase(std::remove (d_attackers.begin(), d_attackers.end(), army), d_attackers.end());
       delete army;
@@ -237,6 +265,7 @@ void BattleCalculatorDialog::add_attacker_army(Army *a, bool add)
   ImageCache *gc = ImageCache::getInstance();
   Gtk::TreeIter i = attackers_list->append();
   (*i)[combatant_columns.army] = a;
+  a->setOwner (get_attacker_player());
   guint32 fs = FontSize::getInstance ()->get_height ();
   (*i)[combatant_columns.image] = gc->getDialogArmyPic (a, fs)->to_pixbuf ();
   (*i)[combatant_columns.strength] = a->getStat(Army::STRENGTH, false);
@@ -254,19 +283,38 @@ void BattleCalculatorDialog::on_attacker_selection_changed()
 
 void BattleCalculatorDialog::on_attacker_player_changed()
 {
-  ImageCache *gc = ImageCache::getInstance();
-  Player *player = get_attacker_player();
-  set_button_sensitivity();
+  umgr->add (new BattleCalculatorAction_AttackerOwner (attacker_owner_row));
+  attacker_owner_row = attacker_player_combobox->get_active_row_number ();
 
-  guint32 fs = FontSize::getInstance ()->get_height ();
+  Player *player = get_attacker_player();
   for (Gtk::TreeIter j = attackers_list->children().begin(),
        jend = attackers_list->children().end(); j != jend; ++j)
     {
       Army *a = (*j)[combatant_columns.army];
       a->setOwner (player);
-      (*j)[combatant_columns.image] =
-        gc->getDialogArmyPic(a, fs)->to_pixbuf ();
     }
+  update ();
+}
+
+void BattleCalculatorDialog::on_terrain_changed()
+{
+  umgr->add (new BattleCalculatorAction_Terrain (terrain_row));
+  terrain_row = terrain_combobox->get_active_row_number ();
+  update ();
+}
+
+void BattleCalculatorDialog::on_sides_changed()
+{
+  umgr->add (new BattleCalculatorAction_Sides (sides_row));
+  sides_row = die_sides_combobox->get_active_row_number ();
+  update ();
+}
+
+void BattleCalculatorDialog::on_fortified_toggled()
+{
+  umgr->add (new BattleCalculatorAction_Fortify (fortified_active));
+  fortified_active = fortified_switch->get_active ();
+  update ();
 }
 
 void BattleCalculatorDialog::cell_data_attacker_strength(Gtk::CellRenderer *renderer, const Gtk::TreeIter& i)
@@ -279,13 +327,22 @@ void BattleCalculatorDialog::cell_data_attacker_strength(Gtk::CellRenderer *rend
       String::ucompose("%1", (*i)[combatant_columns.strength]);
 }
 
-void BattleCalculatorDialog::on_attacker_strength_edited(const Glib::ustring &path, const Glib::ustring &new_text)
+void BattleCalculatorDialog::on_attacker_strength_edited(const Glib::ustring &p, const Glib::ustring &new_text)
 {
   int str = atoi(new_text.c_str());
   if (str < (int)MIN_STRENGTH_FOR_ARMY_UNITS || str > 
       (int)MAX_STRENGTH_FOR_ARMY_UNITS)
     return;
-  (*attackers_list->get_iter(Gtk::TreePath(path)))[combatant_columns.strength] = str;
+  Army *a = 
+    (*attackers_list->get_iter(Gtk::TreePath(p)))[combatant_columns.army];
+
+  if (a->getStat (Army::STRENGTH, false) != (guint32) str)
+    {
+      umgr->add (new BattleCalculatorAction_AttackerStrength
+                 (atoi (p.c_str ()), a->getStat (Army::STRENGTH, false)));
+      (*attackers_list->get_iter(Gtk::TreePath(p)))[combatant_columns.strength] = str;
+      a->setStat (Army::STRENGTH, str);
+    }
 }
 
 void BattleCalculatorDialog::set_button_sensitivity()
@@ -356,6 +413,7 @@ void BattleCalculatorDialog::on_defender_copy_clicked()
   Gtk::TreeIter i = defenders_treeview->get_selection()->get_selected();
   if (i)
     {
+      umgr->add (new BattleCalculatorAction_DefenderCopy (d_defenders));
       Player *player = get_defender_player();
       Army *army = (*i)[combatant_columns.army];
       Army *new_army = new Army(*army, player);
@@ -376,6 +434,7 @@ void BattleCalculatorDialog::on_defender_add_clicked()
   const ArmyProto *army = d.get_selected_army();
   if (army)
     {
+      umgr->add (new BattleCalculatorAction_DefenderAdd (d_defenders));
       if (army->isHero() == true)
         {
           HeroProto *hp = new HeroProto(*army);
@@ -393,10 +452,15 @@ void BattleCalculatorDialog::on_defender_edit_hero_clicked()
   Gtk::TreeIter i = defenders_treeview->get_selection()->get_selected();
   if (i)
     {
+      BattleCalculatorAction_DefenderHeroDetails *action =
+        new BattleCalculatorAction_DefenderHeroDetails (d_defenders);
       Army *army = (*i)[combatant_columns.army];
       Hero *hero = dynamic_cast<Hero*>(army);
       HeroEditorDialog d(*dialog, hero);
-      d.run();
+      if (d.run())
+        umgr->add (action);
+      else
+        delete action;
     }
 }
 
@@ -405,6 +469,7 @@ void BattleCalculatorDialog::on_defender_remove_clicked()
   Gtk::TreeIter i = defenders_treeview->get_selection()->get_selected();
   if (i)
     {
+      umgr->add (new BattleCalculatorAction_DefenderRemove (d_defenders));
       Army *army = (*i)[combatant_columns.army];
       d_defenders.erase(std::remove (d_defenders.begin(), d_defenders.end(), army), d_defenders.end());
       delete army;
@@ -421,11 +486,10 @@ void BattleCalculatorDialog::add_defender_army(Army *a, bool add)
   ImageCache *gc = ImageCache::getInstance();
   Gtk::TreeIter i = defenders_list->append();
   (*i)[combatant_columns.army] = a;
+  a->setOwner (get_defender_player());
   guint32 fs = FontSize::getInstance ()->get_height ();
   (*i)[combatant_columns.image] = gc->getDialogArmyPic (a, fs)->to_pixbuf ();
   (*i)[combatant_columns.strength] = a->getStat(Army::STRENGTH, false);
-  //(*i)[combatant_columns.augmented_strength] =
-    //a->getStat(Army::STRENGTH, false);
   (*i)[combatant_columns.hp] = a->getStat(Army::HP, false);
 
   defenders_treeview->get_selection()->select(i);
@@ -440,19 +504,16 @@ void BattleCalculatorDialog::on_defender_selection_changed()
 
 void BattleCalculatorDialog::on_defender_player_changed()
 {
-  ImageCache *gc = ImageCache::getInstance();
+  umgr->add (new BattleCalculatorAction_DefenderOwner (defender_owner_row));
+  defender_owner_row = defender_player_combobox->get_active_row_number ();
   Player *player = get_defender_player();
-  set_button_sensitivity();
-
-  guint32 fs = FontSize::getInstance ()->get_height ();
   for (Gtk::TreeIter j = defenders_list->children().begin(),
        jend = defenders_list->children().end(); j != jend; ++j)
     {
       Army *a = (*j)[combatant_columns.army];
       a->setOwner (player);
-      (*j)[combatant_columns.image] =
-        gc->getDialogArmyPic(a, fs)->to_pixbuf ();
     }
+  update ();
 }
 
 void BattleCalculatorDialog::cell_data_defender_strength(Gtk::CellRenderer *renderer, const Gtk::TreeIter& i)
@@ -465,20 +526,31 @@ void BattleCalculatorDialog::cell_data_defender_strength(Gtk::CellRenderer *rend
       String::ucompose("%1", (*i)[combatant_columns.strength]);
 }
 
-void BattleCalculatorDialog::on_defender_strength_edited(const Glib::ustring &path, const Glib::ustring &new_text)
+void BattleCalculatorDialog::on_defender_strength_edited(const Glib::ustring &p, const Glib::ustring &new_text)
 {
   int str = atoi(new_text.c_str());
   if (str < (int)MIN_STRENGTH_FOR_ARMY_UNITS || str > 
       (int)MAX_STRENGTH_FOR_ARMY_UNITS)
     return;
-  (*defenders_list->get_iter(Gtk::TreePath(path)))[combatant_columns.strength] = str;
+  Army *a = 
+    (*defenders_list->get_iter(Gtk::TreePath(p)))[combatant_columns.army];
+
+  if (a->getStat (Army::STRENGTH, false) != (guint32) str)
+    {
+      umgr->add (new BattleCalculatorAction_DefenderStrength
+                 (atoi (p.c_str ()), a->getStat (Army::STRENGTH, false)));
+      (*defenders_list->get_iter(Gtk::TreePath(p)))[combatant_columns.strength] = str;
+      a->setStat (Army::STRENGTH, str);
+    }
 }
 
 void BattleCalculatorDialog::on_city_toggled()
 {
+  umgr->add (new BattleCalculatorAction_City (city_active, terrain_row));
+  city_active = city_switch->property_active ();
   if (city_switch->property_active () == true)
     terrain_combobox->set_active (0);
-  terrain_combobox->set_sensitive(!city_switch->property_active());
+  update ();
 }
 
 Fight::Result BattleCalculatorDialog::run_battle ()
@@ -619,4 +691,304 @@ void BattleCalculatorDialog::on_fight100_clicked()
       d->run();
       delete d;
     }
+}
+
+void BattleCalculatorDialog::on_undo_activated ()
+{
+  umgr->undo ();
+  update ();
+}
+
+void BattleCalculatorDialog::on_redo_activated ()
+{
+  umgr->redo ();
+  update ();
+}
+
+void BattleCalculatorDialog::connect_signals ()
+{
+  connections.push_back
+    (attacker_player_combobox->signal_changed().connect
+     (method(on_attacker_player_changed)));
+  connections.push_back
+    (defender_player_combobox->signal_changed().connect
+     (method(on_defender_player_changed)));
+  connections.push_back
+    (attacker_strength_renderer.signal_edited().connect
+     (method(on_attacker_strength_edited)));
+  connections.push_back
+    (defender_strength_renderer.signal_edited().connect
+     (method(on_defender_strength_edited)));
+  connections.push_back
+    (attackers_treeview->get_selection()->signal_changed().connect
+     (method(on_attacker_selection_changed)));
+  connections.push_back
+    (defenders_treeview->get_selection()->signal_changed().connect
+     (method(on_defender_selection_changed)));
+  connections.push_back
+    (city_switch->property_active().signal_changed().connect
+     (method(on_city_toggled)));
+  connections.push_back
+    (terrain_combobox->signal_changed ().connect (method (on_terrain_changed)));
+  connections.push_back
+    (die_sides_combobox->signal_changed ().connect (method (on_sides_changed)));
+  connections.push_back
+    (fortified_switch->property_active().signal_changed().connect
+     (method(on_fortified_toggled)));
+}
+
+void BattleCalculatorDialog::disconnect_signals ()
+{
+  for (auto c : connections)
+    c.disconnect ();
+  connections.clear ();
+}
+
+Army *BattleCalculatorDialog::getAttackerByIndex (BattleCalculatorAction_Index *a)
+{
+  auto path = Gtk::TreePath (String::ucompose ("%1", a->getIndex ()));
+  auto iterrow = attackers_treeview->get_model ()->get_iter (path);
+  if (iterrow)
+    {
+      Gtk::TreeModel::Row row = *iterrow;
+      Army *army = row[combatant_columns.army];
+      return army;
+    }
+  return NULL;
+}
+
+Army *BattleCalculatorDialog::getDefenderByIndex (BattleCalculatorAction_Index *a)
+{
+  auto path = Gtk::TreePath (String::ucompose ("%1", a->getIndex ()));
+  auto iterrow = defenders_treeview->get_model ()->get_iter (path);
+  if (iterrow)
+    {
+      Gtk::TreeModel::Row row = *iterrow;
+      Army *army = row[combatant_columns.army];
+      return army;
+    }
+  return NULL;
+}
+
+UndoAction *BattleCalculatorDialog::executeAction (UndoAction *action2)
+{
+  BattleCalculatorAction *action =
+    dynamic_cast<BattleCalculatorAction*>(action2);
+  UndoAction *out = NULL;
+
+  switch (action->getType ())
+    {
+      case BattleCalculatorAction::SIDES:
+          {
+            BattleCalculatorAction_Sides *a =
+              dynamic_cast<BattleCalculatorAction_Sides*>(action);
+            out = new BattleCalculatorAction_Sides (sides_row);
+
+            sides_row = a->getRow ();
+          } 
+        break;
+      case BattleCalculatorAction::TERRAIN:
+          {
+            BattleCalculatorAction_Terrain *a =
+              dynamic_cast<BattleCalculatorAction_Terrain*>(action);
+            out = new BattleCalculatorAction_Terrain (terrain_row);
+
+            terrain_row = a->getRow ();
+          }
+        break;
+      case BattleCalculatorAction::CITY:
+          {
+            BattleCalculatorAction_City *a =
+              dynamic_cast<BattleCalculatorAction_City*>(action);
+            out = new BattleCalculatorAction_City (city_active,
+                                                   terrain_row);
+            city_active = a->getActive ();
+          }
+        break;
+      case BattleCalculatorAction::FORTIFY:
+          {
+            BattleCalculatorAction_Fortify *a =
+              dynamic_cast<BattleCalculatorAction_Fortify*>(action);
+            out = new BattleCalculatorAction_Fortify (fortified_active);
+            fortified_active = a->getActive ();
+          }
+        break;
+      case BattleCalculatorAction::DEFENDER_OWNER:
+          {
+            BattleCalculatorAction_DefenderOwner *a =
+              dynamic_cast<BattleCalculatorAction_DefenderOwner*>(action);
+            out = new BattleCalculatorAction_DefenderOwner (defender_owner_row);
+
+            defender_owner_row = a->getRow ();
+            for (auto army : d_defenders)
+              army->setOwner (Playerlist::getInstance ()->getPlayer
+                              (defender_owner_row));
+          } 
+        break;
+      case BattleCalculatorAction::ATTACKER_OWNER:
+          {
+            BattleCalculatorAction_AttackerOwner *a =
+              dynamic_cast<BattleCalculatorAction_AttackerOwner*>(action);
+            out = new BattleCalculatorAction_AttackerOwner (attacker_owner_row);
+
+            attacker_owner_row = a->getRow ();
+            for (auto army : d_attackers)
+              army->setOwner (Playerlist::getInstance ()->getPlayer
+                              (attacker_owner_row));
+          } 
+        break;
+      case BattleCalculatorAction::DEFENDER_ADD:
+          {
+            BattleCalculatorAction_DefenderAdd *a =
+              dynamic_cast<BattleCalculatorAction_DefenderAdd*>(action);
+            out = new BattleCalculatorAction_DefenderAdd (d_defenders);
+            replaceDefenders (a, d_defenders);
+          }
+        break;
+      case BattleCalculatorAction::DEFENDER_REMOVE:
+          {
+            BattleCalculatorAction_DefenderRemove *a =
+              dynamic_cast<BattleCalculatorAction_DefenderRemove*>(action);
+            out = new BattleCalculatorAction_DefenderRemove (d_defenders);
+            replaceDefenders (a, d_defenders);
+          }
+        break;
+      case BattleCalculatorAction::DEFENDER_COPY:
+          {
+            BattleCalculatorAction_DefenderCopy *a =
+              dynamic_cast<BattleCalculatorAction_DefenderCopy*>(action);
+            out = new BattleCalculatorAction_DefenderCopy (d_defenders);
+            replaceDefenders (a, d_defenders);
+          }
+        break;
+      case BattleCalculatorAction::DEFENDER_HERO_DETAILS:
+          {
+            BattleCalculatorAction_DefenderHeroDetails *a =
+              dynamic_cast<BattleCalculatorAction_DefenderHeroDetails*>(action);
+            out = new BattleCalculatorAction_DefenderHeroDetails (d_defenders);
+            replaceDefenders (a, d_defenders);
+          }
+        break;
+      case BattleCalculatorAction::DEFENDER_STRENGTH:
+          {
+            BattleCalculatorAction_DefenderStrength *a =
+              dynamic_cast<BattleCalculatorAction_DefenderStrength*>(action);
+            out = new BattleCalculatorAction_DefenderStrength
+              (a->getIndex (),
+               getDefenderByIndex (a)->getStat (Army::STRENGTH, false));
+            getDefenderByIndex (a)->setStat (Army::STRENGTH, a->getStrength ());
+          }
+        break;
+      case BattleCalculatorAction::ATTACKER_ADD:
+          {
+            BattleCalculatorAction_AttackerAdd *a =
+              dynamic_cast<BattleCalculatorAction_AttackerAdd*>(action);
+            out = new BattleCalculatorAction_AttackerAdd (d_attackers);
+            replaceAttackers (a, d_attackers);
+          }
+        break;
+      case BattleCalculatorAction::ATTACKER_REMOVE:
+          {
+            BattleCalculatorAction_AttackerRemove *a =
+              dynamic_cast<BattleCalculatorAction_AttackerRemove*>(action);
+            out = new BattleCalculatorAction_AttackerRemove (d_attackers);
+            replaceAttackers (a, d_attackers);
+          }
+        break;
+      case BattleCalculatorAction::ATTACKER_COPY:
+          {
+            BattleCalculatorAction_AttackerCopy *a =
+              dynamic_cast<BattleCalculatorAction_AttackerCopy*>(action);
+            out = new BattleCalculatorAction_AttackerCopy (d_attackers);
+            replaceAttackers (a, d_attackers);
+          }
+        break;
+      case BattleCalculatorAction::ATTACKER_HERO_DETAILS:
+          {
+            BattleCalculatorAction_AttackerHeroDetails *a =
+              dynamic_cast<BattleCalculatorAction_AttackerHeroDetails*>(action);
+            out = new BattleCalculatorAction_AttackerHeroDetails (d_attackers);
+            replaceAttackers (a, d_attackers);
+          }
+        break;
+      case BattleCalculatorAction::ATTACKER_STRENGTH:
+          {
+            BattleCalculatorAction_AttackerStrength *a =
+              dynamic_cast<BattleCalculatorAction_AttackerStrength*>(action);
+            out = new BattleCalculatorAction_AttackerStrength
+              (a->getIndex (),
+               getAttackerByIndex (a)->getStat (Army::STRENGTH, false));
+            getAttackerByIndex (a)->setStat (Army::STRENGTH, a->getStrength ());
+          }
+        break;
+    }
+  return out;
+}
+
+void BattleCalculatorDialog::replaceArmies (BattleCalculatorAction_Armies *action, std::list<Army*> &armies)
+{
+  for (auto a : armies)
+    delete a;
+  armies.clear ();
+  for (auto a : action->getArmies ())
+    {
+      if (a->isHero ())
+        {
+          Hero *h = dynamic_cast<Hero*>(a);
+          armies.push_back (new Hero (*h));
+        }
+      else
+        armies.push_back (new Army (*a));
+    }
+}
+void BattleCalculatorDialog::replaceAttackers (BattleCalculatorAction_Armies *action, std::list<Army*> &armies)
+{
+  replaceArmies (action, armies);
+  disconnect_signals ();
+  fill_attackers ();
+  connect_signals ();
+}
+
+void BattleCalculatorDialog::replaceDefenders (BattleCalculatorAction_Armies *action, std::list<Army*> &armies)
+{
+  replaceArmies (action, armies);
+  disconnect_signals ();
+  fill_defenders ();
+  connect_signals ();
+}
+
+void BattleCalculatorDialog::update ()
+{
+  disconnect_signals ();
+  if (sides_row > -1)
+    die_sides_combobox->set_active (sides_row);
+  if (terrain_row > -1)
+    terrain_combobox->set_active (terrain_row);
+  fortified_switch->set_active (fortified_active);
+  city_switch->set_active (city_active);
+  terrain_combobox->set_sensitive(!city_switch->property_active());
+  attacker_player_combobox->set_active(attacker_owner_row);
+  defender_player_combobox->set_active(defender_owner_row);
+
+  ImageCache *gc = ImageCache::getInstance();
+
+  guint32 fs = FontSize::getInstance ()->get_height ();
+  for (Gtk::TreeIter j = attackers_list->children().begin(),
+       jend = attackers_list->children().end(); j != jend; ++j)
+    {
+      Army *a = (*j)[combatant_columns.army];
+      (*j)[combatant_columns.image] =
+        gc->getDialogArmyPic(a, fs)->to_pixbuf ();
+      (*j)[combatant_columns.strength] = a->getStat(Army::STRENGTH, false);
+    }
+  for (Gtk::TreeIter j = defenders_list->children().begin(),
+       jend = defenders_list->children().end(); j != jend; ++j)
+    {
+      Army *a = (*j)[combatant_columns.army];
+      (*j)[combatant_columns.image] =
+        gc->getDialogArmyPic(a, fs)->to_pixbuf ();
+      (*j)[combatant_columns.strength] = a->getStat(Army::STRENGTH, false);
+    }
+  set_button_sensitivity();
+  connect_signals ();
 }
