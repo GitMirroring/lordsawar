@@ -67,7 +67,14 @@ Glib::ustring CreateScenarioRandomize::popRandomCityName()
 {
   Glib::ustring name = d_citynames->popRandomName().c_str();
   if (name == "")
-    return City::getDefaultName();
+    {
+      std::list<Glib::ustring> names = collect_city_names.emit ();
+      d_citynames->repopulate (names);
+      if (d_citynames->empty () == true)
+        return City::getDefaultName();
+      else
+        name = d_citynames->popRandomName().c_str();
+    }
   return name;
 }
 
@@ -80,7 +87,14 @@ Glib::ustring CreateScenarioRandomize::popRandomRuinName()
 {
   Glib::ustring name = d_ruinnames->popRandomName().c_str();
   if (name == "")
-    return Ruin::getDefaultName();
+    {
+      std::list<Glib::ustring> names = collect_ruin_names.emit ();
+      d_ruinnames->repopulate (names);
+      if (d_ruinnames->empty () == true)
+        return Ruin::getDefaultName();
+      else
+        name = d_ruinnames->popRandomName().c_str();
+    }
   return name;
 }
 
@@ -93,7 +107,14 @@ Glib::ustring CreateScenarioRandomize::popRandomTempleName()
 {
   Glib::ustring name = d_templenames->popRandomName().c_str();
   if (name == "")
-    return Temple::getDefaultName();
+    {
+      std::list<Glib::ustring> names = collect_temple_names.emit ();
+      d_templenames->repopulate (names);
+      if (d_templenames->empty () == true)
+        return Temple::getDefaultName();
+      else
+        name = d_templenames->popRandomName().c_str();
+    }
   return name;
 }
 
@@ -104,7 +125,17 @@ void CreateScenarioRandomize::pushRandomTempleName(Glib::ustring name)
 
 Glib::ustring CreateScenarioRandomize::popRandomSignpost()
 {
-  return d_signposts->popRandomName().c_str();
+  Glib::ustring name = d_signposts->popRandomName().c_str();
+  if (name == "")
+    {
+      std::list<Glib::ustring> names = collect_signposts.emit ();
+      d_signposts->repopulate (names);
+      if (d_signposts->empty () == true)
+        return name;
+      else
+        name = d_signposts->popRandomName().c_str();
+    }
+  return name;
 }
 
 void CreateScenarioRandomize::pushRandomSignpost(Glib::ustring name)

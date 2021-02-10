@@ -330,6 +330,11 @@ class MainWindow: public sigc::trackable
     void doReloadShieldset ();
     bool check_discard (Glib::ustring msg);
     bool check_save_valid ();
+    void setupCreateScenarioRandomize ();
+    std::list<Glib::ustring> collectCityNames ();
+    std::list<Glib::ustring> collectRuinNames ();
+    std::list<Glib::ustring> collectTempleNames ();
+    std::list<Glib::ustring> collectSignposts ();
 };
 
 #endif

@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, Ben Asselstine
+//  Copyright (C) 2009, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,18 +29,19 @@
 //#define debug(x)
 
 NameList::NameList(Glib::ustring filename, Glib::ustring item_tag)
- : d_item_tag (item_tag)
+ : d_filename (filename), d_item_tag (item_tag)
 {
-  XML_Helper helper(File::getMiscFile(filename), std::ios::in);
+  XML_Helper helper (File::getMiscFile (d_filename), std::ios::in);
 
-  helper.registerTag(d_item_tag, sigc::mem_fun((*this), &NameList::load));
+  helper.registerTag (d_item_tag, sigc::mem_fun ((*this), &NameList::load));
 
-  if (!helper.parseXML())
+  if (!helper.parseXML ())
     {
-      std::cerr << String::ucompose(_("Error can't load namelist `%1'"), filename) << std::endl;
-      exit(-1);
+      std::cerr << String::ucompose (_("Error can't load namelist `%1'"),
+                                     d_filename) << std::endl;
+      exit (-1);
     }
-  helper.close();
+  helper.close ();
   return;
 }
 
@@ -60,6 +61,29 @@ bool NameList::load(Glib::ustring tag, XML_Helper *helper)
       push_back(name); 
     }
   return true;
+}
+
+bool NameList::repopulate (std::list<Glib::ustring> names)
+{
+  clear ();
+  XML_Helper helper(File::getMiscFile (d_filename), std::ios::in);
+
+  helper.registerTag(d_item_tag, sigc::mem_fun ((*this), &NameList::load));
+
+  if (!helper.parseXML ())
+    {
+      std::cerr << String::ucompose (_("Error can't load namelist `%1'"),
+                                     d_filename) << std::endl;
+      exit (-1);
+    }
+  helper.close ();
+  for (auto name : names)
+    {
+      NameList::iterator it = std::find (begin (), end (), name);
+      if (it != end ())
+        erase (it);
+    }
+  return empty () == false;
 }
 
 Glib::ustring NameList::popRandomName()

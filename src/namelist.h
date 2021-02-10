@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, Ben Asselstine
+//  Copyright (C) 2009, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -47,6 +47,12 @@ class NameList : public std::vector<Glib::ustring>, public sigc::trackable
         //! Destructor.
         ~NameList() {};
 
+        //! Reload the namelist and subtract the supplied NAMES that are used.
+        /**
+         * @return whether or not there are any unused names left.
+         */
+        bool repopulate (std::list<Glib::ustring> names);
+
 	Glib::ustring popRandomName();
 
     private:
@@ -54,6 +60,7 @@ class NameList : public std::vector<Glib::ustring>, public sigc::trackable
         //! Callback for loading names into the NameList.
 	bool load(Glib::ustring tag, XML_Helper *helper);
 
+        Glib::ustring d_filename;
 	Glib::ustring d_item_tag;
 };
 

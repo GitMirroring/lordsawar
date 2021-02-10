@@ -527,9 +527,7 @@ void MainWindow::show_initial_map()
       current_save_filename = d_load_filename;
       game_scenario = new GameScenario(current_save_filename, broken);
       Playerlist::getInstance()->syncNeutral();
-      if (d_create_scenario_names)
-	delete d_create_scenario_names;
-      d_create_scenario_names = new CreateScenarioRandomize();
+      setupCreateScenarioRandomize ();
       clear_save_file_of_scenario_specific_data();
       if (broken == false)
 	{
@@ -575,9 +573,7 @@ void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ust
     Glib::ustring scenario_name =
       ScenarioList::getInstance ()->findFreeName (_("Untitled"));
     game_scenario = new GameScenario(scenario_name, _("No description"));
-    if (d_create_scenario_names)
-      delete d_create_scenario_names;
-    d_create_scenario_names = new CreateScenarioRandomize();
+    setupCreateScenarioRandomize ();
     //zip past the player IDs (+1 for neutral)
     for (unsigned int i = 0; i < MAX_PLAYERS + 1; i++)
       fl_counter->getNextId();
@@ -702,9 +698,7 @@ void MainWindow::set_random_map(int width, int height,
     Glib::ustring scenario_name =
       ScenarioList::getInstance ()->findFreeName (_("Untitled"));
     game_scenario = new GameScenario(scenario_name, _("No description"));
-    if (d_create_scenario_names)
-      delete d_create_scenario_names;
-    d_create_scenario_names = new CreateScenarioRandomize();
+    setupCreateScenarioRandomize ();
     
     Cityset *cs = Citysetlist::getInstance()->get(cityset);
     // now fill the lists
@@ -980,9 +974,7 @@ bool MainWindow::load_map ()
       delete s;
       game_scenario->setDirectory(File::get_dirname(current_save_filename));
       Playerlist::getInstance()->syncNeutral();
-      if (d_create_scenario_names)
-        delete d_create_scenario_names;
-      d_create_scenario_names = new CreateScenarioRandomize();
+      setupCreateScenarioRandomize ();
 
       clearUndoAndRedo ();
       init_map_state();
@@ -2221,9 +2213,7 @@ bool MainWindow::import_map ()
       game_scenario->setDirectory(File::get_dirname(filename));
       Playerlist::getInstance()->syncNeutral();
 
-      if (d_create_scenario_names)
-        delete d_create_scenario_names;
-      d_create_scenario_names = new CreateScenarioRandomize();
+      setupCreateScenarioRandomize ();
 
       //now lets get rid of stuff.
       clear_save_file_of_scenario_specific_data();
@@ -3394,4 +3384,46 @@ bool MainWindow::check_save_valid ()
         return false;
     }
   return true;
+}
+
+void MainWindow::setupCreateScenarioRandomize ()
+{
+  if (d_create_scenario_names)
+    delete d_create_scenario_names;
+  d_create_scenario_names = new CreateScenarioRandomize ();
+  d_create_scenario_names->signal_collect_city_names ().connect
+    (method (collectCityNames));
+
+}
+
+std::list<Glib::ustring> MainWindow::collectCityNames ()
+{
+  std::list<Glib::ustring> names;
+  for (auto c : *Citylist::getInstance ())
+    names.push_back (c->getName ());
+  return names;
+}
+
+std::list<Glib::ustring> MainWindow::collectRuinNames ()
+{
+  std::list<Glib::ustring> names;
+  for (auto r : *Ruinlist::getInstance ())
+    names.push_back (r->getName ());
+  return names;
+}
+
+std::list<Glib::ustring> MainWindow::collectTempleNames ()
+{
+  std::list<Glib::ustring> names;
+  for (auto t : *Templelist::getInstance ())
+    names.push_back (t->getName ());
+  return names;
+}
+
+std::list<Glib::ustring> MainWindow::collectSignposts ()
+{
+  std::list<Glib::ustring> names;
+  for (auto s : *Signpostlist::getInstance ())
+    names.push_back (s->getName ());
+  return names;
 }

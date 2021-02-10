@@ -24,6 +24,7 @@
 #include <gtkmm.h>
 #include "shield.h"
 #include "namelist.h"
+#include <sigc++/signal.h>
 
 class Signpost;
 class Army;
@@ -65,6 +66,14 @@ class CreateScenarioRandomize
 
 	int adjustBaseGold (int base_gold);
 
+        sigc::signal<std::list<Glib::ustring> > signal_collect_city_names ()
+          {return collect_city_names;}
+        sigc::signal<std::list<Glib::ustring> > signal_collect_temple_names ()
+          {return collect_temple_names;}
+        sigc::signal<std::list<Glib::ustring> > signal_collect_ruin_names ()
+          {return collect_ruin_names;}
+        sigc::signal<std::list<Glib::ustring> > signal_collect_signposts ()
+          {return collect_signposts;}
 	//! Get the default player name for the given shield colour.
 	static Glib::ustring getPlayerName(Shield::Colour id);
 
@@ -78,6 +87,10 @@ class CreateScenarioRandomize
 
     private:
 
+        sigc::signal<std::list<Glib::ustring> > collect_city_names;
+        sigc::signal<std::list<Glib::ustring> > collect_temple_names;
+        sigc::signal<std::list<Glib::ustring> > collect_ruin_names;
+        sigc::signal<std::list<Glib::ustring> > collect_signposts;
 	Glib::ustring popRandomListName(std::vector<Glib::ustring>& list);
         Glib::ustring get_direction(int xdir, int ydir);
 	bool loadNames(std::vector<Glib::ustring>& list, std::ifstream& file);
