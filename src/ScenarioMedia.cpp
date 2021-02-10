@@ -262,7 +262,6 @@ void ScenarioMedia::copySound(Tar_Helper &t, Glib::ustring name, Glib::ustring p
 
 void ScenarioMedia::copySounds(Tar_Helper &t, bool &broken)
 {
-  Glib::ustring f = "";
   copySound(t, d_bless_name, "bless", broken);
   copySound(t, d_hero_name, "hero", broken);
   copySound(t, d_battle_name, "battle", broken);
@@ -327,6 +326,9 @@ void ScenarioMedia::instantiateImages(Tar_Helper &t, bool &broken)
 
 MusicItem* ScenarioMedia::getSoundEffect(Glib::ustring n)
 {
+  auto it = d_musicMap.find (n);
+  if (it == d_musicMap.end ())
+    return NULL;
   return d_musicMap[n];
 }
 

@@ -57,7 +57,7 @@ Scenario::Scenario (const GameScenario *g)
 Scenario::Scenario (const Scenario &s)
  : d_game_scenario (new GameScenario (*s.d_game_scenario, false)),
   d_game_map (s.d_game_map->copy ()),
-  d_scenario_media (d_scenario_media->copy ()),
+  d_scenario_media (s.d_scenario_media->copy ()),
   d_fl_counter (s.d_fl_counter->copy ()),
   d_itemlist (s.d_itemlist->copy ()),
   d_playerlist (s.d_playerlist->copy ()),
