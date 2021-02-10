@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2010, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ ValidationDialog::ValidationDialog(Gtk::Window &parent, std::list<Glib::ustring>
       for (auto e : errors)
         s += e + newline;
       s+= newline + newline;
-      s = _("Warnings:") + newline;
+      s += _("Warnings:") + newline;
       for (auto w : warnings)
         s += w + newline;
       textview->get_buffer()->set_text(s);

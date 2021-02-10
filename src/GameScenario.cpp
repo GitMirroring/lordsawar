@@ -1126,6 +1126,10 @@ void GameScenario::setNewRandomId()
 	
 bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::ustring> &warnings)
 {
+  std::stringstream ss;
+  ss << std::endl;
+  Glib::ustring newline = ss.str();
+
   Glib::ustring s;
   guint32 num = Playerlist::getInstance()->countPlayersAlive();
   if (num < 2)
@@ -1167,28 +1171,55 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
         }
     }
 
-  guint32 count = 0;
+  std::vector<Vector<int> >unnamed_city_pos;
   for (auto it: *Citylist::getInstance())
+    if (it->isUnnamed() == true)
+      unnamed_city_pos.push_back (it->getPos ());
+  if (unnamed_city_pos.size () > 0)
     {
-      if (it->isUnnamed() == true)
-	count++;
-    }
-  if (count > 0)
-    {
-      s = String::ucompose(ngettext("There is %1 unnamed city", "There are %1 unnamed cities", count), count);
+      s = String::ucompose
+        (ngettext("There is %1 unnamed city", "There are %1 unnamed cities",
+                  unnamed_city_pos.size ()), unnamed_city_pos.size ());
+      for (guint32 i = 0; i < unnamed_city_pos.size (); i++)
+        {
+          if (i > 2)
+            break;
+          if (unnamed_city_pos.size () == 1)
+            s += String::ucompose (_(" (at %1,%2)"), unnamed_city_pos[i].x,
+                                   unnamed_city_pos[i].y);
+          else
+            {
+              s+= newline;
+              s += String::ucompose (_("An unnamed city is at %1,%2"),
+                                     unnamed_city_pos[i].x,
+                                     unnamed_city_pos[i].y);
+            }
+        }
       warnings.push_back(s);
     }
 
-  count = 0;
-
+  std::vector<Vector<int> >unnamed_ruin_pos;
   for (auto it: *Ruinlist::getInstance())
+    if (it->isUnnamed() == true)
+      unnamed_ruin_pos.push_back (it->getPos ());
+  if (unnamed_ruin_pos.size () > 0)
     {
-      if (it->isUnnamed() == true)
-	count++;
-    }
-  if (count > 0)
-    {
-      s = String::ucompose(ngettext("There is %1 unnamed ruin", "There are %1 unnamed ruins", count), count);
+      s = String::ucompose(ngettext("There is %1 unnamed ruin", "There are %1 unnamed ruins", unnamed_ruin_pos.size ()), unnamed_ruin_pos.size ());
+      for (guint32 i = 0; i < unnamed_ruin_pos.size (); i++)
+        {
+          if (i > 2)
+            break;
+          if (unnamed_ruin_pos.size () == 1)
+            s += String::ucompose (_(" (at %1,%2)"), unnamed_ruin_pos[i].x,
+                                   unnamed_ruin_pos[i].y);
+          else
+            {
+              s+= newline;
+              s += String::ucompose (_("An unnamed ruin is at %1,%2"),
+                                     unnamed_ruin_pos[i].x,
+                                     unnamed_ruin_pos[i].y);
+            }
+        }
       warnings.push_back(s);
     }
 
@@ -1202,19 +1233,34 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
         }
     }
 
-  count = 0;
+  std::vector<Vector<int> >unnamed_temple_pos;
   for (auto it: *Templelist::getInstance())
     {
       if (it->isUnnamed() == true)
-	count++;
+        unnamed_temple_pos.push_back (it->getPos ());
     }
-  if (count > 0)
+  if (unnamed_temple_pos.size () > 0)
     {
-      s = String::ucompose(ngettext("There is %1 unnamed temple", "There are %1 unnamed temples", count), count);
+      s = String::ucompose(ngettext("There is %1 unnamed temple", "There are %1 unnamed temples", unnamed_temple_pos.size ()), unnamed_temple_pos.size ());
+      for (guint32 i = 0; i < unnamed_temple_pos.size (); i++)
+        {
+          if (i > 2)
+            break;
+          if (unnamed_temple_pos.size () == 1)
+            s += String::ucompose (_(" (at %1,%2)"), unnamed_temple_pos[i].x,
+                                   unnamed_temple_pos[i].y);
+          else
+            {
+              s+= newline;
+              s += String::ucompose (_("An unnamed temple is at %1,%2"),
+                                     unnamed_temple_pos[i].x,
+                                     unnamed_temple_pos[i].y);
+            }
+        }
       warnings.push_back(s);
     }
 
-  count = 0;
+  guint32 count = 0;
   for (auto it: *Playerlist::getInstance()->getNeutral()->getStacklist())
     {
       if (Citylist::getInstance()->getObjectAt(it->getPos()) == NULL)
