@@ -53,9 +53,6 @@ editor needs to be able to handle tilesets with two different water tiles and so
 
 when the game is done, offer a replay. (idea of Timirtdinov Leonid)
 
-
 undo doesn't always place the cursor properly on entries and textviews
 
 preview army type in armyset editor.  pick tileset/shieldset/cityset.
-
-undoing/redoing very fast segfaults, can't reproduce
