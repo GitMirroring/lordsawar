@@ -1,6 +1,6 @@
 LordsAWar! version 0.3.3, a clone of the turn-based strategy game Warlords II, has been released with the following changes: 
 
-* The Scenario builder now does undo and redo.
+* The Scenario builder now allows for undoing.
 * The button box on the main screen is now shown on two rows instead of three.
 * Added a new temple type that is a stone henge.
 * Players can be given different army sets in the Scenario Builder.
