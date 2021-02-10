@@ -53,9 +53,8 @@ editor needs to be able to handle tilesets with two different water tiles and so
 
 when the game is done, offer a replay. (idea of Timirtdinov Leonid)
 
-do undo/redo for all the other dialogs in the editors
 
-figure out how to do undo for textviews
+undo doesn't always place the cursor properly on entries and textviews
 
 undo doesn't play well with createscenariorandomize (names don't get pushed back)
 
