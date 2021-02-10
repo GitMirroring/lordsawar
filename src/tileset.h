@@ -1,6 +1,6 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007-2011, 2014, 2017, 2020 Ben Asselstine
+// Copyright (C) 2007-2011, 2014, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -208,6 +208,12 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	//! Lookup tilestyle by it's id in this tileset.
 	TileStyle *getTileStyle(guint32 id) const;
+
+        //! Return how many movement bonus images are set.
+        guint32 countMoveBonusImages () const;
+
+        //! Return how many tilestyles are in this tileset.
+        guint32 countTileStyles () const;
 
 	//! Lookup a random tile style.
 	/**

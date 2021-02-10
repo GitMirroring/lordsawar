@@ -64,6 +64,16 @@ class TileSetInfoDialog: public LwEditorDialog
     Gtk::SpinButton *size_spinbutton;
     Gtk::Button *undo_button;
     Gtk::Button *redo_button;
+    Gtk::Label *tiles_label;
+    Gtk::Label *tilestyles_label;
+    Gtk::Label *selector_label;
+    Gtk::Label *explosion_label;
+    Gtk::Label *roads_label;
+    Gtk::Label *bridges_label;
+    Gtk::Label *fog_label;
+    Gtk::Label *flag_label;
+    Gtk::Label *move_bonus_images_label;
+    Gtk::Label *images_label;
 
     void on_name_changed();
     void on_copyright_changed ();

@@ -27,15 +27,17 @@
 #include "defs.h"
 #include "File.h"
 #include "tileset-info-actions.h"
+#include "TarFileMaskedImage.h"
+#include "TarFileImage.h"
 
 #define method(x) sigc::mem_fun(*this, &TileSetInfoDialog::x)
 
-TileSetInfoDialog::TileSetInfoDialog(Gtk::Window &parent, Tileset *s)
+TileSetInfoDialog::TileSetInfoDialog(Gtk::Window &parent, Tileset *t)
  : LwEditorDialog(parent, "tileset-info-dialog.ui")
 {
   umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
   umgr->execute ().connect (method (executeAction));
-  d_tileset = s;
+  d_tileset = t;
   dialog->set_title(_("Tile Set Properties"));
 
   xml->get_widget("close_button", close_button);
@@ -49,6 +51,36 @@ TileSetInfoDialog::TileSetInfoDialog(Gtk::Window &parent, Tileset *s)
   undo_button->signal_activate ().connect (method (on_undo_activated));
   xml->get_widget("redo_button", redo_button);
   redo_button->signal_activate ().connect (method (on_redo_activated));
+  xml->get_widget("tiles_label", tiles_label);
+  tiles_label->set_text (String::ucompose ("%1", d_tileset->size ()));
+  xml->get_widget("tilestyles_label", tilestyles_label);
+  tilestyles_label->set_text
+    (String::ucompose ("%1", d_tileset->countTileStyles ()));
+  xml->get_widget("selector_label", selector_label);
+  selector_label->set_text 
+    (d_tileset->getSelector (true)->getName ().empty () == false &&
+     d_tileset->getSelector (false)->getName ().empty () == false ?
+     _("Present") : _("Not present"));
+  xml->get_widget("explosion_label", explosion_label);
+  explosion_label->set_text (d_tileset->getExplosion ()->getName ().empty () ?
+                             _("Not present") : _("Present"));
+  xml->get_widget("roads_label", roads_label);
+  roads_label->set_text (d_tileset->getRoad ()->getName ().empty () ?
+                         _("Not present") : _("Present"));
+  xml->get_widget("bridges_label", bridges_label);
+  bridges_label->set_text (d_tileset->getBridge ()->getName ().empty () ?
+                           _("Not present") : _("Present"));
+  xml->get_widget("fog_label", fog_label);
+  fog_label->set_text (d_tileset->getFog()->getName().empty () ?
+                       _("Not present") : _("Present"));
+  xml->get_widget("flag_label", flag_label);
+  flag_label->set_text (d_tileset->getFlags()->getName().empty () ?
+                                     _("Not present") : _("Present"));
+  xml->get_widget("move_bonus_images_label", move_bonus_images_label);
+  move_bonus_images_label->set_text (d_tileset->countMoveBonusImages () != 6 ?
+                                     _("Not present") : _("Present"));
+  xml->get_widget("images_label", images_label);
+  images_label->set_text (String::ucompose ("%1", d_tileset->countImages ()));
 
   name_entry->set_text (d_tileset->getName ());
   location_label->property_label () =

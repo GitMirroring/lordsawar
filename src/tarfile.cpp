@@ -245,3 +245,32 @@ void TarFile::setLoadTemporaryFile ()
   File::copy (getConfigurationFile (), f);
   d_tmp_filename = f;
 }
+
+guint32 TarFile::countImages ()
+{
+  guint32 count = 0;
+  Glib::ustring infile = d_tmp_filename;
+  if (infile == "")
+    infile = getConfigurationFile ();
+  if (infile != "")
+    {
+      bool broken = false;
+      std::list<Glib::ustring> delfiles;
+      Tar_Helper orig(infile, std::ios::in, broken);
+      if (broken == false)
+        {
+          std::list<Glib::ustring> extensions;
+          extensions.push_back (".png");
+          extensions.push_back (".svg");
+          for (auto ext : extensions)
+            {
+              std::list<Glib::ustring> files = orig.getFilenames(ext);
+              for (std::list<Glib::ustring>::iterator it = files.begin(); 
+                   it != files.end(); ++it)
+                count++;
+            }
+          orig.Close();
+        }
+    }
+  return count;
+}

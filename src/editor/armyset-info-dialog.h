@@ -64,6 +64,12 @@ class ArmySetInfoDialog: public LwEditorDialog
     Gtk::SpinButton *size_spinbutton;
     Gtk::Button *undo_button;
     Gtk::Button *redo_button;
+    Gtk::Label *armies_label;
+    Gtk::Label *selectors_label;
+    Gtk::Label *bag_label;
+    Gtk::Label *ship_label;
+    Gtk::Label *flag_label;
+    Gtk::Label *images_label;
 
     void on_name_changed();
     void on_copyright_changed ();

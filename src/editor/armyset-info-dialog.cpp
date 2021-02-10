@@ -27,7 +27,8 @@
 #include "defs.h"
 #include "File.h"
 #include "armyset-info-actions.h"
-
+#include "TarFileMaskedImage.h"
+#include "TarFileImage.h"
 
 #define method(x) sigc::mem_fun(*this, &ArmySetInfoDialog::x)
 
@@ -62,6 +63,22 @@ ArmySetInfoDialog::ArmySetInfoDialog(Gtk::Window &parent, Armyset *armyset)
   undo_button->signal_activate ().connect (method (on_undo_activated));
   xml->get_widget("redo_button", redo_button);
   redo_button->signal_activate ().connect (method (on_redo_activated));
+  xml->get_widget("armies_label", armies_label);
+  armies_label->set_text (String::ucompose ("%1", armyset->size ()));
+  xml->get_widget("selectors_label", selectors_label);
+  selectors_label->set_text
+    (String::ucompose ("%1", armyset->countSelectors ()));
+  xml->get_widget("bag_label", bag_label);
+  bag_label->set_text (armyset->getBag ()->getName () == "" ?
+                       _("Not present") : _("Present"));
+  xml->get_widget("ship_label", ship_label);
+  ship_label->set_text (armyset->getShip ()->getName () == "" ?
+                        _("Not present") : _("Present"));
+  xml->get_widget("flag_label", flag_label);
+  flag_label->set_text (armyset->getStandard ()->getName () == "" ?
+                        _("Not present") : _("Present"));
+  xml->get_widget("images_label", images_label);
+  images_label->set_text (String::ucompose ("%1", armyset->countImages ()));
 
   d_name = d_armyset->getName ();
   d_description = d_armyset->getInfo ();

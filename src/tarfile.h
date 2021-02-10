@@ -44,6 +44,7 @@ public:
 
     Glib::ustring getFileFromConfigurationFile(Glib::ustring file);
     bool contains (Glib::ustring ar, bool &broken);
+    guint32 countImages ();
     bool replaceFileInCfgFile(Glib::ustring file, Glib::ustring new_file, Glib::ustring &out);
     bool addFileInCfgFile(Glib::ustring new_file, Glib::ustring &out);
     bool removeFileInCfgFile(Glib::ustring file);

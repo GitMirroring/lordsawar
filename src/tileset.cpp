@@ -824,4 +824,31 @@ void Tileset::uninstantiateSameNamedImages (Glib::ustring name)
   for (auto s : sets)
     delete s;
 }
+
+guint32 Tileset::countMoveBonusImages () const
+{
+  guint32 count = 0;
+  if (getAllMoveBonus()->getName ().empty () == false)
+    count++;
+  if (getWaterMoveBonus()->getName ().empty () == false)
+    count++;
+  if (getForestMoveBonus()->getName ().empty () == false)
+    count++;
+  if (getHillsMoveBonus()->getName ().empty () == false)
+    count++;
+  if (getMountainsMoveBonus()->getName ().empty () == false)
+    count++;
+  if (getSwampMoveBonus()->getName ().empty () == false)
+    count++;
+  return count;
+}
+
+guint32 Tileset::countTileStyles () const
+{
+  guint32 count = 0;
+  for (Tileset::const_iterator i = begin(); i != end(); ++i)
+    for (Tile::const_iterator j = (*i)->begin(); j != (*i)->end(); ++j)
+      count += (*j)->size ();
+  return count;
+}
 //End of file

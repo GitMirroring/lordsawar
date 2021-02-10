@@ -172,6 +172,7 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         void uninstantiateSameNamedImages (Glib::ustring name);
 
         bool loadSelectorPics (Tar_Helper *t);
+        guint32 countSelectors () const;
 
 	static void switchArmyset(Army *army, const Armyset *armyset);
 	static void switchArmyset(ArmyProdBase *army, const Armyset *armyset);

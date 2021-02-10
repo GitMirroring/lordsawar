@@ -1024,3 +1024,15 @@ void Armyset::uninstantiateSameNamedImages (Glib::ustring name)
   TarFileImage::uninstantiate (name, getImages ());
   TarFileMaskedImage::uninstantiate (name, getMaskedImages ());
 }
+
+guint32 Armyset::countSelectors () const
+{
+  guint32 count = 0;
+  for (guint32 c = Shield::WHITE; c < Shield::NEUTRAL; c++)
+    {
+      if (getSelector (true, Shield::Colour(c))->getName ().empty () == false &&
+          getSelector (false, Shield::Colour(c))->getName ().empty () == false)
+        count++;
+    }
+  return count;
+}
