@@ -1,5 +1,5 @@
 #!/bin/bash
-#Copyright (C) 2014 Ben Asselstine
+#Copyright (C) 2014, 2021 Ben Asselstine
 #This script is licensed under the terms of the GNU GPL version 3 or later.
 #
 # Pares down the gnome icons for distribution in the windows version of
@@ -12,9 +12,12 @@
 #
 # This script does it's work in /tmp/, and then drops a newly created 
 # share/ directory in the current working directory.
+#
+# We've removed the stock icons in the glade files but still the default icons
+# on the title bar are required (e.g. minimize, maxmimize, close.)
 
 #process these directories of icons in /usr/share/icons/
-dirs="Adwaita hicolor"
+dirs="Adwaita"
 
 if [ -d share ]; then
   echo "There is already a share/ directory here!"
@@ -22,7 +25,6 @@ if [ -d share ]; then
 fi
 #remove these sizes
 adwaitabadsizes="scalable scalable-up-to-32 8x8 22x22 24x24 32x32 48x48 64x64 96x96 256x256"
-hicolorbadsizes="scalable 128x128 192x192 256x256 512x512 symbolic"
 
 remove_ini_section()
 {
@@ -74,8 +76,6 @@ for d in $dirs; do
   if [ "$d" == "Adwaita" ]; then
     badsizes=$adwaitabadsizes
     rm -rf $tmpdir/share/icons/$d/cursors
-  elif [ "$d" == "hicolor" ]; then
-    badsizes=$hicolorbadsizes
   fi
   for delsize in $badsizes; do
     if [ -d $tmpdir/share/icons/$d/$delsize ]; then
