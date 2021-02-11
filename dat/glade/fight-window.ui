@@ -1,37 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.2 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow" id="window">
-    <property name="width_request">400</property>
-    <property name="height_request">250</property>
-    <property name="can_focus">False</property>
+    <property name="width-request">400</property>
+    <property name="height-request">250</property>
+    <property name="can-focus">False</property>
     <property name="modal">True</property>
-    <property name="destroy_with_parent">True</property>
-    <property name="type_hint">dialog</property>
+    <property name="destroy-with-parent">True</property>
+    <property name="type-hint">dialog</property>
     <property name="decorated">False</property>
     <property name="gravity">static</property>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="margin_left">24</property>
-        <property name="margin_right">24</property>
-        <property name="margin_top">36</property>
+        <property name="can-focus">False</property>
+        <property name="margin-left">24</property>
+        <property name="margin-right">24</property>
+        <property name="margin-top">36</property>
         <property name="orientation">vertical</property>
         <property name="spacing">16</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <child>
               <object class="GtkImage" id="defender_shield_image">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="stock">gtk-missing-image</property>
+                <property name="can-focus">False</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -42,7 +38,7 @@
             <child>
               <object class="GtkBox" id="defender_close_vbox">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <property name="spacing">12</property>
                 <child>
@@ -71,7 +67,7 @@
         <child>
           <object class="GtkLabel" id="separator_label">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -82,12 +78,11 @@
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <child>
               <object class="GtkImage" id="attacker_shield_image">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="stock">gtk-missing-image</property>
+                <property name="can-focus">False</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -98,7 +93,7 @@
             <child>
               <object class="GtkBox" id="attacker_close_vbox">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <property name="spacing">12</property>
                 <child>
@@ -127,8 +122,8 @@
         <child>
           <object class="GtkLabel" id="decision_label">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="margin_bottom">12</property>
+            <property name="can-focus">False</property>
+            <property name="margin-bottom">12</property>
           </object>
           <packing>
             <property name="expand">False</property>

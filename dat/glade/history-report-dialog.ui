@@ -1,42 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.2 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkAdjustment" id="adjustment1">
     <property name="lower">1</property>
     <property name="upper">1</property>
     <property name="value">1</property>
-    <property name="step_increment">1</property>
+    <property name="step-increment">1</property>
   </object>
   <object class="GtkDialog" id="dialog">
-    <property name="can_focus">False</property>
-    <property name="border_width">6</property>
-    <property name="destroy_with_parent">True</property>
-    <property name="type_hint">dialog</property>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
+    <property name="can-focus">False</property>
+    <property name="border-width">6</property>
+    <property name="destroy-with-parent">True</property>
+    <property name="type-hint">dialog</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">12</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
             <child>
               <object class="GtkButton" id="close_button">
                 <property name="label" translatable="yes">Close</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="has_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="has_default">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_underline">True</property>
+                <property name="can-focus">True</property>
+                <property name="has-focus">True</property>
+                <property name="can-default">True</property>
+                <property name="has-default">True</property>
+                <property name="receives-default">True</property>
+                <property name="use-underline">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -48,33 +45,32 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="pack_type">end</property>
+            <property name="pack-type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
         <child>
           <object class="GtkBox" id="outer_hbox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="spacing">24</property>
             <child>
               <object class="GtkBox" id="left_vbox">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkAlignment" id="alignment1">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <child>
                       <object class="GtkEventBox" id="map_eventbox">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <child>
                           <object class="GtkImage" id="map_image">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
+                            <property name="can-focus">False</property>
                           </object>
                         </child>
                       </object>
@@ -95,26 +91,26 @@
             </child>
             <child>
               <object class="GtkBox" id="right_vbox">
-                <property name="width_request">252</property>
+                <property name="width-request">252</property>
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <property name="spacing">12</property>
                 <child>
                   <object class="GtkNotebook" id="history_notebook">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <child>
                       <object class="GtkBox" id="city_box">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkAlignment" id="city_alignment">
-                            <property name="height_request">175</property>
+                            <property name="height-request">175</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="resize_mode">queue</property>
+                            <property name="can-focus">False</property>
+                            <property name="resize-mode">queue</property>
                             <child>
                               <placeholder/>
                             </child>
@@ -128,7 +124,7 @@
                         <child>
                           <object class="GtkLabel" id="city_label">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can-focus">False</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -138,30 +134,30 @@
                         </child>
                       </object>
                       <packing>
-                        <property name="tab_expand">True</property>
+                        <property name="tab-expand">True</property>
                       </packing>
                     </child>
                     <child type="tab">
                       <object class="GtkLabel" id="city_tab_label">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="label" translatable="yes">City</property>
                       </object>
                       <packing>
-                        <property name="tab_fill">False</property>
+                        <property name="tab-fill">False</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkBox" id="ruin_box">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkAlignment" id="ruin_alignment">
-                            <property name="height_request">175</property>
+                            <property name="height-request">175</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="resize_mode">queue</property>
+                            <property name="can-focus">False</property>
+                            <property name="resize-mode">queue</property>
                             <child>
                               <placeholder/>
                             </child>
@@ -175,7 +171,7 @@
                         <child>
                           <object class="GtkLabel" id="ruin_label">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can-focus">False</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -186,45 +182,45 @@
                       </object>
                       <packing>
                         <property name="position">1</property>
-                        <property name="tab_expand">True</property>
+                        <property name="tab-expand">True</property>
                       </packing>
                     </child>
                     <child type="tab">
                       <object class="GtkLabel" id="ruin_tab_label">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="label" translatable="yes">Ruin</property>
                       </object>
                       <packing>
                         <property name="position">1</property>
-                        <property name="tab_fill">False</property>
+                        <property name="tab-fill">False</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkBox" id="events_box">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkAlignment" id="events_alignment">
-                            <property name="height_request">175</property>
+                            <property name="height-request">175</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can-focus">False</property>
                             <child>
                               <object class="GtkScrolledWindow" id="scrolledwindow1">
                                 <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="shadow_type">in</property>
+                                <property name="can-focus">True</property>
+                                <property name="shadow-type">in</property>
                                 <child>
                                   <object class="GtkViewport" id="viewport1">
                                     <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="resize_mode">queue</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="resize-mode">queue</property>
                                     <child>
                                       <object class="GtkBox" id="events_list_box">
                                         <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="resize_mode">queue</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="resize-mode">queue</property>
                                         <property name="orientation">vertical</property>
                                         <property name="spacing">3</property>
                                         <child>
@@ -246,7 +242,7 @@
                         <child>
                           <object class="GtkLabel" id="events_label">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can-focus">False</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -257,31 +253,31 @@
                       </object>
                       <packing>
                         <property name="position">2</property>
-                        <property name="tab_expand">True</property>
+                        <property name="tab-expand">True</property>
                       </packing>
                     </child>
                     <child type="tab">
                       <object class="GtkLabel" id="events_tab_label">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="label" translatable="yes">Events</property>
                       </object>
                       <packing>
                         <property name="position">2</property>
-                        <property name="tab_fill">False</property>
+                        <property name="tab-fill">False</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkBox" id="gold_box">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkAlignment" id="gold_alignment">
-                            <property name="height_request">175</property>
+                            <property name="height-request">175</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="resize_mode">queue</property>
+                            <property name="can-focus">False</property>
+                            <property name="resize-mode">queue</property>
                             <child>
                               <placeholder/>
                             </child>
@@ -295,7 +291,7 @@
                         <child>
                           <object class="GtkLabel" id="gold_label">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can-focus">False</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -306,31 +302,31 @@
                       </object>
                       <packing>
                         <property name="position">3</property>
-                        <property name="tab_expand">True</property>
+                        <property name="tab-expand">True</property>
                       </packing>
                     </child>
                     <child type="tab">
                       <object class="GtkLabel" id="gold_tab_label">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="label" translatable="yes">Gold</property>
                       </object>
                       <packing>
                         <property name="position">3</property>
-                        <property name="tab_fill">False</property>
+                        <property name="tab-fill">False</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkBox" id="winner_box">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkAlignment" id="winner_alignment">
-                            <property name="height_request">175</property>
+                            <property name="height-request">175</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="resize_mode">queue</property>
+                            <property name="can-focus">False</property>
+                            <property name="resize-mode">queue</property>
                             <child>
                               <placeholder/>
                             </child>
@@ -344,7 +340,7 @@
                         <child>
                           <object class="GtkLabel" id="winner_label">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can-focus">False</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -355,18 +351,18 @@
                       </object>
                       <packing>
                         <property name="position">4</property>
-                        <property name="tab_expand">True</property>
+                        <property name="tab-expand">True</property>
                       </packing>
                     </child>
                     <child type="tab">
                       <object class="GtkLabel" id="winners_tab_label">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="label" translatable="yes">Winners</property>
                       </object>
                       <packing>
                         <property name="position">4</property>
-                        <property name="tab_fill">False</property>
+                        <property name="tab-fill">False</property>
                       </packing>
                     </child>
                   </object>
@@ -379,10 +375,10 @@
                 <child>
                   <object class="GtkScale" id="turn_scale">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
+                    <property name="can-focus">True</property>
                     <property name="adjustment">adjustment1</property>
                     <property name="digits">0</property>
-                    <property name="value_pos">bottom</property>
+                    <property name="value-pos">bottom</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
