@@ -456,18 +456,31 @@ void Fight::calculateModifiedStrengths (std::list<Fighter*>friendly,
 
   guint32 fortify_bonus = 0;
   guint32 city_bonus = 0;
+  City *c = NULL;
   if (friendlyIsDefending)
     {
+      bool city_is_burnt = false;
+      guint32 city_defense_level = 0;
       // calculate the city bonus
       std::list<Fighter*>::iterator ffit = friendly.begin();
-      mtile = GameMap::getInstance()->getTile((*ffit)->pos);
-      City *c = Citylist::getInstance()->getNearestCity((*ffit)->pos);
-      if (c && mtile->getBuilding() == Maptile::CITY)
+      if (mtile->getPos () != Vector<int>(-1,-1))
         {
-          if (c->isBurnt())
+          mtile = GameMap::getInstance()->getTile((*ffit)->pos);
+          c = Citylist::getInstance()->getNearestCity((*ffit)->pos);
+          city_is_burnt = c->isBurnt();
+          city_defense_level = c->getDefenseLevel();
+        }
+      else
+        {
+          city_defense_level = 1;
+        }
+
+      if (mtile->getBuilding() == Maptile::CITY)
+        {
+          if (city_is_burnt)
             city_bonus = 0;
           else
-            city_bonus = c->getDefenseLevel() - 1;
+            city_bonus = city_defense_level - 1;
         }
       else
         {
