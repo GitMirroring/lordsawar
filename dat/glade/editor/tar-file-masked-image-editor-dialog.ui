@@ -61,10 +61,9 @@
             </child>
             <child>
               <object class="GtkButton" id="clear_button">
-                <property name="label">gtk-clear</property>
+                <property name="label">Clear</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <property name="use-stock">True</property>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -74,7 +73,7 @@
             </child>
             <child>
               <object class="GtkButton" id="close_button">
-                <property name="label">gtk-close</property>
+                <property name="label">Close</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="has-focus">True</property>
@@ -82,7 +81,6 @@
                 <property name="has-default">True</property>
                 <property name="receives-default">True</property>
                 <property name="use-underline">True</property>
-                <property name="use-stock">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -229,7 +227,6 @@
                           <object class="GtkImage" id="image_white">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -241,7 +238,6 @@
                           <object class="GtkImage" id="image_green">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -253,7 +249,6 @@
                           <object class="GtkImage" id="image_yellow">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -265,7 +260,6 @@
                           <object class="GtkImage" id="image_light_blue">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -277,7 +271,6 @@
                           <object class="GtkImage" id="image_red">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -289,7 +282,6 @@
                           <object class="GtkImage" id="image_dark_blue">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -301,7 +293,6 @@
                           <object class="GtkImage" id="image_orange">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -313,7 +304,6 @@
                           <object class="GtkImage" id="image_black">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -325,7 +315,6 @@
                           <object class="GtkImage" id="image_neutral">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>

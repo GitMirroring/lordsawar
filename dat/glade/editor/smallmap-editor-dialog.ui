@@ -102,7 +102,6 @@
                       <object class="GtkImage" id="smallmap_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="stock">gtk-missing-image</property>
                       </object>
                     </child>
                   </object>
@@ -159,7 +158,6 @@
                                       <object class="GtkImage" id="pointer_image">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="stock">gtk-missing-image</property>
                                       </object>
                                     </child>
                                   </object>
@@ -180,7 +178,6 @@
                                       <object class="GtkImage" id="draw_2_image">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="stock">gtk-missing-image</property>
                                       </object>
                                     </child>
                                   </object>
@@ -201,7 +198,6 @@
                                       <object class="GtkImage" id="draw_3_image">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="stock">gtk-missing-image</property>
                                       </object>
                                     </child>
                                   </object>
@@ -222,7 +218,6 @@
                                       <object class="GtkImage" id="draw_6_image">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="stock">gtk-missing-image</property>
                                       </object>
                                     </child>
                                   </object>
@@ -245,7 +240,6 @@
                                       <object class="GtkImage" id="draw_12_image">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="stock">gtk-missing-image</property>
                                       </object>
                                     </child>
                                   </object>
@@ -266,7 +260,6 @@
                                       <object class="GtkImage" id="erase_image">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="stock">gtk-missing-image</property>
                                       </object>
                                     </child>
                                   </object>
@@ -381,7 +374,6 @@
                                   <object class="GtkImage" id="draw_city_image">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="stock">gtk-missing-image</property>
                                   </object>
                                 </child>
                               </object>
@@ -402,7 +394,6 @@
                                   <object class="GtkImage" id="draw_ruin_image">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="stock">gtk-missing-image</property>
                                   </object>
                                 </child>
                               </object>
@@ -423,7 +414,6 @@
                                   <object class="GtkImage" id="draw_temple_image">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="stock">gtk-missing-image</property>
                                   </object>
                                 </child>
                               </object>

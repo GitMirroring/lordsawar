@@ -102,22 +102,20 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="edit_undo_menuitem">
-                        <property name="label">gtk-undo</property>
+                      <object class="GtkMenuItem" id="edit_undo_menuitem">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Undo</property>
                         <property name="use-underline">True</property>
-                        <property name="use-stock">True</property>
                         <accelerator key="z" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="edit_redo_menuitem">
-                        <property name="label">gtk-redo</property>
+                      <object class="GtkMenuItem" id="edit_redo_menuitem">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Redo</property>
                         <property name="use-underline">True</property>
-                        <property name="use-stock">True</property>
                         <accelerator key="z" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
                         <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
@@ -281,7 +279,6 @@
                               <object class="GtkImage" id="small_image">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="stock">gtk-missing-image</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -345,7 +342,6 @@
                               <object class="GtkImage" id="medium_image">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="stock">gtk-missing-image</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -409,7 +405,6 @@
                               <object class="GtkImage" id="large_image">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="stock">gtk-missing-image</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -525,7 +520,6 @@
                               <object class="GtkImage" id="left_tartan_image">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="stock">gtk-missing-image</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -589,7 +583,6 @@
                               <object class="GtkImage" id="right_tartan_image">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="stock">gtk-missing-image</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -653,7 +646,6 @@
                               <object class="GtkImage" id="center_tartan_image">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="stock">gtk-missing-image</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>

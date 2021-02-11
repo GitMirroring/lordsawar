@@ -122,22 +122,20 @@
                       <object class="GtkMenu" id="edit_menuitem_menu">
                         <property name="can-focus">False</property>
                         <child>
-                          <object class="GtkImageMenuItem" id="edit_undo_menuitem">
-                            <property name="label">gtk-undo</property>
+                          <object class="GtkMenuItem" id="edit_undo_menuitem">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">Undo</property>
                             <property name="use-underline">True</property>
-                            <property name="use-stock">True</property>
                             <accelerator key="z" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkImageMenuItem" id="edit_redo_menuitem">
-                            <property name="label">gtk-redo</property>
+                          <object class="GtkMenuItem" id="edit_redo_menuitem">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">Redo</property>
                             <property name="use-underline">True</property>
-                            <property name="use-stock">True</property>
                             <accelerator key="z" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
                             <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                           </object>
@@ -547,12 +545,11 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkImageMenuItem" id="help_about_menuitem">
-                            <property name="label">gtk-about</property>
+                          <object class="GtkMenuItem" id="help_about_menuitem">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">About</property>
                             <property name="use-underline">True</property>
-                            <property name="use-stock">True</property>
                           </object>
                         </child>
                       </object>
@@ -612,7 +609,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Pointer.  Click to inspect objects.</property>
                 <property name="label" translatable="yes">Pointer</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="active">True</property>
                 <property name="group">draw_1_radiobutton2</property>
               </object>
@@ -627,7 +623,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Draw 1x1 terrain</property>
                 <property name="label" translatable="yes">Make 1x1 Terrain</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -641,7 +636,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Draw 2x2 terrain</property>
                 <property name="label" translatable="yes">Make 2x2 Terrain</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -655,7 +649,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Draw 3x3 terrain</property>
                 <property name="label" translatable="yes">Make 3x3 Terrain</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -669,7 +662,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Draw 6x6 terrain</property>
                 <property name="label" translatable="yes">Make 6x6 Terrain</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -683,7 +675,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Remove object</property>
                 <property name="label" translatable="yes">Erase Object</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -697,7 +688,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Move object</property>
                 <property name="label" translatable="yes">Move Object</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -711,7 +701,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Add stacks to the Battle Calculator</property>
                 <property name="label" translatable="yes">Add To Battle Calculator</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -725,7 +714,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Add a stack</property>
                 <property name="label" translatable="yes">Add Stack</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -739,7 +727,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Add a city</property>
                 <property name="label" translatable="yes">Add City</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -753,7 +740,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Add a ruin</property>
                 <property name="label" translatable="yes">Add Ruin</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -767,7 +753,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Add a temple</property>
                 <property name="label" translatable="yes">Add Temple</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -781,7 +766,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Add a port</property>
                 <property name="label" translatable="yes">Add Port</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -795,7 +779,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Add a sign</property>
                 <property name="label" translatable="yes">Add Signpost</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -809,7 +792,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Add a road</property>
                 <property name="label" translatable="yes">Make Road</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -823,7 +805,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Add a bridge</property>
                 <property name="label" translatable="yes">Make Bridge</property>
-                <property name="icon-name">gkt-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -837,7 +818,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Add a Standing Stone</property>
                 <property name="label" translatable="yes">Make Standing Stone</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -851,7 +831,6 @@
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Add a bag</property>
                 <property name="label" translatable="yes">Add Bag</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -866,7 +845,6 @@
                 <property name="tooltip-text" translatable="yes">Add a Hero's Planted Standard</property>
                 <property name="label" translatable="yes">Plant Standard</property>
                 <property name="use-underline">True</property>
-                <property name="icon-name">gtk-missing</property>
                 <property name="group">pointer_radiobutton2</property>
               </object>
               <packing>
@@ -928,7 +906,6 @@
                           <object class="GtkImage" id="bigmap_image">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
                           </object>
                         </child>
                       </object>
@@ -969,7 +946,6 @@
                               <object class="GtkImage" id="smallmap_image">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="stock">gtk-missing-image</property>
                               </object>
                             </child>
                           </object>

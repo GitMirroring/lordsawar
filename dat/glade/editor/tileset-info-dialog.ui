@@ -71,7 +71,7 @@
             </child>
             <child>
               <object class="GtkButton" id="close_button">
-                <property name="label">gtk-close</property>
+                <property name="label">Close</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="has-focus">True</property>
@@ -80,7 +80,6 @@
                 <property name="has-default">True</property>
                 <property name="receives-default">True</property>
                 <property name="use-underline">True</property>
-                <property name="use-stock">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -307,11 +306,10 @@
                             <property name="orientation">vertical</property>
                             <child>
                               <object class="GtkButton" id="fit_button">
-                                <property name="label">gtk-zoom-fit</property>
+                                <property name="label">Best Fit</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">True</property>
-                                <property name="use-stock">True</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
