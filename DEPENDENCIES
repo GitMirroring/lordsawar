@@ -36,9 +36,10 @@ sudo apt-get install automake autoconf libtool m4 autotools-dev autopoint g++ li
 on Mageia you need the following packages:
 sudo urpmi automake autoconf libtool m4 gettext gcc-c++ libsigc++2.0-devel lib64glibmm2.4-devel lib64gtkmm3.0-devel git lib64gstreamermm1.0-devel intltool libarchive-devel libxslt-devel libxml++2.6-devel make libtool
 
+on Manjaro you need the following packages:
+sudo pacman -Syu gtkmm3 glibmm gstreamermm libxml++2.6 libarchive libsigc++ libxslt pkgconf gettext automake autoconf libtool git intltool gcc
+
 on Fedora you need the following packages:
 sudo dnf install libglademm24-devel gtkmm30-devel gettext gstreamermm-devel libxml++-devel libsigc++20-devel intltool automake autoconf m4 git libarchive-devel glade3 libxslt-devel gcc-c++ libtool
 
-(Several other rpms are needed, but these others will automatically be present in any normal workstation build, or will automatically be pulled in by rpm dependenices for the packages listed here).
-
-Please report changes in these package installation commands if they fail to work for.  Send your mail to lordsawar-discuss@nongnu.org.
+Please report changes in these package installation commands if they fail to work for you.  Send your mail to lordsawar-discuss@nongnu.org.
