@@ -40,7 +40,7 @@ fix up the upgrader by painstakingly providing an upgrade path through each vers
 
 make an svg armyset, tileset, shieldset, cityset to test if it works.
 
-the military advisor is very medieval sounding , might want to make it more neutral for scenarios with other genres.
+the military advisor is somewhat medieval sounding , might want to make it more neutral for scenarios with other genres.
   maybe move the text of it into the scenario editor.
   this business of making it more neutral is probably a bad idea because my users expect a medieval tone.
 
