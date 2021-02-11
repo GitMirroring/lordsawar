@@ -265,7 +265,8 @@ PixMask* TarFileMaskedImage::applyMask(PixMask* im, PixMask* ma, Gdk::RGBA colou
 
   guint8 *data = maskbuf->get_pixels();
   guint8 *copy = (guint8*)  malloc (height * width * 4 * sizeof(guint8));
-  memcpy(copy, data, height * width * 4 * sizeof(guint8));
+  for (int i = 0; i < height * width * 4; i++)
+    copy[i] = data[i];
   for (int i = 0; i < width; i++)
     for (int j = 0; j < height; j++)
       {

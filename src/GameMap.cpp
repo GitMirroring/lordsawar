@@ -179,7 +179,8 @@ void GameMap::processStyles(Glib::ustring s, int chars_per_style)
             //hex digit pairs, so read it character for character
 	    hexstr[0] = '0';
 	    hexstr[1] = 'x';
-	    memcpy (&hexstr[2], &styles[j*s_width*c + (i * c) + offset], c);
+            for (int k = 0; k < c; k++)
+              hexstr[2+k] = styles[j*s_width*c + (i * c) + offset + k];
 	    hexstr[2 + c + 1 - 1] = '\0';
 
 	    unsigned long int val = 0;

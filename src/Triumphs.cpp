@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -71,7 +71,9 @@ Triumphs::Triumphs(XML_Helper* helper)
 
 Triumphs::Triumphs(const Triumphs& triumphs)
 {
-  memcpy (d_triumph, triumphs.d_triumph, sizeof (d_triumph));
+  for (guint32 i = 0; i < MAX_PLAYERS; i++)
+    for (guint32 j = 0; j < 5; j++)
+      d_triumph[i][j] = triumphs.d_triumph[i][j];
 }
 
 bool Triumphs::save(XML_Helper* helper) const
