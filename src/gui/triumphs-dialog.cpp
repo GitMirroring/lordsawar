@@ -118,8 +118,9 @@ void TriumphsDialog::fill_in_page(Player *p)
   Gtk::Label *ship_label = new Gtk::Label(s);
   Gtk::Image *ship_image = new Gtk::Image ();
   ship_image->property_pixbuf() = 
-    ImageCache::circled(gc->getShipPic(p), p->getColor(), 
-                           false)->to_pixbuf();
+    ImageCache::getInstance()->getCircledShipPic
+    (p->getArmyset (), p, false, Shield::NEUTRAL,
+     FontSize::getInstance()->get_height ())->to_pixbuf();
   Gtk::Box *ship_hbox = new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
   ship_hbox->pack_start(*manage(ship_image), Gtk::PACK_SHRINK, 10);
   ship_hbox->pack_start(*manage(ship_label), Gtk::PACK_SHRINK, 10);
@@ -187,8 +188,9 @@ void TriumphsDialog::fill_in_page(Player *p)
   Gtk::Label *flag_label = new Gtk::Label(s);
   Gtk::Image *flag_image = new Gtk::Image ();
   flag_image->property_pixbuf() = 
-    ImageCache::circled(gc->getPlantedStandardPic(p), p->getColor(), 
-                           false)->to_pixbuf();
+    ImageCache::getInstance()->getCircledStandardPic
+    (p->getArmyset (), p, false, Shield::NEUTRAL,
+     FontSize::getInstance()->get_height ())->to_pixbuf();
   Gtk::Box *flag_hbox = new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
   flag_hbox->pack_start(*manage(flag_image), Gtk::PACK_SHRINK, 10);
   flag_hbox->pack_start(*manage(flag_label), Gtk::PACK_SHRINK, 10);

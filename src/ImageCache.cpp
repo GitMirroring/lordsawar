@@ -65,8 +65,9 @@ void ImageCache::deleteInstance()
 ImageCache::ImageCache(const ImageCache &c)
  : d_cachesize(c.d_cachesize), selectorcache(c.selectorcache),
     armycache(c.armycache), flagcache(c.flagcache),
-    circledarmycache(c.circledarmycache), tilecache(c.tilecache),
-    citycache(c.citycache), towercache(c.towercache),
+    circledarmycache(c.circledarmycache), circledshipcache(c.circledshipcache),
+    circledstandardcache(c.circledstandardcache),
+    tilecache(c.tilecache), citycache(c.citycache), towercache(c.towercache),
     templecache(c.templecache), ruincache(c.ruincache),
     diplomacycache(c.diplomacycache), roadcache(c.roadcache),
     fogcache(c.fogcache), bridgecache(c.bridgecache),
@@ -130,6 +131,8 @@ ImageCache::ImageCache()
     armycache((sigc::ptr_fun(&ArmyPixMaskCacheItem::generate))),
     flagcache((sigc::ptr_fun(&FlagPixMaskCacheItem::generate))),
     circledarmycache((sigc::ptr_fun(&CircledArmyPixMaskCacheItem::generate))),
+    circledshipcache((sigc::ptr_fun(&CircledShipPixMaskCacheItem::generate))),
+    circledstandardcache((sigc::ptr_fun(&CircledStandardPixMaskCacheItem::generate))),
     tilecache((sigc::ptr_fun(&TilePixMaskCacheItem::generate))),
     citycache((sigc::ptr_fun(&CityPixMaskCacheItem::generate))),
     towercache((sigc::ptr_fun(&TowerPixMaskCacheItem::generate))),
@@ -436,6 +439,8 @@ void ImageCache::reset()
   flagcache.reset();
   armycache.reset();
   circledarmycache.reset();
+  circledshipcache.reset();
+  circledstandardcache.reset();
   tilecache.reset();
   citycache.reset();
   towercache.reset();
@@ -492,6 +497,20 @@ void ImageCache::checkPictures()
   if (circledarmycache.size() >= 15 * num_players)
     {
       d_cachesize -= circledarmycache.discardHalf();
+      if (d_cachesize < maxcache)
+        return;
+    }
+
+  if (circledshipcache.size() >= num_players)
+    {
+      d_cachesize -= circledshipcache.discardHalf();
+      if (d_cachesize < maxcache)
+        return;
+    }
+
+  if (circledstandardcache.size() >= num_players)
+    {
+      d_cachesize -= circledstandardcache.discardHalf();
       if (d_cachesize < maxcache)
         return;
     }
@@ -824,6 +843,43 @@ PixMask* ImageCache::getCircledArmyPic(guint32 armyset, guint32 army_id,
   i.show_army = show_army;
   i.font_size = font_size;
   PixMask *s = circledarmycache.get(i, added);
+  d_cachesize += added;
+  if (added)
+    checkPictures();
+  return s;
+}
+
+PixMask* ImageCache::getCircledShipPic(guint32 armyset, const Player* p,
+                                       bool greyed, guint32 circle_colour_id,
+                                       guint32 font_size)
+{
+  guint added = 0;
+  CircledShipPixMaskCacheItem i;
+  i.armyset = armyset;
+  i.player_id = p->getId();
+  i.greyed = greyed;
+  i.circle_colour_id = circle_colour_id;
+  i.font_size = font_size;
+  PixMask *s = circledshipcache.get(i, added);
+  d_cachesize += added;
+  if (added)
+    checkPictures();
+  return s;
+}
+
+PixMask* ImageCache::getCircledStandardPic(guint32 armyset, const Player* p,
+                                           bool greyed,
+                                           guint32 circle_colour_id,
+                                           guint32 font_size)
+{
+  guint added = 0;
+  CircledStandardPixMaskCacheItem i;
+  i.armyset = armyset;
+  i.player_id = p->getId();
+  i.greyed = greyed;
+  i.circle_colour_id = circle_colour_id;
+  i.font_size = font_size;
+  PixMask *s = circledstandardcache.get(i, added);
   d_cachesize += added;
   if (added)
     checkPictures();
@@ -1844,6 +1900,62 @@ int CircledArmyPixMaskCacheItem::comp(const CircledArmyPixMaskCacheItem &item) c
     (circle_colour_id > item.circle_colour_id) ?  1 :
     (show_army < item.show_army) ?  -1 :
     (show_army > item.show_army) ?  1 :
+    (font_size < item.font_size) ?  -1 :
+    (font_size > item.font_size) ?  1 :
+    0;
+}
+
+PixMask *CircledShipPixMaskCacheItem::generate(const CircledShipPixMaskCacheItem &i)
+{
+  PixMask *s;
+  Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
+  PixMask *pre_circle = ImageCache::getInstance ()->getShipPic (p);
+  s = ImageCache::circled(pre_circle, p->getColor(),
+                          i.circle_colour_id != Shield::NEUTRAL);
+  int dialogsize = i.font_size * DIALOG_ARMY_PIC_FONTSIZE_MULTIPLE;
+  PixMask::scale (s, dialogsize, dialogsize);
+  return s;
+}
+
+int CircledShipPixMaskCacheItem::comp(const CircledShipPixMaskCacheItem &item) const
+{
+  return
+    (armyset < item.armyset) ? -1 :
+    (armyset > item.armyset)?  1 :
+    (player_id < item.player_id) ? -1 :
+    (player_id > item.player_id) ?  1 :
+    (greyed < item.greyed) ?  -1 :
+    (greyed > item.greyed) ?  1 :
+    (circle_colour_id < item.circle_colour_id) ?  -1 :
+    (circle_colour_id > item.circle_colour_id) ?  1 :
+    (font_size < item.font_size) ?  -1 :
+    (font_size > item.font_size) ?  1 :
+    0;
+}
+
+PixMask *CircledStandardPixMaskCacheItem::generate(const CircledStandardPixMaskCacheItem &i)
+{
+  PixMask *s;
+  Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
+  PixMask *pre_circle = ImageCache::getInstance ()->getPlantedStandardPic(p);
+  s = ImageCache::circled(pre_circle, p->getColor(),
+                          i.circle_colour_id != Shield::NEUTRAL);
+  int dialogsize = i.font_size * DIALOG_ARMY_PIC_FONTSIZE_MULTIPLE;
+  PixMask::scale (s, dialogsize, dialogsize);
+  return s;
+}
+
+int CircledStandardPixMaskCacheItem::comp(const CircledStandardPixMaskCacheItem &item) const
+{
+  return
+    (armyset < item.armyset) ? -1 :
+    (armyset > item.armyset)?  1 :
+    (player_id < item.player_id) ? -1 :
+    (player_id > item.player_id) ?  1 :
+    (greyed < item.greyed) ?  -1 :
+    (greyed > item.greyed) ?  1 :
+    (circle_colour_id < item.circle_colour_id) ?  -1 :
+    (circle_colour_id > item.circle_colour_id) ?  1 :
     (font_size < item.font_size) ?  -1 :
     (font_size > item.font_size) ?  1 :
     0;

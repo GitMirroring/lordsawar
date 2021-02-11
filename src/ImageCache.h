@@ -1,6 +1,6 @@
 // Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
 // Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2006-2011, 2014, 2015, 2017, 2020 Ben Asselstine
+// Copyright (C) 2006-2011, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -44,6 +44,8 @@ class SelectorPixMaskCacheItem;
 class ArmyPixMaskCacheItem;
 class FlagPixMaskCacheItem;
 class CircledArmyPixMaskCacheItem;
+class CircledShipPixMaskCacheItem;
+class CircledStandardPixMaskCacheItem;
 class TilePixMaskCacheItem;
 class CityPixMaskCacheItem;
 class TowerPixMaskCacheItem;
@@ -199,6 +201,12 @@ class ImageCache
         PixMask *getCircledArmyPic(Army *a, bool greyed,
                                    guint32 circle_colour_id, bool show_army,
                                    guint32 font_size);
+        PixMask* getCircledShipPic(guint32 armyset, const Player* p,
+                                   bool greyed, guint32 circle_colour_id,
+                                   guint32 font_size);
+        PixMask* getCircledStandardPic(guint32 armyset, const Player* p,
+                                       bool greyed, guint32 circle_colour_id,
+                                       guint32 font_size);
 
         /** Method for getting the shield picture from the cache
           * 
@@ -522,6 +530,8 @@ class ImageCache
         PixMaskCache<ArmyPixMaskCacheItem> armycache;
         PixMaskCache<FlagPixMaskCacheItem> flagcache;
         PixMaskCache<CircledArmyPixMaskCacheItem> circledarmycache;
+        PixMaskCache<CircledShipPixMaskCacheItem> circledshipcache;
+        PixMaskCache<CircledStandardPixMaskCacheItem> circledstandardcache;
         PixMaskCache<TilePixMaskCacheItem> tilecache;
         PixMaskCache<CityPixMaskCacheItem> citycache;
         PixMaskCache<TowerPixMaskCacheItem> towercache;
@@ -650,6 +660,44 @@ public:
     bool greyed;
     guint32 circle_colour_id;
     bool show_army;
+    guint32 font_size;
+};
+
+//! Helper class for circled ship items in the ImageCache.
+/**
+ * These circled ship images appear in various places in the gui.
+ * It's just the ship image with a coloured circle behind it.
+ */
+class CircledShipPixMaskCacheItem
+{
+public:
+    static PixMask *generate(const CircledShipPixMaskCacheItem &item);
+    int comp(const CircledShipPixMaskCacheItem &item) const;
+    bool operator == (const CircledShipPixMaskCacheItem &c) {return !comp(c);};
+    bool operator < (const CircledShipPixMaskCacheItem &c) const {return comp(c)<0;};
+    guint32 armyset;
+    guint32 player_id;
+    bool greyed;
+    guint32 circle_colour_id;
+    guint32 font_size;
+};
+
+//! Helper class for circled planted standard items in the ImageCache.
+/**
+ * These circled standard images appear in various places in the gui.
+ * It's just the planted standard image with a coloured circle behind it.
+ */
+class CircledStandardPixMaskCacheItem
+{
+public:
+    static PixMask *generate(const CircledStandardPixMaskCacheItem &item);
+    int comp(const CircledStandardPixMaskCacheItem &item) const;
+    bool operator == (const CircledStandardPixMaskCacheItem &c) {return !comp(c);};
+    bool operator < (const CircledStandardPixMaskCacheItem &c) const {return comp(c)<0;};
+    guint32 armyset;
+    guint32 player_id;
+    bool greyed;
+    guint32 circle_colour_id;
     guint32 font_size;
 };
 
