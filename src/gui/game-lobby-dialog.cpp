@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -328,17 +328,19 @@ GameLobbyDialog::~GameLobbyDialog()
   clean_up_players();
 }
 
-void GameLobbyDialog::update_scenario_details()
+void GameLobbyDialog::update_scenario_details ()
 {
-
   Glib::ustring s;
-  s = String::ucompose("%1", d_game_scenario->getRound());
-  turn_label->set_text(s);
-  scenario_name_label->set_text(d_game_scenario->getName());
-  s = String::ucompose("%1", Citylist::getInstance()->size());
-  cities_label->set_text(s);
+  s = String::ucompose ("%1", d_game_scenario->getRound ());
+  turn_label->set_text (s);
+  if (d_game_scenario->getName () == "")
+    scenario_name_label->set_markup ("<i>" + _("(untitled)") + "</i>");
+  else
+    scenario_name_label->set_text (d_game_scenario->getName ());
+  s = String::ucompose ("%1", Citylist::getInstance ()->size ());
+  cities_label->set_text (s);
 
-  update_city_map();
+  update_city_map ();
 }
 
 void GameLobbyDialog::on_map_changed(Cairo::RefPtr<Cairo::Surface> map)
