@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2014, 2017 Ben Asselstine
+// Copyright (C) 2008, 2014, 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,8 +27,9 @@ NetworkAction::NetworkAction(const Action *action, guint32 owner)
 }
 
 NetworkAction::NetworkAction(XML_Helper* helper)
-  : OwnerId(helper), d_action (Action::handle_load (helper))
+  : OwnerId(helper), d_action (NULL)
 {
+  //d_action is filled in later
 }
 
 NetworkAction::~NetworkAction()
