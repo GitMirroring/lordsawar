@@ -13,7 +13,6 @@
     <property name="can-focus">False</property>
     <property name="border-width">6</property>
     <property name="title" translatable="yes">Pick a game to Join</property>
-    <property name="resizable">False</property>
     <property name="window-position">center-on-parent</property>
     <property name="destroy-with-parent">True</property>
     <property name="type-hint">dialog</property>
@@ -22,7 +21,7 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">12</property>
+        <property name="spacing">16</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
@@ -65,7 +64,7 @@
             <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="pack-type">end</property>
-            <property name="position">0</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
@@ -94,16 +93,45 @@ whose game you would like to join.</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <child>
+              <!-- n-columns=2 n-rows=1 -->
+              <object class="GtkGrid">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="column-spacing">16</property>
+                <property name="column-homogeneous">True</property>
                 <child>
-                  <object class="GtkBox" id="connection_hbox">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="orientation">vertical</property>
                     <property name="spacing">6</property>
                     <child>
                       <object class="GtkLabel" id="name_label">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Hostname:</property>
+                        <property name="label" translatable="yes">Host Name</property>
+                        <attributes>
+                          <attribute name="underline" value="True"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -126,16 +154,31 @@ whose game you would like to join.</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">6</property>
                     <child>
                       <object class="GtkLabel" id="label2">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Port:</property>
+                        <property name="label" translatable="yes">Port</property>
+                        <attributes>
+                          <attribute name="underline" value="True"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
-                        <property name="position">2</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -143,22 +186,23 @@ whose game you would like to join.</property>
                         <property name="width-request">150</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
+                        <property name="text" translatable="yes">14998</property>
                         <property name="primary-icon-activatable">False</property>
                         <property name="secondary-icon-activatable">False</property>
                         <property name="adjustment">adjustment1</property>
                         <property name="climb-rate">1</property>
+                        <property name="value">14998</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
-                        <property name="position">3</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">1</property>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">0</property>
                   </packing>
                 </child>
               </object>
@@ -184,13 +228,13 @@ whose game you would like to join.</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
+                <property name="spacing">16</property>
                 <child>
                   <object class="GtkScrolledWindow" id="scrolledwindow2">
                     <property name="height-request">157</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="hscrollbar-policy">never</property>
-                    <property name="shadow-type">in</property>
                     <child>
                       <object class="GtkTreeView" id="games_treeview">
                         <property name="visible">True</property>
@@ -211,13 +255,14 @@ whose game you would like to join.</property>
                   <object class="GtkBox" id="hbox3">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="halign">center</property>
                     <child>
                       <object class="GtkButton" id="refresh_button">
-                        <property name="label">gtk-refresh</property>
+                        <property name="label">Refresh</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
-                        <property name="use-stock">True</property>
+                        <property name="margin-bottom">8</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -253,13 +298,13 @@ whose game you would like to join.</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
+                <property name="spacing">16</property>
                 <child>
                   <object class="GtkScrolledWindow" id="scrolledwindow1">
                     <property name="height-request">157</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="hscrollbar-policy">never</property>
-                    <property name="shadow-type">in</property>
                     <child>
                       <object class="GtkTreeView" id="recent_treeview">
                         <property name="height-request">157</property>
@@ -281,36 +326,30 @@ whose game you would like to join.</property>
                   <object class="GtkBox" id="hbox1">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="halign">center</property>
                     <child>
                       <object class="GtkButton" id="clear_button">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
+                        <property name="margin-bottom">8</property>
                         <child>
-                          <object class="GtkAlignment" id="alignment2">
+                          <object class="GtkBox" id="hbox2">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="xscale">0</property>
-                            <property name="yscale">0</property>
+                            <property name="spacing">2</property>
                             <child>
-                              <object class="GtkBox" id="hbox2">
+                              <object class="GtkLabel" id="label5">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="spacing">2</property>
-                                <child>
-                                  <object class="GtkLabel" id="label5">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">Clear All Games</property>
-                                    <property name="use-underline">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
+                                <property name="label" translatable="yes">Clear All Games</property>
+                                <property name="use-underline">True</property>
                               </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">False</property>
+                                <property name="position">1</property>
+                              </packing>
                             </child>
                           </object>
                         </child>
