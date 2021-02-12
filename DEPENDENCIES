@@ -42,4 +42,4 @@ sudo pacman -Syu gtkmm3 glibmm gstreamermm libxml++2.6 libarchive libsigc++ libx
 on Fedora you need the following packages:
 sudo dnf install libglademm24-devel gtkmm30-devel gettext gstreamermm-devel libxml++-devel libsigc++20-devel intltool automake autoconf m4 git libarchive-devel glade3 libxslt-devel gcc-c++ libtool
 
-Please report changes in these package installation commands if they fail to work for you.  Send your mail to lordsawar-discuss@nongnu.org.
+Please report changes in these package installation commands if they fail to work for you.  Use the bug-tracker at https://sv.nongnu.org/bugs/?group=lordsawar.
