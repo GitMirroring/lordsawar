@@ -78,7 +78,8 @@ status-box-large-screen.ui \
 stack-tile-box-large-screen.ui \
 stack-army-button-large-screen.ui \
 quick-help-window.ui \
-load-progress-window.ui
+load-progress-window.ui \
+new-network-game-download-window.ui
 
 EXTRA_DIST = $(glade_DATA) \
 README

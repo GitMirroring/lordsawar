@@ -1,5 +1,5 @@
 // Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2008, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2008, 2014, 2015, 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@
 #include <cstdlib>
 #include <giomm.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include "timing.h"
 #include "File.h"
 #include "defs.h"
@@ -75,6 +73,7 @@ void NetworkConnection::tear_down_connection(bool lockit)
 
 bool NetworkConnection::on_got_input(Glib::IOCondition cond)
 {
+  connection_received_data.emit ();
   gssize len = -1;
   switch (cond)
     {
@@ -193,6 +192,7 @@ gssize NetworkConnection::on_payload_received(gssize len)
   in->read(payload + (payload_size - payload_left), len);
   payload_left -= len;
 
+  payload_progress.emit (payload_size - payload_left, payload_size);
   if (payload_left > 0)
     return len;
 
@@ -260,11 +260,10 @@ void NetworkConnection::sendFileMessage(int type, const Glib::ustring filename)
   if (fileptr == NULL)
     return;
 
-  struct stat statbuf;
-  stat (filename.c_str(), &statbuf);
+  goffset file_size = File::get_size (filename);
   // write the preamble
   gchar buf[MESSAGE_HEADER_SIZE];
-  guint32 l = g_htonl(MESSAGE_PREAMBLE_EXTRA_BYTES + statbuf.st_size);
+  guint32 l = g_htonl(MESSAGE_PREAMBLE_EXTRA_BYTES + file_size);
   memcpy(buf, &l, MESSAGE_SIZE_BYTES);
   buf[MESSAGE_SIZE_BYTES] = MESSAGE_PROTOCOL_VERSION;
   buf[MESSAGE_SIZE_BYTES + 1] = type;
@@ -273,8 +272,8 @@ void NetworkConnection::sendFileMessage(int type, const Glib::ustring filename)
   bool wrote_all =  out->write_all ((const void*) buf, sizeof (buf), bytessent);
   if (wrote_all)
     {
-      char *buffer = (char*) malloc (statbuf.st_size);
-      ssize_t bytesread = fread (buffer, 1, statbuf.st_size, fileptr);
+      char *buffer = (char*) malloc (file_size);
+      ssize_t bytesread = fread (buffer, 1, file_size, fileptr);
       fclose (fileptr);
       wrote_all = out->write_all (buffer, bytesread, bytessent);
       free (buffer);

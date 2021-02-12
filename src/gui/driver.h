@@ -1,6 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2016, 2017,
-//  2020  Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2016, 2017, 2020,
+//  2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -53,8 +53,9 @@ class Driver: public sigc::trackable
     NewNetworkGameDownloadWindow* download_window;
     MainWindow *editor_window;
     Glib::ustring d_load_filename;
+    sigc::connection download_conn;
+    sigc::connection upload_conn;
     sigc::connection heartbeat_conn;
-    sigc::connection upload_heartbeat_conn;
     sigc::connection recv_conn;
     Player::Type robot_player_type;
     Glib::ustring d_advertised_scenario_id;
@@ -72,7 +73,7 @@ class Driver: public sigc::trackable
     void on_game_ended_and_load_network_game(Glib::ustring filename, int port, Profile *p, bool advertised, bool remotely_hosted);
     void on_new_pbm_game_requested(GameParameters g);
     void on_game_scenario_downloaded(Glib::ustring filename);
-    void on_game_scenario_received(Glib::ustring path, Profile *p);
+    void on_game_scenario_received(Glib::ustring path, Profile *p, sigc::connection con);
     void on_load_requested(Glib::ustring filename);
     void on_editor_requested(Glib::ustring filename = "");
     void on_editor_quit ();
@@ -106,7 +107,6 @@ class Driver: public sigc::trackable
   
 
     bool heartbeat();
-    bool upload_heartbeat();
 
     void on_client_player_chat(Glib::ustring message);
     void on_hosted_player_chat(Glib::ustring message);
@@ -142,7 +142,7 @@ class Driver: public sigc::trackable
 
     void on_connected_to_gamehost_server_for_hosting_request (GameScenario *game_scenario);
     void on_got_game_host_response(Glib::ustring err, GameScenario *game_scenario);
-    void on_remote_game_hosted(guint32 port, Glib::ustring err);
+    void on_remote_game_hosted(guint32 port, Glib::ustring err, sigc::connection con);
     void on_could_not_connect_to_gamehost_server();
     guint32 get_port ();
 };

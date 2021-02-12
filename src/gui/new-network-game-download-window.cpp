@@ -16,23 +16,55 @@
 //  02110-1301, USA.
 #include "new-network-game-download-window.h"
 #include "defs.h"
+#include "builder-cache.h"
 
-NewNetworkGameDownloadWindow::NewNetworkGameDownloadWindow(Glib::ustring title)
-: m_vbox(Gtk::ORIENTATION_VERTICAL, 10)
+NewNetworkGameDownloadWindow::NewNetworkGameDownloadWindow(Glib::ustring title,
+                                                           Gtk::Window *w)
 {
-  set_position(Gtk::WIN_POS_CENTER);
-  add(m_vbox);
-  m_vbox.set_border_width(10);
-  m_vbox.pack_start(m_label);
-  m_vbox.pack_start(m_pbar);
- 
-  if (title == "")
-    title = _("Downloading.");
-  set_title(title);
-  show_all();
+  Glib::RefPtr<Gtk::Builder> xml = 
+    BuilderCache::get("new-network-game-download-window.ui");
+
+  xml->get_widget("window", window);
+  xml->get_widget("progress_treeview", progress_treeview);
+  if (w)
+    window->set_transient_for(*w);
+  if (title.empty () == false)
+    window->set_title (title);
 }
 
-void NewNetworkGameDownloadWindow::pulse()
+int NewNetworkGameDownloadWindow::run()
 {
-  m_pbar.pulse();
+  window->set_modal ();
+  window->show_all();
+  progress_treeview->property_headers_visible () = false;
+  progress_liststore = Gtk::ListStore::create(progress_columns);
+  progress_treeview->set_model (progress_liststore);
+  row = *(progress_liststore->append());
+  pbar = Gtk::manage (new Gtk::CellRendererProgress());
+  pbar->property_text () = window->get_title ();
+  int cols_count = progress_treeview->append_column ("progress", *pbar);
+
+  auto pColumn = progress_treeview->get_column(cols_count -1);
+  if (pColumn)
+    pColumn->add_attribute(pbar->property_value (), progress_columns.perc);
+  return 0;
+}
+
+void NewNetworkGameDownloadWindow::hide()
+{
+  window->hide();
+}
+
+void NewNetworkGameDownloadWindow::pulse (int amt, int total)
+{
+  double percent = (double)amt / (double)total * 100.0;
+  int perc = int(percent);
+  if (perc >= 100)
+    perc = 99;
+  row[progress_columns.perc] = perc;
+
+  if (row[progress_columns.perc] >= 100)
+    row[progress_columns.perc] = 0;
+  progress_treeview->queue_draw ();
+  while (g_main_context_iteration(NULL, FALSE)); //doEvents
 }

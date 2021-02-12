@@ -42,6 +42,7 @@
 [type: gettext/glade]dat/glade/medal-awarded-dialog.ui
 [type: gettext/glade]dat/glade/military-advisor-dialog.ui
 [type: gettext/glade]dat/glade/new-network-game-dialog.ui
+[type: gettext/glade]dat/glade/new-network-game-download-window.ui
 [type: gettext/glade]dat/glade/new-profile-dialog.ui
 [type: gettext/glade]dat/glade/next-player-turn-dialog.ui
 [type: gettext/glade]dat/glade/pick-network-game-to-join-dialog.ui

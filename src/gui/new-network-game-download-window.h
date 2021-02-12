@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,20 +22,33 @@
 #include "game-parameters.h"
 #include <gtkmm.h>
 
-class NewNetworkGameDownloadWindow : public Gtk::Window
+class NewNetworkGameDownloadWindow : public sigc::trackable
 {
   public:
-    NewNetworkGameDownloadWindow(Glib::ustring title = "");
-    virtual ~NewNetworkGameDownloadWindow() {};
-    void pulse();
+    NewNetworkGameDownloadWindow(Glib::ustring title = "",
+                                 Gtk::Window *parent = NULL);
+    ~NewNetworkGameDownloadWindow() {delete window;}
+
+    int run();
+    void hide();
+    void pulse (int amt, int total);
+    void setFileSize (goffset s) {file_size = s;}
 
   private:
-
-    Gtk::Box        m_vbox;
-    Gtk::Label       m_label;
- 
-    Gtk::ProgressBar m_pbar;
-   
+    Gtk::Window * window;
+    Gtk::TreeView *progress_treeview;
+    class ProgressModelColumns : public Gtk::TreeModel::ColumnRecord
+      {
+    public:
+        ProgressModelColumns ()
+          { add (perc);}
+        Gtk::TreeModelColumn<int> perc;
+      };
+    ProgressModelColumns progress_columns;
+    Glib::RefPtr<Gtk::ListStore> progress_liststore;
+    Gtk::TreeModel::Row row;
+    Gtk::CellRendererProgress *pbar;
+    goffset file_size;
 };
 
 #endif

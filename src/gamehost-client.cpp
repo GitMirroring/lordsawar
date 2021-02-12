@@ -1,4 +1,4 @@
-// Copyright (C) 2011, 2014, 2015 Ben Asselstine
+// Copyright (C) 2011, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -82,6 +82,8 @@ void GamehostClient::start(Glib::ustring host, guint32 port, Profile *p)
     sigc::mem_fun(this, &GamehostClient::onGotMessage));
   network_connection->connection_failed.connect
     (sigc::mem_fun(this->client_could_not_connect, &sigc::signal<void>::emit));
+  network_connection->payload_progress.connect
+    (sigc::mem_fun(this->payload_progress, &sigc::signal<void,int,int>::emit));
   network_connection->connectToHost(host, port);
 }
 

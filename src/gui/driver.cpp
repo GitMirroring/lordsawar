@@ -651,18 +651,20 @@ void Driver::on_got_game_host_response(Glib::ustring err, GameScenario *game_sce
       return;
     }
   GamehostClient *ghc = GamehostClient::getInstance();
-  ghc->received_map_response.connect(sigc::hide<0>(method(on_remote_game_hosted)));
   if (download_window)
     delete download_window;
-  download_window = new NewNetworkGameDownloadWindow(_("Uploading."));
-  download_window->pulse();
-  upload_heartbeat_conn = Glib::signal_timeout().connect (method(upload_heartbeat), 1 * 1000);
+  download_window = new NewNetworkGameDownloadWindow(_("Uploading..."));
+  download_window->run ();
+  upload_conn = ghc->payload_progress.connect
+    (sigc::mem_fun (download_window, &NewNetworkGameDownloadWindow::pulse));
+  ghc->received_map_response.connect
+    (sigc::bind(sigc::hide<0>(method(on_remote_game_hosted)), upload_conn));
   ghc->send_map(game_scenario);
 }
 
-void Driver::on_remote_game_hosted(guint32 port, Glib::ustring err)
+void Driver::on_remote_game_hosted(guint32 port, Glib::ustring err, sigc::connection con)
 {
-  upload_heartbeat_conn.disconnect();
+  con.disconnect ();
   if (download_window)
     download_window->hide();
   Profile *profile = 
@@ -786,7 +788,8 @@ void Driver::on_server_went_away_text()
 
 void Driver::on_server_went_away()
 {
-  upload_heartbeat_conn.disconnect();
+  download_conn.disconnect ();
+  upload_conn.disconnect ();
   heartbeat_conn.disconnect();
   if (game_window)
     {
@@ -810,6 +813,8 @@ void Driver::on_server_went_away()
 
 void Driver::on_client_could_not_connect()
 {
+  download_conn.disconnect ();
+  upload_conn.disconnect ();
   heartbeat_conn.disconnect();
   if (game_lobby_dialog)
     game_lobby_dialog->hide();
@@ -835,38 +840,30 @@ void Driver::on_new_remote_network_game_requested(Glib::ustring host, unsigned s
   game_client->client_disconnected.connect (method(on_server_went_away));
   game_client->client_forcibly_disconnected.connect (method(on_server_went_away));
   game_client->client_could_not_connect.connect (method(on_client_could_not_connect));
-  recv_conn = game_scenario_received.connect (sigc::bind(method(on_game_scenario_received), p));
   if (download_window)
     delete download_window;
-  download_window = new NewNetworkGameDownloadWindow();
-  download_window->pulse();
+  download_window = new NewNetworkGameDownloadWindow(_("Downloading..."));
+  download_window->run ();
+  download_conn = game_client->payload_progress.connect
+    (sigc::mem_fun (download_window, &NewNetworkGameDownloadWindow::pulse));
+  recv_conn = game_scenario_received.connect
+    (sigc::bind(method(on_game_scenario_received), p, download_conn));
   game_client->start(host, port, p->getId(), p->getNickname());
   heartbeat_conn = Glib::signal_timeout().connect (method(heartbeat), 1 * 1000);
-
-}
-
-bool Driver::upload_heartbeat()
-{
-  if (download_window)
-    download_window->pulse();
-  return true;
 }
 
 bool Driver::heartbeat()
 {
   if (game_scenario_downloaded == "")
-    {
-      if (download_window)
-	download_window->pulse();
-      return true;
-    }
+    return true;
   
   game_scenario_received.emit(game_scenario_downloaded);
   return false;
 }
 
-void Driver::on_game_scenario_received(Glib::ustring path, Profile *p)
+void Driver::on_game_scenario_received(Glib::ustring path, Profile *p, sigc::connection con)
 {
+  con.disconnect ();
   recv_conn.disconnect();
   heartbeat_conn.disconnect();
   if (download_window)
@@ -1284,6 +1281,8 @@ void Driver::lordsawaromatic(Glib::ustring host, unsigned short port, Player::Ty
 
 void Driver::on_game_scenario_received_for_robots(Glib::ustring path)
 {
+  download_conn.disconnect ();
+  upload_conn.disconnect ();
   heartbeat_conn.disconnect();
   GameScenario *game_scenario = load_game(path);
   if (!game_scenario)

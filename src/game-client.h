@@ -1,5 +1,5 @@
 // Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2011, 2014, 2015, 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@ public:
   sigc::signal<void> client_disconnected; 
   sigc::signal<void> client_forcibly_disconnected; //server went away
   sigc::signal<void> client_could_not_connect;
+  sigc::signal<void, int, int> payload_progress;
   
   void sit_down (Player *player);
   void stand_up (Player *player);

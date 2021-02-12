@@ -50,6 +50,7 @@ public:
   sigc::signal<bool, int, Glib::ustring> got_message;
   sigc::signal<void> queue_flushed;
   sigc::signal<void> torn_down;
+  sigc::signal<void, int, int> payload_progress;
 
   void send(int type, const Glib::ustring &payload);
   void sendFile(int type, const Glib::ustring &filename);
