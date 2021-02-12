@@ -1,6 +1,6 @@
 //  Copyright (C) 2007, 2008, Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016,
-//  2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017,
+//  2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -168,6 +168,9 @@ void Driver::serve (GameScenario *game_scenario)
   Playerlist::getInstance()->syncNeutral();
   //okay we're going to host a game, using this file as a scenario.
   GameServer *game_server = GameServer::getInstance();
+  if (Main::instance().save_server_messages != "") 
+    game_server->saveMessages
+      (Main::instance ().save_server_messages);
   game_server->port_in_use.connect(method(on_could_not_bind_to_port_for_headless_server));
   Glib::ustring id = "";
   if (Profilelist::getInstance()->empty() == false)

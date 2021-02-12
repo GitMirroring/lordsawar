@@ -1,5 +1,5 @@
 // Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2008, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
+// Copyright (C) 2008, 2011, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <list>
 #include "game-parameters.h"
 #include "game-server.h"
@@ -80,12 +81,13 @@ GameServer::GameServer()
   local_player_moved.connect
     (sigc::mem_fun(*this, &GameServer::on_player_finished_turn));
   d_stop = false;
+  d_save_messages = "";
 }
 
 void GameServer::notifyRoundOver()
 {
   for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_ROUND_OVER, "");
+    send(i->conn, MESSAGE_TYPE_ROUND_OVER, "");
 }
 
 bool GameServer::check_end_of_round()
@@ -121,7 +123,7 @@ void GameServer::remove_all_participants()
   stopListeningForLocalEvents();
   //say goodbye to all participants
   for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_SERVER_DISCONNECT, "bye");
+    send(i->conn, MESSAGE_TYPE_SERVER_DISCONNECT, "bye");
   for (auto &i: participants)
     delete i;
   participants.clear();
@@ -177,7 +179,7 @@ bool GameServer::sendNextPlayer()
     String::ucompose("%1", Playerlist::getActiveplayer()->getId());
   //now we can send the start round message, and begin the round ourselves.
   for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_NEXT_PLAYER, s);
+    send(i->conn, MESSAGE_TYPE_NEXT_PLAYER, s);
   Participant *part = findParticipantByPlayerId
     (Playerlist::getActiveplayer()->getId());
   if (!part)
@@ -226,7 +228,7 @@ bool GameServer::sendRoundStart()
   sendTurnOrder();
   //now we can send the start round message, and begin the round ourselves.
   for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_ROUND_START, "");
+    send(i->conn, MESSAGE_TYPE_ROUND_START, "");
   round_begins.emit();
   Playerlist::getInstance()->setActiveplayer(NULL);
   return nextTurn();
@@ -239,113 +241,136 @@ void GameServer::gotChat(void *conn, Glib::ustring message)
     {
       gotChatMessage(part->nickname, message);
       for (auto &i: participants)
-        network_server->send(i->conn, MESSAGE_TYPE_CHATTED, message);
-
+        send(i->conn, MESSAGE_TYPE_CHATTED, message);
     }
   return;
 }
 
-    
+void GameServer::saveMessages (Glib::ustring f)
+{
+  d_save_messages = f;
+  std::ofstream logfile;
+  logfile.open (d_save_messages);
+  logfile.close ();
+}
+
 bool GameServer::onGotMessage(void *conn, int type, Glib::ustring payload)
 {
+  if (d_save_messages.empty () == false)
+    {
+      std::ofstream logfile;
+      logfile.open(d_save_messages, std::ios_base::app);
+      Participant *part = findParticipantByConn (conn);
+      if (part)
+        logfile << "<!-- received message type " << type << " from " <<
+          getPeerHostName (conn) << part->profile_id << " -->" << std::endl;
+      else
+        logfile << "<!-- received message type " << type << " from" <<
+          getPeerHostName (conn) << " -->" << std::endl;
+      logfile << payload << std::endl;
+      logfile.close ();
+    }
   //std::cerr << "got message of type " << type << std::endl;
-  switch (MessageType(type)) {
-  case MESSAGE_TYPE_PING:
-    //std::cerr << "sending pong" << std::endl;
-    network_server->send(conn, MESSAGE_TYPE_PONG, "");
-    break;
+  switch (MessageType(type))
+    {
+    case MESSAGE_TYPE_PING:
+      //std::cerr << "sending pong" << std::endl;
+      send (conn, MESSAGE_TYPE_PONG, "");
+      break;
 
-  case MESSAGE_TYPE_PONG:
-    break;
+    case MESSAGE_TYPE_PONG:
+      break;
 
-  case MESSAGE_TYPE_SENDING_ACTIONS:
-    gotRemoteActions(conn, payload);
-    break;
+    case MESSAGE_TYPE_SENDING_ACTIONS:
+      gotRemoteActions (conn, payload);
+      break;
 
-  case MESSAGE_TYPE_SENDING_MAP:
-    // should never occur
-    break;
+    case MESSAGE_TYPE_SENDING_MAP:
+      // should never occur
+      break;
 
-  case MESSAGE_TYPE_SENDING_HISTORY:
-    gotRemoteHistory(conn, payload);
-    break;
+    case MESSAGE_TYPE_SENDING_HISTORY:
+      gotRemoteHistory (conn, payload);
+      break;
 
-  case MESSAGE_TYPE_PARTICIPANT_CONNECT:
-    join(conn, payload);
-    break;
+    case MESSAGE_TYPE_PARTICIPANT_CONNECT:
+      join (conn, payload);
+      break;
 
-  case MESSAGE_TYPE_REQUEST_SEAT_MANIFEST:
-    sendChatRoster(conn);
-    sendSeats(conn);
-    if (gameHasBegun())
-      network_server->send(conn, MESSAGE_TYPE_GAME_MAY_BEGIN, "");
-    break;
+    case MESSAGE_TYPE_REQUEST_SEAT_MANIFEST:
+      sendChatRoster (conn);
+      sendSeats (conn);
+      if (gameHasBegun ())
+        send (conn, MESSAGE_TYPE_GAME_MAY_BEGIN, "");
+      break;
 
-  case MESSAGE_TYPE_PARTICIPANT_DISCONNECT:
-    depart(conn);
-    break;
+    case MESSAGE_TYPE_PARTICIPANT_DISCONNECT:
+      depart (conn);
+      break;
 
-  case MESSAGE_TYPE_PARTICIPANT_CONNECTED:
-    break;
+    case MESSAGE_TYPE_PARTICIPANT_CONNECTED:
+      break;
 
-  case MESSAGE_TYPE_CHAT:
-    gotChat(conn, payload);
-    break;
+    case MESSAGE_TYPE_CHAT:
+      gotChat (conn, payload);
+      break;
 
-  case MESSAGE_TYPE_ROUND_OVER:
-    //what do we do now?
-    break;
+    case MESSAGE_TYPE_ROUND_OVER:
+      //what do we do now?
+      break;
 
-  case MESSAGE_TYPE_LOBBY_ACTIVITY:
-      {
-        guint32 id;
-        gint32 action;
-        bool reported;
-        Glib::ustring data;
-        bool success = 
-          get_message_lobby_activity (payload, id, action, reported, data);
-        if (success)
-          {
-            if (reported == false) //player is /reporting/
-              {
-                switch (action)
-                  {
-                  case LOBBY_MESSAGE_TYPE_SIT:
-                    sit(conn, Playerlist::getInstance()->getPlayer(id), data);
-                    break;
-                  case LOBBY_MESSAGE_TYPE_STAND:
-                    stand(conn, Playerlist::getInstance()->getPlayer(id), data);
-                    break;
-                  case LOBBY_MESSAGE_TYPE_CHANGE_NAME:
-                    break;
-                  case LOBBY_MESSAGE_TYPE_CHANGE_TYPE:
-                    change_type(conn, 
-                                Playerlist::getInstance()->getPlayer(id), 
-                                atoi(data.c_str()));
-                    break;
-                  default:
-                    break;
-                  }
-              }
-          }
-      }
-    break;
+    case MESSAGE_TYPE_LOBBY_ACTIVITY:
+        {
+          guint32 id;
+          gint32 action;
+          bool reported;
+          Glib::ustring data;
+          bool success = 
+            get_message_lobby_activity (payload, id, action, reported, data);
+          if (success)
+            {
+              if (reported == false) //player is /reporting/
+                {
+                  switch (action)
+                    {
+                    case LOBBY_MESSAGE_TYPE_SIT:
+                      sit (conn,
+                           Playerlist::getInstance ()->getPlayer (id), data);
+                      break;
+                    case LOBBY_MESSAGE_TYPE_STAND:
+                      stand (conn,
+                             Playerlist::getInstance ()->getPlayer (id), data);
+                      break;
+                    case LOBBY_MESSAGE_TYPE_CHANGE_NAME:
+                      break;
+                    case LOBBY_MESSAGE_TYPE_CHANGE_TYPE:
+                      change_type (conn, 
+                                   Playerlist::getInstance ()->getPlayer (id), 
+                                   atoi (data.c_str ()));
+                      break;
+                    default:
+                      break;
+                    }
+                }
+            }
+        }
+      break;
 
-  case MESSAGE_TYPE_PARTICIPANT_DISCONNECTED:
-    break;
+    case MESSAGE_TYPE_PARTICIPANT_DISCONNECTED:
+      break;
 
-  case MESSAGE_TYPE_SERVER_DISCONNECT:
-  case MESSAGE_TYPE_CHATTED:
-  case MESSAGE_TYPE_TURN_ORDER:
-  case MESSAGE_TYPE_KILL_PLAYER:
-  case MESSAGE_TYPE_ROUND_START:
-  case MESSAGE_TYPE_CHANGE_NICKNAME:
-  case MESSAGE_TYPE_GAME_MAY_BEGIN:
-  case MESSAGE_TYPE_OFF_PLAYER:
-  case MESSAGE_TYPE_NEXT_PLAYER:
-    //faulty client
-    break;
-  }
+    case MESSAGE_TYPE_SERVER_DISCONNECT:
+    case MESSAGE_TYPE_CHATTED:
+    case MESSAGE_TYPE_TURN_ORDER:
+    case MESSAGE_TYPE_KILL_PLAYER:
+    case MESSAGE_TYPE_ROUND_START:
+    case MESSAGE_TYPE_CHANGE_NICKNAME:
+    case MESSAGE_TYPE_GAME_MAY_BEGIN:
+    case MESSAGE_TYPE_OFF_PLAYER:
+    case MESSAGE_TYPE_NEXT_PLAYER:
+      //faulty client
+      break;
+    }
   return true;
 }
 
@@ -475,7 +500,7 @@ void GameServer::notifyJoin(Glib::ustring nickname)
 {
   remote_participant_joins.emit(nickname);
   for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_PARTICIPANT_CONNECTED, nickname);
+    send(i->conn, MESSAGE_TYPE_PARTICIPANT_CONNECTED, nickname);
   gotChatMessage("[server]", String::ucompose (_("%1 connected."), nickname));
 }
 
@@ -486,10 +511,9 @@ void GameServer::notifyDepart(void *conn, Glib::ustring nickname)
     {
       if (i->conn == conn)
 	continue;
-      network_server->send(i->conn, MESSAGE_TYPE_PARTICIPANT_DISCONNECTED, 
-                           nickname);
-      network_server->send(i->conn, MESSAGE_TYPE_CHATTED, 
-                           String::ucompose (_("%1 disconnected."), nickname));
+      send(i->conn, MESSAGE_TYPE_PARTICIPANT_DISCONNECTED, nickname);
+      send(i->conn, MESSAGE_TYPE_CHATTED,
+           String::ucompose (_("%1 disconnected."), nickname));
     }
   gotChatMessage("", String::ucompose (_("%1 disconnected"), nickname));
 }
@@ -505,10 +529,9 @@ void GameServer::notifySit(Player *player, Glib::ustring nickname)
 
   for (auto &i: participants)
     {
-      network_server->send(i->conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
-      network_server->send(i->conn, MESSAGE_TYPE_CHATTED, 
-                           nickname + " assumes control of " + 
-                           player->getName() +".");
+      send(i->conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
+      send(i->conn, MESSAGE_TYPE_CHATTED, nickname + " assumes control of " + 
+           player->getName() +".");
     }
   gotChatMessage("", nickname + " assumes control of " + 
 		 player->getName() +".");
@@ -524,7 +547,7 @@ void GameServer::notifyTypeChange(Player *player, int type)
   player_changes_type.emit(player, type);
 
   for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
+    send(i->conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
 }
 
 Participant *GameServer::findParticipantByPlayerId(guint32 id)
@@ -604,8 +627,7 @@ void GameServer::join(void *conn, Glib::ustring nickname_and_profile_id)
       if (new_nickname != nickname)
         {
           part->nickname = new_nickname;
-          network_server->send(conn, MESSAGE_TYPE_CHANGE_NICKNAME, 
-                               new_nickname);
+          send(conn, MESSAGE_TYPE_CHANGE_NICKNAME, new_nickname);
         }
       notifyJoin(new_nickname);
     }
@@ -685,10 +707,9 @@ void GameServer::notifyStand(Player *player, Glib::ustring nickname)
 
   for (auto &i: participants)
     {
-      network_server->send(i->conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
-      network_server->send(i->conn, MESSAGE_TYPE_CHATTED, 
-			   nickname + " relinquishes control of " + 
-			   player->getName() +".");
+      send(i->conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
+      send(i->conn, MESSAGE_TYPE_CHATTED, 
+           nickname + " relinquishes control of " + player->getName() +".");
     }
   gotChatMessage("", nickname + " relinquishes control of " + 
 		 player->getName() +".");
@@ -793,7 +814,7 @@ void GameServer::gotRemoteActions(void *conn, const Glib::ustring &payload)
   gotActions(payload);
   for (auto &i: participants)
     if (i->conn != conn)
-      network_server->send(i->conn, MESSAGE_TYPE_SENDING_ACTIONS, payload);
+      send(i->conn, MESSAGE_TYPE_SENDING_ACTIONS, payload);
 }
 
 void GameServer::gotRemoteHistory(void *conn, const Glib::ustring &payload)
@@ -801,7 +822,7 @@ void GameServer::gotRemoteHistory(void *conn, const Glib::ustring &payload)
   gotHistories(payload);
   for (auto &i: participants)
     if (i->conn != conn)
-      network_server->send(i->conn, MESSAGE_TYPE_SENDING_HISTORY, payload);
+      send(i->conn, MESSAGE_TYPE_SENDING_HISTORY, payload);
 }
 
 void GameServer::sendMap(Participant *part)
@@ -859,7 +880,7 @@ void GameServer::sendActions(Participant *part)
 
   helper.closeTag();
 
-  network_server->send(part->conn, MESSAGE_TYPE_SENDING_ACTIONS, os.str());
+  send(part->conn, MESSAGE_TYPE_SENDING_ACTIONS, os.str());
 }
 
 void GameServer::sendHistories(Participant *part)
@@ -878,7 +899,7 @@ void GameServer::sendHistories(Participant *part)
 
   helper.closeTag();
 
-  network_server->send(part->conn, MESSAGE_TYPE_SENDING_HISTORY, os.str());
+  send(part->conn, MESSAGE_TYPE_SENDING_HISTORY, os.str());
 }
 
 bool GameServer::dumpActionsAndHistories(XML_Helper *helper, Player *player)
@@ -1007,7 +1028,7 @@ void GameServer::notifyChat(Glib::ustring message)
 {
   gotChatMessage(d_nickname, message);
   for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_CHATTED, message);
+    send(i->conn, MESSAGE_TYPE_CHATTED, message);
 }
 
 void GameServer::sendSeat(void *conn, GameParameters::Player player, Glib::ustring nickname)
@@ -1015,16 +1036,16 @@ void GameServer::sendSeat(void *conn, GameParameters::Player player, Glib::ustri
   Glib::ustring payload = String::ucompose ("%1 %2 %3 %4", player.id, 
                                             LOBBY_MESSAGE_TYPE_SIT, 1, 
                                             nickname);
-  network_server->send(conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
+  send(conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
 
   payload = String::ucompose ("%1 %2 %3 %4", player.id, 
                               LOBBY_MESSAGE_TYPE_CHANGE_TYPE, 1, player.type);
-  network_server->send(conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
+  send(conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
 
   payload = String::ucompose ("%1 %2 %3 %4", player.id, 
                               LOBBY_MESSAGE_TYPE_CHANGE_NAME, 1, 
                               player.name);
-  network_server->send(conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
+  send(conn, MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
 }
 
 void GameServer::sendSeats(void *conn)
@@ -1056,11 +1077,9 @@ void GameServer::sendChatRoster(void *conn)
     {
       if (i->conn == part->conn)
 	continue;
-      network_server->send(part->conn, MESSAGE_TYPE_PARTICIPANT_CONNECTED, 
-			   i->nickname);
+      send(part->conn, MESSAGE_TYPE_PARTICIPANT_CONNECTED, i->nickname);
     }
-  network_server->send(part->conn, MESSAGE_TYPE_PARTICIPANT_CONNECTED, 
-		       d_nickname);
+  send(part->conn, MESSAGE_TYPE_PARTICIPANT_CONNECTED, d_nickname);
 }
 
 void GameServer::sendOffPlayer(Player *p)
@@ -1068,7 +1087,7 @@ void GameServer::sendOffPlayer(Player *p)
   std::stringstream player;
   player << p->getId();
   for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_OFF_PLAYER, player.str());
+    send(i->conn, MESSAGE_TYPE_OFF_PLAYER, player.str());
 
   remote_player_died.emit(p);
 }
@@ -1078,7 +1097,7 @@ void GameServer::sendKillPlayer(Player *p)
   std::stringstream player;
   player << p->getId();
   for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_KILL_PLAYER, player.str());
+    send(i->conn, MESSAGE_TYPE_KILL_PLAYER, player.str());
 
   remote_player_died.emit(p);
 }
@@ -1093,7 +1112,7 @@ void GameServer::sendTurnOrder()
       ids.push_back(it->getId());
     }
   for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_TURN_ORDER, players.str());
+    send(i->conn, MESSAGE_TYPE_TURN_ORDER, players.str());
   playerlist_reorder_received.emit();
 }
 
@@ -1108,7 +1127,7 @@ void GameServer::notifyClientsGameMayBeginNow()
   syncLocalPlayers();
   //notify everyone that the game can finally start.
   for (auto &i: participants)
-    network_server->send(i->conn, MESSAGE_TYPE_GAME_MAY_BEGIN, "");
+    send(i->conn, MESSAGE_TYPE_GAME_MAY_BEGIN, "");
 }
 
 void GameServer::syncLocalPlayers()
@@ -1135,11 +1154,34 @@ void GameServer::syncLocalPlayers()
   for (auto &i: ids)
     remove_from_player_list (players_seated_locally, i);
 }
-  
+
 void GameServer::on_turn_aborted()
 {
   d_stop = true;
   remove_all_participants();
 }
 
+void GameServer::send (void *conn, int type, Glib::ustring payload)
+{
+  if (d_save_messages.empty () == false)
+    {
+      std::ofstream logfile;
+      logfile.open(d_save_messages, std::ios_base::app);
+      Participant *part = findParticipantByConn (conn);
+      if (part)
+        logfile << "<!-- sent message type " << type << " to " <<
+          getPeerHostName (conn) << part->profile_id << " -->" << std::endl;
+      else
+        logfile << "<!-- sent message type " << type << " to " <<
+          getPeerHostName (conn) << " -->" << std::endl;
+      logfile << payload << std::endl;
+      logfile.close ();
+    }
+  network_server->send (conn, type, payload);
+}
+
+Glib::ustring GameServer::getPeerHostName (void *conn)
+{
+  return network_server->get_hostname (conn);
+}
 // End of file

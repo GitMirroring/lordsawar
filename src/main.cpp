@@ -1,7 +1,8 @@
 // Copyright (C) 2001, 2002, 2003 Michael Bartl
 // Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014, 2015, 2017 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014, 2015, 2017,
+// 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 // Copyright (C) 2005, 2006 Josef Spillner
 //
@@ -151,6 +152,16 @@ int main(int argc, char* argv[])
 	    kit.start_headless_server = true;
           else if (parameter == "--editor")
 	    kit.start_editor = true;
+          else if (parameter == "--save-server-messages")
+            {
+	      i++;
+              if (i - 1 >= argc)
+		{
+                  std::cerr <<_("missing argument for --save-server-messages") <<std::endl;
+		  exit(-1);
+                }
+	      kit.save_server_messages = argv[i-1];
+            }
 	  else if (parameter == "--help" || parameter == "-h")
 	    {
               std::cout << Glib::get_prgname() << " [OPTION]... [FILE]" << std::endl << std::endl;

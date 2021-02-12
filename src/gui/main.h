@@ -54,6 +54,7 @@ class Main: public sigc::trackable
     int cacheSize;
     std::string configuration_file_path;
     std::string save_path;
+    Glib::ustring save_server_messages;
     
  private:
     struct Impl;

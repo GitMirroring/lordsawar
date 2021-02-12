@@ -1,5 +1,5 @@
 // Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2008, 2011, 2014 Ben Asselstine
+// Copyright (C) 2008, 2011, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -75,6 +75,7 @@ public:
   void on_player_finished_turn(Player *player);
   void on_turn_aborted();
   bool check_end_of_round();
+  void saveMessages (Glib::ustring f);
 protected:
   GameServer();
   ~GameServer();
@@ -85,6 +86,7 @@ private:
   void onActionDone(Action *action, guint32 id);
   void onHistoryDone(History *history, guint32 id);
 
+  void send (void *conn, int type, Glib::ustring payload);
   void join(void *conn, Glib::ustring payload);
   void notifyJoin (Glib::ustring nickname);
   void depart(void *conn);
@@ -145,10 +147,11 @@ private:
 
   bool nextTurn();
 
-
+  Glib::ustring getPeerHostName (void *conn);
   void remove_all_participants();
 
   bool d_stop;
+  Glib::ustring d_save_messages;
   //! A static pointer for the singleton instance.
   static GameServer * s_instance;
 };
