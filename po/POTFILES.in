@@ -151,7 +151,6 @@ src/templelist.cpp
 src/network-connection.cpp
 src/road.cpp
 src/tilestyle.cpp
-src/setlist.cpp
 src/setlist.h
 src/armysetlist.cpp
 src/setlist.h
@@ -218,7 +217,6 @@ src/ruin.cpp
 src/citymap.cpp
 src/tilestyleset.cpp
 src/reward.cpp
-src/Namable.cpp
 src/QCityRaze.cpp
 src/temple.cpp
 src/Positioned.cpp
@@ -361,7 +359,6 @@ src/action.cpp
 src/historymap.cpp
 src/snd.cpp
 src/bigmap.cpp
-src/Renamable.cpp
 src/gamebigmap.cpp
 src/army.cpp
 src/armybase.cpp
