@@ -32,7 +32,8 @@ libeditutil_la_SOURCES = \
 libshieldsetwindow_la_SOURCES = \
 	shieldset-window.cpp shieldset-window.h \
 	shieldset-editor-actions.cpp shieldset-editor-actions.h \
-	shieldset-info-dialog.cpp shieldset-info-dialog.h
+	shieldset-info-dialog.cpp shieldset-info-dialog.h \
+	shieldset-info-actions.h
 
 libarmysetwindow_la_SOURCES = \
 	armyset-window.cpp armyset-window.h  \
@@ -69,6 +70,7 @@ libtilesetwindow_la_SOURCES = \
 	tileset-smallmap-building-colors-dialog.h\
 	tileset-smallmap-building-colors-actions.h\
 	tileset-move-bonus-image-dialog.cpp tileset-move-bonus-image-dialog.h \
+	tileset-move-bonus-image-actions.h \
 	image-editor-dialog.cpp image-editor-dialog.h
 
 libeditor_la_SOURCES =\
@@ -78,6 +80,7 @@ libeditor_la_SOURCES =\
 	signpost-editor-dialog.cpp signpost-editor-dialog.h \
 	signpost-editor-actions.h \
 	temple-editor-dialog.cpp temple-editor-dialog.h \
+       	temple-editor-actions.h \
 	ruin-editor-dialog.cpp ruin-editor-dialog.h ruin-editor-actions.h \
 	stack-editor-dialog.cpp stack-editor-dialog.h stack-editor-actions.h \
 	select-army-dialog.cpp select-army-dialog.h \
@@ -99,6 +102,7 @@ libeditor_la_SOURCES =\
 	select-hidden-ruin-dialog.cpp select-hidden-ruin-dialog.h \
 	RenamableLocation.cpp RenamableLocation.h  \
 	backpack-editor-dialog.cpp backpack-editor-dialog.h \
+	backpack-editor-actions.h \
 	item-editor-dialog.cpp item-editor-dialog.h item-editor-actions.h \
 	planted-standard-editor-dialog.cpp planted-standard-editor-dialog.h \
 	planted-standard-editor-actions.h \
@@ -109,9 +113,10 @@ libeditor_la_SOURCES =\
 	road-editor-tip.cpp road-editor-tip.h \
 	stone-editor-dialog.cpp stone-editor-dialog.h \
 	battle-calculator-dialog.cpp battle-calculator-dialog.h \
+	battle-calculator-actions.h \
 	media-dialog.cpp media-dialog.h media-actions.h \
 	validation-dialog.cpp validation-dialog.h \
-	heroes-dialog.cpp heroes-dialog.h \
+	heroes-dialog.cpp heroes-dialog.h heroes-editor-actions.h \
 	keeper-editor-dialog.cpp keeper-editor-dialog.h \
 	keeper-editor-actions.h \
 	army-chooser-button.cpp army-chooser-button.h
