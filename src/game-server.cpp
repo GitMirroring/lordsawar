@@ -835,7 +835,7 @@ void GameServer::sendMap(Participant *part)
       players.push_back(i);
       if (i->isComputer() == true)
 	connected = true;
-      NetworkPlayer *new_p = new NetworkPlayer(*i);
+      NetworkPlayer *new_p = new NetworkPlayer(*i, true);
       new_p->setConnected(connected);
       Playerlist::getInstance()->swap(i, new_p);
     }
@@ -947,7 +947,7 @@ void GameServer::sit_down (Player *player)
       //alright, we want to sit down as this player
       //convert the network player to a human player
       dynamic_cast<NetworkPlayer*>(player)->setConnected(true);
-      RealPlayer *new_p = new RealPlayer (*player);
+      RealPlayer *new_p = new RealPlayer (*player, true);
       Playerlist::getInstance()->swap(player, new_p);
       stopListeningForLocalEvents(player);
       listenForLocalEvents(new_p);
@@ -985,7 +985,7 @@ void GameServer::stand_up (Player *player)
       //alright, we want to stand up as this player
       //convert the player from a human player back to a network player
 
-      NetworkPlayer *new_p = new NetworkPlayer(*player);
+      NetworkPlayer *new_p = new NetworkPlayer(*player, true);
       Playerlist::getInstance()->swap(player, new_p);
       stopListeningForLocalEvents(player);
       delete player;

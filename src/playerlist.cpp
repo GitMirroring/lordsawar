@@ -683,21 +683,21 @@ void Playerlist::syncPlayer(GameParameters::Player player)
     case GameParameters::Player::HUMAN:
       if (p->getType() != Player::HUMAN)
 	{
-	  RealPlayer *new_p = new RealPlayer(*p);
+	  RealPlayer *new_p = new RealPlayer(*p, true);
 	  swap(p, new_p);
 	}
       break;
     case GameParameters::Player::EASY:
       if (p->getType() != Player::AI_FAST)
 	{
-	  AI_Fast *new_p = new AI_Fast(*p);
+	  AI_Fast *new_p = new AI_Fast(*p, true);
 	  swap(p, new_p);
 	}
       break;
     case GameParameters::Player::HARD:
       if (p->getType() != Player::AI_SMART)
 	{
-	  AI_Smart *new_p = new AI_Smart(*p);
+	  AI_Smart *new_p = new AI_Smart(*p, true);
 	  swap(p, new_p);
 	}
       break;
@@ -745,7 +745,7 @@ guint32 Playerlist::turnHumansIntoNetworkPlayers()
       if ((*i)->getType() == Player::HUMAN)
 	{
           count++;
-	  NetworkPlayer *new_p = new NetworkPlayer(**i);
+	  NetworkPlayer *new_p = new NetworkPlayer(**i, true);
           p.push_back(*i);
 	  swap((*i), new_p);
 	  i = begin();
@@ -770,7 +770,7 @@ guint32 Playerlist::turnHumansInto(Player::Type type, int number_of_players)
 	    {
 	    case Player::AI_DUMMY:
 		{
-		  AI_Dummy *new_p = new AI_Dummy(**i);
+		  AI_Dummy *new_p = new AI_Dummy(**i, true);
 		  swap((*i), new_p);
 		  //delete *i; fixme
 		  i = begin();
@@ -780,7 +780,7 @@ guint32 Playerlist::turnHumansInto(Player::Type type, int number_of_players)
 	      break;
 	    case Player::AI_FAST:
 		{
-		  AI_Fast *new_p = new AI_Fast(**i);
+		  AI_Fast *new_p = new AI_Fast(**i, true);
 		  swap((*i), new_p);
 		  //delete *i; fixme
 		  i = begin();
@@ -790,7 +790,7 @@ guint32 Playerlist::turnHumansInto(Player::Type type, int number_of_players)
 	      break;
 	    case Player::AI_SMART:
 		{
-		  AI_Smart *new_p = new AI_Smart(**i);
+		  AI_Smart *new_p = new AI_Smart(**i, true);
 		  swap((*i), new_p);
 		  //delete *i; fixme
 		  i = begin();
@@ -800,7 +800,7 @@ guint32 Playerlist::turnHumansInto(Player::Type type, int number_of_players)
 	      break;
 	    case Player::NETWORKED:
 		{
-		  NetworkPlayer *new_p = new NetworkPlayer(**i);
+		  NetworkPlayer *new_p = new NetworkPlayer(**i, true);
 		  swap((*i), new_p);
 		  //delete *i; fixme
 		  i = begin();

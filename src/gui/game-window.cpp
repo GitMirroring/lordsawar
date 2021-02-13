@@ -408,6 +408,8 @@ void GameWindow::new_network_game(GameScenario *game_scenario, NextTurn *next_tu
   game->redraw();
   while (g_main_context_iteration(NULL, FALSE)); //doEvents fixes temporary 40x40 smallmap
   game->startGame();
+  if (Playerlist::getActiveplayer()->getType() == Player::HUMAN)
+    Playerlist::getInstance ()->setViewingplayer (Playerlist::getActiveplayer ());
   if (Playerlist::getActiveplayer() && GameServer::getInstance()->isListening() == false)
     if (Playerlist::getActiveplayer()->getType() != Player::NETWORKED)
       {

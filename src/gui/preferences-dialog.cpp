@@ -200,7 +200,7 @@ void PreferencesDialog::run(Game *game)
                   ;
                 else //computer, change to easy
                   {
-                    AI_Fast *new_player = new AI_Fast(*p);
+                    AI_Fast *new_player = new AI_Fast(*p, true);
                     Player *old_player = p;
                     Playerlist::getInstance()->swap(old_player, new_player);
                     //disconnect and connect game signals
@@ -212,7 +212,7 @@ void PreferencesDialog::run(Game *game)
               {
                 if ((*j).second->get_active_text() == _("Human")) //human, change it
                   {
-                    RealPlayer *new_player = new RealPlayer(*p);
+                    RealPlayer *new_player = new RealPlayer(*p, true);
                     Player *old_player = p;
                     Playerlist::getInstance()->swap(old_player, new_player);
                     //disconnect and connect game signals

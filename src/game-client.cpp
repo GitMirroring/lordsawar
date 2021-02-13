@@ -382,7 +382,7 @@ void GameClient::sit_or_stand (Player *player, bool sit)
   network_connection->send(MESSAGE_TYPE_LOBBY_ACTIVITY, payload);
   if (sit)
     {
-      RealPlayer *new_p = new RealPlayer (*player);
+      RealPlayer *new_p = new RealPlayer (*player, true);
       Playerlist::getInstance()->swap(player, new_p);
       stopListeningForLocalEvents(player);
       listenForLocalEvents(new_p);
