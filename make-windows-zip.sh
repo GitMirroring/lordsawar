@@ -39,10 +39,12 @@ cd lordsawar-windows
 echo Please wait while we collect icons from GNOME...
 ../copy-gnome-icons.sh
 cp ../src/.libs/lordsawar.exe ./
+cp ../src/editor/.libs/lordsawar-editor.exe ./
 echo Please wait while we collect DLLs...
 $bundledlls ./lordsawar.exe --copy
 cp -r /usr/local/share/lordsawar/* ./
 mingw-strip ./lordsawar.exe
+mingw-strip ./lordsawar-editor.exe
 cd ..
 rm lordsawar-windows.zip 2>/dev/null >/dev/null
 $zip -9 -r lordsawar-windows.zip lordsawar-windows
