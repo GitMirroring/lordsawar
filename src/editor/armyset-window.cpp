@@ -801,8 +801,8 @@ void ArmySetWindow::fill_army_image(Gtk::Button *button, Gtk::Image *image, Shie
   Glib::ustring imgname = army->getMaskedImage(c)->getName();
   if (imgname.empty () == false)
     {
-      Gdk::RGBA colour = Shieldsetlist::getInstance()->getColor(1, c);
-      PixMask *p = army->getMaskedImage (c)->applyMask (colour);
+      Player *player = Playerlist::getInstance ()->getPlayer (int(c));
+      PixMask *p = army->getMaskedImage (c)->applyMask (player);
       double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
       int font_size = FontSize::getInstance()->get_height ();
       double new_height = font_size * ratio;
@@ -1287,7 +1287,7 @@ void ArmySetWindow::on_sight_changed()
 void ArmySetWindow::on_id_text_changed()
 {
   id_spinbutton->set_value(atoi(id_spinbutton->get_text().c_str()));
-  on_sight_changed();
+  on_id_changed();
 }
 
 void ArmySetWindow::on_id_changed()
