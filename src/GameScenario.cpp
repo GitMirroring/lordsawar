@@ -1661,9 +1661,12 @@ void GameScenario::support_backward_compatibility()
   FileCompat::getInstance()->support_type (FileCompat::GAMESCENARIO, SAVE_EXT, 
                                            d_top_tag, true);
   FileCompat::getInstance()->support_version
+    (FileCompat::GAMESCENARIO, "0.2.0", "0.2.1",
+     sigc::ptr_fun(&GameScenario::upgrade));
+  FileCompat::getInstance()->support_version
     (FileCompat::GAMESCENARIO, "0.2.1", "0.3.2",
      sigc::ptr_fun(&GameScenario::upgrade));
   FileCompat::getInstance()->support_version
-    (FileCompat::GAMESCENARIO, "0.2.0", "0.2.1",
+    (FileCompat::GAMESCENARIO, "0.3.2", "0.3.3",
      sigc::ptr_fun(&GameScenario::upgrade));
 }

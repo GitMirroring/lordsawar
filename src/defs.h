@@ -31,7 +31,7 @@
 #include <glibmm.h>
 #include <libintl.h>
 
-#define LORDSAWAR_SAVEGAME_VERSION "0.3.2"
+#define LORDSAWAR_SAVEGAME_VERSION "0.3.3"
 #define LORDSAWAR_TILESET_VERSION "0.3.3"
 #define LORDSAWAR_ARMYSET_VERSION "0.3.3"
 #define LORDSAWAR_CITYSET_VERSION "0.2.1"
