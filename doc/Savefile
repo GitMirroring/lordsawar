@@ -1,6 +1,6 @@
 Copyright (C) 2003, 2004, 2005 Ulf Lorenz
 Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-Copyright (C) 2007, 2009, 2010, 2014 Ben Asselstine
+Copyright (C) 2007, 2009, 2010, 2014, 2021 Ben Asselstine
 This document describes the format of a lordsawar save game. 
 
 
@@ -82,6 +82,10 @@ The version of the savegame is encoded in the first opening "lordsawar" tag.
             <d_name>    the name of the player                  </d_name>
             <d_immortal> (boolean) player lives on after losing all cities</d_immortal>
             <d_color>   the hex value for the colour.  e.g. #FCFCFC
+                        or three consecutive numbers under 256 like 100 40 100
+
+                        also accepts sets of colours like '#aaaaaa #bbbbbb #cccccc',
+                        for when we want the player to have many colours
             </d_color>
             <d_armyset> Id of the player's armyset
                         Lines up with <d_id> in army/file.lwa->file.lwa
@@ -1205,25 +1209,34 @@ the default colours of players.  It has the following structure:
              <d_type>ShieldStyle::SMALL</d_type>
              <d_image>The basename of the image for the small white shield.
              </d_image>
+             <d_image_num_masks>
+             </d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
              <d_type>ShieldStyle::MEDIUM</d_type>
              <d_image> The basename of the image for the medum white shield
              </d_image>
+             <d_image_num_masks>
+             </d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
              <d_type>ShieldStyle::LARGE</d_type>
              <d_image> The basename of the image for the large white shield.
              </d_image>
+             <d_image_num_masks>
+             </d_image_num_masks>
         </shieldstyle>
        <tartan>
          tartans are the graphics relating to the progress bar
            <d_left_image> basename of the image showing the left
                                       side of the tartan</d_left_image>
+           <d_left_image_num_masks></d_left_image_num_masks>
            <d_center_image> basename of the image showing the center repeating
                                       portion of the tartan</d_center_image>
+           <d_center_image_num_masks></d_center_image_num_masks>
            <d_right_image> basename of the image showing the right
                                       side of the tartan</d_right_image>
+           <d_right_image_num_masks></d_right_image_num_masks>
        </tartan>
     </shield>
 
@@ -1305,10 +1318,18 @@ Armyset files (.lwa) hold images for army unit types, as well as their propertie
       there are 8 of these on a row, followed by a second row of their
       colour masks. one for each player.
     </d_stackship>
+    <d_stackship_num_masks>
+      how many colour masks are in the stack's ship image file.
+      typically 1.
+    </d_stackship_num_masks>
     <d_plantedstandard> The basename of the image for the hero's flag.
       there are 8 of these on a row, followed by a second row of their
       colour masks. one for each player.
     </d_plantedstandard>
+    <d_plantedstandard_num_masks>
+      how many colour masks are in the stack's ship image file.
+      typically 1.
+    </d_plantedstandard_num_masks>
     <d_bag> The basename of the image for what items on the map look like.
             This is the graphic for the bag of stuff.  
     </d_bag>
@@ -1321,6 +1342,10 @@ Armyset files (.lwa) hold images for army unit types, as well as their propertie
       of their colour masks.
       each is a frame of animation.
     </d_white_small_selector>
+    <d_white_small_selector_num_masks>
+      how many colour masks there are in white's small selector image.
+      typically just 1.
+    </d_white_small_selector_num_masks>
     <d_white_large_selector> same as small, but for stacks with all army units
       selected.
     </d_white_large_selector>
@@ -1347,15 +1372,27 @@ Armyset files (.lwa) hold images for army unit types, as well as their propertie
          the player's colour will be on the left side of the image.
          Usually all of these point to the same image, but you can get fancy
          and make different images for each player for the same army unit.
+
+         When the images don't have two halves, the num_masks will be a number
+         higher than one.
          <d_image_white></d_image_white>
+         <d_image_white_num_masks></d_image_white_num_masks>
          <d_image_green></d_image_green>
+         <d_image_green_num_masks></d_image_green_num_masks>
          <d_image_yellow></d_image_yellow>
+         <d_image_yellow_num_masks></d_image_yellow_num_masks>
          <d_image_light_blue></d_image_light_blue>
+         <d_image_light_blue_num_masks></d_image_light_blue_num_masks>
          <d_image_red></d_image_red>
+         <d_image_red_num_masks></d_image_red_num_masks>
          <d_image_dark_blue></d_image_dark_blue>
+         <d_image_dark_blue_num_masks></d_image_dark_blue_num_masks>
          <d_image_orange></d_image_orange>
+         <d_image_orange_num_masks></d_image_orange_num_masks>
          <d_image_black></d_image_black>
+         <d_image_black_num_masks></d_image_black_num_masks>
          <d_image_neutral></d_image_neutral>
+         <d_image_neutral_num_masks></d_image_neutral_num_masks>
 
          Now come the properties for this army type...
          <d_description> A place for some text describing this army type.  
@@ -1521,11 +1558,15 @@ Tileset files (.lwt) hold images for the terrain, as well as tile properties.
                        portion that will be replaced with the player's colour
                        in the top row.  Each box represents another frame in
                        the 6 frame animation.
-    <d_large_selector>
+    </d_large_selector>
+    <d_large_selector_num_masks>
+    </d_large_selector_num_masks>
     <d_small_selector> The basename of the image of the animated box selector
                        that encompasses the single selected army unit.  The
                        image is 4 columns by 2 rows
     </d_small_selector>
+    <d_small_selector_num_masks>
+    </d_small_selector_num_masks>
     <d_explosion> The basename of the image of the fight explosion.  It is 
                   sometimes shown scaled over 2x2 tiles, and sometimes at 1x1.
     </d_explosion>
@@ -1546,12 +1587,14 @@ Tileset files (.lwt) hold images for the terrain, as well as tile properties.
             on top of all other map graphics, so you really want parts of some
             tiles to be opaque and other parts to be transparent.  
     </d_fog>
-    <d_flags> The basename of the image of the stack flags.  There are 8 
+    <d_flasg> The basename of the image of the stack flags.  There are 8 
               different flags, each shaded in the player's colour.  The bottom
               row in white represents where the player's colour will be shaded 
               on the top row.  The flags represent the number of army units in
               the stack.
     </d_flags>
+    <d_flags_num_masks>
+    </d_flags_num_masks>
     <standing_stones> The basename of the image of the standing stone tiles.
       There are a great many of these, as per Stone::Type in stone.h.
     </standing_stones>
