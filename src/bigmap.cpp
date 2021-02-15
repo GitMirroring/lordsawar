@@ -176,7 +176,7 @@ void BigMap::draw(bool redraw_buffer)
 	int width = image.get_width();
 	int height = image.get_height();
 	Cairo::RefPtr<Cairo::Context> outgoing_gc = Cairo::Context::create(outgoing);
-	outgoing_gc->set_source_rgba(FOG_COLOUR.get_red(), FOG_COLOUR.get_green(), FOG_COLOUR.get_blue(), FOG_COLOUR.get_alpha());
+	outgoing_gc->set_source_rgba(FOG_COLOR.get_red(), FOG_COLOR.get_green(), FOG_COLOR.get_blue(), FOG_COLOR.get_alpha());
 	outgoing_gc->rectangle(0, 0, width, height);
 	outgoing_gc->fill();
       }

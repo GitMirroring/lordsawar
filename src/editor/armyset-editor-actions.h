@@ -52,7 +52,7 @@ class ArmySetEditorAction: public UndoAction
                 NAME = 4,
                 /** The description of an army has been changed */
                 DESCRIPTION = 5,
-                /** The white army images are copied down to other colours */
+                /** The white army images are copied down to other colors */
                 COPY_WHITE_DOWN = 6,
                 /** An army has had its position changed in the set */
                 REORDER = 7,
@@ -295,7 +295,7 @@ class ArmySetEditorAction_Description: public ArmySetEditorAction_ArmyIndex, pub
 //! A record of the armyset's images changing in the editor en masse.
 /**
  * The purpose of the ArmySetEditorAction_WhiteDown class is to record
- * when a army's white images are copied down to the other colours.
+ * when a army's white images are copied down to the other colors.
  *
  * We take a copy of the whole armyset to get all of the images in one
  * go.  Our copy is a file on disk and is deleted when this class is 

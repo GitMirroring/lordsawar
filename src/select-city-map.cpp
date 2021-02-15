@@ -68,7 +68,7 @@ void SelectCityMap::mouse_button_event(MouseButtonEvent e)
             {
               draw();
               d_selected_city = nearestCity;
-              draw_square_around_city(d_selected_city, SELECTED_CITY_BOX_COLOUR);
+              draw_square_around_city(d_selected_city, SELECTED_CITY_BOX_COLOR);
               city_selected.emit(d_selected_city);
               map_changed.emit(surface);
             }

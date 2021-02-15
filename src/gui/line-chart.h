@@ -30,7 +30,7 @@ class LineChart: public Gtk::Image
 {
 public:
     LineChart(const std::list<std::list<unsigned int> > &lines,
-              const std::list<Gdk::RGBA> &colours, unsigned int max_height_value,
+              const std::list<Gdk::RGBA> &colors, unsigned int max_height_value,
               Glib::ustring x_axis_description, Glib::ustring y_axis_description);
     virtual ~LineChart() {};
 
@@ -41,7 +41,7 @@ protected:
     virtual bool on_draw (const Cairo::RefPtr<Cairo::Context> &cr);
 private:
     std::list<std::list<unsigned int> > d_lines;
-    std::list<Gdk::RGBA> d_colours;
+    std::list<Gdk::RGBA> d_colors;
     unsigned int d_max_height_value;
     int d_x_indicator;
     Glib::ustring d_x_axis_description;

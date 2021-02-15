@@ -21,11 +21,11 @@
 #include "font-size.h"
 
 LineChart::LineChart(const std::list<std::list<unsigned int> > &lines, 
-		     const std::list<Gdk::RGBA> &colours, 
+		     const std::list<Gdk::RGBA> &colors, 
 		     unsigned int max_height_value,
 		     Glib::ustring x_axis_description,
 		     Glib::ustring y_axis_description)
- : d_lines (lines), d_colours (colours), d_max_height_value (max_height_value),
+ : d_lines (lines), d_colors (colors), d_max_height_value (max_height_value),
     d_x_indicator (-1), d_x_axis_description (x_axis_description),
     d_y_axis_description (y_axis_description)
 {
@@ -93,11 +93,11 @@ bool LineChart::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
     if (w * (hoffs / 4) > hoffs)
       hoffs = w + (hoffs / 4);
 
-    std::list<Gdk::RGBA>::iterator cit = d_colours.begin();
+    std::list<Gdk::RGBA>::iterator cit = d_colors.begin();
     for (std::list<std::list<unsigned int> >::iterator line = d_lines.begin();
-         line!= d_lines.end(), cit != d_colours.end(); ++line, ++cit)
+         line!= d_lines.end(), cit != d_colors.end(); ++line, ++cit)
       {
-	//okay, here's my line and it's colour,
+	//okay, here's my line and it's color,
 	double red = (*cit).get_red();
 	double green = (*cit).get_green();
 	double blue = (*cit).get_blue();

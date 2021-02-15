@@ -992,10 +992,10 @@ copy_armyset_images (Armyset *armyset, Armyset *default_armyset, ArmyProto *army
   for (int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
       Glib::ustring f =
-        default_armyset->getFileFromConfigurationFile(default_army->getMaskedImage(Shield::Colour(i))->getName ());
+        default_armyset->getFileFromConfigurationFile(default_army->getMaskedImage(Shield::Color(i))->getName ());
       Glib::ustring outfile = "";
       armyset->addFileInCfgFile(f, outfile);
-      army->getMaskedImage(Shield::Colour(i))->setName (outfile);
+      army->getMaskedImage(Shield::Color(i))->setName (outfile);
     }
 }
 

@@ -162,7 +162,7 @@ ArmyProto * ArmyProto::createBat()
   return basearmy;
 }
 
-bool ArmyProto::instantiateImage (Glib::ustring cfgfile, Shield::Colour col)
+bool ArmyProto::instantiateImage (Glib::ustring cfgfile, Shield::Color col)
 {
   bool broken = false;
   Tar_Helper t(cfgfile, std::ios::in, broken);

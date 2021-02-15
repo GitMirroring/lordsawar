@@ -74,8 +74,8 @@ class CreateScenarioRandomize
           {return collect_ruin_names;}
         sigc::signal<std::list<Glib::ustring> > signal_collect_signposts ()
           {return collect_signposts;}
-	//! Get the default player name for the given shield colour.
-	static Glib::ustring getPlayerName(Shield::Colour id);
+	//! Get the default player name for the given shield color.
+	static Glib::ustring getPlayerName(Shield::Color id);
 
         void cleanup();
     protected:

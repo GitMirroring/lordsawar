@@ -933,7 +933,7 @@ std::vector<Player*> Playerlist::getPlayersWithArmyset(guint32 id) const
   return players;
 }
 
-void Playerlist::setNewColours(Shieldset *shieldset)
+void Playerlist::setNewColors(Shieldset *shieldset)
 {
   for (iterator it = begin(); it != end(); ++it)
     (*it)->setColors(shieldset->getColors((*it)->getId()));

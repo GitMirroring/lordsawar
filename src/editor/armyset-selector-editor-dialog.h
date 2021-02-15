@@ -79,7 +79,7 @@ class ArmysetSelectorEditorDialog: public LwEditorDialog
     Glib::ustring get_selector_filename ();
     void set_selector_filename (Glib::ustring f);
     Gtk::FileChooserDialog* image_filechooser(bool clear);
-    Shield::Colour get_selected_colour ();
+    Shield::Color get_selected_color ();
     void on_undo_activated ();
     void on_redo_activated ();
     void update ();

@@ -59,7 +59,7 @@ void QuestMap::draw_target(Vector<int> start, Vector<int> target)
   end = target;
 
   start = mapToSurface(start);
-  draw_target_box(end, QUESTMAP_TARGET_BOX_COLOUR);
+  draw_target_box(end, QUESTMAP_TARGET_BOX_COLOR);
   end = mapToSurface(end);
 
 
@@ -97,7 +97,7 @@ void QuestMap::draw_target(Vector<int> start, Vector<int> target)
 	//connect to the northwestern corner of the box.
 	end += Vector<int>(-(xsize / 2), -(ysize / 2));
     }
-  draw_line(start.x, start.y, end.x, end.y, QUEST_LINE_COLOUR);
+  draw_line(start.x, start.y, end.x, end.y, QUEST_LINE_COLOR);
 }
 
 void QuestMap::after_draw()

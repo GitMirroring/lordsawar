@@ -80,24 +80,24 @@ Shieldset::~Shieldset()
   clean_tmp_dir();
 }
 
-ShieldStyle * Shieldset::lookupShieldByTypeAndColour(guint32 type, guint32 colour) const
+ShieldStyle * Shieldset::lookupShieldByTypeAndColor(guint32 type, guint32 color) const
 {
   for (const_iterator it = begin(); it != end(); ++it)
     {
       for (Shield::const_iterator i = (*it)->begin(); i != (*it)->end(); ++i)
 	{
-	  if ((*i)->getType() == type && (*it)->getOwner() == colour)
+	  if ((*i)->getType() == type && (*it)->getOwner() == color)
 	    return *i;
 	}
     }
   return NULL;
 }
 
-Shield * Shieldset::lookupShieldByColour (guint32 colour) const
+Shield * Shieldset::lookupShieldByColor (guint32 color) const
 {
   for (const_iterator it = begin(); it != end(); ++it)
     {
-      if ((*it)->getOwner() == colour)
+      if ((*it)->getOwner() == color)
         return *it;
     }
   return NULL;
@@ -260,12 +260,12 @@ bool Shieldset::validate() const
     return false;
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
-      if (validateShieldImages(Shield::Colour(i)) == false)
+      if (validateShieldImages(Shield::Color(i)) == false)
 	return false;
     }
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
-      if (validateTartanImages(Shield::Colour(i)) == false)
+      if (validateTartanImages(Shield::Color(i)) == false)
 	return false;
     }
   if (d_small_width == 0 || d_small_height == 0)
@@ -309,7 +309,7 @@ bool Shieldset::validateNumberOfShields() const
   return true;
 }
 
-bool Shieldset::validateShieldImages(Shield::Colour c) const
+bool Shieldset::validateShieldImages(Shield::Color c) const
 {
   //if we have a shield, it should have all 3 sizes.
   int player[3];
@@ -337,7 +337,7 @@ bool Shieldset::validateShieldImages(Shield::Colour c) const
   return true;
 }
 
-bool Shieldset::validateTartanImages(Shield::Colour c) const
+bool Shieldset::validateTartanImages(Shield::Color c) const
 {
   //if we have a shield, it should have all 3 portions of a tartan.
   int player[3];
@@ -536,10 +536,10 @@ void Shieldset::setLargeHeightsAndWidthsFromImages()
   return;
 }
 
-TarFileMaskedImage *Shieldset::lookupTartanImage(guint32 colour, Tartan::Type type)
+TarFileMaskedImage *Shieldset::lookupTartanImage(guint32 color, Tartan::Type type)
 {
   for (const_iterator it = begin(); it != end(); ++it)
-    if ((*it)->getOwner() == colour)
+    if ((*it)->getOwner() == color)
       return (*it)->getTartanMaskedImage (type);
   return NULL;
 }

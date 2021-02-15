@@ -894,7 +894,7 @@ class GameMap: public sigc::trackable
          * @param shieldset A pointer to the Shieldset to change to.
          *
          * Loops through all Shields and change the way they look.  This
-         * changes the colour of army units, flags, shields, and selector, as
+         * changes the color of army units, flags, shields, and selector, as
          * well as the graphics of the shields.
          */
 	void switchShieldset(Shieldset *shieldset);

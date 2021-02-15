@@ -60,9 +60,9 @@ class Shieldsetlist : public SetList<Shieldset>, public sigc::trackable
 	void instantiateImages(bool &broken);
 
         //! Get the image and mask of the leftmost tartan.
-        TarFileMaskedImage *getTartan (guint32 shieldset, guint32 colour, Tartan::Type) const;
+        TarFileMaskedImage *getTartan (guint32 shieldset, guint32 color, Tartan::Type) const;
 
-        ShieldStyle *getShield(guint32 shieldset, guint32 type, guint32 colour) const;
+        ShieldStyle *getShield(guint32 shieldset, guint32 type, guint32 color) const;
 	// Static Methods
 
         //! Return the singleton instance of this class.

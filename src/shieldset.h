@@ -42,7 +42,7 @@ class TarFileMaskedImage;
  * dialogs, chiefly the FightWindow, and DiplomacyDialog.
  * Every shield belongs to one of 9 players (the ninth is the Neutral player).
  * The players aren't Player objects in this case; instead it refers to a 
- * Shield::ShieldColour.  e.g. Not `The Sirians' but rather the `White player'
+ * Shield::ShieldColor.  e.g. Not `The Sirians' but rather the `White player'
  * of the scenario.
  *
  * The Shieldset dictates the dimensions of these three sizes of shields.
@@ -89,10 +89,10 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 
 	// Get Methods
 
-	//! Return the mask colour for the given player.
+	//! Return the mask color for the given player.
 	Gdk::RGBA getColor(guint32 owner) const;
 
-        //! Return all of the mask colours for the given player.
+        //! Return all of the mask colors for the given player.
         std::vector<Gdk::RGBA> getColors (guint32 owner) const;
 
 	//! Return the number of pixels high the small shields are.
@@ -156,27 +156,27 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 
         bool save(Glib::ustring filename, Glib::ustring extension) const;
 
-	//! Find the shield of a given size and colour in this Shieldset.
+	//! Find the shield of a given size and color in this Shieldset.
 	/**
 	 * Scan through all Shield objects in this set for first one that is 
 	 * the desired size, and for the desired player.
 	 *
 	 * @param type    One of the values in Shield::ShieldType.
-	 * @param colour  One of the values in Shield::ShieldColour.
+	 * @param color  One of the values in Shield::ShieldColor.
 	 *
 	 * @return A pointer to the shield that matches the size and player.
 	 *         If no Shield object could be found that matches the given
 	 *         parameters, NULL is returned.
 	 */
-	ShieldStyle* lookupShieldByTypeAndColour(guint32 type, guint32 colour) const;
-        Shield* lookupShieldByColour(guint32 colour) const;
+	ShieldStyle* lookupShieldByTypeAndColor(guint32 type, guint32 color) const;
+        Shield* lookupShieldByColor(guint32 color) const;
 
-        //! Get the image and mask associated with the shield of a given colour.
+        //! Get the image and mask associated with the shield of a given color.
         /**
          * This gets the left tartan image and mask for a player denoted by
-         * colour.
+         * color.
          */
-        TarFileMaskedImage *lookupTartanImage(guint32 colour, Tartan::Type type);
+        TarFileMaskedImage *lookupTartanImage(guint32 color, Tartan::Type type);
 
 	//! Check to see if this shieldset can be used in the game.
 	bool validate() const;
@@ -185,10 +185,10 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 	bool validateNumberOfShields() const;
 
 	//! Check to see if the images for the shields are supplied.
-	bool validateShieldImages(Shield::Colour c) const;
+	bool validateShieldImages(Shield::Color c) const;
 
 	//! Check to see if the images for the tartans are supplied.
-	bool validateTartanImages(Shield::Colour c) const;
+	bool validateTartanImages(Shield::Color c) const;
 
         guint32 countEmptyImageNames() const;
 

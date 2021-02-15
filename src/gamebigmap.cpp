@@ -866,7 +866,7 @@ void GameBigMap::get_selector_frame_limits (Player *p, int &limitbig, int &limit
 
   guint32 as = p->getArmyset ();
   Armyset *a = Armysetlist::getInstance()->get(as);
-  Shield::Colour c = Shield::Colour (p->getId());
+  Shield::Color c = Shield::Color (p->getId());
   if (a->getSelector(true,c)->getNumberOfFrames ())
     limitbig = (int) a->getSelector(true,c)->getNumberOfFrames ();
   if (a->getSelector (false,c)->getNumberOfFrames ())

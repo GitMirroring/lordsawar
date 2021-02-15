@@ -100,7 +100,7 @@ void MapRenderer::render(int x, int y, int tileStartX, int tileStartY,
           // first check if we're out of the map bounds
           if (tileX >= width || tileY >= height) 
             {
-              context->set_source_rgba(FOG_COLOUR.get_red(), FOG_COLOUR.get_blue(), FOG_COLOUR.get_green(), FOG_COLOUR.get_alpha());
+              context->set_source_rgba(FOG_COLOR.get_red(), FOG_COLOR.get_blue(), FOG_COLOR.get_green(), FOG_COLOR.get_alpha());
               context->rectangle(drawX, drawY, tilesize, tilesize);
               context->fill();
             }

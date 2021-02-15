@@ -26,7 +26,7 @@ class BarChart: public Gtk::Image
 {
 public:
     BarChart(const std::list<unsigned int> &bars,
-             const std::list<Gdk::RGBA> &colours, unsigned int max_value);
+             const std::list<Gdk::RGBA> &colors, unsigned int max_value);
     virtual ~BarChart() {};
 
 protected:
@@ -34,7 +34,7 @@ protected:
     virtual bool on_draw (const Cairo::RefPtr<Cairo::Context> &cr);
 private:
     std::list<unsigned int> d_bars;
-    std::list<Gdk::RGBA> d_colours;
+    std::list<Gdk::RGBA> d_colors;
     unsigned int d_max_value;
 };
 

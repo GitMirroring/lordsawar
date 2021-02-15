@@ -51,7 +51,7 @@ class StackInfoDialog: public LwDialog
     Gtk::Button *ungroup_button;
     Stack *currently_selected_stack;
 
-    void addArmy (bool first, Stack *s, Army *a, guint32 modified_strength ,guint32 idx, guint32 colour_id);
+    void addArmy (bool first, Stack *s, Army *a, guint32 modified_strength ,guint32 idx, guint32 color_id);
     void addStack(Stack *s, guint32 &idx);
     void on_group_clicked();
     void on_ungroup_clicked();

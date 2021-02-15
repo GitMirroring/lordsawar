@@ -33,7 +33,7 @@ class Player;
  * A helper class to handle image files in tar files that have masks.
  *
  * A mask is a second half of an image that contains white with transparency
- * to be overlaid on the main image in the player's colour.
+ * to be overlaid on the main image in the player's color.
  *
  * This encompasses files like army images, selectors, ships, planted
  * standards and more.
@@ -87,19 +87,19 @@ public:
   //! Return the first image
   PixMask *getImage () const {return frames.empty () ? NULL :frames[0][0];}
 
-  //! Apply the mask onto the image in the player's colour
+  //! Apply the mask onto the image in the player's color
   /**
    * @return a pointer to a new PixMask that must be deleted.
    */
   PixMask *applyMask (Player *p) const;
-  PixMask *applyMask (std::vector<Gdk::RGBA> colours) const;
+  PixMask *applyMask (std::vector<Gdk::RGBA> colors) const;
 
-  //! Apply the mask onto the image at the given index in the player's colour
+  //! Apply the mask onto the image at the given index in the player's color
   /**
    * @return a pointer to a new PixMask that must be deleted.
    */
   PixMask *applyMask (guint32 i, Player *p) const;
-  PixMask *applyMask (guint32 i, std::vector<Gdk::RGBA> colours) const;
+  PixMask *applyMask (guint32 i, std::vector<Gdk::RGBA> colors) const;
 
   //! Return all of the images
   std::vector<PixMask*> getImages () const
@@ -243,12 +243,12 @@ private:
   //! Process a vertically masked image
   void instantiateHorizontal ();
 
-  //! Overlay the masks on the image in the given colour.
+  //! Overlay the masks on the image in the given color.
   /**
    * @param frame  the image and its associated masks
    * @return a new pixmask that must be deleted.
    */
-  PixMask* applyMask(std::vector<PixMask*> frame, std::vector<Gdk::RGBA> colours) const;
+  PixMask* applyMask(std::vector<PixMask*> frame, std::vector<Gdk::RGBA> colors) const;
 
   //! Dice up image into a set of pixmasks.  the inner array is a column.
   std::vector<std::vector<PixMask*> > disassemble_grid (int rows, int cols);

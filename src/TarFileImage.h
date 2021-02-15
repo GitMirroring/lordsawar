@@ -31,7 +31,7 @@ class XML_Helper;
 /**
  * A helper class to handle image files in tar files.
  *
- * This encompasses files that don't have a colour mask like castles,
+ * This encompasses files that don't have a color mask like castles,
  * roads, fog, the next turn image, the bag image, and more.
  *
  * sometimes these images can have many frames, and we know exactly

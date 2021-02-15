@@ -81,7 +81,7 @@ class HistoryReportDialog: public LwDialog
 
     Gtk::Image *map_image;
   
-    std::list<Gdk::RGBA> d_colours; //player colours
+    std::list<Gdk::RGBA> d_colors; //player colors
     
     Gtk::Box *events_list_box;
 

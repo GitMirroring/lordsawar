@@ -68,16 +68,16 @@ bool SmallTile::save(XML_Helper *helper) const
   retval &= helper->saveData("pattern", d_pattern);
   switch (d_pattern)
     {
-      //patterns with a single colour
+      //patterns with a single color
     case SOLID:
       retval &= helper->saveData("color", d_color);
       break;
-      //patterns with two colours
+      //patterns with two colors
     case STIPPLED: case SUNKEN:
       retval &= helper->saveData("color", d_color);
       retval &= helper->saveData("2nd_color", d_second_color);
       break;
-      //patterns with three colours
+      //patterns with three colors
     case RANDOMIZED: case TABLECLOTH: case DIAGONAL: case CROSSHATCH:
     case SUNKEN_STRIPED: case SUNKEN_RADIAL:
       retval &= helper->saveData("color", d_color);

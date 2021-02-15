@@ -167,7 +167,7 @@ bool TilesetFlagEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
 
 void TilesetFlagEditorDialog::show_preview_flags()
 {
-  //load it up and show in the colours of the selected shield theme
+  //load it up and show in the colors of the selected shield theme
   if (heartbeat.connected())
     heartbeat.disconnect();
 

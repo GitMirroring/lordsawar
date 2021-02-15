@@ -94,7 +94,7 @@ class Item: public ItemProto, public UniquelyIdentified
 	//! Return the Player who started out with this item.
 	Player *getPlantableOriginalOwner() const; 
 
-        //! Set which player has originally owned this. (for the colour)
+        //! Set which player has originally owned this. (for the color)
         void setPlantableOriginalOwnerId (guint32 id) {d_plantable_orig_owner_id = id;}
 
 	//! Return the type of this item.
@@ -131,7 +131,7 @@ class Item: public ItemProto, public UniquelyIdentified
 
 	/**
 	 * If the Item is plantable, this value is used to determine if the
-	 * colour of the flag in the ground.
+	 * color of the flag in the ground.
 	 */
 	//! The Id of the Player who originally owned this item.
 	guint32 d_plantable_orig_owner_id;

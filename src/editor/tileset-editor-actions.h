@@ -47,7 +47,7 @@ public:
       TYPE = 3,
       PATTERN = 4,
       MOVES = 5,
-      COLOUR = 6,
+      COLOR = 6,
       ADD_TILESTYLESET = 7,
       REMOVE_TILESTYLESET = 8,
       TILESTYLE = 9,
@@ -61,7 +61,7 @@ public:
       FOG = 17,
       FLAGS = 18,
       TILESTYLES = 19,
-      BUILDING_COLOURS = 20,
+      BUILDING_COLORS = 20,
       MOVE_BONUS = 21,
     };
 
@@ -253,46 +253,46 @@ class TileSetEditorAction_Moves: public TileSetEditorAction_TileIndex
 
 //-----------------------------------------------------------------------------
 
-//! A record of the tile's colour changing in the tileset editor.
+//! A record of the tile's color changing in the tileset editor.
 /**
- * The purpose of the TileSetEditorAction_Colour class is to record
- * when a tile's first, second or third colour has been modified.
+ * The purpose of the TileSetEditorAction_Color class is to record
+ * when a tile's first, second or third color has been modified.
  */
-class TileSetEditorAction_Colour: public TileSetEditorAction_TileIndex
+class TileSetEditorAction_Color: public TileSetEditorAction_TileIndex
 {
     public:
-	//! Make a new colour action
+	//! Make a new color action
 	/**
-         * Populate the colour action with the index of the tile, the
-         * colour number (e.g. 1, 2 or 3), and finally the actual colour.
+         * Populate the color action with the index of the tile, the
+         * color number (e.g. 1, 2 or 3), and finally the actual color.
          */
-        TileSetEditorAction_Colour (guint32 i, guint32 n, Gdk::RGBA colour)
-          : TileSetEditorAction_TileIndex (COLOUR, i), d_colour_number (n),
-          d_colour (colour) {}
-	//! Destroy a colour action.
-        ~TileSetEditorAction_Colour () {}
+        TileSetEditorAction_Color (guint32 i, guint32 n, Gdk::RGBA color)
+          : TileSetEditorAction_TileIndex (COLOR, i), d_color_number (n),
+          d_color (color) {}
+	//! Destroy a color action.
+        ~TileSetEditorAction_Color () {}
 
         Glib::ustring getActionName () const 
           {
-            switch (d_colour_number)
+            switch (d_color_number)
               {
               case 0:
-                return _("First Colour");
+                return _("First Color");
               case 1:
-                return _("Second Colour");
+                return _("Second Color");
               case 2:
-                return _("Third Colour");
+                return _("Third Color");
               default:
                 break;
               }
             return "";
           }
-        guint32 getColourNumber () {return d_colour_number;}
-        Gdk::RGBA getColour () const {return d_colour;}
+        guint32 getColorNumber () {return d_color_number;}
+        Gdk::RGBA getColor () const {return d_color;}
 
     private:
-        guint32 d_colour_number;
-        Gdk::RGBA d_colour;
+        guint32 d_color_number;
+        Gdk::RGBA d_color;
 };
 
 //-----------------------------------------------------------------------------
@@ -643,28 +643,28 @@ class TileSetEditorAction_TileStyles: public TileSetEditorAction_Save
 
 //-----------------------------------------------------------------------------
 
-//! A record of the building colours being modified in the tileset
+//! A record of the building colors being modified in the tileset
 /**
- * The purpose of the TileSetEditorAction_BuildingColours class is to record
- * when the tileset's building colours have been changed.  e.g. the colour of
- * the roads on the smallmap, the colour of the temple dots, etc.
+ * The purpose of the TileSetEditorAction_BuildingColors class is to record
+ * when the tileset's building colors have been changed.  e.g. the color of
+ * the roads on the smallmap, the color of the temple dots, etc.
  *
  * We take a copy of the whole tileset just to make it easy.  Our copy is a
  * file on disk and is deleted when this class is destroyed.
  */
-class TileSetEditorAction_BuildingColours: public TileSetEditorAction_Save
+class TileSetEditorAction_BuildingColors: public TileSetEditorAction_Save
 {
     public:
-	//! Make a new building colours action
+	//! Make a new building colors action
 	/**
-         * Populate the building colours action with the tileset.
+         * Populate the building colors action with the tileset.
          */
-        TileSetEditorAction_BuildingColours (Tileset *t)
+        TileSetEditorAction_BuildingColors (Tileset *t)
           :TileSetEditorAction_Save
-           (t, TileSetEditorAction::BUILDING_COLOURS) {}
-	//! Destroy a building colours action, and delete the file.
-        ~TileSetEditorAction_BuildingColours () {}
-        Glib::ustring getActionName () const {return _("Building Colours");}
+           (t, TileSetEditorAction::BUILDING_COLORS) {}
+	//! Destroy a building colors action, and delete the file.
+        ~TileSetEditorAction_BuildingColors () {}
+        Glib::ustring getActionName () const {return _("Building Colors");}
 };
 
 //-----------------------------------------------------------------------------

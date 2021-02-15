@@ -179,7 +179,7 @@ bool TilesetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
 
 void TilesetSelectorEditorDialog::show_preview_selectors()
 {
-  //load it up and show in the colours of the selected shield theme
+  //load it up and show in the colors of the selected shield theme
   clearSelector();
   if (loadSelector () == true)
     {

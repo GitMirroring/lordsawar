@@ -125,8 +125,8 @@ ShieldSetWindow::ShieldSetWindow(Glib::ustring load_filename)
     player_2ndcolorbutton->signal_color_set().connect(method(on_player_2nd_color_changed));
     xml->get_widget ("player_3rdcolorbutton", player_3rdcolorbutton);
     player_3rdcolorbutton->signal_color_set().connect(method(on_player_3rd_color_changed));
-    xml->get_widget ("colour_spinbutton", colour_spinbutton);
-    colour_spinbutton->set_range (double(1), double(3));
+    xml->get_widget ("color_spinbutton", color_spinbutton);
+    color_spinbutton->set_range (double(1), double(3));
 
     xml->get_widget ("small_image", small_image);
     xml->get_widget ("medium_image", medium_image);
@@ -218,10 +218,10 @@ bool ShieldSetWindow::make_new_shieldset ()
   shields_list->clear();
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
-      std::vector<Gdk::RGBA> colours = Shield::get_default_colors_for_no(i);
+      std::vector<Gdk::RGBA> colors = Shield::get_default_colors_for_no(i);
       if (i == Shield::NEUTRAL)
-        colours = Shield::get_default_colors_for_neutral();
-      Shield *shield = new Shield(Shield::Colour(i), colours);
+        colors = Shield::get_default_colors_for_neutral();
+      Shield *shield = new Shield(Shield::Color(i), colors);
       if (shield)
         {
           shield->push_back(new ShieldStyle(ShieldStyle::SMALL));
@@ -361,13 +361,13 @@ void ShieldSetWindow::on_validate_shieldset_activated()
     {
       for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
         {
-          valid = d_shieldset->validateShieldImages(Shield::Colour(i));
+          valid = d_shieldset->validateShieldImages(Shield::Color(i));
           if (!valid)
             {
               Glib::ustring s =
                 String::ucompose
                 (_("%1 must have all three shield images specified."),
-                 Shield::colourToString(Shield::Colour(i)));
+                 Shield::colorToString(Shield::Color(i)));
               msgs.push_back(s);
               break;
             }
@@ -377,13 +377,13 @@ void ShieldSetWindow::on_validate_shieldset_activated()
     {
       for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
         {
-          valid = d_shieldset->validateTartanImages(Shield::Colour(i));
+          valid = d_shieldset->validateTartanImages(Shield::Color(i));
           if (!valid)
             {
               Glib::ustring s =
                 String::ucompose
                 (_("%1 must have all three tartan images specified."),
-                 Shield::colourToString(Shield::Colour(i)));
+                 Shield::colorToString(Shield::Color(i)));
               msgs.push_back(s);
               break;
             }
@@ -781,7 +781,7 @@ void ShieldSetWindow::fill_shield_info(Shield*shield)
       else
         player_3rdcolorbutton->set_rgba(black);
       int num = shield->getColors ().size ();
-      colour_spinbutton->set_value (num);
+      color_spinbutton->set_value (num);
       player_2ndcolorbutton->set_sensitive (num >= 2);
       player_3rdcolorbutton->set_sensitive (num >= 3);
       Glib::ustring s;
@@ -1018,14 +1018,14 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
     }
 }
 
-std::vector<Gdk::RGBA> ShieldSetWindow::get_current_colours ()
+std::vector<Gdk::RGBA> ShieldSetWindow::get_current_colors ()
 {
   std::vector<Gdk::RGBA> list;
-  if (colour_spinbutton->get_value () >= 1)
+  if (color_spinbutton->get_value () >= 1)
     list.push_back (player_colorbutton->get_rgba ());
-  if (colour_spinbutton->get_value () >= 2)
+  if (color_spinbutton->get_value () >= 2)
     list.push_back (player_2ndcolorbutton->get_rgba ());
-  if (colour_spinbutton->get_value () >= 3)
+  if (color_spinbutton->get_value () >= 3)
     list.push_back (player_3rdcolorbutton->get_rgba ());
   return list;
 }
@@ -1042,7 +1042,7 @@ void ShieldSetWindow::on_player_color_changed()
       ShieldSetEditorAction_Colors *action = 
         new ShieldSetEditorAction_Colors (s->getOwner (), s->getColors ());
       addUndo (action);
-      s->setColors(get_current_colours ());
+      s->setColors(get_current_colors ());
       update_shield_panel();
       update_menuitems ();
       shieldset_modified = true;
@@ -1062,7 +1062,7 @@ void ShieldSetWindow::on_player_2nd_color_changed()
       ShieldSetEditorAction_Colors *action = 
         new ShieldSetEditorAction_Colors (s->getOwner (), s->getColors ());
       addUndo (action);
-      s->setColors(get_current_colours ());
+      s->setColors(get_current_colors ());
       update_shield_panel();
       update_menuitems ();
       shieldset_modified = true;
@@ -1082,7 +1082,7 @@ void ShieldSetWindow::on_player_3rd_color_changed()
       ShieldSetEditorAction_Colors *action = 
         new ShieldSetEditorAction_Colors (s->getOwner (), s->getColors ());
       addUndo (action);
-      s->setColors(get_current_colours ());
+      s->setColors(get_current_colors ());
       update_shield_panel();
       update_menuitems ();
       shieldset_modified = true;
@@ -1093,7 +1093,7 @@ void ShieldSetWindow::on_player_3rd_color_changed()
 void ShieldSetWindow::add_shield_to_treeview (Shield *shield)
 {
   Glib::ustring name =
-    Shield::colourToFriendlyName(Shield::Colour(shield->getOwner()));
+    Shield::colorToFriendlyName(Shield::Color(shield->getOwner()));
   Gtk::TreeIter i = shields_list->append();
   (*i)[shields_columns.name] = name;
   (*i)[shields_columns.shield] = shield;
@@ -1116,15 +1116,15 @@ void ShieldSetWindow::on_edit_copy_shields_activated()
     new ShieldSetEditorAction_WhiteDown (d_shieldset);
   addUndo (action);
 
-  Shield *w = d_shieldset->lookupShieldByColour (Shield::WHITE);
+  Shield *w = d_shieldset->lookupShieldByColor (Shield::WHITE);
   for (guint32 i = Shield::WHITE + 1; i <= Shield::NEUTRAL; i++)
     {
-      Shield *s = d_shieldset->lookupShieldByColour (i);
+      Shield *s = d_shieldset->lookupShieldByColor (i);
       for (auto ss : *s)
         {
           TarFileMaskedImage *mim = ss->getMaskedImage ();
           ShieldStyle *wss =
-            d_shieldset->lookupShieldByTypeAndColour (ss->getType (),
+            d_shieldset->lookupShieldByTypeAndColor (ss->getType (),
                                                       Shield::WHITE);
           wss->getMaskedImage ()->copy (d_shieldset, mim);
         }
@@ -1171,7 +1171,7 @@ Gtk::FileChooserDialog* ShieldSetWindow::tartan_filechooser(Shield *s, Tartan::T
   /* e.g. choose a white left tartan image */
   Glib::ustring title = String::ucompose
     (_("Choose a %1 %2 Tartan image"),
-     Shield::colourToFriendlyName(Shield::Colour(s->getOwner())),
+     Shield::colorToFriendlyName(Shield::Color(s->getOwner())),
      Tartan::tartanTypeToFriendlyName(type));
   return image_filechooser (title, clear);
 }
@@ -1182,7 +1182,7 @@ Gtk::FileChooserDialog* ShieldSetWindow::shield_filechooser(Shield *s, ShieldSty
   Glib::ustring title = String::ucompose
     (_("Choose a %1 %2 Shield image"),
      ShieldStyle::shieldStyleTypeToFriendlyName(type),
-     Shield::colourToFriendlyName(Shield::Colour(s->getOwner())));
+     Shield::colorToFriendlyName(Shield::Color(s->getOwner())));
   return image_filechooser (title, clear);
 }
 
@@ -1348,13 +1348,13 @@ void ShieldSetWindow::on_tutorial_video_activated()
   return;
 }
 
-void ShieldSetWindow::on_num_colours_text_changed()
+void ShieldSetWindow::on_num_colors_text_changed()
 {
-  colour_spinbutton->set_value(atoi(colour_spinbutton->get_text().c_str()));
-  on_num_colours_changed();
+  color_spinbutton->set_value(atoi(color_spinbutton->get_text().c_str()));
+  on_num_colors_changed();
 }
 
-void ShieldSetWindow::on_num_colours_changed()
+void ShieldSetWindow::on_num_colors_changed()
 {
   Glib::RefPtr<Gtk::TreeSelection> selection = shields_treeview->get_selection();
   Gtk::TreeModel::iterator iterrow = selection->get_selected();
@@ -1366,12 +1366,12 @@ void ShieldSetWindow::on_num_colours_changed()
       ShieldSetEditorAction_Colors *action =
         new ShieldSetEditorAction_Colors (getCurIndex (), s->getColors ());
       addUndo (action);
-      if (colour_spinbutton->get_value() < 1)
-        colour_spinbutton->set_value(1);
-      else if (colour_spinbutton->get_value() > 3)
-        colour_spinbutton->set_value(3);
+      if (color_spinbutton->get_value() < 1)
+        color_spinbutton->set_value(1);
+      else if (color_spinbutton->get_value() > 3)
+        color_spinbutton->set_value(3);
       else
-        s->setColors (get_current_colours ());
+        s->setColors (get_current_colors ());
       shieldset_modified = true;
       update ();
     }
@@ -1542,8 +1542,8 @@ void ShieldSetWindow::connect_signals ()
     (shields_treeview->get_selection()->signal_changed().connect
      (method(on_shield_selected)));
   connections.push_back
-    (colour_spinbutton->signal_insert_text().connect
-     (sigc::hide(sigc::hide(method(on_num_colours_text_changed)))));
+    (color_spinbutton->signal_insert_text().connect
+     (sigc::hide(sigc::hide(method(on_num_colors_text_changed)))));
 }
 
 void ShieldSetWindow::disconnect_signals ()

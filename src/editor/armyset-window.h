@@ -164,13 +164,13 @@ class ArmySetWindow: public sigc::trackable
     void on_help_about_activated();
     void on_tutorial_video_activated();
     void on_army_selected();
-    void fill_army_image(Gtk::Button *button, Gtk::Image *image, Shield::Colour c, ArmyProto *army);
+    void fill_army_image(Gtk::Button *button, Gtk::Image *image, Shield::Color c, ArmyProto *army);
     void fill_army_info(ArmyProto *army);
 
     //callbacks
     void on_name_changed();
     void on_description_changed();
-    void on_image_changed(Shield::Colour c);
+    void on_image_changed(Shield::Color c);
     void on_production_changed();
     void on_production_text_changed();
     void on_cost_changed();
@@ -218,7 +218,7 @@ class ArmySetWindow: public sigc::trackable
     bool isValidName ();
     void fill_army_images (ArmyProto *army);
     void sync_armies ();
-    void instantiateOthers (ArmyProto *a, Shield::Colour c, Glib::ustring f);
+    void instantiateOthers (ArmyProto *a, Shield::Color c, Glib::ustring f);
     void on_army_moved ();
     void update_menuitems ();
     void update ();

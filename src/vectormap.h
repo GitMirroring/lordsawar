@@ -189,12 +189,12 @@ private:
      */
     void draw_vectoring_line_to_here_from (Vector<int> src);
 
-    //! Draw a line between the given points, in a given colour.
+    //! Draw a line between the given points, in a given color.
     /**
      * @param src   The position of a tile on the map to draw a line from.
      * @param dest  The position of a tile on the map to draw a line to.
-     * @param to    Whether or not the line will be drawn in a yellow colour
-     *              or an orange colour.  If true, then yellow.  Otherwise
+     * @param to    Whether or not the line will be drawn in a yellow color
+     *              or an orange color.  If true, then yellow.  Otherwise
      *              orange.
      */
     void draw_vectoring_line(Vector<int> src, Vector<int> dest, bool to);

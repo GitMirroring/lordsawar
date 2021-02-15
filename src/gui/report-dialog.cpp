@@ -206,8 +206,8 @@ void ReportDialog::fill_in_info()
 void ReportDialog::updateArmyChart()
 {
   std::list<guint32> bars;
-  std::list<Gdk::RGBA> colours;
-  Gdk::RGBA colour;
+  std::list<Gdk::RGBA> colors;
+  Gdk::RGBA color;
   Glib::ustring s;
   guint32 total;
   for (unsigned int i = 0; i < MAX_PLAYERS; i++)
@@ -220,23 +220,23 @@ void ReportDialog::updateArmyChart()
       total = 0;
       total = p->countArmies();
       bars.push_back(total);
-      colour = p->getColor();
-      colours.push_back(colour);
+      color = p->getColor();
+      colors.push_back(color);
       if (p == d_player)
         army_label->set_text
           (String::ucompose(ngettext("You have %1 army!", "You have %1 armies!",
                                      total), total));
     }
 
-  army_chart = new BarChart(bars, colours, 0);
+  army_chart = new BarChart(bars, colors, 0);
   army_alignment->add(*manage(army_chart));
 }
 
 void ReportDialog::updateCityChart()
 {
   std::list<guint32> bars;
-  std::list<Gdk::RGBA> colours;
-  Gdk::RGBA colour;
+  std::list<Gdk::RGBA> colors;
+  Gdk::RGBA color;
   Glib::ustring s;
   guint32 total;
   for (unsigned int i = 0; i < MAX_PLAYERS; i++)
@@ -249,23 +249,23 @@ void ReportDialog::updateCityChart()
       total = Citylist::getInstance()->countCities(p);
 
       bars.push_back(total);
-      colour = p->getColor();
-      colours.push_back(colour);
+      color = p->getColor();
+      colors.push_back(color);
       if (p == d_player)
         city_label->set_text
           (String::ucompose(ngettext("You have %1 city!", "You have %1 cities!",
                                      total), total));
 
     }
-  city_chart = new BarChart(bars, colours, Citylist::getInstance()->size());
+  city_chart = new BarChart(bars, colors, Citylist::getInstance()->size());
   city_alignment->add(*manage(city_chart));
 }
 
 void ReportDialog::updateGoldChart()
 {
   std::list<guint32> bars;
-  std::list<Gdk::RGBA> colours;
-  Gdk::RGBA colour;
+  std::list<Gdk::RGBA> colors;
+  Gdk::RGBA color;
   Glib::ustring s;
   guint32 total;
   bars.clear();
@@ -278,14 +278,14 @@ void ReportDialog::updateGoldChart()
 	continue;
       total = p->getGold();
       bars.push_back(total);
-      colour = p->getColor();
-      colours.push_back(colour);
+      color = p->getColor();
+      colors.push_back(color);
       if (p == d_player)
         gold_label->set_text
           (String::ucompose(ngettext("You have %1 gold piece!",
                                      "You have %1 gold pieces!", total), total));
     }
-  gold_chart = new BarChart(bars, colours, 0);
+  gold_chart = new BarChart(bars, colors, 0);
   gold_alignment->add(*manage(gold_chart));
 }
 
@@ -327,8 +327,8 @@ Glib::ustring ReportDialog::calculateRank(std::list<guint32> scores, guint32 sco
 void ReportDialog::updateWinningChart()
 {
   std::list<guint32> bars;
-  std::list<Gdk::RGBA> colours;
-  Gdk::RGBA colour;
+  std::list<Gdk::RGBA> colors;
+  Gdk::RGBA color;
   Glib::ustring s;
   guint32 score;
   for (unsigned int i = 0; i < MAX_PLAYERS; i++)
@@ -340,12 +340,12 @@ void ReportDialog::updateWinningChart()
 	continue;
       score = p->getScore();
       bars.push_back(score);
-      colour = p->getColor();
-      colours.push_back(colour);
+      color = p->getColor();
+      colors.push_back(color);
     }
   s = String::ucompose(_("You are coming %1"), calculateRank(bars, d_player->getScore()));
   winning_label->set_text(s);
-  winning_chart = new BarChart(bars, colours, 100);
+  winning_chart = new BarChart(bars, colors, 100);
   winning_alignment->add(*manage(winning_chart));
 }
 

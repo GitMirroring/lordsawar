@@ -81,7 +81,7 @@ class ShieldSetWindow: public sigc::trackable
     Gtk::ColorButton *player_colorbutton;
     Gtk::ColorButton *player_2ndcolorbutton;
     Gtk::ColorButton *player_3rdcolorbutton;
-    Gtk::SpinButton *colour_spinbutton;
+    Gtk::SpinButton *color_spinbutton;
     Gtk::Alignment *shield_alignment;
 
     class ShieldsColumns: public Gtk::TreeModelColumnRecord {
@@ -114,8 +114,8 @@ class ShieldSetWindow: public sigc::trackable
     void on_player_color_changed();
     void on_player_2nd_color_changed();
     void on_player_3rd_color_changed();
-    void on_num_colours_changed();
-    void on_num_colours_text_changed();
+    void on_num_colors_changed();
+    void on_num_colors_text_changed();
 
     bool make_new_shieldset ();
     bool load_shieldset ();
@@ -160,7 +160,7 @@ class ShieldSetWindow: public sigc::trackable
     std::vector<sigc::connection> connections;
     void addUndo(ShieldSetEditorAction *a);
     Shield* getShieldByIndex (ShieldSetEditorAction_ShieldIndex *i);
-    std::vector<Gdk::RGBA> get_current_colours ();
+    std::vector<Gdk::RGBA> get_current_colors ();
 };
 
 #endif

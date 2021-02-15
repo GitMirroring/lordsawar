@@ -173,7 +173,7 @@ class TileSetWindow: public sigc::trackable
 
     void fill_tile_info(Tile *tile);
     void fill_tile_smallmap(Tile *tile);
-    void fill_colours(Tile *);
+    void fill_colors(Tile *);
     void fill_tilestylesets();
     void fill_tilestyleset_info(TileStyleSet *t);
 

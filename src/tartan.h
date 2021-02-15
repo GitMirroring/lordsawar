@@ -37,7 +37,7 @@ class TarFileMaskedImage;
  * 3) a rightpost portion
  *
  * Each image file contains two halves, an image and a mask that gets
- * drawn in the player's colour.
+ * drawn in the player's color.
  */
 class Tartan
 {

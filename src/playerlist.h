@@ -190,8 +190,8 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	//! Add a player to the list.  Use this instead of push_back.
 	void add(Player *player);
 
-        //! Reassign player colours.
-        void setNewColours(Shieldset *shieldset);
+        //! Reassign player colors.
+        void setNewColors(Shieldset *shieldset);
 
         //! Remove all actions from every player's action list.
         void clearAllActions();

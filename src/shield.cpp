@@ -45,7 +45,7 @@ Shield::Shield(const Shield& s)
     push_back(new ShieldStyle(*(*it)));
 }
 
-Shield::Shield(Shield::Colour owner, std::vector<Gdk::RGBA> colors)
+Shield::Shield(Shield::Color owner, std::vector<Gdk::RGBA> colors)
 :Tartan()
 {
   d_owner = guint32(owner);
@@ -89,7 +89,7 @@ std::vector<Gdk::RGBA> Shield::get_default_colors_for_neutral()
   return l;
 }
 
-Glib::ustring Shield::colourToString(const Shield::Colour c)
+Glib::ustring Shield::colorToString(const Shield::Color c)
 {
   switch (c)
     {
@@ -106,7 +106,7 @@ Glib::ustring Shield::colourToString(const Shield::Colour c)
   return "Shield::NEUTRAL";
 }
 
-Glib::ustring Shield::colourToFriendlyName (const Shield::Colour c)
+Glib::ustring Shield::colorToFriendlyName (const Shield::Color c)
 {
   switch (c)
     {
@@ -147,13 +147,13 @@ ShieldStyle *Shield::getFirstShieldstyle(ShieldStyle::Type type)
   return NULL;
 }
     
-guint32 Shield::get_next_shield(guint32 colour)
+guint32 Shield::get_next_shield(guint32 color)
 {
-  if (colour == Shield::NEUTRAL)
+  if (color == Shield::NEUTRAL)
     {
-      colour = Shield::WHITE;
-      return colour;
+      color = Shield::WHITE;
+      return color;
     }
-  colour++;
-  return colour;
+  color++;
+  return color;
 }

@@ -738,7 +738,7 @@ void TileSetWindow::fill_tile_info(Tile *tile)
   tile_smallmap_pattern_combobox->set_active(tile->getSmallTile()->getPattern());
   tile_smallmap_first_colorbutton->set_sensitive(true);
   fill_tilestylesets();
-  fill_colours(tile);
+  fill_colors(tile);
   fill_tile_smallmap(tile);
 }
 
@@ -823,8 +823,8 @@ void TileSetWindow::on_tile_first_color_changed()
     {
       Gtk::TreeModel::Row row = *iterrow;
       Tile *t = row[tiles_columns.tile];
-      TileSetEditorAction_Colour *action =
-        new TileSetEditorAction_Colour (getCurIndex (), 0, 
+      TileSetEditorAction_Color *action =
+        new TileSetEditorAction_Color (getCurIndex (), 0, 
                                          t->getSmallTile ()->getColor ());
       addUndo (action);
       t->getSmallTile()->setColor(tile_smallmap_first_colorbutton->get_rgba());
@@ -842,8 +842,8 @@ void TileSetWindow::on_tile_second_color_changed()
     {
       Gtk::TreeModel::Row row = *iterrow;
       Tile *t = row[tiles_columns.tile];
-      TileSetEditorAction_Colour *action =
-        new TileSetEditorAction_Colour (getCurIndex (), 1, 
+      TileSetEditorAction_Color *action =
+        new TileSetEditorAction_Color (getCurIndex (), 1, 
                                          t->getSmallTile ()->getSecondColor ());
       addUndo (action);
       t->getSmallTile()->setSecondColor(tile_smallmap_second_colorbutton->get_rgba());
@@ -861,8 +861,8 @@ void TileSetWindow::on_tile_third_color_changed()
     {
       Gtk::TreeModel::Row row = *iterrow;
       Tile *t = row[tiles_columns.tile];
-      TileSetEditorAction_Colour *action =
-        new TileSetEditorAction_Colour (getCurIndex (), 2, 
+      TileSetEditorAction_Color *action =
+        new TileSetEditorAction_Color (getCurIndex (), 2, 
                                          t->getSmallTile ()->getThirdColor ());
       addUndo (action);
       t->getSmallTile()->setThirdColor(tile_smallmap_third_colorbutton->get_rgba());
@@ -871,7 +871,7 @@ void TileSetWindow::on_tile_third_color_changed()
     }
 }
 
-void TileSetWindow::fill_colours(Tile *tile)
+void TileSetWindow::fill_colors(Tile *tile)
 {
   Gdk::RGBA c;
   switch (tile->getSmallTile()->getPattern())
@@ -916,7 +916,7 @@ void TileSetWindow::on_tile_pattern_changed()
       int idx = tile_smallmap_pattern_combobox->get_active_row_number();
       SmallTile::Pattern pattern = SmallTile::Pattern(idx);
       t->getSmallTile()->setPattern(pattern);
-      fill_colours(t);
+      fill_colors(t);
       fill_tile_smallmap(t);
       dirty ();
     }
@@ -1252,8 +1252,8 @@ void TileSetWindow::on_organize_tilestyles_activated()
 
 void TileSetWindow::on_smallmap_building_colors_activated()
 {
-  TileSetEditorAction_BuildingColours *action =
-    new TileSetEditorAction_BuildingColours (d_tileset);
+  TileSetEditorAction_BuildingColors *action =
+    new TileSetEditorAction_BuildingColors (d_tileset);
   TilesetSmallmapBuildingColorsDialog d(*window, d_tileset);
   d.run_and_hide();
   if (d.get_changed ())
@@ -2073,13 +2073,13 @@ TileSetWindow::executeAction (UndoAction *action2)
             getTileByIndex (a)->setMoves (a->getMoves ());
           }
         break;
-      case TileSetEditorAction::COLOUR:
+      case TileSetEditorAction::COLOR:
           {
-            TileSetEditorAction_Colour *a =
-              dynamic_cast<TileSetEditorAction_Colour*>(action);
+            TileSetEditorAction_Color *a =
+              dynamic_cast<TileSetEditorAction_Color*>(action);
             
             Gdk::RGBA c;
-            switch (a->getColourNumber ())
+            switch (a->getColorNumber ())
               {
               case 0:
                 c = getTileByIndex (a)->getSmallTile ()->getColor ();
@@ -2091,10 +2091,10 @@ TileSetWindow::executeAction (UndoAction *action2)
                 c = getTileByIndex (a)->getSmallTile ()->getThirdColor ();
                 break;
               }
-            out = new TileSetEditorAction_Colour
-              (a->getIndex (), a->getColourNumber (), c);
-            c = a->getColour ();
-            switch (a->getColourNumber ())
+            out = new TileSetEditorAction_Color
+              (a->getIndex (), a->getColorNumber (), c);
+            c = a->getColor ();
+            switch (a->getColorNumber ())
               {
               case 0:
                 getTileByIndex (a)->getSmallTile ()->setColor (c);
@@ -2214,11 +2214,11 @@ TileSetWindow::executeAction (UndoAction *action2)
             doReloadTileset (a);
           }
         break;
-      case TileSetEditorAction::BUILDING_COLOURS:
+      case TileSetEditorAction::BUILDING_COLORS:
           {
-            TileSetEditorAction_BuildingColours *a =
-              dynamic_cast<TileSetEditorAction_BuildingColours *>(action);
-            out = new TileSetEditorAction_BuildingColours (d_tileset);
+            TileSetEditorAction_BuildingColors *a =
+              dynamic_cast<TileSetEditorAction_BuildingColors *>(action);
+            out = new TileSetEditorAction_BuildingColors (d_tileset);
             doReloadTileset (a);
           }
         break;

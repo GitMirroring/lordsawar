@@ -79,7 +79,7 @@ class ArmyProto : public ArmyProtoBase
         guint32 getId() const {return d_id;};
 
 	//! Returns the army's masked image object
-        TarFileMaskedImage *getMaskedImage (Shield::Colour c) const
+        TarFileMaskedImage *getMaskedImage (Shield::Color c) const
           {return d_mimage[c];}
 
 	//! Gets whether or not this army type can found in a ruin.
@@ -105,8 +105,8 @@ class ArmyProto : public ArmyProtoBase
 	void instantiateImages(guint32 tilesize, Tar_Helper *t, bool scale,
                                bool &broken);
 
-        //! Instantiate the image for the given colour from the lwa file.
-        bool instantiateImage (Glib::ustring cfgfile, Shield::Colour col);
+        //! Instantiate the image for the given color from the lwa file.
+        bool instantiateImage (Glib::ustring cfgfile, Shield::Color col);
 
 	//! Destroy the images associated with this ArmyProto object.
 	void uninstantiateImages();

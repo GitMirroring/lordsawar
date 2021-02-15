@@ -139,12 +139,12 @@ void VectorMap::draw_vectoring_line(Vector<int> src, Vector<int> dest, bool to)
   Vector <int> end = dest;
   start = mapToSurface(start);
   end = mapToSurface(end);
-  Gdk::RGBA line_colour = Gdk::RGBA();
+  Gdk::RGBA line_color = Gdk::RGBA();
   if (to) //yellow
-    line_colour = SEND_VECTORED_UNIT_LINE_COLOUR;
+    line_color = SEND_VECTORED_UNIT_LINE_COLOR;
   else //orange
-    line_colour = RECEIVE_VECTORED_UNIT_LINE_COLOUR;
-  draw_line(start.x, start.y, end.x, end.y, line_colour);
+    line_color = RECEIVE_VECTORED_UNIT_LINE_COLOR;
+  draw_line(start.x, start.y, end.x, end.y, line_color);
 }
 
 void VectorMap::draw_vectoring_line_from_here_to (Vector<int> dest)
@@ -329,7 +329,7 @@ void VectorMap::after_draw()
 
 void VectorMap::draw_square_around_active_city()
 {
-  draw_square_around_city(city, VECTORMAP_ACTIVE_BOX_COLOUR);
+  draw_square_around_city(city, VECTORMAP_ACTIVE_BOX_COLOR);
 }
 
 void VectorMap::mouse_button_event(MouseButtonEvent e)

@@ -415,11 +415,11 @@ void ArmySetWindow::on_validate_armyset_activated()
 
   for (Armyset::iterator it = d_armyset->begin(); it != d_armyset->end(); ++it)
     {
-      Shield::Colour c;
+      Shield::Color c;
       valid = d_armyset->validateArmyUnitImage(*it, c);
       if (!valid)
         {
-          msgs.push_back(String::ucompose(_("%1 does not have an image for the %2 player"), (*it)->getName(), Shield::colourToString(c)));
+          msgs.push_back(String::ucompose(_("%1 does not have an image for the %2 player"), (*it)->getName(), Shield::colorToString(c)));
           break;
         }
     }
@@ -796,7 +796,7 @@ void ArmySetWindow::on_army_selected()
   armies_treeview->queue_draw();
 }
 
-void ArmySetWindow::fill_army_image(Gtk::Button *button, Gtk::Image *image, Shield::Colour c, ArmyProto *army)
+void ArmySetWindow::fill_army_image(Gtk::Button *button, Gtk::Image *image, Shield::Color c, ArmyProto *army)
 {
   Glib::ustring imgname = army->getMaskedImage(c)->getName();
   if (imgname.empty () == false)
@@ -973,7 +973,7 @@ void ArmySetWindow::on_description_changed()
     }
 }
 
-void ArmySetWindow::instantiateOthers (ArmyProto *a, Shield::Colour c,
+void ArmySetWindow::instantiateOthers (ArmyProto *a, Shield::Color c,
                                        Glib::ustring filename)
 {
   if (a->getMaskedImage (c)->getName ().empty () == true)
@@ -981,7 +981,7 @@ void ArmySetWindow::instantiateOthers (ArmyProto *a, Shield::Colour c,
   //what a hassle.  an army can reuse the same file many times
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
-      Shield::Colour col = Shield::Colour(i);
+      Shield::Color col = Shield::Color(i);
       if (col == c)
         continue;
       if (a->getMaskedImage (c)->getName () == a->getMaskedImage(col)->getName ())
@@ -992,7 +992,7 @@ void ArmySetWindow::instantiateOthers (ArmyProto *a, Shield::Colour c,
     }
 }
 
-void ArmySetWindow::on_image_changed(Shield::Colour c)
+void ArmySetWindow::on_image_changed(Shield::Color c)
 {
   Glib::RefPtr<Gtk::TreeSelection> selection = armies_treeview->get_selection();
   Gtk::TreeModel::iterator iterrow = selection->get_selected();
@@ -1006,7 +1006,7 @@ void ArmySetWindow::on_image_changed(Shield::Colour c)
                                        EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE,
                                        "");
       d.set_title(String::ucompose(_("Select a %1 Army image"),
-                                   Shield::colourToFriendlyName(c)));
+                                   Shield::colorToFriendlyName(c)));
       int response = d.run();
       if (response == Gtk::RESPONSE_ACCEPT && d.get_filename() != "")
         {
@@ -1645,7 +1645,7 @@ void ArmySetWindow::on_make_same_clicked()
   ArmyProto *a = row[armies_columns.army];
   if (!a)
     return;
-  TarFileMaskedImage *wmim = a->getMaskedImage(Shield::Colour(0));
+  TarFileMaskedImage *wmim = a->getMaskedImage(Shield::Color(0));
   if (wmim->getName ().empty () == true)
     return;
   ArmySetEditorAction_WhiteDown *action =
@@ -1653,7 +1653,7 @@ void ArmySetWindow::on_make_same_clicked()
   addUndo (action);
 
   for (unsigned int i = Shield::GREEN; i <= Shield::NEUTRAL; i++)
-    wmim->copy (d_armyset, a->getMaskedImage (Shield::Colour (i)));
+    wmim->copy (d_armyset, a->getMaskedImage (Shield::Color (i)));
 
   fill_army_images (a);
 }

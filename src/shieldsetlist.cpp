@@ -90,12 +90,12 @@ std::vector<Gdk::RGBA> Shieldsetlist::getColors(guint32 shieldset, guint32 owner
   return s->getColors(owner);
 }
 
-ShieldStyle *Shieldsetlist::getShield(guint32 shieldset, guint32 type, guint32 colour) const
+ShieldStyle *Shieldsetlist::getShield(guint32 shieldset, guint32 type, guint32 color) const
 {
   Shieldset *s = get(shieldset);
   if (!s)
     return NULL;
-  return s->lookupShieldByTypeAndColour(type, colour);
+  return s->lookupShieldByTypeAndColor(type, color);
 }
 
 void Shieldsetlist::instantiateImages(bool &broken)
@@ -113,10 +113,10 @@ void Shieldsetlist::uninstantiateImages()
     (*it)->uninstantiateImages ();
 }
 
-TarFileMaskedImage *Shieldsetlist::getTartan(guint32 shieldset, guint32 colour, Tartan::Type type) const
+TarFileMaskedImage *Shieldsetlist::getTartan(guint32 shieldset, guint32 color, Tartan::Type type) const
 {
   Shieldset *s = get (shieldset);
   if (!s)
     return NULL;
-  return s->lookupTartanImage (colour, type);
+  return s->lookupTartanImage (color, type);
 }

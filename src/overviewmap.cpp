@@ -570,11 +570,11 @@ void OverviewMap::draw()
             if (Playerlist::getViewingplayer()->getFogMap()->isFogged(pos) == true)
               {
                 pos = mapToSurface(pos);
-                draw_filled_rect(true, pos.x, pos.y, size, size, FOG_COLOUR);
+                draw_filled_rect(true, pos.x, pos.y, size, size, FOG_COLOR);
                 if (i == 0)
-                  draw_filled_rect(true, pos.x-size, pos.y, size, size, FOG_COLOUR);
+                  draw_filled_rect(true, pos.x-size, pos.y, size, size, FOG_COLOR);
                 if (j == 0)
-                  draw_filled_rect(true, pos.x, pos.y-size, size, size, FOG_COLOUR);
+                  draw_filled_rect(true, pos.x, pos.y-size, size, size, FOG_COLOR);
               }
           }
     }
@@ -584,14 +584,14 @@ void OverviewMap::draw()
     {
       int width = get_width();
       int height = get_height();
-      draw_filled_rect(true, 0, 0, width, height, FOG_COLOUR);
+      draw_filled_rect(true, 0, 0, width, height, FOG_COLOR);
     }
 
   if (blank_screen)
     {
       int width = get_width();
       int height = get_height();
-      surface_gc->set_source_rgba(FOG_COLOUR.get_red(), FOG_COLOUR.get_green(), FOG_COLOUR.get_blue(), FOG_COLOUR.get_alpha());
+      surface_gc->set_source_rgba(FOG_COLOR.get_red(), FOG_COLOR.get_green(), FOG_COLOR.get_blue(), FOG_COLOR.get_alpha());
       surface_gc->rectangle(0,0,width, height);
       surface_gc->fill();
     }
@@ -733,7 +733,7 @@ void OverviewMap::draw_target_box(Vector<int> pos, const Gdk::RGBA c)
 		   xsize, ysize, c);
 }
 
-void OverviewMap::draw_square_around_city(City *c, Gdk::RGBA colour)
+void OverviewMap::draw_square_around_city(City *c, Gdk::RGBA color)
 {
   Vector<int> start = c->getPos();
   start = mapToSurface(start);
@@ -742,7 +742,7 @@ void OverviewMap::draw_square_around_city(City *c, Gdk::RGBA colour)
   int width = 14.0 * (height / 14.0);
   start -= Vector<int>(width,height)/2;
   Vector<int> end = start + Vector<int>(width,height);
-  draw_rect (start.x-0, start.y-0, end.x-start.x+0, end.y-start.y+0, colour);
+  draw_rect (start.x-0, start.y-0, end.x-start.x+0, end.y-start.y+0, color);
 }
 
 void OverviewMap::draw_radial_gradient(Cairo::RefPtr<Cairo::Surface> surface, Gdk::RGBA inner, Gdk::RGBA outer, int width, int height)

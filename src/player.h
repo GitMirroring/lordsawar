@@ -167,7 +167,7 @@ class Player: public sigc::trackable
          *
          * @param name         The name of the player.
          * @param armyset      The Id of the player's Armyset.
-         * @param color        The player's colour.
+         * @param color        The player's color.
 	 * @param width        The width of the player's FogMap.
 	 * @param height       The height of the player's FogMap.
 	 * @param type         The kind of player (Player::Type).
@@ -199,10 +199,10 @@ class Player: public sigc::trackable
         //! Set the type of the player (to be used by derived classes only.)
         void setType(Type type) {d_type = type;}
 
-        //! Change the player's colour.
+        //! Change the player's color.
         void setColor(Gdk::RGBA c);
 
-        //! Change all the player's colours.
+        //! Change all the player's colors.
         void setColors(std::vector<Gdk::RGBA> l);
 
         //! Makes a player unable to die, even when having no units or cities.
@@ -278,7 +278,7 @@ class Player: public sigc::trackable
 	//! What rank do we have?  As a name.
 	Glib::ustring getDiplomaticTitle() const {return d_diplomatic_title;};
 
-        //! Returns the colour of the player.
+        //! Returns the color of the player.
 	Gdk::RGBA getColor() const {return d_colors[0];}
 
         std::vector<Gdk::RGBA> getColors () const {return d_colors;}
@@ -1461,7 +1461,7 @@ class Player: public sigc::trackable
          *
          * @param name     The name of the player.
          * @param armyset  The Id of the player's Armyset.
-         * @param color    The player's colours.
+         * @param color    The player's colors.
          * @param width    The width of the player's FogMap.
          * @param height   The height of the player's FogMap.
          * @param type     The player's type (Player::Type).
@@ -1517,9 +1517,9 @@ class Player: public sigc::trackable
         void addAction(Action *action);
 
         // DATA
-	//! The player's colour.
+	//! The player's color.
 	/**
-	 * Mask portions of images are shaded in these colours.
+	 * Mask portions of images are shaded in these colors.
 	 */
         std::vector<Gdk::RGBA> d_colors;
 

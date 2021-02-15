@@ -38,7 +38,7 @@ class ShieldSetEditorAction: public UndoAction
 
 	//! A ShieldSet Editor Action can be one of the following kinds.
         enum Type {
-	        /** Modify a player's shield colours. */
+	        /** Modify a player's shield colors. */
                 CHANGE_COLORS = 1,
 	        /** Modify description/copyright/license. */
                 CHANGE_PROPERTIES = 2,

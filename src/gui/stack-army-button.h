@@ -41,7 +41,7 @@ class StackArmyButton: public Gtk::Box
     bool get_active() const { return army_button->get_active();}
     void update_stack_button(bool selected);
     void reset(); //go back to an empty disabled, untoggled button with the circle
-    void draw(Stack *s, Army *a, guint32 circle_colour_id, bool toggled);
+    void draw(Stack *s, Army *a, guint32 circle_color_id, bool toggled);
 
     //Signals
     sigc::signal<void> stack_clicked;
@@ -55,7 +55,7 @@ class StackArmyButton: public Gtk::Box
  private:
     Stack *d_stack;
     Army *d_army;
-    guint32 d_circle_colour_id;
+    guint32 d_circle_color_id;
 
     Gtk::ToggleButton *army_button;
     Gtk::Image *army_image;

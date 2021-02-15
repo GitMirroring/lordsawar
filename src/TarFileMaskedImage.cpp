@@ -287,9 +287,9 @@ void TarFileMaskedImage::load (XML_Helper *helper, Glib::ustring name_tag,
   helper->getData(maskcount, mask_tag);
 }
 
-PixMask *TarFileMaskedImage::applyMask (std::vector<Gdk::RGBA> colours) const
+PixMask *TarFileMaskedImage::applyMask (std::vector<Gdk::RGBA> colors) const
 {
-  return applyMask(frames[0], colours);
+  return applyMask(frames[0], colors);
 }
 
 PixMask *TarFileMaskedImage::applyMask (Player *p) const
@@ -297,9 +297,9 @@ PixMask *TarFileMaskedImage::applyMask (Player *p) const
   return applyMask (p->getColors ());
 }
 
-PixMask *TarFileMaskedImage::applyMask (guint32 i, std::vector<Gdk::RGBA> colours) const
+PixMask *TarFileMaskedImage::applyMask (guint32 i, std::vector<Gdk::RGBA> colors) const
 {
-  return applyMask(frames[i], colours);
+  return applyMask(frames[i], colors);
 }
 
 PixMask *TarFileMaskedImage::applyMask (guint32 i, Player *p) const
@@ -307,7 +307,7 @@ PixMask *TarFileMaskedImage::applyMask (guint32 i, Player *p) const
   return applyMask (i, p->getColors ());
 }
 
-PixMask* TarFileMaskedImage::applyMask(std::vector<PixMask*> frame, std::vector<Gdk::RGBA> colours) const
+PixMask* TarFileMaskedImage::applyMask(std::vector<PixMask*> frame, std::vector<Gdk::RGBA> colors) const
 {
   PixMask *im = frame[0];
   PixMask *ma = frame[1];
@@ -323,7 +323,7 @@ PixMask* TarFileMaskedImage::applyMask(std::vector<PixMask*> frame, std::vector<
     }
   auto it = frame.begin ();
   it++;
-  for (auto colour : colours)
+  for (auto color : colors)
     {
       ma = *it;
 
@@ -340,16 +340,16 @@ PixMask* TarFileMaskedImage::applyMask(std::vector<PixMask*> frame, std::vector<
 
             if (copy[base+3] != 0)
               {
-                copy[base+0] = colour.get_red() *copy[base+0];
-                copy[base+1] = colour.get_green() * copy[base+1];
-                copy[base+2] = colour.get_blue() * copy[base+2];
+                copy[base+0] = color.get_red() *copy[base+0];
+                copy[base+1] = color.get_green() * copy[base+1];
+                copy[base+2] = color.get_blue() * copy[base+2];
               }
           }
 
-      Glib::RefPtr<Gdk::Pixbuf> colouredmask =
+      Glib::RefPtr<Gdk::Pixbuf> coloredmask =
         Gdk::Pixbuf::create_from_data(copy, Gdk::COLORSPACE_RGB, true, 8,
                                       width, height, width * 4);
-      result->draw_pixbuf(colouredmask, 0, 0, 0, 0, width, height);
+      result->draw_pixbuf(coloredmask, 0, 0, 0, 0, width, height);
       free(copy);
       it++;
       if (it == frame.end ())

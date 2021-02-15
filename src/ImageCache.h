@@ -196,16 +196,16 @@ class ImageCache
         PixMask* getDialogArmyPic(Army *a, guint32 font_size, bool greyed = false);
         PixMask* getCircledArmyPic(guint32 armyset, guint32 army, 
                                    const Player* p, const bool* medals, 
-                                   bool greyed, guint32 circle_colour_id,
+                                   bool greyed, guint32 circle_color_id,
                                    bool show_army, guint32 font_size);
         PixMask *getCircledArmyPic(Army *a, bool greyed,
-                                   guint32 circle_colour_id, bool show_army,
+                                   guint32 circle_color_id, bool show_army,
                                    guint32 font_size);
         PixMask* getCircledShipPic(guint32 armyset, const Player* p,
-                                   bool greyed, guint32 circle_colour_id,
+                                   bool greyed, guint32 circle_color_id,
                                    guint32 font_size);
         PixMask* getCircledStandardPic(guint32 armyset, const Player* p,
-                                       bool greyed, guint32 circle_colour_id,
+                                       bool greyed, guint32 circle_color_id,
                                        guint32 font_size);
 
         /** Method for getting the shield picture from the cache
@@ -220,12 +220,12 @@ class ImageCache
           *
           * @param shieldset    the id of the shieldset to be used
 	  * @param type         the size of the shield: 0=sm, 1=med, 2=lg
-          * @param colour       which player the shield is for
+          * @param color        which player the shield is for
           * @param map          whether or not this shield appears on a map
           * @param font_size    for map=false, to calculate relative size
           * @return the image of the shield
           */
-        PixMask* getShieldPic(guint32 shieldset, guint32 type, guint32 colour,
+        PixMask* getShieldPic(guint32 shieldset, guint32 type, guint32 color,
                               bool map, guint32 font_size);
         PixMask* getShieldPic(guint32 type, Player *p, bool map,
                               guint32 font_size);
@@ -295,7 +295,7 @@ class ImageCache
         /** Method for getting a ship picture.  This is the picture
 	  * that appears when the stack goes into the water.
           *
-          * @param p            the player to colour the ship as
+          * @param p            the player to color the ship as
           * @return image of the ship
           */
         PixMask* getShipPic(const Player* p);
@@ -303,7 +303,7 @@ class ImageCache
         /** Method for getting a standard picture.  This is the picture
 	  * that appears when the hero plants a flag..
           *
-          * @param p            the player to colour the flag as
+          * @param p            the player to color the flag as
           * @return image of the standard
           */
         PixMask* getPlantedStandardPic(const Player* p);
@@ -344,7 +344,7 @@ class ImageCache
 	 * that appears when a hero gains a new level, and subsequently gets
 	 * to increase a stat.
 	 *
-	 * @param p the player to colour the image as.
+	 * @param p the player to color the image as.
          * @param gender male=1, female=2.
          * @font_size is the height of the default font in pixels.
 	 * @return new-level image.
@@ -499,8 +499,8 @@ class ImageCache
 
 	static PixMask* greyOut(PixMask* image);
 
-        static PixMask* circled(PixMask* image, Gdk::RGBA colour, bool coloured = true, double width_percent = 75.0);
-        static void draw_circle(Cairo::RefPtr<Cairo::Context> cr, double width_percent, int width, int height, Gdk::RGBA colour, bool coloured = true, bool mask = false);
+        static PixMask* circled(PixMask* image, Gdk::RGBA color, bool colored = true, double width_percent = 75.0);
+        static void draw_circle(Cairo::RefPtr<Cairo::Context> cr, double width_percent, int width, int height, Gdk::RGBA color, bool colored = true, bool mask = false);
         static PixMask* loadMiscImage(Glib::ustring pngfile);
 
         static int calculate_width_from_adjusted_height (PixMask *p, double new_height);
@@ -644,7 +644,7 @@ public:
 //! Helper class for circled army items in the ImageCache.
 /**
  * These circled army images appear in various places in the gui.
- * It's just an army unit with a coloured circle behind it.
+ * It's just an army unit with a colored circle behind it.
  */
 class CircledArmyPixMaskCacheItem
 {
@@ -658,7 +658,7 @@ public:
     guint32 player_id;
     bool medals[3];
     bool greyed;
-    guint32 circle_colour_id;
+    guint32 circle_color_id;
     bool show_army;
     guint32 font_size;
 };
@@ -666,7 +666,7 @@ public:
 //! Helper class for circled ship items in the ImageCache.
 /**
  * These circled ship images appear in various places in the gui.
- * It's just the ship image with a coloured circle behind it.
+ * It's just the ship image with a colored circle behind it.
  */
 class CircledShipPixMaskCacheItem
 {
@@ -678,14 +678,14 @@ public:
     guint32 armyset;
     guint32 player_id;
     bool greyed;
-    guint32 circle_colour_id;
+    guint32 circle_color_id;
     guint32 font_size;
 };
 
 //! Helper class for circled planted standard items in the ImageCache.
 /**
  * These circled standard images appear in various places in the gui.
- * It's just the planted standard image with a coloured circle behind it.
+ * It's just the planted standard image with a colored circle behind it.
  */
 class CircledStandardPixMaskCacheItem
 {
@@ -697,7 +697,7 @@ public:
     guint32 armyset;
     guint32 player_id;
     bool greyed;
-    guint32 circle_colour_id;
+    guint32 circle_color_id;
     guint32 font_size;
 };
 
@@ -886,7 +886,7 @@ public:
     bool operator < (const ShieldPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 shieldset;
     guint32 type;
-    guint32 colour;
+    guint32 color;
     bool map;
     guint32 font_size;
 };
@@ -936,7 +936,7 @@ public:
 //! Helper class for boat items in the ImageCache.
 /**
  * ship images are for when a stack is in a boat.
- * one ship image per army set, and drawn in the player's colour.
+ * one ship image per army set, and drawn in the player's color.
  */
 class ShipPixMaskCacheItem
 {

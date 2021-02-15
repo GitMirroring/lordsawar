@@ -46,7 +46,7 @@ StackArmyButton * StackArmyButton::create()
 }
 
 StackArmyButton::StackArmyButton(BaseObjectType* baseObject, const Glib::RefPtr<Gtk::Builder> &xml)
-  : Gtk::Box(baseObject), d_stack (NULL), d_army (NULL), d_circle_colour_id (0),
+  : Gtk::Box(baseObject), d_stack (NULL), d_army (NULL), d_circle_color_id (0),
     army_info_tip (NULL)
 {
   xml->get_widget("army_button", army_button);
@@ -126,7 +126,7 @@ void StackArmyButton::fill_army_button()
       army_image->property_pixbuf() =
         gc->getCircledArmyPic(p->getArmyset(), d_army->getTypeId(),
                               p, d_army->getMedalBonuses(), greyed_out, 
-                              !greyed_out ? p->getId() : d_circle_colour_id, 
+                              !greyed_out ? p->getId() : d_circle_color_id, 
                               true,
                               FontSize::getInstance ()->get_height ())->to_pixbuf();
 
@@ -189,11 +189,11 @@ void StackArmyButton::reset()
   stack_button->set_sensitive(false);
 }
     
-void StackArmyButton::draw(Stack *s, Army *a, guint32 circle_colour_id, bool toggled)
+void StackArmyButton::draw(Stack *s, Army *a, guint32 circle_color_id, bool toggled)
 {
   d_stack = s;
   d_army = a;
-  d_circle_colour_id = circle_colour_id;
+  d_circle_color_id = circle_color_id;
   army_button->set_sensitive(true);
   stack_button->set_sensitive(true);
   if (army_button->get_active() != toggled)

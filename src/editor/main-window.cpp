@@ -588,7 +588,7 @@ void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ust
     for (guint32 i = Shield::WHITE; i <= Shield::BLACK; i++)
       {
         Glib::ustring name =
-          d_create_scenario_names->getPlayerName(Shield::Colour(i));
+          d_create_scenario_names->getPlayerName(Shield::Color(i));
         Player *human = new RealPlayer (name, armyset_id,
                                         ssl->getColors(ss->getId (), i),
                                         width, height, Player::HUMAN, i);
@@ -899,7 +899,7 @@ bool MainWindow::make_new_map ()
               GameParameters::Player player;
               player.type = GameParameters::Player::HUMAN;
               player.name =
-                d_create_scenario_names->getPlayerName(Shield::Colour(i));
+                d_create_scenario_names->getPlayerName(Shield::Color(i));
               player.id = i;
               pl->syncPlayer(player);
             }

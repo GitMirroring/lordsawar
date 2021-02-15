@@ -53,7 +53,7 @@ class ArmyBonusDialog: public LwDialog
     Glib::RefPtr<Gtk::ListStore> armies_list;
  private:
     void addArmyType(Player *p, guint32 army_type);
-    Player *d_player; //show armies in this player's colour
+    Player *d_player; //show armies in this player's color
 
     void on_button_toggled (Player *p);
     void fill_armies (Player *p);

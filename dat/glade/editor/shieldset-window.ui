@@ -434,7 +434,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <property name="valign">end</property>
-                                <property name="label" translatable="yes">First Colour</property>
+                                <property name="label" translatable="yes">First Color</property>
                                 <attributes>
                                   <attribute name="underline" value="True"/>
                                 </attributes>
@@ -675,7 +675,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <property name="valign">end</property>
-                                <property name="label" translatable="yes">Second Colour</property>
+                                <property name="label" translatable="yes">Second Color</property>
                                 <attributes>
                                   <attribute name="underline" value="True"/>
                                 </attributes>
@@ -727,7 +727,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <property name="valign">end</property>
-                                <property name="label" translatable="yes">Third Colour</property>
+                                <property name="label" translatable="yes">Third Color</property>
                                 <attributes>
                                   <attribute name="underline" value="True"/>
                                 </attributes>
@@ -779,7 +779,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <property name="valign">end</property>
-                                <property name="label" translatable="yes">Mask Colours</property>
+                                <property name="label" translatable="yes">Mask Colors</property>
                                 <attributes>
                                   <attribute name="underline" value="True"/>
                                 </attributes>
@@ -796,7 +796,7 @@
                                 <property name="can-focus">False</property>
                                 <property name="halign">center</property>
                                 <child>
-                                  <object class="GtkSpinButton" id="colour_spinbutton">
+                                  <object class="GtkSpinButton" id="color_spinbutton">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="adjustment">adjustment1</property>

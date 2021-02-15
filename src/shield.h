@@ -42,7 +42,7 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 	static Glib::ustring d_tag; 
 
 	//! The notional player that the Shield goes with.
-	enum Colour {WHITE = 0, GREEN = 1, YELLOW = 2, DARK_BLUE = 3, ORANGE = 4,
+	enum Color {WHITE = 0, GREEN = 1, YELLOW = 2, DARK_BLUE = 3, ORANGE = 4,
 	  LIGHT_BLUE = 5, RED = 6, BLACK = 7, NEUTRAL = 8};
 
 	//! Loading constructor.
@@ -59,7 +59,7 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
         Shield(const Shield& s);
 
 	//! Default constructor.
-	Shield(Shield::Colour owner, std::vector<Gdk::RGBA> colors);
+	Shield(Shield::Color owner, std::vector<Gdk::RGBA> colors);
 
 	//! Destructor.
         virtual ~Shield();
@@ -70,18 +70,18 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
         //! Returns the player that this shield will belong to.
 	guint32 getOwner() const {return d_owner;}
 
-        //! Returns the colour of the player shield.
+        //! Returns the color of the player shield.
 	Gdk::RGBA getColor() const {return d_colors[0];}
 
-        //! Returns the colours of the player shield.
+        //! Returns the colors of the player shield.
         std::vector<Gdk::RGBA> getColors() const {return d_colors;}
 
 	// Set Methods
 
-	//! Sets the colour of the player shield.
+	//! Sets the color of the player shield.
 	void setColor(Gdk::RGBA c) {d_colors[0] = c;}
 
-        //! Sets the colours of the player shield.
+        //! Sets the colors of the player shield.
         void setColors (std::vector<Gdk::RGBA> l) {d_colors = l;}
 
 	// Methods that operate on class data and do not modify the class.
@@ -96,43 +96,43 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 	// Static Methods
 
 	/**
-	 * Get the default colour for the Player with the given Id.
+	 * Get the default color for the Player with the given Id.
 	 *
-	 * @note This colour is used to graphically shade Army, Shield, Flags,
+	 * @note This color is used to graphically shade Army, Shield, Flags,
 	 * and selector pictures.
 	 *
-	 * @note This is not used to obtain the Neutral player's colour.
+	 * @note This is not used to obtain the Neutral player's color.
 	 *
-	 * @param player_no  The player's Id for which we want the colour.
+	 * @param player_no  The player's Id for which we want the color.
 	 *
-	 * @return The default colours associated with the player.
+	 * @return The default colors associated with the player.
 	 */
-	//! Get standard colour for a player.
+	//! Get standard color for a player.
 	static std::vector<Gdk::RGBA> get_default_colors_for_no(int player_no);
 
-	//! Get standard colour for the neutral player.
+	//! Get standard color for the neutral player.
 	static std::vector<Gdk::RGBA> get_default_colors_for_neutral();
 
-	//! Convert the Shield::Colour enumerated value to a string.
-	static Glib::ustring colourToString(const Shield::Colour c);
+	//! Convert the Shield::Color enumerated value to a string.
+	static Glib::ustring colorToString(const Shield::Color c);
 
-        //! Convert Shield::Colour into a string suitable for display.
-        static Glib::ustring colourToFriendlyName (const Shield::Colour c);
+        //! Convert Shield::Color into a string suitable for display.
+        static Glib::ustring colorToFriendlyName (const Shield::Color c);
 
         static guint32 get_next_shield(guint32 type);
     protected:
 
 	//! The player of the shield.
 	/**
-	 * Equates to the shieldset.shield.d_colour XML entities in the 
+	 * Equates to the shieldset.shield.d_color XML entities in the 
 	 * shieldset configuration file.
-	 * Equates to the Shield::Colour enumeration.
+	 * Equates to the Shield::Color enumeration.
 	 */
 	guint32 d_owner;
 
-	//! The player's colours.
+	//! The player's colors.
 	/**
-	 * Mask portions of images are shaded in these colours.
+	 * Mask portions of images are shaded in these colors.
 	 */
         std::vector<Gdk::RGBA> d_colors;
 

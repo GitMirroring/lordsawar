@@ -204,7 +204,7 @@
                           <object class="GtkMenuItem" id="smallmap_building_colors_menuitem">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Mini-Map Building Colours...</property>
+                            <property name="label" translatable="yes">Mini-Map Building Colors...</property>
                             <property name="use-underline">True</property>
                           </object>
                         </child>
@@ -673,7 +673,7 @@
                                                             <property name="visible">True</property>
                                                             <property name="can-focus">False</property>
                                                             <property name="valign">end</property>
-                                                            <property name="label" translatable="yes">First Colour</property>
+                                                            <property name="label" translatable="yes">First Color</property>
                                                             <attributes>
                                                             <attribute name="underline" value="True"/>
                                                             </attributes>
@@ -731,7 +731,7 @@
                                                             <property name="visible">True</property>
                                                             <property name="can-focus">False</property>
                                                             <property name="valign">end</property>
-                                                            <property name="label" translatable="yes">Second Colour</property>
+                                                            <property name="label" translatable="yes">Second Color</property>
                                                             <attributes>
                                                             <attribute name="underline" value="True"/>
                                                             </attributes>
@@ -789,7 +789,7 @@
                                                             <property name="visible">True</property>
                                                             <property name="can-focus">False</property>
                                                             <property name="valign">end</property>
-                                                            <property name="label" translatable="yes">Third Colour</property>
+                                                            <property name="label" translatable="yes">Third Color</property>
                                                             <attributes>
                                                             <attribute name="underline" value="True"/>
                                                             </attributes>

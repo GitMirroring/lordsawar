@@ -119,13 +119,13 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         //! Returns the fog images
         TarFileImage *getFog() {return d_fog;}
 
-        //! Get the colour associated with the road on the smallmap.
+        //! Get the color associated with the road on the smallmap.
 	Gdk::RGBA getRoadColor() const {return d_road_color;}
 
-        //! Get the colour associated with temples on the smallmap.
+        //! Get the color associated with temples on the smallmap.
 	Gdk::RGBA getTempleColor() const {return d_temple_color;}
 
-        //! Get the colour associated with ruins on the smallmap.
+        //! Get the color associated with ruins on the smallmap.
 	Gdk::RGBA getRuinColor() const {return d_ruin_color;}
 
         //! Get the first tile that has a certain pattern on the small map.
@@ -164,13 +164,13 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
 	// Set Methods
 
-	//! Sets the colour of the road on the smallmap.
+	//! Sets the color of the road on the smallmap.
 	void setRoadColor(Gdk::RGBA color) {d_road_color = color;}
 
-	//! Sets the colour of the ruins on the smallmap.
+	//! Sets the color of the ruins on the smallmap.
 	void setRuinColor(Gdk::RGBA color) {d_ruin_color = color;}
 
-	//! Sets the colour of the temples on the smallmap.
+	//! Sets the color of the temples on the smallmap.
 	void setTempleColor(Gdk::RGBA color) {d_temple_color = color;}
 
         //! clear the tileset and add the normal tiles to it.
@@ -342,13 +342,13 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	//! A map that provides an index when supplying a type of Tile.
         TileTypeIndexMap d_tiletypes;
 
-	//! The colour of roads on the smallmap.
+	//! The color of roads on the smallmap.
 	Gdk::RGBA d_road_color;
 
-	//! The colour of ruins on the smallmap.
+	//! The color of ruins on the smallmap.
 	Gdk::RGBA d_ruin_color;
 
-	//! The colour of temples on the smallmap.
+	//! The color of temples on the smallmap.
 	Gdk::RGBA d_temple_color;
 
         //! The movement bonus graphic for moving quickly over all tile types.

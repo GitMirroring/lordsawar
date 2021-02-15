@@ -13,7 +13,7 @@
   <object class="GtkDialog" id="dialog">
     <property name="can-focus">False</property>
     <property name="border-width">6</property>
-    <property name="title" translatable="yes">Colours of Buildings on the Miniature Map</property>
+    <property name="title" translatable="yes">Colors of Buildings on the Miniature Map</property>
     <property name="type-hint">dialog</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox">
@@ -116,7 +116,7 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="valign">end</property>
-                        <property name="label" translatable="yes">Road Colour</property>
+                        <property name="label" translatable="yes">Road Color</property>
                         <attributes>
                           <attribute name="underline" value="True"/>
                         </attributes>
@@ -168,7 +168,7 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="valign">end</property>
-                        <property name="label" translatable="yes">Ruin Colour</property>
+                        <property name="label" translatable="yes">Ruin Color</property>
                         <attributes>
                           <attribute name="underline" value="True"/>
                         </attributes>
@@ -220,7 +220,7 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="valign">end</property>
-                        <property name="label" translatable="yes">Temple Colour</property>
+                        <property name="label" translatable="yes">Temple Color</property>
                         <attributes>
                           <attribute name="underline" value="True"/>
                         </attributes>

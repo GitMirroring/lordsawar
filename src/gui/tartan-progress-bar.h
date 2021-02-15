@@ -43,7 +43,7 @@ class TartanProgressBar: public Gtk::Image
     //always show this much of the tartan.
     const double MIN_PERCENT = 0.10;
 
-    //! Constructor.  Player determines the colour.
+    //! Constructor.  Player determines the color.
     TartanProgressBar(Player *p);
 
     //! Destructor.

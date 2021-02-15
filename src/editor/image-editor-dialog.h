@@ -31,7 +31,7 @@ class TarFile;
 //! general picture editor.
 /**
  * This class doesn't actually edit the image, instead it shows the image
- * being edited in each player colour.  The user can pick a new file to be
+ * being edited in each player color.  The user can pick a new file to be
  * the new image.
  */
 class ImageEditorDialog: public LwEditorDialog

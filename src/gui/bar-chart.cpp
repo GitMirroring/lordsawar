@@ -20,8 +20,8 @@
 #include "font-size.h"
 
 BarChart::BarChart(const std::list<unsigned int> &bars,
-                   const std::list<Gdk::RGBA> &colours, unsigned int max_value)
- : d_bars (bars), d_colours (colours), d_max_value (max_value)
+                   const std::list<Gdk::RGBA> &colors, unsigned int max_value)
+ : d_bars (bars), d_colors (colors), d_max_value (max_value)
 {
 }
 
@@ -102,12 +102,12 @@ bool BarChart::on_draw (const Cairo::RefPtr<Cairo::Context> &cr)
 
     unsigned int voffs = 15;
     unsigned int hoffs = 15;
-    unsigned int d = ((height-voffs-lw-h)/d_colours.size())-lw;
+    unsigned int d = ((height-voffs-lw-h)/d_colors.size())-lw;
     cr->move_to(0, 0);
-    std::list<Gdk::RGBA>::iterator cit = d_colours.begin();
+    std::list<Gdk::RGBA>::iterator cit = d_colors.begin();
     unsigned int i = 0;
     for (std::list<unsigned int>::iterator bit = d_bars.begin();
-         bit != d_bars.end(), cit != d_colours.end(); ++bit, ++cit, i+=(lw+d))
+         bit != d_bars.end(), cit != d_colors.end(); ++bit, ++cit, i+=(lw+d))
       {
 	cr->move_to(hoffs, i + lw + voffs);
 	double red = (*cit).get_red();

@@ -35,10 +35,10 @@ class SmallTile
 	//! The terrain tile's appearance as seen on the OverviewMap.
 	enum Pattern { 
 
-	  //! The terrain feature is shown as a single solid colour.
+	  //! The terrain feature is shown as a single solid color.
 	  SOLID = 0, 
 
-	  //! The terrain feature is checkered with two alternating colours.
+	  //! The terrain feature is checkered with two alternating colors.
 	  /**
 	   * The stippled pattern looks something like this:
 	   * @verbatim
@@ -52,7 +52,7 @@ oxoxoxox
 	   */
 	  STIPPLED = 1, 
 
-	  //! The feature is random pixels with three different colours.
+	  //! The feature is random pixels with three different colors.
 	  /**
 	   * The random pattern looks something like this:
 	   * @verbatim
@@ -80,7 +80,7 @@ oooooooo
 	   */
 	  SUNKEN = 3,
 
-	  //! The feature is shown as a 3 colour pattern.
+	  //! The feature is shown as a 3 color pattern.
 	  /**
 	   * The tablecloth pattern looks something like this:
 	   * @verbatim
@@ -135,19 +135,19 @@ oeeeeeee
 
 	// Get Methods
 
-        //! Get the colour associated with this tile for the smallmap.
+        //! Get the color associated with this tile for the smallmap.
 	Gdk::RGBA getColor() const {return d_color;}
 
-        //! Get the alternate colour associated with this tile's pattern.
+        //! Get the alternate color associated with this tile's pattern.
 	/**
-	 * This "second" colour gets used when SmallTile::Pattern is
+	 * This "second" color gets used when SmallTile::Pattern is
 	 * STIPPLED, RANDOMIZED, SUNKEN, or TABLECLOTH.
 	 */
 	Gdk::RGBA getSecondColor() const {return d_second_color;}
 
-        //! Get another alternate colour associated with this tile's pattern.
+        //! Get another alternate color associated with this tile's pattern.
 	/**
-	 * This "third" colour gets used when SmallTile::Pattern is
+	 * This "third" color gets used when SmallTile::Pattern is
 	 * RANDOMIZED, DIAGONAL, CROSSHATCH, or TABLECLOTH.
 	 */
 	Gdk::RGBA getThirdColor() const {return d_third_color;}
@@ -158,13 +158,13 @@ oeeeeeee
 
 	// Set Methods
 
-        //! Set the colour associated with this tile for the smallmap.
+        //! Set the color associated with this tile for the smallmap.
 	void setColor(Gdk::RGBA clr) {d_color = clr;}
 
-        //! Set the alternate colour associated with this tile's pattern.
+        //! Set the alternate color associated with this tile's pattern.
         void setSecondColor(Gdk::RGBA color) {d_second_color = color;}
 
-        //! Set another alternate colour associated with this tile's pattern.
+        //! Set another alternate color associated with this tile's pattern.
         void setThirdColor(Gdk::RGBA color) {d_third_color = color;}
 
         //! set the pattern (solid, stippled, random) of this type.
@@ -195,7 +195,7 @@ oeeeeeee
 	 */
 	Pattern d_pattern;
 
-	//! First colour.
+	//! First color.
 	/**
 	 * Equates to the following XML entities in the tileset configuration
 	 * file:
@@ -205,7 +205,7 @@ oeeeeeee
 	 */
 	Gdk::RGBA d_color;
 
-	//! Second colour.
+	//! Second color.
 	/**
 	 * Only used when SmallTile::Pattern is one of: STIPPLED, 
 	 * RANDOMIZED, SUNKEN, TABLECLOTH, DIAGONAL, or CROSSHATCH.
@@ -218,7 +218,7 @@ oeeeeeee
 	 */
 	Gdk::RGBA d_second_color;
 
-	//! Third colour.
+	//! Third color.
 	/**
 	 * Only used when Tile::Pattern is Tile::RANDOMIZED, or 
 	 * Tile::TABLECLOTH.

@@ -45,7 +45,7 @@ class AI_Dummy : public RealPlayer
          * 
          * @param name         The name of the player.
          * @param armyset      The Id of the player's Armyset.
-         * @param colors       The player's colours.
+         * @param colors       The player's colors.
 	 * @param width        The width of the player's FogMap.
 	 * @param height       The height of the player's FogMap.
 	 * @param player_no    The Id of the player.  If this value is -1,

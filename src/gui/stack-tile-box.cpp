@@ -177,9 +177,9 @@ void StackTileBox::show_stack(StackTile *s)
   stks = s->getFriendlyStacks(p);
   unsigned int count= 0;
 	    
-  guint32 colour_id = 0;
-  if (colour_id == p->getId())
-    colour_id = Shield::get_next_shield(colour_id);
+  guint32 color_id = 0;
+  if (color_id == p->getId())
+    color_id = Shield::get_next_shield(color_id);
   for (std::vector<Stack *>::iterator j = stks.begin(); j != stks.end(); ++j)
     {
       bool first = true;
@@ -195,7 +195,7 @@ void StackTileBox::show_stack(StackTile *s)
             break;
 
           StackArmyButton *button = stack_army_buttons[count];
-          button->draw(stack, *i, colour_id, (*j) == currently_selected_stack);
+          button->draw(stack, *i, color_id, (*j) == currently_selected_stack);
           army_conn[count].disconnect();
           army_conn[count] = button->army_toggled.connect
             (sigc::bind(method(on_army_toggled), button, *j, *i));
@@ -205,9 +205,9 @@ void StackTileBox::show_stack(StackTile *s)
           count++;
         }
 
-      colour_id = Shield::get_next_shield(colour_id);
-      if (colour_id== p->getId())
-        colour_id = Shield::get_next_shield(colour_id);
+      color_id = Shield::get_next_shield(color_id);
+      if (color_id== p->getId())
+        color_id = Shield::get_next_shield(color_id);
     }
 
   fill_in_group_info(s, currently_selected_stack);

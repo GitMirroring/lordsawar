@@ -135,10 +135,10 @@ class Maptile: public Movable
 	//! Get the pattern of this maptile on the smalltile.
        SmallTile::Pattern getPattern() const;
 
-	//! Get the associated colour with the pattern.
+	//! Get the associated color with the pattern.
        Gdk::RGBA getSecondColor() const;
 
-	//! Get the associated colour with the pattern.
+	//! Get the associated color with the pattern.
        Gdk::RGBA getThirdColor() const;
 
         //! Get the tile type (the type of the underlying terrain).

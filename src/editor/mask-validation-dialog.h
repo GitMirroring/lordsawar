@@ -32,7 +32,7 @@
  * information to make sense of them.
  *
  * We're trying to determine the geometry of the content with respect to the
- * number of masks that will be coloured in the players' colours.
+ * number of masks that will be colored in the players' colors.
  *
  * If the tar file masked image is in the horizontal orientation, we return
  * how many columns the image has minus one.

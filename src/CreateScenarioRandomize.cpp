@@ -219,7 +219,7 @@ void CreateScenarioRandomize::getBaseGold (int difficulty, int *base_gold)
     *base_gold = 121;
 }
 
-Glib::ustring CreateScenarioRandomize::getPlayerName(Shield::Colour id)
+Glib::ustring CreateScenarioRandomize::getPlayerName(Shield::Color id)
 {
   Glib::ustring name = "";
   switch (id)

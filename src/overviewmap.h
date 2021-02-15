@@ -156,7 +156,7 @@ class OverviewMap : public sigc::trackable
     //! Returns whether or not the given pixel appears sunken (Tile::SUNKEN).
     /**
      * The leftmost and bottommost pixels of a sunken terrain type are shaded
-     * in a different colour.  This method returns whether or not a given pixel
+     * in a different color.  This method returns whether or not a given pixel
      * should be shaded.
      *
      * @param type  The tile associated with the pixel location must be of
@@ -252,8 +252,8 @@ class OverviewMap : public sigc::trackable
     Cairo::RefPtr<Cairo::Surface> surface;
     Cairo::RefPtr<Cairo::Context> surface_gc;
 
-    void draw_target_box(Vector<int> pos, const Gdk::RGBA colour);
-    void draw_square_around_city(City *c, const Gdk::RGBA colour);
+    void draw_target_box(Vector<int> pos, const Gdk::RGBA color);
+    void draw_square_around_city(City *c, const Gdk::RGBA color);
     void draw_radial_gradient(Gdk::RGBA inner, Gdk::RGBA outer, int width, int height);
 
     bool blank_screen;

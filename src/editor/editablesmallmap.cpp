@@ -44,9 +44,9 @@ void EditableSmallMap::after_draw()
   OverviewMap::after_draw();
   draw_cities(false);
   if (road_start != Vector<int>(-1,-1))
-      draw_target_box(road_start, ROAD_PLANNER_TARGET_BOX_COLOUR);
+      draw_target_box(road_start, ROAD_PLANNER_TARGET_BOX_COLOR);
   if (road_finish != Vector<int>(-1,-1))
-      draw_target_box(road_finish, ROAD_PLANNER_TARGET_BOX_COLOUR);
+      draw_target_box(road_finish, ROAD_PLANNER_TARGET_BOX_COLOR);
   map_changed.emit(surface, Gdk::Rectangle(0, 0, get_width(), get_height()));
 }
 

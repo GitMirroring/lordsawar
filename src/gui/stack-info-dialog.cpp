@@ -72,23 +72,23 @@ void StackInfoDialog::addStack(Stack *s, guint32 &idx)
   delete target;
 
   bool first = true;
-  guint32 colour_id = 0;
-  if (colour_id == s->getOwner()->getId())
-    colour_id = Shield::get_next_shield(colour_id);
+  guint32 color_id = 0;
+  if (color_id == s->getOwner()->getId())
+    color_id = Shield::get_next_shield(color_id);
   for (Stack::iterator it = s->begin(); it != s->end(); ++it)
     {
       guint32 str = fight.getModifiedStrengthBonus(*it);
-      addArmy(first, s, *it, str, idx, colour_id);
+      addArmy(first, s, *it, str, idx, color_id);
       if (first == true)
 	first = false;
       idx++;
-      colour_id = Shield::get_next_shield(colour_id);
-      if (colour_id == s->getOwner()->getId())
-        colour_id = Shield::get_next_shield(colour_id);
+      color_id = Shield::get_next_shield(color_id);
+      if (color_id == s->getOwner()->getId())
+        color_id = Shield::get_next_shield(color_id);
     }
 }
 
-void StackInfoDialog::addArmy (bool first, Stack *s, Army *h, guint32 modified_strength, guint32 idx, guint32 colour_id)
+void StackInfoDialog::addArmy (bool first, Stack *s, Army *h, guint32 modified_strength, guint32 idx, guint32 color_id)
 {
   ImageCache *gc = ImageCache::getInstance();
   Player *player = h->getOwner();
@@ -97,7 +97,7 @@ void StackInfoDialog::addArmy (bool first, Stack *s, Army *h, guint32 modified_s
   Gtk::ToggleButton *toggle = manage(new Gtk::ToggleButton);
   Glib::RefPtr<Gdk::Pixbuf> pixbuf= 
     gc->getCircledArmyPic(player->getArmyset(), h->getTypeId(), player, NULL,
-                          greyed_out, !greyed_out ? player->getId() : colour_id,
+                          greyed_out, !greyed_out ? player->getId() : color_id,
                           true,
                           FontSize::getInstance()->get_height ())->to_pixbuf();
   

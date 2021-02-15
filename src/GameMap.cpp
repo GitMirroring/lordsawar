@@ -1278,13 +1278,13 @@ void GameMap::reloadShieldset()
   if (shieldset)
     {
       Shieldsetlist::getInstance()->reload(shieldset->getId());
-      Playerlist::getInstance()->setNewColours(shieldset);
+      Playerlist::getInstance()->setNewColors(shieldset);
     }
 }
 
 void GameMap::switchShieldset(Shieldset *shieldset)
 {
-  Playerlist::getInstance()->setNewColours(shieldset);
+  Playerlist::getInstance()->setNewColors(shieldset);
   d_shieldset = shieldset->getBaseName();
   s_shieldset = Shieldsetlist::getInstance()->get(d_shieldset);
 }

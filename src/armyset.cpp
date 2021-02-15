@@ -70,7 +70,7 @@ Armyset::Armyset(guint32 id, Glib::ustring name)
     }
 }
 
-void Armyset::read_selector_name (XML_Helper *helper, Shield::Colour c, bool large)
+void Armyset::read_selector_name (XML_Helper *helper, Shield::Color c, bool large)
 {
   Glib::ustring name = "";
   if (c == Shield::NEUTRAL)
@@ -123,10 +123,10 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
   d_bag->load_name (helper, "bag");
 
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    read_selector_name (helper, Shield::Colour(i), true);
+    read_selector_name (helper, Shield::Color(i), true);
 
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-    read_selector_name (helper, Shield::Colour(i), false);
+    read_selector_name (helper, Shield::Color(i), false);
 
   helper->registerTag(ArmyProto::d_tag, 
 		      sigc::mem_fun((*this), &Armyset::loadArmyProto));
@@ -188,7 +188,7 @@ bool Armyset::save(Glib::ustring filename, Glib::ustring ext) const
   return saveTar(tmpfile, tmpfile + ".tar", goodfilename, extrafiles);
 }
 
-void Armyset::write_selector_name (XML_Helper *helper, Shield::Colour c, bool large) const
+void Armyset::write_selector_name (XML_Helper *helper, Shield::Color c, bool large) const
 {
   if (c == Shield::NEUTRAL)
     return;
@@ -225,10 +225,10 @@ bool Armyset::save(XML_Helper* helper) const
     retval &= helper->saveData("bag", d_bag->getName ());
 
     for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-      write_selector_name (helper, Shield::Colour(i), true);
+      write_selector_name (helper, Shield::Color(i), true);
 
     for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
-      write_selector_name (helper, Shield::Colour(i), false);
+      write_selector_name (helper, Shield::Color(i), false);
 
     for (const_iterator it = begin(); it != end(); ++it)
       (*it)->save(helper);
@@ -406,12 +406,12 @@ bool Armyset::validateStandard()
   return d_standard->getName () == "" ? false : true;
 }
 
-bool Armyset::validateArmyUnitImage(ArmyProto *army, Shield::Colour &c)
+bool Armyset::validateArmyUnitImage(ArmyProto *army, Shield::Color &c)
 {
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
-    if (army->getMaskedImage(Shield::Colour(i))->getName () == "")
+    if (army->getMaskedImage(Shield::Color(i))->getName () == "")
       {
-	c = Shield::Colour(i);
+	c = Shield::Color(i);
 	return false;
       }
   return true;
@@ -419,7 +419,7 @@ bool Armyset::validateArmyUnitImage(ArmyProto *army, Shield::Colour &c)
 
 bool Armyset::validateArmyUnitImages()
 {
-  Shield::Colour c;
+  Shield::Color c;
   for (iterator it = begin(); it != end(); ++it)
     {
       if (validateArmyUnitImage(*it, c) == false)
@@ -1011,14 +1011,14 @@ std::vector<TarFileMaskedImage*> Armyset::getMaskedImages ()
   std::vector<TarFileMaskedImage*> i;
   for (guint32 c = Shield::WHITE; c < Shield::NEUTRAL; c++)
     {
-      i.push_back (getSelector(true, Shield::Colour (c)));
-      i.push_back (getSelector(false, Shield::Colour (c)));
+      i.push_back (getSelector(true, Shield::Color (c)));
+      i.push_back (getSelector(false, Shield::Color (c)));
     }
   i.push_back (d_standard);
   i.push_back (d_stackship);
   for (iterator j = begin (); j != end (); ++j)
     for (guint32 c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
-      i.push_back ((*j)->getMaskedImage(Shield::Colour (c)));
+      i.push_back ((*j)->getMaskedImage(Shield::Color (c)));
   return i;
 }
 
@@ -1033,8 +1033,8 @@ guint32 Armyset::countSelectors () const
   guint32 count = 0;
   for (guint32 c = Shield::WHITE; c < Shield::NEUTRAL; c++)
     {
-      if (getSelector (true, Shield::Colour(c))->getName ().empty () == false &&
-          getSelector (false, Shield::Colour(c))->getName ().empty () == false)
+      if (getSelector (true, Shield::Color(c))->getName ().empty () == false &&
+          getSelector (false, Shield::Color(c))->getName ().empty () == false)
         count++;
     }
   return count;

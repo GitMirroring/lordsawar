@@ -30,15 +30,15 @@ class TarFile;
 //! Tar File Masked Picture Editor
 /**
  * This class doesn't actually edit the image, instead it shows the image
- * being edited in each player colour.  The user can pick a new file to be
+ * being edited in each player color.  The user can pick a new file to be
  * the new image.
  *
- * The shieldset is required to define the mask colours.
+ * The shieldset is required to define the mask colors.
  *
  * The underlying images have the top row as the image, and the bottom row as the mask.
  * In the case of vertical mask images, there are 8 frames one for each player
  * not including neutral.
- * But for horizontal mask images, there's only 1 frame, drawn in all colours
+ * But for horizontal mask images, there's only 1 frame, drawn in all colors
  * including neutral (9).
  *
  */

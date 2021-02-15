@@ -7,6 +7,6 @@ LordsAWar! version 0.3.3, a clone of the turn-based strategy game Warlords II, h
 * Army sets can have a different ship picture, and army unit selector for each player.
 * Added movement bonus graphics for swamp and mountains.  Tile sets now hold these graphics.
 * Cities can now have descriptions.
-* Players can have up to three colours which makes for more varied army graphics, etc.
+* Players can have up to three colors which makes for more varied army graphics, etc.
 
 Please consider donating to the LordsAWar project! See the donate button here: http://lordsawar.nongnu.org

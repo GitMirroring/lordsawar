@@ -35,7 +35,7 @@ class TarFileMaskedImage;
  * small, medium and large (ShieldStyle::Type).
  *
  * Every ShieldStyle object has an image and a mask.  The mask identifies the
- * portion of the ShieldStyle to shade in the Player's colour (Player::d_color).
+ * portion of the ShieldStyle to shade in the Player's color (Player::d_color).
  * The mask appears on the right side the shield image file.
  *
  */

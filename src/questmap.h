@@ -68,7 +68,7 @@ class QuestMap : public OverviewMap
     
  private:
 
-    //! Draw the given positions on the map in the colour of the given player.
+    //! Draw the given positions on the map in the color of the given player.
     void draw_stacks(Player *p, std::list< Vector<int> > targets);
 
     //! Draw a line to a boxed target.

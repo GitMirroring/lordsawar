@@ -77,38 +77,38 @@ HistoryReportDialog::HistoryReportDialog(Gtk::Window &parent, Player *p, History
   xml->get_widget("gold_alignment", gold_alignment);
   xml->get_widget("winner_alignment", winner_alignment);
 
-  Gdk::RGBA colour;
+  Gdk::RGBA color;
   for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
        pit != Playerlist::getInstance()->end(); ++pit)
     {
       if (*pit == Playerlist::getInstance()->getNeutral())
 	continue;
-      colour = (*pit)->getColor();
+      color = (*pit)->getColor();
       if (*pit == d_player)
-	d_colours.push_front(colour);
+	d_colors.push_front(color);
       else
-	d_colours.push_back(colour);
+	d_colors.push_back(color);
     }
 
   generatePastCityCounts();
-  city_chart = new LineChart(past_citycounts, d_colours, 
+  city_chart = new LineChart(past_citycounts, d_colors, 
                              Citylist::getInstance()->size(),
 			     _("Cities"), _("Turns"));
   city_alignment->add(*manage(city_chart));
 
   generatePastRuinCounts();
-  ruin_chart = new LineChart(past_ruincounts, d_colours, 
+  ruin_chart = new LineChart(past_ruincounts, d_colors, 
 			     Ruinlist::getInstance()->size(),
 			     _("Explored Ruins"), _("Turns"));
   ruin_alignment->add(*manage(ruin_chart));
 
   generatePastGoldCounts();
-  gold_chart = new LineChart(past_goldcounts, d_colours, 0, 
+  gold_chart = new LineChart(past_goldcounts, d_colors, 0, 
 			     _("Gold Pieces"), _("Turns"));
   gold_alignment->add(*manage(gold_chart));
 
   generatePastWinningCounts();
-  rank_chart = new LineChart(past_rankcounts, d_colours, 100,
+  rank_chart = new LineChart(past_rankcounts, d_colors, 100,
 			     _("Score"), _("Turns"));
   winner_alignment->add(*manage(rank_chart));
 

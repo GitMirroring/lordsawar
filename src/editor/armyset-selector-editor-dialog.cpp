@@ -94,8 +94,8 @@ void ArmysetSelectorEditorDialog::setup_owner_combobox(Gtk::Box *box)
 
   for (int i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
-      Shield::Colour c = Shield::Colour (i);
-      owner_combobox->append(Shield::colourToFriendlyName (c));
+      Shield::Color c = Shield::Color (i);
+      owner_combobox->append(Shield::colorToFriendlyName (c));
     }
 
   owner_combobox->set_active(0);
@@ -199,7 +199,7 @@ bool ArmysetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
 
 void ArmysetSelectorEditorDialog::show_preview_selectors()
 {
-  //load it up and show in the colours of the selected shield theme
+  //load it up and show in the colors of the selected shield theme
   clearSelector();
   if (loadSelector () == true)
     {
@@ -226,8 +226,8 @@ bool ArmysetSelectorEditorDialog::loadSelector()
 {
   TarFileMaskedImage *p = NULL;
   //which one, go get it according to owner
-  Shield::Colour o =
-    Shield::Colour (owner_combobox->get_active_row_number ());
+  Shield::Color o =
+    Shield::Color (owner_combobox->get_active_row_number ());
   if (large_selector_radiobutton->get_active() == true)
     {
       delete large_selector;
@@ -332,7 +332,7 @@ Gtk::FileChooserDialog* ArmysetSelectorEditorDialog::image_filechooser(bool clea
 
 TarFileMaskedImage * ArmysetSelectorEditorDialog::get_selector ()
 {
-  Shield::Colour c = get_selected_colour ();
+  Shield::Color c = get_selected_color ();
   if (large_selector_radiobutton->get_active() == true)
     return d_armyset->getSelector(true,c);
   else if (small_selector_radiobutton->get_active() == true)
@@ -347,7 +347,7 @@ Glib::ustring ArmysetSelectorEditorDialog::get_selector_filename ()
 
 void ArmysetSelectorEditorDialog::set_selector_filename (Glib::ustring f)
 {
-  Shield::Colour c = get_selected_colour ();
+  Shield::Color c = get_selected_color ();
   if (large_selector_radiobutton->get_active () == true)
     {
       if (f.empty () == false)
@@ -395,7 +395,7 @@ void ArmysetSelectorEditorDialog::on_selector_imagebutton_clicked ()
               Glib::ustring archive_member = get_selector_filename ();
               ArmySetSelectorEditorAction_Set *action =
                 new ArmySetSelectorEditorAction_Set (d_armyset,
-                                                     get_selected_colour (),
+                                                     get_selected_color (),
                                                      d_large, archive_member);
               if (on_image_chosen (d) == false) //false means not broken
                 umgr->add (action);
@@ -408,7 +408,7 @@ void ArmysetSelectorEditorDialog::on_selector_imagebutton_clicked ()
     {
       Glib::ustring archive_member = get_selector_filename ();
       ArmySetSelectorEditorAction_Set *action =
-        new ArmySetSelectorEditorAction_Set (d_armyset, get_selected_colour (),
+        new ArmySetSelectorEditorAction_Set (d_armyset, get_selected_color (),
                                              d_large, archive_member);
       if (d_armyset->removeFileInCfgFile(f))
         {
@@ -448,9 +448,9 @@ void ArmysetSelectorEditorDialog::on_owner_changed()
   update ();
 }
 
-Shield::Colour ArmysetSelectorEditorDialog::get_selected_colour ()
+Shield::Color ArmysetSelectorEditorDialog::get_selected_color ()
 {
-  return Shield::Colour (owner_combobox->get_active_row_number ());
+  return Shield::Color (owner_combobox->get_active_row_number ());
 }
 
 void ArmysetSelectorEditorDialog::on_undo_activated ()

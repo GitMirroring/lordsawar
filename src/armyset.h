@@ -116,7 +116,7 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         guint32 getMaxId() const;
 
         //! Returns the selector TarFileMaskedImage object
-        TarFileMaskedImage *getSelector(bool large, Shield::Colour c) const
+        TarFileMaskedImage *getSelector(bool large, Shield::Color c) const
           {return d_selector[large ? 1 : 0][c];}
 
 	//! Find an army with a type in this armyset.
@@ -154,7 +154,7 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 	bool validateStandard();
 	bool validateBag();
 	bool validateArmyUnitImages();
-	bool validateArmyUnitImage(ArmyProto *a, Shield::Colour &c);
+	bool validateArmyUnitImage(ArmyProto *a, Shield::Color &c);
 	bool validateArmyUnitNames();
 	bool validateArmyUnitName(ArmyProto *a);
 	bool validateArmyTypeIds();
@@ -194,8 +194,8 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         //! Callback function for the army tag (see XML_Helper)
         bool loadArmyProto(Glib::ustring tag, XML_Helper* helper);
 
-        void read_selector_name (XML_Helper *helper, Shield::Colour c, bool large);
-        void write_selector_name (XML_Helper *helper, Shield::Colour c, bool large) const;
+        void read_selector_name (XML_Helper *helper, Shield::Color c, bool large);
+        void write_selector_name (XML_Helper *helper, Shield::Color c, bool large) const;
         
 	//! The picture of an item when it's lying on the ground.
         TarFileImage *d_bag;

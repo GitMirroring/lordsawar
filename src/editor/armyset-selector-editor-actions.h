@@ -59,7 +59,7 @@ protected:
 class ArmySetSelectorEditorAction_Set: public ArmySetSelectorEditorAction
 {
     public:
-        ArmySetSelectorEditorAction_Set (TarFile *t, Shield::Colour c,
+        ArmySetSelectorEditorAction_Set (TarFile *t, Shield::Color c,
                                          bool large, Glib::ustring ar)
           : ArmySetSelectorEditorAction (SET), d_owner (c), d_large (large),
           d_member (ar)
@@ -91,10 +91,10 @@ class ArmySetSelectorEditorAction_Set: public ArmySetSelectorEditorAction
         Glib::ustring getArchiveMember () const {return d_member;}
         Glib::ustring getFileName () const {return d_filename;}
 
-        Shield::Colour getOwner () const {return d_owner;}
+        Shield::Color getOwner () const {return d_owner;}
         bool getLarge () const {return d_large;}
     private:
-        Shield::Colour d_owner;
+        Shield::Color d_owner;
         bool d_large;
         Glib::ustring d_member;
         Glib::ustring d_filename;
