@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ class ArmyBonusDialog: public LwDialog
 
  private:
     Gtk::TreeView *armies_treeview;
+    Gtk::ButtonBox *button_box;
 
     class ArmiesColumns: public Gtk::TreeModelColumnRecord {
     public:
@@ -51,8 +52,11 @@ class ArmyBonusDialog: public LwDialog
     const ArmiesColumns armies_columns;
     Glib::RefPtr<Gtk::ListStore> armies_list;
  private:
-    void addArmyType(guint32 army_type);
+    void addArmyType(Player *p, guint32 army_type);
     Player *d_player; //show armies in this player's colour
+
+    void on_button_toggled (Player *p);
+    void fill_armies (Player *p);
 };
 
 #endif
