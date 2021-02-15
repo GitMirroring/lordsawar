@@ -2,8 +2,8 @@
 // Copyright (C) 2003 Michael Bartl
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2017,
-// 2020 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2017, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -234,11 +234,11 @@ void CreateScenario::setHeight(int height)
 }
 
 Player* CreateScenario::addPlayer(Glib::ustring name, guint32 armyset,
-                                Gdk::RGBA color, int type)
+                                std::vector<Gdk::RGBA> colors, int type)
 {
     debug("CreateScenario::addPlayer")
 
-    Player* p = Player::create(name, armyset, color, d_width, d_height,
+    Player* p = Player::create(name, armyset, colors, d_width, d_height,
 			       Player::Type(type));
     Playerlist::getInstance()->add(p);
 
@@ -246,13 +246,13 @@ Player* CreateScenario::addPlayer(Glib::ustring name, guint32 armyset,
 }
 
 bool CreateScenario::addNeutral(Glib::ustring name, guint32 armyset,
-                                Gdk::RGBA color, int type)
+                                std::vector<Gdk::RGBA> colors, int type)
 {
     // for consistency, we only allow exactly one neutral player
     if (Playerlist::getInstance()->getNeutral() != 0)
         return false;
 
-    Player* p = addPlayer(name, armyset, color, Player::Type(type));
+    Player* p = addPlayer(name, armyset, colors, Player::Type(type));
     Playerlist::getInstance()->setNeutral(p);
     return true;
 }

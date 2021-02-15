@@ -1,5 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020,
+//  2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -591,14 +592,14 @@ Glib::ustring NewRandomMapDialog::create_and_dump_scenario(const Glib::ustring &
     else
       type = Player::HUMAN;
 
-    creator.addPlayer(i->name, army_id, ssl->getColor(id, i->id), type);
+    creator.addPlayer(i->name, army_id, ssl->getColors(id, i->id), type);
   }
 
 
   CreateScenarioRandomize random;
   // the neutral player must come last so it has the highest id among players
   creator.addNeutral(random.getPlayerName(Shield::NEUTRAL), army_id, 
-                     ssl->getColor(id, MAX_PLAYERS), Player::AI_DUMMY);
+                     ssl->getColors(id, MAX_PLAYERS), Player::AI_DUMMY);
 
   // now fill in some map information
   creator.setMapTiles(g.tile_theme);

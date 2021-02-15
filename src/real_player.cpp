@@ -40,9 +40,10 @@
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
-RealPlayer::RealPlayer(Glib::ustring name, guint32 armyset, Gdk::RGBA color, 
-                       int width, int height, Player::Type type, int player_no)
-    :Player(name, armyset, color, width, height, type, player_no),
+RealPlayer::RealPlayer(Glib::ustring name, guint32 armyset,
+                       std::vector<Gdk::RGBA> colors, int width, int height,
+                       Player::Type type, int player_no)
+    :Player(name, armyset, colors, width, height, type, player_no),
     d_abort_requested(false)
 {
 }

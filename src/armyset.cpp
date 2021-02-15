@@ -51,22 +51,22 @@ Armyset::Armyset(guint32 id, Glib::ustring name)
   d_stackship =
     new TarFileMaskedImage
     (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+     PixMask::DIMENSION_WIDTH_IS_FIXED_MAX_PLAYERS);
   d_standard =
     new TarFileMaskedImage 
     (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+     PixMask::DIMENSION_WIDTH_IS_FIXED_MAX_PLAYERS);
   d_bag = new TarFileImage (1, PixMask::DIMENSION_SAME_HEIGHT_AND_WIDTH);
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
       d_selector[0][i] =
         new TarFileMaskedImage
         (TarFileMaskedImage::VERTICAL_MASK,
-         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
       d_selector[1][i] =
         new TarFileMaskedImage
         (TarFileMaskedImage::VERTICAL_MASK,
-         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
     }
 }
 
@@ -91,7 +91,7 @@ void Armyset::read_selector_name (XML_Helper *helper, Shield::Colour c, bool lar
     name += "_large_selector";
   else
     name += "_small_selector";
-  d_selector[large ? 1 : 0][c]->load_name (helper, name);
+  d_selector[large ? 1 : 0][c]->load (helper, name, name + "_num_masks");
 
 }
 
@@ -100,26 +100,26 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
 {
   d_stackship = new TarFileMaskedImage
     (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+     PixMask::DIMENSION_WIDTH_IS_FIXED_MAX_PLAYERS);
   d_standard = new TarFileMaskedImage
     (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+     PixMask::DIMENSION_WIDTH_IS_FIXED_MAX_PLAYERS);
   d_bag = new TarFileImage (1, PixMask::DIMENSION_SAME_HEIGHT_AND_WIDTH);
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     {
       d_selector[0][i] = new TarFileMaskedImage
         (TarFileMaskedImage::VERTICAL_MASK,
-         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
       d_selector[1][i] = new TarFileMaskedImage
         (TarFileMaskedImage::VERTICAL_MASK,
-         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+         PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
     }
 
   guint32 ts;
   helper->getData(ts, "tilesize");
   setTileSize(ts);
-  d_stackship->load_name (helper, "stackship");
-  d_standard->load_name (helper, "plantedstandard");
+  d_stackship->load (helper, "stackship", "stackship_num_masks");
+  d_standard->load (helper, "plantedstandard", "plantedstandard_num_masks");
   d_bag->load_name (helper, "bag");
 
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
@@ -209,7 +209,7 @@ void Armyset::write_selector_name (XML_Helper *helper, Shield::Colour c, bool la
     name += "_large_selector";
   else
     name += "_small_selector";
-  helper->saveData(name, d_selector[large ? 1 : 0][c]->getName ());
+  d_selector[large ? 1 : 0][c]->save (helper, name, name + "_num_masks");
 }
 
 bool Armyset::save(XML_Helper* helper) const
@@ -220,8 +220,8 @@ bool Armyset::save(XML_Helper* helper) const
 
     retval &= Set::save(helper);
     retval &= helper->saveData("tilesize", getUnscaledTileSize());
-    retval &= helper->saveData("stackship", d_stackship->getName ());
-    retval &= helper->saveData("plantedstandard", d_standard->getName ());
+    retval &= d_stackship->save (helper, "stackship", "stackship_num_masks");
+    retval &= d_standard->save (helper, "plantedstandard", "plantedstandard_num_masks");
     retval &= helper->saveData("bag", d_bag->getName ());
 
     for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
@@ -948,6 +948,9 @@ void Armyset::support_backward_compatibility()
                                           d_tag, true);
   FileCompat::getInstance()->support_version
     (FileCompat::ARMYSET, "0.2.1", "0.3.0",
+     sigc::ptr_fun(&Armyset::upgrade));
+  FileCompat::getInstance()->support_version
+    (FileCompat::ARMYSET, "0.3.0", "0.3.3",
      sigc::ptr_fun(&Armyset::upgrade));
 }
 

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class Shieldsetlist : public SetList<Shieldset>, public sigc::trackable
         //! Returns the names of all Shieldset objects available to the game.
 	std::list<Glib::ustring> getValidNames() const;
 
-	Gdk::RGBA getColor(guint32 shieldset, guint32 owner) const;
+        std::vector<Gdk::RGBA> getColors(guint32 shieldset, guint32 owner) const;
 
 
 	// Methods that operate on the class data and modify the class.

@@ -1,4 +1,5 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020,
+//  2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -33,22 +34,22 @@ Glib::ustring Shield::d_tag = "shield";
 Shield::Shield(XML_Helper* helper)
 {
   helper->getData(d_owner, "owner");
-  helper->getData(d_color, "color");
+  helper->getData(d_colors, "color");
 }
 
 Shield::Shield(const Shield& s)
 : std::list<ShieldStyle*>(), Tartan(s), sigc::trackable(s), d_owner(s.d_owner),
-    d_color(s.d_color)
+    d_colors(s.d_colors)
 {
   for (const_iterator it = s.begin(); it != s.end(); ++it)
     push_back(new ShieldStyle(*(*it)));
 }
 
-Shield::Shield(Shield::Colour owner, Gdk::RGBA color)
+Shield::Shield(Shield::Colour owner, std::vector<Gdk::RGBA> colors)
 :Tartan()
 {
   d_owner = guint32(owner);
-  d_color = color;
+  d_colors = colors;
 }
 
 Shield::~Shield()
@@ -57,7 +58,7 @@ Shield::~Shield()
       delete *it;
 }
 
-Gdk::RGBA Shield::get_default_color_for_no(int player_no)
+std::vector<Gdk::RGBA> Shield::get_default_colors_for_no(int player_no)
 {
   Gdk::RGBA c;
   switch (player_no % MAX_PLAYERS)
@@ -74,14 +75,18 @@ Gdk::RGBA Shield::get_default_color_for_no(int player_no)
     case Shield::BLACK: c.set_rgba(0,0,0); break;
     }
     
-    return c;
+    std::vector<Gdk::RGBA> l;
+    l.push_back (c);
+    return l;
 }
 
-Gdk::RGBA Shield::get_default_color_for_neutral()
+std::vector<Gdk::RGBA> Shield::get_default_colors_for_neutral()
 {
   Gdk::RGBA color;
   color.set_rgba(204.0/255.0,204.0/255.0,204.0/255.0);
-  return color;
+  std::vector<Gdk::RGBA> l;
+  l.push_back (color);
+  return l;
 }
 
 Glib::ustring Shield::colourToString(const Shield::Colour c)
@@ -124,7 +129,7 @@ bool Shield::save(XML_Helper *helper) const
 
   retval &= helper->openTag(d_tag);
   retval &= helper->saveData("owner", d_owner);
-  retval &= helper->saveData("color", d_color);
+  retval &= helper->saveData("color", d_colors);
   for (const_iterator it = begin(); it != end(); ++it)
     (*it)->save(helper);
   retval &= saveTartan(helper);

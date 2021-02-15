@@ -51,9 +51,9 @@ class RealPlayer : public Player
     public:
 
 	//! Default constructor.
-        RealPlayer(Glib::ustring name, guint32 armyset, Gdk::RGBA color, 
-		   int width, int height, Player::Type type = Player::HUMAN, 
-		   int player_no = -1);
+        RealPlayer(Glib::ustring name, guint32 armyset,
+                   std::vector<Gdk::RGBA> colors, int width, int height,
+                   Player::Type type = Player::HUMAN, int player_no = -1);
 
 	//! Copy constructor.
         RealPlayer(const Player&, bool sync_ids = false);

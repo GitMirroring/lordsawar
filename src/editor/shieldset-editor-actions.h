@@ -38,8 +38,8 @@ class ShieldSetEditorAction: public UndoAction
 
 	//! A ShieldSet Editor Action can be one of the following kinds.
         enum Type {
-	        /** Modify a player's shield colour. */
-                CHANGE_COLOR = 1,
+	        /** Modify a player's shield colours. */
+                CHANGE_COLORS = 1,
 	        /** Modify description/copyright/license. */
                 CHANGE_PROPERTIES = 2,
 	        /** Modify the non white shields to be the same as white. */
@@ -62,34 +62,44 @@ class ShieldSetEditorAction: public UndoAction
         Type d_type;
 };
 
+class ShieldSetEditorAction_ShieldIndex: public ShieldSetEditorAction
+{
+    public:
+        ShieldSetEditorAction_ShieldIndex (Type t, guint32 i, bool agg = false)
+          : ShieldSetEditorAction (t, agg ? UndoAction::AGGREGATE_DELAY : UndoAction::AGGREGATE_NONE), d_index (i) {}
+        ~ShieldSetEditorAction_ShieldIndex () {}
+
+        guint32 getIndex () {return d_index;}
+    private:
+        guint32 d_index;
+};
 //-----------------------------------------------------------------------------
 
-//! A record of the player's color changing in the shieldset editor.
+//! A record of the player's colors changing in the shieldset editor.
 /**
  * The purpose of the ShieldSetEditorAction_Color class is to record
- * when a player's color has been modified.
+ * when a player's colors have been modified.
  */
-class ShieldSetEditorAction_Color: public ShieldSetEditorAction
+class ShieldSetEditorAction_Colors: public ShieldSetEditorAction_ShieldIndex
 {
     public:
 	//! Make a new change color action
 	/**
-         * Populate the change color action with the player id and a color.
+         * Populate the change color action with the player id and the
+         * set of colors.
          */
-        ShieldSetEditorAction_Color (guint32 id, Gdk::RGBA c)
-          : ShieldSetEditorAction(ShieldSetEditorAction::CHANGE_COLOR),
-          d_player_id (id), d_color (c) {}
+        ShieldSetEditorAction_Colors (guint32 id, std::vector<Gdk::RGBA> c)
+          : ShieldSetEditorAction_ShieldIndex(CHANGE_COLORS, id),
+          d_colors (c) {}
 	//! Destroy a change color action.
-        ~ShieldSetEditorAction_Color () {}
+        ~ShieldSetEditorAction_Colors () {}
 
         Glib::ustring getActionName () const {return _("Color");}
 
-        guint32 getPlayerId () const {return d_player_id;}
-        Gdk::RGBA getColor () const {return d_color;}
+        std::vector<Gdk::RGBA> getColors () const {return d_colors;}
 
     private:
-        guint32 d_player_id;
-        Gdk::RGBA d_color;
+        std::vector<Gdk::RGBA> d_colors;
 };
 
 //-----------------------------------------------------------------------------

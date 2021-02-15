@@ -2,18 +2,21 @@
 <tileset version="0.3.3">
     <d_id>3</d_id>
     <_d_name>Stark</_d_name>
-    <d_copyright>Copyright (C) 2007, 2009 Ben Asselstine</d_copyright>
+    <d_copyright>Copyright (C) 2007, 2009, 2021 Ben Asselstine</d_copyright>
     <d_license>Licensed under the GPL Version 3 or later at your option.</d_license>
     <_d_info>A stark and simple tileset</_d_info>
     <d_tilesize>40</d_tilesize>
     <d_large_selector>selector</d_large_selector>
+    <d_large_selector_num_masks>1</d_large_selector_num_masks>
     <d_small_selector>small_selector</d_small_selector>
+    <d_small_selector_num_masks>1</d_small_selector_num_masks>
     <d_explosion>explosion</d_explosion>
     <d_roads>roads</d_roads>
     <d_standing_stones>stones</d_standing_stones>
     <d_bridges>bridges</d_bridges>
     <d_fog>fog</d_fog>
     <d_flags>flags</d_flags>
+    <d_flags_num_masks>1</d_flags_num_masks>
     <d_movebonus_all>flight_movebonus</d_movebonus_all>
     <d_movebonus_water>water_movebonus</d_movebonus_water>
     <d_movebonus_forest>forest_movebonus</d_movebonus_forest>

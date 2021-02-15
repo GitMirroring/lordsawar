@@ -73,15 +73,16 @@ class AI_Smart : public RealPlayer
          *
          * @param name         The name of the player.
          * @param armyset      The Id of the player's Armyset.
-         * @param color        The player's colour.
+         * @param colors       The player's colours.
 	 * @param width        The width of the player's FogMap.
 	 * @param height       The height of the player's FogMap.
 	 * @param player_no    The Id of the player.  If this value is -1,
 	 *                     the next free Id it used.
          */
 	//! Default constructor.
-        AI_Smart(Glib::ustring name, guint32 armyset, Gdk::RGBA color, 
-		 int width, int height, int player_no = -1);
+        AI_Smart(Glib::ustring name, guint32 armyset,
+                 std::vector<Gdk::RGBA> colors, int width, int height,
+                 int player_no = -1);
 
         //! Copy constructor.
         AI_Smart(const Player&, bool sync_ids = false);

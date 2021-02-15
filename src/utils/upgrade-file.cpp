@@ -1,4 +1,4 @@
-// Copyright (C) 2011, 2014 Ben Asselstine
+// Copyright (C) 2011, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@
 #include "ucompose.hpp"
 #include "file-compat.h"
 #include "armyset.h"
+#include "shieldset.h"
+#include "tileset.h"
 
 int max_vector_width;
 
@@ -72,6 +74,8 @@ int main(int argc, char* argv[])
 
   bool same_version = false;
   Armyset::support_backward_compatibility();
+  Shieldset::support_backward_compatibility();
+  Tileset::support_backward_compatibility();
   Profilelist::support_backward_compatibility();
   RecentlyPlayedGameList::support_backward_compatibility();
   Gamelist::support_backward_compatibility();

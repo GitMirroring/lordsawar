@@ -34,6 +34,7 @@
 #include "timed-message-dialog.h"
 #include "TarFileMaskedImage.h"
 #include "tileset-selector-editor-actions.h"
+#include "mask-validation-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &TilesetSelectorEditorDialog::x)
 
@@ -116,43 +117,53 @@ bool TilesetSelectorEditorDialog::on_image_chosen (Gtk::FileChooserDialog *d)
   bool broken = false;
   if (PixMask::checkFormat (d->get_filename ()))
     {
-      if (d_tileset->getSelector (d_large)->checkDimension (d->get_filename ()))
+      d->hide ();
+      MaskValidationDialog v
+        (*dialog, d->get_filename (),
+         d_tileset->getSelector (d_large)->getMaskOrientation ());
+
+      int resp = v.run ();
+      if (resp == Gtk::RESPONSE_ACCEPT)
         {
-          Glib::ustring imgname = get_selector_filename ();
-          Glib::ustring newname = "";
-          bool success = false;
-          if (imgname.empty() == true)
-            success = d_tileset->addFileInCfgFile(d->get_filename(), newname);
-          else
-            success = d_tileset->replaceFileInCfgFile (imgname,
-                                                       d->get_filename(),
-                                                       newname);
-          if (success)
+          d_tileset->getSelector (d_large)->setNumMasks (v.get_num_masks ());
+          if (d_tileset->getSelector (d_large)->checkDimension (d->get_filename ()))
             {
-              set_selector_filename (newname);
-              d_changed = true;
-              update ();
+              Glib::ustring imgname = get_selector_filename ();
+              Glib::ustring newname = "";
+              bool success = false;
+              if (imgname.empty() == true)
+                success = d_tileset->addFileInCfgFile(d->get_filename(), newname);
+              else
+                success = d_tileset->replaceFileInCfgFile (imgname,
+                                                           d->get_filename(),
+                                                           newname);
+              if (success)
+                {
+                  set_selector_filename (newname);
+                  d_changed = true;
+                  update ();
+                }
+              else
+                {
+                  Glib::ustring errmsg = Glib::strerror(errno);
+                  TimedMessageDialog
+                    td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
+                                            d->get_filename (),
+                                            d_tileset->getConfigurationFile(),
+                                            errmsg), 0);
+                  td.run_and_hide ();
+                  broken = true;
+                }
             }
           else
             {
               Glib::ustring errmsg = Glib::strerror(errno);
               TimedMessageDialog
-                td(*d, String::ucompose(_("Couldn't add %1 to :\n%2\n%3"),
-                                        d->get_filename (),
-                                        d_tileset->getConfigurationFile(),
-                                        errmsg), 0);
+                td(*d, String::ucompose(_("Bad dimensions in image:\n%1"),
+                                        d->get_filename ()), 0);
               td.run_and_hide ();
               broken = true;
             }
-        }
-      else
-        {
-          Glib::ustring errmsg = Glib::strerror(errno);
-          TimedMessageDialog
-            td(*d, String::ucompose(_("Bad dimensions in image:\n%1"),
-                                    d->get_filename ()), 0);
-          td.run_and_hide ();
-          broken = true;
         }
     }
   else
@@ -232,7 +243,7 @@ bool TilesetSelectorEditorDialog::loadSelector()
         {
           if ((*sit)->getOwner() == 8) //ignore neutral
             continue;
-          PixMask *q = p->applyMask (i, (*sit)->getColor ());
+          PixMask *q = p->applyMask (i, (*sit)->getColors ());
           double ratio = EDITOR_DIALOG_TILE_PIC_FONTSIZE_MULTIPLE;
           int font_size = FontSize::getInstance()->get_height ();
           double new_height = font_size * ratio;

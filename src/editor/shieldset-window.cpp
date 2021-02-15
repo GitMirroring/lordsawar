@@ -46,6 +46,8 @@
 #include "image-file-filter.h"
 #include "timed-message-dialog.h"
 #include "TarFileMaskedImage.h"
+#include "tar-file-masked-image-editor-dialog.h"
+#include "mask-validation-dialog.h"
 
 Glib::ustring no_shield_msg = N_("No image set");
 Glib::ustring no_tartan_msg = N_("No image set");
@@ -119,6 +121,12 @@ ShieldSetWindow::ShieldSetWindow(Glib::ustring load_filename)
       (sigc::bind(method(on_tartanpic_changed), Tartan::RIGHT));
     xml->get_widget ("player_colorbutton", player_colorbutton);
     player_colorbutton->signal_color_set().connect(method(on_player_color_changed));
+    xml->get_widget ("player_2ndcolorbutton", player_2ndcolorbutton);
+    player_2ndcolorbutton->signal_color_set().connect(method(on_player_2nd_color_changed));
+    xml->get_widget ("player_3rdcolorbutton", player_3rdcolorbutton);
+    player_3rdcolorbutton->signal_color_set().connect(method(on_player_3rd_color_changed));
+    xml->get_widget ("colour_spinbutton", colour_spinbutton);
+    colour_spinbutton->set_range (double(1), double(3));
 
     xml->get_widget ("small_image", small_image);
     xml->get_widget ("medium_image", medium_image);
@@ -210,10 +218,10 @@ bool ShieldSetWindow::make_new_shieldset ()
   shields_list->clear();
   for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
-      Gdk::RGBA colour = Shield::get_default_color_for_no(i);
+      std::vector<Gdk::RGBA> colours = Shield::get_default_colors_for_no(i);
       if (i == Shield::NEUTRAL)
-        colour = Shield::get_default_color_for_neutral();
-      Shield *shield = new Shield(Shield::Colour(i), colour);
+        colours = Shield::get_default_colors_for_neutral();
+      Shield *shield = new Shield(Shield::Colour(i), colours);
       if (shield)
         {
           shield->push_back(new ShieldStyle(ShieldStyle::SMALL));
@@ -709,7 +717,7 @@ void ShieldSetWindow::show_tartan (Shield *s, Tartan::Type t, Gtk::Image *image)
       image->clear();
       return;
     }
-  PixMask *i = s->getTartanMaskedImage (t)->applyMask (s->getColor ());
+  PixMask *i = s->getTartanMaskedImage (t)->applyMask (s->getColors ());
   double ratio = DIALOG_TARTAN_PIC_FONTSIZE_MULTIPLE;
   double new_height = FontSize::getInstance()->get_height () * ratio;
   int new_width =
@@ -731,7 +739,7 @@ void ShieldSetWindow::show_shield(ShieldStyle *ss, Shield *s, Gtk::Image *image)
       image->clear();
       return;
     }
-  PixMask *i = ss->getMaskedImage ()->applyMask (s->getColor ());
+  PixMask *i = ss->getMaskedImage ()->applyMask (s->getColors ());
   double ratio = 1.0;
   switch (ss->getType ())
     {
@@ -762,29 +770,42 @@ void ShieldSetWindow::fill_shield_info(Shield*shield)
 {
   if (shield)
     {
-      player_colorbutton->set_rgba(shield->getColor());
+      Gdk::RGBA black = Gdk::RGBA("black");
+      player_colorbutton->set_rgba(shield->getColors()[0]);
+      if (shield->getColors ().size () >= 2)
+        player_2ndcolorbutton->set_rgba(shield->getColors ()[1]);
+      else
+        player_2ndcolorbutton->set_rgba(black);
+      if (shield->getColors ().size () >= 3)
+        player_3rdcolorbutton->set_rgba(shield->getColors()[2]);
+      else
+        player_3rdcolorbutton->set_rgba(black);
+      int num = shield->getColors ().size ();
+      colour_spinbutton->set_value (num);
+      player_2ndcolorbutton->set_sensitive (num >= 2);
+      player_3rdcolorbutton->set_sensitive (num >= 3);
       Glib::ustring s;
       ShieldStyle* ss = shield->getFirstShieldstyle(ShieldStyle::SMALL);
       if (ss && ss->getMaskedImage()->getName().empty() == false)
-	s = ss->getMaskedImage()->getName();
+        s = ss->getMaskedImage()->getName();
       else
-	s = no_shield_msg;
+        s = no_shield_msg;
       show_shield(ss, shield, small_image);
       change_smallpic_button->set_label(s);
 
       ss = shield->getFirstShieldstyle(ShieldStyle::MEDIUM);
       if (ss && ss->getMaskedImage()->getName().empty() == false)
-	s = ss->getMaskedImage()->getName();
+        s = ss->getMaskedImage()->getName();
       else
-	s = no_shield_msg;
+        s = no_shield_msg;
       change_mediumpic_button->set_label(s);
       show_shield(ss, shield, medium_image);
 
       ss = shield->getFirstShieldstyle(ShieldStyle::LARGE);
       if (ss && ss->getMaskedImage()->getName().empty() == false)
-	s = ss->getMaskedImage()->getName();
+        s = ss->getMaskedImage()->getName();
       else
-	s = no_shield_msg;
+        s = no_shield_msg;
       change_largepic_button->set_label(s);
       show_shield(ss, shield, large_image);
 
@@ -930,11 +951,34 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
             ImageFileFilter::getInstance()->showErrorDialog (d);
           else
             {
-              bool broken = false;
-              PixMask *p = PixMask::create (d->get_filename (), broken);
-              if (p)
-                delete p;
-              if (broken)
+              if (PixMask::checkFormat (d->get_filename ()))
+                {
+                  d->hide ();
+                  PastChooser::getInstance()->set_dir(d);
+                  MaskValidationDialog v
+                    (*window, d->get_filename (),
+                     ss->getMaskedImage()->getMaskOrientation ());
+                  int resp = v.run ();
+                  if (resp == Gtk::RESPONSE_ACCEPT)
+                    {
+                      ss->getMaskedImage()->setNumMasks (v.get_num_masks ());
+                      if (ss->getMaskedImage ()->checkDimension
+                          (d->get_filename ()))
+                        {
+                          process_shieldstyle(ss, d);
+                          d_shieldset->setHeightsAndWidthsFromImages(ss);
+                          update_shield_panel();
+                        }
+                      else
+                        {
+                          TimedMessageDialog td
+                            (*d, String::ucompose(_("Bad dimensions in image:\n%1"),
+                                                  d->get_filename ()), 0);
+                          td.run_and_hide ();
+                        }
+                    }
+                }
+              else
                 {
                   TimedMessageDialog
                     td (*d,
@@ -943,13 +987,6 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
                          d->get_filename ()), 0);
                   td.run_and_hide();
                 }
-              else
-                {
-                  PastChooser::getInstance()->set_dir(d);
-                  process_shieldstyle(ss, d);
-                  d_shieldset->setHeightsAndWidthsFromImages(ss);
-                }
-              update_shield_panel();
             }
 	}
       else if (response == Gtk::RESPONSE_REJECT && f != "")
@@ -981,6 +1018,18 @@ void ShieldSetWindow::on_shieldpic_changed(ShieldStyle::Type type)
     }
 }
 
+std::vector<Gdk::RGBA> ShieldSetWindow::get_current_colours ()
+{
+  std::vector<Gdk::RGBA> list;
+  if (colour_spinbutton->get_value () >= 1)
+    list.push_back (player_colorbutton->get_rgba ());
+  if (colour_spinbutton->get_value () >= 2)
+    list.push_back (player_2ndcolorbutton->get_rgba ());
+  if (colour_spinbutton->get_value () >= 3)
+    list.push_back (player_3rdcolorbutton->get_rgba ());
+  return list;
+}
+
 void ShieldSetWindow::on_player_color_changed()
 {
   Gtk::TreeModel::iterator iterrow =
@@ -990,10 +1039,50 @@ void ShieldSetWindow::on_player_color_changed()
     {
       Gtk::TreeModel::Row row = *iterrow;
       Shield *s = row[shields_columns.shield];
-      ShieldSetEditorAction_Color *action = 
-        new ShieldSetEditorAction_Color (s->getOwner (), s->getColor ());
+      ShieldSetEditorAction_Colors *action = 
+        new ShieldSetEditorAction_Colors (s->getOwner (), s->getColors ());
       addUndo (action);
-      s->setColor(player_colorbutton->get_rgba ());
+      s->setColors(get_current_colours ());
+      update_shield_panel();
+      update_menuitems ();
+      shieldset_modified = true;
+      update_window_title();
+    }
+}
+
+void ShieldSetWindow::on_player_2nd_color_changed()
+{
+  Gtk::TreeModel::iterator iterrow =
+    shields_treeview->get_selection()->get_selected();
+
+  if (iterrow)
+    {
+      Gtk::TreeModel::Row row = *iterrow;
+      Shield *s = row[shields_columns.shield];
+      ShieldSetEditorAction_Colors *action = 
+        new ShieldSetEditorAction_Colors (s->getOwner (), s->getColors ());
+      addUndo (action);
+      s->setColors(get_current_colours ());
+      update_shield_panel();
+      update_menuitems ();
+      shieldset_modified = true;
+      update_window_title();
+    }
+}
+
+void ShieldSetWindow::on_player_3rd_color_changed()
+{
+  Gtk::TreeModel::iterator iterrow =
+    shields_treeview->get_selection()->get_selected();
+
+  if (iterrow)
+    {
+      Gtk::TreeModel::Row row = *iterrow;
+      Shield *s = row[shields_columns.shield];
+      ShieldSetEditorAction_Colors *action = 
+        new ShieldSetEditorAction_Colors (s->getOwner (), s->getColors ());
+      addUndo (action);
+      s->setColors(get_current_colours ());
       update_shield_panel();
       update_menuitems ();
       shieldset_modified = true;
@@ -1145,29 +1234,46 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
       int response = d->run();
       if (response == Gtk::RESPONSE_ACCEPT && d->get_filename() != "")
         {
+          d->hide ();
           if (ImageFileFilter::getInstance()->hasInvalidExt(d->get_filename()))
-            ImageFileFilter::getInstance ()->showErrorDialog (d);
+            ImageFileFilter::getInstance()->showErrorDialog (d);
           else
             {
-              bool broken = false;
-              PixMask *p = PixMask::create (d->get_filename (), broken);
-              if (p)
-                delete p;
-              if (broken)
+              if (PixMask::checkFormat (d->get_filename ()))
+                {
+                  PastChooser::getInstance()->set_dir(d);
+                  MaskValidationDialog v
+                    (*window, d->get_filename (),
+                     shield->getTartanMaskedImage(type)->getMaskOrientation ());
+                  int resp = v.run ();
+                  if (resp == Gtk::RESPONSE_ACCEPT)
+                    {
+                      if (shield->getTartanMaskedImage (type)->checkDimension
+                          (d->get_filename ()))
+                        {
+                          shield->getTartanMaskedImage(type)->setNumMasks
+                            (v.get_num_masks ());
+                          process_tartanpic (type, shield, d->get_filename ());
+                          update_shield_panel();
+                        }
+                      else
+                        {
+                          TimedMessageDialog td
+                            (*d, String::ucompose(_("Bad dimensions in image:\n%1"),
+                                                  d->get_filename ()), 0);
+                          td.run_and_hide ();
+                        }
+                    }
+                }
+              else
                 {
                   TimedMessageDialog
                     td (*d,
                         String::ucompose
                         (_("Couldn't make sense of the image:\n%1"),
                          d->get_filename ()), 0);
-                  td.run_and_hide ();
+                  td.run_and_hide();
                 }
-              else
-                {
-                  PastChooser::getInstance()->set_dir(d);
-                  process_tartanpic (type, shield, d);
-                }
-              update_shield_panel();
             }
         }
       else if (response == Gtk::RESPONSE_REJECT)
@@ -1188,7 +1294,7 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
               delete action;
               Glib::ustring errmsg = Glib::strerror(errno);
               TimedMessageDialog
-                td(*d, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
+                td(*window, String::ucompose(_("Couldn't remove %1 from:\n%2\n%3"),
                                         file, d_shieldset->getConfigurationFile(),
                                         errmsg), 0);
               td.run_and_hide ();
@@ -1196,11 +1302,10 @@ void ShieldSetWindow::on_tartanpic_changed (Tartan::Type type)
           update ();
         }
       d->hide();
-      delete d;
     }
 }
 
-void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk::FileChooserDialog *d)
+void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Glib::ustring filename)
 {
   ShieldSetEditorAction_AddImage *action =
     new ShieldSetEditorAction_AddImage (d_shieldset);
@@ -1209,9 +1314,9 @@ void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk:
   Glib::ustring f = shield->getTartanMaskedImage(type)->getName ();
   bool ret = false;
   if (f == "")
-    ret = d_shieldset->addFileInCfgFile(d->get_filename(), newname);
+    ret = d_shieldset->addFileInCfgFile(filename, newname);
   else
-    ret = d_shieldset->replaceFileInCfgFile(f, d->get_filename(), newname);
+    ret = d_shieldset->replaceFileInCfgFile(f, filename, newname);
   if (ret == true)
     {
       addUndo (action);
@@ -1227,9 +1332,9 @@ void ShieldSetWindow::process_tartanpic (Tartan::Type type, Shield *shield, Gtk:
       delete action;
       Glib::ustring errmsg = Glib::strerror(errno);
       TimedMessageDialog
-        td(*d, String::ucompose(_("Couldn't add %1 to:\n%2\n%3"),
-                               d->get_filename (),
-                               d_shieldset->getConfigurationFile(), errmsg),
+        td(*window, String::ucompose(_("Couldn't add %1 to:\n%2\n%3"),
+                                     filename,
+                                     d_shieldset->getConfigurationFile(), errmsg),
            0);
       td.run_and_hide ();
     }
@@ -1241,6 +1346,35 @@ void ShieldSetWindow::on_tutorial_video_activated()
   gtk_show_uri(window->get_screen()->gobj(),
                "http://vimeo.com/406882053", 0, &errs);
   return;
+}
+
+void ShieldSetWindow::on_num_colours_text_changed()
+{
+  colour_spinbutton->set_value(atoi(colour_spinbutton->get_text().c_str()));
+  on_num_colours_changed();
+}
+
+void ShieldSetWindow::on_num_colours_changed()
+{
+  Glib::RefPtr<Gtk::TreeSelection> selection = shields_treeview->get_selection();
+  Gtk::TreeModel::iterator iterrow = selection->get_selected();
+
+  if (iterrow)
+    {
+      Gtk::TreeModel::Row row = *iterrow;
+      Shield *s = row[shields_columns.shield];
+      ShieldSetEditorAction_Colors *action =
+        new ShieldSetEditorAction_Colors (getCurIndex (), s->getColors ());
+      addUndo (action);
+      if (colour_spinbutton->get_value() < 1)
+        colour_spinbutton->set_value(1);
+      else if (colour_spinbutton->get_value() > 3)
+        colour_spinbutton->set_value(3);
+      else
+        s->setColors (get_current_colours ());
+      shieldset_modified = true;
+      update ();
+    }
 }
 
 void ShieldSetWindow::on_edit_undo_activated ()
@@ -1270,20 +1404,6 @@ void ShieldSetWindow::update ()
   update_shield_panel ();
   update_menuitems ();
   connect_signals ();
-}
-
-void
-ShieldSetWindow::executeColor (ShieldSetEditorAction_Color *action)
-{
-  Gtk::TreeModel::iterator iterrow =
-    shields_treeview->get_selection()->get_selected();
-  Shield *active_shield = (*iterrow)[shields_columns.shield];
-
-  if (action->getPlayerId () == active_shield->getOwner ())
-    player_colorbutton->set_rgba (action->getColor ());
-  Shield *s = d_shieldset->lookupShieldByColour (action->getPlayerId ());
-  s->setColor (action->getColor ());
-  return;
 }
 
 int ShieldSetWindow::getCurIndex ()
@@ -1338,6 +1458,15 @@ bool ShieldSetWindow::doReloadShieldset (ShieldSetEditorAction_Save *action)
   return false;
 }
 
+Shield* ShieldSetWindow::getShieldByIndex (ShieldSetEditorAction_ShieldIndex *i)
+{
+  Gtk::TreeModel::iterator iterrow = 
+    shields_treeview->get_model ()->get_iter (String::ucompose ("%1", i->getIndex ()));
+  Gtk::TreeModel::Row row = *iterrow;
+  Shield *s = row[shields_columns.shield];
+  return s;
+}
+
 UndoAction *
 ShieldSetWindow::executeAction (UndoAction *action2)
 {
@@ -1346,14 +1475,13 @@ ShieldSetWindow::executeAction (UndoAction *action2)
 
     switch (action->getType ())
       {
-      case ShieldSetEditorAction::CHANGE_COLOR:
+      case ShieldSetEditorAction::CHANGE_COLORS:
           {
-            ShieldSetEditorAction_Color *a =
-              dynamic_cast<ShieldSetEditorAction_Color*>(action);
-            out =
-              new ShieldSetEditorAction_Color (a->getPlayerId (), 
-                                               player_colorbutton->get_rgba ());
-            executeColor (a);
+            ShieldSetEditorAction_Colors *a =
+              dynamic_cast<ShieldSetEditorAction_Colors*>(action);
+            out = new ShieldSetEditorAction_Colors
+              (a->getIndex (), getShieldByIndex (a)->getColors ());
+            getShieldByIndex (a)->setColors (a->getColors ());
             break;
           }
       case ShieldSetEditorAction::CHANGE_PROPERTIES:
@@ -1413,6 +1541,9 @@ void ShieldSetWindow::connect_signals ()
   connections.push_back
     (shields_treeview->get_selection()->signal_changed().connect
      (method(on_shield_selected)));
+  connections.push_back
+    (colour_spinbutton->signal_insert_text().connect
+     (sigc::hide(sigc::hide(method(on_num_colours_text_changed)))));
 }
 
 void ShieldSetWindow::disconnect_signals ()

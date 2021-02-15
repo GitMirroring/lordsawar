@@ -648,7 +648,7 @@ import_players (FILE *scn, Armyset *armyset)
       Player *player = 
         new RealPlayer(Glib::ustring(names[i]),
                        armyset->getId(),
-                       Shield::get_default_color_for_no(convert_player_id(i)),
+                       Shield::get_default_colors_for_no(convert_player_id(i)),
                        GameMap::getWidth(), GameMap::getHeight(), Player::HUMAN,
                        convert_player_id(i));
       int gold = 0;
@@ -660,7 +660,7 @@ import_players (FILE *scn, Armyset *armyset)
   Glib::ustring neutral_name = d_random->getPlayerName(Shield::NEUTRAL);
   Player* neutral = 
     new AI_Dummy(neutral_name, armyset->getId(),
-                 Shield::get_default_color_for_neutral(), 
+                 Shield::get_default_colors_for_neutral(), 
                  GameMap::getWidth(), GameMap::getHeight(), MAX_PLAYERS);
   Playerlist::getInstance()->add(neutral);
   Playerlist::getInstance()->setNeutral(neutral);

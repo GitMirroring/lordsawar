@@ -175,7 +175,7 @@ class Player: public sigc::trackable
 	 *                     the next free Id it used.
          */
 	//! Default constructor.
-        Player (Glib::ustring name, guint32 armyset, Gdk::RGBA color, int width,
+        Player (Glib::ustring name, guint32 armyset, std::vector<Gdk::RGBA> colors, int width,
 		int height, Type type, int player_no = -1);
 
         //! Copy constructor.
@@ -201,6 +201,9 @@ class Player: public sigc::trackable
 
         //! Change the player's colour.
         void setColor(Gdk::RGBA c);
+
+        //! Change all the player's colours.
+        void setColors(std::vector<Gdk::RGBA> l);
 
         //! Makes a player unable to die, even when having no units or cities.
         void setMortality(bool ismortal) {d_immortal = !ismortal;}
@@ -276,7 +279,9 @@ class Player: public sigc::trackable
 	Glib::ustring getDiplomaticTitle() const {return d_diplomatic_title;};
 
         //! Returns the colour of the player.
-	Gdk::RGBA getColor() const {return d_color;}
+	Gdk::RGBA getColor() const {return d_colors[0];}
+
+        std::vector<Gdk::RGBA> getColors () const {return d_colors;}
 
         //! Returns the amount of gold pieces the player has in the treasury.
         int getGold() const {return d_gold;}
@@ -1456,14 +1461,14 @@ class Player: public sigc::trackable
          *
          * @param name     The name of the player.
          * @param armyset  The Id of the player's Armyset.
-         * @param color    The player's colour.
+         * @param color    The player's colours.
          * @param width    The width of the player's FogMap.
          * @param height   The height of the player's FogMap.
          * @param type     The player's type (Player::Type).
          */
 	//! Create a player.
         static Player* create(Glib::ustring name, guint32 armyset, 
-			      Gdk::RGBA color, int width, int height, 
+			      std::vector<Gdk::RGBA> colors, int width, int height, 
 			      Type type);
         
         /** 
@@ -1514,9 +1519,9 @@ class Player: public sigc::trackable
         // DATA
 	//! The player's colour.
 	/**
-	 * Mask portions of images are shaded in this colour.
+	 * Mask portions of images are shaded in these colours.
 	 */
-	Gdk::RGBA d_color;
+        std::vector<Gdk::RGBA> d_colors;
 
 	//! The name of the Player.
         Glib::ustring d_name;

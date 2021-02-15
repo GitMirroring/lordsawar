@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2009, 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -339,7 +339,7 @@ bool PixMask::checkFormat (Glib::ustring file)
   return !broken;
 }
 
-bool PixMask::checkDimension (Glib::ustring file, DimensionType t)
+bool PixMask::checkDimension (Glib::ustring file, DimensionType t, guint32 rows)
 {
   bool broken = false;
   PixMask *p = PixMask::create (file, broken);
@@ -354,14 +354,21 @@ bool PixMask::checkDimension (Glib::ustring file, DimensionType t)
     case DIMENSION_SAME_HEIGHT_AND_WIDTH:
       match = p->get_unscaled_width () == p->get_unscaled_height ();
       break;
-    case DIMENSION_WIDTH_IS_TWO_HEIGHT:
-      match = p->get_unscaled_width () == p->get_unscaled_height () * 2;
-      break;
-    case DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT:
-      match = p->get_unscaled_width () % (p->get_unscaled_height () / 2) == 0;
-      break;
     case DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT:
       match = p->get_unscaled_width () % p->get_unscaled_height () == 0;
+      break;
+    case DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT:
+      if (rows)
+        {
+          guint32 row_height = p->get_unscaled_height () / rows;
+          match = p->get_unscaled_width () % row_height == 0;
+        }
+      break;
+    case DIMENSION_WIDTH_IS_FIXED_MAX_PLAYERS:
+        {
+          guint32 column_width = p->get_unscaled_width () / MAX_PLAYERS;
+          match = p->get_unscaled_height () % column_width == 0;
+        }
       break;
     }
   if (p)

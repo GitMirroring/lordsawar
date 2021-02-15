@@ -75,32 +75,35 @@ public:
   //! Return the basename of the image (archive member in tar file)
   Glib::ustring getName () const {return name;}
 
+  //! Return the number of masks in the image file
+  guint32 getNumMasks () const {return maskcount;}
+
   //! Get the whole image as loaded from the file
   PixMask *getBackingImage () {return image;}
 
   //! Return an image by index
-  PixMask *getImage (guint32 i) const {return i < frames.size () ? frames[i].first : NULL;}
+  PixMask *getImage (guint32 i) const {return i < frames.size () ? frames[i][0] : NULL;}
 
   //! Return the first image
-  PixMask *getImage () const {return frames.empty () ? NULL :frames[0].first;}
+  PixMask *getImage () const {return frames.empty () ? NULL :frames[0][0];}
 
   //! Apply the mask onto the image in the player's colour
   /**
    * @return a pointer to a new PixMask that must be deleted.
    */
   PixMask *applyMask (Player *p) const;
-  PixMask *applyMask (Gdk::RGBA colour) const;
+  PixMask *applyMask (std::vector<Gdk::RGBA> colours) const;
 
   //! Apply the mask onto the image at the given index in the player's colour
   /**
    * @return a pointer to a new PixMask that must be deleted.
    */
   PixMask *applyMask (guint32 i, Player *p) const;
-  PixMask *applyMask (guint32 i, Gdk::RGBA colour) const;
+  PixMask *applyMask (guint32 i, std::vector<Gdk::RGBA> colours) const;
 
   //! Return all of the images
   std::vector<PixMask*> getImages () const
-    { std::vector<PixMask*> o; for (auto f : frames) o.push_back (f.first); return o; }
+    { std::vector<PixMask*> o; for (auto f : frames) o.push_back (f.front ()); return o; }
 
   //! Return the dimensions that the images are scaled to
   Vector<int> getScaledImageDimensions () const {return scale_dimension;}
@@ -117,11 +120,18 @@ public:
   //! Set the name of the archive member in the tar file that holds the image
   void setName (Glib::ustring n) {name = n;}
 
+  //! Set the number of masks in the image file
+  void setNumMasks (guint32 n) {maskcount = n;}
+
+  //! Try to calculate the number of masks, return false if we can't.
+  bool calculateNumberOfMasks (Glib::ustring file, bool &bad_dimension);
+
   //! Set the opened tar file
   void setTarFile (Tar_Helper *t) {tarfile = t;}
 
   //! Read the data tag from an opened xml file and put it in our name member
-  void load_name (XML_Helper *helper, Glib::ustring data_tag);
+  void load (XML_Helper *helper, Glib::ustring name_tag,
+             Glib::ustring mask_tag);
 
   //! Load an image from a tar file, with bname already provided
   /**
@@ -165,6 +175,10 @@ public:
    * @return         true if something went wrong
    */
   bool loadFromFile (Glib::ustring filename);
+
+  //! write the name and maskcount elements to an opened xml file
+  bool save (XML_Helper *helper, Glib::ustring name_tag,
+             Glib::ustring mask_tag);
 
   //! Process the backing image into a set of images and masks
   void instantiateImages (Vector<int> scale_to_dimension = Vector<int>(-1,-1));
@@ -211,14 +225,17 @@ private:
   //! The backing image, the whole image as loaded from file_on_disk.
   PixMask *image;
 
-  //! in vertical orientation, how many frames there are.
+  //! how many frames there are (columns).
   guint32 calculated_number_of_frames;
+
+  //! how many masks the image has
+  guint32 maskcount;
 
   //! The parts of the backing image cut up into images and masks
   /**
-   * the first member of the pair is the image, and the second is the mask.
+   * the first elemtn of the list is the image, and the rest are the masks.
    */
-  std::vector<std::pair<PixMask*, PixMask *> > frames;
+  std::vector<std::vector<PixMask*> > frames;
 
   //! Process a horizontally masked image
   void instantiateVertical  ();
@@ -226,11 +243,18 @@ private:
   //! Process a vertically masked image
   void instantiateHorizontal ();
 
-  //! Overlay the mask on the image in the given colour.
+  //! Overlay the masks on the image in the given colour.
   /**
+   * @param frame  the image and its associated masks
    * @return a new pixmask that must be deleted.
    */
-  PixMask* applyMask(PixMask* image, PixMask* mask, Gdk::RGBA colour) const;
+  PixMask* applyMask(std::vector<PixMask*> frame, std::vector<Gdk::RGBA> colours) const;
+
+  //! Dice up image into a set of pixmasks.  the inner array is a column.
+  std::vector<std::vector<PixMask*> > disassemble_grid (int rows, int cols);
+
+  //! Chop up the image into COLS pieces of a single row
+  std::vector<PixMask*> disassemble_row(int cols);
 };
 
 #endif

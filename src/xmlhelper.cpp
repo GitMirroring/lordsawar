@@ -1,7 +1,7 @@
 // Copyright (C) 2002, 2003 Michael Bartl
 // Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2003, 2004, 2005 Andrea Paternesi
-// Copyright (C) 2011, 2012, 2014, 2015 Ben Asselstine
+// Copyright (C) 2011, 2012, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -165,7 +165,7 @@ bool XML_Helper::closeTag()
     return true;
 }
 
-bool XML_Helper::saveData(Glib::ustring name, const Gdk::RGBA value)
+bool XML_Helper::saveData(Glib::ustring name, const std::vector<Gdk::RGBA> values)
 {
     //prepend a "d_" to show that this is a data tag
     name = "d_" + name;
@@ -182,19 +182,32 @@ bool XML_Helper::saveData(Glib::ustring name, const Gdk::RGBA value)
     }
 
     addTabs();
-    char buf[3];
-    guint32 r, g, b;
-    r = value.get_red() * 255;
-    g = value.get_green() * 255;
-    b = value.get_blue() * 255;
-    snprintf(buf, sizeof(buf), "%02X", r);
-    Glib::ustring red = buf;
-    snprintf(buf, sizeof(buf), "%02X", g);
-    Glib::ustring green = buf;
-    snprintf(buf, sizeof(buf), "%02X", b);
-    Glib::ustring blue = buf;
+    (*d_out) <<"<" <<name <<">";
 
-    (*d_out) <<"<" <<name <<">#" <<red <<green<<blue <<"</" <<name <<">\n";
+    int first = 1;
+    for (auto value : values)
+      {
+        char buf[3];
+        guint32 r, g, b;
+        r = value.get_red() * 255;
+        g = value.get_green() * 255;
+        b = value.get_blue() * 255;
+        snprintf(buf, sizeof(buf), "%02X", r);
+        Glib::ustring red = buf;
+        snprintf(buf, sizeof(buf), "%02X", g);
+        Glib::ustring green = buf;
+        snprintf(buf, sizeof(buf), "%02X", b);
+        Glib::ustring blue = buf;
+
+        if (first)
+          first = 0;
+        else
+          (*d_out) << " ";
+        (*d_out) << "#" <<red <<green<<blue;
+      }
+
+    (*d_out) << "</" <<name <<">\n";
+
   return true;
 }
 
@@ -366,49 +379,78 @@ bool XML_Helper::registerTag(Glib::ustring tag, XML_Slot callback)
     return true;
 }
 
-bool XML_Helper::getData(Gdk::RGBA & data, Glib::ustring name)
+bool XML_Helper::getData(std::vector<Gdk::RGBA> & data, Glib::ustring name)
 {
-    //the data tags are stored with leading "d_", so prepend it here
-    name = "d_" + name;
+  //the data tags are stored with leading "d_", so prepend it here
+  name = "d_" + name;
 
-    std::map<Glib::ustring, Glib::ustring>::const_iterator it;
+  std::map<Glib::ustring, Glib::ustring>::const_iterator it;
 
-    it = d_data.find(name);
-    
-    if (it == d_data.end())
+  it = d_data.find(name);
+
+  if (it == d_data.end())
     {
-        data.set_rgba(0,0,0);
-        std::cerr<<String::ucompose(_("Error!  couldn't get Gdk::RGBA value from xml tag `%1'."), name) << std::endl;
-        d_failed = true;
-        return false;
-    }
-    
-    Glib::ustring value = (*it).second;
-    char buf[15];
-    int retval = sscanf(value.c_str(), "%s", buf);
-    if (retval == -1)
+      Gdk::RGBA d;
+      d.set_rgba(0,0,0);
+      data.push_back (d);
+      std::cerr<<String::ucompose(_("Error!  couldn't get Gdk::RGBA values from xml tag `%1'."), name) << std::endl;
+      d_failed = true;
       return false;
-    buf[14] = '\0';
-    unsigned int red = 0, green = 0, blue = 0;
-    if (buf[0] == '#')
-      {
-	char hash;
-	//must look like "#00FF33"
-	retval = sscanf(buf, "%c%02X%02X%02X", &hash, &red, &green, &blue);
-	if (retval != 4)
-	  return false;
-      }
-    else
-      {
-	//must look like "123 255 000"
-	retval = sscanf(value.c_str(), "%u%u%u", &red, &green, &blue);
-	if (retval != 3)
-	  return false;
-	if (red > 255 || green > 255 || blue > 255)
-	  return false;
-      }
-    data.set_rgba((float)red / 255.0, (float)green / 255.0,
-		   (float)blue / 255.0);
+    }
+  Glib::ustring value = (*it).second;
+  std::stringstream scolors;
+  scolors.str (value);
+  std::list<Glib::ustring> colors;
+  Glib::ustring c, d;
+  int col = 0;
+  while (scolors.eof() == false)
+    {
+      scolors >> c;
+      if (c.c_str ()[0] == '#')
+        {
+          col = 0;
+          colors.push_back (c);
+          d = "";
+        }
+      else
+        {
+          d += c + " ";
+          col++;
+          if (col == 3)
+            colors.push_back (d);
+        }
+    }
+
+  for (auto color : colors)
+    {
+      char buf[15];
+      int retval = sscanf(color.c_str(), "%s", buf);
+      if (retval == -1)
+        return false;
+      buf[14] = '\0';
+      unsigned int red = 0, green = 0, blue = 0;
+      if (buf[0] == '#')
+        {
+          char hash;
+          //must look like "#00FF33"
+          retval = sscanf(buf, "%c%02X%02X%02X", &hash, &red, &green, &blue);
+          if (retval != 4)
+            return false;
+        }
+      else
+        {
+          //must look like "123 255 000"
+          retval = sscanf(value.c_str(), "%u%u%u", &red, &green, &blue);
+          if (retval != 3)
+            return false;
+          if (red > 255 || green > 255 || blue > 255)
+            return false;
+        }
+      Gdk::RGBA rgb;
+      rgb.set_rgba((float)red / 255.0, (float)green / 255.0,
+                    (float)blue / 255.0);
+      data.push_back (rgb);
+    }
   return true;
 }
 
@@ -826,4 +868,82 @@ guint32 XML_Helper::flagsFromString(Glib::ustring flags, guint32 (*flagStrToNum)
       total += (*flagStrToNum)(bonus);
     }
   return total;
+}
+
+bool XML_Helper::saveData(Glib::ustring name, const Gdk::RGBA value)
+{
+    //prepend a "d_" to show that this is a data tag
+    name = "d_" + name;
+
+    if (name.empty())
+    {
+        std::cerr << "XML_Helper: save_data with empty name\n";
+        return false;
+    }
+    if (!d_out)
+    {
+        std::cerr << "XML_Helper: no output stream given.\n";
+        return false;
+    }
+
+    addTabs();
+    char buf[3];
+    guint32 r, g, b;
+    r = value.get_red() * 255;
+    g = value.get_green() * 255;
+    b = value.get_blue() * 255;
+    snprintf(buf, sizeof(buf), "%02X", r);
+    Glib::ustring red = buf;
+    snprintf(buf, sizeof(buf), "%02X", g);
+    Glib::ustring green = buf;
+    snprintf(buf, sizeof(buf), "%02X", b);
+    Glib::ustring blue = buf;
+
+    (*d_out) <<"<" <<name <<">#" <<red <<green<<blue <<"</" <<name <<">\n";
+  return true;
+}
+bool XML_Helper::getData(Gdk::RGBA & data, Glib::ustring name)
+{
+    //the data tags are stored with leading "d_", so prepend it here
+    name = "d_" + name;
+
+    std::map<Glib::ustring, Glib::ustring>::const_iterator it;
+
+    it = d_data.find(name);
+    
+    if (it == d_data.end())
+    {
+        data.set_rgba(0,0,0);
+        std::cerr<<String::ucompose(_("Error!  couldn't get Gdk::RGBA value from xml tag `%1'."), name) << std::endl;
+        d_failed = true;
+        return false;
+    }
+    
+    Glib::ustring value = (*it).second;
+    char buf[15];
+    int retval = sscanf(value.c_str(), "%s", buf);
+    if (retval == -1)
+      return false;
+    buf[14] = '\0';
+    unsigned int red = 0, green = 0, blue = 0;
+    if (buf[0] == '#')
+      {
+	char hash;
+	//must look like "#00FF33"
+	retval = sscanf(buf, "%c%02X%02X%02X", &hash, &red, &green, &blue);
+	if (retval != 4)
+	  return false;
+      }
+    else
+      {
+	//must look like "123 255 000"
+	retval = sscanf(value.c_str(), "%u%u%u", &red, &green, &blue);
+	if (retval != 3)
+	  return false;
+	if (red > 255 || green > 255 || blue > 255)
+	  return false;
+      }
+    data.set_rgba((float)red / 255.0, (float)green / 255.0,
+		   (float)blue / 255.0);
+  return true;
 }

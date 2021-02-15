@@ -36,6 +36,7 @@
 #include "TarFileMaskedImage.h"
 #include "tar-file-masked-image-editor-actions.h"
 #include "tarfile.h"
+#include "mask-validation-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &TarFileMaskedImageEditorDialog::x)
 
@@ -190,15 +191,14 @@ void TarFileMaskedImageEditorDialog::show_image()
           Glib::ustring n = shield_theme_combobox->get_active_text();
           d_shieldset = Shieldsetlist::getInstance()->get(n, 0);
         }
-      Gdk::RGBA colour = d_shieldset->getColor(i);
       PixMask *p;
       switch (d_mim->getMaskOrientation ())
         {
         case TarFileMaskedImage::HORIZONTAL_MASK:
-          p = d_mim->applyMask (colour);
+          p = d_mim->applyMask (d_shieldset->getColors (i));
           break;
         case TarFileMaskedImage::VERTICAL_MASK:
-          p = d_mim->applyMask (i, colour);
+          p = d_mim->applyMask (i, d_shieldset->getColors (i));
           break;
         }
       PixMask::scale (p, dim.x, dim.y); //idk if we need this
@@ -242,18 +242,56 @@ void TarFileMaskedImageEditorDialog::on_imagebutton_clicked ()
         {
           if (PixMask::checkFormat (d->get_filename ()))
             {
-              if (d_mim->checkDimension (d->get_filename ()))
+              /*
+               * dog's breakfast here.
+               * we want to elide the maskvalidation when we can
+               * but we also want to check the dimensions of the incoming
+               * image
+               * sometimes we have to wait until we have a mask count before
+               * we can check the dimensions.
+               *
+               * we can elide the mask validation when it's a horizontal
+               * oriented maskedimage and the width is divisible by height.
+               * and also when it's a vertical oriented maskedimage and 
+               * the width is fixed by max players, and then the number of
+               * rows is divisible by the width divided by 8.
+               */
+              bool got_masks = false;
+              bool bad_dim = false;
+              if (d_mim->calculateNumberOfMasks (d->get_filename (), bad_dim) == true)
+                got_masks = true;
+              if (got_masks == false || bad_dim)
                 {
-                  PastChooser::getInstance()->set_dir(d);
-                  on_image_chosen (d);
+                  if (!bad_dim)
+                    {
+                      MaskValidationDialog v (*d, d->get_filename (),
+                                              d_mim->getMaskOrientation ());
+                      int resp = v.run ();
+                      if (resp == Gtk::RESPONSE_ACCEPT)
+                        {
+                          d_mim->setNumMasks (v.get_num_masks ());
+                          got_masks = true;
+                        }
+                    }
+                  else
+                    got_masks = true; //so we force a checkDimension which fails
                 }
-              else
+
+              if (got_masks)
                 {
-                  TimedMessageDialog
-                    td(*d,
-                       String::ucompose(_("Bad dimensions in image:\n%1"),
-                                        d->get_filename ()), 0);
-                  td.run_and_hide ();
+                  if (d_mim->checkDimension (d->get_filename ()))
+                    {
+                      PastChooser::getInstance()->set_dir(d);
+                      on_image_chosen (d);
+                    }
+                  else
+                    {
+                      TimedMessageDialog
+                        td(*d,
+                           String::ucompose(_("Bad dimensions in image:\n%1"),
+                                            d->get_filename ()), 0);
+                      td.run_and_hide ();
+                    }
                 }
             }
           else

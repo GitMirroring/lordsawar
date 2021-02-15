@@ -1,7 +1,7 @@
 // Copyright (C) 2002, 2003 Michael Bartl
 // Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 // Copyright (C) 2003, 2004, 2005 Andrea Paternesi
-// Copyright (C) 2011, 2012, 2014 Ben Asselstine
+// Copyright (C) 2011, 2012, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -147,6 +147,7 @@ class XML_Helper: public xmlpp::SaxParser
         bool saveData(Glib::ustring identifier, const double value);
         /* amd64 fix, UL: still neccessary?*/
         bool saveData(Glib::ustring identifier, unsigned long int value);
+	bool saveData(Glib::ustring identifier, const std::vector<Gdk::RGBA> value);
 	bool saveData(Glib::ustring identifier, const Gdk::RGBA value);
 
         /** Closes the reading/writing stream.
@@ -185,6 +186,7 @@ class XML_Helper: public xmlpp::SaxParser
         bool getData(int& data, Glib::ustring name);
         bool getData(guint32& data, Glib::ustring name);
         bool getData(double& data, Glib::ustring name);
+	bool getData(std::vector<Gdk::RGBA> & data, Glib::ustring name);
 	bool getData(Gdk::RGBA & data, Glib::ustring name);
 
         //! Returns the version number of the save file

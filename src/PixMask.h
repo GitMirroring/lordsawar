@@ -35,9 +35,9 @@ class PixMask
        {
          DIMENSION_ANY,
          DIMENSION_SAME_HEIGHT_AND_WIDTH,
-         DIMENSION_WIDTH_IS_TWO_HEIGHT,
-         DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT,
          DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT,
+         DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT,
+         DIMENSION_WIDTH_IS_FIXED_MAX_PLAYERS,
        };
      Cairo::RefPtr<Cairo::Surface> get_pixmap() {return pixmap;};
      Cairo::RefPtr<Cairo::Surface> get_mask() {return mask;};
@@ -52,7 +52,7 @@ class PixMask
      static PixMask* create(Glib::RefPtr<Gdk::Pixbuf> buf);
      static PixMask* create(Cairo::RefPtr<Cairo::Surface> pixmap,
 					 Cairo::RefPtr<Cairo::Surface> mask);
-     static bool checkDimension (Glib::ustring file, DimensionType t);
+     static bool checkDimension (Glib::ustring file, DimensionType t, guint32 rows = 0);
      static bool checkFormat (Glib::ustring file);
      PixMask* copy();
 

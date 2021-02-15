@@ -124,6 +124,7 @@
 [type: gettext/glade]dat/glade/editor/stone-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/heroes-dialog.ui
 [type: gettext/glade]dat/glade/editor/keeper-dialog.ui
+[type: gettext/glade]dat/glade/editor/mask-validation-dialog.ui
 [type: gettext/glade]dat/glade/editor/editor-save-changes-dialog.ui
 [type: gettext/glade]dat/glade/editor/planted-standard-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/item-editor-dialog.ui
@@ -330,6 +331,7 @@ src/editor/image-editor-dialog.cpp
 src/editor/tar-file-masked-image-editor-dialog.cpp
 src/editor/fight-order-editor-dialog.cpp
 src/editor/battle-calculator-dialog.cpp
+src/editor/mask-validation-dialog.cpp
 src/editor/media-dialog.cpp
 src/editor/validation-dialog.cpp
 src/editor/stone-editor-dialog.cpp

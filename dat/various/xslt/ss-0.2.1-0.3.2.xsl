@@ -14,14 +14,14 @@
 </xsl:template>
 
 <xsl:template match="shield">
-         <city>
+         <shield>
                  <xsl:copy-of select="d_owner"/>
                  <xsl:copy-of select="d_color"/>
                  <xsl:copy-of select="shieldstyle"/>
                  <d_left_tartan_image>left-tartan-image</d_left_tartan_image>
                  <d_center_tartan_image>center-tartan-image</d_center_tartan_image>
                  <d_right_tartan_image>right-tartan-image</d_right_tartan_image>
-         </city>
+         </shield>
 </xsl:template>
 
 </xsl:stylesheet>

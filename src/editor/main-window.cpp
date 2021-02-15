@@ -590,7 +590,7 @@ void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ust
         Glib::ustring name =
           d_create_scenario_names->getPlayerName(Shield::Colour(i));
         Player *human = new RealPlayer (name, armyset_id,
-                                        ssl->getColor(ss->getId (), i),
+                                        ssl->getColors(ss->getId (), i),
                                         width, height, Player::HUMAN, i);
         Playerlist::getInstance()->add(human);
         if (i >= num_players - 1)
@@ -600,7 +600,7 @@ void MainWindow::set_filled_map(int width, int height, int fill_style, Glib::ust
     Glib::ustring name =
       d_create_scenario_names->getPlayerName(Shield::NEUTRAL);
     Player* neutral = new AI_Dummy(name, armyset_id, 
-				   ssl->getColor(ss->getId(), MAX_PLAYERS), 
+				   ssl->getColors(ss->getId(), MAX_PLAYERS), 
 				   width, height, MAX_PLAYERS);
     neutral->setType(Player::AI_DUMMY);
     Playerlist::getInstance()->add(neutral);
@@ -651,7 +651,7 @@ void MainWindow::set_random_map(int width, int height,
     Shieldset *ss = ssl->get(shieldset);
     Glib::ustring name = d_create_scenario_names->getPlayerName(Shield::NEUTRAL);
     Player* neutral = new AI_Dummy(name, armyset_id, 
-				   ssl->getColor(ss->getId(), MAX_PLAYERS), 
+				   ssl->getColors(ss->getId(), MAX_PLAYERS), 
 				   width, height, MAX_PLAYERS);
     neutral->setType(Player::AI_DUMMY);
     Playerlist::getInstance()->add(neutral);

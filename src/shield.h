@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
         Shield(const Shield& s);
 
 	//! Default constructor.
-	Shield(Shield::Colour owner, Gdk::RGBA color);
+	Shield(Shield::Colour owner, std::vector<Gdk::RGBA> colors);
 
 	//! Destructor.
         virtual ~Shield();
@@ -71,13 +71,18 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 	guint32 getOwner() const {return d_owner;}
 
         //! Returns the colour of the player shield.
-	Gdk::RGBA getColor() const {return d_color;}
+	Gdk::RGBA getColor() const {return d_colors[0];}
+
+        //! Returns the colours of the player shield.
+        std::vector<Gdk::RGBA> getColors() const {return d_colors;}
 
 	// Set Methods
 
 	//! Sets the colour of the player shield.
-	void setColor(Gdk::RGBA c) {d_color = c;}
+	void setColor(Gdk::RGBA c) {d_colors[0] = c;}
 
+        //! Sets the colours of the player shield.
+        void setColors (std::vector<Gdk::RGBA> l) {d_colors = l;}
 
 	// Methods that operate on class data and do not modify the class.
 
@@ -100,13 +105,13 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 	 *
 	 * @param player_no  The player's Id for which we want the colour.
 	 *
-	 * @return The default colour associated with the player.
+	 * @return The default colours associated with the player.
 	 */
 	//! Get standard colour for a player.
-	static Gdk::RGBA get_default_color_for_no(int player_no);
+	static std::vector<Gdk::RGBA> get_default_colors_for_no(int player_no);
 
 	//! Get standard colour for the neutral player.
-	static Gdk::RGBA get_default_color_for_neutral();
+	static std::vector<Gdk::RGBA> get_default_colors_for_neutral();
 
 	//! Convert the Shield::Colour enumerated value to a string.
 	static Glib::ustring colourToString(const Shield::Colour c);
@@ -125,11 +130,11 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 	 */
 	guint32 d_owner;
 
-	//! The player's colour.
+	//! The player's colours.
 	/**
-	 * Mask portions of images are shaded in this colour.
+	 * Mask portions of images are shaded in these colours.
 	 */
-	Gdk::RGBA d_color;
+        std::vector<Gdk::RGBA> d_colors;
 
 };
 

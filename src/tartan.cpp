@@ -35,17 +35,17 @@ Tartan::Tartan(XML_Helper* helper)
 {
   d_left_mimage =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
   d_center_mimage =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
   d_right_mimage =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
 
-  d_left_mimage->load_name (helper, "left_image");
-  d_center_mimage->load_name (helper, "center_image");
-  d_right_mimage->load_name (helper, "right_image");
+  d_left_mimage->load (helper, "left_image", "left_image_num_masks");
+  d_center_mimage->load (helper, "center_image", "center_image_num_masks");
+  d_right_mimage->load (helper, "right_image", "right_image_num_masks");
 }
 
 Tartan::Tartan(const Tartan& t)
@@ -59,13 +59,13 @@ Tartan::Tartan()
 {
   d_left_mimage =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
   d_center_mimage =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
   d_right_mimage =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
 }
 
 Tartan::~Tartan()
@@ -80,9 +80,9 @@ bool Tartan::saveTartan(XML_Helper *helper) const
   bool retval = true;
 
   retval &= helper->openTag(d_tartan_tag);
-  retval &= helper->saveData("left_image", d_left_mimage->getName ());
-  retval &= helper->saveData("center_image", d_center_mimage->getName ());
-  retval &= helper->saveData("right_image", d_right_mimage->getName ());
+  retval &= d_left_mimage->save (helper, "left_image", "left_image_num_masks");
+  retval &= d_center_mimage->save (helper, "center_image", "center_image_num_masks");
+  retval &= d_right_mimage->save (helper, "right_image", "right_image_num_masks");
   retval &= helper->closeTag();
   return retval;
 }

@@ -51,7 +51,7 @@ ArmyProto::ArmyProto()
     d_mimage[c] =
       new TarFileMaskedImage
       (TarFileMaskedImage::HORIZONTAL_MASK,
-       PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+       PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
 }
 
 ArmyProto::ArmyProto(XML_Helper* helper)
@@ -61,17 +61,17 @@ ArmyProto::ArmyProto(XML_Helper* helper)
     d_mimage[c] =
       new TarFileMaskedImage
       (TarFileMaskedImage::HORIZONTAL_MASK,
-       PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+       PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
   helper->getData(d_id, "id");
-  d_mimage[Shield::WHITE]->load_name (helper, "image_white");
-  d_mimage[Shield::GREEN]->load_name (helper, "image_green");
-  d_mimage[Shield::YELLOW]->load_name (helper, "image_yellow");
-  d_mimage[Shield::LIGHT_BLUE]->load_name (helper, "image_light_blue");
-  d_mimage[Shield::RED]->load_name (helper, "image_red");
-  d_mimage[Shield::DARK_BLUE]->load_name (helper, "image_dark_blue");
-  d_mimage[Shield::ORANGE]->load_name (helper, "image_orange");
-  d_mimage[Shield::BLACK]->load_name (helper, "image_black");
-  d_mimage[Shield::NEUTRAL]->load_name (helper, "image_neutral");
+  d_mimage[Shield::WHITE]->load (helper, "image_white", "image_white_num_masks");
+  d_mimage[Shield::GREEN]->load (helper, "image_green", "image_green_num_masks");
+  d_mimage[Shield::YELLOW]->load (helper, "image_yellow", "image_yellow_num_masks");
+  d_mimage[Shield::LIGHT_BLUE]->load (helper, "image_light_blue", "image_red_num_masks");
+  d_mimage[Shield::RED]->load (helper, "image_red", "image_red_num_masks");
+  d_mimage[Shield::DARK_BLUE]->load (helper, "image_dark_blue", "image_dark_blue_num_masks");
+  d_mimage[Shield::ORANGE]->load (helper, "image_orange", "image_orange_num_masks");
+  d_mimage[Shield::BLACK]->load (helper, "image_black", "image_black_num_masks");
+  d_mimage[Shield::NEUTRAL]->load (helper, "image_neutral", "image_neutral_num_masks");
   helper->getData(d_defends_ruins,"defends_ruins");
   helper->getData(d_awardable,"awardable");
   Glib::ustring gender_str;
@@ -106,24 +106,15 @@ bool ArmyProto::saveData(XML_Helper* helper) const
 
   retval &= helper->saveData("id", d_id);
   retval &= ArmyProtoBase::saveData(helper);
-  retval &= helper->saveData("image_white",
-                             d_mimage[Shield::WHITE]->getName ());
-  retval &= helper->saveData("image_green",
-                             d_mimage[Shield::GREEN]->getName ());
-  retval &= helper->saveData("image_yellow",
-                             d_mimage[Shield::YELLOW]->getName ());
-  retval &= helper->saveData("image_light_blue", 
-			     d_mimage[Shield::LIGHT_BLUE]->getName ());
-  retval &= helper->saveData("image_red",
-                             d_mimage[Shield::RED]->getName ());
-  retval &= helper->saveData("image_dark_blue", 
-			     d_mimage[Shield::DARK_BLUE]->getName ());
-  retval &= helper->saveData("image_orange",
-                             d_mimage[Shield::ORANGE]->getName ());
-  retval &= helper->saveData("image_black",
-                             d_mimage[Shield::BLACK]->getName ());
-  retval &= helper->saveData("image_neutral",
-                             d_mimage[Shield::NEUTRAL]->getName ());
+  retval &= d_mimage[Shield::WHITE]->save (helper, "image_white", "image_white_num_masks");
+  retval &= d_mimage[Shield::GREEN]->save (helper, "image_green", "image_green_num_masks");
+  retval &= d_mimage[Shield::GREEN]->save (helper, "image_yellow", "image_yellow_num_masks");
+  retval &= d_mimage[Shield::GREEN]->save (helper, "image_light_blue", "image_light_blue_num_masks");
+  retval &= d_mimage[Shield::GREEN]->save (helper, "image_red", "image_red_num_masks");
+  retval &= d_mimage[Shield::GREEN]->save (helper, "image_dark_blue", "image_dark_blue_num_masks");
+  retval &= d_mimage[Shield::GREEN]->save (helper, "image_orange", "image_orange_num_masks");
+  retval &= d_mimage[Shield::GREEN]->save (helper, "image_black", "image_black_num_masks");
+  retval &= d_mimage[Shield::GREEN]->save (helper, "image_neutral", "image_neutral_num_masks");
   retval &= helper->saveData("awardable", d_awardable);
   retval &= helper->saveData("defends_ruins", d_defends_ruins);
   Glib::ustring gender_str = Hero::genderToString(Hero::Gender(d_gender));

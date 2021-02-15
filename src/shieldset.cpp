@@ -1,4 +1,5 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020,
+//  2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -110,6 +111,18 @@ Gdk::RGBA Shieldset::getColor(guint32 owner) const
 	return (*it)->getColor();
     }
   return Gdk::RGBA("black");
+}
+
+std::vector<Gdk::RGBA> Shieldset::getColors(guint32 owner) const
+{
+  for (const_iterator it = begin(); it != end(); ++it)
+    {
+      if ((*it)->getOwner() == owner)
+	return (*it)->getColors();
+    }
+  std::vector<Gdk::RGBA> l;
+  l.push_back (Gdk::RGBA("black"));
+  return l;
 }
 
 bool Shieldset::loadShield(Glib::ustring tag, XML_Helper* helper)
@@ -390,6 +403,9 @@ void Shieldset::support_backward_compatibility()
                                           file_extension, d_tag, true);
   FileCompat::getInstance()->support_version
     (FileCompat::SHIELDSET, "0.2.1", "0.3.2",
+     sigc::ptr_fun(&Shieldset::upgrade));
+  FileCompat::getInstance()->support_version
+    (FileCompat::SHIELDSET, "0.3.2", "0.3.3",
      sigc::ptr_fun(&Shieldset::upgrade));
 }
 

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -91,6 +91,9 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
 
 	//! Return the mask colour for the given player.
 	Gdk::RGBA getColor(guint32 owner) const;
+
+        //! Return all of the mask colours for the given player.
+        std::vector<Gdk::RGBA> getColors (guint32 owner) const;
 
 	//! Return the number of pixels high the small shields are.
 	guint32 getSmallHeight() const {return d_small_height;}

@@ -642,17 +642,17 @@ void Playerlist::syncPlayer(GameParameters::Player player)
 	{
 	case GameParameters::Player::HUMAN:
 	  p = new RealPlayer(player.name, armyset,
-			     shieldset->getColor(player.id),
+			     shieldset->getColors(player.id),
 			     width, height, Player::HUMAN, player.id);
 	  break;
 	case GameParameters::Player::EASY:
 	  p = new AI_Fast(player.name, armyset,
-		       	  shieldset->getColor(player.id),
+		       	  shieldset->getColors(player.id),
 			  width, height, player.id);
 	  break;
 	case GameParameters::Player::HARD:
 	  p = new AI_Smart(player.name, armyset,
-			   shieldset->getColor(player.id),
+			   shieldset->getColors(player.id),
 			   width, height, player.id);
 	  break;
 	case GameParameters::Player::OFF:
@@ -936,7 +936,7 @@ std::vector<Player*> Playerlist::getPlayersWithArmyset(guint32 id) const
 void Playerlist::setNewColours(Shieldset *shieldset)
 {
   for (iterator it = begin(); it != end(); ++it)
-    (*it)->setColor(shieldset->getColor((*it)->getId()));
+    (*it)->setColors(shieldset->getColors((*it)->getId()));
 }
 
 void Playerlist::clearAllActions()

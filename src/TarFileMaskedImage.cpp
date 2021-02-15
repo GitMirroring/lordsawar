@@ -29,7 +29,8 @@
 TarFileMaskedImage::TarFileMaskedImage (MaskOrientation o, PixMask::DimensionType d)
  : orientation (o), tarfile (NULL), name (""), file_on_disk (""),
     scale_dimension (Vector<int>(-1,-1)), dimension (Vector<int>(-1,-1)),
-    dimension_type (d), image (NULL), calculated_number_of_frames (0)
+    dimension_type (d), image (NULL), calculated_number_of_frames (0),
+    maskcount(1)
 {
 }
 
@@ -37,15 +38,21 @@ TarFileMaskedImage::TarFileMaskedImage (const TarFileMaskedImage &i)
  : orientation (i.orientation), tarfile (i.tarfile), name (i.name),
     file_on_disk (i.file_on_disk), scale_dimension (i.scale_dimension),
     dimension (i.dimension), dimension_type (i.dimension_type), image (NULL),
-    calculated_number_of_frames (i.calculated_number_of_frames)
+    calculated_number_of_frames (i.calculated_number_of_frames),
+    maskcount(i.maskcount)
 {
   frames.clear ();
   if (i.image)
     image = i.image->copy ();
   else
     return;
-  for (auto f : i.frames)
-    frames.push_back (std::make_pair (f.first->copy (), f.second->copy ()));
+  for (auto frame : i.frames)
+    {
+      std::vector<PixMask*> newframe;
+      for (auto f : frame)
+        newframe.push_back (f->copy ());
+      frames.push_back (newframe);
+    }
 }
 
 bool TarFileMaskedImage::load (TarFile *ta, Glib::ustring bname)
@@ -109,13 +116,13 @@ bool TarFileMaskedImage::loadFromFile (Glib::ustring filename)
       int size = 0;
       if (orientation == HORIZONTAL_MASK)
         {
-          size = p->get_unscaled_width () / 2;
           calculated_number_of_frames = 1;
+          size = p->get_unscaled_width () / (maskcount + 1);
           frames.resize (calculated_number_of_frames);
         }
       else if (orientation == VERTICAL_MASK)
         {
-          size = p->get_unscaled_height () / 2;
+          size = p->get_unscaled_height () / (maskcount + 1);
           calculated_number_of_frames = p->get_unscaled_width () / size;
           frames.resize (calculated_number_of_frames);
         }
@@ -137,17 +144,74 @@ void TarFileMaskedImage::instantiateImages (Vector<int> scale_to_dimension)
     instantiateVertical ();
 }
 
+std::vector<PixMask*> TarFileMaskedImage::disassemble_row(int cols)
+{
+  Glib::RefPtr<Gdk::Pixbuf> row = image->to_pixbuf ();
+
+  std::vector<Glib::RefPtr<Gdk::Pixbuf> > images;
+  images.reserve(cols);
+
+  int h = row->get_height();
+  int w = row->get_width() / cols;
+
+  // disassemble row
+  for (int x = 0; x < cols; ++x) 
+    {
+      Glib::RefPtr<Gdk::Pixbuf> buf
+        = Gdk::Pixbuf::create(row->get_colorspace(),
+                              row->get_has_alpha(),
+                              row->get_bits_per_sample(),
+                              w, h);
+
+      row->copy_area(x * w, 0, w, h, buf, 0, 0);
+
+      images.push_back(buf);
+    }
+
+  std::vector<PixMask*> pixmasks;
+  for (unsigned int i = 0; i < images.size(); i++)
+    pixmasks.push_back(PixMask::create(images[i]));
+
+  return pixmasks;
+}
+
 void TarFileMaskedImage::instantiateHorizontal ()
 {
   if (frames.empty () == false)
     {
-      if (frames[0].first)
-        delete frames[0].first;
-      if (frames[0].second)
-        delete frames[0].second;
+      for (auto frame : frames)
+        for (auto f : frame)
+          delete f;
       frames.clear ();
     }
-  frames.push_back (std::make_pair (image->cropLeftHalf (), image->cropRightHalf ()));
+  std::vector<PixMask*> frame = disassemble_row (maskcount + 1);
+  frames.push_back (frame);
+}
+
+std::vector<std::vector<PixMask*> > TarFileMaskedImage::disassemble_grid (int rows, int cols)
+{
+  std::vector<std::vector<PixMask*> > result;
+  guint32 h = image->get_unscaled_height () / rows;
+  guint32 w = image->get_unscaled_width () / cols;
+  Glib::RefPtr<Gdk::Pixbuf> im = image->to_pixbuf ();
+  for (int i = 0; i < cols; i++)
+    {
+      std::vector<PixMask*> frame;
+      for (int j = 0; j < rows; j++) 
+        {
+          Glib::RefPtr<Gdk::Pixbuf> buf
+            = Gdk::Pixbuf::create(im->get_colorspace(),
+                                  im->get_has_alpha(),
+                                  im->get_bits_per_sample(),
+                                  w, h);
+
+          im->copy_area(i * w, j * h, w, h, buf, 0, 0);
+
+          frame.push_back (PixMask::create (buf));
+        }
+      result.push_back (frame);
+    }
+  return result;
 }
 
 void TarFileMaskedImage::instantiateVertical ()
@@ -160,20 +224,13 @@ void TarFileMaskedImage::instantiateVertical ()
     scale_dimension != Vector<int>(-1,-1) &&
     scale_dimension != dimension;
 
-  std::vector<PixMask *> images =
-    disassemble_row(image->to_pixbuf (), s, true);
-  if (scale)
-    for (guint32 i = 0; i < images.size (); i++)
-      PixMask::scale(images[i], scale_dimension.x, scale_dimension.y);
+  frames = disassemble_grid (maskcount + 1, s);
 
-  std::vector<PixMask *> masks = disassemble_row(image->to_pixbuf (), s, false);
   if (scale)
-    for (guint32 i = 0; i < masks.size (); i++)
-      PixMask::scale(masks[i], scale_dimension.x, scale_dimension.y);
+    for (auto frame : frames)
+      for (auto f : frame)
+        PixMask::scale(f, scale_dimension.x, scale_dimension.y);
 
-  frames.clear ();
-  for (guint32 i = 0; i < images.size (); i++)
-    frames.push_back (std::make_pair (images[i], masks[i]));
   return;
 }
 
@@ -182,18 +239,8 @@ void TarFileMaskedImage::uninstantiateImages ()
   guint32 oldsize = frames.size ();
   for (guint32 i = 0; i < frames.size (); i++)
     {
-      PixMask *p = frames[i].first;
-      if (p)
-        {
-          delete p;
-          frames[i].first = NULL;
-        }
-      p = frames[i].second;
-      if (p)
-        {
-          delete p;
-          frames[i].second = NULL;
-        }
+      for (auto f : frames[i])
+        delete f;
     }
   frames.clear ();
   frames.resize (oldsize);
@@ -221,36 +268,49 @@ TarFileMaskedImage::~TarFileMaskedImage ()
   uninstantiateImages ();
 }
 
-void TarFileMaskedImage::load_name (XML_Helper *helper, Glib::ustring data_tag)
+bool TarFileMaskedImage::save (XML_Helper *helper, Glib::ustring name_tag,
+                               Glib::ustring mask_tag)
 {
-  Glib::ustring n;
-  helper->getData(n, data_tag);
-  File::add_png_if_no_ext (n);
-  setName (n);
+  bool retval = true;
+  retval &= helper->saveData(name_tag, getName ());
+  retval &= helper->saveData(mask_tag, getNumMasks ());
+  return retval;
 }
 
-PixMask *TarFileMaskedImage::applyMask (Gdk::RGBA colour) const
+void TarFileMaskedImage::load (XML_Helper *helper, Glib::ustring name_tag,
+                               Glib::ustring mask_tag)
 {
-  return applyMask(frames[0].first, frames[0].second, colour);
+  Glib::ustring n;
+  helper->getData(n, name_tag);
+  File::add_png_if_no_ext (n);
+  setName (n);
+  helper->getData(maskcount, mask_tag);
+}
+
+PixMask *TarFileMaskedImage::applyMask (std::vector<Gdk::RGBA> colours) const
+{
+  return applyMask(frames[0], colours);
 }
 
 PixMask *TarFileMaskedImage::applyMask (Player *p) const
 {
-  return applyMask (p->getColor ());
+  return applyMask (p->getColors ());
 }
 
-PixMask *TarFileMaskedImage::applyMask (guint32 i, Gdk::RGBA colour) const
+PixMask *TarFileMaskedImage::applyMask (guint32 i, std::vector<Gdk::RGBA> colours) const
 {
-  return applyMask(frames[i].first, frames[i].second, colour);
+  return applyMask(frames[i], colours);
 }
 
 PixMask *TarFileMaskedImage::applyMask (guint32 i, Player *p) const
 {
-  return applyMask (i, p->getColor ());
+  return applyMask (i, p->getColors ());
 }
 
-PixMask* TarFileMaskedImage::applyMask(PixMask* im, PixMask* ma, Gdk::RGBA colour) const
+PixMask* TarFileMaskedImage::applyMask(std::vector<PixMask*> frame, std::vector<Gdk::RGBA> colours) const
 {
+  PixMask *im = frame[0];
+  PixMask *ma = frame[1];
   int width = im->get_width();
   int height = im->get_height();
   PixMask* result = PixMask::create(im->get_pixmap(), ma->get_pixmap());
@@ -261,29 +321,40 @@ PixMask* TarFileMaskedImage::applyMask(PixMask* im, PixMask* ma, Gdk::RGBA colou
       std::cerr <<"Warning: mask and original image do not match\n";
       return NULL;
     }
-  Glib::RefPtr<Gdk::Pixbuf> maskbuf = ma->to_pixbuf();
+  auto it = frame.begin ();
+  it++;
+  for (auto colour : colours)
+    {
+      ma = *it;
 
-  guint8 *data = maskbuf->get_pixels();
-  guint8 *copy = (guint8*)  malloc (height * width * 4 * sizeof(guint8));
-  for (int i = 0; i < height * width * 4; i++)
-    copy[i] = data[i];
-  for (int i = 0; i < width; i++)
-    for (int j = 0; j < height; j++)
-      {
-	const int base = (j * 4) + (i * height * 4);
+      Glib::RefPtr<Gdk::Pixbuf> maskbuf = ma->to_pixbuf();
 
-	if (copy[base+3] != 0)
-	  {
-	    copy[base+0] = colour.get_red() *copy[base+0];
-	    copy[base+1] = colour.get_green() * copy[base+1];
-	    copy[base+2] = colour.get_blue() * copy[base+2];
-	  }
-      }
-  Glib::RefPtr<Gdk::Pixbuf> colouredmask =
-    Gdk::Pixbuf::create_from_data(copy, Gdk::COLORSPACE_RGB, true, 8,
-				  width, height, width * 4);
-  result->draw_pixbuf(colouredmask, 0, 0, 0, 0, width, height);
-  free(copy);
+      guint8 *data = maskbuf->get_pixels();
+      guint8 *copy = (guint8*)  malloc (height * width * 4 * sizeof(guint8));
+      for (int i = 0; i < height * width * 4; i++)
+        copy[i] = data[i];
+      for (int i = 0; i < width; i++)
+        for (int j = 0; j < height; j++)
+          {
+            const int base = (j * 4) + (i * height * 4);
+
+            if (copy[base+3] != 0)
+              {
+                copy[base+0] = colour.get_red() *copy[base+0];
+                copy[base+1] = colour.get_green() * copy[base+1];
+                copy[base+2] = colour.get_blue() * copy[base+2];
+              }
+          }
+
+      Glib::RefPtr<Gdk::Pixbuf> colouredmask =
+        Gdk::Pixbuf::create_from_data(copy, Gdk::COLORSPACE_RGB, true, 8,
+                                      width, height, width * 4);
+      result->draw_pixbuf(colouredmask, 0, 0, 0, 0, width, height);
+      free(copy);
+      it++;
+      if (it == frame.end ())
+        break;
+    }
 
   return result;
 }
@@ -343,12 +414,44 @@ void TarFileMaskedImage::copyFrames (TarFileMaskedImage *dst)
   dst->calculated_number_of_frames = calculated_number_of_frames;
 
   for (guint32 i = 0; i < frames.size (); i++)
-    dst->frames[i] =
-      std::pair<PixMask*,PixMask*>(frames[i].first->copy (),
-                                   frames[i].second->copy ());
+    {
+      std::vector<PixMask*> frame;
+      for (guint32 j = 0; j < frames[i].size (); j++)
+        frame.push_back (frames[i][j]->copy ());
+      dst->frames[i] = frame;
+    }
 }
 
 bool TarFileMaskedImage::checkDimension (Glib::ustring f)
 {
-  return PixMask::checkDimension (f, dimension_type);
+  return PixMask::checkDimension (f, dimension_type, getNumMasks ());
+}
+
+bool TarFileMaskedImage::calculateNumberOfMasks (Glib::ustring f, bool &bad_dimension)
+{
+  if (dimension_type == PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT &&
+      orientation == HORIZONTAL_MASK)
+    {
+      if (checkDimension (f))
+        {
+          maskcount =
+            (image->get_unscaled_width () / image->get_unscaled_height ()) - 1;
+          return true;
+        }
+      else
+        bad_dimension = true;
+    }
+  else if (dimension_type == PixMask::DIMENSION_WIDTH_IS_FIXED_MAX_PLAYERS &&
+           orientation == VERTICAL_MASK)
+    {
+      if (checkDimension (f))
+        {
+          guint32 ts = image->get_unscaled_width () / MAX_PLAYERS;
+          maskcount = (image->get_unscaled_height () / ts) - 1;
+          return true;
+        }
+      else
+        bad_dimension = true;
+    }
+  return false;
 }

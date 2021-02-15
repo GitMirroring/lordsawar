@@ -1,7 +1,7 @@
 // Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
 // Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2016,
-// 2020, 2021 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2016, 2020,
+// 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -163,10 +163,10 @@ ImageCache::ImageCache()
 {
     d_hero_newlevel[0] =
       new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                              PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                              PixMask::DIMENSION_ANY);
     d_hero_newlevel[1] =
       new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                              PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                              PixMask::DIMENSION_ANY);
 
     loadDiplomacyImages();
     loadCursorImages();
@@ -1874,7 +1874,7 @@ PixMask *CircledArmyPixMaskCacheItem::generate(const CircledArmyPixMaskCacheItem
       pixbuf->fill(0x00000000);
       PixMask *empty = PixMask::create(pixbuf);
       s = ImageCache::circled
-        (empty, Shield::get_default_color_for_no(i.circle_colour_id),
+        (empty, Shield::get_default_colors_for_no(i.circle_colour_id)[0],
          i.circle_colour_id != Shield::NEUTRAL);
       delete empty;
     }
@@ -2294,9 +2294,8 @@ PixMask *ShieldPixMaskCacheItem::generate(const ShieldPixMaskCacheItem &i)
 {
   ShieldStyle *sh = Shieldsetlist::getInstance()->getShield(i.shieldset,
                                                             i.type, i.colour);
-  Gdk::RGBA colour =
-    Shieldsetlist::getInstance()->getColor(i.shieldset, i.colour);
-  PixMask *p =sh->getMaskedImage ()->applyMask (colour);
+  PixMask *p =sh->getMaskedImage ()->applyMask
+    (Shieldsetlist::getInstance ()->getColors (i.shieldset, i.colour));
   if (i.map)
     return p;
   //okay now we size things accordingly.
@@ -2807,12 +2806,13 @@ PixMask *TartanPixMaskCacheItem::generate(const TartanPixMaskCacheItem &i)
   //and then finally we cap it off with the rightmost tartan image
   //the images are all masked in the player's colour.
 
-  Gdk::RGBA colour =
-    Shieldsetlist::getInstance()->getColor(i.shieldset, i.player_id);
+  std::vector<Gdk::RGBA> colours =
+    Shieldsetlist::getInstance()->getColors(i.shieldset, i.player_id);
   TarFileMaskedImage *mim =
     Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                             Tartan::LEFT);
-  PixMask *left = mim->applyMask (colour);
+  Player *player = Playerlist::getInstance ()->getPlayer (i.player_id);
+  PixMask *left = mim->applyMask (colours);
   double ratio = DIALOG_TARTAN_PIC_FONTSIZE_MULTIPLE;
   double new_height = i.font_size * ratio;
   int new_width =
@@ -2821,13 +2821,13 @@ PixMask *TartanPixMaskCacheItem::generate(const TartanPixMaskCacheItem &i)
 
   mim = Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                                 Tartan::CENTER);
-  PixMask *center = mim->applyMask (colour);
+  PixMask *center = mim->applyMask (player);
   new_width =
     ImageCache::calculate_width_from_adjusted_height (center, new_height);
   PixMask::scale (center, new_width, new_height);
   mim =Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
                                                Tartan::RIGHT);
-  PixMask *right = mim->applyMask (colour);
+  PixMask *right = mim->applyMask (player);
   new_width =
     ImageCache::calculate_width_from_adjusted_height (right, new_height);
   PixMask::scale (right, new_width, new_height);

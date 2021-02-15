@@ -35,7 +35,7 @@ ShieldStyle::ShieldStyle(ShieldStyle::Type type)
 {
   d_mimage =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
 }
         
 ShieldStyle::~ShieldStyle()
@@ -53,11 +53,11 @@ ShieldStyle::ShieldStyle(XML_Helper* helper)
 {
   d_mimage =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
   Glib::ustring type_str;
   helper->getData(type_str, "type");
   d_type = shieldStyleTypeFromString(type_str);
-  d_mimage->load_name (helper, "image");
+  d_mimage->load (helper, "image", "image_num_masks");
 }
 
 Glib::ustring ShieldStyle::shieldStyleTypeToString(const ShieldStyle::Type type)
@@ -99,7 +99,7 @@ bool ShieldStyle::save(XML_Helper *helper) const
   retval &= helper->openTag(d_tag);
   Glib::ustring s = shieldStyleTypeToString(ShieldStyle::Type(d_type));
   retval &= helper->saveData("type", s);
-  retval &= helper->saveData("image", getMaskedImage()->getName ());
+  retval &= getMaskedImage ()->save (helper, "image", "image_num_masks");
   retval &= helper->closeTag();
   return retval;
 }

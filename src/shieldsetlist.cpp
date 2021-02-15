@@ -1,4 +1,5 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020,
+//  2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -77,12 +78,16 @@ std::list<Glib::ustring> Shieldsetlist::getValidNames() const
   return names;
 }
 
-Gdk::RGBA Shieldsetlist::getColor(guint32 shieldset, guint32 owner) const
+std::vector<Gdk::RGBA> Shieldsetlist::getColors(guint32 shieldset, guint32 owner) const
 {
   Shieldset *s = get(shieldset);
   if (!s)
-    return Gdk::RGBA("black");
-  return s->getColor(owner);
+    {
+      std::vector<Gdk::RGBA> l;
+      l.push_back (Gdk::RGBA("black"));
+      return l;
+    }
+  return s->getColors(owner);
 }
 
 ShieldStyle *Shieldsetlist::getShield(guint32 shieldset, guint32 type, guint32 colour) const

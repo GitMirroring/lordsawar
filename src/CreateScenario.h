@@ -1,6 +1,7 @@
 // Copyright (C) 2003, 2004, 2005 Ulf Lorenz
 // Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2006, 2007, 2008, 2009, 2012, 2014, 2015, 2020 Ben Asselstine
+// Copyright (C) 2006, 2007, 2008, 2009, 2012, 2014, 2015, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -97,23 +98,23 @@ class CreateScenario : public CreateScenarioRandomize
           * 
           * @param name     the name of the player
           * @param armyset  the name of the player's armyset
-          * @param color    the color of the player
+          * @param colors   the colors of the player
           * @param type     the type of the player (see class player for more info)
           * @return a pointer to the created player
           */
-        Player* addPlayer(Glib::ustring name, guint32 armyset, Gdk::RGBA color,
-			  int type);
+        Player* addPlayer(Glib::ustring name, guint32 armyset,
+                          std::vector<Gdk::RGBA> colors, int type);
 
         /** Almost the same as addPlayer, but performs some additional checks
           * 
           * @param name     the name of the player
           * @param armyset  the name of the player's armyset
-          * @param color    the color of the player
+          * @param colors   the colors of the player
           * @param type     the type of the player (see class player for more info)
           * @return false if a neutral player already exists, true otherwise
           */
-        bool addNeutral(Glib::ustring name, guint32 armyset, Gdk::RGBA color,
-                        int type);
+        bool addNeutral(Glib::ustring name, guint32 armyset,
+                        std::vector<Gdk::RGBA> colors, int type);
 
         /** Creates a map
           * 

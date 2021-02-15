@@ -82,7 +82,8 @@ class NetworkPlayer : public Player
 {
     public:
         // CREATORS
-        NetworkPlayer(Glib::ustring name, guint32 armyset, Gdk::RGBA color, int width, int height,
+        NetworkPlayer(Glib::ustring name, guint32 armyset,
+                      std::vector<Gdk::RGBA> colors, int width, int height,
                    Player::Type type = Player::HUMAN, int player_no = -1);
         NetworkPlayer(const Player&, bool sync_ids = false);
         NetworkPlayer(XML_Helper* helper);

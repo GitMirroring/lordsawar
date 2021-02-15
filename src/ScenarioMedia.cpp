@@ -60,10 +60,10 @@ ScenarioMedia::ScenarioMedia()
 {
   d_hero_newlevel[0] =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
   d_hero_newlevel[1] =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
   d_next_turn = new TarFileImage (1, PixMask::DIMENSION_ANY);
   d_city_defeated = new TarFileImage (1, PixMask::DIMENSION_ANY);
   d_winning = new TarFileImage (1, PixMask::DIMENSION_ANY);
@@ -116,10 +116,10 @@ ScenarioMedia::ScenarioMedia(XML_Helper *helper)
 {
   d_hero_newlevel[0] =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
   d_hero_newlevel[1] =
     new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_WIDTH_IS_TWO_HEIGHT);
+                            PixMask::DIMENSION_ANY);
   d_next_turn = new TarFileImage (1, PixMask::DIMENSION_ANY);
   d_city_defeated = new TarFileImage (1, PixMask::DIMENSION_ANY);
   d_winning = new TarFileImage (1, PixMask::DIMENSION_ANY);
@@ -145,8 +145,8 @@ ScenarioMedia::ScenarioMedia(XML_Helper *helper)
   d_ruin_defeat->load_name (helper, "ruin_defeat_image");
   d_parley_offered->load_name (helper, "parley_offered_image");
   d_parley_refused->load_name (helper, "parley_refused_image");
-  d_hero_newlevel[0]->load_name (helper, "hero_newlevel_male_image");
-  d_hero_newlevel[1]->load_name (helper, "hero_newlevel_female_image");
+  d_hero_newlevel[0]->load (helper, "hero_newlevel_male_image", "hero_newlevel_male_image_num_masks");
+  d_hero_newlevel[1]->load (helper, "hero_newlevel_female_image", "hero_newlevel_female_image_num_masks");
   d_medal[0]->load_name (helper, "small_medals_image");
   d_medal[1]->load_name (helper, "big_medals_image");
   d_commentator->load_name (helper, "commentator_image");
@@ -199,10 +199,8 @@ bool ScenarioMedia::save(XML_Helper* helper) const
   retval &= helper->saveData("ruin_defeat_image", d_ruin_defeat->getName ());
   retval &= helper->saveData("parley_offered_image", d_parley_offered->getName ());
   retval &= helper->saveData("parley_refused_image", d_parley_refused->getName ());
-  retval &= helper->saveData("hero_newlevel_male_image",
-                             d_hero_newlevel[0]->getName ());
-  retval &= helper->saveData("hero_newlevel_female_image",
-                             d_hero_newlevel[0]->getName ());
+  retval &= d_hero_newlevel[0]->save (helper, "hero_newlevel_male_image", "hero_newlevel_male_image_num_masks");
+  retval &= d_hero_newlevel[1]->save (helper, "hero_newlevel_female_image", "hero_newlevel_female_image_num_masks");
   retval &= helper->saveData("small_medals_image", d_medal[0]->getName ());
   retval &= helper->saveData("big_medals_image", d_medal[1]->getName ());
   retval &= helper->saveData("commentator_image", d_commentator->getName ());

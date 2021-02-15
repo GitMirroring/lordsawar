@@ -3,8 +3,8 @@
 // Copyright (C) 2004, 2005 Andrea Paternesi
 // Copyright (C) 2004 John Farrell
 // Copyright (C) 2005 Bryan Duff
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2017,
-// 2020, 2021 Ben Asselstine
+// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2017, 2020,
+// 2021 Ben Asselstine
 // Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -93,9 +93,9 @@
 
 Glib::ustring Player::d_tag = "player";
 
-Player::Player(Glib::ustring name, guint32 armyset, Gdk::RGBA color, int width,
+Player::Player(Glib::ustring name, guint32 armyset, std::vector<Gdk::RGBA> colors, int width,
 	       int height, Type type, int player_no)
-    :d_color(color), d_name(name), d_armyset(armyset), d_gold(1000),
+    :d_colors(colors), d_name(name), d_armyset(armyset), d_gold(1000),
     d_dead(false), d_immortal(false), d_type(type), d_upkeep(0), d_income(0),
     d_observable(true), surrendered(false), abort_requested(false)
 {
@@ -126,7 +126,7 @@ Player::Player(Glib::ustring name, guint32 armyset, Gdk::RGBA color, int width,
 }
 
 Player::Player(const Player& player, bool sync_ids)
-    :sigc::trackable(player), d_color(player.d_color), d_name(player.d_name),
+    :sigc::trackable(player), d_colors(player.d_colors), d_name(player.d_name),
     d_armyset(player.d_armyset), d_gold(player.d_gold), d_dead(player.d_dead),
     d_immortal(player.d_immortal), d_type(player.d_type), d_id(player.d_id),
     d_fight_order(player.d_fight_order), d_upkeep(player.d_upkeep),
@@ -182,7 +182,7 @@ Player::Player(XML_Helper* helper)
     d_type = playerTypeFromString(type_str);
     helper->getData(d_upkeep, "upkeep");
     helper->getData(d_income, "income");
-    helper->getData(d_color, "color");
+    helper->getData(d_colors, "color");
     helper->getData(d_armyset, "armyset");
 
     // Read in Fight Order.  One ranking per army type.
@@ -262,20 +262,20 @@ Player::~Player()
     clearHistorylist();
 }
 
-Player* Player::create(Glib::ustring name, guint32 armyset, Gdk::RGBA color, int width, int height, Type type)
+Player* Player::create(Glib::ustring name, guint32 armyset, std::vector<Gdk::RGBA> colors, int width, int height, Type type)
 {
   switch(type)
   {
   case HUMAN:
-    return (new RealPlayer(name, armyset, color, width, height));
+    return (new RealPlayer(name, armyset, colors, width, height));
   case AI_FAST:
-    return (new AI_Fast(name, armyset, color, width, height));
+    return (new AI_Fast(name, armyset, colors, width, height));
   case AI_DUMMY:
-    return (new AI_Dummy(name, armyset, color, width, height));
+    return (new AI_Dummy(name, armyset, colors, width, height));
   case AI_SMART:
-    return (new AI_Smart(name, armyset, color, width, height));
+    return (new AI_Smart(name, armyset, colors, width, height));
   case NETWORKED:
-    return (new NetworkPlayer(name, armyset, color, width, height));
+    return (new NetworkPlayer(name, armyset, colors, width, height));
   }
 
   return 0;
@@ -320,7 +320,12 @@ void Player::initTurn()
 
 void Player::setColor(Gdk::RGBA c)
 {
-    d_color = c;
+  d_colors[0] = c;
+}
+
+void Player::setColors(std::vector<Gdk::RGBA> l)
+{
+  d_colors = l;
 }
 
 void Player::addGold(int gold)
@@ -427,7 +432,7 @@ bool Player::save(XML_Helper* helper) const
 
     retval &= helper->saveData("id", d_id);
     retval &= helper->saveData("name", d_name);
-    retval &= helper->saveData("color", d_color);
+    retval &= helper->saveData("color", d_colors);
     retval &= helper->saveData("armyset", d_armyset);
     retval &= helper->saveData("gold", d_gold);
     retval &= helper->saveData("dead", d_dead);

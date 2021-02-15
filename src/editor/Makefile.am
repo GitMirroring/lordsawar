@@ -43,6 +43,8 @@ libarmysetwindow_la_SOURCES = \
 	armyset-selector-editor-actions.h \
 	tar-file-masked-image-editor-dialog.cpp tar-file-masked-image-editor-dialog.h \
 	tar-file-masked-image-editor-actions.h \
+	mask-validation-dialog.cpp mask-validation-dialog.h \
+	mask-validation-actions.h \
 	image-editor-dialog.cpp image-editor-dialog.h image-editor-actions.h
 
 libcitysetwindow_la_SOURCES = \

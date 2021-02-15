@@ -55,14 +55,14 @@ Tileset::Tileset(guint32 id, Glib::ustring name)
   d_selector[0] =
     new TarFileMaskedImage
     (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
   d_selector[1] =
     new TarFileMaskedImage
     (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
   d_flag =
     new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
   d_fog = new TarFileImage (FOG_TYPES,
                             PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
   d_road = new TarFileImage (ROAD_TYPES,
@@ -123,13 +123,13 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
 {
   d_selector[0] = new TarFileMaskedImage
     (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
   d_selector[1] = new TarFileMaskedImage
     (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
   d_flag = new TarFileMaskedImage
     (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HALF_HEIGHT);
+     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
   d_fog = new TarFileImage (FOG_TYPES,
                             PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
   d_road = new TarFileImage (ROAD_TYPES,
@@ -148,14 +148,14 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   guint32 ts;
   helper->getData(ts, "tilesize");
   setTileSize(ts);
-  d_selector[1]->load_name (helper, "large_selector");
-  d_selector[0]->load_name (helper, "small_selector");
+  d_selector[1]->load (helper, "large_selector", "large_selector_num_masks");
+  d_selector[0]->load (helper, "small_selector", "small_selector_num_masks");
   d_explosion->load_name (helper, "explosion");
   d_road->load_name (helper, "roads");
   d_stone->load_name (helper, "standing_stones");
   d_bridge->load_name (helper, "bridges");
   d_fog->load_name (helper, "fog");
-  d_flag->load_name (helper, "flags");
+  d_flag->load (helper, "flags", "flags_num_masks");
   d_all_movebonus->load_name (helper, "movebonus_all");
   d_water_movebonus->load_name (helper, "movebonus_water");
   d_forest_movebonus->load_name (helper, "movebonus_forest");
@@ -296,14 +296,14 @@ bool Tileset::save(XML_Helper *helper) const
   retval &= helper->openTag(d_tag);
   retval &= Set::save(helper);
   retval &= helper->saveData("tilesize", getUnscaledTileSize());
-  retval &= helper->saveData("large_selector", d_selector[1]->getName ());
-  retval &= helper->saveData("small_selector", d_selector[0]->getName ());
+  retval &= d_selector[1]->save (helper, "large_selector", "large_selector_num_masks");
+  retval &= d_selector[0]->save (helper, "small_selector", "small_selector_num_masks");
   retval &= helper->saveData("explosion", d_explosion->getName ());
   retval &= helper->saveData("roads", d_road->getName ());
   retval &= helper->saveData("standing_stones", d_stone->getName ());
   retval &= helper->saveData("bridges", d_bridge->getName ());
   retval &= helper->saveData("fog", d_fog->getName ());
-  retval &= helper->saveData("flags", d_flag->getName ());
+  retval &= d_flag->save (helper, "flags", "flags_num_masks");
   retval &= helper->saveData("movebonus_all", d_all_movebonus->getName ());
   retval &= helper->saveData("movebonus_water", d_water_movebonus->getName ());
   retval &= helper->saveData("movebonus_forest", d_forest_movebonus->getName ());
@@ -735,6 +735,9 @@ void Tileset::support_backward_compatibility()
                                           d_tag, true);
   FileCompat::getInstance()->support_version
     (FileCompat::TILESET, "0.2.1", "0.3.2",
+     sigc::ptr_fun(&Tileset::upgrade));
+  FileCompat::getInstance()->support_version
+    (FileCompat::TILESET, "0.3.2", "0.3.3",
      sigc::ptr_fun(&Tileset::upgrade));
 }
 
