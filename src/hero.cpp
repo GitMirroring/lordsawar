@@ -36,7 +36,7 @@ Glib::ustring Hero::d_hero_tag = "hero";
 
 Hero::Hero(const HeroProto& a)
   : Army (dynamic_cast<const ArmyProto&>(a)), d_name(a.getName()),
-    d_gender(Gender(a.getGender()))
+    d_gender(Gender(a.getGender())), d_hero_type_id (a.getHeroId())
 {
   d_level = 1;
   d_backpack = new Backpack();
@@ -44,7 +44,8 @@ Hero::Hero(const HeroProto& a)
 }
 
 Hero::Hero(Hero& h, bool sync_id)
-  : Army(h, sync_id, h.getOwner ()), d_name(h.d_name), d_gender(h.d_gender)
+  : Army(h, sync_id, h.getOwner ()), d_name(h.d_name), d_gender(h.d_gender),
+    d_hero_type_id (h.d_hero_type_id)
 {
   d_backpack = new Backpack(*h.d_backpack);
 }
@@ -58,6 +59,7 @@ Hero::Hero(XML_Helper* helper)
     d_gender = NONE;
   else
     d_gender = genderFromString(gender_str);
+  helper->getData(d_hero_type_id, "hero_type");
   helper->registerTag(Backpack::d_tag, 
 		      sigc::mem_fun(*this, &Hero::loadBackpack));
 }
@@ -77,6 +79,7 @@ bool Hero::save(XML_Helper* helper) const
     retval &= helper->saveData("name", d_name);
     Glib::ustring gender_str = genderToString(Hero::Gender(d_gender));
     retval &= helper->saveData("gender", gender_str);
+    retval &= helper->saveData("hero_type", d_hero_type_id);
     retval &= saveData(helper);
 
     // Now save the backpack

@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2014, 2015 Ben Asselstine
+// Copyright (C) 2008, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -48,8 +48,14 @@ class HeroProto : public ArmyProto, public OwnerId
 	//! Destructor.
         ~HeroProto();
 
+        //! Set the Id of the hero.
+        void setHeroId (guint32 id) {d_hero_id = id;}
+
         //! Set the gender of the hero.
         void setGender(Hero::Gender gender){d_gender = gender;}
+
+        //! Return the Id of the hero.
+        guint32 getHeroId () const {return d_hero_id;}
 
         //! Return the gender of the hero.
         guint32 getGender() const {return d_gender;}
@@ -60,6 +66,9 @@ class HeroProto : public ArmyProto, public OwnerId
 
 	//! Gender of the hero
 	Hero::Gender d_gender;
+
+        //! Id of the hero proto
+        guint32 d_hero_id;
 };
 
 #endif // HERO_PROTO_H

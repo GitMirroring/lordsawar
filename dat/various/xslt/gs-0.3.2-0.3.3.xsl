@@ -34,4 +34,73 @@
          </city>
 </xsl:template>
 
+<xsl:template match="heroproto">
+        <heroproto>
+                <d_hero_id>0</d_hero_id>
+                <xsl:copy-of select="d_id"/>
+                <xsl:copy-of select="d_name"/>
+                <xsl:copy-of select="d_description"/>
+                <xsl:copy-of select="d_production_cost"/>
+                <xsl:copy-of select="d_new_production_cost"/>
+                <xsl:copy-of select="d_production"/>
+                <xsl:copy-of select="d_upkeep"/>
+                <xsl:copy-of select="d_move_bonus"/>
+                <xsl:copy-of select="d_army_bonus"/>
+                <xsl:copy-of select="d_max_moves"/>
+                <xsl:copy-of select="d_sight"/>
+                <xsl:copy-of select="d_expvalue"/>
+                <xsl:copy-of select="d_awardable"/>
+                <xsl:copy-of select="d_defends_ruins"/>
+                <xsl:copy-of select="d_gender"/>
+                <xsl:copy-of select="d_owner"/>
+                <xsl:copy-of select="d_armyset"/>
+                <xsl:copy-of select="d_image_white"/>
+                <xsl:copy-of select="d_image_green"/>
+                <xsl:copy-of select="d_image_yellow"/>
+                <xsl:copy-of select="d_image_light_blue"/>
+                <xsl:copy-of select="d_image_red"/>
+                <xsl:copy-of select="d_image_dark_blue"/>
+                <xsl:copy-of select="d_image_orange"/>
+                <xsl:copy-of select="d_image_black"/>
+                <xsl:copy-of select="d_image_neutral"/>
+        </heroproto>
+</xsl:template>
+
+<xsl:template match="herotemplate">
+        <herotemplate>
+                <d_hero_id>0</d_hero_id>
+                <xsl:copy-of select="d_owner"/>
+                <xsl:copy-of select="d_gender"/>
+                <xsl:copy-of select="d_name"/>
+        </herotemplate>
+</xsl:template>
+
+<xsl:template match="hero">
+        <hero>
+                <d_hero_type>0<d_hero_type>
+                <xsl:copy-of select="d_name"/>
+                <xsl:copy-of select="d_gender"/>
+                <xsl:copy-of select="d_upkeep"/>
+                <xsl:copy-of select="d_move_bonus"/>
+                <xsl:copy-of select="d_army_bonus"/>
+                <xsl:copy-of select="d_max_moves"/>
+                <xsl:copy-of select="d_strength"/>
+                <xsl:copy-of select="d_sight"/>
+                <xsl:copy-of select="d_expvalue"/>
+                <xsl:copy-of select="d_id"/>
+                <xsl:copy-of select="d_armyset"/>
+                <xsl:copy-of select="d_type"/>
+                <xsl:copy-of select="d_hp"/>
+                <xsl:copy-of select="d_ship"/>
+                <xsl:copy-of select="d_moves"/>
+                <xsl:copy-of select="d_xp"/>
+                <xsl:copy-of select="d_max_moves_multiplier"/>
+                <xsl:copy-of select="d_level"/>
+                <xsl:copy-of select="d_medals"/>
+                <xsl:copy-of select="d_battlesnumber"/>
+                <xsl:copy-of select="d_visitedtemples"/>
+                <xsl:copy-of select="backpack"/>
+        </hero>
+</xsl:template>
+
 </xsl:stylesheet>

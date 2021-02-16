@@ -76,6 +76,9 @@ class HeroTemplates
 
 	HeroProto *getRandomHero(Hero::Gender gender, int player_id);
 
+        //! get the hero with HERO_ID belonging to the given player
+        HeroProto *getHeroProtoById (int player_id, guint32 hero_id);
+
         //! Save the list of hero templates to a saved-game file.
         bool save(XML_Helper* helper) const;
 
@@ -111,6 +114,7 @@ class HeroTemplates
         void loadHeroTemplates(XML_Helper *helper);
 
         void loadHeroesFromArmysets ();
+        void updateHeroIds ();
 };
 
 #endif

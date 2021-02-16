@@ -99,6 +99,9 @@ class Hero : public Army
         //! Return the gender of the hero.
         guint32 getGender() const {return d_gender;}
 
+        //! Return the id of the heroproto in hero templates
+        guint32 getHeroTypeId () const {return d_hero_type_id;}
+
         //! Can the hero fly?
         bool isFlyer() const;
 
@@ -194,6 +197,9 @@ class Hero : public Army
 
 	//! Gender of the hero
 	Hero::Gender d_gender;
+
+        //! The hero id of the hero
+        guint32 d_hero_type_id;
 };
 
 #endif //HERO_H

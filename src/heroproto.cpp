@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2014, 2015 Ben Asselstine
+// Copyright (C) 2008, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ Glib::ustring HeroProto::d_heroproto_tag = "heroproto";
 #define debug(x)
 
 HeroProto::HeroProto(const HeroProto& a)
-    :ArmyProto(a), OwnerId(a), d_gender(a.d_gender)
+    :ArmyProto(a), OwnerId(a), d_gender(a.d_gender), d_hero_id (a.d_hero_id)
 {
 }
 
@@ -37,16 +37,18 @@ HeroProto::HeroProto(const ArmyProto& a)
   d_gender = a.getGender();
   if (d_gender == Hero::NONE)
     d_gender = Hero::MALE;
+  d_hero_id = 0;
 }
 
 HeroProto::HeroProto()
-  :ArmyProto(), OwnerId(), d_gender(Hero::FEMALE)
+  :ArmyProto(), OwnerId(), d_gender(Hero::FEMALE), d_hero_id (0)
 {
 }
 
 HeroProto::HeroProto(XML_Helper* helper)
   :ArmyProto(helper), OwnerId(helper)
 {
+  helper->getData(d_hero_id, "hero_id");
   Glib::ustring gender_str;
   if (!helper->getData(gender_str, "gender"))
     d_gender = Hero::NONE;
@@ -66,6 +68,7 @@ bool HeroProto::save(XML_Helper* helper) const
 
   retval &= helper->openTag(HeroProto::d_heroproto_tag);
 
+  retval &= helper->saveData("hero_id", d_hero_id);
   retval &= ArmyProto::saveData(helper);
   Glib::ustring gender_str = Hero::genderToString(Hero::Gender(d_gender));
   retval &= helper->saveData("gender", gender_str);

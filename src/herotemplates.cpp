@@ -172,6 +172,8 @@ bool HeroTemplates::load(Glib::ustring tag, XML_Helper *helper)
 {
   if (tag == "herotemplate")
     {
+      guint32 id;
+      helper->getData (id, "hero_id");
       Glib::ustring name;
       helper->getData(name, "name");
       guint32 owner;
@@ -205,6 +207,7 @@ bool HeroTemplates::load(Glib::ustring tag, XML_Helper *helper)
 	return false;
       HeroProto *newhero = new HeroProto (*herotype);
       newhero->setOwnerId(owner);
+      newhero->setHeroId (id);
 
       newhero->setName (_(name.c_str()));
       d_herotemplates[owner].push_back (newhero);
@@ -227,6 +230,7 @@ void HeroTemplates::replaceHeroes (int player_id, std::vector<HeroProto*> he)
   d_herotemplates[player_id].clear ();
   for (guint32 i = 0; i < he.size (); i++)
     d_herotemplates[player_id].push_back (he[i]);
+  updateHeroIds ();
 }
 
 bool HeroTemplates::isDefault() const
@@ -282,6 +286,7 @@ bool HeroTemplates::save(XML_Helper* helper) const
             Glib::ustring gender_str =
               Hero::genderToString(Hero::Gender(h->getGender ()));
             retval &= helper->saveData("gender", gender_str);
+            retval &= helper->saveData("hero_id", h->getHeroId ());
             OwnerId o = *h;
             retval &= o.save (helper);
             retval &= helper->closeTag();
@@ -297,4 +302,32 @@ void HeroTemplates::reset (HeroTemplates *h)
 {
   delete d_instance;
   d_instance = h;
+}
+
+void HeroTemplates::updateHeroIds()
+{
+  guint32 id = 0;
+  for (guint32 i = 0; i < MAX_PLAYERS; i++)
+    {
+      for (guint32 j = 0; j < d_herotemplates[i].size (); j++)
+        {
+          HeroProto *h = d_herotemplates[i][j];
+          h->setHeroId (id);
+        }
+    }
+  return;
+}
+        
+HeroProto *HeroTemplates::getHeroProtoById (int player_id, guint32 hero_id)
+{
+  //let's just do a slow lookup, there's only about 10 to search through.
+  if (player_id >= (int) MAX_PLAYERS)
+    return NULL;
+  for (guint32 j = 0; j < d_herotemplates[player_id].size (); j++)
+    {
+      HeroProto *h = d_herotemplates[player_id][j];
+      if (h->getHeroId () == hero_id)
+        return h;
+    }
+  return NULL;
 }
