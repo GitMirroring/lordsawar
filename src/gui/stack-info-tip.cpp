@@ -51,19 +51,37 @@ StackInfoTip::StackInfoTip(Gtk::Widget *target, MapTipPosition mpos, StackTile *
           window->set_transient_for (*dynamic_cast<Gtk::Dialog*>(w));
       }
     xml->get_widget("image_hbox", image_hbox);
+    xml->get_widget("hero_name_box", hero_name_box);
+    xml->get_widget("hero_description_box", hero_description_box);
 
     //fill up the hbox with images of the armies in the stack
 
     Player *active = Playerlist::getActiveplayer();
     std::vector<Stack *> stks;
     stks = stile->getFriendlyStacks(active);
+    bool enemies = false;
     if (stks.empty() == true)
       {
-        if (GameScenarioOptions::s_see_opponents_stacks)
-          stks = stile->getEnemyStacks(active);
-        else
-          return;
+        stks = stile->getEnemyStacks(active);
+        enemies = true;
       }
+
+    Glib::ustring hero_name;
+    for (auto s : stks)
+      {
+        if (s->getStrongestHero ())
+          {
+            hero_name = s->getStrongestHero ()->getName ();
+            break;
+          }
+      }
+        
+    if (GameScenarioOptions::s_see_opponents_stacks == false &&
+        enemies)
+      stks.clear ();
+
+    if (enemies && hero_name.empty () == true)
+      return;
     guint32 fs = FontSize::getInstance ()->get_height ();
     for (std::vector<Stack *>::iterator i = stks.begin(); i != stks.end(); ++i)
       for (Stack::iterator it = (*i)->begin(); it != (*i)->end(); ++it)
@@ -75,7 +93,17 @@ StackInfoTip::StackInfoTip(Gtk::Widget *target, MapTipPosition mpos, StackTile *
 	  image_hbox->add(*manage(image));
 	}
 
-    image_hbox->show_all();
+    if (stks.empty () == false)
+      image_hbox->show_all();
+
+    if (hero_name.empty () == false)
+      {
+        Gtk::Label *hero_label = new Gtk::Label (hero_name);
+        hero_label->set_hexpand (true);
+        hero_label->property_justify () = Gtk::JUSTIFY_CENTER;
+        hero_name_box->add (*manage (hero_label));
+        hero_name_box->show_all ();
+      }
 
     // move into correct position
     window->get_child()->show();

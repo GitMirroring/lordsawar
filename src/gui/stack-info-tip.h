@@ -38,6 +38,8 @@ class StackInfoTip: public sigc::trackable
  private:
     Gtk::Window* window;
     Gtk::Box *image_hbox;
+    Gtk::Box *hero_name_box;
+    Gtk::Box *hero_description_box;
 };
 
 #endif

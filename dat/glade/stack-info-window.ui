@@ -1,32 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.2 -->
+<!-- Generated with glade 3.38.2 -->
 <!--*- mode: xml -*-->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow" id="window">
-    <property name="can_focus">False</property>
+    <property name="can-focus">False</property>
     <property name="type">popup</property>
-    <property name="window_position">mouse</property>
-    <property name="destroy_with_parent">True</property>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
+    <property name="window-position">mouse</property>
+    <property name="destroy-with-parent">True</property>
     <child>
       <object class="GtkFrame" id="outer_frame">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label_xalign">0</property>
-        <property name="shadow_type">etched-out</property>
+        <property name="can-focus">False</property>
+        <property name="margin-start">12</property>
+        <property name="margin-end">12</property>
+        <property name="margin-top">12</property>
+        <property name="margin-bottom">12</property>
+        <property name="label-xalign">0</property>
+        <property name="shadow-type">etched-out</property>
         <child>
-          <object class="GtkAlignment" id="alignment1">
+          <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="border_width">6</property>
+            <property name="can-focus">False</property>
+            <property name="valign">center</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkBox" id="hero_name_box">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
             <child>
               <object class="GtkBox" id="image_hbox">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
               </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="hero_description_box">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
             </child>
           </object>
         </child>

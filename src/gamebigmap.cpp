@@ -509,6 +509,12 @@ void GameBigMap::mouse_button_event(MouseButtonEvent e)
 		  stack_queried.emit(tile);
 		  mouse_state = SHOWING_STACK;
 		}
+              else if (d_see_opponents_stacks == false &&
+                       st->getStrongestHero ())
+		{
+		  stack_queried.emit(tile);
+		  mouse_state = SHOWING_STACK;
+		}
 	      else if (st->getOwner() == Playerlist::getActiveplayer() && 
 		       d_see_opponents_stacks == false)
 		{
