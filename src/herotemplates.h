@@ -111,6 +111,9 @@ class HeroTemplates
 
         static HeroTemplates* d_instance;
 
+        //! hack to remember which owner hero we're loading
+        guint32 current_owner;
+
         void loadHeroTemplates(XML_Helper *helper);
 
         void loadHeroesFromArmysets ();

@@ -29,6 +29,11 @@
 #include "playerlist.h"
 #include "heroes-editor-actions.h"
 #include "hero-strategy-dialog.h"
+#include "Backpack.h"
+#include "Item.h"
+#include "Itemlist.h"
+#include "ItemProto.h"
+#include "backpack-editor-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &HeroesDialog::x)
 
@@ -76,6 +81,8 @@ HeroesDialog::HeroesDialog(Gtk::Window &parent, guint32 player_id, Glib::ustring
   remove_button->signal_clicked().connect (method (on_remove_pressed));
   xml->get_widget("strategy_button", strategy_button);
   strategy_button->signal_clicked().connect (method (on_strategy_pressed));
+  xml->get_widget("items_button", items_button);
+  items_button->signal_clicked ().connect (method (on_items_pressed));
   xml->get_widget("undo_button", undo_button);
   undo_button->signal_activate ().connect (method (on_undo_activated));
   xml->get_widget("redo_button", redo_button);
@@ -118,6 +125,7 @@ void HeroesDialog::on_strategy_pressed ()
       HeroStrategyDialog d (*dialog, hero->getStrategy ());
       if (d.run ())
         {
+          d_changed = true;
           umgr->add (new HeroesEditorAction_Strategy (getCurIndex (),
                                                       hero->getStrategy ()));
           HeroStrategy *h = hero->getStrategy ();
@@ -212,6 +220,7 @@ void HeroesDialog::clear_heroes ()
 
 HeroesDialog::~HeroesDialog ()
 {
+  disconnect_signals ();
   clear_heroes ();
   delete umgr;
 }
@@ -260,6 +269,40 @@ void HeroesDialog::on_gender_changed ()
         hero->setGender (Hero::FEMALE);
       update_hero_templates ();
     }
+  update ();
+}
+
+void HeroesDialog::on_items_pressed ()
+{
+  HeroProto *hero = get_selected_hero ();
+  if (hero)
+    {
+      HeroesEditorAction_Backpack *action =
+        new HeroesEditorAction_Backpack
+        (getCurIndex (), hero->getStartingItemIds());
+      Backpack *backpack = new Backpack ();
+      for (auto id : hero->getStartingItemIds ())
+        {
+          ItemProto *proto = (*Itemlist::getInstance ())[id];
+          backpack->addToBackpack (new Item (*proto, id));
+        }
+      BackpackEditorDialog d(*dialog, backpack);
+      if (d.run())
+        {
+          std::list<guint32> item_ids;
+          for (auto item : *backpack)
+            item_ids.push_back (item->getType());
+          hero->setStartingItemIds (item_ids);
+          umgr->add (action);
+          d_changed = true;
+        }
+      else
+        delete action;
+      delete backpack;
+      update_hero_templates ();
+      update ();
+    }
+  return;
 }
 
 void HeroesDialog::update_panel ()
@@ -283,12 +326,23 @@ void HeroesDialog::update_panel ()
       else
         strategy_button->set_label (hero->getStrategy ()->getDescription ());
       strategy_button->set_sensitive (false);
+
+      if (hero->getStartingItemIds ().size () == 0)
+        items_button->set_label (_("No starting items"));
+      else
+        items_button->set_label
+          (String::ucompose (ngettext ("Starting with %1 item",
+                                       "Starting with %1 items",
+                                       hero->getStartingItemIds().size ()),
+                             hero->getStartingItemIds().size ()));
+      items_button->set_sensitive (false);
     }
   else
     {
       name_entry->set_text ("");
       gender_combobox->set_active (0);
       strategy_button->set_label (_("No strategy set"));
+      items_button->set_label (_("No starting items"));
     }
   panel_box->set_sensitive (hero != NULL);
 }
@@ -419,6 +473,16 @@ UndoAction *HeroesDialog::executeAction (UndoAction *action2)
               delete h;
             getHeroByIndex (a)->setStrategy
               (HeroStrategy::copy (a->getStrategy ()));
+          }
+        break;
+      case HeroesEditorAction::BACKPACK:
+          {
+            HeroesEditorAction_Backpack *a =
+              dynamic_cast<HeroesEditorAction_Backpack*>(action);
+            out = new HeroesEditorAction_Backpack
+              (a->getIndex (), getHeroByIndex (a)->getStartingItemIds ());
+
+            getHeroByIndex (a)->setStartingItemIds (a->getBackpack ());
           }
         break;
     }

@@ -67,6 +67,10 @@ class HeroProto : public ArmyProto, public OwnerId
         //! Return the strategy that this hero uses.
         HeroStrategy* getStrategy () const {return d_strategy;}
 
+        std::list<guint32> getStartingItemIds () const {return d_starting_items;}
+
+        void setStartingItemIds (std::list<guint32> i) {d_starting_items = i;}
+
         //! Saves the hero prototype to an action
         virtual bool save(XML_Helper* helper) const;
     private:
@@ -79,6 +83,9 @@ class HeroProto : public ArmyProto, public OwnerId
 
         //! How the hero acts
         HeroStrategy *d_strategy;
+
+        //! list of item proto ids to be made into items at recruit time
+        std::list<guint32> d_starting_items;
 
         //! Callback for loading the hero strategy data.
         bool load (Glib::ustring tag, XML_Helper* helper);

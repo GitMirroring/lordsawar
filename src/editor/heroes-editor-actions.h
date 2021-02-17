@@ -42,6 +42,7 @@ public:
       ADD = 3,
       REMOVE = 4,
       STRATEGY = 5,
+      BACKPACK = 6,
     };
 
     HeroesEditorAction(Type type, bool agg = false)
@@ -150,4 +151,20 @@ class HeroesEditorAction_Strategy: public HeroesEditorAction_Index
     private:
         HeroStrategy* d_strategy;
 };
+
+class HeroesEditorAction_Backpack: public HeroesEditorAction_Index
+{
+    public:
+        HeroesEditorAction_Backpack (guint32 i, std::list<guint32> items)
+          : HeroesEditorAction_Index (BACKPACK, i), d_items (items) {}
+        ~HeroesEditorAction_Backpack () {}
+
+        Glib::ustring getActionName () const {return "Backpack";}
+
+        std::list<guint32> getBackpack () {return d_items;}
+
+    private:
+        std::list<guint32> d_items;
+};
+
 #endif //HEROES_EDITOR_ACTIONS_H

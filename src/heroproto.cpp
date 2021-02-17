@@ -28,7 +28,8 @@ Glib::ustring HeroProto::d_heroproto_tag = "heroproto";
 
 HeroProto::HeroProto(const HeroProto& a)
     :ArmyProto(a), OwnerId(a), d_gender(a.d_gender), d_hero_id (a.d_hero_id),
-     d_strategy (HeroStrategy::copy (a.d_strategy))
+     d_strategy (HeroStrategy::copy (a.d_strategy)),
+     d_starting_items (a.d_starting_items)
 {
 }
 
@@ -59,7 +60,21 @@ HeroProto::HeroProto(XML_Helper* helper)
     d_gender = Hero::NONE;
   else
     d_gender = Hero::genderFromString(gender_str);
+
   helper->getData(d_armyset, "armyset");
+
+  Glib::ustring items;
+  std::stringstream sitems;
+  helper->getData(items, "starting_items");
+  sitems.str(items);
+
+  while (sitems.eof() == false)
+    {
+      int ival = -1;
+      sitems >> ival;
+      if (ival != -1)
+	d_starting_items.push_back ((guint32)ival);
+    }
 }
 
 bool HeroProto::load (Glib::ustring tag, XML_Helper* helper)
@@ -77,6 +92,7 @@ bool HeroProto::load (Glib::ustring tag, XML_Helper* helper)
 HeroProto::~HeroProto()
 {
   uninstantiateImages();
+  delete d_strategy;
 }
 
 bool HeroProto::save(XML_Helper* helper) const
@@ -91,6 +107,10 @@ bool HeroProto::save(XML_Helper* helper) const
   retval &= helper->saveData("gender", gender_str);
   retval &= OwnerId::save(helper);
   retval &= helper->saveData("armyset", d_armyset);
+  std::stringstream items;
+  for (auto it: d_starting_items)
+    items << it << " ";
+  retval &= helper->saveData("starting_items", items.str());
   retval &= d_strategy->save (helper);
   retval &= helper->closeTag();
 

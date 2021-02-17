@@ -61,6 +61,7 @@ class HeroesDialog: public LwEditorDialog
     Gtk::Button *add_button;
     Gtk::Button *remove_button;
     Gtk::Button *strategy_button;
+    Gtk::Button *items_button;
     Gtk::Button *undo_button;
     Gtk::Button *redo_button;
 
@@ -73,6 +74,7 @@ class HeroesDialog: public LwEditorDialog
     void on_add_pressed();
     void on_remove_pressed();
     void on_strategy_pressed ();
+    void on_items_pressed ();
 
     void fill_heroes ();
     void update_buttons ();

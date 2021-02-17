@@ -37,6 +37,7 @@
 <xsl:template match="heroproto">
         <heroproto>
                 <d_hero_id>0</d_hero_id>
+                <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
                 </herostrategy>

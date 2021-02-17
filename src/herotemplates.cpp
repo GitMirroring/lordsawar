@@ -62,6 +62,7 @@ void HeroTemplates::deleteInstance()
 
 HeroTemplates::HeroTemplates()
 {
+  current_owner = 0;
   XML_Helper helper(File::getMiscFile("heronames.xml"), std::ios::in);
 
   loadHeroTemplates(&helper);
@@ -72,6 +73,7 @@ HeroTemplates::HeroTemplates()
 
 HeroTemplates::HeroTemplates(const HeroTemplates &h)
 {
+  current_owner = h.current_owner;
   for (guint32 i = 0; i < MAX_PLAYERS; i++)
     {
       d_herotemplates[i] = std::vector<HeroProto*>();
@@ -89,6 +91,7 @@ HeroTemplates::HeroTemplates(const HeroTemplates &h)
 
 HeroTemplates::HeroTemplates(XML_Helper *helper)
 {
+  current_owner = 0;
   loadHeroTemplates(helper);
 }
 
@@ -163,6 +166,8 @@ void HeroTemplates::loadHeroTemplates(XML_Helper *helper)
 {
   loadHeroesFromArmysets ();
 
+  helper->registerTag (HeroStrategy::d_tag,
+                       sigc::mem_fun (this, &HeroTemplates::load));
   helper->registerTag(HeroTemplates::d_child_tag,
                       sigc::mem_fun((*this), &HeroTemplates::load));
   return;
@@ -170,7 +175,7 @@ void HeroTemplates::loadHeroTemplates(XML_Helper *helper)
 
 bool HeroTemplates::load(Glib::ustring tag, XML_Helper *helper)
 {
-  if (tag == "herotemplate")
+  if (tag == d_child_tag)
     {
       guint32 id;
       helper->getData (id, "hero_id");
@@ -184,6 +189,20 @@ bool HeroTemplates::load(Glib::ustring tag, XML_Helper *helper)
       helper->getData(gender_str, "gender");
       Hero::Gender gender;
       gender = Hero::genderFromString(gender_str);
+
+      Glib::ustring items;
+      std::stringstream sitems;
+      helper->getData(items, "starting_items");
+      sitems.str(items);
+
+      std::list<guint32> item_ids;
+      while (sitems.eof() == false)
+        {
+          int ival = -1;
+          sitems >> ival;
+          if (ival != -1)
+            item_ids.push_back ((guint32)ival);
+        }
 
       const ArmyProto *herotype = NULL;
       if (gender == Hero::MALE)
@@ -204,15 +223,24 @@ bool HeroTemplates::load(Glib::ustring tag, XML_Helper *helper)
 	    herotype = d_female_heroes[Rnd::rand() % d_female_heroes.size()];
 	}
       if (herotype == NULL)
-	return false;
+        return false;
       HeroProto *newhero = new HeroProto (*herotype);
       newhero->setOwnerId(owner);
       newhero->setHeroId (id);
+      newhero->setStartingItemIds (item_ids);
 
       newhero->setName (_(name.c_str()));
       d_herotemplates[owner].push_back (newhero);
+      current_owner = owner;
+      return true;
     }
-  return true;
+  if (tag == HeroStrategy::d_tag)
+    {
+      HeroStrategy *s = HeroStrategy::handle_load (helper);
+      d_herotemplates[current_owner].back ()->setStrategy (s);
+      return true;
+    }
+  return false;
 }
 
 std::vector<HeroProto*> HeroTemplates::getHeroes (int player_id)
@@ -289,6 +317,12 @@ bool HeroTemplates::save(XML_Helper* helper) const
             retval &= helper->saveData("hero_id", h->getHeroId ());
             OwnerId o = *h;
             retval &= o.save (helper);
+            std::stringstream items;
+            for (auto it: h->getStartingItemIds ())
+              items << it << " ";
+            retval &= helper->saveData("starting_items", items.str());
+            if (h->getStrategy ())
+              retval &= h->getStrategy ()->save (helper);
             retval &= helper->closeTag();
           }
       }
