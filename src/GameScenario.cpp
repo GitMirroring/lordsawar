@@ -1139,7 +1139,9 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
   if (num < 2)
     errors.push_back(_("There must be at least 2 cities in the scenario."));
 
-  if (getName() == _("Untitled"))
+  Glib::ustring match = _("Untitled");
+  if (getName ().find (match) == 0 ||
+      String::utrim (getName ()).empty () == true)
     errors.push_back(_("The scenario does not have a name."));
 
   for (auto it: *Playerlist::getInstance())
