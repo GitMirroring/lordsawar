@@ -28,6 +28,7 @@
 #include "heroproto.h"
 #include "playerlist.h"
 #include "heroes-editor-actions.h"
+#include "hero-strategy-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &HeroesDialog::x)
 
@@ -73,6 +74,8 @@ HeroesDialog::HeroesDialog(Gtk::Window &parent, guint32 player_id, Glib::ustring
   add_button->signal_clicked().connect (method (on_add_pressed));
   xml->get_widget("remove_button", remove_button);
   remove_button->signal_clicked().connect (method (on_remove_pressed));
+  xml->get_widget("strategy_button", strategy_button);
+  strategy_button->signal_clicked().connect (method (on_strategy_pressed));
   xml->get_widget("undo_button", undo_button);
   undo_button->signal_activate ().connect (method (on_undo_activated));
   xml->get_widget("redo_button", redo_button);
@@ -102,9 +105,28 @@ void HeroesDialog::on_add_pressed ()
   hero->setName ((*i)[hero_columns.name]);
   hero->setOwnerId (d_player_id);
   (*i)[hero_columns.hero] = hero;
-  treeview->get_selection ()->select (i);
   update_hero_templates ();
   treeview->scroll_to_row (treeview->get_model ()->get_path (i));
+  treeview->get_selection ()->select (i);
+}
+
+void HeroesDialog::on_strategy_pressed ()
+{
+  HeroProto *hero = get_selected_hero ();
+  if (hero)
+    {
+      HeroStrategyDialog d (*dialog, hero->getStrategy ());
+      if (d.run ())
+        {
+          umgr->add (new HeroesEditorAction_Strategy (getCurIndex (),
+                                                      hero->getStrategy ()));
+          HeroStrategy *h = hero->getStrategy ();
+          delete h;
+          hero->setStrategy (HeroStrategy::copy (d.get_strategy ()));
+          update_hero_templates ();
+        }
+    }
+  update ();
 }
 
 void HeroesDialog::on_remove_pressed ()
@@ -256,11 +278,17 @@ void HeroesDialog::update_panel ()
           gender_combobox->set_active (1);
           break;
         }
+      if (hero->getStrategy () == NULL)
+        strategy_button->set_label (_("No strategy set"));
+      else
+        strategy_button->set_label (hero->getStrategy ()->getDescription ());
+      strategy_button->set_sensitive (false);
     }
   else
     {
       name_entry->set_text ("");
       gender_combobox->set_active (0);
+      strategy_button->set_label (_("No strategy set"));
     }
   panel_box->set_sensitive (hero != NULL);
 }
@@ -377,6 +405,20 @@ UndoAction *HeroesDialog::executeAction (UndoAction *action2)
             HeroTemplates::reset (a->getHeroes ());
             a->clearHeroes ();
             fill_heroes ();
+          }
+        break;
+      case HeroesEditorAction::STRATEGY:
+          {
+            HeroesEditorAction_Strategy *a =
+              dynamic_cast<HeroesEditorAction_Strategy*>(action);
+            out = new HeroesEditorAction_Strategy
+              (a->getIndex (), getHeroByIndex (a)->getStrategy ());
+
+            HeroStrategy *h = getHeroByIndex (a)->getStrategy ();
+            if (h)
+              delete h;
+            getHeroByIndex (a)->setStrategy
+              (HeroStrategy::copy (a->getStrategy ()));
           }
         break;
     }

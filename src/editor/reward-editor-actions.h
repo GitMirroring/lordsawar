@@ -26,9 +26,9 @@
 #include "ruin.h"
 #include "undo-mgr.h"
 
-//! A record of an event in the ruin editor
+//! A record of an event in the reward editor
 /** 
- * The purpose of these classes is to implement undo/redo in the ruin
+ * The purpose of these classes is to implement undo/redo in the reward
  * editor.
  */
 

@@ -27,7 +27,8 @@ Glib::ustring HeroProto::d_heroproto_tag = "heroproto";
 #define debug(x)
 
 HeroProto::HeroProto(const HeroProto& a)
-    :ArmyProto(a), OwnerId(a), d_gender(a.d_gender), d_hero_id (a.d_hero_id)
+    :ArmyProto(a), OwnerId(a), d_gender(a.d_gender), d_hero_id (a.d_hero_id),
+     d_strategy (HeroStrategy::copy (a.d_strategy))
 {
 }
 
@@ -38,16 +39,20 @@ HeroProto::HeroProto(const ArmyProto& a)
   if (d_gender == Hero::NONE)
     d_gender = Hero::MALE;
   d_hero_id = 0;
+  d_strategy = new HeroStrategy_None ();
 }
 
 HeroProto::HeroProto()
-  :ArmyProto(), OwnerId(), d_gender(Hero::FEMALE), d_hero_id (0)
+  :ArmyProto(), OwnerId(), d_gender(Hero::FEMALE), d_hero_id (0),
+    d_strategy (new HeroStrategy_None ())
 {
 }
 
 HeroProto::HeroProto(XML_Helper* helper)
   :ArmyProto(helper), OwnerId(helper)
 {
+  helper->registerTag (HeroStrategy::d_tag,
+                       sigc::mem_fun (this, &HeroProto::load));
   helper->getData(d_hero_id, "hero_id");
   Glib::ustring gender_str;
   if (!helper->getData(gender_str, "gender"))
@@ -55,6 +60,18 @@ HeroProto::HeroProto(XML_Helper* helper)
   else
     d_gender = Hero::genderFromString(gender_str);
   helper->getData(d_armyset, "armyset");
+}
+
+bool HeroProto::load (Glib::ustring tag, XML_Helper* helper)
+{
+  if (tag == HeroStrategy::d_tag)
+    {
+      HeroStrategy *s = HeroStrategy::handle_load (helper);
+      d_strategy = s;
+      return true;
+    }
+
+  return false;
 }
 
 HeroProto::~HeroProto()
@@ -74,7 +91,7 @@ bool HeroProto::save(XML_Helper* helper) const
   retval &= helper->saveData("gender", gender_str);
   retval &= OwnerId::save(helper);
   retval &= helper->saveData("armyset", d_armyset);
-
+  retval &= d_strategy->save (helper);
   retval &= helper->closeTag();
 
   return retval;

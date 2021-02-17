@@ -24,6 +24,7 @@ class XML_Helper;
 #include "armyproto.h"
 #include "hero.h"
 #include "OwnerId.h"
+#include "hero-strategy.h"
 
 //! A prototype of a Hero object.
 class HeroProto : public ArmyProto, public OwnerId
@@ -54,12 +55,18 @@ class HeroProto : public ArmyProto, public OwnerId
         //! Set the gender of the hero.
         void setGender(Hero::Gender gender){d_gender = gender;}
 
+        //! Set the strategy for the hero.
+        void setStrategy (HeroStrategy *s) {d_strategy = s;}
+
         //! Return the Id of the hero.
         guint32 getHeroId () const {return d_hero_id;}
 
         //! Return the gender of the hero.
         guint32 getGender() const {return d_gender;}
-        
+
+        //! Return the strategy that this hero uses.
+        HeroStrategy* getStrategy () const {return d_strategy;}
+
         //! Saves the hero prototype to an action
         virtual bool save(XML_Helper* helper) const;
     private:
@@ -69,6 +76,12 @@ class HeroProto : public ArmyProto, public OwnerId
 
         //! Id of the hero proto
         guint32 d_hero_id;
+
+        //! How the hero acts
+        HeroStrategy *d_strategy;
+
+        //! Callback for loading the hero strategy data.
+        bool load (Glib::ustring tag, XML_Helper* helper);
 };
 
 #endif // HERO_PROTO_H

@@ -41,6 +41,7 @@ public:
       GENDER = 2,
       ADD = 3,
       REMOVE = 4,
+      STRATEGY = 5,
     };
 
     HeroesEditorAction(Type type, bool agg = false)
@@ -132,5 +133,21 @@ class HeroesEditorAction_Remove: public HeroesEditorAction_Save
         ~HeroesEditorAction_Remove () {}
 
         Glib::ustring getActionName () const {return "Remove";}
+};
+
+class HeroesEditorAction_Strategy: public HeroesEditorAction_Index
+{
+    public:
+        HeroesEditorAction_Strategy (guint32 i, HeroStrategy *s)
+          : HeroesEditorAction_Index (STRATEGY, i),
+          d_strategy (HeroStrategy::copy (s)) {}
+        ~HeroesEditorAction_Strategy () {delete d_strategy;}
+
+        Glib::ustring getActionName () const {return "Strategy";}
+
+        HeroStrategy *getStrategy () {return d_strategy;}
+
+    private:
+        HeroStrategy* d_strategy;
 };
 #endif //HEROES_EDITOR_ACTIONS_H

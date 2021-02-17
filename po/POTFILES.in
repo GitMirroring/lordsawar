@@ -123,6 +123,7 @@
 [type: gettext/glade]dat/glade/editor/validation-dialog.ui
 [type: gettext/glade]dat/glade/editor/stone-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/heroes-dialog.ui
+[type: gettext/glade]dat/glade/editor/strategy-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/keeper-dialog.ui
 [type: gettext/glade]dat/glade/editor/mask-validation-dialog.ui
 [type: gettext/glade]dat/glade/editor/editor-save-changes-dialog.ui
@@ -337,6 +338,7 @@ src/editor/validation-dialog.cpp
 src/editor/stone-editor-dialog.cpp
 src/editor/image-file-filter.cpp
 src/editor/heroes-dialog.cpp
+src/editor/hero-strategy-dialog.cpp
 src/editor/keeper-editor-dialog.cpp
 src/editor/army-chooser-button.cpp
 src/editor/editor-save-changes-dialog.cpp
@@ -354,6 +356,8 @@ src/gui/item-report-dialog.cpp
 src/gui/stack-tile-box.cpp
 src/NamedLocation.cpp
 src/herotemplates.cpp
+src/hero-strategy.cpp
+src/hero-strategy.h
 src/xmlhelper.cpp
 src/tarhelper.cpp
 src/tarfile.cpp

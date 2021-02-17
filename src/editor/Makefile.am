@@ -119,6 +119,8 @@ libeditor_la_SOURCES =\
 	media-dialog.cpp media-dialog.h media-actions.h \
 	validation-dialog.cpp validation-dialog.h \
 	heroes-dialog.cpp heroes-dialog.h heroes-editor-actions.h \
+	hero-strategy-dialog.cpp hero-strategy-dialog.h \
+	hero-strategy-editor-actions.h \
 	keeper-editor-dialog.cpp keeper-editor-dialog.h \
 	keeper-editor-actions.h \
 	army-chooser-button.cpp army-chooser-button.h

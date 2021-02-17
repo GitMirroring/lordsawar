@@ -52,7 +52,8 @@ stone-editor-dialog.ui \
 editor-save-changes-dialog.ui \
 heroes-dialog.ui \
 keeper-dialog.ui \
-mask-validation-dialog.ui
+mask-validation-dialog.ui \
+strategy-editor-dialog.ui
 
 EXTRA_DIST = $(glade_DATA) \
 README

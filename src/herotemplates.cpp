@@ -28,6 +28,7 @@
 #include "xmlhelper.h"
 #include "ucompose.hpp"
 #include "rnd.h"
+#include "hero-strategy.h"
 
 HeroTemplates* HeroTemplates::d_instance = 0;
 
@@ -164,7 +165,6 @@ void HeroTemplates::loadHeroTemplates(XML_Helper *helper)
 
   helper->registerTag(HeroTemplates::d_child_tag,
                       sigc::mem_fun((*this), &HeroTemplates::load));
-
   return;
 }
 
