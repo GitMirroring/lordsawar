@@ -397,7 +397,14 @@ void GamePreferencesDialog::on_start_game_clicked()
 
   if (mode == GameScenario::NETWORKED)
     g.name = String::utrim(game_name_entry->get_text());
-
+  else
+    {
+      bool broken = false;
+      GameParameters load_map_parameters;
+      load_map_parameters = GameScenario::loadGameParameters(d_filename,
+                                                             broken);
+      g.name = load_map_parameters.name;
+    }
   // and call callback
   game_started.emit(g);
   dialog->hide();

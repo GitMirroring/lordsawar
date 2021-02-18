@@ -1431,6 +1431,7 @@ public:
 	  }
 	if (tag == GameScenario::d_tag)
 	  {
+	    helper->getData(game_params.name, "name");
 	    helper->getData(game_params.see_opponents_stacks, 
 			    "view_enemies");
 	    helper->getData(game_params.see_opponents_production, 
