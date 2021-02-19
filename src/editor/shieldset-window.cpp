@@ -581,8 +581,6 @@ bool ShieldSetWindow::save_current_shieldset_file_as ()
             }
           else
             {
-              shieldset_modified = false;
-              new_shieldset_needs_saving = false;
               d_shieldset->created (filename);
               Glib::ustring dir =
                 File::add_slash_if_necessary (File::get_dirname (filename));
@@ -595,6 +593,8 @@ bool ShieldSetWindow::save_current_shieldset_file_as ()
                   shieldset_saved.emit(d_shieldset->getId());
                 }
               refresh_shields();
+              shieldset_modified = false;
+              new_shieldset_needs_saving = false;
               update_window_title();
             }
         }
@@ -1564,7 +1564,7 @@ void ShieldSetWindow::addUndo (ShieldSetEditorAction *a)
   3. save a copy of the default shieldset, and switch sets
   4. modify the working shieldset so we can see it change in scenario builder
   5. modify the working shieldset so that it's invalid, try to save
-  6. try adding an image file that isn't a .png
+  6. try adding an image file that isn't a .png or .svg
   7. try adding an image file that says it's a .png but is actually a .jpg
   8. try adding an image file that says it's a .png but is actually random data
   9. try saving a new shieldset that has a same name
