@@ -1,6 +1,6 @@
 //  Copyright (C) 2007, 2008, Ole Laursen
 //  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017,
-//  2020 Ben Asselstine
+//  2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -864,6 +864,7 @@ void GameWindow::on_save_game_as_activated()
   chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   chooser.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_ACCEPT);
   chooser.set_default_response(Gtk::RESPONSE_ACCEPT);
+  chooser.set_do_overwrite_confirmation ();
 
   chooser.show_all();
   int res = chooser.run();
