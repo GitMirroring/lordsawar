@@ -53,7 +53,7 @@ public:
   ~TarFileImage ();
 
   //! Return the number of images
-  guint32 getNumberOfFrames () const {return frames.size ();}
+  guint32 getNumberOfFrames () const {return number_of_frames;}
 
   //! Return the basename of the image (archive member in tar file)
   Glib::ustring getName () const {return name;}
