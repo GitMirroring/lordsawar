@@ -8,6 +8,7 @@ LordsAWar! version 0.3.3, a clone of the turn-based strategy game Warlords II, h
 * Added movement bonus graphics for swamp and mountains.  Tile sets now hold these graphics.
 * Cities can now have descriptions.
 * Players can have up to three colors which allows for more varied army graphics, etc.
-* Right-clicking on enemy heroes now shows their name.
+* Right-clicking on enemy heroes now shows their name, and an optional blurb.
+* The Scenario Builder now lets heroes have items when recruited.
 
 Please consider donating to the LordsAWar project! See the donate button here: http://lordsawar.nongnu.org
