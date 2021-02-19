@@ -397,10 +397,26 @@ void TilesetSelectorEditorDialog::on_selector_imagebutton_clicked ()
                 new TileSetSelectorEditorAction_Set (d_tileset,
                                                      d_large, archive_member);
               if (on_image_chosen (d) == false)
-                umgr->add (action);
+                {
+                  umgr->add (action);
+                  heartbeat.disconnect ();
+                  if (d_large)
+                    {
+                      delete large_selector;
+                      large_selector =
+                        new TarFileMaskedImage (*d_tileset->getSelector(false));
+                    }
+                  else
+                    {
+                      delete small_selector;
+                      small_selector =
+                        new TarFileMaskedImage (*d_tileset->getSelector(false));
+                    }
+                }
               else
                 delete action;
             }
+          update ();
         }
     }
   else if (response == Gtk::RESPONSE_REJECT && f != "")
