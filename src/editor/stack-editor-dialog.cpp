@@ -319,8 +319,9 @@ void StackEditorDialog::on_remove_clicked()
       umgr->add (new StackEditorAction_Remove (new Stack (*stack)));
       Army *army = (*i)[army_columns.army];
       army_list->erase(i);
-      if (std::find(stack->begin(), stack->end(), army) == stack->end())
-        delete army;
+      auto it = std::find(stack->begin(), stack->end(), army);
+      if (it != stack->end())
+        stack->flErase (it);
       d_changed = true;
       update ();
     }
