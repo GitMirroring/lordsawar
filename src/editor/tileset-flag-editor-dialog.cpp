@@ -128,6 +128,8 @@ bool TilesetFlagEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
                 {
                   d_tileset->getFlags ()->load (d_tileset, newname);
                   d_tileset->getFlags ()->instantiateImages ();
+                  delete d_flags;
+                  d_flags = new TarFileMaskedImage (*d_tileset->getFlags ());
                   d_changed = true;
                   update ();
                 }
@@ -168,9 +170,6 @@ bool TilesetFlagEditorDialog::on_image_chosen(Gtk::FileChooserDialog *d)
 void TilesetFlagEditorDialog::show_preview_flags()
 {
   //load it up and show in the colors of the selected shield theme
-  if (heartbeat.connected())
-    heartbeat.disconnect();
-
   clearFlag();
   if (loadFlag() == true)
     {
@@ -244,8 +243,6 @@ void TilesetFlagEditorDialog::update_flag_panel()
   else
     {
       flag_imagebutton->set_label (_("No image set"));
-      if (heartbeat.connected ())
-        heartbeat.disconnect ();
       clearFlag();
     }
 }
@@ -403,6 +400,7 @@ void TilesetFlagEditorDialog::connect_signals ()
 
 void TilesetFlagEditorDialog::disconnect_signals ()
 {
+  heartbeat.disconnect ();
   for (auto c : connections)
     c.disconnect ();
   connections.clear ();
@@ -414,7 +412,6 @@ UndoAction *TilesetFlagEditorDialog::executeAction (UndoAction *action2)
     dynamic_cast<TileSetFlagEditorAction*>(action2);
   UndoAction *out = NULL;
 
-  heartbeat.disconnect ();
   switch (action->getType ())
     {
     case TileSetFlagEditorAction::SET:
