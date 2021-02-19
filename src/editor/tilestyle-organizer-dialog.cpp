@@ -52,6 +52,10 @@ TileStyleOrganizerDialog::TileStyleOrganizerDialog(Gtk::Window &parent, Tile *ti
     xml->get_widget("redo_button", redo_button);
     redo_button->signal_activate ().connect (method (on_redo_activated));
 
+    unsorted_iconview->signal_button_press_event().connect
+      (method(on_unsorted_mouse_button_event));
+    category_iconview->signal_button_press_event().connect
+      (method(on_category_mouse_button_event));
     categories_list = Gtk::ListStore::create (categories_columns);
     categories_iconview->set_model(categories_list); 
     categories_iconview->set_pixbuf_column(categories_columns.image);
@@ -526,4 +530,57 @@ UndoAction *TileStyleOrganizerDialog::executeAction (UndoAction *action2)
       break;
     }
   return out;
+}
+
+void TileStyleOrganizerDialog::popup (GdkEventButton *e, Gtk::IconView *i)
+{
+  Gtk::Menu *menu = manage(new Gtk::Menu);
+    {
+      Gtk::MenuItem *item = manage(new Gtk::MenuItem(_("Undo")));
+      item->signal_activate().connect (method(on_undo_activated));
+      item->set_sensitive (umgr->undoEmpty () == false);
+      item->show();
+      menu->add(*item);
+    }
+    {
+      Gtk::MenuItem *item = manage(new Gtk::MenuItem(_("Redo")));
+      item->signal_activate().connect (method(on_redo_activated));
+      item->set_sensitive (umgr->redoEmpty () == false);
+      item->show();
+      menu->add(*item);
+    }
+    {
+      Gtk::MenuItem *item = manage(new Gtk::MenuItem(_("Select All")));
+      item->signal_activate().connect
+        (sigc::bind (method(on_select_all_activated), i));
+      item->show();
+      menu->add(*item);
+    }
+  menu->accelerate (*dialog);
+  menu->popup_at_pointer (reinterpret_cast<const GdkEvent*>(e));
+}
+
+bool TileStyleOrganizerDialog::on_unsorted_mouse_button_event(GdkEventButton *e)
+{
+  if (e->type != GDK_BUTTON_PRESS && e->type != GDK_BUTTON_RELEASE)
+    return true;	// useless event
+
+  popup (e, unsorted_iconview);
+
+  return true;
+}
+
+void TileStyleOrganizerDialog::on_select_all_activated (Gtk::IconView *iconview)
+{
+  iconview->select_all ();
+}
+
+bool TileStyleOrganizerDialog::on_category_mouse_button_event(GdkEventButton *e)
+{
+  if (e->type != GDK_BUTTON_PRESS && e->type != GDK_BUTTON_RELEASE)
+    return true;	// useless event
+
+  popup (e, category_iconview);
+
+  return true;
 }

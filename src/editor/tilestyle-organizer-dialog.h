@@ -98,6 +98,11 @@ class TileStyleOrganizerDialog: public LwEditorDialog
     std::list<TileStyle*> get_selected_category_tilestyles();
     int get_selected_category();
 
+    bool on_unsorted_mouse_button_event(GdkEventButton *e);
+    bool on_category_mouse_button_event(GdkEventButton *e);
+    void on_select_all_activated (Gtk::IconView *i);
+    void popup (GdkEventButton *e, Gtk::IconView *i);
+
     void on_categories_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext> &context, int a, int b, const Gtk::SelectionData& selection_data, guint c, guint time);
     void on_category_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext> &context, int a, int b, const Gtk::SelectionData& selection_data, guint c, guint time);
     void on_unsorted_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext> &context, int a, int b, const Gtk::SelectionData& selection_data, guint c, guint time);
@@ -117,6 +122,7 @@ class TileStyleOrganizerDialog: public LwEditorDialog
     void disconnect_signals ();
     std::list<sigc::connection> connections;
     UndoAction *executeAction (UndoAction *action);
+
 };
 
 #endif
