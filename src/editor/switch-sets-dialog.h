@@ -43,6 +43,8 @@ class SwitchSetsDialog: public LwEditorDialog
 
     bool get_tileset_changed() const {return tileset_changed;}
 
+    bool get_cityset_changed () const {return cityset_changed;}
+
     bool get_set_changed () const {return armyset_changed || tileset_changed ||
       cityset_changed || shieldset_changed;}
     

@@ -2262,6 +2262,8 @@ void MainWindow::on_switch_sets_activated()
           setup_terrain_radiobuttons();
           on_terrain_radiobutton_toggled();
         }
+      if (d.get_cityset_changed ())
+        doReloadCityset ();
       on_best_fit_activated ();
       redraw();
       fill_players();
