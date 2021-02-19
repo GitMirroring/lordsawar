@@ -704,7 +704,10 @@ void TileSetWindow::on_tile_selected ()
 
 void TileSetWindow::on_tilestyleset_selected ()
 {
-  update ();
+  disconnect_signals ();
+  update_tilestyleset_panel ();
+  update_tilestyle_panel ();
+  connect_signals ();
 }
 
 void TileSetWindow::on_tilestyle_selected ()
