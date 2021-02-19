@@ -118,13 +118,11 @@ bool TarFileMaskedImage::loadFromFile (Glib::ustring filename)
         {
           calculated_number_of_frames = 1;
           size = p->get_unscaled_width () / (maskcount + 1);
-          frames.resize (calculated_number_of_frames);
         }
       else if (orientation == VERTICAL_MASK)
         {
           size = p->get_unscaled_height () / (maskcount + 1);
           calculated_number_of_frames = p->get_unscaled_width () / size;
-          frames.resize (calculated_number_of_frames);
         }
       dimension = Vector<int>(size,size);
     }
@@ -236,14 +234,12 @@ void TarFileMaskedImage::instantiateVertical ()
 
 void TarFileMaskedImage::uninstantiateImages ()
 {
-  guint32 oldsize = frames.size ();
   for (guint32 i = 0; i < frames.size (); i++)
     {
       for (auto f : frames[i])
         delete f;
     }
   frames.clear ();
-  frames.resize (oldsize);
 }
 
 void TarFileMaskedImage::clear (bool clear_name)
