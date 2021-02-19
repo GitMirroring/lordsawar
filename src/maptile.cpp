@@ -26,6 +26,7 @@
 #include "stacktile.h"
 #include "army.h"
 #include "GameMap.h"
+#include "playerlist.h"
 
 Maptile::Maptile()
         :Movable(Vector<int>(-1,-1)), d_index(0), d_building(NONE)
@@ -94,7 +95,7 @@ Gdk::RGBA Maptile::getThirdColor() const
 MapBackpack *Maptile::getBackpack()
 {
   if (!d_backpack)
-    d_backpack = new MapBackpack (getPos());
+    d_backpack = new MapBackpack (getPos(), Playerlist::getActiveplayer ());
   return d_backpack;
 }
 

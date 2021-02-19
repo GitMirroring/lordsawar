@@ -21,11 +21,13 @@
 
 #include "vector.h"
 #include "Backpack.h"
+#include "OwnerId.h"
 #include "Immovable.h"
 #include "UniquelyIdentified.h"
 
 class XML_Helper;
 class Item;
+class Player;
 
 //! A backpack that resides on the map.
 /** 
@@ -33,14 +35,14 @@ class Item;
  * game map.
  */
 
-class MapBackpack: public Backpack, public Immovable, public UniquelyIdentified
+class MapBackpack: public Backpack, public OwnerId, public Immovable, public UniquelyIdentified
 {
  public:
      //! The xml tag of this object in a saved-game file.
      static Glib::ustring d_mapbackpack_tag; 
 
      //! Default constructor.
-     MapBackpack(Vector<int> pos);
+     MapBackpack(Vector<int> pos, Player *p);
 
      //! Copy constructor.
      MapBackpack(const MapBackpack&, bool sync_id = false);

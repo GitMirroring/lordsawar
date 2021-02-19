@@ -886,21 +886,22 @@ PixMask* ImageCache::getCircledStandardPic(guint32 armyset, const Player* p,
   return s;
 }
 
-PixMask* ImageCache::getTilePic(int tile_style_id, int fog_type_id, bool has_bag, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid, int stone_type)
+PixMask* ImageCache::getTilePic(int tile_style_id, int fog_type_id, bool has_bag, int bag_player_id, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid, int stone_type)
 {
   guint32 tileset = GameMap::getInstance()->getTilesetId();
   guint32 cityset = GameMap::getInstance()->getCitysetId();
   guint32 shieldset = GameMap::getInstance()->getShieldsetId();
-  return getTilePic(tile_style_id, fog_type_id, has_bag, has_standard, standard_player_id, stack_size, stack_player_id, army_type_id, has_tower, has_ship, building_type, building_subtype, building_tile, building_player_id, tilesize, has_grid, tileset, cityset, shieldset, stone_type);
+  return getTilePic(tile_style_id, fog_type_id, has_bag, bag_player_id, has_standard, standard_player_id, stack_size, stack_player_id, army_type_id, has_tower, has_ship, building_type, building_subtype, building_tile, building_player_id, tilesize, has_grid, tileset, cityset, shieldset, stone_type);
 }
 
-PixMask* ImageCache::getTilePic(int tile_style_id, int fog_type_id, bool has_bag, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid, guint32 tileset, guint32 cityset, guint32 shieldset, int stone_type)
+PixMask* ImageCache::getTilePic(int tile_style_id, int fog_type_id, bool has_bag, int bag_player_id, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid, guint32 tileset, guint32 cityset, guint32 shieldset, int stone_type)
 {
   guint added = 0;
   TilePixMaskCacheItem i;
   i.tile_style_id = tile_style_id;
   i.fog_type_id = fog_type_id;
   i.has_bag = has_bag;
+  i.bag_player_id = bag_player_id;
   i.has_standard = has_standard;
   i.standard_player_id = standard_player_id;
   i.stack_size = stack_size; //flag size
@@ -2078,6 +2079,8 @@ int TilePixMaskCacheItem::comp(const TilePixMaskCacheItem &item) const
     (fog_type_id > item.fog_type_id) ?  1 :
     (has_bag < item.has_bag) ? -1 :
     (has_bag > item.has_bag) ?  1 :
+    (bag_player_id < item.bag_player_id) ? -1 :
+    (bag_player_id > item.bag_player_id) ?  1 :
     (has_standard < item.has_standard) ? -1 :
     (has_standard > item.has_standard) ?  1 :
     (standard_player_id < item.standard_player_id) ?  -1 :

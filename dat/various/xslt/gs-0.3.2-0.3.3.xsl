@@ -108,4 +108,13 @@
         </hero>
 </xsl:template>
 
+<xsl:template match="itemstack">
+        <itemstack>
+                <d_owner>8</d_owner>
+                <xsl:copy-of select="d_x"/>
+                <xsl:copy-of select="d_y"/>
+                <xsl:copy-of select="backpack"/>
+        </itemstack>
+</xsl:template>
+
 </xsl:stylesheet>

@@ -24,18 +24,19 @@ Glib::ustring MapBackpack::d_mapbackpack_tag = "itemstack";
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
-MapBackpack::MapBackpack(Vector<int> pos)
-  :Backpack(), Immovable(pos), UniquelyIdentified((guint32)0)
+MapBackpack::MapBackpack(Vector<int> pos, Player *p)
+  :Backpack(), OwnerId (p), Immovable(pos), UniquelyIdentified((guint32)0)
 {
 }
 
 MapBackpack::MapBackpack(const MapBackpack& object, bool sync_id)
-  :Backpack(object), Immovable(object), UniquelyIdentified(object, sync_id)
+  :Backpack(object), OwnerId (object), Immovable(object),
+    UniquelyIdentified(object, sync_id)
 {
 }
 
 MapBackpack::MapBackpack(XML_Helper* helper)
-  :Immovable(helper), UniquelyIdentified((guint32)0)
+  :OwnerId (helper), Immovable(helper), UniquelyIdentified((guint32)0)
 {
   helper->registerTag(Backpack::d_tag, sigc::mem_fun(this, &MapBackpack::loadItem));
   helper->registerTag(Item::d_tag, sigc::mem_fun(this, &MapBackpack::loadItem));
@@ -46,6 +47,7 @@ bool MapBackpack::save(XML_Helper* helper) const
   bool retval = true;
 
   retval &= helper->openTag(MapBackpack::d_mapbackpack_tag);
+  retval &= OwnerId::save (helper);
   retval &= helper->saveData("x", getPos().x);
   retval &= helper->saveData("y", getPos().y);
   retval &= Backpack::saveData(helper);

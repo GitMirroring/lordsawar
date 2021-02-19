@@ -423,6 +423,7 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
     fog_type_id = viewing->getFogMap()->getShadeTile(tile);
 
   bool has_bag = false;
+  guint32 bag_player_id = 0;
   bool has_standard = false;
   guint32 player_standard_id = 0;
   int stack_size = -1;
@@ -440,11 +441,12 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
     {
       //short circuit.  the tile is completely fogged.
       PixMask *pixmask =
-	gc->getTilePic(tile_style_id, fog_type_id, has_bag, has_standard, 
-		       player_standard_id, stack_size, stack_player_id, 
-		       army_type_id, has_tower, has_ship, building_type, 
-		       building_subtype, building_tile, building_player_id, 
-		       tilesize, d_grid_toggled, stone_type);
+	gc->getTilePic(tile_style_id, fog_type_id, has_bag, bag_player_id,
+                       has_standard, player_standard_id, stack_size,
+                       stack_player_id, army_type_id, has_tower, has_ship,
+                       building_type, building_subtype, building_tile,
+                       building_player_id, tilesize, d_grid_toggled,
+                       stone_type);
       pixmask->blit(surface, tile_to_buffer_pos(tile));
       return;
     }
@@ -463,7 +465,10 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
           has_bag = backpack->size () > 1;
 	}
       else
-        has_bag = true;
+        {
+          has_bag = true;
+          bag_player_id = backpack->getOwnerId ();
+        }
     }
 
   Stack *stack = GameMap::getStrongestStack(tile);
@@ -591,11 +596,11 @@ void BigMap::draw_buffer_tile(Vector<int> tile, Cairo::RefPtr<Cairo::Surface> su
   if (GameMap::getTileset()->getStone()->getName().empty() == true)
     stone_type = -1;
   PixMask *pixmask = 
-    gc->getTilePic(tile_style_id, fog_type_id, has_bag, has_standard, 
-		   player_standard_id, stack_size, stack_player_id, 
-		   army_type_id, has_tower, has_ship, building_type, 
-		   building_subtype, building_tile, building_player_id, 
-		   tilesize, d_grid_toggled, stone_type);
+    gc->getTilePic(tile_style_id, fog_type_id, has_bag, bag_player_id,
+                   has_standard, player_standard_id, stack_size,
+                   stack_player_id, army_type_id, has_tower, has_ship,
+                   building_type, building_subtype, building_tile,
+                   building_player_id, tilesize, d_grid_toggled, stone_type);
   pixmask->blit(surface, tile_to_buffer_pos(tile));
 }
 
