@@ -61,5 +61,3 @@ switch from gtk notebooks to gtk stack switchers
 it would be nice if the lobby messages, join/depart, etc were xmlized
 
 it would be nice if the editor showed a progress bar when opening a map, or importing a saved game
-
-organize tilestyles needs a select all context menu
