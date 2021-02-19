@@ -599,7 +599,7 @@ bool ShieldSetWindow::save_current_shieldset_file_as ()
             }
         }
       chooser.hide ();
-      if (res == Gtk::RESPONSE_CANCEL)
+      if (res != Gtk::RESPONSE_ACCEPT)
         break;
       if (ret == true)
         break;

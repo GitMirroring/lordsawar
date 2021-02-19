@@ -383,7 +383,7 @@ bool CitySetWindow::save_current_cityset_file_as ()
             }
         }
       chooser.hide ();
-      if (res == Gtk::RESPONSE_CANCEL)
+      if (res != Gtk::RESPONSE_ACCEPT)
         break;
       if (ret == true)
         break;
