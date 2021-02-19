@@ -64,6 +64,4 @@ it would be nice if the editor showed a progress bar when opening a map, or impo
 
 saving a game over top of an existing game didn't warn of overwrite
 
-bags are being drawn as activeplayer's bag instead of old hero owner player
-
 organize tilestyles needs a select all context menu
