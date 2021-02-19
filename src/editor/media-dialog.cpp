@@ -206,7 +206,8 @@ bool MediaDialog::on_masked_image_button_activated(TarFileMaskedImage *omim, Tar
 
   if (response == Gtk::RESPONSE_ACCEPT && d.get_filename () != "")
     {
-      bool success = d.installFile (t, mim, d.get_filename ());
+      bool success = d.installFile (t, mim, d.get_filename (),
+                                    d.get_num_masks ());
       if (success)
         {
           d_changed = true;

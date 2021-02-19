@@ -592,7 +592,7 @@ void ArmySetWindow::on_edit_ship_picture_activated()
         new ArmySetEditorAction_AddImage (d_armyset);
       Glib::ustring newname = "";
       bool success = d.installFile (d_armyset, d_armyset->getShip (),
-                                    d.get_filename ());
+                                    d.get_filename (), d.get_num_masks ());
       if (success)
         {
           addUndo (action);
@@ -656,7 +656,7 @@ void ArmySetWindow::on_edit_standard_picture_activated()
         new ArmySetEditorAction_AddImage (d_armyset);
       Glib::ustring newname = "";
       bool success = d.installFile (d_armyset, d_armyset->getStandard (),
-                                    d.get_filename ());
+                                    d.get_filename (), d.get_num_masks ());
       if (success)
         {
           addUndo (action);
@@ -1014,7 +1014,7 @@ void ArmySetWindow::on_image_changed(Shield::Color c)
             ArmySetEditorAction_AddImage (d_armyset);
           Glib::ustring newname = "";
           bool success = d.installFile (d_armyset, a->getMaskedImage (c),
-                                        d.get_filename ());
+                                        d.get_filename (), d.get_num_masks ());
           if (success)
             {
               addUndo (action);

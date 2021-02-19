@@ -379,6 +379,7 @@ bool TarFileMaskedImage::copy (TarFile *t, TarFileMaskedImage *dest)
 
   if (success)
     {
+      dest->setNumMasks (getNumMasks ());
       dest->load (t, newname);
       dest->instantiateImages ();
     }
@@ -430,8 +431,11 @@ bool TarFileMaskedImage::calculateNumberOfMasks (Glib::ustring f, bool &bad_dime
     {
       if (checkDimension (f))
         {
+          bool broken = false;
+          PixMask *p = PixMask::create (f, broken);
           maskcount =
-            (image->get_unscaled_width () / image->get_unscaled_height ()) - 1;
+            (p->get_unscaled_width () / p->get_unscaled_height ()) - 1;
+          delete p;
           return true;
         }
       else
@@ -442,8 +446,11 @@ bool TarFileMaskedImage::calculateNumberOfMasks (Glib::ustring f, bool &bad_dime
     {
       if (checkDimension (f))
         {
-          guint32 ts = image->get_unscaled_width () / MAX_PLAYERS;
-          maskcount = (image->get_unscaled_height () / ts) - 1;
+          bool broken = false;
+          PixMask *p = PixMask::create (f, broken);
+          guint32 ts = p->get_unscaled_width () / MAX_PLAYERS;
+          maskcount = (p->get_unscaled_height () / ts) - 1;
+          delete p;
           return true;
         }
       else

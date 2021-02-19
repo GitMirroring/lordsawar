@@ -52,10 +52,11 @@ class TarFileMaskedImageEditorDialog: public LwEditorDialog
 
     void set_title(Glib::ustring t) {dialog->set_title(t);}
 
+    guint32 get_num_masks ();
     Glib::ustring get_filename() {return d_target_filename;}
     int run();
     void hide();
-    bool installFile (TarFile *t, TarFileMaskedImage *im, Glib::ustring file);
+    bool installFile (TarFile *t, TarFileMaskedImage *im, Glib::ustring file, guint32 mask_count);
     bool uninstallFile (TarFile *t, TarFileMaskedImage *im);
 
  private:

@@ -412,7 +412,8 @@ UndoAction *TarFileMaskedImageEditorDialog::executeAction (UndoAction *action2)
     return out;
 }
 
-bool TarFileMaskedImageEditorDialog::installFile (TarFile *t, TarFileMaskedImage *im, Glib::ustring filename)
+bool TarFileMaskedImageEditorDialog::installFile (TarFile *t, TarFileMaskedImage *im, Glib::ustring filename,
+                                                  guint32 mask_count)
 {
   Glib::ustring newname;
   bool success = false;
@@ -421,6 +422,7 @@ bool TarFileMaskedImageEditorDialog::installFile (TarFile *t, TarFileMaskedImage
   else
     success =
       t->replaceFileInCfgFile (d_orig_target_filename, filename, newname);
+  im->setNumMasks (mask_count);
   im->setName(newname);
   im->load (t, newname);
   im->instantiateImages();
@@ -431,4 +433,9 @@ bool TarFileMaskedImageEditorDialog::uninstallFile (TarFile *t, TarFileMaskedIma
 {
   im->clear ();
   return t->removeFileInCfgFile(d_orig_target_filename);
+}
+
+guint32 TarFileMaskedImageEditorDialog::get_num_masks ()
+{
+  return d_mim->getNumMasks ();
 }
