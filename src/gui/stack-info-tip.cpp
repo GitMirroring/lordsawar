@@ -1,6 +1,6 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2015, 2016,
-//  2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2012, 2014, 2015, 2016, 2020,
+//  2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -67,11 +67,14 @@ StackInfoTip::StackInfoTip(Gtk::Widget *target, MapTipPosition mpos, StackTile *
       }
 
     Glib::ustring hero_name;
+    Glib::ustring hero_desc;
     for (auto s : stks)
       {
         if (s->getStrongestHero ())
           {
             hero_name = s->getStrongestHero ()->getName ();
+            hero_desc =
+              dynamic_cast<Hero*>(s->getStrongestHero ())->getDescription ();
             break;
           }
       }
@@ -103,6 +106,15 @@ StackInfoTip::StackInfoTip(Gtk::Widget *target, MapTipPosition mpos, StackTile *
         hero_label->property_justify () = Gtk::JUSTIFY_CENTER;
         hero_name_box->add (*manage (hero_label));
         hero_name_box->show_all ();
+      }
+
+    if (hero_desc.empty () == false)
+      {
+        Gtk::Label *desc_label = new Gtk::Label (hero_desc);
+        desc_label->set_hexpand (true);
+        desc_label->property_justify () = Gtk::JUSTIFY_CENTER;
+        hero_description_box->add (*manage (desc_label));
+        hero_description_box->show_all ();
       }
 
     // move into correct position

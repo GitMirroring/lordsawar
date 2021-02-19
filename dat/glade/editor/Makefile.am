@@ -20,6 +20,7 @@ reward-editor-dialog.ui \
 select-item-dialog.ui \
 reward-list-dialog.ui \
 select-hidden-ruin-dialog.ui \
+select-character-dialog.ui \
 tileset-window.ui \
 tileset-info-dialog.ui \
 tile-preview-dialog.ui \

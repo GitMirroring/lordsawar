@@ -41,10 +41,12 @@ class HeroEditorDialog: public LwEditorDialog
     Gtk::Entry *name_entry;
     Gtk::ComboBox *gender_combobox;
     Gtk::Button *edit_backpack_button;
+    Gtk::Button *edit_character_button;
     Gtk::Button *undo_button;
     Gtk::Button *redo_button;
 	
     void on_edit_backpack_clicked ();
+    void on_edit_character_clicked ();
     void on_name_changed ();
     void on_gender_changed ();
     void update_buttons ();

@@ -128,7 +128,7 @@ class PlayersEditorAction_RandomizeGold : public PlayersEditorAction
 class PlayersEditorAction_Heroes : public PlayersEditorAction_PlayerIndex
 {
     public:
-        PlayersEditorAction_Heroes (guint32 i, std::vector<HeroProto*> h)
+        PlayersEditorAction_Heroes (guint32 i, std::vector<Character*> h)
           :PlayersEditorAction_PlayerIndex (HEROES, i, true), d_heroes (h) {}
         ~PlayersEditorAction_Heroes ()
           {
@@ -139,9 +139,9 @@ class PlayersEditorAction_Heroes : public PlayersEditorAction_PlayerIndex
         Glib::ustring getActionName () const {return "Heroes";}
 
         void clearHeroes () {d_heroes.clear ();}
-        std::vector<HeroProto *> getHeroes () const {return d_heroes;}
+        std::vector<Character *> getHeroes () const {return d_heroes;}
     private:
-        std::vector<HeroProto *> d_heroes;
+        std::vector<Character *> d_heroes;
 };
 
 #endif //PLAYERS_EDITOR_ACTIONS_H

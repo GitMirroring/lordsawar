@@ -28,6 +28,10 @@
 #include "backpack-editor-dialog.h"
 #include "Backpack.h"
 #include "hero-editor-actions.h"
+#include "select-character-dialog.h"
+#include "character.h"
+#include "herotemplates.h"
+#include "playerlist.h"
 
 #define method(x) sigc::mem_fun(*this, &HeroEditorDialog::x)
 
@@ -41,6 +45,8 @@ HeroEditorDialog::HeroEditorDialog(Gtk::Window &parent, Hero *hero)
 
   xml->get_widget("edit_backpack_button", edit_backpack_button);
   edit_backpack_button->signal_clicked().connect (method(on_edit_backpack_clicked));
+  xml->get_widget("edit_character_button", edit_character_button);
+  edit_character_button->signal_clicked().connect (method(on_edit_character_clicked));
   xml->get_widget("undo_button", undo_button);
   undo_button->signal_activate ().connect (method (on_undo_activated));
   xml->get_widget("redo_button", redo_button);
@@ -80,6 +86,25 @@ void HeroEditorDialog::on_edit_backpack_clicked()
   return;
 }
 
+void HeroEditorDialog::on_edit_character_clicked()
+{
+  HeroEditorAction_Character *action =
+    new HeroEditorAction_Character (d_hero->getHeroTypeId());
+  SelectCharacterDialog d(*dialog, d_hero->getOwner (),
+                          d_hero->getHeroTypeId ());
+  if (d.run())
+    {
+      if (d.get_selected_id () >= 0)
+        d_hero->setHeroTypeId (d.get_selected_id ());
+      umgr->add (action);
+      d_changed = true;
+    }
+  else
+    delete action;
+  update_buttons ();
+  return;
+}
+
 void HeroEditorDialog::on_name_changed ()
 {
   umgr->add (new HeroEditorAction_Name (d_hero->getName (), umgr, name_entry));
@@ -101,6 +126,20 @@ void HeroEditorDialog::update_buttons ()
                                  "Carrying %1 items",
                                  d_hero->getBackpack()->size ()),
                        d_hero->getBackpack()->size ()));
+  if (d_hero->getOwner () == Playerlist::getInstance ()->getNeutral ())
+    {
+      edit_character_button->set_label (_("No character set"));
+      edit_character_button->set_sensitive (false);
+    }
+  else
+    {
+      Character *c =
+        HeroTemplates::getInstance ()->getCharacterById (d_hero->getHeroTypeId ());
+      if (c)
+        edit_character_button->set_label (c->name);
+      else
+        edit_character_button->set_label (_("No character set"));
+    }
 }
 
 void HeroEditorDialog::on_undo_activated ()
@@ -180,6 +219,15 @@ UndoAction *HeroEditorDialog::executeAction (UndoAction *action2)
 
             d_hero->getBackpack ()->removeAllFromBackpack ();
             d_hero->getBackpack ()->add (a->getBackpack ());
+          }
+        break;
+      case HeroEditorAction::CHARACTER:
+          {
+            HeroEditorAction_Character *a =
+              dynamic_cast<HeroEditorAction_Character*>(action);
+            out = new HeroEditorAction_Character (d_hero->getHeroTypeId ());
+
+            d_hero->setHeroTypeId (a->getHeroTypeId ());
           }
         break;
     }

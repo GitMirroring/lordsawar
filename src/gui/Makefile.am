@@ -35,6 +35,7 @@ liblwgui_la_SOURCES = \
     destination-dialog.cpp destination-dialog.h \
     fight-window.cpp fight-window.h \
     game-preferences-dialog.cpp game-preferences-dialog.h \
+    characters-dialog.cpp characters-dialog.h \
     game-options-dialog.cpp game-options-dialog.h \
     game-window.cpp game-window.h \
     hero-dialog.cpp hero-dialog.h \

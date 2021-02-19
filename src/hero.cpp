@@ -31,6 +31,7 @@
 #include "xmlhelper.h"
 #include "playerlist.h"
 #include "QuestsManager.h"
+#include "herotemplates.h"
 
 Glib::ustring Hero::d_hero_tag = "hero";
 
@@ -237,4 +238,14 @@ bool Hero::isFlyer() const
         flying = true;
     }
   return flying;
+}
+        
+Glib::ustring Hero::getDescription () const
+{
+  Character *c =
+    HeroTemplates::getInstance ()->getCharacterById (getHeroTypeId ());
+  if (c)
+    return c->description;
+  else
+    return "";
 }

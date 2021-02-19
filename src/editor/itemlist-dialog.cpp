@@ -34,6 +34,8 @@
 #include "ucompose.hpp"
 #include "army-chooser-button.h"
 #include "itemlist-editor-actions.h"
+#include "timed-message-dialog.h"
+#include "herotemplates.h"
 #define method(x) sigc::mem_fun(*this, &ItemlistDialog::x)
 
 ItemlistDialog::ItemlistDialog(Gtk::Window &parent)
@@ -42,6 +44,7 @@ ItemlistDialog::ItemlistDialog(Gtk::Window &parent)
   umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
   umgr->execute ().connect (method (executeAction));
   d_changed = false;
+  d_warn_itemlist_change_affects_herotemplates = false;
   d_itemlist = Itemlist::getInstance();
 
   kill_army_type_button =
@@ -389,7 +392,8 @@ void ItemlistDialog::on_name_changed()
 
 void ItemlistDialog::on_add_item_clicked()
 {
-  umgr->add (new ItemListEditorAction_Add (Itemlist::getInstance ()->copy ()));
+  umgr->add (new ItemListEditorAction_Add (Itemlist::getInstance ()->copy (),
+                                           getCurIndex ()));
   //add a new empty item to the itemlist
   ItemProto *a = new ItemProto(_("Untitled"));
   d_itemlist->add(a);
@@ -414,12 +418,20 @@ void ItemlistDialog::on_remove_item_clicked()
   if (iterrow) 
     {
       umgr->add (new ItemListEditorAction_Remove
-                 (Itemlist::getInstance ()->copy ()));
+                 (Itemlist::getInstance ()->copy (), getCurIndex ()));
       Gtk::TreeModel::Row row = *iterrow;
       ItemProto *a = row[items_columns.item];
       items_list->erase(iterrow);
       d_itemlist->remove(a);
       d_changed = true;
+      if (HeroTemplates::getInstance ()->removeItemAffectsStartingItemIds
+          ((guint32)getCurIndex ()))
+        {
+          d_warn_itemlist_change_affects_herotemplates = true;
+          TimedMessageDialog
+            d(*dialog, _("Removing this item has broken one or more hero starting items.\nWe'd like to automatically fix this for you but we can't!\nYou must manually fix them."), 0);
+          d.run_and_hide ();
+        }
     }
 }
 
@@ -901,7 +913,7 @@ UndoAction *ItemlistDialog::executeAction (UndoAction *action2)
             ItemListEditorAction_Add *a =
               dynamic_cast<ItemListEditorAction_Add*>(action);
             out = new ItemListEditorAction_Add
-              (Itemlist::getInstance ()->copy ());
+              (Itemlist::getInstance ()->copy (), d_itemlist->size ());
             Itemlist::reset (a->getItemList ());
             d_itemlist = Itemlist::getInstance();
             a->clearItemList ();
@@ -914,7 +926,7 @@ UndoAction *ItemlistDialog::executeAction (UndoAction *action2)
             ItemListEditorAction_Remove *a =
               dynamic_cast<ItemListEditorAction_Remove*>(action);
             out = new ItemListEditorAction_Remove
-              (Itemlist::getInstance ()->copy ());
+              (Itemlist::getInstance ()->copy (), a->getIndex ());
             Itemlist::reset (a->getItemList ());
             d_itemlist = Itemlist::getInstance();
             a->clearItemList ();

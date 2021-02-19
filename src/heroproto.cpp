@@ -27,9 +27,7 @@ Glib::ustring HeroProto::d_heroproto_tag = "heroproto";
 #define debug(x)
 
 HeroProto::HeroProto(const HeroProto& a)
-    :ArmyProto(a), OwnerId(a), d_gender(a.d_gender), d_hero_id (a.d_hero_id),
-     d_strategy (HeroStrategy::copy (a.d_strategy)),
-     d_starting_items (a.d_starting_items)
+    :ArmyProto(a), OwnerId(a), d_gender(a.d_gender), d_hero_id (a.d_hero_id)
 {
 }
 
@@ -40,20 +38,16 @@ HeroProto::HeroProto(const ArmyProto& a)
   if (d_gender == Hero::NONE)
     d_gender = Hero::MALE;
   d_hero_id = 0;
-  d_strategy = new HeroStrategy_None ();
 }
 
 HeroProto::HeroProto()
-  :ArmyProto(), OwnerId(), d_gender(Hero::FEMALE), d_hero_id (0),
-    d_strategy (new HeroStrategy_None ())
+  :ArmyProto(), OwnerId(), d_gender(Hero::FEMALE), d_hero_id (0)
 {
 }
 
 HeroProto::HeroProto(XML_Helper* helper)
   :ArmyProto(helper), OwnerId(helper)
 {
-  helper->registerTag (HeroStrategy::d_tag,
-                       sigc::mem_fun (this, &HeroProto::load));
   helper->getData(d_hero_id, "hero_id");
   Glib::ustring gender_str;
   if (!helper->getData(gender_str, "gender"))
@@ -63,36 +57,11 @@ HeroProto::HeroProto(XML_Helper* helper)
 
   helper->getData(d_armyset, "armyset");
 
-  Glib::ustring items;
-  std::stringstream sitems;
-  helper->getData(items, "starting_items");
-  sitems.str(items);
-
-  while (sitems.eof() == false)
-    {
-      int ival = -1;
-      sitems >> ival;
-      if (ival != -1)
-	d_starting_items.push_back ((guint32)ival);
-    }
-}
-
-bool HeroProto::load (Glib::ustring tag, XML_Helper* helper)
-{
-  if (tag == HeroStrategy::d_tag)
-    {
-      HeroStrategy *s = HeroStrategy::handle_load (helper);
-      d_strategy = s;
-      return true;
-    }
-
-  return false;
 }
 
 HeroProto::~HeroProto()
 {
   uninstantiateImages();
-  delete d_strategy;
 }
 
 bool HeroProto::save(XML_Helper* helper) const
@@ -107,11 +76,6 @@ bool HeroProto::save(XML_Helper* helper) const
   retval &= helper->saveData("gender", gender_str);
   retval &= OwnerId::save(helper);
   retval &= helper->saveData("armyset", d_armyset);
-  std::stringstream items;
-  for (auto it: d_starting_items)
-    items << it << " ";
-  retval &= helper->saveData("starting_items", items.str());
-  retval &= d_strategy->save (helper);
   retval &= helper->closeTag();
 
   return retval;

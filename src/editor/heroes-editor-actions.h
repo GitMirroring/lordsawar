@@ -43,6 +43,7 @@ public:
       REMOVE = 4,
       STRATEGY = 5,
       BACKPACK = 6,
+      DESCRIPTION = 7,
     };
 
     HeroesEditorAction(Type type, bool agg = false)
@@ -165,6 +166,23 @@ class HeroesEditorAction_Backpack: public HeroesEditorAction_Index
 
     private:
         std::list<guint32> d_items;
+};
+
+class HeroesEditorAction_Desc: public HeroesEditorAction_Index, public UndoCursor
+{
+    public:
+        HeroesEditorAction_Desc (guint32 i, Glib::ustring d, UndoMgr *u,
+                                 Gtk::Entry *e)
+          : HeroesEditorAction_Index (DESCRIPTION, i, true), UndoCursor (u, e),
+          d_desc (d) {}
+        ~HeroesEditorAction_Desc () {}
+
+        Glib::ustring getActionName () const {return "Description";}
+
+        Glib::ustring getDescription () {return d_desc;}
+
+    private:
+        Glib::ustring d_desc;
 };
 
 #endif //HEROES_EDITOR_ACTIONS_H

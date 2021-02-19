@@ -223,3 +223,43 @@ HeroStrategy* HeroStrategy::copy (const HeroStrategy* r)
     }
   return 0;
 }
+
+bool HeroStrategy::compare (const HeroStrategy *l, const HeroStrategy *r)
+{
+  if (l && !r)
+    return false;
+  if (!l && r)
+    return false;
+  if (!l && !r)
+    return true;
+  if (l->getType () != r->getType ())
+    return false;
+  switch(r->getType ())
+    {
+    case HeroStrategy::NONE:
+      break;
+    case HeroStrategy::RANDOM:
+        {
+          const HeroStrategy_Random *left =
+            (dynamic_cast<const HeroStrategy_Random*>(l));
+          const HeroStrategy_Random *right =
+            (dynamic_cast<const HeroStrategy_Random*>(r));
+          if (left->getTurns () != right->getTurns ())
+            return false;
+        }
+      break;
+    case HeroStrategy::SIMPLE_QUESTER:
+        {
+          const HeroStrategy_SimpleQuester *left =
+            (dynamic_cast<const HeroStrategy_SimpleQuester*>(l));
+          const HeroStrategy_SimpleQuester *right =
+            (dynamic_cast<const HeroStrategy_SimpleQuester*>(r));
+          if (left->getNumHelpers () != right->getNumHelpers ())
+            return false;
+          if (left->getFallbackStrategy () != right->getFallbackStrategy ())
+            return false;
+        }
+      break;
+    }
+  return true;
+}

@@ -26,7 +26,7 @@
 #include "undo-mgr.h"
 #include "heroes-editor-actions.h"
 
-class HeroProto;
+class Character;
 
 // edit the heroes that can join a player
 class HeroesDialog: public LwEditorDialog
@@ -44,7 +44,7 @@ class HeroesDialog: public LwEditorDialog
 	    { add(name); add(hero); }
 	
 	Gtk::TreeModelColumn<Glib::ustring> name;
-	Gtk::TreeModelColumn<HeroProto*> hero;
+	Gtk::TreeModelColumn<Character*> hero;
     };
     const HeroesColumns hero_columns;
     Glib::RefPtr<Gtk::ListStore> hero_list;
@@ -56,6 +56,8 @@ class HeroesDialog: public LwEditorDialog
 
     UndoMgr *umgr;
     bool d_changed;
+    bool d_warn_herotemplates_change_affects_heroes;
+
     bool d_player_id;
     Gtk::TreeView *treeview;
     Gtk::Button *add_button;
@@ -67,10 +69,12 @@ class HeroesDialog: public LwEditorDialog
 
     Gtk::Entry *name_entry;
     Gtk::ComboBoxText *gender_combobox;
+    Gtk::Entry *description_entry;
     Gtk::Box *panel_box;
 
     void on_name_changed ();
     void on_gender_changed ();
+    void on_description_changed ();
     void on_add_pressed();
     void on_remove_pressed();
     void on_strategy_pressed ();
@@ -79,7 +83,7 @@ class HeroesDialog: public LwEditorDialog
     void fill_heroes ();
     void update_buttons ();
 
-    HeroProto * get_selected_hero ();
+    Character * get_selected_hero ();
     void on_hero_selected ();
     void update_hero_templates ();
     void update_panel ();
@@ -91,7 +95,7 @@ class HeroesDialog: public LwEditorDialog
     void update ();
     UndoAction *executeAction (UndoAction *action);
     void clear_heroes();
-    HeroProto* getHeroByIndex (HeroesEditorAction_Index *a);
+    Character* getHeroByIndex (HeroesEditorAction_Index *a);
     int getCurIndex ();
 };
 

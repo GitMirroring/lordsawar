@@ -56,6 +56,7 @@ hero-levels-dialog.ui \
 player-resign-dialog.ui \
 player-resign-completed-dialog.ui \
 army-bonus-dialog.ui \
+characters-dialog.ui \
 item-bonus-dialog.ui \
 game-options-dialog.ui \
 triumphs-dialog.ui \

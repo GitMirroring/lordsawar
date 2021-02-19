@@ -93,6 +93,9 @@ class Hero : public Army
 	//! Return the name of this hero.
 	virtual Glib::ustring getName() const {return d_name;};
 
+        //! Return the hero blurb.
+        Glib::ustring getDescription () const;
+
 	//! Return that this object is a hero.
 	bool isHero() const {return true;};
 
@@ -125,6 +128,8 @@ class Hero : public Army
         //! Set the gender of the hero.
         void setGender(Gender gender){d_gender = gender;}
 
+        //! Set the character/hero proto that the hero is based on.
+        void setHeroTypeId (guint32 id) {d_hero_type_id = id;}
 
 	// Methods that operate on class data and do not modify the class.
 

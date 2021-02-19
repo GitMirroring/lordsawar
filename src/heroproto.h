@@ -55,21 +55,11 @@ class HeroProto : public ArmyProto, public OwnerId
         //! Set the gender of the hero.
         void setGender(Hero::Gender gender){d_gender = gender;}
 
-        //! Set the strategy for the hero.
-        void setStrategy (HeroStrategy *s) {d_strategy = s;}
-
         //! Return the Id of the hero.
         guint32 getHeroId () const {return d_hero_id;}
 
         //! Return the gender of the hero.
         guint32 getGender() const {return d_gender;}
-
-        //! Return the strategy that this hero uses.
-        HeroStrategy* getStrategy () const {return d_strategy;}
-
-        std::list<guint32> getStartingItemIds () const {return d_starting_items;}
-
-        void setStartingItemIds (std::list<guint32> i) {d_starting_items = i;}
 
         //! Saves the hero prototype to an action
         virtual bool save(XML_Helper* helper) const;
@@ -80,15 +70,6 @@ class HeroProto : public ArmyProto, public OwnerId
 
         //! Id of the hero proto
         guint32 d_hero_id;
-
-        //! How the hero acts
-        HeroStrategy *d_strategy;
-
-        //! list of item proto ids to be made into items at recruit time
-        std::list<guint32> d_starting_items;
-
-        //! Callback for loading the hero strategy data.
-        bool load (Glib::ustring tag, XML_Helper* helper);
 };
 
 #endif // HERO_PROTO_H

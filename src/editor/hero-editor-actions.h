@@ -38,6 +38,7 @@ public:
       NAME = 1,
       GENDER = 2,
       BACKPACK = 3,
+      CHARACTER = 4,
     };
 
     HeroEditorAction(Type type, bool agg = false)
@@ -95,5 +96,20 @@ class HeroEditorAction_Backpack: public HeroEditorAction
 
     private:
         Backpack *d_backpack;
+};
+
+class HeroEditorAction_Character: public HeroEditorAction
+{
+    public:
+        HeroEditorAction_Character (guint32 id)
+          : HeroEditorAction (CHARACTER), d_hero_type_id (id) {}
+        ~HeroEditorAction_Character () {}
+
+        Glib::ustring getActionName () const {return "Character";}
+
+        guint32 getHeroTypeId () {return d_hero_type_id;}
+
+    private:
+        guint32 d_hero_type_id;
 };
 #endif //HERO_EDITOR_ACTIONS_H

@@ -87,6 +87,7 @@
 #include "game-actionlist.h"
 #include "turn-actionlist.h"
 #include "keeper.h"
+#include "Itemlist.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::flush<<std::endl;}
 #define debug(x)
@@ -2439,9 +2440,9 @@ void Player::updateArmyValues(std::list<Stack*>& stacks, double xp_sum)
     }
 }
 
-Hero* Player::doRecruitHero(HeroProto* herotemplate, City *city, int cost, int alliesCount, const ArmyProto *ally, StackReflist *stacks)
+Hero* Player::doRecruitHero(HeroProto* hproto, City *city, int cost, int alliesCount, const ArmyProto *ally, StackReflist *stacks)
 {
-  Hero *newhero = new Hero(*herotemplate);
+  Hero *newhero = new Hero(*hproto);
   newhero->setOwner(this);
   Stack *s = GameMap::getInstance()->addArmy(city, newhero);
   if (stacks)
@@ -2464,6 +2465,20 @@ Hero* Player::doRecruitHero(HeroProto* herotemplate, City *city, int cost, int a
       Item *battle_standard = new Item (name, true, this);
       battle_standard->addBonus(Item::ADD1STACK);
       newhero->getBackpack()->addToBackpack(battle_standard, 0);
+    }
+  Character *c =
+    HeroTemplates::getInstance ()->getCharacterById (hproto->getHeroId ());
+  for (auto item_id : c->item_ids)
+    {
+      ItemProto *proto = (*Itemlist::getInstance ())[item_id];
+      Item *item = new Item (*proto, item_id);
+      if (proto->getBonus (ItemProto::PLANT_TO_VECTOR))
+        {
+          item->setPlantableOwnerId (d_id);
+          item->setPlantableOriginalOwnerId (d_id);
+          item->setPlanted (false);
+        }
+      newhero->getBackpack()->addToBackpack(item);
     }
   withdrawGold(cost);
   supdatingStack.emit(0);

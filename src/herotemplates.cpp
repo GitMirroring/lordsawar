@@ -33,7 +33,6 @@
 HeroTemplates* HeroTemplates::d_instance = 0;
 
 Glib::ustring HeroTemplates::d_tag = "herotemplates";
-Glib::ustring HeroTemplates::d_child_tag = "herotemplate";
 
 HeroTemplates* HeroTemplates::getInstance()
 {
@@ -60,20 +59,61 @@ void HeroTemplates::deleteInstance()
   d_instance = 0;
 }
 
+void HeroTemplates::populateHeroProtos ()
+{
+  for (unsigned int i = 0; i < MAX_PLAYERS; ++i)
+    {
+      for (std::vector<HeroProto *>::iterator j = d_herotemplates[i].begin();
+           j != d_herotemplates[i].end(); ++j)
+        delete *j;
+      d_herotemplates[i].clear();
+    }
+  //take our characters and fill our hero proto arrays
+  for (auto c : d_characters)
+    {
+      const ArmyProto *herotype = NULL;
+      if (c->gender == Hero::MALE)
+        {
+          if (d_male_heroes.size() > 0)
+            herotype = d_male_heroes[Rnd::rand() % d_male_heroes.size()];
+        }
+      else if (c->gender == Hero::FEMALE)
+        {
+          if (d_female_heroes.size() > 0)
+            herotype = d_female_heroes[Rnd::rand() % d_female_heroes.size()];
+        }
+      if (herotype == NULL)
+        {
+          if (d_male_heroes.size() > 0)
+            herotype = d_male_heroes[Rnd::rand() % d_male_heroes.size()];
+          else if (d_female_heroes.size() > 0)
+            herotype = d_female_heroes[Rnd::rand() % d_female_heroes.size()];
+        }
+      if (herotype &&
+          c->owner != Playerlist::getInstance ()->getNeutral ()->getId ())
+        {
+          HeroProto *newhero = new HeroProto (*herotype);
+          newhero->setOwnerId(c->owner);
+          newhero->setHeroId (c->id);
+
+          newhero->setName (_(c->name.c_str()));
+          newhero->setDescription (_(c->description.c_str()));
+          d_herotemplates[c->owner].push_back (newhero);
+        }
+    }
+}
+
 HeroTemplates::HeroTemplates()
 {
-  current_owner = 0;
-  XML_Helper helper(File::getMiscFile("heronames.xml"), std::ios::in);
-
-  loadHeroTemplates(&helper);
-  if (!helper.parseXML())
-    std::cerr << String::ucompose(_("Error!  can't load heronames file `%1'.  Exiting."), File::getMiscFile("heronames.xml")) << std::endl;
-  helper.close();
+  loadHeroesFromArmysets ();
+  CharacterLoader loader (File::getMiscFile("heronames.xml"));
+  for (auto c : loader.characters)
+    d_characters.push_back (Character::copy (c));
+  populateHeroProtos ();
 }
 
 HeroTemplates::HeroTemplates(const HeroTemplates &h)
 {
-  current_owner = h.current_owner;
   for (guint32 i = 0; i < MAX_PLAYERS; i++)
     {
       d_herotemplates[i] = std::vector<HeroProto*>();
@@ -87,12 +127,20 @@ HeroTemplates::HeroTemplates(const HeroTemplates &h)
 
   for (guint32 i = 0; i < h.d_female_heroes.size (); i++)
     d_female_heroes.push_back (new ArmyProto (*h.d_female_heroes[i]));
+  for (auto c: h.d_characters)
+    d_characters.push_back (Character::copy (c));
 }
 
 HeroTemplates::HeroTemplates(XML_Helper *helper)
 {
-  current_owner = 0;
-  loadHeroTemplates(helper);
+  loadHeroesFromArmysets ();
+
+  helper->registerTag
+    (HeroStrategy::d_tag,
+     sigc::bind (sigc::ptr_fun (&Character::load), &d_characters));
+  helper->registerTag
+    (Character::d_tag,
+     sigc::bind (sigc::ptr_fun (&Character::load), &d_characters));
 }
 
 HeroTemplates::~HeroTemplates()
@@ -110,6 +158,9 @@ HeroTemplates::~HeroTemplates()
   for (unsigned int i = 0; i < d_female_heroes.size(); i++)
     delete d_female_heroes[i];
   d_female_heroes.clear();
+  for (auto c : d_characters)
+    delete c;
+  d_characters.clear ();
 }
 
 HeroProto *HeroTemplates::getRandomHero(Hero::Gender gender, int player_id)
@@ -162,103 +213,33 @@ void HeroTemplates::loadHeroesFromArmysets ()
     }
 }
 
-void HeroTemplates::loadHeroTemplates(XML_Helper *helper)
+std::vector<Character*> HeroTemplates::getHeroes (guint32 player_id)
 {
-  loadHeroesFromArmysets ();
-
-  helper->registerTag (HeroStrategy::d_tag,
-                       sigc::mem_fun (this, &HeroTemplates::load));
-  helper->registerTag(HeroTemplates::d_child_tag,
-                      sigc::mem_fun((*this), &HeroTemplates::load));
-  return;
-}
-
-bool HeroTemplates::load(Glib::ustring tag, XML_Helper *helper)
-{
-  if (tag == d_child_tag)
-    {
-      guint32 id;
-      helper->getData (id, "hero_id");
-      Glib::ustring name;
-      helper->getData(name, "name");
-      guint32 owner;
-      helper->getData(owner, "owner");
-      Glib::ustring gender_str;
-      if (owner >= (int) MAX_PLAYERS)
-	return false;
-      helper->getData(gender_str, "gender");
-      Hero::Gender gender;
-      gender = Hero::genderFromString(gender_str);
-
-      Glib::ustring items;
-      std::stringstream sitems;
-      helper->getData(items, "starting_items");
-      sitems.str(items);
-
-      std::list<guint32> item_ids;
-      while (sitems.eof() == false)
-        {
-          int ival = -1;
-          sitems >> ival;
-          if (ival != -1)
-            item_ids.push_back ((guint32)ival);
-        }
-
-      const ArmyProto *herotype = NULL;
-      if (gender == Hero::MALE)
-	{
-	  if (d_male_heroes.size() > 0)
-	    herotype = d_male_heroes[Rnd::rand() % d_male_heroes.size()];
-	}
-      else if (gender == Hero::FEMALE)
-	{
-	  if (d_female_heroes.size() > 0)
-	    herotype = d_female_heroes[Rnd::rand() % d_female_heroes.size()];
-	}
-      if (herotype == NULL)
-	{
-	  if (d_male_heroes.size() > 0)
-	    herotype = d_male_heroes[Rnd::rand() % d_male_heroes.size()];
-	  else if (d_female_heroes.size() > 0)
-	    herotype = d_female_heroes[Rnd::rand() % d_female_heroes.size()];
-	}
-      if (herotype == NULL)
-        return false;
-      HeroProto *newhero = new HeroProto (*herotype);
-      newhero->setOwnerId(owner);
-      newhero->setHeroId (id);
-      newhero->setStartingItemIds (item_ids);
-
-      newhero->setName (_(name.c_str()));
-      d_herotemplates[owner].push_back (newhero);
-      current_owner = owner;
-      return true;
-    }
-  if (tag == HeroStrategy::d_tag)
-    {
-      HeroStrategy *s = HeroStrategy::handle_load (helper);
-      d_herotemplates[current_owner].back ()->setStrategy (s);
-      return true;
-    }
-  return false;
-}
-
-std::vector<HeroProto*> HeroTemplates::getHeroes (int player_id)
-{
-  std::vector<HeroProto*> out;
-  for (auto h : d_herotemplates[player_id])
-    out.push_back (new HeroProto (*h));
+  std::vector<Character*> out;
+  for (auto c : d_characters)
+    if (c->owner == player_id)
+      out.push_back (Character::copy (c));
   return out;
 }
 
-void HeroTemplates::replaceHeroes (int player_id, std::vector<HeroProto*> he)
+void HeroTemplates::replaceHeroes (guint32 player_id, std::vector<Character*> he)
 {
-  for (guint32 i = 0; i < d_herotemplates[player_id].size (); i++)
-    delete d_herotemplates[player_id][i];
-  d_herotemplates[player_id].clear ();
-  for (guint32 i = 0; i < he.size (); i++)
-    d_herotemplates[player_id].push_back (he[i]);
-  updateHeroIds ();
+  std::list<Character*> to_delete;
+  for (auto c : d_characters)
+    {
+      if (c->owner == player_id)
+        to_delete.push_back (c);
+    }
+
+  for (auto c : to_delete)
+    {
+      d_characters.remove (c);
+      delete c;
+    }
+
+  for (auto c : he)
+    d_characters.push_back (c);
+  populateHeroProtos ();
 }
 
 bool HeroTemplates::isDefault() const
@@ -266,34 +247,50 @@ bool HeroTemplates::isDefault() const
   bool same = true;
   HeroTemplates *def = new HeroTemplates ();
 
-  for (guint32 i = 0; i < MAX_PLAYERS; i++)
+  if (def->d_characters.size () != d_characters.size ())
     {
-      std::vector<HeroProto*> h1 = d_herotemplates[i];
-      std::vector<HeroProto*> h2 = def->d_herotemplates[i];
-      if (h1.size () != h2.size ())
+      delete def;
+      return false;
+    }
+  auto i = def->d_characters.begin ();
+  auto j = d_characters.begin ();
+
+  for (; i != def->d_characters.end (); ++i, ++j)
+    {
+      Character *l = *i;
+      Character *r = *j;
+      if (l->name != r->name)
         {
           same = false;
           break;
         }
-      for (guint32 j = 0; j < h1.size (); j++)
+      if (l->description != r->description)
         {
-          if (h1[j]->getName () != h2[j]->getName ())
-            {
-              same = false;
-              break;
-            }
-          if (h1[j]->getOwnerId () != h2[j]->getOwnerId ())
-            {
-              same = false;
-              break;
-            }
-          if (h1[j]->getGender () != h2[j]->getGender ())
-            {
-              same = false;
-              break;
-            }
+          same = false;
+          break;
+        }
+      if (l->item_ids != r->item_ids)
+        {
+          same = false;
+          break;
+        }
+      if (l->owner != r->owner)
+        {
+          same = false;
+          break;
+        }
+      if (l->gender != r->gender)
+        {
+          same = false;
+          break;
+        }
+      if (HeroStrategy::compare (l->strategy, r->strategy) == false)
+        {
+          same = false;
+          break;
         }
     }
+
   delete def;
   return same;
 }
@@ -304,28 +301,8 @@ bool HeroTemplates::save(XML_Helper* helper) const
 
     retval &= helper->openTag(HeroTemplates::d_tag);
 
-    for (guint32 i = 0; i < MAX_PLAYERS; i++)
-      {
-        for (guint32 j = 0; j < d_herotemplates[i].size (); j++)
-          {
-            HeroProto *h = d_herotemplates[i][j];
-            retval &= helper->openTag(HeroTemplates::d_child_tag);
-            retval &= helper->saveData("name", h->getName ());
-            Glib::ustring gender_str =
-              Hero::genderToString(Hero::Gender(h->getGender ()));
-            retval &= helper->saveData("gender", gender_str);
-            retval &= helper->saveData("hero_id", h->getHeroId ());
-            OwnerId o = *h;
-            retval &= o.save (helper);
-            std::stringstream items;
-            for (auto it: h->getStartingItemIds ())
-              items << it << " ";
-            retval &= helper->saveData("starting_items", items.str());
-            if (h->getStrategy ())
-              retval &= h->getStrategy ()->save (helper);
-            retval &= helper->closeTag();
-          }
-      }
+    for (auto c : d_characters)
+      retval &= Character::save (helper, c);
 
     retval &= helper->closeTag();
 
@@ -338,30 +315,38 @@ void HeroTemplates::reset (HeroTemplates *h)
   d_instance = h;
 }
 
-void HeroTemplates::updateHeroIds()
+bool HeroTemplates::removeItemAffectsStartingItemIds (guint32 idx)
 {
-  guint32 id = 0;
-  for (guint32 i = 0; i < MAX_PLAYERS; i++)
+  for (auto c : d_characters)
     {
-      for (guint32 j = 0; j < d_herotemplates[i].size (); j++)
-        {
-          HeroProto *h = d_herotemplates[i][j];
-          h->setHeroId (id);
-        }
+          for (auto k : c->item_ids)
+            if (k >= idx)
+              return true;
     }
-  return;
+  return false;
 }
-        
-HeroProto *HeroTemplates::getHeroProtoById (int player_id, guint32 hero_id)
+
+Character *HeroTemplates::getCharacterById (guint32 hero_id)
 {
-  //let's just do a slow lookup, there's only about 10 to search through.
-  if (player_id >= (int) MAX_PLAYERS)
-    return NULL;
-  for (guint32 j = 0; j < d_herotemplates[player_id].size (); j++)
-    {
-      HeroProto *h = d_herotemplates[player_id][j];
-      if (h->getHeroId () == hero_id)
-        return h;
-    }
+  for (auto c : d_characters)
+    if (c->id == hero_id)
+      return c;
   return NULL;
+}
+
+guint32 HeroTemplates::getNextAvailableId () const
+{
+  std::list<guint32> ids;
+  for (auto c : d_characters)
+    ids.push_back (c->id);
+  ids.sort ();
+
+  guint32 new_id = 0;
+  for (auto id : ids)
+    {
+      if (id != new_id)
+        return new_id;
+      new_id++;
+    }
+  return ids.size ();
 }

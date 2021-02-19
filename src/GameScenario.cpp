@@ -76,6 +76,7 @@
 #include "ScenarioMedia.h"
 #include "herotemplates.h"
 #include "heroproto.h"
+#include "character.h"
 #include "keeper.h"
 
 Glib::ustring GameScenario::d_tag = "scenario";
@@ -697,6 +698,7 @@ bool GameScenario::loadWithHelper(XML_Helper& helper)
     {
       GameMap::getInstance()->updateStackPositions();
       GameMap::getInstance()->calculateBlockedAvenues();
+      HeroTemplates::getInstance ()->populateHeroProtos ();
     }
 
   return broken;
@@ -1147,7 +1149,11 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
   for (auto it: *Playerlist::getInstance())
     {
       if (it == Playerlist::getInstance()->getNeutral())
-	continue;
+        {
+          if (it->getHeroes().size ())
+            errors.push_back(_("Neutrals have one or more heroes."));
+          continue;
+        }
       if (it->isDead() == true)
 	continue;
       if (Citylist::getInstance()->getCapitalCity(it) == NULL ||
@@ -1159,8 +1165,22 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
 	  errors.push_back(s);
 	  break;
 	}
-      std::vector<HeroProto*> heroes =
+      std::vector<Character*> heroes =
         HeroTemplates::getInstance()->getHeroes (it->getId());
+      Itemlist *il = Itemlist::getInstance ();
+      for (auto h : heroes)
+        {
+          for (auto item : h->item_ids)
+            {
+              if (il->find (item) == il->end ())
+                {
+                  s = String::ucompose
+                    (_("The hero type called `%1' belonging to '%2' has bad starting items."),
+                     h->name, Playerlist::getInstance ()->getPlayer (h->owner)->getName ());
+                  errors.push_back(s);
+                }
+            }
+        }
       guint32 num_heroes = heroes.size ();
       for (auto h : heroes)
         delete h;
@@ -1170,6 +1190,20 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
                                 it->getName().c_str());
 	  errors.push_back(s);
           break;
+        }
+      for (auto h : it->getHeroes())
+        {
+          HeroTemplates *templates = HeroTemplates::getInstance ();
+          Character *c = templates->getCharacterById (h->getHeroTypeId ());
+          if (c->owner == Playerlist::getInstance ()->getNeutral ()->getId ())
+            continue;
+          if (!c || c->owner != it->getId ())
+            {
+              s = String::ucompose
+                (_("The hero `%1' belonging to '%2' has a bad hero type."),
+                 h->getName(), it->getName ());
+              errors.push_back(s);
+            }
         }
     }
 

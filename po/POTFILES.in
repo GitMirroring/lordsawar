@@ -6,6 +6,7 @@
 
 [type: gettext/glade]dat/glade/about-dialog.ui
 [type: gettext/glade]dat/glade/army-bonus-dialog.ui
+[type: gettext/glade]dat/glade/characters-dialog.ui
 [type: gettext/glade]dat/glade/army-gains-level-dialog.ui
 [type: gettext/glade]dat/glade/army-info-window.ui
 [type: gettext/glade]dat/glade/city-info-window.ui
@@ -92,6 +93,7 @@
 [type: gettext/glade]dat/glade/editor/ruin-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/select-army-dialog.ui
 [type: gettext/glade]dat/glade/editor/select-hidden-ruin-dialog.ui
+[type: gettext/glade]dat/glade/editor/select-character-dialog.ui
 [type: gettext/glade]dat/glade/editor/select-item-dialog.ui
 [type: gettext/glade]dat/glade/editor/signpost-editor-dialog.ui
 [type: gettext/glade]dat/glade/editor/stack-editor-dialog.ui
@@ -246,6 +248,7 @@ src/gui/destination-dialog.cpp
 src/gui/stack-info-tip.cpp
 src/gui/bar-chart.cpp
 src/gui/army-bonus-dialog.cpp
+src/gui/characters-dialog.cpp
 src/gui/quest-assigned-dialog.cpp
 src/gui/history-report-dialog.cpp
 src/gui/sage-dialog.cpp
@@ -282,6 +285,7 @@ src/editor/Scenario.cpp
 src/editor/itemlist-dialog.cpp
 src/editor/signpost-editor-dialog.cpp
 src/editor/select-hidden-ruin-dialog.cpp
+src/editor/select-character-dialog.cpp
 src/editor/armyset-info-dialog.cpp
 src/editor/cityset-info-dialog.cpp
 src/editor/armyset-window.cpp

@@ -34,6 +34,7 @@
 #include "Itemlist.h"
 #include "ItemProto.h"
 #include "backpack-editor-dialog.h"
+#include "timed-message-dialog.h"
 
 #define method(x) sigc::mem_fun(*this, &HeroesDialog::x)
 
@@ -44,6 +45,7 @@ HeroesDialog::HeroesDialog(Gtk::Window &parent, guint32 player_id, Glib::ustring
   umgr = new UndoMgr (UndoMgr::DELAY, UndoMgr::LIMIT);
   umgr->execute ().connect (method (executeAction));
   d_changed = false;
+  d_warn_herotemplates_change_affects_heroes = false;
   d_player_id = player_id;
   xml->get_widget("treeview", treeview);
   xml->get_widget("panel_box", panel_box);
@@ -65,6 +67,9 @@ HeroesDialog::HeroesDialog(Gtk::Window &parent, guint32 player_id, Glib::ustring
 
   xml->get_widget("name_entry", name_entry);
   umgr->addCursor (name_entry);
+
+  xml->get_widget("description_entry", description_entry);
+  umgr->addCursor (description_entry);
 
   Gtk::Box *box;
   xml->get_widget("gender_box", box);
@@ -107,10 +112,11 @@ void HeroesDialog::on_add_pressed ()
              (HeroTemplates::getInstance ()->copy ()));
   Gtk::TreeIter i = hero_list->append();
   (*i)[hero_columns.name] = _("Unnamed Hero");
-  HeroProto *hero = new HeroProto;
-  hero->setGender (Hero::FEMALE);
-  hero->setName ((*i)[hero_columns.name]);
-  hero->setOwnerId (d_player_id);
+  std::list<guint32> ids;
+  guint32 id = HeroTemplates::getInstance ()->getNextAvailableId ();
+  Character *hero = new 
+    Character (d_player_id, (*i)[hero_columns.name], "", id,
+               Hero::FEMALE, ids, new HeroStrategy_None);
   (*i)[hero_columns.hero] = hero;
   update_hero_templates ();
   treeview->scroll_to_row (treeview->get_model ()->get_path (i));
@@ -119,18 +125,18 @@ void HeroesDialog::on_add_pressed ()
 
 void HeroesDialog::on_strategy_pressed ()
 {
-  HeroProto *hero = get_selected_hero ();
+  Character *hero = get_selected_hero ();
   if (hero)
     {
-      HeroStrategyDialog d (*dialog, hero->getStrategy ());
+      HeroStrategyDialog d (*dialog, hero->strategy);
       if (d.run ())
         {
           d_changed = true;
           umgr->add (new HeroesEditorAction_Strategy (getCurIndex (),
-                                                      hero->getStrategy ()));
-          HeroStrategy *h = hero->getStrategy ();
+                                                      hero->strategy));
+          HeroStrategy *h = hero->strategy;
           delete h;
-          hero->setStrategy (HeroStrategy::copy (d.get_strategy ()));
+          hero->strategy = HeroStrategy::copy (d.get_strategy ());
           update_hero_templates ();
         }
     }
@@ -146,8 +152,19 @@ void HeroesDialog::on_remove_pressed ()
     {
       umgr->add (new HeroesEditorAction_Remove
                  (HeroTemplates::getInstance ()->copy ()));
+      if (d_warn_herotemplates_change_affects_heroes)
+        {
+          Player *p = Playerlist::getInstance ()->getPlayer (d_player_id);
+          if (p->getHeroes ().empty () == false)
+            {
+              d_warn_herotemplates_change_affects_heroes = true;
+              TimedMessageDialog
+                d(*dialog, _("Removing hero types can break heros.\nWe'd like to automatically fix this for you but we can't!\nYou must manually fix them."), 0);
+              d.run_and_hide ();
+            }
+        }
       Gtk::TreeModel::Row row = *iterrow;
-      HeroProto *h = row[hero_columns.hero];
+      Character *h = row[hero_columns.hero];
       hero_list->erase(iterrow);
       delete h;
       update_hero_templates ();
@@ -157,12 +174,12 @@ void HeroesDialog::on_remove_pressed ()
 void HeroesDialog::fill_heroes ()
 {
   clear_heroes ();
-  std::vector<HeroProto *> heroes =
+  std::vector<Character *> heroes =
     HeroTemplates::getInstance ()->getHeroes (d_player_id);
   for (auto h : heroes)
     {
       Gtk::TreeIter i = hero_list->append();
-      (*i)[hero_columns.name] = h->getName ();
+      (*i)[hero_columns.name] = h->name;
       (*i)[hero_columns.hero] = h;
     }
 }
@@ -179,12 +196,12 @@ void HeroesDialog::update_buttons ()
   remove_button->set_sensitive (get_selected_hero () != NULL);
 }
   
-HeroProto* HeroesDialog::get_selected_hero ()
+Character* HeroesDialog::get_selected_hero ()
 {
   Gtk::TreeIter i = treeview->get_selection()->get_selected();
   if (i)
     {
-      HeroProto *h = (*i)[hero_columns.hero];
+      Character *h = (*i)[hero_columns.hero];
       return h;
     }
   else
@@ -199,11 +216,11 @@ void HeroesDialog::on_hero_selected ()
 void HeroesDialog::update_hero_templates ()
 {
   d_changed = true;
-  std::vector<HeroProto*> heroes;
+  std::vector<Character*> heroes;
   for (auto i : hero_list->children ())
     {
-      HeroProto *hero = (*i)[hero_columns.hero];
-      heroes.push_back (new HeroProto (*hero));
+      Character *hero = (*i)[hero_columns.hero];
+      heroes.push_back (Character::copy (hero));
     }
   HeroTemplates::getInstance ()->replaceHeroes (d_player_id, heroes);
 }
@@ -212,7 +229,7 @@ void HeroesDialog::clear_heroes ()
 {
   for (auto i : hero_list->children ())
     {
-      HeroProto *hero = (*i)[hero_columns.hero];
+      Character *hero = (*i)[hero_columns.hero];
       delete hero;
     }
   hero_list->clear ();
@@ -239,10 +256,10 @@ int HeroesDialog::getCurIndex ()
 
 void HeroesDialog::on_name_changed ()
 {
-  HeroProto *hero = get_selected_hero ();
+  Character *hero = get_selected_hero ();
   if (hero)
     {
-      umgr->add (new HeroesEditorAction_Name (getCurIndex (), hero->getName (),
+      umgr->add (new HeroesEditorAction_Name (getCurIndex (), hero->name,
                                               umgr, name_entry));
       Glib::RefPtr<Gtk::TreeSelection> selection = treeview->get_selection();
       Gtk::TreeModel::iterator iterrow = selection->get_selected();
@@ -251,22 +268,36 @@ void HeroesDialog::on_name_changed ()
           Gtk::TreeModel::Row row = *iterrow;
           row[hero_columns.name] = String::utrim (name_entry->get_text());
         }
-      hero->setName (String::utrim (name_entry->get_text ()));
+      hero->name = String::utrim (name_entry->get_text ());
       update_hero_templates ();
     }
 }
 
+void HeroesDialog::on_description_changed ()
+{
+  Character *hero = get_selected_hero ();
+  if (hero)
+    {
+      umgr->add (new HeroesEditorAction_Desc (getCurIndex (),
+                                              hero->description,
+                                              umgr, description_entry));
+      hero->description = String::utrim (description_entry->get_text ());
+      update_hero_templates ();
+    }
+}
+
+
 void HeroesDialog::on_gender_changed ()
 {
-  HeroProto *hero = get_selected_hero ();
+  Character *hero = get_selected_hero ();
   if (hero)
     {
       umgr->add (new HeroesEditorAction_Gender
-                 (getCurIndex (), Hero::Gender(hero->getGender ())));
+                 (getCurIndex (), Hero::Gender(hero->gender)));
       if (gender_combobox->get_active_row_number () == 0)
-        hero->setGender (Hero::MALE);
+        hero->gender = Hero::MALE;
       else
-        hero->setGender (Hero::FEMALE);
+        hero->gender = Hero::FEMALE;
       update_hero_templates ();
     }
   update ();
@@ -274,17 +305,20 @@ void HeroesDialog::on_gender_changed ()
 
 void HeroesDialog::on_items_pressed ()
 {
-  HeroProto *hero = get_selected_hero ();
+  Character *hero = get_selected_hero ();
   if (hero)
     {
       HeroesEditorAction_Backpack *action =
-        new HeroesEditorAction_Backpack
-        (getCurIndex (), hero->getStartingItemIds());
+        new HeroesEditorAction_Backpack (getCurIndex (), hero->item_ids);
       Backpack *backpack = new Backpack ();
-      for (auto id : hero->getStartingItemIds ())
+      for (auto id : hero->item_ids)
         {
-          ItemProto *proto = (*Itemlist::getInstance ())[id];
-          backpack->addToBackpack (new Item (*proto, id));
+          if (id < Itemlist::getInstance ()->size ())
+            {
+              ItemProto *proto = (*Itemlist::getInstance ())[id];
+              if (proto)
+                backpack->addToBackpack (new Item (*proto, id));
+            }
         }
       BackpackEditorDialog d(*dialog, backpack);
       if (d.run())
@@ -292,7 +326,7 @@ void HeroesDialog::on_items_pressed ()
           std::list<guint32> item_ids;
           for (auto item : *backpack)
             item_ids.push_back (item->getType());
-          hero->setStartingItemIds (item_ids);
+          hero->item_ids = item_ids;
           umgr->add (action);
           d_changed = true;
         }
@@ -307,35 +341,37 @@ void HeroesDialog::on_items_pressed ()
 
 void HeroesDialog::update_panel ()
 {
-  HeroProto *hero = get_selected_hero ();
+  Character *hero = get_selected_hero ();
   if (hero)
     {
-      if (name_entry->get_text () != hero->getName ())
-        name_entry->set_text (hero->getName ());
-      switch (hero->getGender ())
+      if (name_entry->get_text () != hero->name)
+        name_entry->set_text (hero->name);
+      switch (hero->gender)
         {
         case Hero::MALE:
           gender_combobox->set_active (0);
           break;
+        default:
         case Hero::FEMALE:
           gender_combobox->set_active (1);
           break;
         }
-      if (hero->getStrategy () == NULL)
+      if (hero->strategy == NULL)
         strategy_button->set_label (_("No strategy set"));
       else
-        strategy_button->set_label (hero->getStrategy ()->getDescription ());
+        strategy_button->set_label (hero->strategy->getDescription ());
       strategy_button->set_sensitive (false);
 
-      if (hero->getStartingItemIds ().size () == 0)
+      if (hero->item_ids.size () == 0)
         items_button->set_label (_("No starting items"));
       else
         items_button->set_label
           (String::ucompose (ngettext ("Starting with %1 item",
                                        "Starting with %1 items",
-                                       hero->getStartingItemIds().size ()),
-                             hero->getStartingItemIds().size ()));
-      items_button->set_sensitive (false);
+                                       hero->item_ids.size ()),
+                             hero->item_ids.size ()));
+      if (description_entry->get_text () != hero->description)
+        description_entry->set_text (hero->description);
     }
   else
     {
@@ -343,6 +379,7 @@ void HeroesDialog::update_panel ()
       gender_combobox->set_active (0);
       strategy_button->set_label (_("No strategy set"));
       items_button->set_label (_("No starting items"));
+      description_entry->set_text ("");
     }
   panel_box->set_sensitive (hero != NULL);
 }
@@ -354,6 +391,9 @@ void HeroesDialog::connect_signals ()
     (gender_combobox->signal_changed ().connect (method (on_gender_changed)));
   connections.push_back
     (name_entry->signal_changed ().connect (method (on_name_changed)));
+  connections.push_back
+    (description_entry->signal_changed ().connect
+     (method (on_description_changed)));
   connections.push_back
     (treeview->get_selection ()->signal_changed ().connect
      (method (on_hero_selected)));
@@ -394,12 +434,12 @@ void HeroesDialog::update ()
   connect_signals ();
 }
 
-HeroProto* HeroesDialog::getHeroByIndex (HeroesEditorAction_Index *a)
+Character* HeroesDialog::getHeroByIndex (HeroesEditorAction_Index *a)
 {
   auto path = Gtk::TreePath (String::ucompose ("%1", a->getIndex ()));
   auto iterrow = treeview->get_model ()->get_iter (path);
   Gtk::TreeModel::Row row = *iterrow;
-  HeroProto *hero = row[hero_columns.hero];
+  Character *hero = row[hero_columns.hero];
   return hero;
 }
 
@@ -415,9 +455,9 @@ UndoAction *HeroesDialog::executeAction (UndoAction *action2)
             HeroesEditorAction_Gender *a =
               dynamic_cast<HeroesEditorAction_Gender*>(action);
             out = new HeroesEditorAction_Gender
-              (a->getIndex (), Hero::Gender (getHeroByIndex (a)->getGender ()));
+              (a->getIndex (), getHeroByIndex (a)->gender);
 
-            getHeroByIndex (a)->setGender (a->getGender ());
+            getHeroByIndex (a)->gender = a->getGender ();
           }
         break;
       case HeroesEditorAction::NAME:
@@ -425,10 +465,10 @@ UndoAction *HeroesDialog::executeAction (UndoAction *action2)
             HeroesEditorAction_Name *a =
               dynamic_cast<HeroesEditorAction_Name*>(action);
             out = new HeroesEditorAction_Name
-              (a->getIndex (), getHeroByIndex (a)->getName (), umgr,
+              (a->getIndex (), getHeroByIndex (a)->name, umgr,
                name_entry);
 
-            getHeroByIndex (a)->setName (a->getName ());
+            getHeroByIndex (a)->name = a->getName ();
             auto iterrow = treeview->get_model ()->get_iter
               (String::ucompose ("%1", a->getIndex ()));
             if (iterrow)
@@ -466,13 +506,13 @@ UndoAction *HeroesDialog::executeAction (UndoAction *action2)
             HeroesEditorAction_Strategy *a =
               dynamic_cast<HeroesEditorAction_Strategy*>(action);
             out = new HeroesEditorAction_Strategy
-              (a->getIndex (), getHeroByIndex (a)->getStrategy ());
+              (a->getIndex (), getHeroByIndex (a)->strategy);
 
-            HeroStrategy *h = getHeroByIndex (a)->getStrategy ();
+            HeroStrategy *h = getHeroByIndex (a)->strategy;
             if (h)
               delete h;
-            getHeroByIndex (a)->setStrategy
-              (HeroStrategy::copy (a->getStrategy ()));
+            getHeroByIndex (a)->strategy =
+              HeroStrategy::copy (a->getStrategy ());
           }
         break;
       case HeroesEditorAction::BACKPACK:
@@ -480,10 +520,21 @@ UndoAction *HeroesDialog::executeAction (UndoAction *action2)
             HeroesEditorAction_Backpack *a =
               dynamic_cast<HeroesEditorAction_Backpack*>(action);
             out = new HeroesEditorAction_Backpack
-              (a->getIndex (), getHeroByIndex (a)->getStartingItemIds ());
+              (a->getIndex (), getHeroByIndex (a)->item_ids);
 
-            getHeroByIndex (a)->setStartingItemIds (a->getBackpack ());
+            getHeroByIndex (a)->item_ids = a->getBackpack ();
           }
+        break;
+      case HeroesEditorAction::DESCRIPTION:
+          {
+            HeroesEditorAction_Desc *a =
+              dynamic_cast<HeroesEditorAction_Desc*>(action);
+            out = new HeroesEditorAction_Desc
+              (a->getIndex (), getHeroByIndex (a)->description, umgr,
+               description_entry);
+
+            getHeroByIndex (a)->description = a->getDescription();
+          } 
         break;
     }
   return out;

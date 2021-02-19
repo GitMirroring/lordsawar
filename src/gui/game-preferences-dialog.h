@@ -53,6 +53,7 @@ class GamePreferencesDialog: public LwDialog
     Gtk::ProgressBar *progressbar;
     Gtk::Button *start_game_button;
     Gtk::Button *edit_options_button;
+    Gtk::Button *characters_button;
     Gtk::Label *game_name_label;
     Gtk::Entry *game_name_entry;
     Gtk::Label *difficulty_label;
@@ -75,6 +76,7 @@ class GamePreferencesDialog: public LwDialog
 				       const Glib::ustring &name);
     void on_difficulty_changed();
     void on_start_game_clicked();
+    void on_characters_clicked();
     void on_edit_options_clicked();
     void on_player_type_changed();
     void on_player_name_changed();

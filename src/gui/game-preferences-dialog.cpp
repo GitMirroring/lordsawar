@@ -32,6 +32,7 @@
 #include "game-parameters.h"
 #include "Configuration.h"
 #include "font-size.h"
+#include "characters-dialog.h"
 
 static bool inhibit_difficulty_combobox = false;
 
@@ -47,6 +48,9 @@ void GamePreferencesDialog::init(Glib::ustring filename)
   xml->get_widget("start_game_button", start_game_button);
   xml->get_widget("difficulty_label", difficulty_label);
   xml->get_widget("difficulty_combobox", difficulty_combobox);
+
+  xml->get_widget("characters_button", characters_button);
+  characters_button->signal_clicked().connect (method(on_characters_clicked));
 
   xml->get_widget("players_vbox", players_vbox);
   xml->get_widget("game_name_label", game_name_label);
@@ -597,4 +601,10 @@ void GamePreferencesDialog::finish_progress ()
   progress_treeview->queue_draw ();
   Glib::usleep (20000);
   while (g_main_context_iteration(NULL, FALSE)); //doEvents
+}
+
+void GamePreferencesDialog::on_characters_clicked ()
+{
+  CharactersDialog d (*dialog, player_shields, d_filename);
+  d.run_and_hide ();
 }

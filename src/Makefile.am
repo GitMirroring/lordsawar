@@ -99,7 +99,8 @@ liblordsawar_la_SOURCES = action.cpp action.h AI_Analysis.cpp AI_Analysis.h \
 	snd.cpp snd.h \
 	scenario-list.cpp scenario-list.h \
 	scenario-details.cpp scenario-details.h \
-	keeper.cpp keeper.h
+	keeper.cpp keeper.h \
+	character.cpp character.h
 
 liblordsawarnet_la_SOURCES = \
 	game-client.cpp game-client.h \

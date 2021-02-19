@@ -70,6 +70,8 @@ class HeroStrategy
 
         static Type getRandom ();
 
+        static bool compare (const HeroStrategy *l, const HeroStrategy *r);
+
     protected:
 
         Type d_type;

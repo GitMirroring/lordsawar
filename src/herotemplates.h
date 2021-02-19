@@ -23,12 +23,13 @@
 #include <vector>
 #include "hero.h"
 #include "defs.h"
+#include "character.h"
 
 class ArmyProto;
 class HeroProto;
 class XML_Helper;
 
-//! A list of Item objects.
+//! A list of Hero Template objects.
 /**
  * The HeroTemplates holds all hero templates together.
  *
@@ -42,9 +43,6 @@ class HeroTemplates
     public:
 	//! The xml tag of this object in a saved-game file.
 	static Glib::ustring d_tag;
-
-	//! The xml object holds several of entities named this.
-	static Glib::ustring d_child_tag;
 
         //! Makes a copy of the hero templates.
         HeroTemplates* copy () {return new HeroTemplates (*this);}
@@ -63,32 +61,39 @@ class HeroTemplates
          * The caller is responsible for freeing the returned objects.
          * (or pass them back with replaceHeroes)
          */
-        std::vector<HeroProto*> getHeroes (int player_id);
+        std::vector<Character*> getHeroes (guint32 player_id);
 
         //! Replace all the heroes belonging to the player with the given id.
         /**
-         * HeroTemplates takes control of the HeroProto objects passed in.
+         * HeroTemplates takes control of the Character objects passed in.
          * This means the caller doesn't free them.
          */
-        void replaceHeroes (int player_id, std::vector<HeroProto*> he);
+        void replaceHeroes (guint32 player_id, std::vector<Character*> he);
 
         HeroProto *getRandomHero(int player_id);
 
 	HeroProto *getRandomHero(Hero::Gender gender, int player_id);
 
-        //! get the hero with HERO_ID belonging to the given player
-        HeroProto *getHeroProtoById (int player_id, guint32 hero_id);
+        Character*getCharacterById (guint32 hero_id);
 
         //! Save the list of hero templates to a saved-game file.
         bool save(XML_Helper* helper) const;
 
         bool isDefault () const;
 
+        //! itemlist changed, does it affect us?
+        bool removeItemAffectsStartingItemIds (guint32 idx);
+
         //! Replace the current hero templates with another.
         static void reset (HeroTemplates *t);
 
 	//! Destructor.
         ~HeroTemplates();
+
+        //! meld Character and ArmyProtos objects into HeroProtos
+        void populateHeroProtos ();
+
+        guint32 getNextAvailableId () const;
 
     protected:
 	//! Default constructor. The function reads in the heronames file and produces a set of hero templates to be randomly selected from.
@@ -101,7 +106,10 @@ class HeroTemplates
 	bool load(Glib::ustring tag, XML_Helper *helper);
 
     private:
-        /* the contents of the heronames data file */
+        //! the contents of the heronames data file
+        std::list<Character*> d_characters;
+
+        /* the hero protos we made from the character data */
         std::vector<HeroProto*> d_herotemplates[MAX_PLAYERS];
 
 	//a list of male hero prototypes contained in the the army set.
@@ -111,13 +119,10 @@ class HeroTemplates
 
         static HeroTemplates* d_instance;
 
-        //! hack to remember which owner hero we're loading
-        guint32 current_owner;
-
         void loadHeroTemplates(XML_Helper *helper);
 
         void loadHeroesFromArmysets ();
-        void updateHeroIds ();
+
 };
 
 #endif

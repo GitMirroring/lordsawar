@@ -99,21 +99,27 @@ class ItemListEditorAction_Save : public ItemListEditorAction
 class ItemListEditorAction_Add: public ItemListEditorAction_Save
 {
     public:
-        ItemListEditorAction_Add (Itemlist *i)
-          :ItemListEditorAction_Save (ADD, i) {}
+        ItemListEditorAction_Add (Itemlist *i, int idx)
+          :ItemListEditorAction_Save (ADD, i), d_idx (idx) {}
         ~ItemListEditorAction_Add () {}
 
         Glib::ustring getActionName () const {return "Add";}
+        int getIndex () const {return d_idx;}
+    private:
+        int d_idx;
 };
 
 class ItemListEditorAction_Remove: public ItemListEditorAction_Save
 {
     public:
-        ItemListEditorAction_Remove (Itemlist *i)
-          :ItemListEditorAction_Save (REMOVE, i) {}
+        ItemListEditorAction_Remove (Itemlist *i, int idx)
+          :ItemListEditorAction_Save (REMOVE, i), d_idx (idx) {}
         ~ItemListEditorAction_Remove () {}
 
         Glib::ustring getActionName () const {return "Remove";}
+        int getIndex () const {return d_idx;}
+    private:
+        int d_idx;
 };
 
 class ItemListEditorAction_Index: public ItemListEditorAction

@@ -4,6 +4,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Endurien</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -14,6 +15,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Ondorien</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -24,6 +26,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Thordolf</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -34,6 +37,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Alagon</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -44,6 +48,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Encalgrim</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -54,6 +59,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Ingaron</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -64,6 +70,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Inloran</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -74,6 +81,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Ongoladan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -84,6 +92,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Ilmorgrist</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -94,6 +103,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Ganthag</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -104,6 +114,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Alcargrim</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -114,6 +125,7 @@
 		<d_owner>0</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Eldaragon</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -124,6 +136,7 @@
 		<d_owner>1</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Ingorian</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -134,6 +147,7 @@
 		<d_owner>1</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Ilgarion</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -144,6 +158,7 @@
 		<d_owner>1</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Thorgolf</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -154,6 +169,7 @@
 		<d_owner>1</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Belcarain</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -164,6 +180,7 @@
 		<d_owner>1</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Glathros</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -174,6 +191,7 @@
 		<d_owner>1</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Insharien</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -184,6 +202,7 @@
 		<d_owner>1</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Staelram</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -194,6 +213,7 @@
 		<d_owner>1</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Ellorgrist</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -204,6 +224,7 @@
 		<d_owner>1</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Encanadan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -214,6 +235,7 @@
 		<d_owner>1</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Belloren</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -224,6 +246,7 @@
 		<d_owner>1</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Emorgrist</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -234,6 +257,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Andaradan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -244,6 +268,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Belsharien</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -254,6 +279,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Maedhring</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -264,6 +290,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Aladin</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -274,6 +301,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Beldarian</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -284,6 +312,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Inmargrim</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -294,6 +323,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Eldanas</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -304,6 +334,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Belshargrim</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -314,6 +345,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Ilmorian</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -324,6 +356,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Almarain</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -334,6 +367,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Alloragon</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -344,6 +378,7 @@
 		<d_owner>2</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Andoron</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -354,6 +389,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Induradan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -364,6 +400,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Enmorath</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -374,6 +411,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Alsharain</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -384,6 +422,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Anmaron</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -394,6 +433,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Algaragon</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -404,6 +444,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Bandane</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -414,6 +455,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Illorath</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -424,6 +466,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Alcanan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -434,6 +477,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Indurgrist</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -444,6 +488,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Alcanen</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -454,6 +499,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Enduradan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -464,6 +510,7 @@
 		<d_owner>3</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Emoras</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -474,6 +521,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Alcanadan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -484,6 +532,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Aldoran</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -494,6 +543,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Elsharadan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -504,6 +554,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Gilmorthas</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -514,6 +565,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Cormyr</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -524,6 +576,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Damonir</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -534,6 +587,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Forgrym</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -544,6 +598,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Grimbald</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -554,6 +609,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Hunor</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -564,6 +620,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Jomatta</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -574,6 +631,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Kyrian</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -584,6 +642,7 @@
 		<d_owner>4</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Lasfallas</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -594,6 +653,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Morthorg</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -604,6 +664,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Nyvar</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -614,6 +675,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Orogond</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -624,6 +686,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Paylas</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -634,6 +697,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Quelya</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -644,6 +708,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Rimbanan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -654,6 +719,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Simisola</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -664,6 +730,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Thorgorain</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -674,6 +741,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Ulthmord</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -684,6 +752,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Vangarian</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -694,6 +763,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Waldorath</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -704,6 +774,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Xermian</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -714,6 +785,7 @@
 		<d_owner>5</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Yamesh</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -724,6 +796,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Zorabadan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -734,6 +807,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Caethlin</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -744,6 +818,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Dundorflas</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -754,6 +829,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Fanturian</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -764,6 +840,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Galbollan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -774,6 +851,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Hathmort</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -784,6 +862,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Justarian</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -794,6 +873,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Kelmore</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -804,6 +884,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Lurian</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -814,6 +895,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Mandraes</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -824,6 +906,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Nethlia</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -834,6 +917,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Odger</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -844,6 +928,7 @@
 		<d_owner>6</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Phaeros</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -854,6 +939,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Qyssia</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -864,6 +950,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Romodan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -874,6 +961,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Sigward</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -884,6 +972,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Tumerain</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -894,6 +983,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Ur-gallant</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -904,6 +994,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Vindomell</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -914,6 +1005,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Wastain</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -924,6 +1016,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Xaphocles</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -934,6 +1027,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Yorsha</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -944,6 +1038,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Zygashian</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -954,6 +1049,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Lutomere</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -964,6 +1060,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::FEMALE</d_gender>
 		<_d_name>Sharban</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -974,6 +1071,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Gryzyl</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -984,6 +1082,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Omelan</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -994,6 +1093,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Thastophere</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>
@@ -1004,6 +1104,7 @@
 		<d_owner>7</d_owner>
 		<d_gender>Hero::MALE</d_gender>
 		<_d_name>Cohen</_d_name>
+                <_d_description></_d_description>
                 <d_starting_items></d_starting_items>
                 <herostrategy>
                         <d_type>HeroStrategy::NONE</d_type>

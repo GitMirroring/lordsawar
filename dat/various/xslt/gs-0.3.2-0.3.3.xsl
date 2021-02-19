@@ -37,10 +37,6 @@
 <xsl:template match="heroproto">
         <heroproto>
                 <d_hero_id>0</d_hero_id>
-                <d_starting_items></d_starting_items>
-                <herostrategy>
-                        <d_type>HeroStrategy::NONE</d_type>
-                </herostrategy>
                 <xsl:copy-of select="d_id"/>
                 <xsl:copy-of select="d_name"/>
                 <xsl:copy-of select="d_description"/>
@@ -73,6 +69,11 @@
 <xsl:template match="herotemplate">
         <herotemplate>
                 <d_hero_id>0</d_hero_id>
+                <d_description></d_description>
+                <d_starting_items></d_starting_items>
+                <herostrategy>
+                        <d_type>HeroStrategy::NONE</d_type>
+                </herostrategy>
                 <xsl:copy-of select="d_owner"/>
                 <xsl:copy-of select="d_gender"/>
                 <xsl:copy-of select="d_name"/>

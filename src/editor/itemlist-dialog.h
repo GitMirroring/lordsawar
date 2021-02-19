@@ -40,6 +40,7 @@ class ItemlistDialog: public LwEditorDialog
  private:
     UndoMgr *umgr;
     bool d_changed;
+    bool d_warn_itemlist_change_affects_herotemplates;
     Glib::ustring current_save_filename;
     Itemlist *d_itemlist; //current itemlist
     ItemProto *d_item; //current item
