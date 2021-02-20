@@ -102,36 +102,30 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkAlignment" id="stats_alignment">
+                  <object class="GtkBox" id="stats_vbox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="left-padding">12</property>
-                    <property name="right-padding">12</property>
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkBox" id="stats_vbox">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="orientation">vertical</property>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                      </object>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
+                    <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="position">2</property>
                   </packing>

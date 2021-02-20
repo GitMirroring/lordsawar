@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -58,13 +58,13 @@ class ReportDialog: public LwDialog
     Gtk::Label *production_label;
     Gtk::Label *winning_label;
     Gtk::Notebook *report_notebook;
-    Gtk::Alignment *army_alignment;
+    Gtk::Box *army_alignment;
     BarChart *army_chart;
-    Gtk::Alignment *city_alignment;
+    Gtk::Box *city_alignment;
     BarChart *city_chart;
-    Gtk::Alignment *gold_alignment;
+    Gtk::Box *gold_alignment;
     BarChart *gold_chart;
-    Gtk::Alignment *winning_alignment;
+    Gtk::Box *winning_alignment;
     BarChart *winning_chart;
     sigc::connection switch_conn;
 

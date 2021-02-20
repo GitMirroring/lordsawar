@@ -53,25 +53,19 @@
                 <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkAlignment" id="alignment1">
+                  <object class="GtkEventBox" id="map_eventbox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <child>
-                      <object class="GtkEventBox" id="map_eventbox">
+                      <object class="GtkImage" id="map_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <child>
-                          <object class="GtkImage" id="map_image">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                          </object>
-                        </child>
                       </object>
                     </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">False</property>
+                    <property name="fill">True</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
@@ -92,8 +86,8 @@
                   <object class="GtkLabel" id="label">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="margin-left">10</property>
-                    <property name="margin-right">10</property>
+                    <property name="margin-end">10</property>
+                    <property name="margin-bottom">10</property>
                     <property name="label" translatable="yes">The Sages show thee the site of X where Y can be found.</property>
                     <property name="wrap">True</property>
                   </object>

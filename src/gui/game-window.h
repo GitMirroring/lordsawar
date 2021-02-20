@@ -116,8 +116,8 @@ class GameWindow: public sigc::trackable
     Gtk::Window* window;
     Gtk::Window* map_tip;	// tooltip appears over the map
     Gtk::Window* stack_tip;// tooltip appears over the map
-    Gtk::Container *bigmap_container;
-    Gtk::Container *map_container;
+    Gtk::Box *bigmap_container;
+    Gtk::Box *map_container;
     Gtk::MenuBar *menubar;
     Gtk::CheckMenuItem *fullscreen_menuitem;
     Gtk::MenuItem *new_game_menuitem;

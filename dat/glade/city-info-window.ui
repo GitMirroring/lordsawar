@@ -16,55 +16,19 @@
         <property name="label-xalign">0</property>
         <property name="shadow-type">etched-out</property>
         <child>
-          <object class="GtkAlignment" id="alignment1">
+          <object class="GtkBox" id="vbox1">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="border-width">6</property>
+            <property name="orientation">vertical</property>
             <child>
-              <object class="GtkBox" id="vbox1">
+              <object class="GtkBox" id="hbox2">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="orientation">vertical</property>
+                <property name="border-width">2</property>
                 <child>
-                  <object class="GtkBox" id="hbox2">
+                  <object class="GtkImage" id="left_shield_image">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="border-width">2</property>
-                    <child>
-                      <object class="GtkImage" id="left_shield_image">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="name_label">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="justify">center</property>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkImage" id="right_shield_image">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="pack-type">end</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -73,7 +37,66 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="razed_label">
+                  <object class="GtkLabel" id="name_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="justify">center</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkImage" id="right_shield_image">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="pack-type">end</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="razed_label">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="hbox1">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="border-width">2</property>
+                <property name="homogeneous">True</property>
+                <child>
+                  <object class="GtkImage" id="income_image">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="income_label">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                   </object>
@@ -84,55 +107,9 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox" id="hbox1">
+                  <object class="GtkImage" id="defense_image">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="border-width">2</property>
-                    <property name="homogeneous">True</property>
-                    <child>
-                      <object class="GtkImage" id="income_image">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="income_label">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkImage" id="defense_image">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="defense_label">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">3</property>
-                      </packing>
-                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -141,28 +118,44 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="capital_label">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">3</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkImage" id="capital_image">
+                  <object class="GtkLabel" id="defense_label">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">4</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
               </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="capital_label">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkImage" id="capital_image">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">4</property>
+              </packing>
             </child>
           </object>
         </child>

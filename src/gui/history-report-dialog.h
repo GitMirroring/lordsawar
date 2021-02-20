@@ -62,10 +62,10 @@ class HistoryReportDialog: public LwDialog
     Gtk::Label *ruin_label;
     Gtk::Label *gold_label;
     Gtk::Label *winner_label;
-    Gtk::Alignment *city_alignment;
-    Gtk::Alignment *ruin_alignment;
-    Gtk::Alignment *gold_alignment;
-    Gtk::Alignment *winner_alignment;
+    Gtk::Box *city_alignment;
+    Gtk::Box *ruin_alignment;
+    Gtk::Box *gold_alignment;
+    Gtk::Box *winner_alignment;
 
     std::vector<LocationList<City*>* > past_citylists;
     LineChart *city_chart;

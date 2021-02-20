@@ -14,43 +14,23 @@
         <property name="label-xalign">0</property>
         <property name="shadow-type">etched-out</property>
         <child>
-          <object class="GtkAlignment" id="alignment1">
+          <object class="GtkBox" id="hbox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="border-width">6</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-bottom">12</property>
+            <property name="spacing">6</property>
             <child>
-              <object class="GtkBox" id="hbox">
+              <object class="GtkBox" id="images_vbox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="orientation">vertical</property>
                 <property name="spacing">6</property>
                 <child>
-                  <object class="GtkBox" id="images_vbox">
+                  <object class="GtkImage" id="army_image">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="orientation">vertical</property>
-                    <property name="spacing">6</property>
-                    <child>
-                      <object class="GtkImage" id="army_image">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkImage" id="terrain_image">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -59,7 +39,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="info_label">
+                  <object class="GtkImage" id="terrain_image">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                   </object>
@@ -70,6 +50,22 @@
                   </packing>
                 </child>
               </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="info_label">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
             </child>
           </object>
         </child>

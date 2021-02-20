@@ -57,25 +57,19 @@
                 <property name="orientation">vertical</property>
                 <property name="spacing">12</property>
                 <child>
-                  <object class="GtkAlignment" id="alignment1">
+                  <object class="GtkEventBox" id="map_eventbox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <child>
-                      <object class="GtkEventBox" id="map_eventbox">
+                      <object class="GtkImage" id="map_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <child>
-                          <object class="GtkImage" id="map_image">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                          </object>
-                        </child>
                       </object>
                     </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">False</property>
+                    <property name="fill">True</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
@@ -90,8 +84,8 @@
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-left">12</property>
-                <property name="margin-right">12</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
                 <child>
                   <object class="GtkBox" id="ops_vbox">
                     <property name="visible">True</property>

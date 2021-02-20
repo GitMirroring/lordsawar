@@ -206,7 +206,7 @@ void FightWindow::add_army(Army *army, int initial_hp,
       hbox->set_spacing(6);
       hboxes.push_back(hbox);
 
-      Gtk::Alignment *a = manage(new Gtk::Alignment(Gtk::ALIGN_START));
+      Gtk::Box *a = manage(new Gtk::Box());
       a->add(*hbox);
       vbox->pack_start(*a, Gtk::PACK_SHRINK);
     }

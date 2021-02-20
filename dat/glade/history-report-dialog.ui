@@ -60,25 +60,19 @@
                 <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkAlignment" id="alignment1">
+                  <object class="GtkEventBox" id="map_eventbox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <child>
-                      <object class="GtkEventBox" id="map_eventbox">
+                      <object class="GtkImage" id="map_image">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <child>
-                          <object class="GtkImage" id="map_image">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                          </object>
-                        </child>
                       </object>
                     </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">False</property>
+                    <property name="fill">True</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
@@ -106,11 +100,10 @@
                         <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkAlignment" id="city_alignment">
-                            <property name="height-request">175</property>
+                          <object class="GtkBox" id="city_alignment">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="resize-mode">queue</property>
+                            <property name="orientation">vertical</property>
                             <child>
                               <placeholder/>
                             </child>
@@ -153,11 +146,10 @@
                         <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkAlignment" id="ruin_alignment">
-                            <property name="height-request">175</property>
+                          <object class="GtkBox" id="ruin_alignment">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="resize-mode">queue</property>
+                            <property name="orientation">vertical</property>
                             <child>
                               <placeholder/>
                             </child>
@@ -202,31 +194,24 @@
                         <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkAlignment" id="events_alignment">
-                            <property name="height-request">175</property>
+                          <object class="GtkScrolledWindow" id="scrolledwindow1">
                             <property name="visible">True</property>
-                            <property name="can-focus">False</property>
+                            <property name="can-focus">True</property>
+                            <property name="shadow-type">in</property>
                             <child>
-                              <object class="GtkScrolledWindow" id="scrolledwindow1">
+                              <object class="GtkViewport" id="viewport1">
                                 <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="shadow-type">in</property>
+                                <property name="can-focus">False</property>
+                                <property name="resize-mode">queue</property>
                                 <child>
-                                  <object class="GtkViewport" id="viewport1">
+                                  <object class="GtkBox" id="events_list_box">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="resize-mode">queue</property>
+                                    <property name="orientation">vertical</property>
+                                    <property name="spacing">3</property>
                                     <child>
-                                      <object class="GtkBox" id="events_list_box">
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">False</property>
-                                        <property name="resize-mode">queue</property>
-                                        <property name="orientation">vertical</property>
-                                        <property name="spacing">3</property>
-                                        <child>
-                                          <placeholder/>
-                                        </child>
-                                      </object>
+                                      <placeholder/>
                                     </child>
                                   </object>
                                 </child>
@@ -273,11 +258,10 @@
                         <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkAlignment" id="gold_alignment">
-                            <property name="height-request">175</property>
+                          <object class="GtkBox" id="gold_alignment">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="resize-mode">queue</property>
+                            <property name="orientation">vertical</property>
                             <child>
                               <placeholder/>
                             </child>
@@ -322,11 +306,10 @@
                         <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkAlignment" id="winner_alignment">
-                            <property name="height-request">175</property>
+                          <object class="GtkBox" id="winner_alignment">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="resize-mode">queue</property>
+                            <property name="orientation">vertical</property>
                             <child>
                               <placeholder/>
                             </child>

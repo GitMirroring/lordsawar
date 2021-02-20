@@ -88,7 +88,6 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="headers-visible">False</property>
-                    <property name="rules-hint">True</property>
                     <property name="enable-search">False</property>
                     <child internal-child="selection">
                       <object class="GtkTreeSelection"/>
