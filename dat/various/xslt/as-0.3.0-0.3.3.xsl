@@ -21,6 +21,38 @@
                  <xsl:copy-of select="d_plantedstandard"/>
                  <d_plantedstandard_num_masks>1</d_plantedstandard_num_masks>
                  <xsl:copy-of select="d_bag"/>
+                 <d_white_small_selector></d_white_small_selector>
+                 <d_white_small_selector_num_masks>0</d_white_small_selector_num_masks>
+                 <d_green_small_selector></d_green_small_selector>
+                 <d_green_small_selector_num_masks>0</d_green_small_selector_num_masks>
+                 <d_yellow_small_selector></d_yellow_small_selector>
+                 <d_yellow_small_selector_num_masks>0</d_yellow_small_selector_num_masks>
+                 <d_dark_blue_small_selector></d_dark_blue_small_selector>
+                 <d_dark_blue_small_selector_num_masks>0</d_dark_blue_small_selector_num_masks>
+                 <d_orange_small_selector></d_orange_small_selector>
+                 <d_orange_small_selector_num_masks>0</d_orange_small_selector_num_masks>
+                 <d_light_blue_small_selector></d_light_blue_small_selector>
+                 <d_light_blue_small_selector_num_masks>0</d_light_blue_small_selector_num_masks>
+                 <d_red_small_selector></d_red_small_selector>
+                 <d_red_small_selector_num_masks>0</d_red_small_selector_num_masks>
+                 <d_black_small_selector></d_black_small_selector>
+                 <d_black_small_selector_num_masks>0</d_black_small_selector_num_masks>
+                 <d_white_large_selector></d_white_large_selector>
+                 <d_white_large_selector_num_masks>0</d_white_large_selector_num_masks>
+                 <d_green_large_selector></d_green_large_selector>
+                 <d_green_large_selector_num_masks>0</d_green_large_selector_num_masks>
+                 <d_yellow_large_selector></d_yellow_large_selector>
+                 <d_yellow_large_selector_num_masks>0</d_yellow_large_selector_num_masks>
+                 <d_dark_blue_large_selector></d_dark_blue_large_selector>
+                 <d_dark_blue_large_selector_num_masks>0</d_dark_blue_large_selector_num_masks>
+                 <d_orange_large_selector></d_orange_large_selector>
+                 <d_orange_large_selector_num_masks>0</d_orange_large_selector_num_masks>
+                 <d_light_blue_large_selector></d_light_blue_large_selector>
+                 <d_light_blue_large_selector_num_masks>0</d_light_blue_large_selector_num_masks>
+                 <d_red_large_selector></d_red_large_selector>
+                 <d_red_large_selector_num_masks>0</d_red_large_selector_num_masks>
+                 <d_black_large_selector></d_black_large_selector>
+                 <d_black_large_selector_num_masks>0</d_black_large_selector_num_masks>
                  <xsl:for-each select="armyproto">
                  <armyproto>
                         <xsl:copy-of select="d_id"/>
@@ -57,22 +89,6 @@
                         <xsl:copy-of select="d_strength"/>
                         <xsl:copy-of select="d_sight"/>
                         <xsl:copy-of select="d_expvalue"/>
-                        <d_white_small_selector></d_white_small_selector>
-                        <d_white_small_selector_num_masks>0</d_white_small_selector_num_masks>
-                        <d_green_small_selector></d_green_small_selector>
-                        <d_green_small_selector_num_masks>0</d_green_small_selector_num_masks>
-                        <d_yellow_small_selector></d_yellow_small_selector>
-                        <d_yellow_small_selector_num_masks>0</d_yellow_small_selector_num_masks>
-                        <d_dark_blue_small_selector></d_dark_blue_small_selector>
-                        <d_dark_blue_small_selector_num_masks>0</d_dark_blue_small_selector_num_masks>
-                        <d_orange_small_selector></d_orange_small_selector>
-                        <d_orange_small_selector_num_masks>0</d_orange_small_selector_num_masks>
-                        <d_light_blue_small_selector></d_light_blue_small_selector>
-                        <d_light_blue_small_selector_num_masks>0</d_light_blue_small_selector_num_masks>
-                        <d_red_small_selector></d_red_small_selector>
-                        <d_red_small_selector_num_masks>0</d_red_small_selector_num_masks>
-                        <d_black_small_selector></d_black_small_selector>
-                        <d_black_small_selector_num_masks>0</d_black_small_selector_num_masks>
                  </armyproto>
                  </xsl:for-each>
         </armyset>

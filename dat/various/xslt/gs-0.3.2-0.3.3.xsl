@@ -103,7 +103,7 @@
                 <xsl:copy-of select="d_level"/>
                 <xsl:copy-of select="d_medals"/>
                 <xsl:copy-of select="d_battlesnumber"/>
-                <xsl:copy-of select="d_visitedtemples"/>
+                <xsl:copy-of select="d_visited_temples"/>
                 <xsl:copy-of select="backpack"/>
         </hero>
 </xsl:template>

@@ -28,12 +28,12 @@
         <xsl:copy-of select="d_fog"/>
         <xsl:copy-of select="d_flags"/>
         <d_flags_num_masks>1</d_flags_num_masks>
-        <xsl:copy-of select="d_movebonus_all"/>
-        <xsl:copy-of select="d_movebonus_water"/>
-        <xsl:copy-of select="d_movebonus_forest"/>
-        <xsl:copy-of select="d_movebonus_hills"/>
-        <xsl:copy-of select="d_movebonus_swamp"/>
-        <xsl:copy-of select="d_movebonus_mountains"/>
+        <d_movebonus_all/>
+        <d_movebonus_water/>
+        <d_movebonus_forest/>
+        <d_movebonus_hills/>
+        <d_movebonus_swamp/>
+        <d_movebonus_mountains/>
         <xsl:copy-of select="road_smallmap"/>
         <xsl:copy-of select="ruin_smallmap"/>
         <xsl:copy-of select="temple_smallmap"/>
