@@ -2056,7 +2056,7 @@ To make battles go faster, press the spacebar during a fight.  To make all futur
 <sect2 id="lordsawar-hot-seat">
 	<title>Hot-seat Play</title> 
 <para>
-Playing a game in hotseat mode is the traditional way to play &app;.  The idea here is that there are two or more human players, and when it's their turn they are said to be in the "hot-seat"; they get to move their stacks.  The other players are usually not allowed to watch the player in the hot-seat make their moves, although it certainly can be fun to do so.  When the player is finished the turn, the "end-turn" button is pressed and the next player is notified that it is now their turn.
+Playing a game in hotseat mode is the traditional way to play &app;.  The idea here is that there are two or more people physically in the same room, and when it's their turn they are said to be in the "hot-seat"; they get to move their stacks.  The other players are usually not allowed to watch the player in the hot-seat make their moves, although it certainly can be fun to do so.  When the player is finished the turn, the "end-turn" button is pressed and the next player is notified that it is now their turn.
 </para>
 <para>
 A hotseat game begins with all players agreeing on the scenario options, and then conducting their turns in order until there's a winner.
