@@ -82,7 +82,7 @@
 
 <xsl:template match="hero">
         <hero>
-                <d_hero_type>0<d_hero_type>
+                <d_hero_type>0</d_hero_type>
                 <xsl:copy-of select="d_name"/>
                 <xsl:copy-of select="d_gender"/>
                 <xsl:copy-of select="d_upkeep"/>
