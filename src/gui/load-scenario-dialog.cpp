@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ LoadScenarioDialog::LoadScenarioDialog(Gtk::Window &parent)
   scenarios_treeview->append_column(name_column);
 
   for (auto j : *ScenarioList::getInstance ())
-    add_scenario (j);
+    add_scenario (j, false);
 
   Gtk::TreeModel::Row row;
   row = scenarios_treeview->get_model()->children()[0];
@@ -146,11 +146,18 @@ Glib::ustring LoadScenarioDialog::get_scenario_filename()
   return selected_filename;
 }
 
-void LoadScenarioDialog::add_scenario(ScenarioDetails *d)
+void LoadScenarioDialog::add_scenario(ScenarioDetails *d, bool sel)
 {
   Gtk::TreeIter i = scenarios_list->append();
   (*i)[scenarios_columns.filename] = d->getFilename ();
   (*i)[scenarios_columns.details] = d;
+  if (sel)
+    {
+      scenarios_treeview->scroll_to_row
+        (scenarios_treeview->get_model ()->get_path (i));
+      scenarios_treeview->get_selection ()->select (i);
+    }
+
 }
 
 void LoadScenarioDialog::on_selection_changed()
@@ -212,7 +219,7 @@ void LoadScenarioDialog::on_add_scenario_clicked()
       // add it to the list
       if (ScenarioList::getInstance ()->add_file
           (File::getUserMapFile (mapname)))
-        add_scenario (ScenarioList::getInstance()->back ());
+        add_scenario (ScenarioList::getInstance()->back (), true);
     }
   delete load_map_filechooser;
 }

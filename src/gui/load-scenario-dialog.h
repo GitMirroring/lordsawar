@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ class LoadScenarioDialog: public LwDialog
     Glib::ustring selected_filename;
     
     void on_selection_changed();
-    void add_scenario(ScenarioDetails *d);
+    void add_scenario(ScenarioDetails *d, bool sel);
     void on_add_scenario_clicked();
     void on_remove_scenario_clicked();
     int copy_file (Glib::ustring from, Glib::ustring to);
