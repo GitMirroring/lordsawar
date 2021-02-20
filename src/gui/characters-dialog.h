@@ -34,7 +34,7 @@ class CharactersDialog: public LwDialog
 
  private:
     Gtk::TreeView *heroes_treeview;
-    Gtk::ButtonBox *button_box;
+    Gtk::Box *button_box;
 
     class HeroesColumns: public Gtk::TreeModelColumnRecord {
     public:

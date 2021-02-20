@@ -34,7 +34,7 @@ class ArmyBonusDialog: public LwDialog
 
  private:
     Gtk::TreeView *armies_treeview;
-    Gtk::ButtonBox *button_box;
+    Gtk::Box *button_box;
 
     class ArmiesColumns: public Gtk::TreeModelColumnRecord {
     public:
