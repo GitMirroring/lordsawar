@@ -32,10 +32,24 @@
 
 int max_vector_width;
 
+void usage (char *progname)
+{
+  std::cout << File::get_basename(progname, true) << " [OPTION]... FILE" << std::endl << std::endl;
+  std::cout << "LordsAWar! File Upgrading Tool " << _("version") << 
+    " " << VERSION << std::endl << std::endl;
+  std::cout << _("Options:") << std::endl << std::endl; 
+  std::cout << "  -?, --help                 " << _("Display this help and exit") <<std::endl;
+  std::cout << "  -i, --identify             " << _("Show the file type instead of upgrading") << std::endl;
+  //std::cout << "  -r, --rewrite VERSION      " << _("Just change the version instead of upgrading") << std::endl;
+  std::cout << std::endl;
+  std::cout << _("Report bugs to") << " <" << PACKAGE_BUGREPORT ">." << std::endl;
+  exit(0);
+}
+
 int main(int argc, char* argv[])
 {
   int err = EXIT_SUCCESS;
-  Glib::ustring filename;
+  Glib::ustring filename = "";
   Glib::ustring rewrite;
   bool identify_file = false;
   Vector<int>::setMaximumWidth(1000);
@@ -55,22 +69,14 @@ int main(int argc, char* argv[])
               rewrite = parameter;
             }
 	  else if (parameter == "--help" || parameter == "-?")
-	    {
-              std::cout << File::get_basename(argv[0], true) << " [OPTION]... FILE" << std::endl << std::endl;
-              std::cout << "LordsAWar! File Upgrading Tool " << _("version") << 
-                " " << VERSION << std::endl << std::endl;
-              std::cout << _("Options:") << std::endl << std::endl; 
-              std::cout << "  -?, --help                 " << _("Display this help and exit") <<std::endl;
-              std::cout << "  -i, --identify             " << _("Show the file type instead of upgrading") << std::endl;
-              //std::cout << "  -r, --rewrite VERSION      " << _("Just change the version instead of upgrading") << std::endl;
-              std::cout << std::endl;
-              std::cout << _("Report bugs to") << " <" << PACKAGE_BUGREPORT ">." << std::endl;
-	      exit(0);
-	    }
+            usage (argv[0]);
 	  else
 	    filename = parameter;
 	}
     }
+
+  if (filename == "")
+    usage (argv[0]);
 
   bool same_version = false;
   Armyset::support_backward_compatibility();
