@@ -1199,9 +1199,11 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
             continue;
           if (!c || c->owner != it->getId ())
             {
+              Vector<int> pos =
+                it->getStacklist ()->getArmyStackById (h->getId ())->getPos ();
               s = String::ucompose
-                (_("The hero `%1' belonging to '%2' has a bad hero type."),
-                 h->getName(), it->getName ());
+                (_("The hero `%1' belonging to '%2' has a bad hero type (%3,%4)."),
+                 h->getName(), it->getName (), pos.x, pos.y);
               errors.push_back(s);
             }
         }
