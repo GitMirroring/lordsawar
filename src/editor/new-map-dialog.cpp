@@ -88,6 +88,7 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
 	  default_id = counter;
 	counter++;
       }
+    selected_tile_size_id = default_id;
     tile_size_combobox->set_active(default_id);
 
     xml->get_widget("tile_size_box", box);
