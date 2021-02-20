@@ -10,5 +10,6 @@ LordsAWar! version 0.3.3, a clone of the turn-based strategy game Warlords II, h
 * Players can have up to three colors which allows for more varied army graphics, etc.
 * Right-clicking on enemy heroes now shows their name, and an optional blurb.
 * The Scenario Builder now lets heroes have items when recruited.
+* New Russian translation. (Thanks Leonid!)
 
 Please consider donating to the LordsAWar project! See the donate button here: http://lordsawar.nongnu.org
