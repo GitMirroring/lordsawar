@@ -50,8 +50,8 @@
                 <child>
                   <placeholder/>
                 </child>
-                <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                 <accelerator key="z" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
+                <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -119,12 +119,10 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkAlignment" id="players_alignment">
+                      <object class="GtkBox" id="players_alignment">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="halign">center</property>
-                        <property name="xalign">0</property>
-                        <property name="xscale">0</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <placeholder/>
                         </child>
@@ -181,34 +179,23 @@
                 <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkAlignment" id="armies_alignment">
+                  <object class="GtkScrolledWindow" id="treeview_scrolledwindow">
+                    <property name="width-request">400</property>
+                    <property name="height-request">300</property>
                     <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="left-padding">6</property>
+                    <property name="can-focus">True</property>
+                    <property name="shadow-type">in</property>
                     <child>
-                      <object class="GtkScrolledWindow" id="treeview_scrolledwindow">
-                        <property name="width-request">400</property>
-                        <property name="height-request">300</property>
+                      <object class="GtkTreeView" id="treeview">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
-                        <property name="shadow-type">in</property>
-                        <child>
-                          <object class="GtkTreeView" id="treeview">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="headers-visible">False</property>
-                            <property name="rules-hint">True</property>
-                            <property name="enable-search">False</property>
-                            <child internal-child="selection">
-                              <object class="GtkTreeSelection"/>
-                            </child>
-                          </object>
-                        </child>
+                        <property name="headers-visible">False</property>
+                        <property name="enable-search">False</property>
                       </object>
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
+                    <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="position">0</property>
                   </packing>

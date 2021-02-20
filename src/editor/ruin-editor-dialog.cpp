@@ -78,7 +78,7 @@ RuinEditorDialog::RuinEditorDialog(Gtk::Window &parent, Ruin *r, CreateScenarioR
         player_combobox->append(_("Hero's player"));
     }
 
-  Gtk::Alignment *alignment;
+  Gtk::Box *alignment;
   xml->get_widget("player_alignment", alignment);
   alignment->add(*player_combobox);
   xml->get_widget("new_reward_hbox", new_reward_hbox);

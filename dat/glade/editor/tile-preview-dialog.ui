@@ -61,26 +61,20 @@
                     <property name="can-focus">False</property>
                     <property name="halign">center</property>
                     <child>
-                      <object class="GtkAlignment" id="alignment1">
+                      <object class="GtkEventBox" id="eventbox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="above-child">True</property>
                         <child>
-                          <object class="GtkEventBox" id="eventbox">
+                          <object class="GtkImage" id="preview_image">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="above-child">True</property>
-                            <child>
-                              <object class="GtkImage" id="preview_image">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                              </object>
-                            </child>
                           </object>
                         </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
-                        <property name="fill">False</property>
+                        <property name="fill">True</property>
                         <property name="position">0</property>
                       </packing>
                     </child>

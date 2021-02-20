@@ -148,7 +148,7 @@ NewMapDialog::NewMapDialog(Gtk::Window &parent)
     fill_style_combobox->append(_("Random"));
     fill_style.push_back(-1);
 
-    Gtk::Alignment *alignment;
+    Gtk::Box *alignment;
     xml->get_widget("fill_style_alignment", alignment);
     alignment->add(*fill_style_combobox);
 

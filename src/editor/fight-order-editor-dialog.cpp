@@ -58,7 +58,7 @@ FightOrderEditorDialog::FightOrderEditorDialog(Gtk::Window &parent)
         }
     }
 
-  Gtk::Alignment *alignment;
+  Gtk::Box *alignment;
   xml->get_widget("players_alignment", alignment);
   alignment->add(*Gtk::manage(player_combobox));
   player_combobox->show_all();

@@ -94,8 +94,8 @@ class TileSetWindow: public sigc::trackable
     Gtk::ComboBoxText *tilestyle_combobox;
     Gtk::Image *tilestyle_image;
     Gtk::Button *image_button;
-    Gtk::Alignment *tilestyle_alignment;
-    Gtk::Alignment *tilestyleset_alignment;
+    Gtk::Box *tilestyle_alignment;
+    Gtk::Box *tilestyleset_alignment;
     Gtk::Notebook *notebook;
 
     std::vector<PixMask* > tilestyle_images;

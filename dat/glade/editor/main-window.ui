@@ -869,7 +869,7 @@
                 <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkAlignment" id="terrain_type_alignment">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <child>
@@ -883,6 +883,11 @@
                         <property name="selection-mode">none</property>
                         <property name="activate-on-single-click">False</property>
                       </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -892,10 +897,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkAlignment" id="alignment2">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="resize-mode">queue</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkEventBox" id="bigmap_eventbox">
                         <property name="width-request">600</property>
@@ -909,6 +914,11 @@
                           </object>
                         </child>
                       </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -935,9 +945,10 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <child>
-                      <object class="GtkAlignment" id="alignment3">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkEventBox" id="map_eventbox">
                             <property name="visible">True</property>
@@ -949,11 +960,16 @@
                               </object>
                             </child>
                           </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
-                        <property name="fill">False</property>
+                        <property name="fill">True</property>
                         <property name="position">0</property>
                       </packing>
                     </child>
@@ -965,25 +981,18 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkAlignment" id="alignment1">
+                  <object class="GtkScrolledWindow" id="scrolledwindow1">
                     <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="bottom-padding">6</property>
+                    <property name="can-focus">True</property>
+                    <property name="hadjustment">adjustment1</property>
+                    <property name="vadjustment">adjustment2</property>
+                    <property name="shadow-type">in</property>
                     <child>
-                      <object class="GtkScrolledWindow" id="scrolledwindow1">
+                      <object class="GtkViewport" id="terrain_tile_style_viewport">
                         <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="hadjustment">adjustment1</property>
-                        <property name="vadjustment">adjustment2</property>
-                        <property name="shadow-type">in</property>
+                        <property name="can-focus">False</property>
                         <child>
-                          <object class="GtkViewport" id="terrain_tile_style_viewport">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <child>
-                              <placeholder/>
-                            </child>
-                          </object>
+                          <placeholder/>
                         </child>
                       </object>
                     </child>

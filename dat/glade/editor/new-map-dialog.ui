@@ -200,348 +200,335 @@
             <property name="can-focus">True</property>
             <property name="margin-bottom">12</property>
             <child>
-              <object class="GtkAlignment" id="random_map_container">
+              <object class="GtkBox" id="random_map_container">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="xalign">0</property>
-                <property name="yalign">0</property>
-                <property name="left-padding">18</property>
-                <property name="right-padding">18</property>
+                <property name="margin-top">6</property>
+                <property name="margin-bottom">6</property>
                 <child>
-                  <object class="GtkBox" id="aaaa">
+                  <!-- n-columns=3 n-rows=11 -->
+                  <object class="GtkGrid" id="map_settings_table">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="margin-top">6</property>
-                    <property name="margin-bottom">6</property>
+                    <property name="row-spacing">2</property>
+                    <property name="column-spacing">12</property>
                     <child>
-                      <!-- n-columns=3 n-rows=11 -->
-                      <object class="GtkGrid" id="map_settings_table">
+                      <object class="GtkScale" id="signposts_scale">
                         <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="row-spacing">2</property>
-                        <property name="column-spacing">12</property>
-                        <child>
-                          <object class="GtkScale" id="signposts_scale">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="adjustment">adjustment1</property>
-                            <property name="round-digits">0</property>
-                            <property name="digits">0</property>
-                            <property name="value-pos">right</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">9</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label1">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Signposts</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">9</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label11">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Temples</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">8</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label10">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Ruins</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">7</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkScale" id="temples_scale">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="adjustment">adjustment2</property>
-                            <property name="round-digits">0</property>
-                            <property name="digits">0</property>
-                            <property name="value-pos">right</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">8</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkScale" id="ruins_scale">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="adjustment">adjustment3</property>
-                            <property name="round-digits">0</property>
-                            <property name="digits">0</property>
-                            <property name="value-pos">right</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">7</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkScale" id="cities_scale">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="adjustment">adjustment4</property>
-                            <property name="round-digits">0</property>
-                            <property name="digits">0</property>
-                            <property name="value-pos">right</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">6</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label3">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Grass</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label4">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Water</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label5">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Swamp</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label6">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Forest</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">3</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label7">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Hills</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">4</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label8">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Mountains</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">5</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkScale" id="grass_scale">
-                            <property name="width-request">290</property>
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="adjustment">adjustment5</property>
-                            <property name="round-digits">0</property>
-                            <property name="digits">0</property>
-                            <property name="value-pos">right</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkScale" id="water_scale">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="adjustment">adjustment6</property>
-                            <property name="round-digits">0</property>
-                            <property name="digits">0</property>
-                            <property name="value-pos">right</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkScale" id="forest_scale">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="adjustment">adjustment8</property>
-                            <property name="round-digits">0</property>
-                            <property name="digits">0</property>
-                            <property name="value-pos">right</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">3</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkScale" id="hills_scale">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="adjustment">adjustment9</property>
-                            <property name="round-digits">0</property>
-                            <property name="digits">0</property>
-                            <property name="value-pos">right</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">4</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkScale" id="mountains_scale">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="adjustment">adjustment10</property>
-                            <property name="round-digits">0</property>
-                            <property name="digits">0</property>
-                            <property name="value-pos">right</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">5</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label16">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Cities</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">6</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkScale" id="swamp_scale">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="adjustment">adjustment7</property>
-                            <property name="round-digits">0</property>
-                            <property name="digits">0</property>
-                            <property name="value-pos">right</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Standing Stones</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">10</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkScale" id="stones_scale">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="adjustment">adjustment14</property>
-                            <property name="round-digits">0</property>
-                            <property name="digits">0</property>
-                            <property name="value-pos">right</property>
-                          </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">10</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
+                        <property name="can-focus">True</property>
+                        <property name="adjustment">adjustment1</property>
+                        <property name="round-digits">0</property>
+                        <property name="digits">0</property>
+                        <property name="value-pos">right</property>
                       </object>
                       <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">False</property>
-                        <property name="position">0</property>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">9</property>
                       </packing>
                     </child>
+                    <child>
+                      <object class="GtkLabel" id="label1">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Signposts</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">9</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label11">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Temples</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">8</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label10">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Ruins</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">7</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScale" id="temples_scale">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="adjustment">adjustment2</property>
+                        <property name="round-digits">0</property>
+                        <property name="digits">0</property>
+                        <property name="value-pos">right</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">8</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScale" id="ruins_scale">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="adjustment">adjustment3</property>
+                        <property name="round-digits">0</property>
+                        <property name="digits">0</property>
+                        <property name="value-pos">right</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">7</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScale" id="cities_scale">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="adjustment">adjustment4</property>
+                        <property name="round-digits">0</property>
+                        <property name="digits">0</property>
+                        <property name="value-pos">right</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label3">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Grass</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label4">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Water</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label5">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Swamp</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label6">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Forest</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label7">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Hills</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label8">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Mountains</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScale" id="grass_scale">
+                        <property name="width-request">290</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="adjustment">adjustment5</property>
+                        <property name="round-digits">0</property>
+                        <property name="digits">0</property>
+                        <property name="value-pos">right</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScale" id="water_scale">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="adjustment">adjustment6</property>
+                        <property name="round-digits">0</property>
+                        <property name="digits">0</property>
+                        <property name="value-pos">right</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScale" id="forest_scale">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="adjustment">adjustment8</property>
+                        <property name="round-digits">0</property>
+                        <property name="digits">0</property>
+                        <property name="value-pos">right</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScale" id="hills_scale">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="adjustment">adjustment9</property>
+                        <property name="round-digits">0</property>
+                        <property name="digits">0</property>
+                        <property name="value-pos">right</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScale" id="mountains_scale">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="adjustment">adjustment10</property>
+                        <property name="round-digits">0</property>
+                        <property name="digits">0</property>
+                        <property name="value-pos">right</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label16">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Cities</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScale" id="swamp_scale">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="adjustment">adjustment7</property>
+                        <property name="round-digits">0</property>
+                        <property name="digits">0</property>
+                        <property name="value-pos">right</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Standing Stones</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">10</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScale" id="stones_scale">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="adjustment">adjustment14</property>
+                        <property name="round-digits">0</property>
+                        <property name="digits">0</property>
+                        <property name="value-pos">right</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">10</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
               </object>
-              <packing>
-                <property name="tab-expand">True</property>
-              </packing>
             </child>
             <child type="tab">
               <object class="GtkLabel">
@@ -559,8 +546,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">center</property>
-                <property name="margin-left">6</property>
-                <property name="margin-right">6</property>
+                <property name="margin-start">6</property>
+                <property name="margin-end">6</property>
                 <property name="margin-top">6</property>
                 <property name="margin-bottom">6</property>
                 <property name="row-spacing">24</property>
@@ -1034,25 +1021,12 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="fill_style_alignment">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="halign">center</property>
                         <child>
-                          <object class="GtkAlignment" id="fill_style_alignment">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="xalign">0</property>
-                            <property name="xscale">0</property>
-                            <child>
-                              <placeholder/>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">True</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                       </object>
                       <packing>

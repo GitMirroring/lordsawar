@@ -50,8 +50,8 @@
                 <child>
                   <placeholder/>
                 </child>
-                <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                 <accelerator key="z" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
+                <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -440,85 +440,46 @@
                     <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkAlignment" id="alignment1">
+                      <object class="GtkBox" id="vbox1">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="left-padding">12</property>
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">6</property>
                         <child>
-                          <object class="GtkBox" id="vbox1">
+                          <object class="GtkLabel" id="label1">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="orientation">vertical</property>
-                            <property name="spacing">6</property>
-                            <child>
-                              <object class="GtkLabel" id="label1">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Road Planner</property>
-                                <attributes>
-                                  <attribute name="weight" value="bold"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">True</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Road Planner</property>
+                            <attributes>
+                              <attribute name="weight" value="bold"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="halign">center</property>
+                            <property name="spacing">12</property>
                             <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="halign">center</property>
-                                <property name="spacing">12</property>
+                                <property name="orientation">vertical</property>
+                                <property name="spacing">6</property>
                                 <child>
-                                  <object class="GtkBox">
+                                  <object class="GtkLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="orientation">vertical</property>
-                                    <property name="spacing">6</property>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">False</property>
-                                        <property name="label" translatable="yes">Starting Point</property>
-                                        <attributes>
-                                          <attribute name="underline" value="True"/>
-                                        </attributes>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkBox">
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">False</property>
-                                        <property name="halign">center</property>
-                                        <child>
-                                          <object class="GtkRadioButton" id="road_start_radiobutton">
-                                            <property name="visible">True</property>
-                                            <property name="can-focus">True</property>
-                                            <property name="focus-on-click">False</property>
-                                            <property name="receives-default">False</property>
-                                            <property name="draw-indicator">False</property>
-                                            <property name="group">pointer_radiobutton</property>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">0</property>
-                                          </packing>
-                                        </child>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
+                                    <property name="label" translatable="yes">Starting Point</property>
+                                    <attributes>
+                                      <attribute name="underline" value="True"/>
+                                    </attributes>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -530,16 +491,15 @@
                                   <object class="GtkBox">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="orientation">vertical</property>
-                                    <property name="spacing">6</property>
+                                    <property name="halign">center</property>
                                     <child>
-                                      <object class="GtkLabel">
+                                      <object class="GtkRadioButton" id="road_start_radiobutton">
                                         <property name="visible">True</property>
-                                        <property name="can-focus">False</property>
-                                        <property name="label" translatable="yes">Finishing Point</property>
-                                        <attributes>
-                                          <attribute name="underline" value="True"/>
-                                        </attributes>
+                                        <property name="can-focus">True</property>
+                                        <property name="focus-on-click">False</property>
+                                        <property name="receives-default">False</property>
+                                        <property name="draw-indicator">False</property>
+                                        <property name="group">pointer_radiobutton</property>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
@@ -547,31 +507,59 @@
                                         <property name="position">0</property>
                                       </packing>
                                     </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="orientation">vertical</property>
+                                <property name="spacing">6</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">Finishing Point</property>
+                                    <attributes>
+                                      <attribute name="underline" value="True"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">center</property>
                                     <child>
-                                      <object class="GtkBox">
+                                      <object class="GtkRadioButton" id="road_finish_radiobutton">
                                         <property name="visible">True</property>
-                                        <property name="can-focus">False</property>
-                                        <property name="halign">center</property>
-                                        <child>
-                                          <object class="GtkRadioButton" id="road_finish_radiobutton">
-                                            <property name="visible">True</property>
-                                            <property name="can-focus">True</property>
-                                            <property name="focus-on-click">False</property>
-                                            <property name="receives-default">False</property>
-                                            <property name="draw-indicator">False</property>
-                                            <property name="group">pointer_radiobutton</property>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">0</property>
-                                          </packing>
-                                        </child>
+                                        <property name="can-focus">True</property>
+                                        <property name="focus-on-click">False</property>
+                                        <property name="receives-default">False</property>
+                                        <property name="draw-indicator">False</property>
+                                        <property name="group">pointer_radiobutton</property>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
-                                        <property name="position">1</property>
+                                        <property name="position">0</property>
                                       </packing>
                                     </child>
                                   </object>
@@ -588,50 +576,55 @@
                                 <property name="position">1</property>
                               </packing>
                             </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkBox" id="hbox1">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="halign">center</property>
                             <child>
-                              <object class="GtkBox" id="hbox1">
+                              <object class="GtkButton" id="clear_points_button">
+                                <property name="label" translatable="yes">Clear</property>
                                 <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="halign">center</property>
-                                <child>
-                                  <object class="GtkButton" id="clear_points_button">
-                                    <property name="label" translatable="yes">Clear</property>
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="focus-on-click">False</property>
-                                    <property name="receives-default">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkButton" id="create_road_button">
-                                    <property name="label" translatable="yes">Build</property>
-                                    <property name="visible">True</property>
-                                    <property name="sensitive">False</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="focus-on-click">False</property>
-                                    <property name="receives-default">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                    <property name="padding">5</property>
-                                    <property name="position">2</property>
-                                  </packing>
-                                </child>
+                                <property name="can-focus">True</property>
+                                <property name="focus-on-click">False</property>
+                                <property name="receives-default">True</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
-                                <property name="fill">True</property>
+                                <property name="fill">False</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="create_road_button">
+                                <property name="label" translatable="yes">Build</property>
+                                <property name="visible">True</property>
+                                <property name="sensitive">False</property>
+                                <property name="can-focus">True</property>
+                                <property name="focus-on-click">False</property>
+                                <property name="receives-default">True</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">False</property>
                                 <property name="padding">5</property>
                                 <property name="position">2</property>
                               </packing>
                             </child>
                           </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="padding">5</property>
+                            <property name="position">2</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>

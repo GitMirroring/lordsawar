@@ -90,8 +90,8 @@
                 <child>
                   <placeholder/>
                 </child>
-                <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                 <accelerator key="z" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
+                <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -574,7 +574,7 @@ Width/Height</property>
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">True</property>
-                                    <property name="margin-right">12</property>
+                                    <property name="margin-start">12</property>
                                   </object>
                                   <packing>
                                     <property name="expand">True</property>
