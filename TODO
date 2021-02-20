@@ -63,3 +63,11 @@ it would be nice if the lobby messages, join/depart, etc were xmlized
 it would be nice if the editor showed a progress bar when opening a map, or importing a saved game
 
 need recently opened files in file menus
+
+gtk4
+migrate radiobuttons to togglebuttons
+migrate buttonbox to something else
+
+to find deprecated stuff, use:
+G_ENABLE_DIAGNOSTIC=1 ./lordsawar 
+
