@@ -617,8 +617,7 @@ bool Configuration::upgrade(Glib::ustring filename, Glib::ustring old_version,
 
 void Configuration::support_backward_compatibility()
 {
-  Glib::ustring ext = File::get_extension(Configuration::s_configuration_file_path);
-  FileCompat::getInstance()->support_type (FileCompat::CONFIGURATION, ext, 
+  FileCompat::getInstance()->support_type (FileCompat::CONFIGURATION, "rc",
                                            d_tag, false);
   FileCompat::getInstance()->support_version
     (FileCompat::CONFIGURATION, "0.2.1", LORDSAWAR_CONFIG_VERSION,
