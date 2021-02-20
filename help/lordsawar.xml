@@ -2,9 +2,9 @@
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
   <!ENTITY legal SYSTEM "legal.xml">
 <!ENTITY app "<application>LordsAWar!</application>">
-<!ENTITY appversion "0.3.2">
+<!ENTITY appversion "0.3.3">
 <!ENTITY date "May 2020">
-<!ENTITY manrevision "0.3.2">
+<!ENTITY manrevision "0.3.3">
 ]>
 
 <article id="index" lang="en"> 
@@ -12,7 +12,7 @@
 <articleinfo> 
 	<title>LordsAWar! User's Manual &manrevision;</title> 
 	<copyright> 
-		<year>2008, 2009, 2010, 2011, 2014, 2016, 2017, 2020</year>
+		<year>2008, 2009, 2010, 2011, 2014, 2016, 2017, 2020, 2021</year>
 		<holder>Ben Asselstine</holder> 
  	</copyright>
 	<publisher> 
@@ -961,7 +961,7 @@ Army units may not move through a foreign city without conquering it first.
         The most noticeable thing in the screen is the miniature map that only shows all of the player's cities.  At a glance it shows; which cities are producing an army unit (shown by a white shield with an anvil), which ones are not (shown by a white shield without an anvil), and which city the player is currently visiting (shown by a black shield, with or without an anvil).  The player can see the details of another city by left-clicking it on the miniature map.
 </para>
 <para>
-The screen contains information about the selected city.  The title of the screen is the name of the city.  To the right of the map the defense level is shown, along with the amount of money in gold pieces that this city provides.  Next is the army unit that is currently being produced, and how many more turns until it becomes available for use.  The set of buttons in the middle of the screen represent the set of army unit types that this city can produce.
+The screen contains information about the selected city.  The title of the screen is the name of the city.  To the right of the map the defense level is shown, along with the amount of money in gold pieces that this city provides per round.  Next is the army unit that is currently being produced, and how many more turns until it becomes available for use.  The set of buttons in the middle of the screen represent the army unit types that this city can produce.
 Below that are statistics about the army unit currently being produced.
 </para>
 <para>
@@ -2092,7 +2092,7 @@ After the game server is running, the lobby screen is shown.  Clients also see t
 </figure>
 </para>
 <para>
-The lobby screen has three main portions: the chat window, the seats, and the map.  The figure shows two people (ben, and benny) playing an eight-sided game with a map that has 76 cities.  Ben is responsible for playing The Sirians (and others), and it is also currently his turn.  Others can join or leave the game at any time.
+The lobby screen has three main portions: the chat window, the seats, and the map.  The figure shows two people (ben, and admin) playing an eight-sided game with a map that has 50 cities.  Ben is responsible for playing Storm Giants, and the admin hasn't taken a side yet.  Others can join or leave the game at any time.
 <para>
 As other people connect to the server, they appear in the People list of the chat window.  To send a message to all other players, type in a message into the box next to "Send:" and press the Enter key.
 </para>
