@@ -104,7 +104,6 @@
           <object class="GtkButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="layout-style">end</property>
             <child>
               <placeholder/>
             </child>
@@ -892,6 +891,7 @@
                 <property name="label" translatable="yes">Create Random Map</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
+                <property name="has-focus">True</property>
                 <property name="can-default">True</property>
                 <property name="has-default">True</property>
                 <property name="receives-default">True</property>

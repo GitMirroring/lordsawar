@@ -60,7 +60,7 @@ class NewRandomMapDialog: public LwDialog
     Map map;
 
     Gtk::Box *dialog_vbox;
-    Gtk::ButtonBox *dialog_action_area;
+    Gtk::Box *dialog_action_area;
     Gtk::ComboBox *map_size_combobox;
     Gtk::ComboBoxText *tile_size_combobox;
     Gtk::ComboBoxText *tile_theme_combobox;

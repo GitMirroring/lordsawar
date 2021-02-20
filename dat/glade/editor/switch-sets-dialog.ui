@@ -37,11 +37,10 @@
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area1">
+          <object class="GtkBox" id="dialog-action_area1">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="margin-top">6</property>
-            <property name="layout-style">end</property>
             <child>
               <object class="GtkButton" id="undo_button">
                 <property name="visible">True</property>

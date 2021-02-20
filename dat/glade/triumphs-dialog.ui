@@ -19,15 +19,15 @@
         <property name="orientation">vertical</property>
         <property name="spacing">12</property>
         <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area1">
+          <object class="GtkBox" id="dialog-action_area1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
             <child>
               <object class="GtkButton" id="continue_button">
                 <property name="label" translatable="yes">Continue</property>
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="has_focus">True</property>
+                <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="use_underline">True</property>
               </object>

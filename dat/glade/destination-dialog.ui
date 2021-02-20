@@ -17,10 +17,9 @@
         <property name="orientation">vertical</property>
         <property name="spacing">18</property>
         <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area1">
+          <object class="GtkBox" id="dialog-action_area1">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="layout-style">end</property>
             <child>
               <object class="GtkButton" id="close_button">
                 <property name="label" translatable="yes">Close</property>
