@@ -71,3 +71,6 @@ migrate buttonbox to something else
 to find deprecated stuff, use:
 G_ENABLE_DIAGNOSTIC=1 ./lordsawar 
 
+we need to switch away from Main to Application
+all run() calls on dialogs need to be signal_response() instead
+
