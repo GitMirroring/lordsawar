@@ -62,6 +62,4 @@ it would be nice if the lobby messages, join/depart, etc were xmlized
 
 it would be nice if the editor showed a progress bar when opening a map, or importing a saved game
 
-when we add a new map it should select and scroll to it in load scenario dialog
-
 need recently opened files in file menus
