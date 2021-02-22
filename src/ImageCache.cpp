@@ -1484,14 +1484,12 @@ PixMask* ImageCache::getSmallTempleImage()
 
 PixMask* ImageCache::greyOut(PixMask* image)
 {
-  bool broken = false;
   int width = image->get_width();
   int height = image->get_height();
-  PixMask* result = PixMask::create(image->to_pixbuf());
-  if (broken)
-    return NULL;
+  PixMask* result = image->copy ();
 
-  guint8 *data = result->to_pixbuf()->get_pixels();
+  Glib::RefPtr<Gdk::Pixbuf> d = image->to_pixbuf ();
+  guint8 *data = d->get_pixels ();
   guint8 *copy = (guint8*)  malloc (height * width * 4 * sizeof(guint8));
   for (int i = 0; i < height * width * 4; i++)
     copy[i] = data[i];
@@ -1518,6 +1516,7 @@ PixMask* ImageCache::greyOut(PixMask* image)
 	    copy[base+2] = max;
 	  }
       }
+  d.reset ();
   Glib::RefPtr<Gdk::Pixbuf> greyed_out =
     Gdk::Pixbuf::create_from_data(copy, Gdk::COLORSPACE_RGB, true, 8,
 				  width, height, width * 4);
