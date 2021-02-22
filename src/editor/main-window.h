@@ -181,13 +181,13 @@ class MainWindow: public sigc::trackable
     void on_zoom_out_activated ();
     void on_best_fit_activated ();
 
-    void on_random_all_cities_activated();
+    void on_random_all_cities_activated(bool act);
     void on_random_unnamed_cities_activated();
-    void on_random_all_ruins_activated();
+    void on_random_all_ruins_activated(bool act);
     void on_random_unnamed_ruins_activated();
-    void on_random_all_temples_activated();
+    void on_random_all_temples_activated(bool act);
     void on_random_unnamed_temples_activated();
-    void on_random_all_signs_activated();
+    void on_random_all_signs_activated(bool act);
     void on_random_unnamed_signs_activated();
     void on_random_assign_capital_cities_activated();
 

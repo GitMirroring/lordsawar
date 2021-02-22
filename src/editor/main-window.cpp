@@ -308,14 +308,14 @@ MainWindow::MainWindow(Glib::ustring load_filename)
       (method(on_edit_scenario_media_activated));
     xml->get_widget ("random_all_cities_menuitem", random_all_cities_menuitem);
     random_all_cities_menuitem->signal_activate().connect
-      (method(on_random_all_cities_activated));
+      (sigc::bind(method(on_random_all_cities_activated), true));
     xml->get_widget ("random_unnamed_cities_menuitem", 
 		     random_unnamed_cities_menuitem);
     random_unnamed_cities_menuitem->signal_activate().connect
       (method(on_random_unnamed_cities_activated));
     xml->get_widget ("random_all_ruins_menuitem", random_all_ruins_menuitem);
     random_all_ruins_menuitem->signal_activate().connect
-      (method(on_random_all_ruins_activated));
+      (sigc::bind(method(on_random_all_ruins_activated), true));
     xml->get_widget ("random_unnamed_ruins_menuitem", 
 		     random_unnamed_ruins_menuitem);
     random_unnamed_ruins_menuitem->signal_activate().connect
@@ -323,7 +323,7 @@ MainWindow::MainWindow(Glib::ustring load_filename)
     xml->get_widget ("random_all_temples_menuitem", 
 		     random_all_temples_menuitem);
     random_all_temples_menuitem->signal_activate().connect
-      (method(on_random_all_temples_activated));
+      (sigc::bind(method(on_random_all_temples_activated), true));
     xml->get_widget ("random_unnamed_temples_menuitem", 
 		     random_unnamed_temples_menuitem);
     random_unnamed_temples_menuitem->signal_activate().connect
@@ -331,7 +331,7 @@ MainWindow::MainWindow(Glib::ustring load_filename)
     xml->get_widget ("random_all_signs_menuitem", 
 		     random_all_signs_menuitem);
     random_all_signs_menuitem->signal_activate().connect
-      (method(on_random_all_signs_activated));
+      (sigc::bind(method(on_random_all_signs_activated), true));
     xml->get_widget ("random_unnamed_signs_menuitem", 
 		     random_unnamed_signs_menuitem);
     random_unnamed_signs_menuitem->signal_activate().connect
@@ -766,10 +766,10 @@ void MainWindow::set_random_map(int width, int height,
     game_scenario->created(getDefaultMapFilename());
     if (random_names)
       {
-        on_random_all_cities_activated();
-        on_random_all_ruins_activated();
-        on_random_all_temples_activated();
-        on_random_all_signs_activated();
+        on_random_all_cities_activated(false);
+        on_random_all_ruins_activated(false);
+        on_random_all_temples_activated(false);
+        on_random_all_signs_activated(false);
       }
     if (generate_roads)
       for (auto pos : gen.getRoadStones ())
@@ -1923,7 +1923,7 @@ void MainWindow::randomize_city(City *c)
   update_window_title();
 }
 
-void MainWindow::on_random_all_cities_activated()
+void MainWindow::on_random_all_cities_activated(bool act)
 {
   guint32 count = 0;
   EditorAction_RandAllCities *action =
@@ -1934,7 +1934,7 @@ void MainWindow::on_random_all_cities_activated()
       count++;
       randomize_city(*it);
     }
-  if (count != 0)
+  if (count != 0 && act)
     addUndo (action);
   else
     delete action;
@@ -1971,7 +1971,7 @@ void MainWindow::randomize_ruin(Ruin *r)
     }
 }
 
-void MainWindow::on_random_all_ruins_activated()
+void MainWindow::on_random_all_ruins_activated(bool act)
 {
   guint32 count = 0;
   EditorAction_RandAllRuins *action =
@@ -1982,7 +1982,7 @@ void MainWindow::on_random_all_ruins_activated()
       count++;
       randomize_ruin(*it);
     }
-  if (count != 0)
+  if (count != 0 && act)
     addUndo (action);
   else
     delete action;
@@ -2006,7 +2006,7 @@ void MainWindow::on_random_unnamed_ruins_activated()
     delete action;
 }
 
-void MainWindow::on_random_all_temples_activated()
+void MainWindow::on_random_all_temples_activated(bool act)
 {
   guint32 count = 0;
   EditorAction_RandAllTemples *action =
@@ -2026,7 +2026,7 @@ void MainWindow::on_random_all_temples_activated()
           update_window_title();
 	}
     }
-  if (count != 0)
+  if (count != 0 && act)
     addUndo (action);
   else
     delete action;
@@ -2078,7 +2078,7 @@ void MainWindow::randomize_signpost(Signpost *signpost)
     }
 }
 
-void MainWindow::on_random_all_signs_activated()
+void MainWindow::on_random_all_signs_activated(bool act)
 {
   EditorAction_RandUnnamedSigns *action =
     new EditorAction_RandUnnamedSigns (game_scenario);
@@ -2089,7 +2089,7 @@ void MainWindow::on_random_all_signs_activated()
       count++;
       randomize_signpost(*it);
     }
-  if (count != 0)
+  if (count != 0 && act)
     addUndo (action);
   else
     delete action;
