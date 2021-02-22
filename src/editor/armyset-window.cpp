@@ -62,7 +62,7 @@ ArmySetWindow::ArmySetWindow(Glib::ustring load_filename)
   d_armyset = NULL;
   Glib::RefPtr<Gtk::Builder> xml = BuilderCache::editor_get("armyset-window.ui");
 
-  xml->get_widget("window", window);
+  xml->get_widget("dialog", window);
   window->set_icon_from_file(File::getVariousFile("castle_icon.png"));
   window->signal_delete_event().connect (method(on_window_closed));
 
@@ -1658,7 +1658,7 @@ void ArmySetWindow::on_make_same_clicked()
   fill_army_images (a);
 }
 
-void ArmySetWindow::show_add_file_error(Armyset *a, Gtk::Window &d, Glib::ustring file)
+void ArmySetWindow::show_add_file_error(Armyset *a, Gtk::Dialog &d, Glib::ustring file)
 {
   Glib::ustring errmsg = Glib::strerror(errno);
   Glib::ustring m = String::ucompose(_("Couldn't add %1 to:\n%2\n%3"), file,
@@ -1667,7 +1667,7 @@ void ArmySetWindow::show_add_file_error(Armyset *a, Gtk::Window &d, Glib::ustrin
   td.run_and_hide();
 }
 
-void ArmySetWindow::show_remove_file_error(Armyset *a, Gtk::Window &d, Glib::ustring file)
+void ArmySetWindow::show_remove_file_error(Armyset *a, Gtk::Dialog &d, Glib::ustring file)
 {
   Glib::ustring errmsg = Glib::strerror(errno);
   Glib::ustring m =

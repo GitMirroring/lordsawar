@@ -57,7 +57,7 @@ CitySetWindow::CitySetWindow(Glib::ustring load_filename)
     Glib::RefPtr<Gtk::Builder> xml =
       BuilderCache::editor_get("cityset-window.ui");
 
-    xml->get_widget("window", window);
+    xml->get_widget("dialog", window);
     window->set_icon_from_file(File::getVariousFile("castle_icon.png"));
     window->signal_delete_event().connect (method(on_window_closed));
 

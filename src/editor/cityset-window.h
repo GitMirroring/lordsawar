@@ -38,14 +38,14 @@ class CitySetWindow: public sigc::trackable
     CitySetWindow(Glib::ustring load_filename = "");
     ~CitySetWindow();
 
-    Gtk::Window &get_window() { return *window; }
+    Gtk::Dialog *get_dialog () { return window; }
     void show() {window->show();};
     void hide() {window->hide();};
 
     sigc::signal<void, guint32> cityset_saved;
 
  private:
-    Gtk::Window* window;
+    Gtk::Dialog* window;
     Glib::ustring current_save_filename;
     Cityset *d_cityset; //current cityset
     bool cityset_modified;
@@ -72,7 +72,7 @@ class CitySetWindow: public sigc::trackable
     Gtk::SpinButton *city_tile_width_spinbutton;
     Gtk::SpinButton *ruin_tile_width_spinbutton;
     Gtk::SpinButton *temple_tile_width_spinbutton;
-    Gtk::Alignment *cityset_alignment;
+    Gtk::Box *cityset_alignment;
     Gtk::Notebook *notebook;
 
     void update_cityset_panel();

@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2010, 2017 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2010, 2017, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,12 +27,14 @@
 class Main: public sigc::trackable
 {
  public:
-    Main(int &argc, char **&argv);
+    Main();
     ~Main();
 
     // singleton interface
     static Main &instance();
     
+    Glib::RefPtr<Gtk::Application> app ();
+    Gtk::Window *win ();
     void initialize ();
     void start_main_loop();
     void stop_main_loop();
@@ -60,6 +62,7 @@ class Main: public sigc::trackable
     struct Impl;
     Impl *impl;
     void override_font_size ();
+    void kickoff ();
 };
 
 

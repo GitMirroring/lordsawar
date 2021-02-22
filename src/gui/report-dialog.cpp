@@ -229,6 +229,7 @@ void ReportDialog::updateArmyChart()
     }
 
   army_chart = new BarChart(bars, colors, 0);
+  army_chart->set_vexpand (true);
   army_alignment->add(*manage(army_chart));
 }
 
@@ -258,6 +259,7 @@ void ReportDialog::updateCityChart()
 
     }
   city_chart = new BarChart(bars, colors, Citylist::getInstance()->size());
+  city_chart->set_vexpand (true);
   city_alignment->add(*manage(city_chart));
 }
 
@@ -286,6 +288,7 @@ void ReportDialog::updateGoldChart()
                                      "You have %1 gold pieces!", total), total));
     }
   gold_chart = new BarChart(bars, colors, 0);
+  gold_chart->set_vexpand (true);
   gold_alignment->add(*manage(gold_chart));
 }
 
@@ -346,6 +349,7 @@ void ReportDialog::updateWinningChart()
   s = String::ucompose(_("You are coming %1"), calculateRank(bars, d_player->getScore()));
   winning_label->set_text(s);
   winning_chart = new BarChart(bars, colors, 100);
+  winning_chart->set_vexpand (true);
   winning_alignment->add(*manage(winning_chart));
 }
 

@@ -41,14 +41,14 @@ class TileSetWindow: public sigc::trackable
     void show() {window->show();};
     void hide() {window->hide();};
 
-    Gtk::Window &get_window() { return *window; }
+    Gtk::Dialog* get_dialog() { return window; }
 
     sigc::signal<void, guint32> tileset_saved;
 
     static void show_add_file_error(Tileset *t, Gtk::Dialog &d, Glib::ustring file);
-    static void show_remove_file_error(Tileset *t, Gtk::Window &d, Glib::ustring file);
+    static void show_remove_file_error(Tileset *t, Gtk::Dialog &d, Glib::ustring file);
  private:
-    Gtk::Window* window;
+    Gtk::Dialog * window;
     Glib::ustring current_save_filename;
     Tileset *d_tileset; //current tileset
     Tile *d_tile; //current tile
@@ -217,7 +217,7 @@ class TileSetWindow: public sigc::trackable
     bool check_save_valid (bool existing);
     bool check_name_valid (bool existing);
     bool isValidName ();
-    bool remove_selected_tilestyleset (Gtk::Window *);
+    bool remove_selected_tilestyleset (Gtk::Dialog *);
     void dirty ();
     bool remove_tilestyleset_files (Tile *a);
     

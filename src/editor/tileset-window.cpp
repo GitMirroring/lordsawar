@@ -66,7 +66,7 @@ TileSetWindow::TileSetWindow(Glib::ustring load_filename)
     Glib::RefPtr<Gtk::Builder> xml =
       BuilderCache::editor_get("tileset-window.ui");
 
-    xml->get_widget("window", window);
+    xml->get_widget("dialog", window);
     window->set_icon_from_file(File::getVariousFile("tileset_icon.png"));
     window->signal_delete_event().connect (sigc::hide(method(on_window_closed)));
 
@@ -83,7 +83,7 @@ TileSetWindow::TileSetWindow(Glib::ustring load_filename)
     tile_type_combobox->append(Tile::tileTypeToFriendlyName(Tile::HILLS));
     tile_type_combobox->append(Tile::tileTypeToFriendlyName(Tile::MOUNTAIN));
     tile_type_combobox->append(Tile::tileTypeToFriendlyName(Tile::SWAMP));
-    type_combo_container->add(*manage(tile_type_combobox));
+    type_combo_container->add (*manage(tile_type_combobox));
     type_combo_container->show_all();
 
     Gtk::Box *tilestyle_combo_container;
@@ -107,7 +107,7 @@ TileSetWindow::TileSetWindow(Glib::ustring load_filename)
     tilestyle_combobox->append(_("Bottom-Left To Top-Right"));
     tilestyle_combobox->append(_("Other"));
     tilestyle_combobox->append(_("Unknown"));
-    tilestyle_combo_container->add(*manage(tilestyle_combobox));
+    tilestyle_combo_container->add (*manage(tilestyle_combobox));
     tilestyle_combo_container->show_all();
 
     Gtk::Box *pattern_container;
@@ -122,7 +122,7 @@ TileSetWindow::TileSetWindow(Glib::ustring load_filename)
     tile_smallmap_pattern_combobox->append(_("Crosshatched"));
     tile_smallmap_pattern_combobox->append(_("Sunken Striped"));
     tile_smallmap_pattern_combobox->append(_("Sunken Radial"));
-    pattern_container->add(*manage(tile_smallmap_pattern_combobox));
+    pattern_container->add (*manage(tile_smallmap_pattern_combobox));
     pattern_container->show_all();
 
     xml->get_widget("tile_moves_spinbutton", tile_moves_spinbutton);
@@ -1152,7 +1152,7 @@ Tile * TileSetWindow::get_selected_tile ()
   return NULL;
 }
 
-bool TileSetWindow::remove_selected_tilestyleset (Gtk::Window *d)
+bool TileSetWindow::remove_selected_tilestyleset (Gtk::Dialog *d)
 {
   bool ret = false;
   //erase the selected row from the treeview
@@ -1767,7 +1767,7 @@ void TileSetWindow::show_add_file_error(Tileset *t, Gtk::Dialog &d, Glib::ustrin
   td.run_and_hide ();
 }
 
-void TileSetWindow::show_remove_file_error(Tileset *t, Gtk::Window &d, Glib::ustring file)
+void TileSetWindow::show_remove_file_error(Tileset *t, Gtk::Dialog &d, Glib::ustring file)
 {
   Glib::ustring errmsg = Glib::strerror(errno);
   Glib::ustring m =

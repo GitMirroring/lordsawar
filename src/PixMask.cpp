@@ -22,6 +22,7 @@
 #include <cairomm/cairomm.h>
 #include <gdkmm.h>
 #include "ucompose.hpp"
+#include "gui/main.h"
 
 
 PixMask::PixMask(Glib::RefPtr<Gdk::Pixbuf> p)
@@ -121,11 +122,8 @@ PixMask::PixMask(const PixMask&p)
 PixMask::PixMask(Glib::ustring filename, bool &broken)
      : width(0), height(0)
 {
-  if (Gtk::Main::instance() == NULL)
-    {
-      broken = true;
-      return;
-    }
+  if (getenv ("LORDSAWAR_HEADLESS"))
+    return;
   Glib::RefPtr<Gdk::Pixbuf> pixbuf;
   try
     {

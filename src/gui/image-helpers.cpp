@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2009, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2011, 2014, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ disassemble_row(const Glib::ustring &file, int no, bool &broken)
   Glib::RefPtr<Gdk::Pixbuf> row;
   try
     {
-      if(Gtk::Main::instance())
+      if (getenv ("LORDSAWAR_HEADLESS") == NULL)
         row = Gdk::Pixbuf::create_from_file(file);
       else
         broken = true;

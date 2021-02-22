@@ -88,7 +88,6 @@
   </object>
   <object class="GtkDialog" id="dialog">
     <property name="can-focus">False</property>
-    <property name="border-width">12</property>
     <property name="title" translatable="yes">Make a New Random Map</property>
     <property name="resizable">False</property>
     <property name="modal">True</property>
@@ -98,6 +97,10 @@
       <object class="GtkBox" id="dialog-vbox1">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+        <property name="margin-start">6</property>
+        <property name="margin-end">6</property>
+        <property name="margin-top">6</property>
+        <property name="margin-bottom">6</property>
         <property name="orientation">vertical</property>
         <property name="spacing">5</property>
         <child internal-child="action_area">
@@ -855,7 +858,6 @@
           <object class="GtkBox" id="vbox1">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="border-width">8</property>
             <property name="orientation">vertical</property>
             <child>
               <placeholder/>
@@ -864,6 +866,10 @@
               <object class="GtkTreeView" id="progress_treeview">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
+                <property name="margin-start">8</property>
+                <property name="margin-end">8</property>
+                <property name="margin-top">8</property>
+                <property name="margin-bottom">8</property>
                 <child internal-child="selection">
                   <object class="GtkTreeSelection"/>
                 </child>

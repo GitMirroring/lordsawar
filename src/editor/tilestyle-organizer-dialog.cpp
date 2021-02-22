@@ -540,21 +540,21 @@ void TileStyleOrganizerDialog::popup (GdkEventButton *e, Gtk::IconView *i)
       item->signal_activate().connect (method(on_undo_activated));
       item->set_sensitive (umgr->undoEmpty () == false);
       item->show();
-      menu->add(*item);
+      menu->append (*item);
     }
     {
       Gtk::MenuItem *item = manage(new Gtk::MenuItem(_("Redo")));
       item->signal_activate().connect (method(on_redo_activated));
       item->set_sensitive (umgr->redoEmpty () == false);
       item->show();
-      menu->add(*item);
+      menu->append (*item);
     }
     {
       Gtk::MenuItem *item = manage(new Gtk::MenuItem(_("Select All")));
       item->signal_activate().connect
         (sigc::bind (method(on_select_all_activated), i));
       item->show();
-      menu->add(*item);
+      menu->append (*item);
     }
   menu->accelerate (*dialog);
   menu->popup_at_pointer (reinterpret_cast<const GdkEvent*>(e));

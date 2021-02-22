@@ -156,6 +156,7 @@ GameWindow::GameWindow()
   xml->get_widget("menubar", menubar);
   xml->get_widget("bigmap_image", bigmap_image);
   bigmap_image->signal_size_allocate().connect (method(on_bigmap_surface_changed));
+  bigmap_image->signal_draw ().connect (method (on_bigmap_draw));
   bigmap_image->grab_focus();
   xml->get_widget("bigmap_eventbox", bigmap_eventbox);
   bigmap_eventbox->add_events(Gdk::KEY_PRESS_MASK | Gdk::BUTTON_PRESS_MASK | 
@@ -803,6 +804,18 @@ void GameWindow::on_bigmap_surface_changed(Gtk::Allocation box)
     }
 }
 
+bool GameWindow::on_bigmap_draw (const ::Cairo::RefPtr< ::Cairo::Context >& cr)
+{
+  if (game)
+    {
+      Cairo::RefPtr<Cairo::Surface> surf = game->get_bigmap().get_surface ();
+      cr->set_source(surf, 0, 0);
+      cr->rectangle(0, 0, bigmap_image->get_width(), bigmap_image->get_height());
+      cr->fill();
+    }
+  return true;
+}
+
 void GameWindow::on_load_game_activated()
 {
   Gtk::FileChooserDialog chooser(*window, _("Choose Game to Load"));
@@ -901,8 +914,8 @@ void GameWindow::on_quit_activated()
   if (fullscreen_menuitem->get_active())
     {
       window->unfullscreen ();
-      window->resize (unmaximized_box.get_width (),
-                      unmaximized_box.get_height ());
+      window->set_default_size (unmaximized_box.get_width (),
+                                unmaximized_box.get_height ());
     }
   if (window->is_maximized ())
     window->unmaximize ();
@@ -1028,8 +1041,8 @@ void GameWindow::on_fullscreen_activated()
   else
     {
       window->unfullscreen();
-      window->resize (unmaximized_box.get_width (),
-                      unmaximized_box.get_height ());
+      window->set_default_size (unmaximized_box.get_width (),
+                                unmaximized_box.get_height ());
     }
 }
 
@@ -1523,7 +1536,7 @@ void GameWindow::on_bigmap_changed(Cairo::RefPtr<Cairo::Surface> map)
   int height = bigmap_image->get_allocated_height();
   Glib::RefPtr<Gdk::Pixbuf> pixbuf = 
     Gdk::Pixbuf::create(map, 0, 0, std::min(width, old.get_width()), std::min(height, old.get_height()));
-  bigmap_image->property_pixbuf() = pixbuf;
+  //bigmap_image->property_pixbuf() = pixbuf;
   bigmap_image->queue_draw();
   //while (g_main_context_iteration(NULL, FALSE)); //doEvents
   //enabling this makes dragging the smallmap freeze
@@ -1616,7 +1629,7 @@ void GameWindow::show_map_tip(Glib::ustring msg, MapTipPosition pos, bool timeou
   p += pos.pos;
 
   Vector<int> size(0, 0);
-  map_tip->get_size(size.x, size.y);
+  map_tip->get_size (size.x, size.y);
 
   switch (pos.justification)
     {
@@ -1636,8 +1649,8 @@ void GameWindow::show_map_tip(Glib::ustring msg, MapTipPosition pos, bool timeou
       break;
     }
 
-  // and action
   map_tip->move(p.x, p.y);
+
   map_tip->show();
   if (timeout)
     {
@@ -3110,8 +3123,8 @@ bool GameWindow::on_window_state_event (GdkEventWindowState *e)
           if (e->new_window_state & GDK_WINDOW_STATE_MAXIMIZED)
             ; //maximized
           else
-            window->resize (unmaximized_box.get_width (),
-                            unmaximized_box.get_height ());
+            window->set_default_size (unmaximized_box.get_width (),
+                                      unmaximized_box.get_height ());
         }
     }
   return false;

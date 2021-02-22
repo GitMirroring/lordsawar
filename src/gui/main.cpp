@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2017, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@
 
 struct Main::Impl: public sigc::trackable 
 {
-    Gtk::Main* gtk_main;
+  Glib::RefPtr<Gtk::Application> app;
     Driver* driver;
 
     sigc::connection on_timer_registered(Timing::timer_slot s,
@@ -57,7 +57,7 @@ struct Main::Impl: public sigc::trackable
 
 static Main *singleton;
 
-Main::Main(int &argc, char **&argv)
+Main::Main()
   : start_stress_test (false), start_editor (false), start_robots (0),
     start_test_scenario (false), start_net_test_scenario (false),
     speedy (false), own_all_on_round_two (false), load_filename (""),
@@ -70,7 +70,8 @@ Main::Main(int &argc, char **&argv)
     Glib::thread_init();
     try
     {
-	impl->gtk_main = new Gtk::Main(argc, argv);
+        impl->app = Gtk::Application::create ("org.nongnu.lordsawar");
+        impl->app->hold ();
 
 	g_set_application_name("LordsAWar!");
 
@@ -85,7 +86,7 @@ Main::Main(int &argc, char **&argv)
 Main::~Main()
 {
     delete impl->driver;
-    delete impl->gtk_main;
+    impl->app->quit ();
     delete impl;
     singleton = 0;
 }
@@ -118,8 +119,9 @@ void Main::start_main_loop()
           FightWindow::s_quick_all = true;
           Configuration::s_displaySpeedDelay = 0;
         }
-      impl->driver = new Driver(start_editor, load_filename);
-      impl->gtk_main->run();
+
+      impl->app->signal_startup ().connect (sigc::mem_fun (this, &Main::kickoff));
+      impl->app->run();
     }
   catch (const Glib::Error &ex) {
     std::cerr << ex.what() << std::endl;
@@ -130,7 +132,7 @@ void Main::stop_main_loop()
 {
     try
     {
-	impl->gtk_main->quit();
+      impl->app->quit ();
     }
     catch (const Glib::Error &ex) {
 	std::cerr << ex.what() << std::endl;
@@ -189,4 +191,14 @@ void Main::override_font_size ()
     }
   free (f);
   return;
+}
+
+Glib::RefPtr<Gtk::Application> Main::app ()
+{
+  return impl->app;
+}
+
+void Main::kickoff ()
+{
+  impl->driver = new Driver(start_editor, load_filename);
 }

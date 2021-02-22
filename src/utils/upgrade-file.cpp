@@ -46,38 +46,9 @@ void usage (char *progname)
   exit(0);
 }
 
-int main(int argc, char* argv[])
+void kickoff (Glib::ustring filename, Glib::ustring rewrite, bool identify_file)
 {
   int err = EXIT_SUCCESS;
-  Glib::ustring filename = "";
-  Glib::ustring rewrite;
-  bool identify_file = false;
-  Vector<int>::setMaximumWidth(1000);
-
-  Gtk::Main kit(argc, argv);
-  if (argc > 1)
-    {
-      for (int i = 2; i <= argc; i++)
-	{
-          Glib::ustring parameter(argv[i-1]); 
-	  if (parameter == "--identify" || parameter == "-i")
-            {
-              identify_file = true;
-            }
-          else if (parameter == "--rewrite" || parameter == "-r")
-            {
-              rewrite = parameter;
-            }
-	  else if (parameter == "--help" || parameter == "-?")
-            usage (argv[0]);
-	  else
-	    filename = parameter;
-	}
-    }
-
-  if (filename == "")
-    usage (argv[0]);
-
   bool same_version = false;
   Armyset::support_backward_compatibility();
   Shieldset::support_backward_compatibility();
@@ -97,7 +68,7 @@ int main(int argc, char* argv[])
       if (same_version)
         {
           std::cout << String::ucompose(_("%1 is already the latest version."), 
-                                   filename) << std::endl;
+                                        filename) << std::endl;
 
           bool is_tar_file = false;
           FileCompat::Type type = 
@@ -132,7 +103,7 @@ int main(int argc, char* argv[])
       else if (!upgraded && !same_version)
         {
           std::cout << String::ucompose(_("Error: %1 could not be upgraded."), 
-                                   filename) << std::endl;
+                                        filename) << std::endl;
           File::erase(tmpfile);
         }
       else
@@ -170,6 +141,43 @@ int main(int argc, char* argv[])
       std::cout << _("Error: The --identify and --rewrite options cannot be used at the same time.") << std::endl;
       err = EXIT_FAILURE;
     }
-  return err;
+  exit (err);
+}
+
+int main(int argc, char* argv[])
+{
+  Glib::ustring filename = "";
+  Glib::ustring rewrite;
+  bool identify_file = false;
+  Vector<int>::setMaximumWidth(1000);
+
+  if (argc > 1)
+    {
+      for (int i = 2; i <= argc; i++)
+	{
+          Glib::ustring parameter(argv[i-1]); 
+	  if (parameter == "--identify" || parameter == "-i")
+            {
+              identify_file = true;
+            }
+          else if (parameter == "--rewrite" || parameter == "-r")
+            {
+              rewrite = parameter;
+            }
+	  else if (parameter == "--help" || parameter == "-?")
+            usage (argv[0]);
+	  else
+	    filename = parameter;
+	}
+    }
+
+  if (filename == "")
+    usage (argv[0]);
+
+  auto app = Gtk::Application::create ("org.nongnu.lordsawar.upgrade-file");
+
+  app->signal_startup ().connect (sigc::bind (sigc::ptr_fun (&kickoff), filename, rewrite, identify_file));
+  app->run();
+  app->quit ();
 }
 

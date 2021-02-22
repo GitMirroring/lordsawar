@@ -41,12 +41,12 @@ class ArmySetWindow: public sigc::trackable
     void show() {window->show();}
     void hide() {window->hide();}
 
-    Gtk::Window &get_window() { return *window; }
+    Gtk::Dialog *get_dialog() { return window; }
 
     sigc::signal<void, guint32> armyset_saved;
 
  private:
-    Gtk::Window* window;
+    Gtk::Dialog * window;
     Glib::ustring current_save_filename;
     Armyset *d_armyset; //current armyset
     ArmyProto *d_army; //current army
@@ -203,8 +203,8 @@ class ArmySetWindow: public sigc::trackable
     void update_window_title();
     void on_make_same_clicked();
 
-    void show_add_file_error(Armyset *a, Gtk::Window &d, Glib::ustring file);
-    void show_remove_file_error(Armyset *a, Gtk::Window &d, Glib::ustring file);
+    void show_add_file_error(Armyset *a, Gtk::Dialog &d, Glib::ustring file);
+    void show_remove_file_error(Armyset *a, Gtk::Dialog &d, Glib::ustring file);
     void refresh_armies();
 
     bool make_new_armyset ();

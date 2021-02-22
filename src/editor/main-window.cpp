@@ -142,6 +142,7 @@ MainWindow::MainWindow(Glib::ustring load_filename)
     // the map image
     xml->get_widget("bigmap_image", bigmap_image);
     bigmap_image->signal_size_allocate().connect(method(on_bigmap_surface_changed));
+    bigmap_image->signal_draw ().connect (method (on_bigmap_draw));
     xml->get_widget("bigmap_eventbox", bigmap_eventbox);
 
     bigmap_eventbox->add_events(Gdk::BUTTON_PRESS_MASK | 
@@ -499,6 +500,24 @@ void MainWindow::on_bigmap_surface_changed(Gtk::Allocation box)
       redraw(true);
     }
   last_box = box;
+}
+
+void MainWindow::on_bigmap_changed(Cairo::RefPtr<Cairo::Surface> map)
+{
+  (void)map;
+  bigmap_image->queue_draw();
+}
+
+bool MainWindow::on_bigmap_draw (const ::Cairo::RefPtr< ::Cairo::Context >& cr)
+{
+  if (bigmap)
+    {
+      Cairo::RefPtr<Cairo::Surface> surf = bigmap->get_surface ();
+      cr->set_source(surf, 0, 0);
+      cr->rectangle(0, 0, bigmap_image->get_width(), bigmap_image->get_height());
+      cr->fill();
+    }
+  return true;
 }
 
 void MainWindow::init()
@@ -1151,17 +1170,15 @@ void MainWindow::on_edit_map_info_activated()
 
 void MainWindow::on_edit_shieldset_activated()
 {
-  Gtk::Main *kit = Gtk::Main::instance();;
-
   EditorAction_ShieldSet *action =
     new EditorAction_ShieldSet (GameMap::getShieldset ());
   active_shieldset_saved_in_editor = false;
 
   ShieldSetWindow *shieldset_window = new ShieldSetWindow
     (GameMap::getShieldset()->getConfigurationFile());
-  shieldset_window->get_window().property_transient_for() = window;
+  shieldset_window->get_dialog()->property_transient_for() = window;
   shieldset_window->shieldset_saved.connect (method(on_shieldset_saved));
-  kit->run(shieldset_window->get_window());
+  shieldset_window->get_dialog ()->run();
 
   if (active_shieldset_saved_in_editor)
     addUndo (action);
@@ -1186,7 +1203,6 @@ void MainWindow::on_shieldset_saved(guint32 id)
 
 void MainWindow::on_edit_armyset_activated()
 {
-  Gtk::Main *kit = Gtk::Main::instance();;
   guint32 army_set_id = Playerlist::getActiveplayer()->getArmyset();
   Armyset *armyset = Armysetlist::getInstance()->get(army_set_id);
   Glib::ustring file = armyset->getConfigurationFile();
@@ -1195,9 +1211,9 @@ void MainWindow::on_edit_armyset_activated()
   active_armyset_saved_in_editor = false;
 
   ArmySetWindow* armyset_window = new ArmySetWindow (file);
-  armyset_window->get_window().property_transient_for() = window;
+  armyset_window->get_dialog()->property_transient_for() = window;
   armyset_window->armyset_saved.connect (method(on_armyset_saved));
-  kit->run(armyset_window->get_window());
+  armyset_window->get_dialog ()->run();
   if (active_armyset_saved_in_editor)
     addUndo (action);
   else
@@ -1219,7 +1235,6 @@ void MainWindow::on_armyset_saved(guint32 id)
 
 void MainWindow::on_edit_cityset_activated()
 {
-  Gtk::Main *kit = Gtk::Main::instance();;
   Cityset *cityset = GameMap::getCityset();
 
   EditorAction_CitySet *action = new EditorAction_CitySet (cityset);
@@ -1227,9 +1242,9 @@ void MainWindow::on_edit_cityset_activated()
 
   Glib::ustring file = cityset->getConfigurationFile();
   CitySetWindow* cityset_window = new CitySetWindow (file);
-  cityset_window->get_window().property_transient_for() = window;
+  cityset_window->get_dialog()->property_transient_for() = window;
   cityset_window->cityset_saved.connect (method(on_cityset_saved));
-  kit->run(cityset_window->get_window());
+  cityset_window->get_dialog ()->run();
 
   if (active_cityset_saved_in_editor)
     addUndo (action);
@@ -1273,7 +1288,6 @@ void MainWindow::on_edit_smallmap_activated()
 
 void MainWindow::on_edit_tileset_activated()
 {
-  Gtk::Main *kit = Gtk::Main::instance();;
   Tileset *tileset = GameMap::getTileset();
 
   EditorAction_TileSet *action = new EditorAction_TileSet (tileset);
@@ -1281,9 +1295,9 @@ void MainWindow::on_edit_tileset_activated()
 
   Glib::ustring file = tileset->getConfigurationFile();
   TileSetWindow* tileset_window = new TileSetWindow (file);
-  tileset_window->get_window().property_transient_for() = window;
+  tileset_window->get_dialog()->property_transient_for() = window;
   tileset_window->tileset_saved.connect (method(on_tileset_saved));
-  kit->run(tileset_window->get_window());
+  tileset_window->get_dialog ()->run();
 
   if (active_tileset_saved_in_editor)
     addUndo (action);
@@ -1312,8 +1326,8 @@ void MainWindow::on_fullscreen_activated()
   else
     {
       window->unfullscreen();
-      window->resize (unmaximized_box.get_width (),
-                      unmaximized_box.get_height ());
+      window->set_default_size (unmaximized_box.get_width (),
+                                unmaximized_box.get_height ());
     }
 }
 
@@ -1525,13 +1539,6 @@ void MainWindow::on_smallmap_water_changed()
   //this is so that the radial water can be redrawn again.
   //otherwise the land doesn't get erased on the smallmap
   smallmap->resize();
-}
-
-void MainWindow::on_bigmap_changed(Cairo::RefPtr<Cairo::Surface> map)
-{
-  Glib::RefPtr<Gdk::Pixbuf> pixbuf = 
-    Gdk::Pixbuf::create(map, 0, 0, bigmap_image->get_allocated_width(), bigmap_image->get_allocated_height());
-  bigmap_image->property_pixbuf() = pixbuf;
 }
 
 void MainWindow::on_smallmap_changed(Cairo::RefPtr<Cairo::Surface> map)
@@ -2675,8 +2682,8 @@ bool MainWindow::on_window_state_event (GdkEventWindowState *e)
           if (e->new_window_state & GDK_WINDOW_STATE_MAXIMIZED)
             ; //maximized
           else
-            window->resize (unmaximized_box.get_width (),
-                            unmaximized_box.get_height ());
+            window->set_default_size (unmaximized_box.get_width (),
+                                      unmaximized_box.get_height ());
         }
     }
   return false;

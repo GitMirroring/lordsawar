@@ -94,22 +94,26 @@ HistoryReportDialog::HistoryReportDialog(Gtk::Window &parent, Player *p, History
   city_chart = new LineChart(past_citycounts, d_colors, 
                              Citylist::getInstance()->size(),
 			     _("Cities"), _("Turns"));
+  city_chart->set_vexpand (true);
   city_alignment->add(*manage(city_chart));
 
   generatePastRuinCounts();
   ruin_chart = new LineChart(past_ruincounts, d_colors, 
 			     Ruinlist::getInstance()->size(),
 			     _("Explored Ruins"), _("Turns"));
+  ruin_chart->set_vexpand (true);
   ruin_alignment->add(*manage(ruin_chart));
 
   generatePastGoldCounts();
   gold_chart = new LineChart(past_goldcounts, d_colors, 0, 
 			     _("Gold Pieces"), _("Turns"));
+  gold_chart->set_vexpand (true);
   gold_alignment->add(*manage(gold_chart));
 
   generatePastWinningCounts();
   rank_chart = new LineChart(past_rankcounts, d_colors, 100,
 			     _("Score"), _("Turns"));
+  rank_chart->set_vexpand (true);
   winner_alignment->add(*manage(rank_chart));
 
   fill_in_turn_info((guint32)turn_scale->get_value());

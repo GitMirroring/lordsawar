@@ -354,6 +354,7 @@ class GameWindow: public sigc::trackable
     bool on_window_state_event (GdkEventWindowState *e);
     bool on_configure_event (GdkEventConfigure *e);
     void set_default_bigmap_zoom ();
+    bool on_bigmap_draw (const ::Cairo::RefPtr< ::Cairo::Context >& cr);
 public:
     bool d_quick_fights; //do we speed up fights for this player's turn?
     Glib::ustring stop_action; //hackhackhack

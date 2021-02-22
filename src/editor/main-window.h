@@ -258,7 +258,6 @@ class MainWindow: public sigc::trackable
 
     // map callbacks
     void on_smallmap_changed(Cairo::RefPtr<Cairo::Surface> map);
-    void on_bigmap_changed(Cairo::RefPtr<Cairo::Surface> map);
     void on_smallmap_water_changed();
     void on_objects_selected(std::vector<UniquelyIdentified *> objects);
     void on_mouse_on_tile(Vector<int> tile);
@@ -335,6 +334,8 @@ class MainWindow: public sigc::trackable
     std::list<Glib::ustring> collectRuinNames ();
     std::list<Glib::ustring> collectTempleNames ();
     std::list<Glib::ustring> collectSignposts ();
+    bool on_bigmap_draw (const ::Cairo::RefPtr< ::Cairo::Context >& cr);
+    void on_bigmap_changed(Cairo::RefPtr<Cairo::Surface> map);
 };
 
 #endif

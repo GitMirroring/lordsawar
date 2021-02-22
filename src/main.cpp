@@ -38,7 +38,7 @@
 int max_vector_width;
 int main(int argc, char* argv[])
 {
-  Main kit(argc, argv);
+  Main kit;
 
   if (argc > 1)
     {

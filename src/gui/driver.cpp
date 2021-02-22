@@ -152,11 +152,6 @@ Driver::Driver(bool start_editor, Glib::ustring load_filename)
         return;
       }
     splash_window->show();
-    if (getenv ("LORDSAWAR_GUI_TEST") != NULL)
-      {
-        splash_window->get_window()->set_position(Gtk::WIN_POS_NONE);
-        splash_window->get_window()->move(0, 0);
-      }
     //here are the ones that do
     run();
 }
@@ -1113,9 +1108,15 @@ void Driver::init_game_window()
     (method(on_game_ended_and_load_network_game));
 
   //make the width+height suitable for the screen size.
-  Glib::RefPtr<Gdk::Screen> screen =
-    Gdk::Display::get_default()->get_default_screen();
-  guint32 screen_height = screen->get_height();
+  Glib::RefPtr<Gdk::Monitor> monitor =
+    Gdk::Display::get_default ()->get_primary_monitor ();
+
+  if (!monitor)
+    monitor = Gdk::Display::get_default ()->get_monitor (0);
+  
+  Gdk::Rectangle monitor_geometry;
+  monitor->get_workarea (monitor_geometry);
+  guint32 screen_height = monitor_geometry.get_height () * monitor->get_scale_factor ();
   guint32 height = 450;
   if (screen_height <= 600)
     height = 400;

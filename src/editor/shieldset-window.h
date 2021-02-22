@@ -41,14 +41,14 @@ class ShieldSetWindow: public sigc::trackable
     void show() {window->show();}
     void hide() {window->hide();}
 
-    Gtk::Window &get_window() { return *window; }
+    Gtk::Dialog * get_dialog () { return window; }
 
     sigc::signal<void, guint32> shieldset_saved;
 
  private:
     bool shieldset_modified;
     bool new_shieldset_needs_saving;
-    Gtk::Window* window;
+    Gtk::Dialog* window;
     Glib::ustring current_save_filename;
     Shieldset *d_shieldset; //current shieldset
     Shield *d_shield; //current shield
@@ -82,7 +82,7 @@ class ShieldSetWindow: public sigc::trackable
     Gtk::ColorButton *player_2ndcolorbutton;
     Gtk::ColorButton *player_3rdcolorbutton;
     Gtk::SpinButton *color_spinbutton;
-    Gtk::Alignment *shield_alignment;
+    Gtk::Box *shield_alignment;
 
     class ShieldsColumns: public Gtk::TreeModelColumnRecord {
     public:
