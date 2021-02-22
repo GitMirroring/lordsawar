@@ -682,8 +682,8 @@ void BattleCalculatorDialog::on_fight100_clicked()
                          attacker_wins, defender_wins);
       Gtk::Label l;
       l.set_text (s);
-      l.set_margin_left (10);
-      l.set_margin_right (10);
+      l.set_margin_start (10);
+      l.set_margin_end (10);
       l.set_margin_top (10);
       l.set_margin_bottom (10);
       box->add(l);

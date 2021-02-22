@@ -402,7 +402,7 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
-                        <property name="margin-left">4</property>
+                        <property name="margin-start">4</property>
                         <property name="use-underline">True</property>
                       </object>
                       <packing>

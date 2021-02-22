@@ -47,8 +47,10 @@ StatusBox * StatusBox::create()
 void StatusBox::pad_image(Gtk::Image *image)
 {
   int padding = 3;
-  image->property_xpad() = padding;
-  image->property_ypad() = padding;
+  image->property_margin_start () = padding;
+  image->property_margin_end () = padding;
+  image->property_margin_top () = padding;
+  image->property_margin_bottom () = padding;
 }
 
 StatusBox::StatusBox(BaseObjectType* baseObject, const Glib::RefPtr<Gtk::Builder> &xml)

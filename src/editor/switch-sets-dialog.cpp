@@ -124,10 +124,10 @@ SwitchSetsDialog::SwitchSetsDialog(Gtk::Window &parent)
       Gtk::Label *l = Gtk::manage (new Gtk::Label (p->getName ()));
       l->property_hexpand () = true;
       l->property_halign () = Gtk::ALIGN_START;
-      l->property_margin_left () = px;
+      l->property_margin_start () = px;
       armysets_grid->attach (*l, 0, row);
       Gtk::ComboBoxText *c = manage(new Gtk::ComboBoxText);
-      c->property_margin_right () = px;
+      c->property_margin_end () = px;
       armysets_grid->attach (*c, 1, row);
       armysets_rows.push_back (-1);
       row++;

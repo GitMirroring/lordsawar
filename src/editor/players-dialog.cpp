@@ -157,7 +157,7 @@ Gtk::Button* PlayersDialog::add_button_for_player_heroes ()
   b->set_label (_("Heroes"));
   b->set_focus_on_click (false);
   int px = FontSize::getInstance ()->get_height ();
-  b->property_margin_right () = px;
+  b->property_margin_end () = px;
   player_heroes_buttons.push_back (b);
   return b;
 }
@@ -192,7 +192,7 @@ Gtk::ComboBoxText* PlayersDialog::add_combo_for_player_type (Player *p)
         }
     }
   int px = FontSize::getInstance ()->get_height ();
-  c->property_margin_left () = px;
+  c->property_margin_start () = px;
   player_type_comboboxes.push_back (c);
   return c;
 }

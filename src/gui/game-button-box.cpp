@@ -42,8 +42,10 @@ GameButtonBox * GameButtonBox::create()
 void GameButtonBox::pad_image(Gtk::Image *image)
 {
   int padding = 3;
-  image->property_xpad() = padding;
-  image->property_ypad() = padding;
+  image->property_margin_start () = padding;
+  image->property_margin_end () = padding;
+  image->property_margin_top () = padding;
+  image->property_margin_bottom () = padding;
 }
 
 void GameButtonBox::add_picture_to_button (guint32 icontype, Gtk::Button *button)
