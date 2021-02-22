@@ -225,9 +225,23 @@ void TarFileMaskedImage::instantiateVertical ()
   frames = disassemble_grid (maskcount + 1, s);
 
   if (scale)
-    for (auto frame : frames)
-      for (auto f : frame)
-        PixMask::scale(f, scale_dimension.x, scale_dimension.y);
+    {
+      std::vector<std::vector<PixMask*> > scaled_frames;
+      for (auto frame : frames)
+        {
+          std::vector<PixMask*> newframe;
+          for (auto f : frame)
+            {
+              newframe.push_back (f->copy ());
+              PixMask::scale(newframe.back (), scale_dimension.x,
+                             scale_dimension.y);
+
+            }
+          scaled_frames.push_back (newframe);
+        }
+      uninstantiateImages ();
+      frames = scaled_frames;
+    }
 
   return;
 }
@@ -305,6 +319,11 @@ PixMask *TarFileMaskedImage::applyMask (guint32 i, Player *p) const
 
 PixMask* TarFileMaskedImage::applyMask(std::vector<PixMask*> frame, std::vector<Gdk::RGBA> colors) const
 {
+  if (frame.size () <= 1)
+    {
+      printf ("masked image '%s' reports only 1 frame when we need at least 2\n", name.c_str ());
+      exit (0);
+    }
   PixMask *im = frame[0];
   PixMask *ma = frame[1];
   int width = im->get_width();
