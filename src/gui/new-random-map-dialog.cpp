@@ -80,26 +80,26 @@ NewRandomMapDialog::NewRandomMapDialog(Gtk::Window &parent)
   accept_button->signal_clicked().connect (method(on_accept_clicked));
   xml->get_widget("cancel2_button", cancel_button);
   cancel_button->signal_clicked().connect (method(on_cancel_clicked));
-  xml->get_widget("grass_random_checkbutton", grass_random_checkbutton);
-  grass_random_checkbutton->signal_toggled().connect
+  xml->get_widget("grass_random_switch", grass_random_switch);
+  grass_random_switch->property_active().signal_changed().connect
     (method(on_grass_random_toggled));
-  xml->get_widget("water_random_checkbutton", water_random_checkbutton);
-  water_random_checkbutton->signal_toggled().connect
+  xml->get_widget("water_random_switch", water_random_switch);
+  water_random_switch->property_active().signal_changed().connect
     (method(on_water_random_toggled));
-  xml->get_widget("swamp_random_checkbutton", swamp_random_checkbutton);
-  swamp_random_checkbutton->signal_toggled().connect
+  xml->get_widget("swamp_random_switch", swamp_random_switch);
+  swamp_random_switch->property_active().signal_changed().connect
     (method(on_swamp_random_toggled));
-  xml->get_widget("forest_random_checkbutton", forest_random_checkbutton);
-  forest_random_checkbutton->signal_toggled().connect
+  xml->get_widget("forest_random_switch", forest_random_switch);
+  forest_random_switch->property_active().signal_changed().connect
     (method(on_forest_random_toggled));
-  xml->get_widget("hills_random_checkbutton", hills_random_checkbutton);
-  hills_random_checkbutton->signal_toggled().connect
+  xml->get_widget("hills_random_switch", hills_random_switch);
+  hills_random_switch->property_active().signal_changed().connect
     (method(on_hills_random_toggled));
-  xml->get_widget("mountains_random_checkbutton", mountains_random_checkbutton);
-  mountains_random_checkbutton->signal_toggled().connect
+  xml->get_widget("mountains_random_switch", mountains_random_switch);
+  mountains_random_switch->property_active().signal_changed().connect
     (method(on_mountains_random_toggled));
-  xml->get_widget("cities_random_checkbutton", cities_random_checkbutton);
-  cities_random_checkbutton->signal_toggled().connect
+  xml->get_widget("cities_random_switch", cities_random_switch);
+  cities_random_switch->property_active().signal_changed().connect
     (method(on_cities_random_toggled));
   xml->get_widget("progress_treeview", progress_treeview);
 
@@ -311,7 +311,7 @@ void NewRandomMapDialog::assign_random_terrain (GameParameters &g)
   double sum = 0;
   std::vector<ActiveTerrainType> ter;
 
-  if (!grass_random_checkbutton->get_active())
+  if (!grass_random_switch->get_active())
     sum += grass_scale->get_value ();
   else
     {
@@ -320,7 +320,7 @@ void NewRandomMapDialog::assign_random_terrain (GameParameters &g)
     }
 
 
-  if (!water_random_checkbutton->get_active())
+  if (!water_random_switch->get_active())
     sum += water_scale->get_value ();
   else
     {
@@ -328,7 +328,7 @@ void NewRandomMapDialog::assign_random_terrain (GameParameters &g)
       g.map.water = 0;
     }
 
-  if (!forest_random_checkbutton->get_active())
+  if (!forest_random_switch->get_active())
     sum += forest_scale->get_value ();
   else
     {
@@ -336,7 +336,7 @@ void NewRandomMapDialog::assign_random_terrain (GameParameters &g)
       g.map.forest = 0;
     }
 
-  if (!hills_random_checkbutton->get_active())
+  if (!hills_random_switch->get_active())
     sum += hills_scale->get_value ();
   else
     {
@@ -344,7 +344,7 @@ void NewRandomMapDialog::assign_random_terrain (GameParameters &g)
       g.map.hills = 0;
     }
 
-  if (!swamp_random_checkbutton->get_active())
+  if (!swamp_random_switch->get_active())
     sum += swamp_scale->get_value ();
   else
     {
@@ -352,7 +352,7 @@ void NewRandomMapDialog::assign_random_terrain (GameParameters &g)
       g.map.swamp = 0;
     }
 
-  if (!mountains_random_checkbutton->get_active())
+  if (!mountains_random_switch->get_active())
     sum += mountains_scale->get_value ();
   else
     {
@@ -459,27 +459,27 @@ GameParameters NewRandomMapDialog::getParams()
     CreateScenario::calculateNumberOfSignposts(g.map.width, g.map.height,
                                                int(grass_scale->get_value()));
 
-  if (!grass_random_checkbutton->get_active())
+  if (!grass_random_switch->get_active())
     g.map.grass = int(grass_scale->get_value());
 
-  if (!water_random_checkbutton->get_active())
+  if (!water_random_switch->get_active())
     g.map.water = int(water_scale->get_value());
 
-  if (!swamp_random_checkbutton->get_active())
+  if (!swamp_random_switch->get_active())
     g.map.swamp = int(swamp_scale->get_value());
 
-  if (!forest_random_checkbutton->get_active())
+  if (!forest_random_switch->get_active())
     g.map.forest = int(forest_scale->get_value());
 
-  if (!hills_random_checkbutton->get_active())
+  if (!hills_random_switch->get_active())
     g.map.hills = int(hills_scale->get_value());
 
-  if (!mountains_random_checkbutton->get_active())
+  if (!mountains_random_switch->get_active())
     g.map.mountains = int(mountains_scale->get_value());
 
   assign_random_terrain (g);
 
-  if (cities_random_checkbutton->get_active())
+  if (cities_random_switch->get_active())
     g.map.cities =  
       int(cities_scale->get_adjustment()->get_lower()) + 
       (Rnd::rand() % (int(cities_scale->get_adjustment()->get_upper()) -
@@ -531,37 +531,37 @@ GameParameters NewRandomMapDialog::getParams()
 
 void NewRandomMapDialog::on_grass_random_toggled()
 {
-  grass_scale->set_sensitive(!grass_random_checkbutton->get_active());
+  grass_scale->set_sensitive(!grass_random_switch->get_active());
 }
 
 void NewRandomMapDialog::on_water_random_toggled()
 {
-  water_scale->set_sensitive(!water_random_checkbutton->get_active());
+  water_scale->set_sensitive(!water_random_switch->get_active());
 }
 
 void NewRandomMapDialog::on_swamp_random_toggled()
 {
-  swamp_scale->set_sensitive(!swamp_random_checkbutton->get_active());
+  swamp_scale->set_sensitive(!swamp_random_switch->get_active());
 }
 
 void NewRandomMapDialog::on_forest_random_toggled()
 {
-  forest_scale->set_sensitive(!forest_random_checkbutton->get_active());
+  forest_scale->set_sensitive(!forest_random_switch->get_active());
 }
 
 void NewRandomMapDialog::on_hills_random_toggled()
 {
-  hills_scale->set_sensitive(!hills_random_checkbutton->get_active());
+  hills_scale->set_sensitive(!hills_random_switch->get_active());
 }
 
 void NewRandomMapDialog::on_mountains_random_toggled()
 {
-  mountains_scale->set_sensitive(!mountains_random_checkbutton->get_active());
+  mountains_scale->set_sensitive(!mountains_random_switch->get_active());
 }
 
 void NewRandomMapDialog::on_cities_random_toggled()
 {
-  cities_scale->set_sensitive(!cities_random_checkbutton->get_active());
+  cities_scale->set_sensitive(!cities_random_switch->get_active());
 }
 
 Glib::ustring NewRandomMapDialog::create_and_dump_scenario(const Glib::ustring &file,

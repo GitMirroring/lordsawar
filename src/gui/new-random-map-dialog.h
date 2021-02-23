@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -76,13 +76,13 @@ class NewRandomMapDialog: public LwDialog
     Gtk::Scale *cities_scale;
     Gtk::Button *accept_button;
     Gtk::Button *cancel_button;
-    Gtk::CheckButton *grass_random_checkbutton;
-    Gtk::CheckButton *water_random_checkbutton;
-    Gtk::CheckButton *swamp_random_checkbutton;
-    Gtk::CheckButton *forest_random_checkbutton;
-    Gtk::CheckButton *hills_random_checkbutton;
-    Gtk::CheckButton *mountains_random_checkbutton;
-    Gtk::CheckButton *cities_random_checkbutton;
+    Gtk::Switch *grass_random_switch;
+    Gtk::Switch *water_random_switch;
+    Gtk::Switch *swamp_random_switch;
+    Gtk::Switch *forest_random_switch;
+    Gtk::Switch *hills_random_switch;
+    Gtk::Switch *mountains_random_switch;
+    Gtk::Switch *cities_random_switch;
     Gtk::CheckButton *cities_can_produce_allies_checkbutton;
     Gtk::Notebook *notebook;
     Gtk::TreeView *progress_treeview;
