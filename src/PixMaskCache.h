@@ -119,7 +119,11 @@ public:
           {
             guint32 half = cachesize / 2;
             while (cachesize > half)
-              siz += this->eraseLeastRecentlyUsed();
+              {
+                siz += this->eraseLeastRecentlyUsed();
+                if (this->size () == 1)
+                  break;
+              }
           }
         return siz;
       }

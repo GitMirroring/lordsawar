@@ -950,8 +950,6 @@ PixMask* ImageCache::getCityPic(int type, const Player* p, guint32 cityset)
   CityPixMaskCacheItem i;
   i.cityset = cityset;
   i.type = type;
-  if (p == NULL)
-    printf ("what\n");
   i.player_id = p->getId();
   PixMask *s = citycache.get(i, added);
   d_cachesize += added;
@@ -2330,6 +2328,8 @@ int ShieldPixMaskCacheItem::comp(const ShieldPixMaskCacheItem &item) const
     (type > item.type) ?  1 :
     (color < item.color) ? -1 :
     (color > item.color) ?  1 :
+    (map < item.map) ? -1 :
+    (map > item.map) ?  1 :
     (font_size < item.font_size) ? -1 :
     (font_size > item.font_size) ?  1 :
     0;
