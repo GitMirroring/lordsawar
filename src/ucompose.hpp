@@ -6,7 +6,7 @@
  * Version 1.0.4.
  *
  * Copyright (c) 2002, 03, 04 Ole Laursen <olau@hardworking.dk>.
- * Copyright (C) 2015, 2017 Ben Asselstine
+ * Copyright (C) 2015, 2017, 2021 Ben Asselstine
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -337,7 +337,28 @@ namespace String
         }
       return name.substr (0, name.length () - digits);
     }
-}
 
+  inline Glib::ustring indent (Glib::ustring s, int num_spaces)
+    {
+      Glib::ustring result = "";
+      std::string delimiter = "\n";
+      std::string spaces = "";
+      for (int i = 0; i < num_spaces; i++)
+        spaces += " ";
+      Glib::ustring::size_type idx = s.rfind(delimiter);
+      if (idx == Glib::ustring::npos ||
+          idx != s.length() - delimiter.length())
+        s += delimiter;
+      size_t pos = 0;
+      std::string token;
+      while ((pos = s.find (delimiter)) != std::string::npos)
+        {
+          token = s.substr (0, pos);
+          result += spaces + token + delimiter;
+          s.erase (0, pos + delimiter.length ());
+        }
+      return result;
+    }
+}
 
 #endif // STRING_UCOMPOSE_HPP

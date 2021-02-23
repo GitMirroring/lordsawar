@@ -107,10 +107,10 @@ HeroDialog::HeroDialog(Gtk::Window &parent, Hero *h, Vector<int> p)
   item_list = Gtk::ListStore::create(item_columns);
   xml->get_widget("treeview", item_treeview);
   item_treeview->set_model(item_list);
-  item_treeview->append_column("", item_columns.image);
-  item_treeview->append_column(_("Name"), item_columns.name);
-  item_treeview->append_column(_("Attributes"), item_columns.attributes);
+  item_treeview->append_column(_("Item"), item_columns.item_desc);
+  item_treeview->get_column (0)->set_expand (true);
   item_treeview->append_column(_("Status"), item_columns.status);
+
 
   item_treeview->get_selection()->signal_changed().connect(method(on_item_selection_changed));
 
@@ -355,10 +355,13 @@ void HeroDialog::add_hero(Hero *h)
 
 void HeroDialog::add_item(Item *item, bool in_backpack)
 {
-  Gtk::TreeIter i = item_list->append();
-  (*i)[item_columns.name] = item->getName();
+  std::stringstream ss;
+  ss << std::endl;
+  Glib::ustring newline = ss.str();
 
-  (*i)[item_columns.attributes] = item->getBonusDescription();
+  Gtk::TreeIter i = item_list->append();
+  Glib::ustring s = String::indent (item->getBonusDescription (), 2);
+  (*i)[item_columns.item_desc] = item->getName() + newline + s;
 
   if (in_backpack)
     (*i)[item_columns.status] = _("In backpack");

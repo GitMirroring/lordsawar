@@ -75,11 +75,9 @@ class HeroDialog: public LwDialog
     class ItemColumns: public Gtk::TreeModelColumnRecord {
     public:
 	ItemColumns() 
-        { add(image); add(name); add(attributes); add(status); add(item); }
+        { add(item_desc); add(status); add(item); }
 	
-	Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf> > image;
-	Gtk::TreeModelColumn<Glib::ustring> name;
-	Gtk::TreeModelColumn<Glib::ustring> attributes;
+	Gtk::TreeModelColumn<Glib::ustring> item_desc;
 	Gtk::TreeModelColumn<Glib::ustring> status;
 	Gtk::TreeModelColumn<Item *> item;
     };
