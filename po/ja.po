@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: lordsawar-0.3.3-pre2\n"
 "Report-Msgid-Bugs-To: https://savannah.nongnu.org/bugs/?group=lordsawar\n"
 "POT-Creation-Date: 2021-02-19 15:08-0500\n"
-"PO-Revision-Date: 2021-03-16 23:34+0900\n"
+"PO-Revision-Date: 2021-04-02 21:59+0900\n"
 "Last-Translator: Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>\n"
 "Language-Team: Japanese <translation-team-ja@lists.sourceforge.net>\n"
 "Language: ja\n"
-"X-Bugs: Report translation errors to the Language-Team address.\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 2.2.1\n"
 
@@ -77,7 +77,6 @@ msgstr "閉じる"
 
 #: ../dat/glade/characters-dialog.ui.h:1
 #: ../dat/glade/game-preferences-dialog.ui.h:15
-#, fuzzy
 msgid "Characters"
 msgstr "文字"
 
@@ -272,19 +271,16 @@ msgid "Set destination for produced armies"
 msgstr "軍隊の集まるポイントを設定する"
 
 #: ../dat/glade/city-window.ui.h:15
-#, fuzzy
 msgid "Raze..."
 msgstr "破壊する"
 
 #: ../dat/glade/city-window.ui.h:16
-#, fuzzy
 msgid "Burn the city to the ground"
-msgstr "地上で"
+msgstr "街を地面に燃やす"
 
 #: ../dat/glade/city-window.ui.h:17
-#, fuzzy
 msgid "Rename..."
-msgstr "名前を変更"
+msgstr "名前を変更..."
 
 #: ../dat/glade/city-window.ui.h:18
 msgid "Change the city name"
@@ -308,7 +304,7 @@ msgstr ""
 
 #: ../dat/glade/destination-dialog.ui.h:7
 msgid "Next Turn:"
-msgstr "次のターン"
+msgstr "次のターン:"
 
 #: ../dat/glade/destination-dialog.ui.h:8
 msgid "Turn After:"
@@ -706,7 +702,7 @@ msgstr "新しい"
 #: ../dat/glade/editor/cityset-window.ui.h:4
 #: ../dat/glade/editor/shieldset-window.ui.h:4
 msgid "Open..."
-msgstr "オーペンする"
+msgstr "開く..."
 
 #: ../dat/glade/game-window.ui.h:4 ../dat/glade/editor/armyset-window.ui.h:8
 #: ../dat/glade/editor/main-window.ui.h:5
@@ -1039,7 +1035,7 @@ msgstr "ワイドスクリーン"
 
 #: ../dat/glade/medal-awarded-dialog.ui.h:1
 msgid "Medal Awarded"
-msgstr "メダル賞"
+msgstr "授与されたメダル"
 
 #: ../dat/glade/new-network-game-dialog.ui.h:1
 #: ../dat/glade/splash-window.ui.h:2
@@ -1077,9 +1073,8 @@ msgstr ""
 "他のユーザーが参加できる。"
 
 #: ../dat/glade/new-network-game-download-window.ui.h:1
-#, fuzzy
 msgid "LordsAWar! Scenario"
-msgstr "LordsAWar!"
+msgstr "LordsAWar!シナリオ"
 
 #: ../dat/glade/new-profile-dialog.ui.h:1
 msgid "New Profile"
@@ -1107,8 +1102,8 @@ msgid ""
 "Type in the name of the computer\n"
 "whose game you would like to join."
 msgstr ""
-"コンピュータの名前を入力してください\n"
-"参加したいゲーム"
+"参加したいゲームを実施しているコンピュータ\n"
+"の名前を入力してください。"
 
 #: ../dat/glade/pick-network-game-to-join-dialog.ui.h:6
 msgid "Host Name"
@@ -1152,7 +1147,7 @@ msgid ""
 "Let the enemy come!"
 msgstr ""
 "ハ！私はすべてを燃やした!\n"
-"敵が来てみましょう!"
+"敵よ来てみろ!"
 
 #: ../dat/glade/preferences-dialog.ui.h:4
 msgid "Movement Speed"
@@ -1204,7 +1199,7 @@ msgstr "...勝者！または...これで殺された!"
 
 #: ../dat/glade/ruinfight-started-dialog.ui.h:2
 msgid "So and so encounters a monster and..."
-msgstr "だから、モンスターに直面しましたと..."
+msgstr "だから、モンスターに直面し..."
 
 #: ../dat/glade/ruin-report-dialog.ui.h:1
 msgid "Ruin Report"
@@ -1325,7 +1320,7 @@ msgstr "裏切り！"
 
 #: ../dat/glade/treachery-dialog.ui.h:2
 msgid "Whoops!  Pardon me, friend."
-msgstr "おっと！すみません、仲間。"
+msgstr "おっと！許せ、友よ。"
 
 #: ../dat/glade/treachery-dialog.ui.h:3
 msgid "Attack!"
@@ -1520,15 +1515,15 @@ msgstr "選択したスタックなし"
 
 #: ../dat/glade/quick-help-window.ui.h:2
 msgid "Move the main map: left-click + drag"
-msgstr "メインマップを移動する:left-click + drag"
+msgstr "メインマップを移動する:左クリック + ドラッグ"
 
 #: ../dat/glade/quick-help-window.ui.h:3
 msgid "Select a stack: left-click on a stack"
-msgstr "スタックを選択する: スタックでleft-clickをしてください"
+msgstr "スタックを選択する: スタックで左クリックをしてください"
 
 #: ../dat/glade/quick-help-window.ui.h:4
 msgid "City production: left-click on a city"
-msgstr "都市製造: 都市でleft-clickをしてください"
+msgstr "都市製造: 都市で左クリックをしてください"
 
 #: ../dat/glade/quick-help-window.ui.h:5
 msgid "With a stack already selected"
@@ -1536,15 +1531,15 @@ msgstr "選択したスタックを使用する"
 
 #: ../dat/glade/quick-help-window.ui.h:6
 msgid "Deselect a stack: right-click anywhere else on map"
-msgstr "スタック選択をクリアする:マップ上のスタック以外の場所で right-click をクリックします。"
+msgstr "スタック選択をクリアする:マップ上のスタック以外の場所で右クリックします。"
 
 #: ../dat/glade/quick-help-window.ui.h:7
 msgid "Move a stack: left click on map, or left-click + drag"
-msgstr "スタックを運動する:マップ上のleft-click をしてください、またはleft-click + drag"
+msgstr "スタックを運動する:マップ上で左クリック をしてください、または左クリック + ドラッグ"
 
 #: ../dat/glade/quick-help-window.ui.h:8
 msgid "See stack actions: right-click on stack"
-msgstr "スタックアクションを参照してください：スタックをright-clickをします"
+msgstr "スタックアクションを参照してください：スタックを右クリックをします"
 
 #: ../dat/glade/quick-help-window.ui.h:9
 msgid "Either with or without a stack selected"
@@ -1552,27 +1547,27 @@ msgstr "スタックが選択されているかどうかにかかわらず"
 
 #: ../dat/glade/quick-help-window.ui.h:10
 msgid "Move the mini map: left-click"
-msgstr "ミニマップを運動する：left-click"
+msgstr "ミニマップを運動する：左クリック"
 
 #: ../dat/glade/quick-help-window.ui.h:11
 msgid "See opponents stack: right-click on stack"
-msgstr "対戦敵のスタックを見る：スタックをright-clickする"
+msgstr "対戦敵のスタックを見る：スタックを右クリックする"
 
 #: ../dat/glade/quick-help-window.ui.h:12
 msgid "Read sign: right-click on sign"
-msgstr "標識を読む:標識のright-clickします。"
+msgstr "標識を読む:標識の右クリックします。"
 
 #: ../dat/glade/quick-help-window.ui.h:13
 msgid "Ruin information: right-click on ruin"
-msgstr "廃墟情報：廃墟をright-clickします"
+msgstr "廃墟情報：廃墟を右クリックします"
 
 #: ../dat/glade/quick-help-window.ui.h:14
 msgid "Temple information: right-click on temple"
-msgstr "神殿情報: 神殿をright-clickします。"
+msgstr "神殿情報: 神殿を右クリックします。"
 
 #: ../dat/glade/quick-help-window.ui.h:15
 msgid "City information: right-click on city"
-msgstr "都市情報: 都市をright-clickします。"
+msgstr "都市情報: 都市を右クリックします。"
 
 #: ../dat/glade/quick-help-window.ui.h:16
 msgid "Mouse Controls"
@@ -1583,7 +1578,6 @@ msgid "Group/Upgroup stack"
 msgstr "スタックのグループ/グループ解除"
 
 #: ../dat/glade/quick-help-window.ui.h:18
-#, fuzzy
 msgid "space"
 msgstr "Space"
 
@@ -1600,18 +1594,16 @@ msgid "Select next stack"
 msgstr "次のスタックを選ぶ"
 
 #: ../dat/glade/quick-help-window.ui.h:22
-#, fuzzy
 msgid "Return"
-msgstr "戻り値の型が不完全型です"
+msgstr "戻る"
 
 #: ../dat/glade/quick-help-window.ui.h:23
 msgid "Pick up/drop items"
 msgstr "アイテムの選び出す/落とす"
 
 #: ../dat/glade/quick-help-window.ui.h:24
-#, fuzzy
 msgid "comma"
-msgstr "Comma"
+msgstr ", カンマ"
 
 #: ../dat/glade/quick-help-window.ui.h:26
 msgid "Z"
@@ -1639,7 +1631,7 @@ msgstr "戦う順序を表示する"
 
 #: ../dat/glade/quick-help-window.ui.h:32
 msgid "I"
-msgstr "一世"
+msgstr "I"
 
 #: ../dat/glade/quick-help-window.ui.h:33
 msgid "Show stack bonuses"
@@ -1702,9 +1694,8 @@ msgid "Quest report"
 msgstr "クエストレポート"
 
 #: ../dat/glade/quick-help-window.ui.h:48
-#, fuzzy
 msgid "equal"
-msgstr " -b, --blocksize     このブロックサイズを使用します。ページサイズと同じである必要があります"
+msgstr "等しい"
 
 #: ../dat/glade/quick-help-window.ui.h:49
 msgid "Hero report"
@@ -1719,7 +1710,6 @@ msgid "Ruin report"
 msgstr "廃墟レポート"
 
 #: ../dat/glade/quick-help-window.ui.h:52
-#, fuzzy
 msgid "period"
 msgstr "Period"
 
@@ -1732,7 +1722,6 @@ msgid "Load game"
 msgstr "ゲームロード"
 
 #: ../dat/glade/quick-help-window.ui.h:55
-#, fuzzy
 msgid "<alt>l"
 msgstr "Alt+L"
 
@@ -1741,7 +1730,6 @@ msgid "Save game"
 msgstr "ゲームセーブ"
 
 #: ../dat/glade/quick-help-window.ui.h:57
-#, fuzzy
 msgid "<alt>s"
 msgstr "Alt+S"
 
@@ -1750,7 +1738,6 @@ msgid "Game Lobby (networked play)"
 msgstr "ゲームロビー（ネットワークプレイ）"
 
 #: ../dat/glade/quick-help-window.ui.h:59
-#, fuzzy
 msgid "<ctrl>l"
 msgstr "Ctrl+L"
 
@@ -1763,7 +1750,6 @@ msgid "F11"
 msgstr "F11"
 
 #: ../dat/glade/quick-help-window.ui.h:63
-#, fuzzy
 msgid "<ctrl>p"
 msgstr "Ctrl+P"
 
@@ -1772,7 +1758,6 @@ msgid "Toggle grid"
 msgstr "グリッドオプション"
 
 #: ../dat/glade/quick-help-window.ui.h:65
-#, fuzzy
 msgid "<shift>G"
 msgstr "Shift+G"
 
@@ -1781,7 +1766,6 @@ msgid "End turn"
 msgstr "ターンを終わる"
 
 #: ../dat/glade/quick-help-window.ui.h:67
-#, fuzzy
 msgid "<alt>e"
 msgstr "Alt+E"
 
@@ -1794,9 +1778,8 @@ msgid "Army Abilities report"
 msgstr "軍隊能力レポート"
 
 #: ../dat/glade/quick-help-window.ui.h:71
-#, fuzzy
 msgid "O"
-msgstr "モード=%#o\tアクセスパーミッション=%#o\n"
+msgstr "O"
 
 #: ../dat/glade/quick-help-window.ui.h:72
 msgid "Item Abilities report"
@@ -1905,37 +1888,29 @@ msgid "License"
 msgstr "ライセンス"
 
 #: ../dat/glade/editor/armyset-info-dialog.ui.h:8
-#, fuzzy
 msgid "Armies:"
-msgstr ""
-"変更はこちら\n"
-"軍隊の集まるポイント"
+msgstr "軍隊:"
 
 #: ../dat/glade/editor/armyset-info-dialog.ui.h:9
-#, fuzzy
 msgid "Selectors:"
-msgstr "軍隊ユニットセレクター..."
+msgstr "軍隊ユニットセレクター:"
 
 #: ../dat/glade/editor/armyset-info-dialog.ui.h:10
-#, fuzzy
 msgid "Bag:"
 msgstr "バッグ"
 
 #: ../dat/glade/editor/armyset-info-dialog.ui.h:11
-#, fuzzy
 msgid "Ship:"
-msgstr "船画像を確立する必要があります。"
+msgstr "船:"
 
 #: ../dat/glade/editor/armyset-info-dialog.ui.h:12
-#, fuzzy
 msgid "Hero's Flag:"
-msgstr "ヒーローの旗画像..."
+msgstr "ヒーローの旗:"
 
 #: ../dat/glade/editor/armyset-info-dialog.ui.h:13
 #: ../dat/glade/editor/tileset-info-dialog.ui.h:17
-#, fuzzy
 msgid "Images:"
-msgstr "画像"
+msgstr "画像:"
 
 #: ../dat/glade/editor/armyset-info-dialog.ui.h:14
 #: ../dat/glade/editor/map-info-dialog.ui.h:20
@@ -2197,11 +2172,12 @@ msgid "3"
 msgstr "3"
 
 #: ../dat/glade/editor/armyset-window.ui.h:69
-#, fuzzy
 msgid ""
 "Confers Movement\n"
 "Bonus to Stack"
-msgstr "スタックの二重運動"
+msgstr ""
+"動きを与える\n"
+"スタックへのボーナス "
 
 #: ../dat/glade/editor/armyset-window.ui.h:71 ../src/shield.cpp:113
 msgid "White"
@@ -2345,31 +2321,31 @@ msgstr "使用回数"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:14
 msgid "+1 to Hero's Strength"
-msgstr "+1ヒーロー力へ"
+msgstr "ヒーローの力 +1"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:15
 msgid "+2 to Hero's Strength"
-msgstr "+2ヒーロー力へ"
+msgstr "ヒーローの力 +2"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:16
 msgid "+3 to Hero's Strength"
-msgstr "+3ヒーロー力へ"
+msgstr "ヒーローの力 +3"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:17
 msgid "+1 to Stack's Strength"
-msgstr "+1スタック力へ"
+msgstr "スタックの力+1"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:18
 msgid "+2 to Stack's Strength"
-msgstr "+2スタック力へ"
+msgstr "スタックの力+2"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:19
 msgid "+3 to Stack's Strength"
-msgstr "+3スタック力へ"
+msgstr "スタックの力+3"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:20
 msgid "Stack Can Fly"
-msgstr "スタックが飛ぶができる"
+msgstr "スタックは飛べる"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:21
 msgid "Double Movement of Stack"
@@ -2377,19 +2353,19 @@ msgstr "スタックの二重運動"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:22
 msgid "+2 Gold Per City"
-msgstr "+2金都市から"
+msgstr "都市ごとに金+2"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:23
 msgid "+3 Gold Per City"
-msgstr "+3金都市から"
+msgstr "都市ごとに金+3"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:24
 msgid "+4 Gold Per City"
-msgstr "+4金都市から"
+msgstr "都市ごとに金+4"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:25
 msgid "+5 Gold Per City"
-msgstr "+5金都市から"
+msgstr "都市ごとに金+5"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:27
 #, no-c-format
@@ -2398,7 +2374,7 @@ msgstr "敵から%金を盗む"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:28
 msgid "Sink Enemy Ships"
-msgstr "洪水敵船"
+msgstr "敵船を沈没させる"
 
 #: ../dat/glade/editor/itemlist-dialog.ui.h:29
 msgid "Burn Bridge"
@@ -2467,6 +2443,8 @@ msgid ""
 "Destination for Vectored\n"
 "Army Units when Planted"
 msgstr ""
+"ベクトル化の宛先\n"
+"植えられた時の陸軍ユニット"
 
 #: ../dat/glade/editor/main-window.ui.h:3
 msgid "New..."
@@ -2613,7 +2591,7 @@ msgstr "1x1 の風景を作る"
 
 #: ../dat/glade/editor/main-window.ui.h:59
 msgid "Draw 2x2 terrain"
-msgstr "2x2 の風景を描画します。"
+msgstr "2x2 の風景を描画する"
 
 #: ../dat/glade/editor/main-window.ui.h:60
 msgid "Make 2x2 Terrain"
@@ -2629,7 +2607,7 @@ msgstr "3x3の風景を作る"
 
 #: ../dat/glade/editor/main-window.ui.h:63
 msgid "Draw 6x6 terrain"
-msgstr "6x6 の風景を描画します。"
+msgstr "6x6 の風景を描画する"
 
 #: ../dat/glade/editor/main-window.ui.h:64
 msgid "Make 6x6 Terrain"
@@ -2740,12 +2718,10 @@ msgid "Add Bag"
 msgstr "バッグを追加する"
 
 #: ../dat/glade/editor/main-window.ui.h:91
-#, fuzzy
 msgid "Add a Hero's Planted Standard"
-msgstr "ヒーローの標準(旗)の画像を確立する必要があります。"
+msgstr "ヒーローの植えられた標準を追加する"
 
 #: ../dat/glade/editor/main-window.ui.h:92
-#, fuzzy
 msgid "Plant Standard"
 msgstr "旗を置く"
 
@@ -2862,13 +2838,12 @@ msgid "Switch Image Sets"
 msgstr "画像セットを切り替える"
 
 #: ../dat/glade/editor/switch-sets-dialog.ui.h:6
-#, fuzzy
 msgid ""
 "Make All Army Sets\n"
 "the Same as Neutrals"
 msgstr ""
 "すべての画像を作成する\n"
-"白と同じ"
+"ニュートラルと同じ"
 
 #: ../dat/glade/editor/switch-sets-dialog.ui.h:8
 msgid "Army Sets"
@@ -3022,34 +2997,28 @@ msgid "Location::"
 msgstr "場所："
 
 #: ../dat/glade/editor/tileset-info-dialog.ui.h:8
-#, fuzzy
 msgid "Tiles:"
-msgstr "タイル"
+msgstr "タイル:"
 
 #: ../dat/glade/editor/tileset-info-dialog.ui.h:9
-#, fuzzy
 msgid "Tile Styles:"
-msgstr "%1 タイルには、このスタイルの正しい外観がありません。"
+msgstr "タイルスタイル:"
 
 #: ../dat/glade/editor/tileset-info-dialog.ui.h:10
-#, fuzzy
 msgid "Selector:"
-msgstr "選択画面 - リスト"
+msgstr "セレクター:"
 
 #: ../dat/glade/editor/tileset-info-dialog.ui.h:11
-#, fuzzy
 msgid "Explosion:"
-msgstr "爆発画像が必要です。"
+msgstr "爆発:"
 
 #: ../dat/glade/editor/tileset-info-dialog.ui.h:12
-#, fuzzy
 msgid "Roads:"
-msgstr "水上の1つ以上の道路。"
+msgstr "道路:"
 
 #: ../dat/glade/editor/tileset-info-dialog.ui.h:13
-#, fuzzy
 msgid "Bridges:"
-msgstr "地上の 1 つ以上の橋"
+msgstr "橋:"
 
 #: ../dat/glade/editor/tileset-info-dialog.ui.h:14
 msgid "Fog:"
@@ -3060,9 +3029,8 @@ msgid "Flags:"
 msgstr "旗："
 
 #: ../dat/glade/editor/tileset-info-dialog.ui.h:16
-#, fuzzy
 msgid "Move Bonus Images:"
-msgstr "運動ボーナス: %1"
+msgstr "運動ボーナス絵画: "
 
 #: ../dat/glade/editor/tileset-selector-editor-dialog.ui.h:1
 #: ../dat/glade/editor/armyset-selector-editor-dialog.ui.h:1
@@ -3086,9 +3054,8 @@ msgid "Image"
 msgstr "画像"
 
 #: ../dat/glade/editor/armyset-selector-editor-dialog.ui.h:7
-#, fuzzy
 msgid "These selectors override the one in the tileset."
-msgstr "タイルセットには少なくとも1つのタイルが必要です。"
+msgstr "これらのセレクターは、タイルセット内のセレクターをオーバーライドします。。"
 
 #: ../dat/glade/editor/tileset-flag-editor-dialog.ui.h:1
 msgid "Flag Details"
@@ -3141,14 +3108,12 @@ msgid "Organize TileStyles..."
 msgstr "タイルスタイルを整理します..."
 
 #: ../dat/glade/editor/tileset-window.ui.h:21
-#, fuzzy
 msgid "Mini-Map Building Colors..."
 msgstr "ミニマップビルダーの色"
 
 #: ../dat/glade/editor/tileset-window.ui.h:22
-#, fuzzy
 msgid "Move Bonus Images..."
-msgstr "運動ボーナス: %1"
+msgstr "運動ボーナス絵画"
 
 #: ../dat/glade/editor/tileset-window.ui.h:24
 msgid "Preview Tile..."
@@ -3166,23 +3131,20 @@ msgstr "パターン"
 #: ../dat/glade/editor/tileset-window.ui.h:34
 #: ../dat/glade/editor/shieldset-window.ui.h:20
 #: ../src/editor/tileset-editor-actions.h:280
-#, fuzzy
 msgid "First Color"
-msgstr "一番目"
+msgstr "一番目の色"
 
 #: ../dat/glade/editor/tileset-window.ui.h:35
 #: ../dat/glade/editor/shieldset-window.ui.h:24
 #: ../src/editor/tileset-editor-actions.h:282
-#, fuzzy
 msgid "Second Color"
-msgstr "二番目"
+msgstr "二番目の色"
 
 #: ../dat/glade/editor/tileset-window.ui.h:36
 #: ../dat/glade/editor/shieldset-window.ui.h:25
 #: ../src/editor/tileset-editor-actions.h:284
-#, fuzzy
 msgid "Third Color"
-msgstr "三番目"
+msgstr "三番目の色"
 
 #: ../dat/glade/editor/tileset-window.ui.h:37
 msgid "Tile"
@@ -3247,7 +3209,6 @@ msgid "Save changes before closing?"
 msgstr "閉じる前に変更を保存しますか?"
 
 #: ../dat/glade/editor/tileset-smallmap-building-colors-dialog.ui.h:1
-#, fuzzy
 msgid "Colors of Buildings on the Miniature Map"
 msgstr "ミニマップ上の建物の色"
 
@@ -3366,9 +3327,8 @@ msgid "Center Tartan"
 msgstr "中央"
 
 #: ../dat/glade/editor/shieldset-window.ui.h:26
-#, fuzzy
 msgid "Mask Colors"
-msgstr "フォントと色"
+msgstr "マスクの色"
 
 #: ../dat/glade/editor/shieldset-info-dialog.ui.h:7
 msgid ""
@@ -3582,77 +3542,48 @@ msgid "Heroes"
 msgstr "ヒーロー"
 
 #: ../dat/glade/editor/heroes-dialog.ui.h:4
-#, fuzzy
 msgid "Starting Items"
-msgstr "アイテム..."
+msgstr "スタートアイテム"
 
 #: ../dat/glade/editor/heroes-dialog.ui.h:5
-#, fuzzy
 msgid "Strategy"
-msgstr "ターンベースの戦略ゲーム"
+msgstr "戦略"
 
 #: ../dat/glade/editor/strategy-editor-dialog.ui.h:1
-#, fuzzy
 msgid "Hero Strategy"
-msgstr "ヒーロー"
+msgstr "ヒーロー戦略"
 
 #: ../dat/glade/editor/strategy-editor-dialog.ui.h:2
-#, fuzzy
 msgid "Type of Strategy"
-msgstr "ターンベースの戦略ゲーム"
+msgstr "戦略のタイプ"
 
 #: ../dat/glade/editor/strategy-editor-dialog.ui.h:3
-#, fuzzy
 msgid "page 1"
-msgstr ""
-"-------------------------------------------------------\n"
-"  h                       この画面を表示します\n"
-"  q または Q              プログラムを終了します\n"
-"  <newline>               次のページに移動します\n"
-"  f                       1 ページ分だけ次に移動します\n"
-"  d または ^D             半ページ分だけ次に移動します\n"
-"  l                       次の行に移動します\n"
-"  $                       最終ページに移動します\n"
-"  /regex/                 正規表現で前進検索を行ないます\n"
-"  ?regex? または ^regex^  正規表現で後退検査を行ないます\n"
-"  . または ^L             画面を再描画します\n"
-"  w または z              ページサイズを設定し、次のページに移動します\n"
-"  s ファイル名            現在のファイルを指定したファイル名に保存します\n"
-"  !コマンド               シェルを実行します\n"
-"  p                       前のファイルに移動します\n"
-"  n                       次のファイルに移動します\n"
-"\n"
-"ほとんどのコマンドの前には、整数を指定することができます。たとえば:\n"
-"+1<newline> (次のページ); -1<newline> (前のページ); 1<newline> (最初のページ)\n"
-"\n"
-"詳しくは pg(1) をお読みください。\n"
-"-------------------------------------------------------\n"
+msgstr "ページ1"
 
 #: ../dat/glade/editor/strategy-editor-dialog.ui.h:6
 msgid ""
 "Change the strategy\n"
 "after this many turns."
 msgstr ""
+"戦略を変更する\n"
+"この多くのターンの後。"
 
 #: ../dat/glade/editor/strategy-editor-dialog.ui.h:8
-#, fuzzy
 msgid "page 2"
-msgstr "ページ"
+msgstr "ページ2"
 
 #: ../dat/glade/editor/strategy-editor-dialog.ui.h:9
-#, fuzzy
 msgid "Fallback Strategy"
-msgstr "ターンベースの戦略ゲーム"
+msgstr "フォールバック戦略"
 
 #: ../dat/glade/editor/strategy-editor-dialog.ui.h:10
-#, fuzzy
 msgid "Number of Helpers"
-msgstr " -<数値>                '-n <数値>' と同じ\n"
+msgstr "ヘルパーの数"
 
 #: ../dat/glade/editor/strategy-editor-dialog.ui.h:12
-#, fuzzy
 msgid "page 3"
-msgstr "ページ"
+msgstr "ページ3"
 
 #: ../dat/glade/editor/keeper-dialog.ui.h:1
 msgid "Ruin Keeper Details"
@@ -3668,12 +3599,11 @@ msgstr "ランダム管理人"
 
 #: ../dat/glade/editor/mask-validation-dialog.ui.h:1
 msgid "Identify Masks"
-msgstr ""
+msgstr "マスクの識別"
 
 #: ../dat/glade/editor/mask-validation-dialog.ui.h:2
-#, fuzzy
 msgid "Masks"
-msgstr " -x, --hex               CPU をリストではなく 16 進数のマスク形式で表示します\n"
+msgstr "マスク"
 
 #: ../dat/glade/editor/mask-validation-dialog.ui.h:3
 msgid ""
@@ -3681,94 +3611,81 @@ msgid ""
 "does this image\n"
 "have?"
 msgstr ""
+"マスクの数\n"
+"この画像を行います\n"
+"持っていますか?"
 
 #: ../dat/glade/editor/planted-standard-editor-dialog.ui.h:1
-#, fuzzy
 msgid "Planted Standard Details"
-msgstr "普通"
+msgstr "植えられた標準の詳細"
 
 #: ../dat/glade/editor/planted-standard-editor-dialog.ui.h:3
-#, fuzzy
 msgid "Original Owner"
-msgstr "所有者"
+msgstr "元の所有者"
 
 #: ../dat/glade/editor/item-editor-dialog.ui.h:3
-#, fuzzy
 msgid "Number of Uses Left"
-msgstr "使用回数"
+msgstr "残りの使用回数"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:1
-#, fuzzy
 msgid "Move Bonus Images"
-msgstr "運動ボーナス: %1"
+msgstr "運動ボーナス絵画"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:7
 msgid "All"
 msgstr "全て"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:8
-#, fuzzy
 msgid "Tile Types"
-msgstr "タイル"
+msgstr "タイルのタイプ"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:9
-#, fuzzy
 msgid "(Scaled 2x)"
-msgstr "サイズ調整(_S)"
+msgstr "(スケール2倍)"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:10
-#, fuzzy
 msgid "Forest/Hills"
-msgstr "丘"
+msgstr "森/丘"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:11
-#, fuzzy
 msgid "Forest/Mountains"
-msgstr "森"
+msgstr "森/山"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:12
-#, fuzzy
 msgid "Forest/Swamp"
-msgstr "森"
+msgstr "森/沼"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:13
-#, fuzzy
 msgid "Hills/Mountains"
-msgstr "丘"
+msgstr "丘/山"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:14
-#, fuzzy
 msgid "Hills/Swamp"
-msgstr "丘"
+msgstr "丘/沼"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:15
-#, fuzzy
 msgid "Mountains/Swamp"
-msgstr "山"
+msgstr "山/沼"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:16
-#, fuzzy
 msgid "Forest/Hills/Mountains"
-msgstr "森"
+msgstr "森/丘/山"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:17
-#, fuzzy
 msgid "Forest/Hills/Swamp"
-msgstr "森"
+msgstr "森/丘/沼"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:18
-#, fuzzy
 msgid "Forest/Mountains/Swamp"
-msgstr "山"
+msgstr "森/山/沼"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:19
-#, fuzzy
 msgid "Hills/Mountains/Swamp"
-msgstr "山"
+msgstr "丘/山/沼"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:20
 msgid "Forest/Hills/Mountains/Swamp"
-msgstr ""
+msgstr "森/丘/山/沼"
 
 #: ../dat/glade/editor/tileset-move-bonus-image-dialog.ui.h:21
 msgid "Preview"
@@ -4134,9 +4051,8 @@ msgid "The scenario does not have a name."
 msgstr "シナリオに名前がありません。"
 
 #: ../src/GameScenario.cpp:1154
-#, fuzzy
 msgid "Neutrals have one or more heroes."
-msgstr "いくつかのファイルが変更されています."
+msgstr "ニュートラルには1人以上のヒーローがいる."
 
 #: ../src/GameScenario.cpp:1163
 msgid "The player called `%1' lacks a capital city."
@@ -4144,7 +4060,7 @@ msgstr "`%1' という名前のプレイヤーは、資本を欠いています�
 
 #: ../src/GameScenario.cpp:1178
 msgid "The hero type called `%1' belonging to '%2' has bad starting items."
-msgstr ""
+msgstr "'%2' に属する '%1' というヒーロータイプの開始項目が無効です。"
 
 #: ../src/GameScenario.cpp:1189
 msgid "The player called `%1' lacks a hero."
@@ -4152,7 +4068,7 @@ msgstr "`%1' という名前のプレイヤーにはヒーローが欠けてい�
 
 #: ../src/GameScenario.cpp:1203
 msgid "The hero `%1' belonging to '%2' has a bad hero type."
-msgstr ""
+msgstr "'%2' に属するヒーロー '%1' は、ヒーロータイプが悪い。"
 
 #: ../src/GameScenario.cpp:1217
 msgid "There is %1 unnamed city"
@@ -4161,14 +4077,12 @@ msgstr[0] "ここに%1の無名都市があります"
 
 #: ../src/GameScenario.cpp:1224 ../src/GameScenario.cpp:1249
 #: ../src/GameScenario.cpp:1286
-#, fuzzy
 msgid " (at %1,%2)"
-msgstr "(%1, %2)"
+msgstr "(%1で, %2)"
 
 #: ../src/GameScenario.cpp:1229
-#, fuzzy
 msgid "An unnamed city is at %1,%2"
-msgstr "ここに%1の無名都市があります"
+msgstr "名前のない都市は %1,%2 です"
 
 #: ../src/GameScenario.cpp:1243
 msgid "There is %1 unnamed ruin"
@@ -4176,9 +4090,8 @@ msgid_plural "There are %1 unnamed ruins"
 msgstr[0] "ここに%1の無名の廃墟があります"
 
 #: ../src/GameScenario.cpp:1254
-#, fuzzy
 msgid "An unnamed ruin is at %1,%2"
-msgstr "ここに%1の無名の廃墟があります"
+msgstr "名前のない廃墟は %1,%2 です"
 
 #: ../src/GameScenario.cpp:1280
 msgid "There is %1 unnamed temple"
@@ -4186,9 +4099,8 @@ msgid_plural "There are %1 unnamed temples"
 msgstr[0] "ここに%1の無名の神殿があります"
 
 #: ../src/GameScenario.cpp:1291
-#, fuzzy
 msgid "An unnamed temple is at %1,%2"
-msgstr "ここに%1の無名の神殿があります"
+msgstr "無名の神殿は %1,%2 にあります"
 
 #: ../src/GameScenario.cpp:1307
 msgid "There is %1 neutral stack not in a city"
@@ -4228,24 +4140,20 @@ msgid "One or more signs are on water."
 msgstr "水上の1つ以上の標識"
 
 #: ../src/GameScenario.cpp:1338
-#, fuzzy
 msgid "The item \"%1\" doesn't have an army type specified for Kill All Units Of Giant Worms"
-msgstr "%1 には、巨大なワームのすべてのユニットを殺すために特化した種類の軍隊がありません"
+msgstr "アイテム \"%1\"には、巨大ワームのすべてのユニットを殺すために指定された軍のタイプがありません"
 
 #: ../src/GameScenario.cpp:1342
-#, fuzzy
 msgid "The item \"%1\" doesn't have an army type specified for Summon Monster"
-msgstr "%1 にはモンスターを呼び出す特殊な種類の軍隊がありません"
+msgstr "アイテム \"%1\" には、召喚モンスターに指定された軍の種類がありません"
 
 #: ../src/GameScenario.cpp:1346
-#, fuzzy
 msgid "The item \"%1\" doesn't have an army type specified for Raise Defenders In City"
-msgstr "%1 には、市内の防御者を上げる種類の軍隊がありません"
+msgstr "アイテム \"%1\"には、都市でディフェンダーを育てるに指定された軍の種類がありません"
 
 #: ../src/GameScenario.cpp:1349
-#, fuzzy
 msgid "The item \"%1\" lacks a bonus"
-msgstr "ボーナス: %1"
+msgstr "アイテム\"%1\"にはボーナスがありません"
 
 #: ../src/QKillHero.cpp:108
 msgid "You're still searching for him..."
@@ -5540,9 +5448,8 @@ msgid "%1 has burned a bridge!  None shall pass this way again!"
 msgstr "%1が橋を燃やしました！ 誰もこの道を再び通過することはありません！"
 
 #: ../src/gui/game-window.cpp:2941
-#, fuzzy
 msgid "%1 has turned %2 from %3!"
-msgstr "%1は%3から%2の単位になりました！"
+msgstr "%1 は %3 から %2 に変わりました!"
 
 #: ../src/gui/game-window.cpp:2951
 msgid "%1 unit in %2 have perished!"
@@ -5655,9 +5562,8 @@ msgid "Server Failure"
 msgstr "サーバー障害"
 
 #: ../src/gui/driver.cpp:656
-#, fuzzy
 msgid "Uploading..."
-msgstr "アプロード"
+msgstr "アプロード。。。"
 
 #: ../src/gui/driver.cpp:808
 msgid "Server went away."
@@ -5883,9 +5789,8 @@ msgid "Your armies have won the city!"
 msgstr "あなたの軍隊は街を獲得しました!"
 
 #: ../src/gui/fight-window.cpp:117
-#, fuzzy
 msgid "%1 has won the battle!"
-msgstr "戦闘が勝った"
+msgstr "%1 が戦いに勝ちました!"
 
 #: ../src/gui/fight-window.cpp:120
 msgid "You have lost!"
@@ -5994,6 +5899,9 @@ msgid ""
 "We'd like to automatically fix this for you but we can't!\n"
 "You must manually fix them."
 msgstr ""
+"このアイテムを削除すると、1 つ以上のヒーローの開始アイテムが破損しています。\n"
+"私たちは自動的にあなたのためにこれを修正したいと思いますが、私たちはできません!\n"
+"手動で修正する必要があります。"
 
 #: ../src/editor/armyset-info-dialog.cpp:73
 #: ../src/editor/armyset-info-dialog.cpp:76
@@ -6005,9 +5913,8 @@ msgstr ""
 #: ../src/editor/tileset-info-dialog.cpp:75
 #: ../src/editor/tileset-info-dialog.cpp:78
 #: ../src/editor/tileset-info-dialog.cpp:81
-#, fuzzy
 msgid "Not present"
-msgstr " -p, --present <時刻>     指定した時刻にログインしていたユーザを表示します\n"
+msgstr "現在ではない"
 
 #: ../src/editor/armyset-info-dialog.cpp:73
 #: ../src/editor/armyset-info-dialog.cpp:76
@@ -6019,9 +5926,8 @@ msgstr " -p, --present <時刻>     指定した時刻にログインしてい�
 #: ../src/editor/tileset-info-dialog.cpp:75
 #: ../src/editor/tileset-info-dialog.cpp:78
 #: ../src/editor/tileset-info-dialog.cpp:81
-#, fuzzy
 msgid "Present"
-msgstr " -p, --present <時刻>     指定した時刻にログインしていたユーザを表示します\n"
+msgstr "現在"
 
 #: ../src/editor/armyset-info-dialog.cpp:109
 #: ../src/editor/cityset-info-dialog.cpp:89
@@ -6237,18 +6143,16 @@ msgstr "画像を追加する"
 
 #: ../src/editor/armyset-editor-actions.h:214
 #: ../src/editor/cityset-editor-actions.h:167
-#, fuzzy
 msgid "Clear Image"
-msgstr "クリア"
+msgstr "絵画をクリア"
 
 #: ../src/editor/armyset-editor-actions.h:316
 msgid "Copy White Army"
 msgstr "白い軍隊をコピー"
 
 #: ../src/editor/armyset-editor-actions.h:341
-#, fuzzy
 msgid "Reorder"
-msgstr "文書を並べ替える"
+msgstr "並べ替える"
 
 #: ../src/editor/armyset-editor-actions.h:366
 msgid "Add Army"
@@ -6263,43 +6167,29 @@ msgid "Id"
 msgstr "Id"
 
 #: ../src/editor/armyset-editor-actions.h:737
-#, fuzzy
 msgid "Faster In Forests"
-msgstr ""
-"より速く移動する\n"
-"森の中で"
+msgstr "森の中でより速く移動する"
 
 #: ../src/editor/armyset-editor-actions.h:760
-#, fuzzy
 msgid "Faster In Marshland"
-msgstr ""
-"より速く移動する\n"
-"沼地で"
+msgstr "沼地でより速く移動する"
 
 #: ../src/editor/armyset-editor-actions.h:783
-#, fuzzy
 msgid "Faster In Hills"
-msgstr ""
-"より速く移動する\n"
-"丘の中で"
+msgstr "丘の中でより速く移動する"
 
 #: ../src/editor/armyset-editor-actions.h:806
-#, fuzzy
 msgid "Faster In Mountains"
-msgstr ""
-"より速く移動する\n"
-"山の中で"
+msgstr "山の中でより速く移動する"
 
 #: ../src/editor/armyset-editor-actions.h:828
-#, fuzzy
 msgid "Fly"
-msgstr "スタックが飛ぶができる"
+msgstr "飛ぶ"
 
 #: ../src/editor/armyset-editor-actions.h:852
 #: ../src/editor/tileset-editor-actions.h:473
-#, fuzzy
 msgid "Selector"
-msgstr "選択画面 - リスト"
+msgstr "セレクター"
 
 #: ../src/editor/cityset-window.cpp:125
 msgid "Select a Cities image"
@@ -6318,19 +6208,16 @@ msgid "Select a Signpost image"
 msgstr "道路標識画像を選択する"
 
 #: ../src/editor/cityset-window.cpp:145
-#, fuzzy
 msgid "Select a Ruin image"
-msgstr "隠された廃墟を選ぶ"
+msgstr "廃墟の絵画を選択する"
 
 #: ../src/editor/cityset-window.cpp:150
-#, fuzzy
 msgid "Select a Temple image"
-msgstr "船の絵画を選択します。"
+msgstr "神殿のイメージを選択する"
 
 #: ../src/editor/cityset-window.cpp:155
-#, fuzzy
 msgid "Select a Tower image"
-msgstr "船の絵画を選択します。"
+msgstr "タワーの絵画を選択する。"
 
 #: ../src/editor/cityset-window.cpp:234
 msgid "Save these changes before making a new City Set?"
@@ -6369,9 +6256,8 @@ msgid "The towers picture is not set."
 msgstr "タワーの画像は確立されていません。"
 
 #: ../src/editor/cityset-window.cpp:298
-#, fuzzy
 msgid "The tile width for cities must be over zero."
-msgstr "神殿のタイルの幅は 0 を超える必要があります。"
+msgstr "都市のタイルの幅は 0 以上である必要があります。"
 
 #: ../src/editor/cityset-window.cpp:300
 msgid "The tile width for ruins must be over zero."
@@ -6500,9 +6386,8 @@ msgid "Could not load map %1."
 msgstr "マップ%1 をロードできません。"
 
 #: ../src/editor/main-window.cpp:1010 ../src/editor/main-window.cpp:1057
-#, fuzzy
 msgid "Scenario was not saved!"
-msgstr "シナリオの名前"
+msgstr "シナリオは保存されませんでした！"
 
 #: ../src/editor/main-window.cpp:1352
 msgid "Auto"
@@ -6518,18 +6403,16 @@ msgid "Standing Stone"
 msgstr "立石"
 
 #: ../src/editor/main-window.cpp:1666
-#, fuzzy
 msgid "Planted Standard"
-msgstr "普通"
+msgstr "植えられた旗"
 
 #: ../src/editor/main-window.cpp:1677
 msgid "Bag"
 msgstr "バッグ"
 
 #: ../src/editor/main-window.cpp:2163
-#, fuzzy
 msgid "Save these changes before importing a game?"
-msgstr "閉じる前に\"%s\"に行われた変更を保存しますか？"
+msgstr "ゲームをインポートする前にこれらの変更を保存しますか?"
 
 #: ../src/editor/main-window.cpp:2166
 msgid "Choose Game to Load Map from"
@@ -6571,69 +6454,56 @@ msgid "The Scenario is invalid.  Do you want to proceed?"
 msgstr "シナリオは間違っています。続行しますか?"
 
 #: ../src/editor/editor-actions.h:315
-#, fuzzy
 msgid "Erase"
-msgstr "bootbits セクタを消去できません"
+msgstr "消去"
 
 #: ../src/editor/editor-actions.h:479
-#, fuzzy
 msgid "Sign"
-msgstr "標識を読む:標識のright-clickします。"
+msgstr "署名"
 
 #: ../src/editor/editor-actions.h:571
-#, fuzzy
 msgid "Flag"
-msgstr "' ' フラグ"
+msgstr "フラグ"
 
 #: ../src/editor/editor-actions.h:595
-#, fuzzy
 msgid "Edit Flag"
-msgstr "' ' フラグ"
+msgstr "フラグの編集"
 
 #: ../src/editor/editor-actions.h:619
-#, fuzzy
 msgid "Edit Stack"
-msgstr "編集(_E)"
+msgstr "スタックの編集"
 
 #: ../src/editor/editor-actions.h:643
-#, fuzzy
 msgid "Edit City"
-msgstr "都市で"
+msgstr "都市の編集"
 
 #: ../src/editor/editor-actions.h:667
-#, fuzzy
 msgid "Edit Ruin"
-msgstr "廃墟で"
+msgstr "廃墟の編集"
 
 #: ../src/editor/editor-actions.h:691
-#, fuzzy
 msgid "Edit Temple"
-msgstr "神殿で"
+msgstr "神殿の編集"
 
 #: ../src/editor/editor-actions.h:715
-#, fuzzy
 msgid "Edit Stone"
-msgstr "石"
+msgstr "石の編集"
 
 #: ../src/editor/editor-actions.h:740
-#, fuzzy
 msgid "Edit Sign"
-msgstr "標識を追加する"
+msgstr "署名の編集"
 
 #: ../src/editor/editor-actions.h:764
-#, fuzzy
 msgid "Edit Backpack"
-msgstr "バックパックの中で"
+msgstr "バックパックの編集"
 
 #: ../src/editor/editor-actions.h:787
-#, fuzzy
 msgid "Edit Road"
-msgstr "道路上で"
+msgstr "道路の編集"
 
 #: ../src/editor/editor-actions.h:796
-#, fuzzy
 msgid "Miniature Map"
-msgstr "ミニマップ..."
+msgstr "ミニマップ"
 
 #: ../src/editor/editor-actions.h:804
 #: ../src/gui/network-game-selector-dialog.cpp:54
@@ -6642,69 +6512,56 @@ msgid "Players"
 msgstr "プレイヤー"
 
 #: ../src/editor/editor-actions.h:829
-#, fuzzy
 msgid "Smooth Map"
-msgstr "全てマップをスムーズする"
+msgstr "マップをスムーズする"
 
 #: ../src/editor/editor-actions.h:837
-#, fuzzy
 msgid "Switch Sets"
-msgstr "画像セットを切り替える"
+msgstr "セットを切り替える"
 
 #: ../src/editor/editor-actions.h:909
-#, fuzzy
 msgid "Random All Cities"
-msgstr "全ての都市"
+msgstr "全ての都市をランダムする"
 
 #: ../src/editor/editor-actions.h:917
-#, fuzzy
 msgid "Random Unnamed Cities"
-msgstr "無名の都市"
+msgstr "無名の都市をランダムする"
 
 #: ../src/editor/editor-actions.h:925
-#, fuzzy
 msgid "Random All Ruins"
-msgstr "全ての廃墟"
+msgstr "全ての廃墟をランダムする"
 
 #: ../src/editor/editor-actions.h:933
-#, fuzzy
 msgid "Random Unnamed Ruins"
-msgstr "無名の廃墟"
+msgstr "無名の廃墟をランダムする"
 
 #: ../src/editor/editor-actions.h:941
-#, fuzzy
 msgid "Random All Temples"
-msgstr "全ての神殿"
+msgstr "全ての神殿をランダムする"
 
 #: ../src/editor/editor-actions.h:949
-#, fuzzy
 msgid "Random Unnamed Temples"
-msgstr "無名の神殿"
+msgstr "無名の神殿をランダムする"
 
 #: ../src/editor/editor-actions.h:957
-#, fuzzy
 msgid "Random All Signs"
-msgstr "全ての標識"
+msgstr "全ての標識をランダムする"
 
 #: ../src/editor/editor-actions.h:965
-#, fuzzy
 msgid "Random Unnamed Signs"
-msgstr "無名の標識"
+msgstr "無名の標識をランダムする"
 
 #: ../src/editor/undo-mgr.cpp:264
-#, fuzzy
 msgid "Undo %1"
-msgstr "やり直す(_U)"
+msgstr "%1元に戻す"
 
 #: ../src/editor/undo-mgr.cpp:266
-#, fuzzy
 msgid "Redo %1"
-msgstr "元に戻す(_R)"
+msgstr "%1やり直す"
 
 #: ../src/editor/ruin-editor-dialog.cpp:78
-#, fuzzy
 msgid "Hero's player"
-msgstr "プレーヤー"
+msgstr "ヒーローのプレーヤー"
 
 #: ../src/editor/ruin-editor-dialog.cpp:117
 #: ../src/editor/ruin-editor-dialog.cpp:122
@@ -6756,9 +6613,8 @@ msgid "%1, %2 empty"
 msgstr "％1、％2は空です"
 
 #: ../src/editor/reward-editor-dialog.cpp:278
-#, fuzzy
 msgid "No item set"
-msgstr "項目"
+msgstr "アイテムセットなし"
 
 #: ../src/editor/reward-editor-dialog.cpp:405
 msgid "No Ruin"
@@ -7025,34 +6881,28 @@ msgid "A set of flag images are required."
 msgstr "旗セットの画像が必要です。"
 
 #: ../src/editor/tileset-window.cpp:1720
-#, fuzzy
 msgid "An all (flight) movement bonus image is required."
-msgstr "小さなセレクター画像が必要です。"
+msgstr "全 (飛行) 運動ボーナス画像が必要です。"
 
 #: ../src/editor/tileset-window.cpp:1722
-#, fuzzy
 msgid "A water movement bonus image is required."
-msgstr "大きなセレクター画像が必要です。"
+msgstr "水の動きのボーナス画像が必要です。"
 
 #: ../src/editor/tileset-window.cpp:1724
-#, fuzzy
 msgid "A forest movement bonus image is required."
-msgstr "大きなセレクター画像が必要です。"
+msgstr "森の動きのボーナス画像が必要です。"
 
 #: ../src/editor/tileset-window.cpp:1726
-#, fuzzy
 msgid "A hills movement bonus image is required."
-msgstr "小さなセレクター画像が必要です。"
+msgstr "丘の動きのボーナス画像が必要です。"
 
 #: ../src/editor/tileset-window.cpp:1728
-#, fuzzy
 msgid "A mountains movement bonus image is required."
-msgstr "立石の画像が必要です。"
+msgstr "山の動きのボーナス画像が必要です。"
 
 #: ../src/editor/tileset-window.cpp:1730
-#, fuzzy
 msgid "A swamp movement bonus image is required."
-msgstr "小さなセレクター画像が必要です。"
+msgstr "沼の動きのボーナス画像が必要です。"
 
 #: ../src/editor/tileset-window.cpp:1733
 msgid "The name of the Tile Set is not unique."
@@ -7103,82 +6953,68 @@ msgstr ""
 "代わりに'%1'に変更しますか?."
 
 #: ../src/editor/tileset-editor-actions.h:341
-#, fuzzy
 msgid "Add TileStyle Set"
-msgstr "タイルスタイルセット画像"
+msgstr "タイルスタイルセットの追加"
 
 #: ../src/editor/tileset-editor-actions.h:367
-#, fuzzy
 msgid "Remove TileStyle Set"
-msgstr "タイルスタイルセット画像"
+msgstr "タイルスタイルセットの削除"
 
 #: ../src/editor/tileset-editor-actions.h:393
-#, fuzzy
 msgid "TileStyle Type"
-msgstr "タイルスタイルId"
+msgstr "タイルスタイルタイプ"
 
 #: ../src/editor/tileset-editor-actions.h:424
-#, fuzzy
 msgid "Add Tile"
-msgstr "追加"
+msgstr "タイルの追加"
 
 #: ../src/editor/tileset-editor-actions.h:449
-#, fuzzy
 msgid "Remove Tile"
-msgstr "削除"
+msgstr "タイルの削除"
 
 #: ../src/editor/tileset-editor-actions.h:497
-#, fuzzy
 msgid "Explosion"
-msgstr "爆発画像が必要です。"
+msgstr "爆発"
 
 #: ../src/editor/tileset-editor-actions.h:521
-#, fuzzy
 msgid "Roads"
-msgstr "水上の1つ以上の道路。"
+msgstr "道路"
 
 #: ../src/editor/tileset-editor-actions.h:545
-#, fuzzy
 msgid "Stones"
-msgstr "立石画像..."
+msgstr "石石"
 
 #: ../src/editor/tileset-editor-actions.h:569
-#, fuzzy
 msgid "Bridges"
-msgstr "地上の 1 つ以上の橋"
+msgstr "橋橋"
 
 #: ../src/editor/tileset-editor-actions.h:593
-#, fuzzy
 msgid "Fog"
-msgstr "霧:"
+msgstr "霧"
 
 #: ../src/editor/tileset-editor-actions.h:617
 msgid "Flags"
 msgstr "フラグ"
 
 #: ../src/editor/tileset-editor-actions.h:641
-#, fuzzy
 msgid "TileStyles"
-msgstr "未分類タイルスタイル"
+msgstr "タイルスタイル"
 
 #: ../src/editor/tileset-editor-actions.h:667
-#, fuzzy
 msgid "Building Colors"
-msgstr "フォントと色"
+msgstr "建物の色"
 
 #: ../src/editor/tileset-editor-actions.h:692
-#, fuzzy
 msgid "Move Bonus"
-msgstr "運動ボーナス: %1"
+msgstr "運動ボーナス"
 
 #: ../src/editor/tilestyle-organizer-dialog.cpp:235
 msgid "(%1 items)"
 msgstr "(%1アイテム)"
 
 #: ../src/editor/tilestyle-organizer-dialog.cpp:553
-#, fuzzy
 msgid "Select All"
-msgstr "すべて選択"
+msgstr "すべての選択"
 
 #: ../src/editor/hero-editor-dialog.cpp:125
 msgid "Carrying %1 item"
@@ -7187,9 +7023,8 @@ msgstr[0] "%1アイテムを運ぶ"
 
 #: ../src/editor/hero-editor-dialog.cpp:131
 #: ../src/editor/hero-editor-dialog.cpp:141
-#, fuzzy
 msgid "No character set"
-msgstr " -iso                  DOS と ISO-8859-1 文字セット間で変換する\n"
+msgstr "文字セットなし"
 
 #: ../src/editor/shieldset-window.cpp:201
 msgid "Save these changes before making a new Shield Set?"
@@ -7309,12 +7144,11 @@ msgstr "シールドセットの画像をロードできません。"
 #: ../src/editor/image-editor-dialog.cpp:225
 #: ../src/editor/tar-file-masked-image-editor-dialog.cpp:291
 #: ../src/editor/tileset-explosion-picture-editor-dialog.cpp:124
-#, fuzzy
 msgid ""
 "Bad dimensions in image:\n"
 "%1"
 msgstr ""
-"画像を理解できませんでした：\n"
+"画像の寸法が正しくありません:\n"
 "%1"
 
 #: ../src/editor/shieldset-window.cpp:1173
@@ -7452,22 +7286,22 @@ msgid ""
 "We'd like to automatically fix this for you but we can't!\n"
 "You must manually fix them."
 msgstr ""
+"ヒーロータイプを削除すると、ヒーローを壊すことができます。\n"
+"私たちは自動的にあなたのためにこれを修正したいと思いますが、私たちはできません!\n"
+"手動で修正する必要があります。"
 
 #: ../src/editor/heroes-dialog.cpp:360 ../src/editor/heroes-dialog.cpp:380
-#, fuzzy
 msgid "No strategy set"
-msgstr "ターンベースの戦略ゲーム"
+msgstr "戦略が設定されていません"
 
 #: ../src/editor/heroes-dialog.cpp:366 ../src/editor/heroes-dialog.cpp:381
-#, fuzzy
 msgid "No starting items"
-msgstr "アイテム..."
+msgstr "スタートアイテムはありません"
 
 #: ../src/editor/heroes-dialog.cpp:369
-#, fuzzy
 msgid "Starting with %1 item"
 msgid_plural "Starting with %1 items"
-msgstr[0] "あなたが%1 アイテムをあります。"
+msgstr[0] "%1アイテムを持ってにスタートする"
 
 #: ../src/editor/army-chooser-button.cpp:76
 msgid "No army type selected"
@@ -7696,16 +7530,15 @@ msgstr "グループ解除"
 
 #: ../src/hero-strategy.h:90
 msgid "Acts like any other stack"
-msgstr ""
+msgstr "他のスタックと同様に動作します。"
 
 #: ../src/hero-strategy.h:108
 msgid "Switches strategies every so often"
-msgstr ""
+msgstr "頻繁に戦略を切り替える"
 
 #: ../src/hero-strategy.h:129
-#, fuzzy
 msgid "Goes on quests with help"
-msgstr "クエストなし"
+msgstr "助けを借りてクエストに行く"
 
 #: ../src/xmlhelper.cpp:61
 msgid "Error opening `%1' for reading.  Exiting."
@@ -7752,99 +7585,80 @@ msgid "Error loading music descriptions; disabling music."
 msgstr "音楽の説明をロードするエラー。私は音楽をオフにします。"
 
 #: ../src/armybase.cpp:82
-#, fuzzy
 msgid "+3 Str In Open"
 msgstr "+3力オープンで"
 
 #: ../src/armybase.cpp:91
-#, fuzzy
 msgid "+3 Str In Forest"
-msgstr "＋２力森の中で"
+msgstr "＋3力森の中で"
 
 #: ../src/armybase.cpp:100
-#, fuzzy
 msgid "+3 Str In Hills"
 msgstr "+3力丘で"
 
 #: ../src/armybase.cpp:110
-#, fuzzy
 msgid "+3 Str In City"
 msgstr "+3力都市で"
 
 #: ../src/armybase.cpp:125
-#, fuzzy
 msgid "-3 Enemy Stack"
 msgstr "-3敵スタック"
 
 #: ../src/armybase.cpp:134
-#, fuzzy
 msgid "+3 Stack"
 msgstr "+3スタック"
 
 #: ../src/armybase.cpp:206
-#, fuzzy
 msgid "+2 Str In Open"
 msgstr "+2力オープンエリアの中で"
 
 #: ../src/armybase.cpp:209
-#, fuzzy
 msgid "+1 Str In City"
 msgstr "＋1力都市の中で"
 
 #: ../src/armybase.cpp:210
-#, fuzzy
 msgid "+2 Str In City"
 msgstr "+2力都市の中で"
 
 #: ../src/armybase.cpp:211
-#, fuzzy
 msgid "+1 Stack In Hills"
 msgstr "+3スタック丘で"
 
 #: ../src/armybase.cpp:212
-#, fuzzy
 msgid "Cancel City Bonus"
 msgstr "都市ボーナスをキャンセル"
 
 #: ../src/armybase.cpp:213
-#, fuzzy
 msgid "-1 Enemy Stack)"
 msgstr "-1敵スタック"
 
 #: ../src/armybase.cpp:214
-#, fuzzy
 msgid "+1 Stack"
 msgstr "+1スタック"
 
 #: ../src/armybase.cpp:215
-#, fuzzy
 msgid "+2 Stack"
 msgstr "+2スタック"
 
 #: ../src/armybase.cpp:216
-#, fuzzy
 msgid "Cancel Non-Hero"
-msgstr "非ひーろをキャンセル"
+msgstr "非ヒーローをキャンセル"
 
 #: ../src/armybase.cpp:217
-#, fuzzy
 msgid "Cancel Hero"
-msgstr "ひーろをキャンセル"
+msgstr "ヒーローをキャンセル"
 
 #: ../src/armybase.cpp:219
-#, fuzzy
 msgid "+2 Str In Forest"
 msgstr "＋２力森の中で"
 
 #: ../src/armybase.cpp:221
-#, fuzzy
 msgid "-2 Enemy Stack"
 msgstr "-2敵スタック"
 
 #: ../src/armybase.cpp:222
-#, fuzzy
 msgid "Confers Move Bonus To Stack"
-msgstr "運動ボーナス: %1"
+msgstr "ボーナスをスタックに移動する"
 
 #: ../src/armybase.cpp:303
 msgid "Flies"
@@ -7912,7 +7726,7 @@ msgstr "都市にスタックをテレポート"
 
 #: ../src/ItemProto.cpp:246
 msgid "Army units can be Vectored when Planted"
-msgstr ""
+msgstr "陸軍ユニットは、植えられたときにベクトル化することができます"
 
 #: ../src/ItemProto.cpp:249
 msgid "+%1 Battle"
@@ -9160,120 +8974,104 @@ msgid "Skytower"
 msgstr "スカイタワー"
 
 #: ../dat/citynames.xml.in.h:115
-#, fuzzy
 msgid "Shadyfist"
-msgstr "シェディ ヒル"
+msgstr "シェディフィスト"
 
 #: ../dat/citynames.xml.in.h:116
-#, fuzzy
 msgid "Shadycliff"
-msgstr "シェディ ヒル"
+msgstr "シェディクリッフ"
 
 #: ../dat/citynames.xml.in.h:117
-#, fuzzy
 msgid "Thornfist"
-msgstr "鉄の拳"
+msgstr "トーノフィスト"
 
 #: ../dat/citynames.xml.in.h:118
-#, fuzzy
 msgid "Thorncliff"
-msgstr "トルドルフ"
+msgstr "トーノクリッフ"
 
 #: ../dat/citynames.xml.in.h:119
 msgid "Lowcliff"
-msgstr ""
+msgstr "ロウクリッフ"
 
 #: ../dat/citynames.xml.in.h:120
 msgid "Highcliff"
-msgstr ""
+msgstr "ハイクリッフ"
 
 #: ../dat/citynames.xml.in.h:121
-#, fuzzy
 msgid "Highstone"
-msgstr "高い水"
+msgstr "高い石"
 
 #: ../dat/citynames.xml.in.h:122
 msgid "Neap"
-msgstr ""
+msgstr "ニープ"
 
 #: ../dat/citynames.xml.in.h:123
-#, fuzzy
 msgid "Ringfist"
-msgstr "リングステップ"
+msgstr "リングフィスト"
 
 #: ../dat/citynames.xml.in.h:124
-#, fuzzy
 msgid "Highring"
-msgstr "高い石"
+msgstr "ハイリング"
 
 #: ../dat/citynames.xml.in.h:125
-#, fuzzy
 msgid "Thorn Town"
-msgstr "クリフタウン"
+msgstr "トールノタウン"
 
 #: ../dat/citynames.xml.in.h:126
-#, fuzzy
 msgid "Moonring"
-msgstr "木のリング"
+msgstr "ムーンリング"
 
 #: ../dat/citynames.xml.in.h:127
-#, fuzzy
 msgid "Bell Town"
-msgstr "クリフタウン"
+msgstr "ベルタウン"
 
 #: ../dat/citynames.xml.in.h:128
-#, fuzzy
 msgid "Tower Town"
-msgstr "クリフタウン"
+msgstr "タワータウン"
 
 #: ../dat/citynames.xml.in.h:129
-#, fuzzy
 msgid "Cliffview"
-msgstr "クリフタウン"
+msgstr "クリフビュー"
 
 #: ../dat/citynames.xml.in.h:130
 msgid "Skyview"
-msgstr ""
+msgstr "スカイビュー"
 
 #: ../dat/citynames.xml.in.h:131
-#, fuzzy
 msgid "Shadyview"
-msgstr "シェディ ヒル"
+msgstr "シェディビュー"
 
 #: ../dat/citynames.xml.in.h:132
 msgid "Eyer"
-msgstr ""
+msgstr "エイェル"
 
 #: ../dat/citynames.xml.in.h:133
 msgid "Amberset"
-msgstr ""
+msgstr "エムベルセット"
 
 #: ../dat/citynames.xml.in.h:134
 msgid "Atinage"
-msgstr ""
+msgstr "エティネージ"
 
 #: ../dat/citynames.xml.in.h:135
 msgid "Paltoir"
-msgstr ""
+msgstr "パートイレ"
 
 #: ../dat/citynames.xml.in.h:136
-#, fuzzy
 msgid "Farjewel"
-msgstr "ケープベル"
+msgstr "ファージェウェル"
 
 #: ../dat/citynames.xml.in.h:137
-#, fuzzy
 msgid "Neargreen"
-msgstr "ワイドスクリーン"
+msgstr "ニアグリーン"
 
 #: ../dat/citynames.xml.in.h:138
 msgid "Shadyfoot"
-msgstr ""
+msgstr "シェーディフート"
 
 #: ../dat/citynames.xml.in.h:139
-#, fuzzy
 msgid "Deepring"
-msgstr "フェンリング"
+msgstr "ディープリング"
 
 #: ../dat/templenames.xml.in.h:1
 msgid "Shrine of the Paladin"
