@@ -226,6 +226,9 @@ MainWindow::MainWindow(Glib::ustring load_filename)
     // connect callbacks for the menu
     xml->get_widget("new_map_menuitem", new_map_menuitem);
     new_map_menuitem->signal_activate().connect(method(on_new_map_activated));
+    xml->get_widget("new_blank_map_menuitem", new_blank_map_menuitem);
+    new_blank_map_menuitem->signal_activate().connect
+      (method(on_new_blank_map_activated));
     xml->get_widget("load_map_menuitem", load_map_menuitem);
     load_map_menuitem->signal_activate().connect (method(on_load_map_activated));
     xml->get_widget("save_map_menuitem", save_map_menuitem);
@@ -886,6 +889,35 @@ bool MainWindow::on_smallmap_mouse_motion_event(GdkEventMotion *e)
     return true;
 }
 
+bool MainWindow::make_new_blank_map ()
+{
+  Glib::ustring msg = _("Save these changes before making a new Scenario?");
+  if (check_discard (msg) == false)
+    return false;
+
+  current_save_filename = "";
+
+  set_filled_map(112, 156, Tile::WATER, "default", "default", "default",
+                 "default", MAX_PLAYERS);
+  for (guint32 i = 0; i < MAX_PLAYERS; i++)
+    {
+      Playerlist *pl = Playerlist::getInstance();
+      GameParameters::Player player;
+      player.type = GameParameters::Player::HUMAN;
+      player.name =
+        d_create_scenario_names->getPlayerName(Shield::Color(i));
+      player.id = i;
+      pl->syncPlayer(player);
+    }
+  Playerlist::getInstance()->setActiveplayer(Playerlist::getInstance()->getNeutral());
+  fill_players ();
+  scenario_modified = false;
+  new_scenario_needs_saving = true;
+  clearUndoAndRedo ();
+  update_window_title();
+  return true;
+}
+
 bool MainWindow::make_new_map ()
 {
   Glib::ustring msg = _("Save these changes before making a new Scenario?");
@@ -936,6 +968,11 @@ bool MainWindow::make_new_map ()
 void MainWindow::on_new_map_activated()
 {
   make_new_map ();
+}
+
+void MainWindow::on_new_blank_map_activated()
+{
+  make_new_blank_map ();
 }
 
 bool MainWindow::load_map ()

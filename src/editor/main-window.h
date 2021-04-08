@@ -74,6 +74,7 @@ class MainWindow: public sigc::trackable
     Gtk::EventBox *bigmap_eventbox;
     Gtk::CheckMenuItem *fullscreen_menuitem;
     Gtk::MenuItem *new_map_menuitem;
+    Gtk::MenuItem *new_blank_map_menuitem;
     Gtk::MenuItem *load_map_menuitem;
     Gtk::MenuItem *save_map_menuitem;
     Gtk::MenuItem *save_map_as_menuitem;
@@ -140,6 +141,8 @@ class MainWindow: public sigc::trackable
     
     void on_new_map_activated();
     bool make_new_map ();
+    void on_new_blank_map_activated();
+    bool make_new_blank_map ();
     void on_load_map_activated();
     bool load_map ();
     void on_save_map_activated ();
