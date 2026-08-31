@@ -1,7 +1,6 @@
 SUBDIRS=
 EXTRA_DIST=\
 armyset-info.ui \
-armyset-selector-editor.ui \
 backpack-editor.ui \
 battle-calculator.ui \
 city-editor.ui \
@@ -28,17 +27,11 @@ select-item.ui \
 shieldset-info.ui \
 signpost-editor.ui \
 stack-editor.ui \
-stone-editor.ui \
 switch-sets.ui \
 masked-image-editor.ui \
 temple-editor.ui \
 tile-preview.ui \
-tileset-explosion-picture-editor.ui \
-tileset-flag-editor.ui \
 tileset-info.ui \
-tileset-move-bonus-image.ui \
-tileset-selector-editor.ui \
-tileset-smallmap-building-colors.ui \
 tilestyles.ui \
 validation.ui \
 tartan-preview.ui \
