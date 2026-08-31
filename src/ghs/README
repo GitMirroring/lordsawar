@@ -1,8 +1,0 @@
-Game Host Server.
-
-LordsAWar servers can send their games to another server to have it hosted there.
-This is that software.
-
-Game Host Client.
-
-A command-line tool to interact with a running Game Host Server.

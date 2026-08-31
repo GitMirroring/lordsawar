@@ -1,8 +1,0 @@
-Game List Server.
-
-LordsAWar servers can advertise their games on a game list server.
-This is that software.
-
-Game List Client.
-
-A command-line tool to interact with a running Game List Server.
