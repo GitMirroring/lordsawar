@@ -1,7 +1,7 @@
-// Copyright (C) 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017,
-// 2020 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2006 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017, 2020,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef OVERVIEWMAP_H
@@ -26,8 +25,11 @@
 #include <gtkmm.h>
 #include "vector.h"
 #include "rectangle.h"
-#include "Tile.h"
-#include "SmallTile.h"
+#include "tile.h"
+#include "small-tile.h"
+#include "location-box.h"
+#include "image-cache.h"
+#include "game-map.h"
 
 class Maptile;
 class Player;
@@ -46,7 +48,7 @@ class City;
  * Derived classes can add their own stuff to the map by overriding the 
  * after_draw method that is called by OverviewMap::draw.
  */
-class OverviewMap : public sigc::trackable
+class OverviewMap: public sigc::trackable
 {
  public:
      //! Default constructor.
@@ -119,7 +121,7 @@ class OverviewMap : public sigc::trackable
      * It only makes sense to get the surface after OverviewMap::resize and 
      * OverviewMap::draw have been called.
      */
-    Cairo::RefPtr<Cairo::Surface> get_surface();
+    Cairo::RefPtr<Cairo::ImageSurface> get_surface();
 
 
     static void draw_terrain_tile (Cairo::RefPtr<Cairo::Context> gc,
@@ -150,6 +152,28 @@ class OverviewMap : public sigc::trackable
 
     int get_width();
     int get_height();
+
+    //! Add a location box to the heat map of the image, e.g. something clickable.
+    void add_to_hotmap (LocationBox b)
+      {
+        auto r = b.getArea ();
+        r.grow (2);
+        add_to_hotmap (r);
+      }
+
+    //! Add a tile to the heat map of the image, e.g. something clickable.
+    void add_to_hotmap (Vector<int> pos)
+      {
+        auto b = LocationBox (pos);
+        auto r = b.getArea ();
+        r.grow (2);
+        add_to_hotmap (r);
+      }
+
+    void clear_hotmap ()
+      {
+        m_hotmap.clear ();
+      }
 
  private:
 
@@ -245,20 +269,34 @@ class OverviewMap : public sigc::trackable
      * This is the cached surface after the resize method was called.
      * It is cached so that we don't have recalculate it.
      */
-    Cairo::RefPtr<Cairo::Surface> static_surface;
+    Cairo::RefPtr<Cairo::ImageSurface> static_surface;
     Cairo::RefPtr<Cairo::Context> static_surface_gc;
 
     //! The surface containing the drawn map.
-    Cairo::RefPtr<Cairo::Surface> surface;
+    Cairo::RefPtr<Cairo::ImageSurface> surface;
     Cairo::RefPtr<Cairo::Context> surface_gc;
 
     void draw_target_box(Vector<int> pos, const Gdk::RGBA color);
     void draw_square_around_city(City *c, const Gdk::RGBA color);
     void draw_radial_gradient(Gdk::RGBA inner, Gdk::RGBA outer, int width, int height);
 
+    bool is_hot (Vector<int> pos)
+      {
+        return m_hotmap.find (pos) != m_hotmap.end ();
+      }
+
+    void add_to_hotmap (LwRectangle r)
+      {
+        for (auto pos : GameMap::on_map (r.getPoints ()))
+          m_hotmap.insert (pos);
+      }
+    
+    bool is_fogged (City *c);
+
     bool blank_screen;
     bool d_headless;
 
+    std::set<Vector<int>> m_hotmap;
 };
 
-#endif // OVERVIEWMAP_H
+#endif

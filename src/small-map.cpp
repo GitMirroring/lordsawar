@@ -1,10 +1,10 @@
-// Copyright (C) 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2004 Thomas Plonka
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2017,
-// 2020 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2004 Thomas Plonka
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,17 +18,16 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
 #include <assert.h>
 
-#include "smallmap.h"
+#include "small-map.h"
 #include "vector.h"
-#include "GameScenarioOptions.h"
-#include "GameMap.h"
-#include "playerlist.h"
+#include "game-scenario-options.h"
+#include "game-map.h"
+#include "player-list.h"
 
 bool SmallMap::s_quick = false;
 
@@ -76,7 +75,6 @@ void SmallMap::draw_selection()
 	   pos.y >= 0 && pos.y + h < height);
     
     draw_rect(pos.x, pos.y, w, h, SELECTOR_BOX_COLOR);
-    //draw_rect(pos.x-1, pos.y-1, w+2,  h+2, SELECTOR_BOX_COLOR);
 }
 
 void SmallMap::center_view_on_tile(Vector<int> pos, bool slide_me)
@@ -90,7 +88,7 @@ void SmallMap::center_view_on_tile(Vector<int> pos, bool slide_me)
   else
     set_view(LwRectangle(pos.x, pos.y, view.w, view.h));
 	  
-  view_changed.emit(view);
+  m_view_changed.emit(view);
 }
 
 void SmallMap::center_view_on_pixel(Vector<int> pos, bool slide_me)
@@ -98,10 +96,9 @@ void SmallMap::center_view_on_pixel(Vector<int> pos, bool slide_me)
   pos.x = int(round(pos.x / pixels_per_tile * map_tiles_per_tile));
   pos.y = int(round(pos.y / pixels_per_tile * map_tiles_per_tile));
 
-  /* FIXME: i have no idea why 1.65 is the number i need here.
-   it controls the centeredness of the white box on where we clicked.
-   this works well for the 3 standard sizes of maps.
-   */
+  // FIXME: i have no idea why 1.65 is the number i need here.
+  // it controls the centeredness of the white box on where we clicked.
+  // this works well for the 3 standard sizes of maps.
 
   pos.x -= (view.w / 1.65);
   pos.y -= (view.h / 1.65);
@@ -113,7 +110,7 @@ void SmallMap::center_view_on_pixel(Vector<int> pos, bool slide_me)
   else
     set_view(LwRectangle(pos.x, pos.y, view.w, view.h));
 
-  view_changed.emit(view);
+  m_view_changed.emit(view);
 }
 
 void SmallMap::after_draw()
@@ -121,7 +118,7 @@ void SmallMap::after_draw()
   int width = get_width(), height = get_height();
   if (blank_screen == true)
     {
-      map_changed.emit(surface, Gdk::Rectangle(0, 0, width, height));
+      m_map_changed.emit(surface, Gdk::Rectangle(0, 0, width, height));
       return;
     }
   Player *p = Playerlist::getViewingplayer();
@@ -138,7 +135,7 @@ void SmallMap::after_draw()
       draw_cities(false);
       draw_selection();
     }
-    map_changed.emit(surface, Gdk::Rectangle(0, 0, width, height));
+    m_map_changed.emit(surface, Gdk::Rectangle(0, 0, width, height));
 }
 
 void SmallMap::mouse_button_event(MouseButtonEvent e)
@@ -200,7 +197,7 @@ void SmallMap::slide_view(LwRectangle new_view)
 
 	  view = tmp_view;
 	  draw();
-          view_slid.emit(view);
+          m_view_slid.emit(view);
           if (sliding_to != new_view)
             break;
           Glib::usleep(sleep_interval);
@@ -215,5 +212,5 @@ void SmallMap::slide_view(LwRectangle new_view)
 void SmallMap::center_view ()
 {
   set_view (LwRectangle ((GameMap::get_dim () / 2) - (view.dim / 2), view.dim));
-  view_changed.emit(view);
+  m_view_changed.emit(view);
 }

@@ -1,7 +1,7 @@
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
-// 2021 Ben Asselstine
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,28 +15,27 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 #include <string.h>
 #include <iostream>
 
-#include "tileset.h"
+#include "tile-set.h"
 
 #include "defs.h"
-#include "File.h"
-#include "SmallTile.h"
-#include "xmlhelper.h"
-#include "gui/image-helpers.h"
-#include "ImageCache.h"
-#include "tilesetlist.h"
-#include "tarhelper.h"
-#include "Configuration.h"
+#include "file.h"
+#include "small-tile.h"
+#include "xml-helper.h"
+#include "image-helpers.h"
+#include "image-cache.h"
+#include "tile-set-list.h"
+#include "tar-helper.h"
+#include "configuration.h"
 #include "file-compat.h"
 #include "ucompose.hpp"
-#include "TarFileMaskedImage.h"
-#include "TarFileImage.h"
+#include "tar-file-masked-image.h"
+#include "tar-file-image.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -60,9 +59,11 @@ Tileset::Tileset(guint32 id, Glib::ustring name)
     new TarFileMaskedImage
     (TarFileMaskedImage::VERTICAL_MASK,
      PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
-  d_flag =
-    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
+  for (guint32 i = 0; i < MAX_PLAYERS + 1; i++)
+    d_flag[i] =
+      new TarFileMaskedImage
+      (TarFileMaskedImage::VERTICAL_MASK,
+       PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
   d_fog = new TarFileImage (FOG_TYPES,
                             PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
   d_road = new TarFileImage (ROAD_TYPES,
@@ -90,7 +91,8 @@ Tileset::Tileset (const Tileset& t)
 {
   d_selector[0] = new TarFileMaskedImage (*t.d_selector[0]);
   d_selector[1] = new TarFileMaskedImage (*t.d_selector[1]);
-  d_flag = new TarFileMaskedImage (*t.d_flag);
+  for (guint32 i = 0; i < MAX_PLAYERS + 1; i++)
+    d_flag[i] = new TarFileMaskedImage (*t.d_flag[i]);
   d_fog = new TarFileImage (*t.d_fog);
   d_road = new TarFileImage (*t.d_road);
   d_stone = new TarFileImage (*t.d_stone);
@@ -127,9 +129,10 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   d_selector[1] = new TarFileMaskedImage
     (TarFileMaskedImage::VERTICAL_MASK,
      PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
-  d_flag = new TarFileMaskedImage
-    (TarFileMaskedImage::VERTICAL_MASK,
-     PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
+  for (guint32 i = 0; i < MAX_PLAYERS + 1; i++)
+    d_flag[i] = new TarFileMaskedImage
+      (TarFileMaskedImage::VERTICAL_MASK,
+       PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT);
   d_fog = new TarFileImage (FOG_TYPES,
                             PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
   d_road = new TarFileImage (ROAD_TYPES,
@@ -146,16 +149,24 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   d_mountains_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
   d_swamp_movebonus = new TarFileImage (1, PixMask::DIMENSION_ANY);
   guint32 ts;
-  helper->getData(ts, "tilesize");
+  helper->get(ts, "tilesize");
   setTileSize(ts);
-  d_selector[1]->load (helper, "large_selector", "large_selector_num_masks");
-  d_selector[0]->load (helper, "small_selector", "small_selector_num_masks");
+  d_selector[1]->load (helper, "large_selector");
+  d_selector[0]->load (helper, "small_selector");
   d_explosion->load_name (helper, "explosion");
   d_road->load_name (helper, "roads");
   d_stone->load_name (helper, "standing_stones");
   d_bridge->load_name (helper, "bridges");
   d_fog->load_name (helper, "fog");
-  d_flag->load (helper, "flags", "flags_num_masks");
+  d_flag[0]->load (helper, "white_flags");
+  d_flag[1]->load (helper, "green_flags");
+  d_flag[2]->load (helper, "yellow_flags");
+  d_flag[3]->load (helper, "dark_blue_flags");
+  d_flag[4]->load (helper, "orange_flags");
+  d_flag[5]->load (helper, "light_blue_flags");
+  d_flag[6]->load (helper, "red_flags");
+  d_flag[7]->load (helper, "black_flags");
+  d_flag[8]->load (helper, "neutral_flags");
   d_all_movebonus->load_name (helper, "movebonus_all");
   d_water_movebonus->load_name (helper, "movebonus_water");
   d_forest_movebonus->load_name (helper, "movebonus_forest");
@@ -163,13 +174,13 @@ Tileset::Tileset(XML_Helper *helper, Glib::ustring directory)
   d_mountains_movebonus->load_name (helper, "movebonus_mountains");
   d_swamp_movebonus->load_name (helper, "movebonus_swamp");
 
-  helper->registerTag(Tile::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
-  helper->registerTag(Tileset::d_road_smallmap_tag, sigc::mem_fun((*this), &Tileset::loadTile));
-  helper->registerTag(Tileset::d_ruin_smallmap_tag, sigc::mem_fun((*this), &Tileset::loadTile));
-  helper->registerTag(Tileset::d_temple_smallmap_tag, sigc::mem_fun((*this), &Tileset::loadTile));
-  helper->registerTag(SmallTile::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
-  helper->registerTag(TileStyle::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
-  helper->registerTag(TileStyleSet::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
+  helper->register_tag(Tile::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
+  helper->register_tag(Tileset::d_road_smallmap_tag, sigc::mem_fun((*this), &Tileset::loadTile));
+  helper->register_tag(Tileset::d_ruin_smallmap_tag, sigc::mem_fun((*this), &Tileset::loadTile));
+  helper->register_tag(Tileset::d_temple_smallmap_tag, sigc::mem_fun((*this), &Tileset::loadTile));
+  helper->register_tag(SmallTile::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
+  helper->register_tag(TileStyle::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
+  helper->register_tag(TileStyleSet::d_tag, sigc::mem_fun((*this), &Tileset::loadTile));
 }
 
 Tileset::~Tileset()
@@ -179,7 +190,8 @@ Tileset::~Tileset()
     delete (*this)[i];
   delete d_selector[0];
   delete d_selector[1];
-  delete d_flag;
+  for (guint32 i = 0; i < MAX_PLAYERS; i++)
+    delete d_flag[i];
   delete d_explosion;
   delete d_road;
   delete d_stone;
@@ -230,19 +242,19 @@ bool Tileset::loadTile(Glib::ustring tag, XML_Helper* helper)
 
   if (tag == Tileset::d_road_smallmap_tag)
     {
-      helper->getData(d_road_color, "color");
+      helper->get(d_road_color, "color");
       return true;
     }
 
   if (tag == Tileset::d_ruin_smallmap_tag)
     {
-      helper->getData(d_ruin_color, "color");
+      helper->get(d_ruin_color, "color");
       return true;
     }
 
   if (tag == Tileset::d_temple_smallmap_tag)
     {
-      helper->getData(d_temple_color, "color");
+      helper->get(d_temple_color, "color");
       return true;
     }
 
@@ -293,35 +305,43 @@ bool Tileset::save(XML_Helper *helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(d_tag);
+  retval &= helper->open_tag(d_tag);
   retval &= Set::save(helper);
-  retval &= helper->saveData("tilesize", getUnscaledTileSize());
-  retval &= d_selector[1]->save (helper, "large_selector", "large_selector_num_masks");
-  retval &= d_selector[0]->save (helper, "small_selector", "small_selector_num_masks");
-  retval &= helper->saveData("explosion", d_explosion->getName ());
-  retval &= helper->saveData("roads", d_road->getName ());
-  retval &= helper->saveData("standing_stones", d_stone->getName ());
-  retval &= helper->saveData("bridges", d_bridge->getName ());
-  retval &= helper->saveData("fog", d_fog->getName ());
-  retval &= d_flag->save (helper, "flags", "flags_num_masks");
-  retval &= helper->saveData("movebonus_all", d_all_movebonus->getName ());
-  retval &= helper->saveData("movebonus_water", d_water_movebonus->getName ());
-  retval &= helper->saveData("movebonus_forest", d_forest_movebonus->getName ());
-  retval &= helper->saveData("movebonus_hills", d_hills_movebonus->getName ());
-  retval &= helper->saveData("movebonus_mountains", d_mountains_movebonus->getName ());
-  retval &= helper->saveData("movebonus_swamp", d_swamp_movebonus->getName ());
-  retval &= helper->openTag(d_road_smallmap_tag);
-  retval &= helper->saveData("color", d_road_color);
-  retval &= helper->closeTag();
-  retval &= helper->openTag(d_ruin_smallmap_tag);
-  retval &= helper->saveData("color", d_ruin_color);
-  retval &= helper->closeTag();
-  retval &= helper->openTag(d_temple_smallmap_tag);
-  retval &= helper->saveData("color", d_temple_color);
-  retval &= helper->closeTag();
+  retval &= helper->save("tilesize", getTileSize());
+  retval &= d_selector[1]->save (helper, "large_selector");
+  retval &= d_selector[0]->save (helper, "small_selector");
+  retval &= helper->save("explosion", d_explosion->getName ());
+  retval &= helper->save("roads", d_road->getName ());
+  retval &= helper->save("standing_stones", d_stone->getName ());
+  retval &= helper->save("bridges", d_bridge->getName ());
+  retval &= helper->save("fog", d_fog->getName ());
+  retval &= d_flag[0]->save (helper, "white_flags");
+  retval &= d_flag[1]->save (helper, "green_flags");
+  retval &= d_flag[2]->save (helper, "yellow_flags");
+  retval &= d_flag[3]->save (helper, "dark_blue_flags");
+  retval &= d_flag[4]->save (helper, "orange_flags");
+  retval &= d_flag[5]->save (helper, "light_blue_flags");
+  retval &= d_flag[6]->save (helper, "red_flags");
+  retval &= d_flag[7]->save (helper, "black_flags");
+  retval &= d_flag[8]->save (helper, "neutral_flags");
+  retval &= helper->save("movebonus_all", d_all_movebonus->getName ());
+  retval &= helper->save("movebonus_water", d_water_movebonus->getName ());
+  retval &= helper->save("movebonus_forest", d_forest_movebonus->getName ());
+  retval &= helper->save("movebonus_hills", d_hills_movebonus->getName ());
+  retval &= helper->save("movebonus_mountains", d_mountains_movebonus->getName ());
+  retval &= helper->save("movebonus_swamp", d_swamp_movebonus->getName ());
+  retval &= helper->open_tag(d_road_smallmap_tag);
+  retval &= helper->save("color", d_road_color);
+  retval &= helper->close_tag();
+  retval &= helper->open_tag(d_ruin_smallmap_tag);
+  retval &= helper->save("color", d_ruin_color);
+  retval &= helper->close_tag();
+  retval &= helper->open_tag(d_temple_smallmap_tag);
+  retval &= helper->save("color", d_temple_color);
+  retval &= helper->close_tag();
   for (Tileset::const_iterator i = begin(); i != end(); ++i)
     retval &= (*i)->save(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -337,7 +357,7 @@ bool Tileset::save(Glib::ustring filename, Glib::ustring ext) const
   helper.close();
   if (broken == true)
     return false;
-  std::vector<Glib::ustring> extrafiles;
+  std::vector<std::string> extrafiles;
   return saveTar(tmpfile, tmpfile + ".tar", goodfilename, extrafiles);
 }
 
@@ -417,8 +437,9 @@ bool Tileset::validate() const
     return false;
   if (d_fog->getName().empty () == true)
     return false;
-  if (d_flag->getName().empty () == true)
-    return false;
+  for (guint32 i = 0; i < MAX_PLAYERS + 1; i++)
+    if (d_flag[i]->getName().empty () == true)
+      return false;
   if (getAllMoveBonus()->getName ().empty () == true)
     return false;
   if (getWaterMoveBonus()->getName ().empty () == true)
@@ -439,64 +460,126 @@ bool Tileset::validate() const
 class TilesetLoader
 {
 public:
-    TilesetLoader(Glib::ustring filename, bool &broken, bool &unsupported)
-      :dir (File::get_dirname(filename)), file (File::get_basename(filename)),
-      tileset (NULL), unsupported_version (NULL)
+    TilesetLoader (Glib::ustring f)
+      : filename (f), dir (File::get_dirname (filename)),
+      file (File::get_basename (filename)), bad_version (""),
+      found_top_tag (false)
       {
-	if (File::nameEndsWith(filename, Tileset::file_extension) == false)
-	  filename += Tileset::file_extension;
-        Tar_Helper t(filename, std::ios::in, broken);
+        if (File::nameEndsWith (filename, Tileset::file_extension) == false)
+          filename += Tileset::file_extension;
+      }
+
+    bool parse ()
+      {
+        bool broken = false;
+        Tar_Helper t (filename, std::ios::in, broken);
         if (broken)
-          return;
+          {
+            Glib::ustring err;
+            if (File::exists (filename) && File::is_readonly (filename))
+              err = String::ucompose (_("Couldn't open %1 for reading"),
+                                      filename);
+            else
+              err =
+                String::ucompose
+                (_("Couldn't scan archive in %1, not a valid file"), filename);
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
         Glib::ustring lwtfilename = 
-          t.getFirstFile(Tileset::file_extension, broken);
+          t.getFirstFile (Tileset::file_extension, broken);
+        if (lwtfilename.empty () == true)
+          {
+            Glib::ustring err =
+              String::ucompose (_("Tile set file `%1' lacks a %2 file"),
+                                filename, Tileset::file_extension);
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
         if (broken)
-          return;
-	XML_Helper helper(lwtfilename, std::ios::in);
-	helper.registerTag(Tileset::d_tag, sigc::mem_fun((*this), &TilesetLoader::load));
-	if (!helper.parseXML())
-	  {
-            unsupported = unsupported_version;
-            std::cerr << String::ucompose(_("Error!  can't load Tile Set `%1'."), filename) << std::endl;
-	    if (tileset != NULL)
-	      delete tileset;
-	    tileset = NULL;
-	  }
-        helper.close();
-        File::erase(lwtfilename);
-        t.Close();
-      };
-    bool load(Glib::ustring tag, XML_Helper* helper)
+          {
+            Glib::ustring err =
+              String::ucompose
+              (_("Could not extract first file from tile set file `%1'"),
+               filename);
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
+
+        XML_Helper helper (lwtfilename, std::ios::in);
+        helper.register_tag (Tileset::d_tag,
+                            sigc::mem_fun(*this, &TilesetLoader::load));
+        bool retval = true;
+        if (!helper.parse_XML ())
+          {
+            if (bad_version != "")
+              {
+                Glib::ustring err =
+                  String::ucompose (_("Expected version %1 but got %2"),
+                                    LORDSAWAR_TILESET_VERSION, bad_version);
+
+                signal_finished.emit (NULL, false, true, err);
+              }
+            else
+              signal_finished.emit (NULL, true, false,
+                                    _("Unknown parsing error"));
+            retval = false;
+          }
+        else
+          {
+            if (!found_top_tag)
+              {
+                Glib::ustring err =
+                  String::ucompose (_("Couldn't find <%1> tag"),
+                                    Tileset::d_tag);
+                signal_finished.emit (NULL, true, false, err);
+              }
+            else
+              signal_finished.emit (tileset, false, false, "");
+          }
+        helper.close ();
+        File::erase (lwtfilename);
+        t.Close ();
+        return retval;
+      }
+
+    bool load (Glib::ustring tag, XML_Helper* helper)
       {
 	if (tag == Tileset::d_tag)
 	  {
-            if (helper->getVersion() == LORDSAWAR_TILESET_VERSION)
+            if (helper->get_version () == LORDSAWAR_TILESET_VERSION)
               {
-                tileset = new Tileset(helper, dir);
-                tileset->setBaseName(file);
+                found_top_tag = true;
+                tileset = new Tileset (helper, dir);
+                tileset->setBaseName (file);
                 return true;
               }
             else
               {
-                unsupported_version = true;
+                bad_version = helper->get_version ();
                 return false;
               }
 	  }
 	return false;
       };
+    Glib::ustring filename;
     Glib::ustring dir;
     Glib::ustring file;
+    Glib::ustring bad_version;
+    bool found_top_tag;
+    sigc::signal<void(Tileset*, bool, bool, Glib::ustring)> signal_finished;
     Tileset *tileset;
-    bool unsupported_version;
 };
 
-Tileset *Tileset::create(Glib::ustring file, bool &unsupported_version)
+void Tileset::create(Glib::ustring filename, sigc::slot<void(Tileset*,bool,bool,Glib::ustring)> finished)
 {
-  bool broken = false;
-  TilesetLoader d(file, broken, unsupported_version);
-  if (broken)
-    return NULL;
-  return d.tileset;
+  TilesetLoader d(filename);
+  d.signal_finished.connect
+    ([finished](Tileset *tileset, bool broken, bool unsupported_version, Glib::ustring err)
+     {
+       finished (tileset, broken, unsupported_version, err);
+     });
+  d.parse ();
 }
 
 void Tileset::uninstantiateImages()
@@ -511,10 +594,8 @@ void Tileset::uninstantiateImages()
     i->uninstantiateImages ();
 }
 
-void Tileset::instantiateImages(bool scale, bool &broken)
+void Tileset::instantiateImages(bool &broken)
 {
-  int siz = getUnscaledTileSize();
-  Vector<int>scale_dim = Vector<int>(siz,siz);
   debug("Loading images for Tile Set " << getName());
   uninstantiateImages();
   broken = false;
@@ -524,26 +605,28 @@ void Tileset::instantiateImages(bool scale, bool &broken)
   for (iterator it = begin(); it != end(); ++it)
     {
       if (!broken)
-        (*it)->instantiateImages(siz, &t, scale, broken);
+        (*it)->instantiateImages(&t, broken);
     }
   if (broken)
     return;
 
-
   broken = d_selector[0]->load(&t);
   if (broken)
     return;
-  d_selector[0]->instantiateImages (scale_dim);
+  d_selector[0]->instantiateImages ();
 
   broken = d_selector[1]->load(&t);
   if (broken)
     return;
-  d_selector[1]->instantiateImages (scale_dim);
+  d_selector[1]->instantiateImages ();
 
-  broken = d_flag->load(&t);
-  if (broken)
-    return;
-  d_flag->instantiateImages (scale_dim);
+  for (guint32 i = 0; i < MAX_PLAYERS + 1; i++)
+    {
+      broken = d_flag[i]->load(&t);
+      if (broken)
+        return;
+      d_flag[i]->instantiateImages ();
+    }
 
   broken = d_all_movebonus->load(&t);
   if (broken)
@@ -613,22 +696,31 @@ TileStyle *Tileset::getTileStyle(guint32 id) const
     return (*it).second;
 }
 
-void Tileset::reload(bool &broken)
+void Tileset::reload()
 {
-  broken = false;
-  bool unsupported_version = false;
-  TilesetLoader d(getConfigurationFile(), broken, unsupported_version);
-  if (!broken && d.tileset && d.tileset->validate())
-    {
-      //steal the values from d.tileset and then don't delete it.
-      uninstantiateImages();
-      for (iterator it = begin(); it != end(); ++it)
-        delete *it;
-      Glib::ustring basename = getBaseName();
-      *this = *d.tileset;
-      instantiateImages(true, broken);
-      setBaseName(basename);
-    }
+  TilesetLoader d(getConfigurationFile());
+  d.signal_finished.connect
+    ([this](Tileset *tileset, bool broken, bool unsupported_version,
+            Glib::ustring)
+     {
+       if (!broken && !unsupported_version && tileset)
+         {
+           if (tileset->validate ())
+             {
+               //steal the values from d.tileset and then don't delete it.
+               uninstantiateImages();
+               for (iterator it = begin(); it != end(); ++it)
+                 delete *it;
+               clear ();
+               Glib::ustring basename = getBaseName();
+               *this = *tileset;
+               instantiateImages(broken);
+               setBaseName(basename);
+             }
+         }
+     });
+
+  d.parse ();
 }
 
 bool Tileset::calculate_preferred_tile_size(guint32 &ts) const
@@ -637,19 +729,20 @@ bool Tileset::calculate_preferred_tile_size(guint32 &ts) const
   std::map<guint32, guint32> sizecounts;
 
   if (d_road->getImage ())
-    sizecounts[d_road->getImage ()->get_unscaled_width()]++;
+    sizecounts[d_road->getImage ()->get_width()]++;
   if (d_bridge->getImage ())
-    sizecounts[d_bridge->getImage ()->get_unscaled_width()]++;
-  if (d_flag->getName ().empty () == false)
-    sizecounts[d_flag->getImage ()->get_unscaled_width()]++;
+    sizecounts[d_bridge->getImage ()->get_width()]++;
+  for (guint32 i = 0; i < MAX_PLAYERS + 1; i++)
+    if (d_flag[i]->getName ().empty () == false)
+      sizecounts[d_flag[i]->getImage ()->get_width()]++;
   if (d_selector[0]->getName ().empty() == false)
-    sizecounts[d_selector[0]->getImage ()->get_unscaled_width()]++;
+    sizecounts[d_selector[0]->getImage ()->get_width()]++;
   if (d_selector[1]->getName ().empty() == false)
-    sizecounts[d_selector[1]->getImage ()->get_unscaled_width()]++;
+    sizecounts[d_selector[1]->getImage ()->get_width()]++;
   if (d_fog->getImage ())
-    sizecounts[d_fog->getImage ()->get_unscaled_width()]++;
+    sizecounts[d_fog->getImage ()->get_width()]++;
   if (d_explosion->getImage ())
-    sizecounts[d_explosion->getImage ()->get_unscaled_width()]++;
+    sizecounts[d_explosion->getImage ()->get_width()]++;
   for (const_iterator it = begin(); it != end(); ++it)
     {
       Tile *tile = *it;
@@ -657,7 +750,7 @@ bool Tileset::calculate_preferred_tile_size(guint32 &ts) const
         {
           TileStyle *tilestyle = (*i)->front();
           if (tilestyle && tilestyle->getImage())
-            sizecounts[tilestyle->getImage()->get_unscaled_width()]++;
+            sizecounts[tilestyle->getImage()->get_width()]++;
         }
     }
 
@@ -687,7 +780,7 @@ bool Tileset::addTileStyleSet(Tile *tile, Glib::ustring filename)
   TileStyle::Type tilestyle_type;
   tilestyle_type = TileStyle::UNKNOWN;
   TileStyleSet *set = 
-    new TileStyleSet(filename, getUnscaledTileSize(), success, tilestyle_type);
+    new TileStyleSet(filename, success, tilestyle_type);
   if (!success)
     {
       delete set;
@@ -725,19 +818,22 @@ bool Tileset::getTileStyle(guint32 id, Tile **tile, TileStyleSet **set, TileStyl
 
 bool Tileset::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version)
 {
-  return FileCompat::getInstance()->upgrade(filename, old_version, new_version,
+  return FileCompat::instance()->upgrade(filename, old_version, new_version,
                                             FileCompat::TILESET, d_tag);
 }
 
 void Tileset::support_backward_compatibility()
 {
-  FileCompat::getInstance()->support_type(FileCompat::TILESET, file_extension, 
+  FileCompat::instance()->support_type(FileCompat::TILESET, file_extension, 
                                           d_tag, true);
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::TILESET, "0.2.1", "0.3.2",
      sigc::ptr_fun(&Tileset::upgrade));
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::TILESET, "0.3.2", "0.3.3",
+     sigc::ptr_fun(&Tileset::upgrade));
+  FileCompat::instance()->support_version
+    (FileCompat::TILESET, "0.3.3", "0.4.0",
      sigc::ptr_fun(&Tileset::upgrade));
 }
 
@@ -784,7 +880,7 @@ int Tileset::countTilesWithPattern(SmallTile::Pattern pattern) const
 guint32 Tileset::get_default_tile_size ()
 {
   Tileset *t = new Tileset (1, "");
-  guint32 ts = t->getUnscaledTileSize ();
+  guint32 ts = t->getTileSize ();
   delete t;
   return ts;
 }
@@ -811,7 +907,8 @@ std::vector<TarFileMaskedImage*> Tileset::getMaskedImages ()
   std::vector<TarFileMaskedImage*> i;
   i.push_back (d_selector[0]);
   i.push_back (d_selector[1]);
-  i.push_back (d_flag);
+  for (guint32 j = 0; j < MAX_PLAYERS + 1; j++)
+    i.push_back (d_flag[j]);
   return i;
 }
 
@@ -854,4 +951,76 @@ guint32 Tileset::countTileStyles () const
       count += (*j)->size ();
   return count;
 }
-//End of file
+
+Tileset& Tileset::operator= (const Tileset& other)
+{
+  if (this != &other)
+    {
+      uninstantiateImages ();
+      for (unsigned int i=0; i < size (); i++)
+        delete (*this)[i];
+      delete d_selector[0];
+      delete d_selector[1];
+      for (guint32 i = 0; i < MAX_PLAYERS + 1; i++)
+        delete d_flag[i];
+      delete d_explosion;
+      delete d_road;
+      delete d_stone;
+      delete d_bridge;
+      delete d_fog;
+      delete d_all_movebonus;
+      delete d_water_movebonus;
+      delete d_forest_movebonus;
+      delete d_hills_movebonus;
+      delete d_mountains_movebonus;
+      delete d_swamp_movebonus;
+      clear ();
+      clean_tmp_dir ();
+
+      Set::operator=(other);
+
+      d_selector[0] = new TarFileMaskedImage (*other.d_selector[0]);
+      d_selector[1] = new TarFileMaskedImage (*other.d_selector[1]);
+      for (guint32 i = 0; i < MAX_PLAYERS + 1; i++)
+        d_flag[i] = new TarFileMaskedImage (*other.d_flag[i]);
+      d_fog = new TarFileImage (*other.d_fog);
+      d_road = new TarFileImage (*other.d_road);
+      d_stone = new TarFileImage (*other.d_stone);
+      d_bridge = new TarFileImage (*other.d_bridge);
+      d_explosion = new TarFileImage (*other.d_explosion);
+      d_road_color = other.d_road_color;
+      d_ruin_color = other.d_ruin_color;
+      d_temple_color = other.d_temple_color;
+
+      for (Tileset::const_iterator i = other.begin (); i != other.end (); ++i)
+        push_back (new Tile (*(*i)));
+
+      for (Tileset::const_iterator i = begin (); i != end (); ++i)
+        for (std::list<TileStyleSet*>::const_iterator j = (*i)->begin ();
+             j != (*i)->end (); ++j)
+          for (std::vector<TileStyle*>::const_iterator k = (*j)->begin ();
+               k != (*j)->end (); ++k)
+            d_tilestyles[(*k)->getId ()] = *k;
+
+      d_all_movebonus = new TarFileImage (*other.d_all_movebonus);
+      d_water_movebonus = new TarFileImage (*other.d_water_movebonus);
+      d_forest_movebonus = new TarFileImage (*other.d_forest_movebonus);
+      d_hills_movebonus = new TarFileImage (*other.d_hills_movebonus);
+      d_mountains_movebonus = new TarFileImage (*other.d_mountains_movebonus);
+      d_swamp_movebonus = new TarFileImage (*other.d_swamp_movebonus);
+    }
+  return *this;
+}
+
+bool Tileset::get_images_instantiated ()
+{
+  for (auto i : getImages ())
+    if (i->getBackingImage () != NULL)
+      return true;
+
+  for (auto i : getMaskedImages ())
+    if (i->getBackingImage () != NULL)
+      return true;
+
+  return false;
+}

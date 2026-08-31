@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014, 2015, 2017, 2021 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2015, 2017, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,17 +12,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
+
 #include <assert.h>
-#include "stacktile.h"
+#include "stack-tile.h"
 #include "stack.h"
 #include "defs.h"
 #include "vector.h"
 #include "player.h"
-#include "stacklist.h"
-#include "playerlist.h"
-#include "Tile.h"
+#include "stack-list.h"
+#include "player-list.h"
+#include "tile.h"
 
 StackTile::StackTile(Vector<int> pos)
   :tile(pos)
@@ -134,7 +134,7 @@ Stack *StackTile::getStack() const
   if (size() > 0)
     {
       StackTileRecord rec = front();
-      Player *p = Playerlist::getInstance()->getPlayer(rec.player_id);
+      Player *p = Playerlist::instance()->get (rec.player_id);
       return p->getStacklist()->getStackById(rec.stack_id);
     }
   return NULL;
@@ -145,7 +145,7 @@ std::vector<Stack *> StackTile::getStacks() const
   std::vector<Stack *> stacks;
   for (const_iterator it = begin(); it != end(); ++it)
     {
-      for (auto i: *Playerlist::getInstance())
+      for (auto i: *Playerlist::instance())
 	{
 	  Stack *stack = i->getStacklist()->getStackById((*it).stack_id);
 	  if (stack)
@@ -155,7 +155,7 @@ std::vector<Stack *> StackTile::getStacks() const
   return stacks;
 }
 
-std::vector<Stack *> StackTile::getFriendlyStacks(Player *owner) const
+std::vector<Stack *> StackTile::getFriendlyStacks(const Player *owner) const
 {
   std::vector<Stack *> stacks;
   for (const_iterator it = begin(); it != end(); ++it)
@@ -189,7 +189,7 @@ Stack *StackTile::getEnemyStack(Player *owner) const
     {
       if ((*it).player_id == owner->getId())
 	continue;
-      Player *p = Playerlist::getInstance()->getPlayer((*it).player_id);
+      Player *p = Playerlist::instance()->get ((*it).player_id);
       Stack *stack = p->getStacklist()->getStackById((*it).stack_id);
       if (stack)
 	return stack;
@@ -204,7 +204,7 @@ std::vector<Stack *> StackTile::getEnemyStacks(Player *owner) const
     {
       if ((*it).player_id == owner->getId())
 	continue;
-      Player *p = Playerlist::getInstance()->getPlayer((*it).player_id);
+      Player *p = Playerlist::instance()->get ((*it).player_id);
       Stack *stack = p->getStacklist()->getStackById((*it).stack_id);
       if (stack)
 	stacks.push_back(stack);
@@ -310,9 +310,9 @@ void StackTile::setParked(Player *owner, bool parked)
 void StackTile::group()
 {
   Player *old = Playerlist::getActiveplayer();
-  for (auto p : *Playerlist::getInstance())
+  for (auto p : *Playerlist::instance())
     {
-      Playerlist::getInstance()->setActiveplayer(p);
+      Playerlist::instance()->setActiveplayer(p);
       std::vector<Stack *> stacks = getFriendlyStacks(p);
       if (stacks.size() > 1)
         {
@@ -324,9 +324,9 @@ void StackTile::group()
             }
         }
     }
-  Playerlist::getInstance()->setActiveplayer(old);
-  for (auto p : *Playerlist::getInstance())
-    p->setActivestack(0);
+  Playerlist::instance()->setActiveplayer(old);
+  for (auto p : *Playerlist::instance())
+    p->stackDeselect ();
 }
 
 void StackTile::dump () const

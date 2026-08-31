@@ -1,4 +1,4 @@
-// Copyright (C) 2007, 2008, 2009, 2012, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef RUINMAP_H
@@ -21,9 +20,10 @@
 
 #include <sigc++/signal.h>
 
-#include "overviewmap.h"
+#include "overview-map.h"
 #include "input-events.h"
-#include "NamedLocation.h"
+#include "named-location.h"
+#include "image-cache.h"
 
 //! Draw the ruins and temples onto a miniature map graphic.
 /** 
@@ -48,6 +48,15 @@ class RuinMap : public OverviewMap
 
      // Get Methods
   
+    ImageCache::CursorType get_cursor (double x, double y)
+      {
+        Vector<int> pos (x, y);
+
+        Vector<int> tile = mapFromScreen (pos);
+        if (is_hot (tile))
+          return ImageCache::HAND_POINTER;
+        return ImageCache::POINTER;
+      }
      //! Return the Ruin or Temple object that is currently selected.
      NamedLocation * getNamedLocation () const {return ruin;}
 
@@ -64,7 +73,7 @@ class RuinMap : public OverviewMap
      /**
       * Classes that use RuinMap must catch this signal to display the map.
       */
-     sigc::signal<void, Cairo::RefPtr<Cairo::Surface> > map_changed;
+     sigc::signal<void(Cairo::RefPtr<Cairo::Surface>)> map_changed;
 
  private:
      //! Draw the Ruin objects on the map.
@@ -87,6 +96,7 @@ class RuinMap : public OverviewMap
       */
      virtual void after_draw();
 
+     void create_hotmap ();
      // DATA
 
      //! The currently selected Ruin or Temple object.

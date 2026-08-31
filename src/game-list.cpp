@@ -1,4 +1,4 @@
-// Copyright (C) 2011, 2014 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,26 +12,25 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "xmlhelper.h"
-#include "gamelist.h"
+#include "xml-helper.h"
+#include "game-list.h"
 #include "hosted-game.h"
 #include <limits.h>
 #include <fstream>
 #include <iostream>
-#include "Configuration.h"
+#include "configuration.h"
 #include "defs.h"
 #include "profile.h"
-#include "profilelist.h"
+#include "profile-list.h"
 #include "file-compat.h"
 #include "advertised-game.h"
 #include "recently-played-game-list.h"
 #include "recently-played-game.h"
-#include "File.h"
+#include "file.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -40,7 +39,7 @@ Glib::ustring Gamelist::d_tag = "gamelist";
 
 Gamelist* Gamelist::s_instance = 0;
 
-Gamelist* Gamelist::getInstance()
+Gamelist* Gamelist::instance()
 {
   if (s_instance == 0)
     s_instance = new Gamelist();
@@ -64,8 +63,8 @@ bool Gamelist::loadFromFile(Glib::ustring filename)
   if (in)
     {
       XML_Helper helper(filename.c_str(), std::ios::in);
-      helper.registerTag(HostedGame::d_tag, sigc::mem_fun(this, &Gamelist::load_tag));
-      bool retval = helper.parseXML();
+      helper.register_tag(HostedGame::d_tag, sigc::mem_fun(*this, &Gamelist::load_tag));
+      bool retval = helper.parse_XML();
       helper.close();
       if (retval == false)
 	File::erase(filename);
@@ -74,7 +73,7 @@ bool Gamelist::loadFromFile(Glib::ustring filename)
   return true;
 }
 
-Gamelist* Gamelist::getInstance(XML_Helper* helper)
+Gamelist* Gamelist::instance(XML_Helper* helper)
 {
   if (s_instance)
     deleteInstance();
@@ -97,7 +96,7 @@ Gamelist::Gamelist()
 
 Gamelist::Gamelist(XML_Helper* helper)
 {
-  helper->registerTag(HostedGame::d_tag, sigc::mem_fun(this, &Gamelist::load_tag));
+  helper->register_tag(HostedGame::d_tag, sigc::mem_fun(*this, &Gamelist::load_tag));
 }
 
 void Gamelist::remove_all()
@@ -117,19 +116,19 @@ bool Gamelist::save(XML_Helper* helper) const
   bool retval = true;
 
   retval &= helper->begin(LORDSAWAR_RECENTLY_HOSTED_VERSION);
-  retval &= helper->openTag(Gamelist::d_tag);
+  retval &= helper->open_tag(Gamelist::d_tag);
 
   for (const_iterator it = begin(); it != end(); ++it)
     (*it)->save(helper);
 
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
 
 bool Gamelist::load_tag(Glib::ustring tag, XML_Helper* helper)
 {
-  if (helper->getVersion() != LORDSAWAR_RECENTLY_HOSTED_VERSION)
+  if (helper->get_version() != LORDSAWAR_RECENTLY_HOSTED_VERSION)
     {
       return false;
     }
@@ -153,7 +152,7 @@ void Gamelist::addEntry(AdvertisedGame *advertised_game)
 
 bool Gamelist::orderByTime(HostedGame*rhs, HostedGame *lhs)
 {
-  if (rhs->getAdvertisedGame()->getTimeOfLastPlay().as_double() > lhs->getAdvertisedGame()->getTimeOfLastPlay().as_double())
+  if (rhs->getAdvertisedGame()->getTimeOfLastPlay().to_unix () > lhs->getAdvertisedGame()->getTimeOfLastPlay().to_unix())
     return true;
   else
     return false;
@@ -185,11 +184,10 @@ void Gamelist::pruneTooManyGames(int too_many)
 
 void Gamelist::pruneOldGames(int stale)
 {
-  Glib::TimeVal now;
-  now.assign_current_time();
+  Glib::DateTime now = Glib::DateTime::create_now_local();
   for (Gamelist::iterator it = begin(); it != end();)
     {
-      if ((*it)->getAdvertisedGame()->getTimeOfLastPlay().as_double() + stale < now.as_double())
+      if ((*it)->getAdvertisedGame()->getTimeOfLastPlay().to_unix() + stale < now.to_unix())
 	{
 	  delete *it;
 	  it = erase (it);
@@ -205,8 +203,7 @@ void Gamelist::updateEntry(Glib::ustring scenario_id, guint32 round)
     {
       if ((*it)->getAdvertisedGame()->getId() == scenario_id)
 	{
-          Glib::TimeVal now;
-          now.assign_current_time();
+          Glib::DateTime now = Glib::DateTime::create_now_local();
 	  (*it)->getAdvertisedGame()->setTimeOfLastPlay(now);
 	  (*it)->getAdvertisedGame()->setRound(round);
 	}
@@ -215,12 +212,12 @@ void Gamelist::updateEntry(Glib::ustring scenario_id, guint32 round)
 	
 bool Gamelist::load()
 {
-  return loadFromFile(File::getSaveFile(RECENTLY_HOSTED_LIST));
+  return loadFromFile(File::getUserRecentlyHostedGamesDescription());
 }
 
 bool Gamelist::save() const
 {
-  return saveToFile(File::getSaveFile(RECENTLY_HOSTED_LIST));
+  return saveToFile(File::getUserRecentlyHostedGamesDescription());
 }
 
 RecentlyPlayedGameList* Gamelist::getList(bool scrub_profile_id) const
@@ -262,12 +259,11 @@ bool Gamelist::add(HostedGame *g)
 void Gamelist::pingGames()
 {
   double stale = (double) FIVE_MINUTES_OLD;
-  Glib::TimeVal now;
-  now.assign_current_time();
+  Glib::DateTime now = Glib::DateTime::create_now_local();
   for (iterator i = begin(); i != end(); ++i)
     {
       AdvertisedGame *a = (*i)->getAdvertisedGame();
-      if (a->getGameLastPingedOn().as_double() + stale < now.as_double())
+      if (a->getGameLastPingedOn().to_unix() + stale < now.to_unix())
         {
           (*i)->cannot_ping_game.connect
             (sigc::mem_fun(*this, &Gamelist::on_could_not_ping_game));
@@ -295,23 +291,22 @@ void Gamelist::on_could_not_ping_game(HostedGame *game)
 
 bool Gamelist::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version)
 {
-  return FileCompat::getInstance()->upgrade(filename, old_version, new_version,
+  return FileCompat::instance()->upgrade(filename, old_version, new_version,
                                             FileCompat::GAMELIST, 
                                             d_tag);
 }
 
 void Gamelist::support_backward_compatibility()
 {
-  FileCompat::getInstance()->support_type
+  FileCompat::instance()->support_type
     (FileCompat::GAMELIST, 
      File::get_extension(File::getUserRecentlyHostedGamesDescription()), d_tag, 
      false);
-  FileCompat::getInstance()->support_type
+  FileCompat::instance()->support_type
     (FileCompat::GAMELIST, 
      File::get_extension(File::getUserRecentlyAdvertisedGamesDescription()), 
      d_tag, false);
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::GAMELIST, "0.2.0", LORDSAWAR_RECENTLY_HOSTED_VERSION,
      sigc::ptr_fun(&Gamelist::upgrade));
 }
-// End of file

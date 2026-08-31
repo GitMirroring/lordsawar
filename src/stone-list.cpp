@@ -1,4 +1,4 @@
-//  Copyright (C) 2017, 2021 Ben Asselstine
+//  Copyright (C) 2017, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,15 +12,14 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "stonelist.h"
+#include "stone-list.h"
 #include "stone.h"
-#include "GameMap.h"
-#include "xmlhelper.h"
+#include "game-map.h"
+#include "xml-helper.h"
 
 Glib::ustring Stonelist::d_tag = "stonelist";
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -28,7 +27,7 @@ Glib::ustring Stonelist::d_tag = "stonelist";
 
 Stonelist* Stonelist::s_instance=0;
 
-Stonelist* Stonelist::getInstance()
+Stonelist* Stonelist::instance()
 {
     if (s_instance == 0)
         s_instance = new Stonelist();
@@ -36,7 +35,7 @@ Stonelist* Stonelist::getInstance()
     return s_instance;
 }
 
-Stonelist* Stonelist::getInstance(XML_Helper* helper)
+Stonelist* Stonelist::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -73,19 +72,19 @@ Stonelist::Stonelist (const Stonelist &s, bool sync_ids)
 
 Stonelist::Stonelist(XML_Helper* helper)
 {
-    helper->registerTag(Stone::d_tag, sigc::mem_fun(this, &Stonelist::load));
+    helper->register_tag(Stone::d_tag, sigc::mem_fun(*this, &Stonelist::load));
 }
 
 bool Stonelist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Stonelist::d_tag);
+    retval &= helper->open_tag(Stonelist::d_tag);
 
     for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }

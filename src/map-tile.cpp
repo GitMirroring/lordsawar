@@ -1,8 +1,8 @@
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020,
-// 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,17 +16,16 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "maptile.h"
+#include "map-tile.h"
 #include <iostream>
-#include "tileset.h"
-#include "MapBackpack.h"
-#include "stacktile.h"
+#include "tile-set.h"
+#include "map-backpack.h"
+#include "stack-tile.h"
 #include "army.h"
-#include "GameMap.h"
-#include "playerlist.h"
+#include "game-map.h"
+#include "player-list.h"
 
 Maptile::Maptile()
         :Movable(Vector<int>(-1,-1)), d_index(0), d_building(NONE)
@@ -322,4 +321,3 @@ TileStyle * Maptile::getTileStyle (Tileset *tileset)
     d_tileStyle = tileset->getTileStyle (d_tilestyle_id);
   return d_tileStyle;
 }
-// End of file

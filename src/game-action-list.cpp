@@ -1,4 +1,4 @@
-//  Copyright (C) 2017, 2021 Ben Asselstine
+//  Copyright (C) 2017, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,14 +12,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "game-actionlist.h"
+#include "game-action-list.h"
 #include "network-action.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
 Glib::ustring GameActionlist::d_tag = "turnlist";
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -27,7 +26,7 @@ Glib::ustring GameActionlist::d_tag = "turnlist";
 
 GameActionlist* GameActionlist::s_instance = 0;
 
-GameActionlist* GameActionlist::getInstance()
+GameActionlist* GameActionlist::instance()
 {
   if (s_instance == NULL)
     s_instance = new GameActionlist();
@@ -35,7 +34,7 @@ GameActionlist* GameActionlist::getInstance()
   return s_instance;
 }
 
-GameActionlist* GameActionlist::getInstance(XML_Helper* helper)
+GameActionlist* GameActionlist::instance(XML_Helper* helper)
 {
   if (s_instance)
     deleteInstance();
@@ -72,19 +71,19 @@ GameActionlist::~GameActionlist()
 
 GameActionlist::GameActionlist(XML_Helper* helper)
 {
-  helper->registerTag(TurnActionlist::d_tag, sigc::mem_fun(this, &GameActionlist::load));
+  helper->register_tag(TurnActionlist::d_tag, sigc::mem_fun(*this, &GameActionlist::load));
 }
 
 bool GameActionlist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(GameActionlist::d_tag);
+    retval &= helper->open_tag(GameActionlist::d_tag);
 
     for (GameActionlist::const_iterator it = begin(); it != end(); ++it)
       retval &= (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef SHIELDSTYLE_H
@@ -21,7 +20,7 @@
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
-#include "PixMask.h"
+#include "pixmask.h"
 
 
 class XML_Helper;
@@ -115,4 +114,4 @@ class ShieldStyle : public sigc::trackable
         TarFileMaskedImage * d_mimage;
 };
 
-#endif // SHIELDSTYLE_H
+#endif

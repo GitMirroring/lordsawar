@@ -1,7 +1,7 @@
-// Copyright (C) 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <gtkmm.h>
@@ -24,23 +23,23 @@
 #include <assert.h>
 
 #include "rectangle.h"
-#include "armysetlist.h"
-#include "armyset.h"
-#include "File.h"
+#include "army-set-list.h"
+#include "army-set.h"
+#include "file.h"
 #include "defs.h"
 #include "ucompose.hpp"
-#include "PixMask.h"
-#include "tarhelper.h"
-#include "setlist.h"
-#include "TarFileMaskedImage.h"
-#include "TarFileImage.h"
+#include "pixmask.h"
+#include "tar-helper.h"
+#include "set-list.h"
+#include "tar-file-masked-image.h"
+#include "tar-file-image.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
 Armysetlist* Armysetlist::s_instance = 0;
 
-Armysetlist* Armysetlist::getInstance()
+Armysetlist* Armysetlist::instance()
 {
   if (!s_instance)
     s_instance = new Armysetlist();
@@ -59,8 +58,8 @@ void Armysetlist::deleteInstance()
 Armysetlist::Armysetlist()
  : SetList(Armyset::file_extension)
 {
-  signal_add().connect(sigc::mem_fun(this, &Armysetlist::on_armyset_added));
-  signal_reload().connect(sigc::mem_fun(this, &Armysetlist::on_armyset_reloaded));
+  signal_add().connect(sigc::mem_fun(*this, &Armysetlist::on_armyset_added));
+  signal_reload().connect(sigc::mem_fun(*this, &Armysetlist::on_armyset_reloaded));
   loadSets(SetList::scan(Armyset::file_extension));
   loadSets(SetList::scan(Armyset::file_extension, false));
 }
@@ -146,7 +145,7 @@ void Armysetlist::instantiateImages(bool &broken)
       if (!broken)
         {
           if ((*it)->validate () == true)
-            (*it)->instantiateImages(true, broken);
+            (*it)->instantiateImages(broken);
         }
     }
 }

@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2021 Ben Asselstine
+//  Copyright (C) 2009, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef NAMELIST_H
@@ -64,5 +63,4 @@ class NameList : public std::vector<Glib::ustring>, public sigc::trackable
 	Glib::ustring d_item_tag;
 };
 
-#endif // NAMELIST_H
-
+#endif

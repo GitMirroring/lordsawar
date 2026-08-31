@@ -1,9 +1,9 @@
-// Copyright (C) 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2004 Thomas Plonka
-// Copyright (C) 2007, 2008, 2009, 2014, 2017, 2020 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2004 Thomas Plonka
+//  Copyright (C) 2007, 2008, 2009, 2014, 2017, 2020, 2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef SMALLMAP_H
@@ -28,7 +27,7 @@
 #include <sigc++/connection.h>
 #include <sigc++/trackable.h>
 
-#include "overviewmap.h"
+#include "overview-map.h"
 
 #include "rectangle.h"
 #include "input-events.h"
@@ -116,27 +115,21 @@ public:
     //! Center the little white box in the center of the map graphic.
     void center_view ();
 
-    // Signals
- 
-    // Emitted when the white box is redrawn after a call to SmallMap::set_view.
-    /**
-     * Classes that use SmallMap must catch this signal to display the change
-     * in position of the little white box.
-     */
-    sigc::signal<void, LwRectangle> view_changed;
 
-    //! Emitted during sliding animation after a call to Smallmap::slide_view.
-    /**
-     * Classes that use SmallMap must catch this signal to display the 
-     * animation of the little white box.
-     */
-    sigc::signal<void, LwRectangle> view_slid;
+    sigc::signal<void(LwRectangle)> signal_view_changed ()
+      {
+        return m_view_changed;
+      }
 
-    // Emitted after a call to SmallMap::Draw.
-    /**
-     * Classes that use SmallMap must catch this signal to display the map.
-     */
-    sigc::signal<void, Cairo::RefPtr<Cairo::Surface>, Gdk::Rectangle> map_changed;
+    sigc::signal<void(LwRectangle)> signal_view_slid ()
+      {
+        return m_view_slid;
+      }
+
+    sigc::signal<void(Cairo::RefPtr<Cairo::Surface>, Gdk::Rectangle)> signal_map_changed ()
+      {
+        return m_map_changed;
+      }
 
 private:
     //! Draw the selection rectangle that shows the viewed portion of the map.
@@ -172,6 +165,28 @@ private:
 
     //! When sliding the box, it sleeps this long per frame (in microseconds).
     guint32 sleep_interval;
+
+    // Signals
+ 
+    // Emitted when the white box is redrawn after a call to SmallMap::set_view.
+    /**
+     * Classes that use SmallMap must catch this signal to display the change
+     * in position of the little white box.
+     */
+    sigc::signal<void(LwRectangle)> m_view_changed;
+
+    //! Emitted during sliding animation after a call to Smallmap::slide_view.
+    /**
+     * Classes that use SmallMap must catch this signal to display the 
+     * animation of the little white box.
+     */
+    sigc::signal<void(LwRectangle)> m_view_slid;
+
+    // Emitted after a call to SmallMap::Draw.
+    /**
+     * Classes that use SmallMap must catch this signal to display the map.
+     */
+    sigc::signal<void(Cairo::RefPtr<Cairo::Surface>, Gdk::Rectangle)> m_map_changed;
 };
 
 #endif

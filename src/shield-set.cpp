@@ -1,5 +1,5 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020,
-//  2021 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,23 +13,22 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include "rectangle.h"
 #include <sigc++/functors/mem_fun.h>
 
 #include <string.h>
-#include "shieldset.h"
-#include "shieldstyle.h"
-#include "File.h"
-#include "Configuration.h"
-#include "tarhelper.h"
+#include "shield-set.h"
+#include "shield-style.h"
+#include "file.h"
+#include "configuration.h"
+#include "tar-helper.h"
 #include "file-compat.h"
 #include "ucompose.hpp"
-#include "xmlhelper.h"
-#include "TarFileMaskedImage.h"
+#include "xml-helper.h"
+#include "tar-file-masked-image.h"
 
 Glib::ustring Shieldset::d_tag = "shieldset";
 Glib::ustring Shieldset::file_extension = SHIELDSET_EXT;
@@ -38,16 +37,12 @@ Glib::ustring Shieldset::file_extension = SHIELDSET_EXT;
 //#define debug(x)
 
 Shieldset::Shieldset(guint32 id, Glib::ustring name)
- : Set(SHIELDSET_EXT, id, name, 0), d_small_height(0), d_small_width(0), 
-    d_medium_height(0), d_medium_width(0), d_large_height(0), d_large_width(0)
+ : Set(SHIELDSET_EXT, id, name, 0)
 {
 }
 
 Shieldset::Shieldset(const Shieldset& s)
- : std::list<Shield*>(), sigc::trackable(s), Set(s), 
-    d_small_height(s.d_small_height), d_small_width(s.d_small_width),
-    d_medium_height(s.d_medium_height), d_medium_width(s.d_medium_width),
-    d_large_height(s.d_large_height), d_large_width(s.d_large_width)
+ : std::list<Shield*>(), sigc::trackable(s), Set(s)
 {
   for (const_iterator it = s.begin(); it != s.end(); ++it)
     push_back(new Shield(*(*it)));
@@ -56,18 +51,12 @@ Shieldset::Shieldset(const Shieldset& s)
 Shieldset::Shieldset(XML_Helper *helper, Glib::ustring directory)
  : Set(SHIELDSET_EXT, helper, directory)
 {
-  setTileSize(0);
-  helper->getData(d_small_width, "small_width");
-  helper->getData(d_small_height, "small_height");
-  helper->getData(d_medium_width, "medium_width");
-  helper->getData(d_medium_height, "medium_height");
-  helper->getData(d_large_width, "large_width");
-  helper->getData(d_large_height, "large_height");
-  helper->registerTag(Shield::d_tag, 
+  setTileSize (0);
+  helper->register_tag(Shield::d_tag, 
 		      sigc::mem_fun((*this), &Shieldset::loadShield));
-  helper->registerTag(ShieldStyle::d_tag, sigc::mem_fun((*this), 
+  helper->register_tag(ShieldStyle::d_tag, sigc::mem_fun((*this), 
 							&Shieldset::loadShield));
-  helper->registerTag(Tartan::d_tartan_tag, sigc::mem_fun((*this),
+  helper->register_tag(Tartan::d_tartan_tag, sigc::mem_fun((*this),
                                                           &Shieldset::loadShield));
   clear();
 }
@@ -158,64 +147,130 @@ bool Shieldset::loadShield(Glib::ustring tag, XML_Helper* helper)
 class ShieldsetLoader
 {
 public:
-    ShieldsetLoader(Glib::ustring filename, bool &broken, bool &unsupported)
-      : dir (File::get_dirname(filename)), file (File::get_basename(filename)),
-      shieldset (NULL), unsupported_version (false)
+    ShieldsetLoader (Glib::ustring f)
+      : filename (f), dir (File::get_dirname (filename)),
+      file (File::get_basename (filename)), bad_version (""),
+      found_top_tag (false)
       {
-	if (File::nameEndsWith(filename, Shieldset::file_extension) == false)
-	  filename += Shieldset::file_extension;
-        Tar_Helper t(filename, std::ios::in, broken);
+        if (File::nameEndsWith (filename, Shieldset::file_extension) == false)
+          filename += Shieldset::file_extension;
+      }
+
+    bool parse ()
+      {
+        bool broken = false;
+        Tar_Helper t (filename, std::ios::in, broken);
         if (broken)
-          return;
+          {
+            Glib::ustring err;
+            if (File::exists (filename) && File::is_readonly (filename))
+              err = String::ucompose (_("Couldn't open %1 for reading"),
+                                      filename);
+            else
+              err =
+                String::ucompose
+                (_("Couldn't scan archive in %1, not a valid file"), filename);
+
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
         Glib::ustring lwsfilename = 
-          t.getFirstFile(Shieldset::file_extension, broken);
+          t.getFirstFile (Shieldset::file_extension, broken);
+        if (lwsfilename.empty () == true)
+          {
+            Glib::ustring err =
+              String::ucompose (_("Shield set file `%1' lacks a %2 file"),
+                                filename, Shieldset::file_extension);
+
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
         if (broken)
-          return;
-	XML_Helper helper(lwsfilename, std::ios::in);
-	helper.registerTag(Shieldset::d_tag, sigc::mem_fun((*this), &ShieldsetLoader::load));
-	if (!helper.parseXML())
-	  {
-            unsupported = unsupported_version;
-            std::cerr << String::ucompose(_("Error!  can't load Shield Set `%1'."), filename) << std::endl;
-	    if (shieldset != NULL)
-	      delete shieldset;
-	    shieldset = NULL;
-	  }
-        helper.close();
-        File::erase(lwsfilename);
-        t.Close();
-      };
-    bool load(Glib::ustring tag, XML_Helper* helper)
+          {
+            Glib::ustring err =
+              String::ucompose
+              (_("Could not extract first file from shield set file `%1'"),
+               filename);
+
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
+
+        XML_Helper helper (lwsfilename, std::ios::in);
+        helper.register_tag (Shieldset::d_tag,
+                            sigc::mem_fun(*this, &ShieldsetLoader::load));
+        bool retval = true;
+        if (!helper.parse_XML ())
+          {
+            if (bad_version != "")
+              {
+                Glib::ustring err =
+                  String::ucompose (_("Expected version %1 but got %2"),
+                                    LORDSAWAR_SHIELDSET_VERSION, bad_version);
+
+                signal_finished.emit (NULL, false, true, err);
+              }
+            else
+              signal_finished.emit (NULL, true, false,
+                                    _("Unknown parsing error"));
+            retval = false;
+          }
+        else
+          {
+            if (!found_top_tag)
+              {
+                Glib::ustring err =
+                  String::ucompose (_("Couldn't find <%1> tag"),
+                                    Shieldset::d_tag);
+                signal_finished.emit (NULL, true, false, err);
+              }
+            else
+              signal_finished.emit (shieldset, false, false, "");
+          }
+        helper.close ();
+        File::erase (lwsfilename);
+        t.Close ();
+        return retval;
+      }
+
+    bool load (Glib::ustring tag, XML_Helper* helper)
       {
 	if (tag == Shieldset::d_tag)
 	  {
-            if (helper->getVersion() == LORDSAWAR_SHIELDSET_VERSION)
+            if (helper->get_version () == LORDSAWAR_SHIELDSET_VERSION)
               {
-                shieldset = new Shieldset(helper, dir);
-                shieldset->setBaseName(file);
+                found_top_tag = true;
+                shieldset = new Shieldset (helper, dir);
+                shieldset->setBaseName (file);
                 return true;
               }
             else
               {
-                unsupported_version = true;
+                bad_version = helper->get_version ();
                 return false;
               }
 	  }
 	return false;
       };
+    Glib::ustring filename;
     Glib::ustring dir;
     Glib::ustring file;
+    Glib::ustring bad_version;
+    bool found_top_tag;
+    sigc::signal<void(Shieldset*, bool, bool, Glib::ustring)> signal_finished;
     Shieldset *shieldset;
-    bool unsupported_version;
 };
 
-Shieldset *Shieldset::create(Glib::ustring filename, bool &unsupported_version)
+void Shieldset::create(Glib::ustring filename, sigc::slot<void(Shieldset*,bool,bool,Glib::ustring)> finished)
 {
-  bool broken = false;
-  ShieldsetLoader d(filename, broken, unsupported_version);
-  if (broken)
-    return NULL;
-  return d.shieldset;
+  ShieldsetLoader d(filename);
+  d.signal_finished.connect
+    ([finished](Shieldset *shieldset, bool broken, bool unsupported_version,
+                Glib::ustring err)
+     {
+       finished (shieldset, broken, unsupported_version, err);
+     });
+  d.parse ();
 }
 
 bool Shieldset::save(Glib::ustring filename, Glib::ustring ext) const
@@ -229,7 +284,7 @@ bool Shieldset::save(Glib::ustring filename, Glib::ustring ext) const
   helper.close();
   if (broken == true)
     return false;
-  std::vector<Glib::ustring> extrafiles;
+  std::vector<std::string> extrafiles;
   return saveTar(tmpfile, tmpfile + ".tar", goodfilename, extrafiles);
 }
 
@@ -237,17 +292,11 @@ bool Shieldset::save(XML_Helper *helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(d_tag);
+  retval &= helper->open_tag(d_tag);
   retval &= Set::save(helper);
-  retval &= helper->saveData("small_width", d_small_width);
-  retval &= helper->saveData("small_height", d_small_height);
-  retval &= helper->saveData("medium_width", d_medium_width);
-  retval &= helper->saveData("medium_height", d_medium_height);
-  retval &= helper->saveData("large_width", d_large_width);
-  retval &= helper->saveData("large_height", d_large_height);
   for (const_iterator it = begin(); it != end(); ++it)
     retval &= (*it)->save(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
   return retval;
 }
 
@@ -268,12 +317,6 @@ bool Shieldset::validate() const
       if (validateTartanImages(Shield::Color(i)) == false)
 	return false;
     }
-  if (d_small_width == 0 || d_small_height == 0)
-    return false;
-  if (d_medium_width == 0 || d_medium_height == 0)
-    return false;
-  if (d_large_width == 0 || d_large_height == 0)
-    return false;
   return valid;
 }
 
@@ -359,22 +402,31 @@ bool Shieldset::validateTartanImages(Shield::Color c) const
   return true;
 }
 
-void Shieldset::reload(bool &broken)
+void Shieldset::reload()
 {
-  broken = false;
-  bool unsupported_version = false;
-  ShieldsetLoader d(getConfigurationFile(), broken, unsupported_version);
-  if (broken == false && d.shieldset && d.shieldset->validate())
-    {
-      //steal the values from d.shieldset and then don't delete it.
-      uninstantiateImages();
-      for (iterator it = begin(); it != end(); ++it)
-        delete *it;
-      Glib::ustring basename = getBaseName();
-      *this = *d.shieldset;
-      instantiateImages(true, broken);
-      setBaseName(basename);
-    }
+  ShieldsetLoader d(getConfigurationFile());
+  d.signal_finished.connect
+    ([this](Shieldset *shieldset, bool broken, bool unsupported_version,
+            Glib::ustring)
+     {
+       if (!broken && !unsupported_version && shieldset)
+         {
+           if (shieldset->validate ())
+             {
+               //steal the values from d.shieldset and then don't delete it.
+               uninstantiateImages();
+               for (iterator it = begin(); it != end(); ++it)
+                 delete *it;
+               clear ();
+               Glib::ustring basename = getBaseName();
+               *this = *shieldset;
+               instantiateImages(broken);
+               setBaseName(basename);
+             }
+         }
+     });
+
+  d.parse ();
 }
 
 guint32 Shieldset::countEmptyImageNames() const
@@ -393,19 +445,22 @@ guint32 Shieldset::countEmptyImageNames() const
 
 bool Shieldset::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version)
 {
-  return FileCompat::getInstance()->upgrade(filename, old_version, new_version,
+  return FileCompat::instance()->upgrade(filename, old_version, new_version,
                                             FileCompat::SHIELDSET, d_tag);
 }
 
 void Shieldset::support_backward_compatibility()
 {
-  FileCompat::getInstance()->support_type(FileCompat::SHIELDSET, 
+  FileCompat::instance()->support_type(FileCompat::SHIELDSET, 
                                           file_extension, d_tag, true);
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::SHIELDSET, "0.2.1", "0.3.2",
      sigc::ptr_fun(&Shieldset::upgrade));
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::SHIELDSET, "0.3.2", "0.3.3",
+     sigc::ptr_fun(&Shieldset::upgrade));
+  FileCompat::instance()->support_version
+    (FileCompat::SHIELDSET, "0.3.3", "0.4.0",
      sigc::ptr_fun(&Shieldset::upgrade));
 }
 
@@ -414,126 +469,6 @@ Shieldset* Shieldset::copy(const Shieldset *shieldset)
   if (!shieldset)
     return NULL;
   return new Shieldset(*shieldset);
-}
-
-void Shieldset::setHeightsAndWidthsFromImages()
-{
-  setSmallHeightsAndWidthsFromImages();
-  setMediumHeightsAndWidthsFromImages();
-  setLargeHeightsAndWidthsFromImages();
-}
-
-void Shieldset::setHeightsAndWidthsFromImages(ShieldStyle *ss)
-{
-  ShieldStyle::Type t = ShieldStyle::Type(ss->getType ());
-  switch (t)
-    {
-    case ShieldStyle::SMALL:
-      return setSmallHeightsAndWidthsFromImages();
-    case ShieldStyle::MEDIUM:
-      return setMediumHeightsAndWidthsFromImages();
-    case ShieldStyle::LARGE:
-      return setLargeHeightsAndWidthsFromImages();
-    }
-}
-
-void Shieldset::setSmallHeightsAndWidthsFromImages()
-{
-  d_small_width = 0;
-  d_small_height = 0;
-  std::map<Vector<int>, guint32> small_sizecounts;
-
-  for (iterator it = begin(); it != end(); ++it)
-    for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); ++i)
-      {
-        PixMask *image = (*i)->getMaskedImage()->getImage ();
-        if (image == NULL)
-          continue;
-        switch ((*i)->getType ())
-          {
-          case ShieldStyle::SMALL:
-            small_sizecounts[image->get_unscaled_dim ()]++;
-            break;
-          }
-      }
-
-  guint32 maxcount = 0;
-  for (auto i : small_sizecounts)
-    {
-      if (i.second > maxcount)
-        {
-          maxcount = i.second;
-          d_small_width = i.first.x;
-          d_small_height = i.first.y;
-        }
-    }
-  return;
-}
-
-void Shieldset::setMediumHeightsAndWidthsFromImages()
-{
-  d_medium_width = 0;
-  d_medium_height = 0;
-  std::map<Vector<int>, guint32> medium_sizecounts;
-
-  for (iterator it = begin(); it != end(); ++it)
-    for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); ++i)
-      {
-        PixMask *image = (*i)->getMaskedImage()->getImage ();
-        if (image == NULL)
-          continue;
-        switch ((*i)->getType ())
-          {
-          case ShieldStyle::MEDIUM:
-            medium_sizecounts[image->get_unscaled_dim ()]++;
-            break;
-          }
-      }
-
-  guint32 maxcount = 0;
-  for (auto i : medium_sizecounts)
-    {
-      if (i.second > maxcount)
-        {
-          maxcount = i.second;
-          d_medium_width = i.first.x;
-          d_medium_height = i.first.y;
-        }
-    }
-  return;
-}
-
-void Shieldset::setLargeHeightsAndWidthsFromImages()
-{
-  d_large_width = 0;
-  d_large_height = 0;
-  std::map<Vector<int>, guint32> large_sizecounts;
-
-  for (iterator it = begin(); it != end(); ++it)
-    for (Shield::iterator i = (*it)->begin(); i != (*it)->end(); ++i)
-      {
-        PixMask *image = (*i)->getMaskedImage()->getImage ();
-        if (image == NULL)
-          continue;
-        switch ((*i)->getType ())
-          {
-          case ShieldStyle::LARGE:
-            large_sizecounts[image->get_unscaled_dim ()]++;
-            break;
-          }
-      }
-
-  guint32 maxcount = 0;
-  for (auto i : large_sizecounts)
-    {
-      if (i.second > maxcount)
-        {
-          maxcount = i.second;
-          d_large_width = i.first.x;
-          d_large_height = i.first.y;
-        }
-    }
-  return;
 }
 
 TarFileMaskedImage *Shieldset::lookupTartanImage(guint32 color, Tartan::Type type)
@@ -561,23 +496,8 @@ void Shieldset::uninstantiateSameNamedImages (Glib::ustring name)
 {
   TarFileMaskedImage::uninstantiate (name, getMaskedImages ());
 }
-        
-bool Shieldset::isSmallHeightAndWidthSet()
-{
-  return d_small_width && d_small_height;
-}
 
-bool Shieldset::isMediumHeightAndWidthSet()
-{
-  return d_medium_width && d_medium_height;
-}
-
-bool Shieldset::isLargeHeightAndWidthSet()
-{
-  return d_large_width && d_large_height;
-}
-
-void Shieldset::instantiateImages(bool scale, bool &broken)
+void Shieldset::instantiateImages(bool &broken)
 {
   uninstantiateImages ();
 
@@ -590,26 +510,13 @@ void Shieldset::instantiateImages(bool scale, bool &broken)
     {
       for (auto j : *(*i))
         {
-          Vector<int> dim = Vector<int>(-1, -1);
-          if (scale)
-            {
-              switch (j->getType())
-                {
-                case ShieldStyle::SMALL:
-                  dim = Vector<int>(getSmallWidth(), getSmallHeight()); break;
-                case ShieldStyle::MEDIUM:
-                  dim = Vector<int>(getMediumWidth(), getMediumHeight()); break;
-                case ShieldStyle::LARGE:
-                  dim = Vector<int>(getLargeWidth(), getLargeHeight()); break;
-                }
-            }
           TarFileMaskedImage *mim = j->getMaskedImage ();
           if (mim->getName ().empty () == false)
             {
               mim->setTarFile (&t);
               broken = mim->load ();
               if (!broken)
-                mim->instantiateImages (dim);
+                mim->instantiateImages ();
               else
                 break;
             }
@@ -645,4 +552,46 @@ void Shieldset::uninstantiateImages()
         (*i)->getTartanMaskedImage (Tartan::Type (k))->uninstantiateImages ();
     }
 }
-//End of file
+
+Shieldset& Shieldset::operator= (const Shieldset& other)
+{
+  if (this != &other)
+    {
+      uninstantiateImages ();
+      for (iterator it = begin (); it != end (); ++it)
+        delete *it;
+      clear ();
+      clean_tmp_dir ();
+    }
+  Set::operator=(other);
+  for (const_iterator it = other.begin (); it != other.end (); ++it)
+    push_back (new Shield (*(*it)));
+  return *this;
+}
+
+void Shieldset::populate_with_defaults ()
+{
+  for (unsigned int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
+    {
+      auto colors = Shield::get_default_colors (i);
+      if (i == Shield::NEUTRAL)
+        colors = Shield::get_default_colors_for_neutral ();
+      Shield *shield = new Shield (Shield::Color (i), colors);
+      if (shield)
+        {
+          shield->push_back (new ShieldStyle (ShieldStyle::SMALL));
+          shield->push_back (new ShieldStyle (ShieldStyle::MEDIUM));
+          shield->push_back (new ShieldStyle (ShieldStyle::LARGE));
+          push_back (shield);
+        }
+    }
+}
+
+bool Shieldset::get_images_instantiated ()
+{
+  for (auto i : getMaskedImages ())
+    if (i->getBackingImage () != NULL)
+      return true;
+
+  return false;
+}

@@ -1,8 +1,8 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2014, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,16 +16,15 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
 #include <algorithm>
-#include "armyprodbase.h"
-#include "armyprotobase.h"
-#include "xmlhelper.h"
-#include "armysetlist.h"
+#include "army-prod-base.h"
+#include "army-proto-base.h"
+#include "xml-helper.h"
+#include "army-set-list.h"
 
 Glib::ustring ArmyProdBase::d_tag = "armyprodbase";
 
@@ -45,22 +44,22 @@ ArmyProdBase::ArmyProdBase(const ArmyProto& a)
 ArmyProdBase::ArmyProdBase(XML_Helper* helper)
   :ArmyProtoBase(helper)
 {
-  helper->getData(d_armyset, "armyset");
-  helper->getData(d_type_id, "type");
+  helper->get(d_armyset, "armyset");
+  helper->get(d_type_id, "type");
 }
 
 bool ArmyProdBase::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(ArmyProdBase::d_tag);
+  retval &= helper->open_tag(ArmyProdBase::d_tag);
 
-  ArmyProtoBase::saveData(helper);
+  ArmyProtoBase::save(helper);
 
-  retval &= helper->saveData("type", d_type_id);
-  retval &= helper->saveData("armyset", d_armyset);
+  retval &= helper->save("type", d_type_id);
+  retval &= helper->save("armyset", d_armyset);
 
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }

@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2008, 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,23 +12,22 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "cityset.h"
-#include "File.h"
-#include "xmlhelper.h"
-#include "gui/image-helpers.h"
+#include "city-set.h"
+#include "file.h"
+#include "xml-helper.h"
+#include "image-helpers.h"
 #include "city.h"
 #include "ruin.h"
 #include "temple.h"
-#include "tarhelper.h"
-#include "Configuration.h"
+#include "tar-helper.h"
+#include "configuration.h"
 #include "file-compat.h"
 #include "ucompose.hpp"
-#include "TarFileImage.h"
+#include "tar-file-image.h"
 
 Glib::ustring Cityset::d_tag = "cityset";
 Glib::ustring Cityset::file_extension = CITYSET_EXT;
@@ -91,7 +90,7 @@ Cityset::Cityset(XML_Helper *helper, Glib::ustring directory)
   d_rcity = new TarFileImage (MAX_PLAYERS,
                               PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
   guint32 ts;
-  helper->getData(ts, "tilesize");
+  helper->get(ts, "tilesize");
   setTileSize(ts);
   d_city->load_name (helper, "cities");
   d_rcity->load_name (helper, "razed_cities");
@@ -100,9 +99,9 @@ Cityset::Cityset(XML_Helper *helper, Glib::ustring directory)
   d_ruin->load_name (helper, "ruins");
   d_temple->load_name (helper, "temples");
   d_tower->load_name (helper, "towers");
-  helper->getData(d_city_tile_width, "city_tile_width");
-  helper->getData(d_temple_tile_width, "temple_tile_width");
-  helper->getData(d_ruin_tile_width, "ruin_tile_width");
+  helper->get(d_city_tile_width, "city_tile_width");
+  helper->get(d_temple_tile_width, "temple_tile_width");
+  helper->get(d_ruin_tile_width, "ruin_tile_width");
 }
 
 Cityset::~Cityset()
@@ -122,64 +121,125 @@ Cityset::~Cityset()
 class CitysetLoader
 {
 public:
-    CitysetLoader(Glib::ustring filename, bool &broken, bool &unsupported)
-      : dir (File::get_dirname(filename)), file (File::get_basename(filename)),
-      cityset (NULL), unsupported_version (false)
+    CitysetLoader (Glib::ustring f)
+      : filename (f), dir (File::get_dirname (filename)),
+      file (File::get_basename (filename)), bad_version (""),
+      found_top_tag (false)
       {
-	if (File::nameEndsWith(filename, Cityset::file_extension) == false)
-	  filename += Cityset::file_extension;
-        Tar_Helper t(filename, std::ios::in, broken);
+        if (File::nameEndsWith (filename, Cityset::file_extension) == false)
+          filename += Cityset::file_extension;
+      }
+
+    bool parse ()
+      {
+        bool broken = false;
+        Tar_Helper t (filename, std::ios::in, broken);
         if (broken)
-          return;
+          {
+            Glib::ustring err;
+            if (File::exists (filename) && File::is_readonly (filename))
+              err = String::ucompose (_("Couldn't open %1 for reading"),
+                                      filename);
+            else
+              err =
+                String::ucompose
+                (_("Couldn't scan archive in %1, not a valid file"), filename);
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
         Glib::ustring lwcfilename = 
-          t.getFirstFile(Cityset::file_extension, broken);
+          t.getFirstFile (Cityset::file_extension, broken);
+        if (lwcfilename.empty () == true)
+          {
+            Glib::ustring err =
+              String::ucompose (_("City set file `%1' lacks a %2 file"),
+                                filename, Cityset::file_extension);
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
         if (broken)
-          return;
-	XML_Helper helper(lwcfilename, std::ios::in);
-	helper.registerTag(Cityset::d_tag, sigc::mem_fun((*this), &CitysetLoader::load));
-	if (!helper.parseXML())
-	  {
-            unsupported = unsupported_version;
-            std::cerr << String::ucompose(_("Error!  can't load cityset `%1'."), filename) << std::endl;
-	    if (cityset != NULL)
-	      delete cityset;
-	    cityset = NULL;
-	  }
-        helper.close();
-        File::erase(lwcfilename);
-        t.Close();
-      };
-    bool load(Glib::ustring tag, XML_Helper* helper)
+          {
+            Glib::ustring err =
+              String::ucompose
+              (_("Could not extract first file from city set file `%1'"),
+               filename);
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
+
+        XML_Helper helper (lwcfilename, std::ios::in);
+        helper.register_tag (Cityset::d_tag,
+                            sigc::mem_fun(*this, &CitysetLoader::load));
+        bool retval = true;
+        if (!helper.parse_XML ())
+          {
+            if (bad_version != "")
+              {
+                Glib::ustring err =
+                  String::ucompose (_("Expected version %1 but got %2"),
+                                    LORDSAWAR_CITYSET_VERSION, bad_version);
+                signal_finished.emit (NULL, false, true, err);
+              }
+            else
+              signal_finished.emit (NULL, true, false,
+                                    _("Unknown parsing error"));
+            retval = false;
+          }
+        else
+          {
+            if (!found_top_tag)
+              {
+                Glib::ustring err =
+                  String::ucompose (_("Couldn't find <%1> tag"),
+                                    Cityset::d_tag);
+                signal_finished.emit (NULL, true, false, err);
+              }
+            else
+              signal_finished.emit (cityset, false, false, "");
+          }
+        helper.close ();
+        File::erase (lwcfilename);
+        t.Close ();
+        return retval;
+      }
+
+    bool load (Glib::ustring tag, XML_Helper* helper)
       {
 	if (tag == Cityset::d_tag)
 	  {
-            if (helper->getVersion() == LORDSAWAR_CITYSET_VERSION)
+            found_top_tag = true;
+            if (helper->get_version () == LORDSAWAR_CITYSET_VERSION)
               {
-                cityset = new Cityset(helper, dir);
-                cityset->setBaseName(file);
+                cityset = new Cityset (helper, dir);
+                cityset->setBaseName (file);
                 return true;
               }
             else
               {
-                unsupported_version = true;
+                bad_version = helper->get_version ();
                 return false;
               }
 	  }
 	return false;
       };
+    Glib::ustring filename;
     Glib::ustring dir;
     Glib::ustring file;
+    Glib::ustring bad_version;
+    bool found_top_tag;
+    sigc::signal<void(Cityset*, bool, bool, Glib::ustring)> signal_finished;
     Cityset *cityset;
-    bool unsupported_version;
 };
 
-Cityset *Cityset::create(Glib::ustring file, bool &unsupported_version)
+void Cityset::create(Glib::ustring filename, sigc::slot<void(Cityset*,bool,bool,Glib::ustring)> finished)
 {
-  bool broken = false;
-  CitysetLoader d(file, broken, unsupported_version);
-  if (broken)
-    return NULL;
-  return d.cityset;
+  CitysetLoader d(filename);
+  d.signal_finished.connect
+    ([finished](Cityset *cityset, bool broken, bool unsupported_version, Glib::ustring err)
+     {
+       finished (cityset, broken, unsupported_version, err);
+     });
+  d.parse ();
 }
 
 bool Cityset::save(Glib::ustring filename, Glib::ustring ext) const
@@ -193,7 +253,7 @@ bool Cityset::save(Glib::ustring filename, Glib::ustring ext) const
   helper.close();
   if (broken == true)
     return false;
-  std::vector<Glib::ustring> extrafiles;
+  std::vector<std::string> extrafiles;
   return saveTar(tmpfile, tmpfile + ".tar", goodfilename, extrafiles);
 }
 
@@ -201,20 +261,20 @@ bool Cityset::save(XML_Helper *helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(d_tag);
+  retval &= helper->open_tag(d_tag);
   retval &= Set::save(helper);
-  retval &= helper->saveData("tilesize", getUnscaledTileSize());
-  retval &= helper->saveData("cities", d_city->getName ());
-  retval &= helper->saveData("razed_cities", d_rcity->getName ());
-  retval &= helper->saveData("port", d_port->getName ());
-  retval &= helper->saveData("signpost", d_sign->getName ());
-  retval &= helper->saveData("ruins", d_ruin->getName ());
-  retval &= helper->saveData("temples", d_temple->getName ());
-  retval &= helper->saveData("towers", d_tower->getName ());
-  retval &= helper->saveData("city_tile_width", d_city_tile_width);
-  retval &= helper->saveData("temple_tile_width", d_temple_tile_width);
-  retval &= helper->saveData("ruin_tile_width", d_ruin_tile_width);
-  retval &= helper->closeTag();
+  retval &= helper->save("tilesize", getTileSize());
+  retval &= helper->save("cities", d_city->getName ());
+  retval &= helper->save("razed_cities", d_rcity->getName ());
+  retval &= helper->save("port", d_port->getName ());
+  retval &= helper->save("signpost", d_sign->getName ());
+  retval &= helper->save("ruins", d_ruin->getName ());
+  retval &= helper->save("temples", d_temple->getName ());
+  retval &= helper->save("towers", d_tower->getName ());
+  retval &= helper->save("city_tile_width", d_city_tile_width);
+  retval &= helper->save("temple_tile_width", d_temple_tile_width);
+  retval &= helper->save("ruin_tile_width", d_ruin_tile_width);
+  retval &= helper->close_tag();
   return retval;
 }
 
@@ -224,52 +284,65 @@ void Cityset::uninstantiateImages()
     i->uninstantiateImages ();
 }
 
-void Cityset::instantiateImages(bool scale, bool &broken)
+void Cityset::instantiateImages(bool &broken)
 {
-  debug("Loading images for cityset " << getName());
-  uninstantiateImages();
+  debug("Loading images for cityset " << getName ());
+  uninstantiateImages ();
   broken = false;
-  Tar_Helper t(getConfigurationFile(), std::ios::in, broken);
+  Tar_Helper t (getConfigurationFile (), std::ios::in, broken);
   if (broken)
     return;
-  Vector<int> scale_dim = Vector<int>(-1,-1);
-  if (scale)
-    scale_dim = Vector<int>(getUnscaledTileSize (), getUnscaledTileSize ());
 
-  d_port->load (&t);
-  d_port->instantiateImages (scale_dim);
+  if (d_port->load (&t))
+    {
+      broken = true;
+      return;
+    }
+  d_port->instantiateImages ();
 
-  d_sign->load (&t);
-  d_sign->instantiateImages (scale_dim);
+  if (d_sign->load (&t))
+    {
+      broken = true;
+      return;
+    }
+  d_sign->instantiateImages ();
 
-  d_temple->load (&t);
-  if (scale)
-    d_temple->instantiateImages (scale_dim * d_temple_tile_width);
-  else
-    d_temple->instantiateImages ();
+  if (d_temple->load (&t))
+    {
+      broken = true;
+      return;
+    }
+  d_temple->instantiateImages ();
 
-  d_ruin->load (&t);
-  if (scale)
-    d_ruin->instantiateImages (scale_dim * d_ruin_tile_width);
-  else
-    d_ruin->instantiateImages ();
+  if (d_ruin->load (&t))
+    {
+      broken = true;
+      return;
+    }
+  d_ruin->instantiateImages ();
 
-  d_tower->load (&t);
-  d_tower->instantiateImages (scale_dim);
+  if (d_tower->load (&t))
+    {
+      broken = true;
+      return;
+    }
+  d_tower->instantiateImages ();
 
-  d_city->load (&t);
-  if (scale)
-    d_city->instantiateImages (scale_dim * d_city_tile_width);
-  else
-    d_city->instantiateImages ();
+  if (d_city->load (&t))
+    {
+      broken = true;
+      return;
+    }
+  d_city->instantiateImages ();
 
-  d_rcity->load (&t);
-  if (scale)
-    d_rcity->instantiateImages (scale_dim * d_city_tile_width);
-  else
-    d_rcity->instantiateImages ();
+  if (d_rcity->load (&t))
+    {
+      broken = true;
+      return;
+    }
+  d_rcity->instantiateImages ();
 
-  t.Close();
+  t.Close ();
 }
 
 bool Cityset::validate()
@@ -321,20 +394,28 @@ bool Cityset::validateTempleTileWidth()
   return true; 
 }
 
-void Cityset::reload(bool &broken)
+void Cityset::reload()
 {
-  broken = false;
-  bool unsupported_version = false;
-  CitysetLoader d(getConfigurationFile(), broken, unsupported_version);
-  if (!broken && d.cityset && d.cityset->validate())
-    {
-      //steal the values from d.cityset and then don't delete it.
-      uninstantiateImages();
-      Glib::ustring basename = getBaseName();
-      *this = *d.cityset;
-      instantiateImages(true, broken);
-      setBaseName(basename);
-    }
+  CitysetLoader d(getConfigurationFile());
+  d.signal_finished.connect
+    ([this](Cityset *cityset, bool broken, bool unsupported_version,
+            Glib::ustring)
+     {
+       if (!broken && !unsupported_version && cityset)
+         {
+           if (cityset->validate ())
+             {
+               //steal the values from d.cityset and then don't delete it.
+               uninstantiateImages();
+               Glib::ustring basename = getBaseName();
+               *this = *cityset;
+               instantiateImages(broken);
+               setBaseName(basename);
+             }
+         }
+     });
+
+  d.parse ();
 }
 
 bool Cityset::calculate_preferred_tile_size(guint32 &ts) const
@@ -343,19 +424,19 @@ bool Cityset::calculate_preferred_tile_size(guint32 &ts) const
   std::map<guint32, guint32> sizecounts;
 
   if (d_city->getImage ())
-    sizecounts[d_city->getImage ()->get_unscaled_width() / d_city_tile_width]++;
+    sizecounts[d_city->getImage ()->get_width() / d_city_tile_width]++;
   if (d_rcity->getImage ())
-    sizecounts[d_rcity->getImage ()->get_unscaled_width() / d_city_tile_width]++;
+    sizecounts[d_rcity->getImage ()->get_width() / d_city_tile_width]++;
   if (d_port->getImage ())
-    sizecounts[d_port->getImage ()->get_unscaled_width()]++;
+    sizecounts[d_port->getImage ()->get_width()]++;
   if (d_sign->getImage ())
-    sizecounts[d_sign->getImage ()->get_unscaled_width()]++;
+    sizecounts[d_sign->getImage ()->get_width()]++;
   if (d_ruin->getImage ())
-    sizecounts[d_ruin->getImage ()->get_unscaled_width() / d_ruin_tile_width]++;
+    sizecounts[d_ruin->getImage ()->get_width() / d_ruin_tile_width]++;
   if (d_temple->getImage ())
-    sizecounts[d_temple->getImage ()->get_unscaled_width() / d_temple_tile_width]++;
+    sizecounts[d_temple->getImage ()->get_width() / d_temple_tile_width]++;
   if (d_tower->getImage ())
-    sizecounts[d_tower->getImage ()->get_unscaled_width()]++;
+    sizecounts[d_tower->getImage ()->get_width()]++;
 
   guint32 maxcount = 0;
   for (std::map<guint32, guint32>::iterator it = sizecounts.begin(); 
@@ -380,15 +461,15 @@ bool Cityset::calculate_preferred_tile_size(guint32 &ts) const
 
 bool Cityset::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version)
 {
-  return FileCompat::getInstance()->upgrade(filename, old_version, new_version,
+  return FileCompat::instance()->upgrade(filename, old_version, new_version,
                                             FileCompat::CITYSET, d_tag);
 }
 
 void Cityset::support_backward_compatibility()
 {
-  FileCompat::getInstance()->support_type (FileCompat::CITYSET, file_extension, 
+  FileCompat::instance()->support_type (FileCompat::CITYSET, file_extension, 
                                            d_tag, true);
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::CITYSET, "0.2.0", LORDSAWAR_CITYSET_VERSION,
      sigc::ptr_fun(&Cityset::upgrade));
 }
@@ -403,7 +484,7 @@ Cityset* Cityset::copy(const Cityset *cityset)
 guint32 Cityset::get_default_tile_size ()
 {
   Cityset *c = new Cityset (1, "");
-  guint32 ts = c->getUnscaledTileSize ();
+  guint32 ts = c->getTileSize ();
   delete c;
   return ts;
 }
@@ -425,4 +506,46 @@ void Cityset::uninstantiateSameNamedImages (Glib::ustring name)
 {
   TarFileImage::uninstantiate (name, getImages ());
 }
-// End of file
+
+Cityset& Cityset::operator=(const Cityset& other)
+{
+  if (this != &other)
+    {
+      Set::operator=(other);
+      if (d_port)
+        delete d_port;
+      d_port = new TarFileImage (*other.d_port);
+      if (d_sign)
+        delete d_sign;
+      d_sign = new TarFileImage (*other.d_sign);
+      if (d_temple)
+        delete d_temple;
+      d_temple = new TarFileImage (*other.d_temple);
+      if (d_ruin)
+        delete d_ruin;
+      d_ruin = new TarFileImage (*other.d_ruin);
+      if (d_tower)
+        delete d_tower;
+      d_tower = new TarFileImage (*other.d_tower);
+      if (d_city)
+        delete d_city;
+      d_city = new TarFileImage (*other.d_city);
+      if (d_rcity)
+        delete d_rcity;
+      d_rcity = new TarFileImage (*other.d_rcity);
+
+      d_city_tile_width = other.d_city_tile_width;
+      d_temple_tile_width = other.d_temple_tile_width;
+      d_ruin_tile_width = other.d_ruin_tile_width;
+    }
+  return *this;
+}
+
+bool Cityset::get_images_instantiated ()
+{
+  for (auto i : getImages ())
+    if (i->getBackingImage () != NULL)
+      return true;
+
+  return false;
+}

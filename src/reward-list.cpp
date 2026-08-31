@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2015, 2017, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,14 +12,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "rewardlist.h"
+#include "reward-list.h"
 #include "reward.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "rnd.h"
 
 Glib::ustring Rewardlist::d_tag = "rewardlist";
@@ -29,7 +28,7 @@ Glib::ustring Rewardlist::d_tag = "rewardlist";
 
 Rewardlist* Rewardlist::s_instance = 0;
 
-Rewardlist* Rewardlist::getInstance()
+Rewardlist* Rewardlist::instance()
 {
     if (s_instance == 0)
         s_instance = new Rewardlist();
@@ -37,7 +36,7 @@ Rewardlist* Rewardlist::getInstance()
     return s_instance;
 }
 
-Rewardlist* Rewardlist::getInstance(XML_Helper* helper)
+Rewardlist* Rewardlist::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -107,7 +106,7 @@ Rewardlist::Rewardlist(Rewardlist *rewardlist)
 
 Rewardlist::Rewardlist(XML_Helper* helper)
 {
-  helper->registerTag(Reward::d_tag, sigc::mem_fun((*this), &Rewardlist::load));
+  helper->register_tag(Reward::d_tag, sigc::mem_fun((*this), &Rewardlist::load));
   load(Rewardlist::d_tag, helper);
 }
 
@@ -142,7 +141,7 @@ bool Rewardlist::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(Rewardlist::d_tag);
+  retval &= helper->open_tag(Rewardlist::d_tag);
 
   //save rewards
   for (const_iterator it = begin(); it != end(); ++it)
@@ -159,7 +158,7 @@ bool Rewardlist::save(XML_Helper* helper) const
         static_cast<Reward_Map*>(*it)->save(helper);
     }
 
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -200,4 +199,3 @@ void Rewardlist::reset (Rewardlist *r)
   delete s_instance;
   s_instance = r;
 }
-// End of file

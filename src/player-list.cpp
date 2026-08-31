@@ -1,10 +1,10 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020,
-// 2021 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,33 +18,33 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
 #include <sstream>
 #include <sigc++/functors/mem_fun.h>
 
-#include "playerlist.h"
-#include "armysetlist.h"
-#include "citylist.h"
-#include "ruinlist.h"
-#include "vectoredunitlist.h"
-#include "xmlhelper.h"
+#include "player-list.h"
+#include "army-set-list.h"
+#include "city-list.h"
+#include "ruin-list.h"
+#include "vectored-unit-list.h"
+#include "xml-helper.h"
 #include "history.h"
-#include "stacklist.h"
-#include "FogMap.h"
-#include "real_player.h"
-#include "ai_smart.h"
-#include "ai_fast.h"
-#include "ai_dummy.h"
-#include "network_player.h"
-#include "GameMap.h"
-#include "shieldset.h"
-#include "shieldsetlist.h"
+#include "stack-list.h"
+#include "fog-map.h"
+#include "real-player.h"
+#include "ai-smart.h"
+#include "ai-fast.h"
+#include "ai-dummy.h"
+#include "network-player.h"
+#include "game-map.h"
+#include "shield-set.h"
+#include "shield-set-list.h"
 #include "ucompose.hpp"
 #include "stack.h"
 #include "rnd.h"
+#include "game-scenario-options.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -52,7 +52,7 @@
 Glib::ustring Playerlist::d_tag = "playerlist";
 Playerlist* Playerlist::s_instance = 0;
 
-Playerlist* Playerlist::getInstance()
+Playerlist* Playerlist::instance()
 {
     if (s_instance == 0)
         s_instance = new Playerlist();
@@ -60,7 +60,7 @@ Playerlist* Playerlist::getInstance()
     return s_instance;
 }
 
-Playerlist* Playerlist::getInstance(XML_Helper* helper)
+Playerlist* Playerlist::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -108,7 +108,7 @@ Playerlist::Playerlist (const Playerlist &plist, bool sync_ids)
           add (new NetworkPlayer (*p, sync_ids));
           break;
         }
-      if (plist.getNeutral () == p)
+      if (plist.d_neutral == p)
         d_neutral = back ();
       if (plist.getViewingplayer () == p)
         viewingplayer = back ();
@@ -128,7 +128,7 @@ Playerlist::Playerlist(XML_Helper* helper)
     //we do it by calling load with playerlist as string
     load(Playerlist::d_tag, helper);
 
-    helper->registerTag(Player::d_tag, sigc::mem_fun(this, &Playerlist::load));
+    helper->register_tag(Player::d_tag, sigc::mem_fun(*this, &Playerlist::load));
 }
 
 Playerlist::~Playerlist()
@@ -138,98 +138,75 @@ Playerlist::~Playerlist()
         it = flErase(it);
 }
 
-bool Playerlist::checkPlayers()
+std::list<Player*> Playerlist::getDeadPlayers ()
 {
-    bool last = false;
-    bool dead = false;
-    debug("checkPlayers()");
-    iterator it = begin ();
-	  
-    while (it != end ())
+  std::list<Player*> dead;
+  for (auto p : *this)
     {
-        debug("checkPlayers() iter");
-        //ignore the neutral player as well as dead and immortal ones
-        if ((*it) == d_neutral || (*it)->isDead() || (*it)->isImmortal())
-        {
-            debug("checkPlayers() dead?");
-            ++it;
-            continue;
-        }
-
-        if (!Citylist::getInstance()->countCities((*it)))
-        {
-            debug("checkPlayers() city?");
-            iterator nextit = it;
-            ++nextit;
-
-            (*it)->kill();
-	    if (getNoOfPlayers() == 1)
-	      last = true;
-            splayerDead.emit(*it);
-            dead = true;
-	    if (last)
-	      break;
-
-            it = nextit;    // do this at the end to catch abuse of invalid it
-        } else {
-            debug("checkPlayers() inc");
-            ++it;
-        }
+      if (p == d_neutral || p->isDead () || p->isImmortal ())
+        continue;
+      if (!Citylist::instance ()->countCities (p))
+        dead.push_back (p);
     }
   return dead;
 }
 
-void Playerlist::nextPlayer()
+void Playerlist::nextPlayer ()
 {
-    debug("nextPlayer()");
+  iterator it;
 
-    iterator it;
-
-    if (!d_activeplayer)
-      it = begin();
-    else
+  if (!d_activeplayer)
+    it = begin ();
+  else
     {
-        for (it = begin(); it != end(); ++it)
+      for (it = begin (); it != end (); ++it)
         {
-            if ((*it) == d_activeplayer)
+          if ((*it) == d_activeplayer)
             {
-                ++it;
-                break;
+              ++it;
+              break;
             }
         }
     }
 
-    // in case we have got a dead player, continue iterating. This breaks
-    // if we have ONLY dead players which we assume never happens.
-    while ((it == end()) || ((*it)->isDead()))
+  // in case we have got a dead player, continue iterating. This breaks
+  // if we have ONLY dead players which we assume never happens.
+  while (it == end () || (*it)->isDead ())
     {
-        if (it == end())
+      if (it == end ())
         {
-            it = begin();
-            continue;
+          it = begin ();
+          continue;
         }
-        ++it;
+      ++it;
     }
 
-    d_activeplayer = (*it);
-    updateViewingPlayer();
-    debug("got player: " <<d_activeplayer->getName())
+  d_activeplayer = (*it);
+  updateViewingPlayer ();
 }
 
-Player* Playerlist::getPlayer(Glib::ustring name) const
+Player* Playerlist::get (Glib::ustring name) const
 {
-    debug("getPlayer()");
+    debug("get ()");
     for (const_iterator it = begin(); it != end(); ++it)
       if ((*it)->getName() == name) return (*it);
     return 0;
 }
 
-Player* Playerlist::getPlayer(guint32 id) const
+Player* Playerlist::get (guint32 id) const
 {
   IdMap::const_iterator it = d_id.find(id);
   if (it == d_id.end())
     return NULL;
   return (*it).second;
+}
+
+Player* Playerlist::get (Shield::Color shield) const
+{
+  for (const_iterator it = begin (); it != end (); ++it)
+    if ((*it)->get_shield () == shield)
+      return (*it);
+  return 0;
 }
 
 guint32 Playerlist::getNoOfPlayers() const
@@ -245,28 +222,56 @@ guint32 Playerlist::getNoOfPlayers() const
     return number;
 }
 
-Player* Playerlist::getFirstLiving() const
+Player* Playerlist::getFirstLiving ()
 {
-    for (const_iterator it = begin(); ; ++it)
-        if (!(*it)->isDead() && *it != d_neutral)
-            return (*it);
+  for (const_iterator it = instance ()->begin (); ; ++it)
+    if (!(*it)->isDead() && *it != Playerlist::getNeutral ())
+      return (*it);
 }
 
 bool Playerlist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Playerlist::d_tag);
+    retval &= helper->open_tag(Playerlist::d_tag);
+
     if (d_activeplayer)
-      retval &= helper->saveData("active", d_activeplayer->getId());
+      retval &= helper->save("active", d_activeplayer->getId());
     else
-      retval &= helper->saveData("active", d_neutral->getId ());
-    retval &= helper->saveData("neutral", d_neutral->getId());
+      retval &= helper->save("active", d_neutral->getId ());
+
+    retval &= helper->save("neutral", d_neutral->getId());
 
     for (const_iterator it = begin(); it != end(); ++it)
-        retval &= (*it)->save(helper);
+      {
+        if ((*it)->getType () == Player::AI_FAST)
+          {
+            auto p = dynamic_cast<AI_Fast*> (*it);
+            retval &= p->save(helper);
+          }
+        else if ((*it)->getType () == Player::AI_SMART)
+          {
+            auto p = dynamic_cast<AI_Smart*> (*it);
+            retval &= p->save(helper);
+          }
+        else if ((*it)->getType () == Player::AI_DUMMY)
+          {
+            auto p = dynamic_cast<AI_Dummy*> (*it);
+            retval &= p->save(helper);
+          }
+        else if ((*it)->getType () == Player::NETWORKED)
+          {
+            auto p = dynamic_cast<NetworkPlayer*> (*it);
+            retval &= p->save(helper);
+          }
+        else if ((*it)->getType () == Player::HUMAN)
+          {
+            auto p = dynamic_cast<RealPlayer*> (*it);
+            retval &= p->save(helper);
+          }
+      }
 
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -284,8 +289,8 @@ bool Playerlist::load(Glib::ustring tag, XML_Helper* helper)
 
     if (tag == Playerlist::d_tag) //only called in the constructor
     {
-        helper->getData(active, "active");
-        helper->getData(neutral, "neutral");
+        helper->get(active, "active");
+        helper->get(neutral, "neutral");
         return true;
     }
 
@@ -430,7 +435,6 @@ void Playerlist::calculateDiplomaticRankings()
 
 void Playerlist::calculateWinners()
 {
-    guint32 score;
     guint32 total_gold = 0;
     guint32 total_armies = 0;
     guint32 total_cities = 0;
@@ -443,7 +447,7 @@ void Playerlist::calculateWinners()
 	total_gold += (*it)->getGold();
 	total_armies += (*it)->getStacklist()->countArmies();
       }
-    total_cities = Citylist::getInstance()->size();
+    total_cities = Citylist::instance()->size();
 
     for (const_iterator it = begin(); it != end(); ++it)
       {
@@ -452,14 +456,9 @@ void Playerlist::calculateWinners()
 	if ((*it)->isDead() == true)
 	  continue;
 
-	float city_component = (float)
-	  ((float) Citylist::getInstance()->countCities(*it)/ (float)total_cities) * 70.0;
-	float gold_component = (float)
-	  ((float) (*it)->getGold() / (float)total_gold) * 10.0;
-	float army_component = (float)
-	  ((float) (*it)->getStacklist()->countArmies() / 
-	   (float)total_armies) * 20.0;
-	score = (guint32) (city_component + gold_component + army_component);
+        guint32 score =
+          (*it)->calculate_score (total_cities, total_gold, total_armies);
+
         (*it)->reportEndOfRound(score);
       }
 
@@ -498,7 +497,7 @@ void Playerlist::negotiateDiplomacy()
       if ((*pit)->isDead())
 	continue;
 
-      if ((*pit) == getNeutral())
+      if ((*pit) == d_neutral)
 	continue;
   
       for (iterator it = begin(); it != end(); ++it)
@@ -507,7 +506,7 @@ void Playerlist::negotiateDiplomacy()
 	  if ((*it)->isDead())
 	    continue;
 
-	  if ((*it) == getNeutral())
+	  if ((*it) == d_neutral)
 	    continue;
 
 	  if ((*it) == (*pit))
@@ -550,20 +549,20 @@ void Playerlist::swap(Player *old_player, Player *new_player)
 {
   std::replace(begin(), end(), old_player, new_player);
   //point cities to the new owner
-  Citylist::getInstance()->changeOwnership (old_player, new_player);
-  Ruinlist::getInstance()->changeOwnership (old_player, new_player);
-  VectoredUnitlist::getInstance()->changeOwnership (old_player, new_player);
+  Citylist::instance()->changeOwnership (old_player, new_player);
+  Ruinlist::instance()->changeOwnership (old_player, new_player);
+  VectoredUnitlist::instance()->changeOwnership (old_player, new_player);
   AI_Analysis::changeOwnership(old_player, new_player);
   if (old_player == d_activeplayer)
     {
       d_activeplayer = new_player;
-      d_activeplayer->setActivestack(0);
+      d_activeplayer->stackDeselect ();
     }
   if (old_player == viewingplayer)
     viewingplayer = new_player;
   d_id[new_player->getId()] = new_player;
-  GameMap::getInstance()->clearStackPositions();
-  GameMap::getInstance()->updateStackPositions();
+  GameMap::instance()->clearStackPositions();
+  GameMap::instance()->updateStackPositions();
   /* note, we don't have to change the player associated with flag graphics
      because it's stored as an id. */
 }
@@ -571,7 +570,7 @@ void Playerlist::swap(Player *old_player, Player *new_player)
 bool Playerlist::randomly(const Player *lhs, const Player *rhs)  
 {
   (void) rhs;
-  if (lhs == Playerlist::getInstance()->getNeutral())
+  if (lhs == Playerlist::getNeutral ())
     return false;
   if (Rnd::rand() % 2 == 0)
     return true;
@@ -595,65 +594,37 @@ void Playerlist::randomizeOrder()
   viewingplayer = NULL;
 }
 
-void Playerlist::nextRound(bool diplomacy, bool *surrender_already_offered)
+void Playerlist::syncPlayer(GameParameters::Player player, Glib::ustring army_theme)
 {
-  // update diplomacy
-  if (diplomacy)
+  if (army_theme == "")
     {
-      negotiateDiplomacy();
-      calculateDiplomaticRankings();
+      //when we're a canned scenario we might not have an army theme associated
+      //with a player, so we grab neutral's.
+      guint32 as = d_neutral->getArmyset ();
+      army_theme = Armysetlist::instance ()->get (as)->getBaseName ();
     }
-
-  // update winners
-  calculateWinners();
-
-  // offer surrender
-  if (countHumanPlayersAlive() == 1 &&
-      *surrender_already_offered == 0)
-    {
-      for (iterator it = begin(); it != end(); ++it)
-	{
-	  if ((*it)->getType() == Player::HUMAN)
-	    {
-	      int target_level = Citylist::getInstance()->size() / 2;
-	      if (Citylist::getInstance()->countCities(*it) > target_level)
-		{
-		  *surrender_already_offered = 1;
-		  ssurrender.emit(*it);
-		  break;
-		}
-	    }
-	}
-    }
-}
-
-void Playerlist::syncPlayer(GameParameters::Player player)
-{
-  Player *p = getPlayer((guint32)player.id);
+  Player *p = get ((guint32)player.id);
   if (!p)
     {
       //player was off originally, but now it's on
-      guint32 armyset = d_neutral->getArmyset();
+      guint32 armyset = Armysetlist::instance ()->get (army_theme)->getId ();
       int width = d_neutral->getFogMap()->getWidth();
       int height = d_neutral->getFogMap()->getHeight();
       int gold = d_neutral->getGold();
-      Shieldset *shieldset = GameMap::getShieldset();
+      Shield::Color shield = Shield::Color (player.id);
       switch (player.type)
 	{
 	case GameParameters::Player::HUMAN:
-	  p = new RealPlayer(player.name, armyset,
-			     shieldset->getColors(player.id),
-			     width, height, Player::HUMAN, player.id);
+	  p = new RealPlayer(player.name, armyset, shield,
+			     width, height, Player::HUMAN);
 	  break;
 	case GameParameters::Player::EASY:
-	  p = new AI_Fast(player.name, armyset,
-		       	  shieldset->getColors(player.id),
-			  width, height, player.id);
+	  p = new AI_Fast(player.name, armyset, shield,
+			  width, height);
 	  break;
 	case GameParameters::Player::HARD:
-	  p = new AI_Smart(player.name, armyset,
-			   shieldset->getColors(player.id),
-			   width, height, player.id);
+	  p = new AI_Smart(player.name, armyset, shield,
+			   width, height);
 	  break;
 	case GameParameters::Player::OFF:
 	  //was off, now it's still off.
@@ -704,17 +675,17 @@ void Playerlist::syncPlayer(GameParameters::Player player)
     case GameParameters::Player::OFF:
 	{
 	  //point owned cities to neutral
-          Citylist::getInstance()->changeOwnership (p, d_neutral);
+          Citylist::instance()->changeOwnership (p, d_neutral);
 	  //point owned ruins to neutral
-          Ruinlist::getInstance()->changeOwnership (p, d_neutral);
+          Ruinlist::instance()->changeOwnership (p, d_neutral);
           //also copy over the stacks to neutral
           p->getStacklist()->changeOwnership(p, d_neutral);
 	  //now get rid of the player entirely
-          GameMap::getInstance()->clearStackPositions();
+          GameMap::instance()->clearStackPositions();
           if (d_id.find(p->getId()) != d_id.end())
             d_id.erase(d_id.find(p->getId()));
 	  flErase(find(begin(), end(), p));
-          GameMap::getInstance()->updateStackPositions();
+          GameMap::instance()->updateStackPositions();
 	}
       break;
     default:
@@ -725,15 +696,19 @@ void Playerlist::syncPlayer(GameParameters::Player player)
 
   sort(inOrderOfId);
   d_activeplayer = getFirstLiving();
+          
   updateViewingPlayer();
   return;
 }
 
-void Playerlist::syncPlayers(std::vector<GameParameters::Player> players)
+void Playerlist::syncPlayers (GameParameters g)
 {
-  std::vector<GameParameters::Player>::const_iterator i = players.begin();
-  for (; i != players.end(); ++i)
-    syncPlayer(*i);
+  int i = 0;
+  for (auto p : g.players)
+    {
+      syncPlayer (p, g.army_theme[i]);
+      i++;
+    }
 }
 	
 guint32 Playerlist::turnHumansIntoNetworkPlayers()
@@ -745,7 +720,8 @@ guint32 Playerlist::turnHumansIntoNetworkPlayers()
       if ((*i)->getType() == Player::HUMAN)
 	{
           count++;
-	  NetworkPlayer *new_p = new NetworkPlayer(**i, true);
+          auto player = dynamic_cast<RealPlayer*>(*i);
+	  NetworkPlayer *new_p = new NetworkPlayer(*player, true);
           p.push_back(*i);
 	  swap((*i), new_p);
 	  i = begin();
@@ -874,23 +850,6 @@ void Playerlist::surrender()
     }
 }
 
-bool Playerlist::isEndOfRound() const
-{
-  //check to see if all players have moved this round.
-  //do all players have the same number of history:end_turn events?
-  if (d_activeplayer == NULL)
-    return false;
-  guint32 count = d_activeplayer->countEndTurnHistoryEntries();
-  for (const_iterator it = begin(); it != end(); ++it)
-    {
-      if (*it == d_activeplayer)
-	continue;
-      if (count != (*it)->countEndTurnHistoryEntries())
-	return false;
-    }
-  return true;
-}
-
 void Playerlist::setWinningPlayer(Player *winner)
 {
   //only for humans
@@ -906,7 +865,7 @@ Player *Playerlist::getWinningPlayer() const
       Player *p = (*it);
       if (p->isDead() == false)
         continue;
-      if (p == getNeutral())
+      if (p == d_neutral)
         continue;
       if (p->getScore() >= best_score)
         {
@@ -931,12 +890,6 @@ std::vector<Player*> Playerlist::getPlayersWithArmyset(guint32 id) const
         players.push_back (*it);
     }
   return players;
-}
-
-void Playerlist::setNewColors(Shieldset *shieldset)
-{
-  for (iterator it = begin(); it != end(); ++it)
-    (*it)->setColors(shieldset->getColors((*it)->getId()));
 }
 
 void Playerlist::clearAllActions()
@@ -995,7 +948,7 @@ void Playerlist::updateViewingPlayer ()
   if (d_activeplayer && d_activeplayer->getType() == Player::HUMAN)
     viewingplayer = d_activeplayer;
   else
-    viewingplayer = getNeutral();
+    viewingplayer = d_neutral;
 }
 
 guint32 Playerlist::getTurnOrderNumber(const Player *p)
@@ -1022,22 +975,29 @@ bool Playerlist::playerHasNoCapitalCity () const
 {
   for (const_iterator i = begin (); i != end (); ++i)
     if (*i != d_neutral &&
-        Citylist::getInstance ()->getCapitalCity (*i) == NULL)
+        Citylist::instance ()->getCapitalCity (*i) == NULL)
       return true;
   return false;
 }
         
-std::list<guint32> Playerlist::getArmysets() const
-{
-  std::list<guint32> ids;
-  for (const_iterator i = begin (); i != end (); ++i)
-    ids.push_back ((*i)->getArmyset ());
-  ids.unique ();
-  return ids;
-}
-
 void Playerlist::reset (Playerlist *p)
 {
   delete s_instance;
   s_instance = p;
+}
+        
+std::list<Stack*> Playerlist::getArmyUnitsInBoats () const
+{
+  std::list<Stack*> stacks;
+  for (auto p : *this)
+    p->getStacklist ()->getArmyUnitsInBoats (stacks);
+  return stacks;
+}
+
+guint32 Playerlist::countArmies (guint32 army_type_id) const
+{
+  guint32 count = 0;
+  for (auto p : *this)
+    count += p->getStacklist ()->countArmies (army_type_id);
+  return count;
 }

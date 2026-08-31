@@ -1,8 +1,8 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014, 2015, 2020, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2014, 2015, 2020, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,14 +16,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include "ucompose.hpp"
-#include "armybase.h"
-#include "xmlhelper.h"
-#include "Tile.h"
+#include "army-base.h"
+#include "xml-helper.h"
+#include "tile.h"
 #include "defs.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -45,108 +44,127 @@ ArmyBase::ArmyBase()
 
 ArmyBase::ArmyBase(XML_Helper* helper)
 {
-  helper->getData(d_upkeep, "upkeep");
+  helper->get(d_upkeep, "upkeep");
   Glib::ustring move_bonus_str;
-  helper->getData(move_bonus_str, "move_bonus");
+  helper->get(move_bonus_str, "move_bonus");
   d_move_bonus = moveFlagsFromString(move_bonus_str);
   Glib::ustring army_bonus_str;
-  helper->getData(army_bonus_str, "army_bonus");
+  helper->get(army_bonus_str, "army_bonus");
   d_army_bonus = bonusFlagsFromString(army_bonus_str);
-  helper->getData(d_max_moves, "max_moves");
-  helper->getData(d_strength, "strength");
-  helper->getData(d_sight, "sight");
-  helper->getData(d_xp_value, "expvalue");
+  helper->get(d_max_moves, "max_moves");
+  helper->get(d_strength, "strength");
+  helper->get(d_sight, "sight");
+  helper->get(d_xp_value, "expvalue");
 }
 
-bool ArmyBase::saveData(XML_Helper* helper) const
+bool ArmyBase::save(XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->saveData("upkeep", d_upkeep);
+  retval &= helper->save("upkeep", d_upkeep);
   Glib::ustring move_bonus_str = moveFlagsToString(d_move_bonus);
-  retval &= helper->saveData("move_bonus", move_bonus_str);
+  retval &= helper->save("move_bonus", move_bonus_str);
   Glib::ustring army_bonus_str = bonusFlagsToString(d_army_bonus);
-  retval &= helper->saveData("army_bonus", army_bonus_str);
-  retval &= helper->saveData("max_moves", d_max_moves);
-  retval &= helper->saveData("strength", d_strength);
-  retval &= helper->saveData("sight", d_sight);
-  retval &= helper->saveData("expvalue", d_xp_value);
+  retval &= helper->save("army_bonus", army_bonus_str);
+  retval &= helper->save("max_moves", d_max_moves);
+  retval &= helper->save("strength", d_strength);
+  retval &= helper->save("sight", d_sight);
+  retval &= helper->save("expvalue", d_xp_value);
   return retval;
 }
 
-Glib::ustring ArmyBase::getArmyBonusDescription() const
+Glib::ustring ArmyBase::getArmyBonusDescription (bool one_per_row) const
 {
+  std::string sep = " ";
+  std::string nsep = ", ";
+  if (one_per_row)
+    {
+      sep = "";
+      nsep = "\n";
+    }
+
   guint32 bonus = d_army_bonus;
   Glib::ustring s = "";
   if (bonus & ArmyBase::ADD1STRINOPEN && bonus & ArmyBase::ADD2STRINOPEN)
-    s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  _("+3 Str In Open"));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           _("+3 Str In Open"));
   else if (bonus & ArmyBase::ADD1STRINOPEN)
-    s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  bonusFlagToFriendlyName(ArmyBase::ADD1STRINOPEN));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::ADD1STRINOPEN));
   else if (bonus & ArmyBase::ADD2STRINOPEN)
-    s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  bonusFlagToFriendlyName(ArmyBase::ADD2STRINOPEN));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::ADD2STRINOPEN));
+
   if (bonus & ArmyBase::ADD1STRINFOREST && bonus & ArmyBase::ADD2STRINFOREST)
-    s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  _("+3 Str In Forest"));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           _("+3 Str In Forest"));
   else if (bonus & ArmyBase::ADD1STRINFOREST)
-    s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  bonusFlagToFriendlyName(ArmyBase::ADD1STRINFOREST));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::ADD1STRINFOREST));
   else if (bonus & ArmyBase::ADD2STRINFOREST)
-    s += String::ucompose("%1%2", s == "" ? " " : "& ",
-			  bonusFlagToFriendlyName(ArmyBase::ADD2STRINFOREST));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::ADD2STRINFOREST));
+
   if (bonus & ArmyBase::ADD1STRINHILLS && bonus & ArmyBase::ADD2STRINHILLS)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("+3 Str In Hills"));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           _("+3 Str In Hills"));
   else if (bonus & ArmyBase::ADD1STRINHILLS)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  bonusFlagToFriendlyName(ArmyBase::ADD1STRINHILLS));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::ADD1STRINHILLS));
   else if (bonus & ArmyBase::ADD2STRINHILLS)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  bonusFlagToFriendlyName(ArmyBase::ADD2STRINHILLS));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::ADD2STRINHILLS));
 
   if (bonus & ArmyBase::ADD1STRINCITY && bonus & ArmyBase::ADD2STRINCITY)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("+3 Str In City"));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           _("+3 Str In City"));
   else if (bonus & ArmyBase::ADD1STRINCITY)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  bonusFlagToFriendlyName(ArmyBase::ADD1STRINCITY));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::ADD1STRINCITY));
   else if (bonus & ArmyBase::ADD2STRINCITY)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  bonusFlagToFriendlyName(ArmyBase::ADD2STRINCITY));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::ADD2STRINCITY));
+
   if (bonus & ArmyBase::ADD1STACKINHILLS)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  bonusFlagToFriendlyName(ArmyBase::ADD1STACKINHILLS));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::ADD1STACKINHILLS));
+
   if (bonus & ArmyBase::SUBALLCITYBONUS)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  bonusFlagToFriendlyName(ArmyBase::SUBALLCITYBONUS));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::SUBALLCITYBONUS));
+
   if (bonus & ArmyBase::SUB1ENEMYSTACK && bonus & ArmyBase::SUB2ENEMYSTACK)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  _("-3 Enemy Stack"));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           _("-3 Enemy Stack"));
   else if (bonus & ArmyBase::SUB1ENEMYSTACK)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  bonusFlagToFriendlyName(ArmyBase::SUB1ENEMYSTACK));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::SUB1ENEMYSTACK));
   else if (bonus & ArmyBase::SUB2ENEMYSTACK)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  bonusFlagToFriendlyName(ArmyBase::SUB2ENEMYSTACK));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::SUB2ENEMYSTACK));
 
   if (bonus & ArmyBase::ADD1STACK && bonus & ArmyBase::ADD2STACK)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ", _("+3 Stack"));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           _("+3 Stack"));
   else if (bonus & ArmyBase::ADD1STACK)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ", 
-			  bonusFlagToFriendlyName(ArmyBase::ADD1STACK));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep, 
+                           bonusFlagToFriendlyName (ArmyBase::ADD1STACK));
   else if (bonus & ArmyBase::ADD2STACK)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ", 
-			  bonusFlagToFriendlyName(ArmyBase::ADD2STACK));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep, 
+                           bonusFlagToFriendlyName (ArmyBase::ADD2STACK));
+
   if (bonus & ArmyBase::SUBALLNONHEROBONUS)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  bonusFlagToFriendlyName(ArmyBase::SUBALLNONHEROBONUS));
+    s += String::ucompose
+      ("%1%2", s == "" ? sep : nsep,
+       bonusFlagToFriendlyName (ArmyBase::SUBALLNONHEROBONUS));
+
   if (bonus & ArmyBase::SUBALLHEROBONUS)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  bonusFlagToFriendlyName(ArmyBase::SUBALLHEROBONUS));
+    s += String::ucompose ("%1%2", s == "" ? sep : nsep,
+                           bonusFlagToFriendlyName (ArmyBase::SUBALLHEROBONUS));
+
   if (bonus & ArmyBase::CONFER_MOVE_BONUS)
-    s += String::ucompose("%1%2", s == "" ? " " : " & ",
-			  bonusFlagToFriendlyName(ArmyBase::CONFER_MOVE_BONUS));
+    s += String::ucompose
+      ("%1%2", s == "" ? sep : nsep,
+       bonusFlagToFriendlyName (ArmyBase::CONFER_MOVE_BONUS));
   return s;
 }
 
@@ -169,7 +187,7 @@ Glib::ustring ArmyBase::moveFlagsToString(const guint32 bonus)
 
 guint32 ArmyBase::moveFlagsFromString(const Glib::ustring str)
 {
-  return XML_Helper::flagsFromString(str, Tile::tileTypeFromString);
+  return XML_Helper::flags_from_string (str, Tile::tileTypeFromString);
 }
 
 Glib::ustring ArmyBase::bonusFlagToString(const ArmyBase::Bonus bonus)
@@ -210,7 +228,7 @@ Glib::ustring ArmyBase::bonusFlagToFriendlyName(const ArmyBase::Bonus bonus)
     case ArmyBase::ADD2STRINCITY: return _("+2 Str In City");
     case ArmyBase::ADD1STACKINHILLS: return _("+1 Stack In Hills");
     case ArmyBase::SUBALLCITYBONUS: return _("Cancel City Bonus");
-    case ArmyBase::SUB1ENEMYSTACK: return _("-1 Enemy Stack)");
+    case ArmyBase::SUB1ENEMYSTACK: return _("-1 Enemy Stack");
     case ArmyBase::ADD1STACK: return _("+1 Stack");
     case ArmyBase::ADD2STACK: return _("+2 Stack");
     case ArmyBase::SUBALLNONHEROBONUS: return _("Cancel Non-Hero");
@@ -268,7 +286,7 @@ Glib::ustring ArmyBase::bonusFlagsToString(const guint32 bonus)
 
 guint32 ArmyBase::bonusFlagsFromString(const Glib::ustring str)
 {
-  return XML_Helper::flagsFromString(str, bonusFlagFromString);
+  return XML_Helper::flags_from_string (str, bonusFlagFromString);
 }
 
 guint32 ArmyBase::bonusFlagFromString(const Glib::ustring str)
@@ -296,8 +314,15 @@ guint32 ArmyBase::bonusFlagFromString(const Glib::ustring str)
   return ArmyBase::ADD1STRINOPEN;
 }
 
-Glib::ustring ArmyBase::getMoveBonusDescription() const
+Glib::ustring ArmyBase::getMoveBonusDescription (bool one_per_row) const
 {
+  std::string sep = " ";
+  std::string nsep = ", ";
+  if (one_per_row)
+    {
+      sep = "";
+      nsep = "\n";
+    }
   guint32 bonus = getMoveBonus ();
   if (bonus == Tile::isFlying ())
     return _("Flies");
@@ -307,36 +332,38 @@ Glib::ustring ArmyBase::getMoveBonusDescription() const
         return "";
       else
         {
-          Glib::ustring s = "";
+          Glib::ustring s = _("Moves better in:");
+          if (one_per_row)
+            s += "\n";
           bool first = true;
           if (bonus & Tile::WATER)
             {
-              s += (first ? " " : ", ") +
-                Tile::tileTypeToFriendlyName(Tile::WATER);
+              s += (first ? sep : nsep) +
+                Tile::tileTypeToFriendlyName (Tile::WATER);
               first = false;
             }
           if (bonus & Tile::FOREST)
             {
-              s += (first ? " " : ", ") +
-                Tile::tileTypeToFriendlyName(Tile::FOREST);
+              s += (first ? sep : nsep) +
+                Tile::tileTypeToFriendlyName (Tile::FOREST);
               first = false;
             }
           if (bonus & Tile::HILLS)
             {
-              s += (first ? " " : ", ") +
-                Tile::tileTypeToFriendlyName(Tile::HILLS);
+              s += (first ? sep : nsep) +
+                Tile::tileTypeToFriendlyName (Tile::HILLS);
               first = false;
             }
           if (bonus & Tile::MOUNTAIN)
             {
-              s += (first ? " " : ", ") +
-                Tile::tileTypeToFriendlyName(Tile::MOUNTAIN);
+              s += (first ? sep : nsep) +
+                Tile::tileTypeToFriendlyName (Tile::MOUNTAIN);
               first = false;
             }
           if (bonus & Tile::SWAMP)
             {
-              s += (first ? " " : ", ") +
-                Tile::tileTypeToFriendlyName(Tile::SWAMP);
+              s += (first ? sep : nsep) +
+                Tile::tileTypeToFriendlyName (Tile::SWAMP);
               first = false;
             }
           return s;

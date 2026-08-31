@@ -1,8 +1,8 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,13 +16,12 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
-#include "armyprotobase.h"
-#include "xmlhelper.h"
+#include "army-proto-base.h"
+#include "xml-helper.h"
 #include "defs.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -30,7 +29,7 @@
 
 ArmyProtoBase::ArmyProtoBase(const ArmyProtoBase& a)
     :ArmyBase(a), d_name(a.d_name), 
-     d_description(a.d_description), d_production_cost(a.d_production_cost),
+     d_production_cost(a.d_production_cost),
      d_new_production_cost(a.d_new_production_cost),
      d_production(a.d_production), d_armyset(a.d_armyset)
 {
@@ -38,34 +37,32 @@ ArmyProtoBase::ArmyProtoBase(const ArmyProtoBase& a)
 
 ArmyProtoBase::ArmyProtoBase()
   :ArmyBase(), d_name(_("Untitled")),
-    d_description(""), d_production_cost(0), d_new_production_cost(0),
+    d_production_cost(0), d_new_production_cost(0),
     d_production(0), d_armyset(0)
 {
 }
 
 ArmyProtoBase::ArmyProtoBase(XML_Helper* helper)
   :ArmyBase(helper), d_name(""), 
-    d_description(""), d_production_cost(0), d_new_production_cost(0),
+    d_production_cost(0), d_new_production_cost(0),
     d_production(0), d_armyset(0)
 {
 
-  helper->getData(d_name, "name");
-  helper->getData(d_production_cost, "production_cost");
-  helper->getData(d_new_production_cost, "new_production_cost");
-  helper->getData(d_production, "production");
-  helper->getData(d_description, "description");
+  helper->get(d_name, "name");
+  helper->get(d_production_cost, "production_cost");
+  helper->get(d_new_production_cost, "new_production_cost");
+  helper->get(d_production, "production");
 }
 
-bool ArmyProtoBase::saveData(XML_Helper* helper) const
+bool ArmyProtoBase::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("name", d_name);
-  retval &= helper->saveData("description", d_description);
-  retval &= helper->saveData("production_cost", d_production_cost);
-  retval &= helper->saveData("new_production_cost", d_new_production_cost);
-  retval &= helper->saveData("production", d_production);
-  retval &= ArmyBase::saveData(helper);
+  retval &= helper->save("name", d_name);
+  retval &= helper->save("production_cost", d_production_cost);
+  retval &= helper->save("new_production_cost", d_new_production_cost);
+  retval &= helper->save("production", d_production);
+  retval &= ArmyBase::save(helper);
   return retval;
 }
 

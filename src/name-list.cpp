@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2021 Ben Asselstine
+//  Copyright (C) 2009, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,17 +12,16 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sigc++/functors/mem_fun.h>
 
-#include "namelist.h"
+#include "name-list.h"
 #include "defs.h"
-#include "File.h"
+#include "file.h"
 #include "ucompose.hpp"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "rnd.h"
 
 #define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -33,9 +32,9 @@ NameList::NameList(Glib::ustring filename, Glib::ustring item_tag)
 {
   XML_Helper helper (File::getMiscFile (d_filename), std::ios::in);
 
-  helper.registerTag (d_item_tag, sigc::mem_fun ((*this), &NameList::load));
+  helper.register_tag (d_item_tag, sigc::mem_fun ((*this), &NameList::load));
 
-  if (!helper.parseXML ())
+  if (!helper.parse_XML ())
     {
       std::cerr << String::ucompose (_("Error can't load namelist `%1'"),
                                      d_filename) << std::endl;
@@ -57,7 +56,7 @@ bool NameList::load(Glib::ustring tag, XML_Helper *helper)
   if (tag == d_item_tag)
     {
       Glib::ustring name;
-      helper->getData(name, "name");
+      helper->get(name, "name");
       push_back(name); 
     }
   return true;
@@ -68,9 +67,9 @@ bool NameList::repopulate (std::list<Glib::ustring> names)
   clear ();
   XML_Helper helper(File::getMiscFile (d_filename), std::ios::in);
 
-  helper.registerTag(d_item_tag, sigc::mem_fun ((*this), &NameList::load));
+  helper.register_tag(d_item_tag, sigc::mem_fun ((*this), &NameList::load));
 
-  if (!helper.parseXML ())
+  if (!helper.parse_XML ())
     {
       std::cerr << String::ucompose (_("Error can't load namelist `%1'"),
                                      d_filename) << std::endl;

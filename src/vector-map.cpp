@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2017, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,22 +12,21 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
 
-#include "vectormap.h"
-#include "gui/image-helpers.h"
+#include "vector-map.h"
+#include "image-helpers.h"
 
 #include "city.h"
-#include "citylist.h"
-#include "playerlist.h"
-#include "ImageCache.h"
-#include "GameMap.h"
-#include "LocationBox.h"
-#include "shieldsetlist.h"
-#include "Configuration.h"
+#include "city-list.h"
+#include "player-list.h"
+#include "image-cache.h"
+#include "game-map.h"
+#include "location-box.h"
+#include "shield-set-list.h"
+#include "configuration.h"
 
 VectorMap::VectorMap(City *c, enum ShowVectoring v, bool see_opponents_production)
 {
@@ -35,6 +34,7 @@ VectorMap::VectorMap(City *c, enum ShowVectoring v, bool see_opponents_productio
   show_vectoring = v;
   city = c;
   click_action = CLICK_SELECTS;
+  create_hotmap ();
 }
 
 void VectorMap::draw_planted_standard(Vector<int> flag)
@@ -45,7 +45,7 @@ void VectorMap::draw_planted_standard(Vector<int> flag)
   start = flag;
   start = mapToSurface(start);
       
-  PixMask *heropic = ImageCache::getInstance()->getSmallHeroImage(true);
+  PixMask *heropic = ImageCache::instance()->getSmallHeroImage(true);
   heropic->blit_centered(surface, start);
 }
 
@@ -56,35 +56,20 @@ void VectorMap::draw_city (City *c, guint32 &type, bool &prod)
   PixMask *tmp;
   if (c->isBurnt() == true)
     {
-      tmp = ImageCache::getInstance()->getSmallRuinedCityImage()->copy ();
-      //we need 78 of these per map height
-      double new_height = get_height () / 78.0;
-      int new_width = tmp->get_width () * (new_height / tmp->get_height ());
-
-      PixMask::scale (tmp, new_width, new_height);
+      tmp = ImageCache::instance()->getSmallRuinedCityImage()->copy ();
     }
   else
     {
-      if (Playerlist::getInstance()->getViewingplayer() != c->getOwner())
+      if (Playerlist::instance()->getViewingplayer() != c->getOwner())
 	{
-	  guint32 s = GameMap::getInstance()->getShieldsetId();
-	  tmp = ImageCache::getInstance()->getShieldPic(s, 0,
+	  guint32 s = GameMap::instance()->getShieldsetId();
+	  tmp = ImageCache::instance()->getShieldPic(s, 0,
                                                         c->getOwner()->getId(),
-                                                        true, 0)->copy ();
-          //we need 39 of these per map height
-          double new_height = get_height () / 39.0;
-          int new_width = tmp->get_width () * (new_height / tmp->get_height ());
-
-          PixMask::scale (tmp, new_width, new_height);
+                                                        true)->copy ();
 	}
       else
         {
-          tmp = ImageCache::getInstance()->getProdShieldPic (type, prod)->copy ();
-          //we need 31.2 of these per map height
-          double new_height = get_height () / 31.2;
-          int new_width = tmp->get_width () * (new_height / tmp->get_height ());
-
-          PixMask::scale (tmp, new_width, new_height);
+          tmp = ImageCache::instance()->getProdShieldPic (type, prod)->copy ();
         }
     }
 
@@ -168,7 +153,7 @@ void VectorMap::draw_lines (std::list<City*> srcs, std::list<City*> dests)
       if (it->isVisible(Playerlist::getViewingplayer()) == false)
         continue;
       City *c = 
-        Citylist::getInstance()->getNearestObjectBefore(it->getVectoring(), 2);
+        Citylist::instance()->getNearestObjectBefore(it->getVectoring(), 2);
       if (c)
         end = c->getPos();
       else
@@ -181,7 +166,7 @@ void VectorMap::draw_lines (std::list<City*> srcs, std::list<City*> dests)
   for (auto it : dests)
     {
       //who is vectoring to this (*it) city?
-      std::list<City*> sources = Citylist::getInstance()->getCitiesVectoringTo(it);
+      std::list<City*> sources = Citylist::instance()->getCitiesVectoringTo(it);
       for (auto cit : sources)
 	draw_vectoring_line (it->getPos(), cit->getPos(), false);
     }
@@ -197,7 +182,7 @@ void VectorMap::after_draw()
   std::list<City*> srcs; //source cities
     
   Vector<int> flag;
-  flag = GameMap::getInstance()->findPlantedStandard(city->getOwner());
+  flag = GameMap::instance()->findPlantedStandard(city->getOwner());
   planted_standard = flag;
 
   //only show cities that can accept more vectoring when
@@ -206,10 +191,10 @@ void VectorMap::after_draw()
   std::list<City*> sources;
 
   if (click_action == CLICK_CHANGES_DESTINATION)
-    sources = Citylist::getInstance()->getCitiesVectoringTo(city);
+    sources = Citylist::instance()->getCitiesVectoringTo(city);
 
   // draw special shield for every city that player owns.
-  for (auto it: *Citylist::getInstance())
+  for (auto it: *Citylist::instance())
     {
       if (it->getOwner() == Playerlist::getViewingplayer())
         {
@@ -222,7 +207,7 @@ void VectorMap::after_draw()
               // first pass, identify every city that's a source or dest
               if (it->getVectoring() != Vector<int>(-1, -1))
                 {
-                  City *c = Citylist::getInstance()->getNearestCity(it->getVectoring(), 2);
+                  City *c = Citylist::instance()->getNearestCity(it->getVectoring(), 2);
                   if (c)
                     dests.push_back(c);
                   srcs.push_back(it);
@@ -241,7 +226,7 @@ void VectorMap::after_draw()
                 }
               //is this the city i'm vectoring to?
               else if (city->getVectoring() != Vector<int>(-1, -1) &&
-                       Citylist::getInstance()->getNearestCity(city->getVectoring(),
+                       Citylist::instance()->getNearestCity(city->getVectoring(),
                                                                2)->getId() == 
                        it->getId() && show_vectoring != SHOW_NO_VECTORING)
                 {
@@ -250,7 +235,7 @@ void VectorMap::after_draw()
                 }
               //is this a city that is vectoring to me?
               else if (it->getVectoring() != Vector<int>(-1, -1) &&
-                       Citylist::getInstance()->getNearestCity(it->getVectoring(),
+                       Citylist::instance()->getNearestCity(it->getVectoring(),
                                                                2)->getId() ==
                        city->getId() && show_vectoring != SHOW_NO_VECTORING)
                 type = 3; 
@@ -296,7 +281,7 @@ void VectorMap::after_draw()
       click_action == CLICK_SELECTS && viewing_player_owns_city)
     {
       // draw lines from origination to city/planted standard
-      for (auto it: *Citylist::getInstance())
+      for (auto it: *Citylist::instance())
 	{
 	  if (it->isVisible(Playerlist::getViewingplayer()) == false)
 	    continue;
@@ -339,13 +324,15 @@ void VectorMap::mouse_button_event(MouseButtonEvent e)
     {
       City *nearestCity;
       Vector<int> dest = mapFromScreen(e.pos);
+      if (!is_hot (dest))
+        return;
 
       switch (click_action)
 	{
 	case CLICK_VECTORS:
 
 	  nearestCity = 
-            Citylist::getInstance()->getNearestVisibleFriendlyCity(dest, 4);
+            Citylist::instance()->getNearestVisibleFriendlyCity(dest, 4);
 	  if (nearestCity == NULL)
 	    {
 	      //no city near there.  are we close to the planted standard?
@@ -387,16 +374,16 @@ void VectorMap::mouse_button_event(MouseButtonEvent e)
 	  break;
 	case CLICK_SELECTS:
 	  if (d_see_opponents_production == true)
-	    nearestCity = Citylist::getInstance()->getNearestVisibleCity(dest, 4);
+	    nearestCity = Citylist::instance()->getNearestVisibleCity(dest, 4);
 	  else
-	    nearestCity = Citylist::getInstance()->getNearestVisibleFriendlyCity(dest, 4);
+	    nearestCity = Citylist::instance()->getNearestVisibleFriendlyCity(dest, 4);
 	  if (nearestCity == NULL)
 	    return;
 	  city = nearestCity;
 	  draw();
 	  break;
 	case CLICK_CHANGES_DESTINATION:
-	  nearestCity = Citylist::getInstance()->getNearestVisibleFriendlyCity(dest, 4);
+	  nearestCity = Citylist::instance()->getNearestVisibleFriendlyCity(dest, 4);
 	  if (nearestCity == NULL)
 	    {
 	      //no city near there.  are we close to the planted standard?
@@ -428,7 +415,7 @@ void VectorMap::mouse_button_event(MouseButtonEvent e)
 	  draw();
           break;
 	  //bool is_source_city = false;
-          //for (auto cit: Citylist::getInstance()->getCitiesVectoringTo(city))
+          //for (auto cit: Citylist::instance()->getCitiesVectoringTo(city))
 	    //{
 	      //if (cit->contains(dest))
 		//{
@@ -455,4 +442,38 @@ void VectorMap::setCity(City *c)
 {
   city = c;
   draw();
+}
+
+void VectorMap::create_hotmap ()
+{
+  clear_hotmap ();
+  switch (click_action)
+    {
+    case CLICK_VECTORS:
+    case CLICK_CHANGES_DESTINATION:
+      for (auto c : *Citylist::instance ())
+        if (!c->isBurnt () && !is_fogged (c) &&
+            c->getOwner () == Playerlist::getActiveplayer ())
+          add_to_hotmap (*c);
+
+      if (planted_standard != Vector<int>(-1, -1))
+        add_to_hotmap (planted_standard);
+      break;
+
+    case CLICK_SELECTS:
+      if (d_see_opponents_production == true)
+        {
+          for (auto c : *Citylist::instance ())
+            if (!c->isBurnt () && !is_fogged (c))
+              add_to_hotmap (*c);
+        }
+      else
+        {
+          for (auto c : *Citylist::instance ())
+            if (!c->isBurnt () && !is_fogged (c) &&
+                c->getOwner () == Playerlist::getActiveplayer ())
+              add_to_hotmap (*c);
+        }
+      break;
+    }
 }

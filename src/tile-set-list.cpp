@@ -1,4 +1,5 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <assert.h>
@@ -21,20 +21,20 @@
 #include "ucompose.hpp"
 #include <sigc++/functors/mem_fun.h>
 
-#include "tilesetlist.h"
-#include "File.h"
+#include "tile-set-list.h"
+#include "file.h"
 #include "defs.h"
-#include "tileset.h"
-#include "tarhelper.h"
-#include "SmallTile.h"
-#include "setlist.h"
+#include "tile-set.h"
+#include "tar-helper.h"
+#include "small-tile.h"
+#include "set-list.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
 Tilesetlist* Tilesetlist::s_instance = 0;
 
-Tilesetlist* Tilesetlist::getInstance()
+Tilesetlist* Tilesetlist::instance()
 {
     if (!s_instance)
         s_instance = new Tilesetlist();
@@ -80,7 +80,7 @@ void Tilesetlist::instantiateImages(bool &broken)
       if (!broken)
         {
           if ((*it)->validate () == true)
-            (*it)->instantiateImages(true, broken);
+            (*it)->instantiateImages(broken);
         }
     }
 }

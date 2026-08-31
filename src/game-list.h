@@ -1,4 +1,4 @@
-//  Copyright (C) 2011, 2014 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef GAMELIST_H
@@ -86,10 +85,10 @@ class Gamelist: public std::list<HostedGame*>, public sigc::trackable
 	// Static Methods
 
         //! return the singleton instance of this class.
-        static Gamelist * getInstance();
+        static Gamelist * instance();
 
         //! Loads the singleton instance from an opened file.
-        static Gamelist * getInstance(XML_Helper *helper);
+        static Gamelist * instance(XML_Helper *helper);
 
         //! Explicitly delete the singleton instance of this class.
         static void deleteInstance();
@@ -133,5 +132,4 @@ class Gamelist: public std::list<HostedGame*>, public sigc::trackable
         static Gamelist* s_instance;
 };
 
-#endif // GAMELIST_H
-
+#endif

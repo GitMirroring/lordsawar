@@ -1,6 +1,6 @@
-// Copyright (C) 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,8 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef ARMYSETLIST_H
@@ -26,9 +25,9 @@
 #include <vector>
 #include <sigc++/trackable.h>
 
-#include "armyproto.h"
-#include "armyset.h"
-#include "setlist.h"
+#include "army-proto.h"
+#include "army-set.h"
+#include "set-list.h"
 class Tar_Helper;
 class TarFileImage;
 
@@ -49,7 +48,7 @@ class Armysetlist : public SetList<Armyset>, public sigc::trackable
 {
     public:
         //! Return the singleton instance of this class.
-        static Armysetlist* getInstance();
+        static Armysetlist* instance();
 
         //! Explicitly delete the singleton instance of this class
         static void deleteInstance();
@@ -111,5 +110,4 @@ class Armysetlist : public SetList<Armyset>, public sigc::trackable
         static Armysetlist* s_instance;
 };
 
-#endif // ARMYSETLIST_H
-
+#endif

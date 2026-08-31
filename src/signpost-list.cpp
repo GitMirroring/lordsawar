@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,13 +12,12 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "signpostlist.h"
-#include "xmlhelper.h"
+#include "signpost-list.h"
+#include "xml-helper.h"
 
 Glib::ustring Signpostlist::d_tag = "signpostlist";
 
@@ -27,7 +26,7 @@ Glib::ustring Signpostlist::d_tag = "signpostlist";
 
 Signpostlist* Signpostlist::s_instance=0;
 
-Signpostlist* Signpostlist::getInstance()
+Signpostlist* Signpostlist::instance()
 {
     if (s_instance == 0)
         s_instance = new Signpostlist();
@@ -35,7 +34,7 @@ Signpostlist* Signpostlist::getInstance()
     return s_instance;
 }
 
-Signpostlist* Signpostlist::getInstance(XML_Helper* helper)
+Signpostlist* Signpostlist::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -73,19 +72,19 @@ Signpostlist::Signpostlist (const Signpostlist &s, bool sync_ids)
 
 Signpostlist::Signpostlist(XML_Helper* helper)
 {
-    helper->registerTag(Signpost::d_tag, sigc::mem_fun(this, &Signpostlist::load));
+    helper->register_tag(Signpost::d_tag, sigc::mem_fun(*this, &Signpostlist::load));
 }
 
 bool Signpostlist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Signpostlist::d_tag);
+    retval &= helper->open_tag(Signpostlist::d_tag);
 
     for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }

@@ -1,4 +1,4 @@
-// Copyright (C) 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2010, 2011, 2014, 2015, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,10 +12,9 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "tarhelper.h"
+#include "tar-helper.h"
 #include <algorithm>
 #include <iostream>
 #include <fcntl.h>
@@ -23,7 +22,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fstream>
-#include "File.h"
+#include "file.h"
 #include <errno.h>
 #include "ucompose.hpp"
 #include <archive_entry.h>
@@ -40,7 +39,7 @@
  *
  * this class was originally implemented with libtar.
  */
-Tar_Helper::Tar_Helper(Glib::ustring file, std::ios::openmode mode, bool &broken)
+Tar_Helper::Tar_Helper(std::string file, std::ios::openmode mode, bool &broken)
 {
   t = NULL;
   broken = Open(file, mode);
@@ -52,7 +51,7 @@ void Tar_Helper::reopen(Tar_Helper *t)
   t->Open(t->pathname, t->openmode);
 }
 
-bool Tar_Helper::Open(Glib::ustring file, std::ios::openmode mode)
+bool Tar_Helper::Open(std::string file, std::ios::openmode mode)
 {
   t = NULL;
   if (mode == std::ios::in && is_tarfile (file) == false)
@@ -113,11 +112,11 @@ int Tar_Helper::dump_entry(struct archive *in, struct archive_entry *entry, stru
   return ARCHIVE_OK;
 }
 
-bool Tar_Helper::saveFile(Tar_Helper *t, Glib::ustring filename, Glib::ustring destfile)
+bool Tar_Helper::saveFile(Tar_Helper *t, std::string filename, std::string destfile)
 {
   //save each already existing file entry out, and then add ours on the end.
   //write the whole tar file to a temporary file and then copy it in place.
-  Glib::ustring tmp = File::get_tmp_file();
+  std::string tmp = File::get_tmp_file();
   bool broken = false;
   Tar_Helper out(tmp, std::ios::out, broken);
   Tar_Helper in(t->pathname, std::ios::in, broken);
@@ -134,7 +133,7 @@ bool Tar_Helper::saveFile(Tar_Helper *t, Glib::ustring filename, Glib::ustring d
       in.Close();
     }
 
-  Glib::ustring b;
+  std::string b;
   if (destfile == "")
     b = File::get_basename(filename, true);
   else
@@ -151,7 +150,7 @@ bool Tar_Helper::saveFile(Tar_Helper *t, Glib::ustring filename, Glib::ustring d
   return true;
 }
 
-bool Tar_Helper::saveFile(Glib::ustring filename, Glib::ustring destfile)
+bool Tar_Helper::saveFile(std::string filename, std::string destfile)
 {
   //archive_seek_data(t, 0, SEEK_SET);
   return saveFile(this, filename, destfile);
@@ -177,28 +176,28 @@ void Tar_Helper::Close(bool clean)
     }
 }
 
-Glib::ustring Tar_Helper::getFirstFile(std::list<Glib::ustring> exts, bool &broken)
+std::string Tar_Helper::getFirstFile(std::list<std::string> exts, bool &broken)
 {
-  for (std::list<Glib::ustring>::iterator i = exts.begin(); i != exts.end(); ++i)
+  for (std::list<std::string>::iterator i = exts.begin(); i != exts.end(); ++i)
     {
-      Glib::ustring file = getFirstFile(*i, broken);
+      std::string file = getFirstFile(*i, broken);
       if (file != "")
         return file;
     }
   return "";
 }
 
-Glib::ustring Tar_Helper::getFirstFile(Glib::ustring extension, bool &broken)
+std::string Tar_Helper::getFirstFile(std::string extension, bool &broken)
 {
-  std::list<Glib::ustring> files = getFilenames(extension);
+  std::list<std::string> files = getFilenames(extension);
   if (files.size() == 0)
     return "";
   return getFile(files.front(), broken);
 }
 
-Glib::ustring Tar_Helper::getFile(Tar_Helper *t, Glib::ustring filename, bool &broken, Glib::ustring tmpoutdir)
+std::string Tar_Helper::getFile(Tar_Helper *t, std::string filename, bool &broken, std::string tmpoutdir)
 {
-  Glib::ustring f = File::getTempFile(tmpoutdir, filename);
+  std::string f = File::getTempFile(tmpoutdir, filename);
   if (File::exists(f) == true)
     return f;
   struct archive_entry *entry = NULL;
@@ -229,7 +228,7 @@ Glib::ustring Tar_Helper::getFile(Tar_Helper *t, Glib::ustring filename, bool &b
       archive_write_disk_set_options(ext, 
                                      ARCHIVE_EXTRACT_OWNER |
                                      ARCHIVE_EXTRACT_PERM);
-      Glib::ustring outfile = File::getTempFile(tmpoutdir, filename);
+      std::string outfile = File::getTempFile(tmpoutdir, filename);
       archive_entry_copy_pathname(entry, outfile.c_str());
 
       archive_write_header(ext, entry);
@@ -256,15 +255,15 @@ Glib::ustring Tar_Helper::getFile(Tar_Helper *t, Glib::ustring filename, bool &b
   return "";
 }
 
-Glib::ustring Tar_Helper::getFile(Glib::ustring filename, bool &broken)
+std::string Tar_Helper::getFile(std::string filename, bool &broken)
 {
   return getFile(this, filename, broken, tmpoutdir);
 }
 
-std::list<Glib::ustring> Tar_Helper::getFilenames(Tar_Helper *t)
+std::list<std::string> Tar_Helper::getFilenames(Tar_Helper *t)
 {
   reopen(t);
-  std::list<Glib::ustring> result;
+  std::list<std::string> result;
   //archive_seek_data(t, 0, SEEK_SET);
   struct archive_entry *entry = NULL;
   while (1) 
@@ -280,24 +279,24 @@ std::list<Glib::ustring> Tar_Helper::getFilenames(Tar_Helper *t)
   return result;
 }
 
-std::list<Glib::ustring> Tar_Helper::getFilenames()
+std::list<std::string> Tar_Helper::getFilenames()
 {
   return getFilenames(this);
 }
 
-Glib::ustring Tar_Helper::getFirstFilename(Glib::ustring ext)
+std::string Tar_Helper::getFirstFilename(std::string ext)
 {
-  std::list<Glib::ustring> result = getFilenames(ext);
+  std::list<std::string> result = getFilenames(ext);
   if (result.empty())
     return "";
   return result.front();
 }
 
-std::list<Glib::ustring> Tar_Helper::getFilenames(Glib::ustring ext)
+std::list<std::string> Tar_Helper::getFilenames(std::string ext)
 {
-  std::list<Glib::ustring> result;
-  std::list<Glib::ustring> f = getFilenames(this);
-  for (std::list<Glib::ustring>::iterator i = f.begin(); i != f.end(); ++i)
+  std::list<std::string> result;
+  std::list<std::string> f = getFilenames(this);
+  for (std::list<std::string>::iterator i = f.begin(); i != f.end(); ++i)
     {
       if (ext == "")
         result.push_back(*i);
@@ -314,7 +313,7 @@ Tar_Helper::~Tar_Helper()
     Close();
 }
 
-bool Tar_Helper::is_tarfile (Glib::ustring file)
+bool Tar_Helper::is_tarfile (std::string file)
 {
   bool retval = false;
   struct archive *a = archive_read_new ();
@@ -331,11 +330,13 @@ bool Tar_Helper::is_tarfile (Glib::ustring file)
   return retval;
 }
 
-int Tar_Helper::dump_file_entry (Glib::ustring filename, struct archive_entry *entry, Glib::ustring nameinarchive, struct archive *out)
+int Tar_Helper::dump_file_entry (std::string filename, struct archive_entry *entry, std::string nameinarchive, struct archive *out)
 {
     struct stat st;
     stat(filename.c_str(), &st);
     archive_entry_copy_stat(entry, &st);
+    archive_entry_set_uid (entry, 0);
+    archive_entry_set_gid (entry, 0);
     archive_entry_set_pathname(entry, nameinarchive.c_str());
     archive_write_header(out, entry);
     int fd = open (filename.c_str(), O_RDONLY);
@@ -354,19 +355,19 @@ int Tar_Helper::dump_file_entry (Glib::ustring filename, struct archive_entry *e
     return ARCHIVE_OK;
 }
 
-Glib::ustring Tar_Helper::makeNameUnique(Glib::ustring name)
+std::string Tar_Helper::makeNameUnique(std::string name)
 {
   if (name.empty () == true)
     return name;
-  std::list<Glib::ustring> files = getFilenames();
+  std::list<std::string> files = getFilenames();
   if (find(files.begin(), files.end(), name) == files.end())
     return name;
-  Glib::ustring bname = File::get_basename (name, false);
-  Glib::ustring ext = File::get_extension (name);
+  std::string bname = File::get_basename (name, false);
+  std::string ext = File::get_extension (name);
 
   //take any trailing numbers
   int digits = 0;
-  for (Glib::ustring::reverse_iterator i = bname.rbegin ();
+  for (std::string::reverse_iterator i = bname.rbegin ();
        i != bname.rend(); ++i)
     {
       if (g_unichar_isdigit (*i))
@@ -377,7 +378,7 @@ Glib::ustring Tar_Helper::makeNameUnique(Glib::ustring name)
   int count = 2;
   if (digits > 0)
     {
-      Glib::ustring numerals = bname.substr (bname.length () - digits);
+      std::string numerals = bname.substr (bname.length () - digits);
       bname = bname.substr (0, bname.length () - digits);
       if (numerals.empty () == false)
         count = atoi (numerals.c_str ()) + 1;
@@ -385,7 +386,7 @@ Glib::ustring Tar_Helper::makeNameUnique(Glib::ustring name)
   //okay we have to munge the name now.
   while (1)
     {
-      Glib::ustring newname = String::ucompose ("%1%2%3", bname, count, ext);
+      std::string newname = String::ucompose ("%1%2%3", bname, count, ext);
       if (find(files.begin(), files.end(), newname) == files.end())
         return newname;
       count++;
@@ -395,7 +396,7 @@ Glib::ustring Tar_Helper::makeNameUnique(Glib::ustring name)
   return name;
 }
 
-bool Tar_Helper::replaceFile(Glib::ustring filename, Glib::ustring newfilename, Glib::ustring archive_name)
+bool Tar_Helper::replaceFile(std::string filename, std::string newfilename, std::string archive_name)
 {
   if (newfilename != "" && File::exists(newfilename) == false)
     return false;
@@ -403,7 +404,7 @@ bool Tar_Helper::replaceFile(Glib::ustring filename, Glib::ustring newfilename, 
   //when we see the one we want to replace, we do so.
   //unless newfilename is "", in which case we skip it (remove it).
   //write the whole tar file to a temporary file and then copy it in place.
-  Glib::ustring tmp = File::get_tmp_file();
+  std::string tmp = File::get_tmp_file();
   bool broken = false;
   Tar_Helper out(tmp, std::ios::out, broken);
   Tar_Helper in(pathname, std::ios::in, broken);
@@ -417,14 +418,14 @@ bool Tar_Helper::replaceFile(Glib::ustring filename, Glib::ustring newfilename, 
             break;
           if (r != ARCHIVE_OK)
             break;
-          if (filename == Glib::ustring(archive_entry_pathname(in_entry)) &&
+          if (filename == std::string(archive_entry_pathname(in_entry)) &&
               newfilename != "")
             {
               //hey it's the one we want to replace
               dump_file_entry (newfilename, in_entry, 
                                archive_name, out.t);
             }
-          else if (filename == Glib::ustring(archive_entry_pathname(in_entry)) &&
+          else if (filename == std::string(archive_entry_pathname(in_entry)) &&
               newfilename == "")
             ; //hey it's the one we're removing
           else
@@ -450,8 +451,8 @@ bool Tar_Helper::replaceFile(Glib::ustring filename, Glib::ustring newfilename, 
   return ret;
 }
 
-void Tar_Helper::clean_tmp_dir(Glib::ustring filename)
+void Tar_Helper::clean_tmp_dir(std::string filename)
 {
-  Glib::ustring tmpoutdir = File::getTarTempDir (File::get_basename(filename, true));
+  std::string tmpoutdir = File::getTarTempDir (File::get_basename(filename, true));
   File::clean_dir(tmpoutdir);
 }

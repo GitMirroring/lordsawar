@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,20 +12,20 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
-#include "heroesmap.h"
+#include "heroes-map.h"
 
-#include "playerlist.h"
+#include "player-list.h"
 #include "player.h"
-#include "stacklist.h"
+#include "stack-list.h"
 #include "hero.h"
 
 HeroesMap::HeroesMap(const std::list<Hero*> &h)
  : heroes (h), active_hero (*(heroes.begin()))
 {
+  create_hotmap ();
 }
 
 void HeroesMap::after_draw()
@@ -53,6 +53,8 @@ void HeroesMap::mouse_button_event(MouseButtonEvent e)
     {
       Player *active = Playerlist::getActiveplayer();
       Vector<int> dest = mapFromScreen(e.pos);
+      if (!is_hot (dest))
+        return;
 
       //is dest close to one of our heroes?
       Hero *hero = active->getStacklist()->getNearestHero(dest, 4);
@@ -61,5 +63,15 @@ void HeroesMap::mouse_button_event(MouseButtonEvent e)
 	  active_hero = hero;
 	  hero_selected.emit(hero);
 	}
+    }
+}
+
+void HeroesMap::create_hotmap ()
+{
+  for (auto h : heroes)
+    {
+      Vector<int> pos = 
+        h->getOwner ()->getStacklist ()->getPosition (h->getId ());
+      add_to_hotmap (pos);
     }
 }

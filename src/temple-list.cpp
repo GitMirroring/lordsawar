@@ -1,7 +1,7 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020, 2021 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,18 +15,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "xmlhelper.h"
-#include "templelist.h"
-#include "playerlist.h"
+#include "xml-helper.h"
+#include "temple-list.h"
+#include "player-list.h"
 #include "stack.h"
-#include "citysetlist.h"
-#include "cityset.h"
-#include "GameMap.h"
+#include "city-set-list.h"
+#include "city-set.h"
+#include "game-map.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -34,7 +33,7 @@
 Glib::ustring Templelist::d_tag = "templelist";
 Templelist* Templelist::s_instance=0;
 
-Templelist* Templelist::getInstance()
+Templelist* Templelist::instance()
 {
     if (s_instance == 0)
         s_instance = new Templelist();
@@ -42,7 +41,7 @@ Templelist* Templelist::getInstance()
     return s_instance;
 }
 
-Templelist* Templelist::getInstance(XML_Helper* helper)
+Templelist* Templelist::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -80,19 +79,19 @@ Templelist::Templelist (const Templelist &t, bool sync_ids)
 
 Templelist::Templelist(XML_Helper* helper)
 {
-  helper->registerTag(Temple::d_tag, sigc::mem_fun(this, &Templelist::load));
+  helper->register_tag(Temple::d_tag, sigc::mem_fun(*this, &Templelist::load));
 }
 
 bool Templelist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Templelist::d_tag);
+    retval &= helper->open_tag(Templelist::d_tag);
 
     for (const_iterator it = begin(); it != end();++it)
         retval &= (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }

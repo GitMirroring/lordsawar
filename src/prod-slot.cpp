@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2015 Ben Asselstine
+//  Copyright (C) 2008, 2015, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,13 +12,12 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "prodslot.h"
+#include "prod-slot.h"
 
-#include "armyprodbase.h"
-#include "xmlhelper.h"
+#include "army-prod-base.h"
+#include "xml-helper.h"
 
 Glib::ustring ProdSlot::d_tag = "slot";
 
@@ -41,8 +40,8 @@ ProdSlot::ProdSlot(const ProdSlot& object)
 ProdSlot::ProdSlot(XML_Helper* helper)
 {
   d_armyprodbase = NULL;
-  helper->registerTag(ArmyProdBase::d_tag, 
-		      sigc::mem_fun(this, &ProdSlot::load));
+  helper->register_tag(ArmyProdBase::d_tag, 
+		      sigc::mem_fun(*this, &ProdSlot::load));
 
 }
 
@@ -68,10 +67,10 @@ ProdSlot::~ProdSlot()
 bool ProdSlot::save(XML_Helper *helper) const
 {
   bool retval = true;
-  retval &= helper->openTag(ProdSlot::d_tag);
+  retval &= helper->open_tag(ProdSlot::d_tag);
   if (d_armyprodbase)
     retval &= d_armyprodbase->save(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
   return retval;
 }
     

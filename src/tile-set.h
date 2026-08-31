@@ -1,6 +1,7 @@
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007-2011, 2014, 2017, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2017, 2020, 2021,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef TILESET_H
@@ -24,10 +24,11 @@
 #include <vector>
 #include <sigc++/trackable.h>
 
-#include "Tile.h"
+#include "tile.h"
 #include "defs.h"
 #include "set.h"
-#include "SmallTile.h"
+#include "small-tile.h"
+#include "shield.h"
 
 class XML_Helper;
 class TarFileMaskedImage;
@@ -102,7 +103,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         TarFileMaskedImage *getSelector(bool large) {return d_selector[large ? 1 : 0];}
 
         //! Returns the frames of the flag
-        TarFileMaskedImage *getFlags() {return d_flag;}
+        TarFileMaskedImage *getFlags(Shield::Color c) {return d_flag[c];}
 
         //! Returns the explosion image
         TarFileImage *getExplosion() {return d_explosion;}
@@ -189,13 +190,12 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
          * Go get the image files from the tileset file and create the
          * various pixmask objects.
          *
-         * @param scale   The images are clamped to the tile size or not.
          * @param broken  True when things went wrong reading the tileset file.
          */
-	void instantiateImages(bool scale, bool &broken);
+	void instantiateImages(bool &broken);
 
         //! Load the tileset again.
-        void reload(bool &broken);
+        void reload();
         
         //! make a new tilestyleset from an image and add it to the tile's list.
         bool addTileStyleSet(Tile *tile, Glib::ustring filename);
@@ -259,7 +259,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	static guint32 getDefaultTileSize();
 
 	//! Create a tileset from the given tileset configuration file.
-	static Tileset *create(Glib::ustring file, bool &unsupported_version);
+        static void create(Glib::ustring filename, sigc::slot<void(Tileset*,bool,bool,Glib::ustring)> finished);
         
         static Tileset *copy (const Tileset *orig);
 
@@ -269,6 +269,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 	
         static guint32 get_default_tile_size ();
 
+        bool get_images_instantiated ();
 
     private:
         //! Callback to load Tile objects into the Tileset.
@@ -280,7 +281,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
         TarFileMaskedImage *d_selector[2];
 
         //! The object containing the set of images that comprise the flags
-        TarFileMaskedImage *d_flag;
+        TarFileMaskedImage *d_flag[MAX_PLAYERS + 1];
 
 	//! The explosion image
 	/**
@@ -371,7 +372,7 @@ class Tileset : public sigc::trackable, public std::vector<Tile*>, public Set
 
         std::vector<TarFileImage*> getImages ();
         std::vector<TarFileMaskedImage*> getMaskedImages ();
+    public:
+        Tileset& operator=(const Tileset& other);
 };
-#endif // TILESET_H
-
-// End of file
+#endif

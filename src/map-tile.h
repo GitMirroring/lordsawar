@@ -1,8 +1,8 @@
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2017,
-// 2020, 2021 Ben Asselstine
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2005 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2017, 2020,
+//  2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,18 +16,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef MAPTILE_H
 #define MAPTILE_H
 
 #include <list>
-#include "Tile.h"
-#include "Movable.h"
-#include "SmallTile.h"
-#include "MapBackpack.h"
+#include "tile.h"
+#include "movable.h"
+#include "small-tile.h"
+#include "map-backpack.h"
 class StackTile;
 
 //! A single tile on the game map.
@@ -250,6 +249,4 @@ class Maptile: public Movable
 	StackTile *d_stacktile;
 };
 
-#endif // MAPTILE_H
-
-// End of file
+#endif

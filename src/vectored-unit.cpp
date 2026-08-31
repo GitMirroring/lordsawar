@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,20 +12,19 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "vectoredunit.h"
-#include <xmlhelper.h>
+#include "vectored-unit.h"
+#include <xml-helper.h>
 
-#include "armysetlist.h"
-#include "playerlist.h"
+#include "army-set-list.h"
+#include "player-list.h"
 #include "army.h"
 #include "city.h"
-#include "GameMap.h"
+#include "game-map.h"
 #include "action.h"
-#include "MapBackpack.h"
-#include "GameScenario.h"
+#include "map-backpack.h"
+#include "game-scenario.h"
 
 Glib::ustring VectoredUnit::d_tag = "vectoredunit";
 
@@ -52,9 +51,9 @@ VectoredUnit::VectoredUnit(const VectoredUnit& v)
 VectoredUnit::VectoredUnit(XML_Helper* helper)
     :OwnerId(helper), LocationBox(helper), d_army(NULL)
 {
-    helper->getData(d_duration, "duration");
-    helper->getData(d_destination.x, "dest_x");
-    helper->getData(d_destination.y, "dest_y");
+    helper->get(d_duration, "duration");
+    helper->get(d_destination.x, "dest_x");
+    helper->get(d_destination.y, "dest_y");
     //army is loaded via callback in vectoredunitlist
 }
 
@@ -69,19 +68,19 @@ bool VectoredUnit::save(XML_Helper* helper) const
     bool retval = true;
     Glib::ustring name = "";
 
-    retval &= helper->openTag(VectoredUnit::d_tag);
-    retval &= helper->saveData("x", getPos().x);
-    retval &= helper->saveData("y", getPos().y);
-    retval &= helper->saveData("name", name);
-    retval &= helper->saveData("duration", d_duration);
-    retval &= helper->saveData("dest_x", d_destination.x);
-    retval &= helper->saveData("dest_y", d_destination.y);
+    retval &= helper->open_tag(VectoredUnit::d_tag);
+    retval &= helper->save("x", getPos().x);
+    retval &= helper->save("y", getPos().y);
+    retval &= helper->save("name", name);
+    retval &= helper->save("duration", d_duration);
+    retval &= helper->save("dest_x", d_destination.x);
+    retval &= helper->save("dest_y", d_destination.y);
     if (getOwner ())
-        retval &= helper->saveData("owner", d_owner_id);
+        retval &= helper->save("owner", d_owner_id);
     else
-        retval &= helper->saveData("owner", -1);
+        retval &= helper->save("owner", -1);
     retval &= d_army->save(helper);
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -99,7 +98,7 @@ Army *VectoredUnit::armyArrives(Stack *& stack) const
 	return NULL;
 	}
       printf ("uhh... no city at %d,%d?\n", d_destination.x, d_destination.y);
-      Maptile *tile = GameMap::getInstance()->getTile(d_destination);
+      Maptile *tile = GameMap::instance()->getTile(d_destination);
       if (tile)
 	{
 	  if (tile->getBackpack()->getPlantedItem(getOwner ()))
@@ -107,7 +106,7 @@ Army *VectoredUnit::armyArrives(Stack *& stack) const
 	      //army arrives on a planted standard
 	      Army *a = new Army(*d_army, getOwner ());
 	      LocationBox loc = LocationBox(d_destination);
-              stack = GameMap::getInstance()->addArmy(d_destination, a);
+              stack = GameMap::instance()->addArmy(d_destination, a);
 	      return a;
 	    }
 	}
@@ -118,7 +117,7 @@ Army *VectoredUnit::armyArrives(Stack *& stack) const
 	{
 	  //army arrives in a city
 	  Army *a = new Army(*d_army, getOwner ());
-          stack = GameMap::getInstance()->addArmy(d_destination, a);
+          stack = GameMap::instance()->addArmy(d_destination, a);
 	  return a;
 	}
       printf ("destination city is owned by `%s', but the vectored unit is owned by `%s'\n", dest->getOwner()->getName().c_str(), getOwner ()->getName().c_str());
@@ -151,4 +150,3 @@ int VectoredUnit::get_travel_turns (Vector<int> src, Vector<int> dest)
     }
   return turns;
 }
-// End of file

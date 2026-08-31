@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2012, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2015, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef VECTORMAP_H
@@ -21,8 +20,9 @@
 
 #include <sigc++/signal.h>
 
-#include "overviewmap.h"
+#include "overview-map.h"
 #include "input-events.h"
+#include "image-cache.h"
 
 class City;
 
@@ -90,26 +90,49 @@ public:
     VectorMap(City *city, enum ShowVectoring vector, 
 	      bool see_opponents_production);
 
+    ImageCache::CursorType get_cursor (double x, double y)
+      {
+        Vector<int> pos (x, y);
+
+        Vector<int> tile = mapFromScreen (pos);
+        if (is_hot (tile))
+          return ImageCache::HAND_POINTER;
+        return ImageCache::POINTER;
+      }
+
     //! Realize a mouse button event.
     void mouse_button_event(MouseButtonEvent e);
 
     // Emitted whenever something is drawn on to the miniature map graphic.
-    sigc::signal<void, Cairo::RefPtr<Cairo::Surface> > map_changed;
+    sigc::signal<void(Cairo::RefPtr<Cairo::Surface>)> map_changed;
 
     //! Change what kind of vectoring is depicted on the VectorMap.
-    void setShowVectoring (enum ShowVectoring v) { show_vectoring = v;}
+    void setShowVectoring (enum ShowVectoring v)
+      {
+        show_vectoring = v;
+      }
 
     //! Return the currently selected City object.
-    City* getCity() {return city;}
+    City* getCity()
+      {
+        return city;
+      }
 
     //! show vectoring from a different city.
     void setCity(City *c);
 
     //! Change what happens when a City object is clicked on.
-    void setClickAction (enum ClickAction a) { click_action = a;}
+    void setClickAction (enum ClickAction a)
+      {
+        click_action = a;
+        create_hotmap ();
+      }
 
     //! Return what happens when a City object is clicked on.
-    enum ClickAction getClickAction () { return click_action;}
+    enum ClickAction getClickAction ()
+      {
+        return click_action;
+      }
 
 private:
     //! The currently selected city object.
@@ -200,6 +223,8 @@ private:
     void draw_vectoring_line(Vector<int> src, Vector<int> dest, bool to);
 
     void draw_square_around_active_city();
+
+    void create_hotmap ();
 };
 
 #endif

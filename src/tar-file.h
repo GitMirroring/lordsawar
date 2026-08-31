@@ -1,4 +1,4 @@
-// Copyright (C) 2017, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2017, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,15 +12,14 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef TARFILE_H
 #define TARFILE_H
-#include "File.h"
+#include "file.h"
 #include "defs.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
 //! An interface for dealing with tar files
 /**
@@ -33,46 +32,58 @@
 class TarFile
 {
 public:
-    TarFile (Glib::ustring dir, Glib::ustring name, Glib::ustring ext);
+    TarFile (std::string dir, std::string name, std::string ext);
     ~TarFile() {};
     TarFile(const TarFile &s);
 
-    Glib::ustring getDirectory() const {return d_dir;}
-    void setDirectory(Glib::ustring d) {d_dir = File::add_slash_if_necessary(d);}
+    std::string getDirectory() const {return d_dir;}
+    void setDirectory(std::string d) {d_dir = File::add_slash_if_necessary(d);}
 
-    Glib::ustring getConfigurationFile(bool master = false) const;
+    std::string getConfigurationFile(bool master = false) const;
 
-    Glib::ustring getFileFromConfigurationFile(Glib::ustring file);
-    bool contains (Glib::ustring ar, bool &broken);
+    std::string getFileFromConfigurationFile(std::string file);
+    bool contains (std::string ar, bool &broken);
     guint32 countImages ();
-    bool replaceFileInCfgFile(Glib::ustring file, Glib::ustring new_file, Glib::ustring &out);
-    bool addFileInCfgFile(Glib::ustring new_file, Glib::ustring &out);
-    bool removeFileInCfgFile(Glib::ustring file);
+    bool replaceFileInCfgFile(std::string file, std::string new_file, std::string &out, Glib::ustring &err);
+    bool addFileInCfgFile(std::string new_file, std::string &out, Glib::ustring &err);
+    bool removeFileInCfgFile(std::string file, Glib::ustring &err);
 
     void clean_tmp_dir();
 
-    bool saveTar(Glib::ustring tmpfile, Glib::ustring tmptar, Glib::ustring dest, std::vector<Glib::ustring> extrafiles) const;
-    Glib::ustring getBaseName () const {return d_basename;}
-    Glib::ustring getExtension () const {return d_extension;}
+    bool saveTar(std::string tmpfile, std::string tmptar, std::string dest, std::vector<std::string> extrafiles) const;
+    std::string getBaseName () const {return d_basename;}
+    std::string getExtension () const {return d_extension;}
 
-    void setBaseName(Glib::ustring bname) {d_basename = bname;}
-    void setExtension(Glib::ustring ext) {d_extension = ext;}
+    void setBaseName(std::string bname) {d_basename = bname;}
+    void setExtension(std::string ext) {d_extension = ext;}
 
-    void moved(Glib::ustring filename);
-    void created(Glib::ustring filename);
+    void moved(std::string filename);
+    void created(std::string filename);
 
     //! when we don't have a configuration file yet, we use this
     void setNewTemporaryFile ();
     //! when we open a file, we work on a copy of it
-    void setLoadTemporaryFile ();
+    bool setLoadTemporaryFile ();
 
 private:
 
-    Glib::ustring d_dir;
-    Glib::ustring d_basename;
-    Glib::ustring d_extension;
-    Glib::ustring d_tmp_filename;
+    std::string d_dir;
+    std::string d_basename;
+    std::string d_extension;
+    std::string d_tmp_filename;
 
+public:
+    TarFile& operator=(const TarFile& other)
+      {
+        if (this != &other)
+          {
+            d_dir = other.d_dir;
+            d_basename = other.d_basename;
+            d_extension = other.d_extension;
+            d_tmp_filename = other.d_tmp_filename;
+          }
+        return *this;
+      }
 };
 
 #endif //TarFile

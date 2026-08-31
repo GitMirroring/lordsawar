@@ -1,7 +1,8 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +16,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef PLAYERLIST_H
@@ -59,15 +59,22 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	void setWinningPlayer(Player *winner);
 
 	//! Set the player who's turn it is.  should only be used by the editor.
-	void setActiveplayer(Player *p) {d_activeplayer = p;};
+	void setActiveplayer (Player *p)
+          {
+            d_activeplayer = p;
+          }
+
+        void setActiveplayer (Shield::Color shield)
+          {
+            for (auto it = begin (); it != end (); ++it)
+              if ((*it)->get_shield () == shield)
+                d_activeplayer = *it;
+          }
 
 	//! set the player who is looking at the bigmap and smallmap.
 	void setViewingplayer(Player *p) {viewingplayer = p;};
 
 	//! Get Methods
-
-        //! Returns the neutral player.
-        Player* getNeutral() const {return d_neutral;}
 
         //! The game is over and this is the winner.
         Player *getWinningPlayer() const;
@@ -77,14 +84,8 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
         //! Sets the active player to the next player in the order.
         void nextPlayer();
 
-        /** 
-	 * Checks if a player is alive and has no cities left. If not then 
-	 * this method marks the player as killed.
-	 *
-	 * @param Returns whether or not any players were marked as dead.
-         */
-	//! Kill any players that don't have cities left.
-        bool checkPlayers();
+        //! Returns the newly dead players, e.g. not dead and lack cities.
+        std::list<Player*> getDeadPlayers ();
 
         /** 
 	 * Though the neutral player is located in the list of existing 
@@ -123,27 +124,6 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
         iterator flErase(iterator it);
 
 	/**
-	 * This method is called when a round starts.
-	 * The purpose of this method is to calculate who is winning, and 
-	 * it to negotiate diplomacy between players.  This method also 
-	 * implements the computer players collectively surrendering to a 
-	 * final human player.
-	 *
-	 * @param diplomacy     Whether or not we should negotiate diplomacy
-	 *                      between players.
-	 * @param surrender_already_offered Tells the method if surrender
-	 *                      has already been offered by the computer
-	 *                      players.  This needs to be kept track of
-	 *                      because the computer players only offer
-	 *                      surrender once.  The method will change this
-	 *                      value from false to true if it decided that 
-	 *                      the computer players collectively offer 
-	 *                      surrender.
-	 */
-	//! Callback method to process all players at the start of a round.
-	void nextRound(bool diplomacy, bool *surrender_already_offered);
-
-	/**
 	 * The purpose of randomzing the Playerlist is to implement
 	 * random turns.
 	 * Note: This method does not set the active player.
@@ -167,16 +147,22 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	/**
 	 * Sync the playerlist with the list of players given.
 	 */
-	void syncPlayers(std::vector<GameParameters::Player> players);
+	void syncPlayers(GameParameters g);
 
 	//! Sync the given player with the playerlist
-	void syncPlayer(GameParameters::Player player);
+	void syncPlayer(GameParameters::Player player, Glib::ustring army_theme);
 
         //! Switch the neutral player to AI_DUMMY if it has any other type.
         void syncNeutral();
 
 	//! Converts all of the human players into network players.
 	guint32 turnHumansIntoNetworkPlayers();
+
+	//! Calculate new scores for all players.
+        void calculateWinners();
+
+	//! Calculate new diplomatic states for all players.
+	void negotiateDiplomacy();
 
 	//! Converts a given number of the human players into a type of player.
 	guint32 turnHumansInto(Player::Type type, int num_players = -1);
@@ -190,9 +176,6 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	//! Add a player to the list.  Use this instead of push_back.
 	void add(Player *player);
 
-        //! Reassign player colors.
-        void setNewColors(Shieldset *shieldset);
-
         //! Remove all actions from every player's action list.
         void clearAllActions();
 
@@ -205,8 +188,8 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	 *
 	 * @return A pointer to the Player if it is found, or NULL if it isn't.
 	 */
-	//! Lookup a Player by it's name.
-        Player* getPlayer(Glib::ustring name) const;
+	//! Lookup a Player by its name.
+        Player* get (Glib::ustring name) const;
 
 	/**
 	 * Scan the list of players for a Player with a given Id.
@@ -215,8 +198,18 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	 *
 	 * @return A pointer to the Player if it is found, or NULL if it isn't.
 	 */
-        //! Lookup a Player by it's Id.
-        Player* getPlayer(guint32 id) const;
+        //! Lookup a Player by its Id.
+        Player* get (guint32 id) const;
+
+	/**
+	 * Scan the list of players for a Player with a given shield.
+	 *
+	 * @param shield    The shield of the Player to lookup.
+	 *
+	 * @return A pointer to the Player if it is found, or NULL if it isn't.
+	 */
+        //! Lookup a Player by its shield.
+        Player *get (Shield::Color) const;
 
         //! Returns the number of living players (neutral player excluded.)
         guint32 getNoOfPlayers() const;
@@ -228,7 +221,7 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	 * @return A pointer to the first living Player.
          */
 	//! Return the first living Player in the list.
-        Player* getFirstLiving() const;
+        static Player* getFirstLiving();
 
         //! Saves the playerlist to an opened saved-game file.
         bool save(XML_Helper* helper) const;
@@ -251,27 +244,20 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
         //! Return a stack belonging to any player with the given id.
         Stack *getStackById(guint32 id) const;
 
-	/** 
-	  \brief Check to see if this is the end of the round or not.
-	  */
-	bool isEndOfRound() const;
-
         //! Return true if any of the players use the given armyset.
         bool hasArmyset(guint32 id) const;
         std::vector<Player*> getPlayersWithArmyset(guint32 id) const;
 
-        //! Return the ids of the armysets in use.
-        std::list<guint32> getArmysets() const;
-
         //! Get which numeric sequence the player is in this round
         guint32 getTurnOrderNumber(const Player *p);
-	// Signals
 
-	/**
-	 * @param player  The player who has died.
-	 */
-        //! Emitted when a player has died.
-        sigc::signal<void, Player*> splayerDead;
+        //! Get a list of all of stacks currently in boats
+        std::list<Stack*> getArmyUnitsInBoats () const;
+
+        guint32 countArmies (guint32 army_type_id) const;
+
+
+	// Signals
     
 	/**
 	 * Emitted when the computer players collectively offer surrender to 
@@ -280,13 +266,13 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	 * @param player  The human player who is being surrendered to.
 	 */
         //! Emitted when a surrender is offered.
-        sigc::signal<void, Player*> ssurrender;
+        sigc::signal<void(Player*, sigc::slot<void()>)> ssurrender;
     
 
 	// Static Methods
 
         //! Gets the singleton instance or creates a new one.
-        static Playerlist* getInstance();
+        static Playerlist* instance();
 
 	/**
 	 * Load all Players in the Playerlist from a saved-game file.
@@ -296,18 +282,25 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	 * @return The loaded Playerlist.
 	 */
         //! Loads the playerlist from a saved-game file.
-        static Playerlist* getInstance(XML_Helper* helper);
+        static Playerlist* instance(XML_Helper* helper);
 
         //! Explicitly deletes the singleton instance.
         static void deleteInstance();
 
         //! Returns the active player (the Player whose turn it is).
-        static Player* getActiveplayer()
-          {return getInstance ()->d_activeplayer;}
+        static Player* getActiveplayer ()
+          {
+            return instance ()->d_activeplayer;
+          }
+
+        //! Returns the neutral player.
+        static Player* getNeutral() {return instance ()->d_neutral;}
 
         //! Returns the viewing player (the Player who is looking at maps).
 	static Player *getViewingplayer()
-          {return getInstance ()->viewingplayer;}
+          {
+            return instance ()->viewingplayer;
+          }
 
         //! Replace the current playerlist with another.
         static void reset (Playerlist *p);
@@ -339,12 +332,6 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 	//! Comparison function to assist in sorting the list of players.
 	static bool inOrderOfId(const Player *lhs, const Player *rhs);
 
-	//! Calculate new scores for all players.
-        void calculateWinners();
-
-	//! Calculate new diplomatic states for all players.
-	void negotiateDiplomacy();
-
         void updateViewingPlayer ();
 
         Glib::ustring get_title(int rank);
@@ -365,6 +352,7 @@ class Playerlist : public std::list<Player*>, public sigc::trackable
 
         //! A static pointer for the singleton instance.
         static Playerlist* s_instance;
+
 };
 
 //! A helper struct in Playerlist to help with sorting Player objects by score.
@@ -375,4 +363,4 @@ struct rankable_t
 };
 
 bool compareDiplomaticScores (const struct rankable_t lhs, const struct rankable_t rhs);
-#endif // PLAYERLIST_H
+#endif

@@ -1,8 +1,8 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef ARMY_PROTO_BASE_H
@@ -28,7 +27,7 @@
 
 class XML_Helper;
 
-#include "armybase.h"
+#include "army-base.h"
 
 //! A basic set of properties belonging to an army prototype.
 class ArmyProtoBase : public ArmyBase
@@ -48,9 +47,6 @@ class ArmyProtoBase : public ArmyBase
         ~ArmyProtoBase() {};
 
         // Set Methods
-        
-        //! Sets the descriptive text for this Army.
-        void setDescription(Glib::ustring text) {d_description = text;};
         
         //! Set the gold pieces needed to make an Army unit of this kind.
         void setProductionCost(guint32 production_cost)
@@ -86,9 +82,6 @@ class ArmyProtoBase : public ArmyBase
 
         // Get Methods
         
-        //! Returns the descriptive text of this Army.
-        Glib::ustring getDescription() const {return _(d_description.c_str());}
-
 	//! Returns how much gold making one of these army units costs.
         guint32 getProductionCost() const {return d_production_cost;}
 
@@ -110,13 +103,10 @@ class ArmyProtoBase : public ArmyBase
 
     protected:
 	//! Callback method for loading this object from an opened file.
-	bool saveData(XML_Helper* helper) const;
+	bool save(XML_Helper* helper) const;
 
 	//! The name of the Army unit.  e.g. Scouts.
         Glib::ustring d_name;
-
-	//! The description of the Army unit.
-        Glib::ustring d_description;
 
 	//! How many gold pieces needed to create an army of this kind.
 	/**
@@ -148,4 +138,4 @@ class ArmyProtoBase : public ArmyBase
 	
 };
 
-#endif // ARMY_PROTO_BASE_H
+#endif

@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,18 +12,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <assert.h>
 #include <sigc++/functors/mem_fun.h>
 
-#include "vectoredunitlist.h"
-#include "vectoredunit.h"
+#include "vectored-unit-list.h"
+#include "vectored-unit.h"
 #include "city.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "player.h"
-#include "GameMap.h"
+#include "game-map.h"
 
 Glib::ustring VectoredUnitlist::d_tag = "vectoredunitlist";
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -31,7 +30,7 @@ Glib::ustring VectoredUnitlist::d_tag = "vectoredunitlist";
 
 VectoredUnitlist* VectoredUnitlist::s_instance = 0;
 
-VectoredUnitlist* VectoredUnitlist::getInstance()
+VectoredUnitlist* VectoredUnitlist::instance()
 {
     if (s_instance == 0)
         s_instance = new VectoredUnitlist();
@@ -39,7 +38,7 @@ VectoredUnitlist* VectoredUnitlist::getInstance()
     return s_instance;
 }
 
-VectoredUnitlist* VectoredUnitlist::getInstance(XML_Helper* helper)
+VectoredUnitlist* VectoredUnitlist::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -75,20 +74,20 @@ VectoredUnitlist::~VectoredUnitlist()
 
 VectoredUnitlist::VectoredUnitlist(XML_Helper* helper)
 {
-    helper->registerTag(VectoredUnit::d_tag, sigc::mem_fun(this, &VectoredUnitlist::load));
-    helper->registerTag(ArmyProdBase::d_tag, sigc::mem_fun(this, &VectoredUnitlist::load));
+    helper->register_tag(VectoredUnit::d_tag, sigc::mem_fun(*this, &VectoredUnitlist::load));
+    helper->register_tag(ArmyProdBase::d_tag, sigc::mem_fun(*this, &VectoredUnitlist::load));
 }
 
 bool VectoredUnitlist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(VectoredUnitlist::d_tag);
+    retval &= helper->open_tag(VectoredUnitlist::d_tag);
 
     for (VectoredUnitlist::const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }

@@ -1,5 +1,5 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020,
-//  2021 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,29 +13,28 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <assert.h>
 #include "rectangle.h"
 #include <sigc++/functors/mem_fun.h>
 
-#include "shieldsetlist.h"
-#include "shieldset.h"
-#include "File.h"
+#include "shield-set-list.h"
+#include "shield-set.h"
+#include "file.h"
 #include "defs.h"
 #include "ucompose.hpp"
-#include "tarhelper.h"
-#include "setlist.h"
-#include "TarFileMaskedImage.h"
+#include "tar-helper.h"
+#include "set-list.h"
+#include "tar-file-masked-image.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
 Shieldsetlist* Shieldsetlist::s_instance = 0;
 
-Shieldsetlist* Shieldsetlist::getInstance()
+Shieldsetlist* Shieldsetlist::instance()
 {
     if (!s_instance)
         s_instance = new Shieldsetlist();
@@ -66,16 +65,24 @@ Shieldsetlist::~Shieldsetlist()
   clear();
 }
 
-std::list<Glib::ustring> Shieldsetlist::getValidNames() const
+std::list<guint32> Shieldsetlist::getValidIds() const
 {
-  std::list<Glib::ustring> names;
+  std::vector<Shieldset*> objects;
   for (const_iterator it = begin(); it != end(); ++it)
-    {
-      if ((*it)->validate() == true)
-        names.push_back((*it)->getName());
-    }
-  names.sort(case_insensitive);
-  return names;
+    if ((*it)->validate () == true)
+      objects.push_back (*it);
+
+  std::sort
+    (objects.begin(), objects.end (),
+     [](const Shieldset* a, const Shieldset* b)
+     {
+       return (a->getName ().casefold () < b->getName ().casefold ());
+     });
+
+  std::list<guint32> ids;
+  for (auto o : objects)
+    ids.push_back (o->getId ());
+  return ids;
 }
 
 std::vector<Gdk::RGBA> Shieldsetlist::getColors(guint32 shieldset, guint32 owner) const
@@ -104,7 +111,7 @@ void Shieldsetlist::instantiateImages(bool &broken)
   for (iterator it = begin (); it != end (); ++it)
     if (!broken)
       if ((*it)->validate () == true)
-        (*it)->instantiateImages (true, broken);
+        (*it)->instantiateImages (broken);
 }
 
 void Shieldsetlist::uninstantiateImages()

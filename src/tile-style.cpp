@@ -1,4 +1,4 @@
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,17 +12,16 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <iomanip>
 
 
-#include "tilestyle.h"
+#include "tile-style.h"
 #include "ucompose.hpp"
 #include "defs.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
 Glib::ustring TileStyle::d_tag = "tilestyle";
 
@@ -60,11 +59,11 @@ TileStyle::TileStyle(XML_Helper* helper)
   char *end = NULL;
   Glib::ustring idstr;
 
-  helper->getData(idstr, "id");
+  helper->get(idstr, "id");
   unsigned long int val = 0;
   val = strtoul (idstr.c_str(), &end, 0);
   d_id = (guint32) val;
-  helper->getData(i, "type");
+  helper->get(i, "type");
   d_type = static_cast<TileStyle::Type>(i);
 
 }
@@ -73,13 +72,13 @@ bool TileStyle::save(XML_Helper *helper)
 {
   bool retval = true;
 
-  retval &= helper->openTag(d_tag);
+  retval &= helper->open_tag(d_tag);
   Glib::ustring idstr;
   
   idstr = String::ucompose ("0x%1", idToString(d_id));
-  retval &= helper->saveData("id", idstr);
-  retval &= helper->saveData("type", d_type);
-  retval &= helper->closeTag();
+  retval &= helper->save("id", idstr);
+  retval &= helper->save("type", d_type);
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -102,13 +101,13 @@ Glib::ustring TileStyle::getTypeName(Type type)
     {
     case LONE: return "Lone";
     case OUTERTOPLEFT: return "Outer Top-Left";
-    case OUTERTOPCENTER: return "Outer Top-Centre";
+    case OUTERTOPCENTER: return "Outer Top-Center";
     case OUTERTOPRIGHT: return "Outer Top-Right";
     case OUTERBOTTOMLEFT: return "Outer Bottom-Left";
-    case OUTERBOTTOMCENTER: return "Outer Bottom-Centre";
+    case OUTERBOTTOMCENTER: return "Outer Bottom-Center";
     case OUTERBOTTOMRIGHT: return "Outer Bottom-Right";
     case OUTERMIDDLELEFT: return "Outer Middle-Left";
-    case INNERMIDDLECENTER: return "Outer Middle-Centre";
+    case INNERMIDDLECENTER: return "Center";
     case OUTERMIDDLERIGHT: return "Outer Middle-Right";
     case INNERTOPLEFT: return "Inner Top-Left";
     case INNERTOPRIGHT: return "Inner Top-Right";
@@ -145,4 +144,3 @@ Glib::ustring TileStyle::idToString(guint32 id, guint32 digits)
 
   return String::ucompose ("%1", Glib::ustring::format(std::hex, std::setfill(L'0'), std::setw(num_digits), id));
 }
-// End of file

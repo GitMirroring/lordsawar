@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,15 +12,14 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "roadlist.h"
+#include "road-list.h"
 #include "road.h"
-#include "GameMap.h"
-#include "xmlhelper.h"
+#include "game-map.h"
+#include "xml-helper.h"
 
 Glib::ustring Roadlist::d_tag = "roadlist";
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -28,7 +27,7 @@ Glib::ustring Roadlist::d_tag = "roadlist";
 
 Roadlist* Roadlist::s_instance=0;
 
-Roadlist* Roadlist::getInstance()
+Roadlist* Roadlist::instance()
 {
     if (s_instance == 0)
         s_instance = new Roadlist();
@@ -36,7 +35,7 @@ Roadlist* Roadlist::getInstance()
     return s_instance;
 }
 
-Roadlist* Roadlist::getInstance(XML_Helper* helper)
+Roadlist* Roadlist::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -74,19 +73,19 @@ Roadlist::Roadlist (const Roadlist &r, bool sync_ids)
 
 Roadlist::Roadlist(XML_Helper* helper)
 {
-    helper->registerTag(Road::d_tag, sigc::mem_fun(this, &Roadlist::load));
+    helper->register_tag(Road::d_tag, sigc::mem_fun(*this, &Roadlist::load));
 }
 
 bool Roadlist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Roadlist::d_tag);
+    retval &= helper->open_tag(Roadlist::d_tag);
 
     for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -102,7 +101,7 @@ bool Roadlist::load(Glib::ustring tag, XML_Helper* helper)
     return true;
 }
 
-int Roadlist::calculateType (Vector<int> t) const
+Road::Type Roadlist::calculateType (Vector<int> t) const
 {
     // examine neighbour tiles to discover whether there's a road on them
     bool u = false; //up
@@ -120,40 +119,40 @@ int Roadlist::calculateType (Vector<int> t) const
     r = getObjectAt(t + Vector<int>(1, 0));
 
     // then translate this to the type
-    int type = 2; 
+    auto type = Road::CONNECTS_ALL_DIRECTIONS;
     //show road type 2 when no other road tiles are around
     if (!u && !b && !l && !r)
-	type = 2;
+      type = Road::CONNECTS_ALL_DIRECTIONS;
     else if (u && b && l && r)
-	type = 2;
+      type = Road::CONNECTS_ALL_DIRECTIONS;
     else if (!u && b && l && r)
-	type = 9;
+      type = Road::CONNECTS_EAST_WEST_AND_SOUTH;
     else if (u && !b && l && r)
-	type = 8;
+      type = Road::CONNECTS_EAST_WEST_AND_NORTH;
     else if (u && b && !l && r)
-	type = 7;
+      type = Road::CONNECTS_NORTH_AND_SOUTH_AND_EAST;
     else if (u && b && l && !r)
-	type = 10;
+      type = Road::CONNECTS_NORTH_SOUTH_AND_WEST;
     else if (u && b && !l && !r)
-	type = 1;
+      type = Road::CONNECTS_NORTH_AND_SOUTH;
     else if (!u && !b && l && r)
-	type = 0;
+      type = Road::CONNECTS_EAST_AND_WEST;
     else if (u && !b && l && !r)
-	type = 3;
+      type = Road::CONNECTS_NORTH_AND_WEST;
     else if (u && !b && !l && r)
-	type = 4;
+      type = Road::CONNECTS_NORTH_AND_EAST;
     else if (!u && b && l && !r)
-	type = 6;
+      type = Road::CONNECTS_WEST_AND_SOUTH;
     else if (!u && b && !l && r)
-	type = 5;
+      type = Road::CONNECTS_SOUTH_AND_EAST;
     else if (u && !b && !l && !r)
-	type = Road::CONNECTS_NORTH;
+      type = Road::CONNECTS_NORTH;
     else if (!u && b && !l && !r)
-	type = Road::CONNECTS_SOUTH;
+      type = Road::CONNECTS_SOUTH;
     else if (!u && !b && l && !r)
-	type = Road::CONNECTS_WEST;
+      type = Road::CONNECTS_WEST;
     else if (!u && !b && !l && r)
-	type = Road::CONNECTS_EAST;
+      type = Road::CONNECTS_EAST;
     return type;
 }
 

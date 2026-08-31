@@ -2,7 +2,7 @@
 //  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 //  Copyright (C) 2002 Mark L. Amidon
 //  Copyright (C) 2005 Andrea Paternesi
-//  Copyright (C) 2006, 2007, 2008, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2006, 2007, 2008, 2014, 2015, 2026 Ben Asselstine
 //  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -17,25 +17,24 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sstream>
-#include "prodslotlist.h"
+#include "prod-slot-list.h"
 #include "path.h"
 #include "army.h"
-#include "armyprodbase.h"
+#include "army-prod-base.h"
 #include "hero.h"
-#include "stacklist.h"
+#include "stack-list.h"
 #include "stack.h"
-#include "playerlist.h"
-#include "armysetlist.h"
-#include "citylist.h"
-#include "GameMap.h"
-#include "vectoredunitlist.h"
-#include "vectoredunit.h"
+#include "player-list.h"
+#include "army-set-list.h"
+#include "city-list.h"
+#include "game-map.h"
+#include "vectored-unit-list.h"
+#include "vectored-unit.h"
 #include "action.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -51,10 +50,10 @@ ProdSlotlist::ProdSlotlist(guint32 numslots)
 
 ProdSlotlist::ProdSlotlist(XML_Helper* helper)
 {
-  helper->getData(d_active_production_slot, "active_production_slot");
-  helper->getData(d_duration, "duration");
-  helper->registerTag(ProdSlot::d_tag, 
-		      sigc::mem_fun(this, &ProdSlotlist::load));
+  helper->get(d_active_production_slot, "active_production_slot");
+  helper->get(d_duration, "duration");
+  helper->register_tag(ProdSlot::d_tag, 
+		      sigc::mem_fun(*this, &ProdSlotlist::load));
 }
 
 bool ProdSlotlist::load(Glib::ustring tag, XML_Helper *helper)
@@ -81,9 +80,9 @@ bool ProdSlotlist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->saveData("active_production_slot", 
+    retval &= helper->save("active_production_slot", 
 			       d_active_production_slot);
-    retval &= helper->saveData("duration", d_duration);
+    retval &= helper->save("duration", d_duration);
 
     for (unsigned int i = 0; i < size(); i++)
       {
@@ -266,11 +265,10 @@ bool ProdSlotlist::removeArmyProdBasesWithoutAType(guint32 armyset)
       const ArmyProdBase* armyprodbase = this->getProductionBase(i);
       if (armyprodbase == NULL)
 	continue;
-      ArmyProto *a = Armysetlist::getInstance()->getArmy (armyset, armyprodbase->getTypeId());
+      ArmyProto *a = Armysetlist::instance()->getArmy (armyset, armyprodbase->getTypeId());
       if (!a)
         removeProductionBase(i);
       //XXX XXX XXX should we squeeze out the empty spaces?
     }
   return removed;
 }
-// End of file

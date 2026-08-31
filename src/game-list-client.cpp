@@ -1,4 +1,4 @@
-// Copyright (C) 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2015 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,21 +12,20 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
 #include <fstream>
 
-#include "gamelist-client.h"
+#include "game-list-client.h"
 
 #include "network-connection.h"
 #include "network-gls-common.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "ucompose.hpp"
 #include "profile.h"
-#include "profilelist.h"
+#include "profile-list.h"
 #include "advertised-game.h"
 #include "recently-played-game-list.h"
 #include "recently-played-game.h"
@@ -37,7 +36,7 @@
 
 GamelistClient * GamelistClient::s_instance = 0;
 
-GamelistClient* GamelistClient::getInstance()
+GamelistClient* GamelistClient::instance()
 {
     if (s_instance == 0)
         s_instance = new GamelistClient();
@@ -68,15 +67,15 @@ void GamelistClient::start(Glib::ustring host, guint32 port, Profile *p)
     network_connection->tear_down_connection();
   network_connection = ConnectionManager::create_connection();
   network_connection->torn_down.connect(
-    sigc::mem_fun(this, &GamelistClient::on_torn_down));
+    sigc::mem_fun(*this, &GamelistClient::on_torn_down));
   network_connection->connected.connect(
-    sigc::mem_fun(this, &GamelistClient::onConnected));
+    sigc::mem_fun(*this, &GamelistClient::onConnected));
   network_connection->connection_lost.connect(
-    sigc::mem_fun(this, &GamelistClient::onConnectionLost));
+    sigc::mem_fun(*this, &GamelistClient::onConnectionLost));
   network_connection->got_message.connect(
-    sigc::mem_fun(this, &GamelistClient::onGotMessage));
+    sigc::mem_fun(*this, &GamelistClient::onGotMessage));
   network_connection->connection_failed.connect
-    (sigc::mem_fun(this, &GamelistClient::onConnectionFailed));
+    (sigc::mem_fun(*this, &GamelistClient::onConnectionFailed));
   network_connection->connectToHost(host, port);
 }
 
@@ -114,10 +113,10 @@ bool GamelistClient::onGotMessage(int type, Glib::ustring payload)
         {
           std::istringstream is(payload);
           XML_Helper helper(&is);
-          helper.registerTag
+          helper.register_tag
             (RecentlyPlayedGameList::d_tag, 
              sigc::mem_fun(*this, &GamelistClient::loadRecentlyPlayedGameList));
-          helper.parseXML();
+          helper.parse_XML();
           helper.close();
           received_game_list.emit(d_recently_played_game_list, "");
         }
@@ -184,14 +183,14 @@ void GamelistClient::request_advertising(RecentlyPlayedGame *game)
     {
       RecentlyPlayedNetworkedGame *ng = 
         dynamic_cast<RecentlyPlayedNetworkedGame*>(game);
-      Profile *p = Profilelist::getInstance()->findProfileById(d_profile_id);
+      Profile *p = Profilelist::instance()->findProfileById(d_profile_id);
       AdvertisedGame *g = new AdvertisedGame(*ng, p);
       std::ostringstream os;
       XML_Helper helper(&os);
       helper.begin(LORDSAWAR_RECENTLY_HOSTED_VERSION);
-      helper.openTag("advertising_request");
+      helper.open_tag("advertising_request");
       g->saveEntry(&helper);
-      helper.closeTag();
+      helper.close_tag();
       network_connection->send(GLS_MESSAGE_ADVERTISE_GAME, os.str());
       delete g;
     }

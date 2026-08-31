@@ -1,10 +1,10 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2020,
-// 2021 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2005 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,23 +18,22 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "citylist.h"
+#include "city-list.h"
 #include "city.h"
-#include "playerlist.h"
+#include "player-list.h"
 #include <limits.h>
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "hero.h"
 #include "stack.h"
-#include "armyprodbase.h"
-#include "GameMap.h"
-#include "cityset.h"
-#include "citysetlist.h"
-#include "PathCalculator.h"
+#include "army-prod-base.h"
+#include "game-map.h"
+#include "city-set.h"
+#include "city-set-list.h"
+#include "path-calculator.h"
 #include "rnd.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -44,7 +43,7 @@ Glib::ustring Citylist::d_tag = "citylist";
 
 Citylist* Citylist::s_instance = 0;
 
-Citylist* Citylist::getInstance()
+Citylist* Citylist::instance()
 {
     if (s_instance == 0)
         s_instance = new Citylist();
@@ -52,7 +51,7 @@ Citylist* Citylist::getInstance()
     return s_instance;
 }
 
-Citylist* Citylist::getInstance(XML_Helper* helper)
+Citylist* Citylist::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -91,7 +90,7 @@ Citylist::Citylist (const Citylist &c, bool sync_ids)
 Citylist::Citylist(XML_Helper* helper)
 {
     // simply ask the helper to inform us when a city tag is opened
-    helper->registerTag(City::d_tag, sigc::mem_fun(this, &Citylist::load));
+    helper->register_tag(City::d_tag, sigc::mem_fun(*this, &Citylist::load));
 }
 
 int Citylist::countCities() const
@@ -108,7 +107,7 @@ int Citylist::countCities() const
     return cities;
 }
 
-int Citylist::countCities(Player* player) const
+int Citylist::countCities(const Player* player) const
 {
     int cities = 0;
     
@@ -206,7 +205,7 @@ static bool isBurnt(void *object)
 
 static bool isNotOwnedByNeutral(void *object)
 {
-  return ((City*)object)->getOwner() != Playerlist::getInstance()->getNeutral();
+  return ((City*)object)->getOwner() != Playerlist::getNeutral();
 }
 
 static bool isNotOwnedByActivePlayer(void *object)
@@ -234,7 +233,7 @@ static bool isNotOwnedByEnemy(void *object)
 static bool canNotAcceptMoreVectoring(void *object)
 {
   City *c = ((City*)object);
-  guint32 num = Citylist::getInstance()->countCitiesVectoringTo(c);
+  guint32 num = Citylist::instance()->countCitiesVectoringTo(c);
   if (num < MAX_CITIES_VECTORED_TO_ONE_CITY)
     return false;
   return true;
@@ -296,7 +295,7 @@ City* Citylist::getNearestFriendlyCity(const Vector<int>& pos, int dist) const
 
 City* Citylist::getNearestFriendlyCity(const Vector<int>& pos) const
 {
-    Player* p = Playerlist::getInstance()->getActiveplayer();
+    Player* p = Playerlist::instance()->getActiveplayer();
     return getNearestCity (pos, p);
 }
 
@@ -342,7 +341,7 @@ City* Citylist::getClosestCity(const Stack *stack, Player *p) const
 
         if ((*it)->getOwner() == p)
         {
-            int delta = pc.calculate((*it)->getPos());
+            int delta = pc.calculateMoves((*it)->getPos());
             if (delta <= 0)
               continue;
             
@@ -360,7 +359,7 @@ City* Citylist::getClosestCity(const Stack *stack, Player *p) const
 
 City* Citylist::getClosestFriendlyCity(const Stack *stack) const
 {
-    Player* p = Playerlist::getInstance()->getActiveplayer();
+    Player* p = Playerlist::instance()->getActiveplayer();
     return getClosestCity (stack, p);
 }
 City* Citylist::getClosestCity(const Stack *stack) const
@@ -438,12 +437,12 @@ bool Citylist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Citylist::d_tag);
+    retval &= helper->open_tag(Citylist::d_tag);
 
     for (const_iterator it = begin(); it != end(); ++it)
         (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -471,7 +470,7 @@ void Citylist::changeOwnership(Player *old_owner, Player *new_owner)
 	if ((*it)->isCapital())
 	  if ((*it)->getCapitalOwner() == old_owner)
 	    (*it)->setCapitalOwner(new_owner);
-        if (new_owner == Playerlist::getInstance()->getNeutral())
+        if (new_owner == Playerlist::getNeutral())
           (*it)->setActiveProductionSlot(-1); //hmm, what about neutral policy.
       }
 }
@@ -642,4 +641,3 @@ void Citylist::reset (Citylist *c)
   delete s_instance;
   s_instance = c;
 }
-// End of file

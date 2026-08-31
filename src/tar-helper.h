@@ -1,4 +1,4 @@
-// Copyright (C) 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2010, 2011, 2014, 2015, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,9 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
-
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef TARHELPER_H
@@ -31,26 +29,25 @@ class Tar_Helper
 public:
 
     //! Constructor
-    Tar_Helper(Glib::ustring file, std::ios::openmode mode, bool &broken);
+    Tar_Helper(std::string file, std::ios::openmode mode, bool &broken);
 
     //! Destructor
     ~Tar_Helper();
 
-    bool saveFile(Glib::ustring file, Glib::ustring destfile = "");
+    bool saveFile(std::string file, std::string destfile = "");
 
-    Glib::ustring getFile(Glib::ustring filename, bool &broken);
+    std::string getFile(std::string filename, bool &broken);
 
-    //Glib::ustring getFirstFile(bool &broken);
-    Glib::ustring getFirstFile(Glib::ustring extension, bool &broken);
-    Glib::ustring getFirstFile(std::list<Glib::ustring> exts, bool &broken);
+    std::string getFirstFile(std::string extension, bool &broken);
+    std::string getFirstFile(std::list<std::string> exts, bool &broken);
 
-    std::list<Glib::ustring> getFilenames(Glib::ustring ext);
-    Glib::ustring getFirstFilename(Glib::ustring ext);
+    std::list<std::string> getFilenames(std::string ext);
+    std::string getFirstFilename(std::string ext);
 
-    std::list<Glib::ustring> getFilenames();
+    std::list<std::string> getFilenames();
 
     //munge name if necessary to make it unique
-    Glib::ustring makeNameUnique (Glib::ustring name);
+    std::string makeNameUnique (std::string name);
 
     //! Replaces old_filename with new_filename, or adds it if not present.
     /**
@@ -70,27 +67,27 @@ public:
      * with another member.
      * @return returns True if successful.
      */
-    bool replaceFile(Glib::ustring old_filename, Glib::ustring new_filename,
-                     Glib::ustring archive_name);
+    bool replaceFile(std::string old_filename, std::string new_filename,
+                     std::string archive_name);
 
-    bool Open(Glib::ustring file, std::ios::openmode mode);
+    bool Open(std::string file, std::ios::openmode mode);
     void Close(bool clean = true);
 
-    static bool is_tarfile (Glib::ustring file);
+    static bool is_tarfile (std::string file);
 
-    static Glib::ustring getFile(Tar_Helper *t, Glib::ustring filename, bool &broken, Glib::ustring tmpoutdir);
-    static std::list<Glib::ustring> getFilenames(Tar_Helper *t);
-    static bool saveFile(Tar_Helper *t, Glib::ustring filename, Glib::ustring destfile = "");
-    static void clean_tmp_dir(Glib::ustring filename);
+    static std::string getFile(Tar_Helper *t, std::string filename, bool &broken, std::string tmpoutdir);
+    static std::list<std::string> getFilenames(Tar_Helper *t);
+    static bool saveFile(Tar_Helper *t, std::string filename, std::string destfile = "");
+    static void clean_tmp_dir(std::string filename);
     static void reopen(Tar_Helper *t);
     static int dump_entry(struct archive *in, struct archive_entry *entry, struct archive *out);
-    static int dump_file_entry(Glib::ustring filename, struct archive_entry *entry, Glib::ustring nameinarchive, struct archive *out);
+    static int dump_file_entry(std::string filename, struct archive_entry *entry, std::string nameinarchive, struct archive *out);
 private:
 
     // DATA
     struct archive *t;
     std::ios::openmode openmode;
-    Glib::ustring tmpoutdir;
-    Glib::ustring pathname;
+    std::string tmpoutdir;
+    std::string pathname;
 };
 #endif

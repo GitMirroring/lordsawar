@@ -1,4 +1,5 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef ARMYSET_H
@@ -24,7 +24,7 @@
 #include <vector>
 #include <sigc++/trackable.h>
 
-#include "armyproto.h"
+#include "army-proto.h"
 #include "set.h"
 #include "hero.h"
 
@@ -88,7 +88,7 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         //! Copy constructor.
         Armyset(const Armyset& armyset);
 
-	static Armyset *create(Glib::ustring filename, bool &unsupported);
+	static void create(Glib::ustring filename, sigc::slot<void(Armyset*,bool,bool,Glib::ustring)> finished);
 
         static Armyset *copy (const Armyset *orig);
 
@@ -164,10 +164,9 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
          * Go get the image files from the armyset file and create the
          * various pixmask objects.
          *
-         * @param scale   The images are clamped to the tile size or not.
          * @param broken  True when things went wrong reading the armyset file.
          */
-	void instantiateImages(bool scale, bool &broken);
+	void instantiateImages(bool &broken);
 	void uninstantiateImages();
         void uninstantiateSameNamedImages (Glib::ustring name);
 
@@ -181,7 +180,7 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 	const ArmyProto *getRandomAwardableAlly() const;
 
         //! Load the armyset again.
-        void reload(bool &broken);
+        void reload();
         bool calculate_preferred_tile_size(guint32 &ts) const;
 
         //! callback to upgrade old files.
@@ -189,6 +188,9 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
         static void support_backward_compatibility();
 
         static guint32 get_default_tile_size ();
+
+        bool get_images_instantiated ();
+
     private:
 
         //! Callback function for the army tag (see XML_Helper)
@@ -206,14 +208,16 @@ class Armyset: public std::list<ArmyProto *>, public sigc::trackable, public Set
 	//! The picture of the hero's planted standard. one frame per player.
         TarFileMaskedImage *d_standard;
 
-        //! The selector animation, 0 = small, 1 = large, one for each player.
+        //! The selector animation, 0 = small, 1 = large, one for each player,
+        //but not not neutral
         TarFileMaskedImage *d_selector[2][MAX_PLAYERS];
 
         std::vector<TarFileImage*> getImages ();
         std::vector<TarFileMaskedImage*> getMaskedImages ();
 
+    public:
+        Armyset& operator=(const Armyset& other);
 };
 
 bool weakest_quickest (const ArmyProto* first, const ArmyProto* second);
-#endif // ARMYSET_H
-
+#endif

@@ -1,4 +1,4 @@
-// Copyright (C) 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2015 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef GAMELIST_CLIENT_H
@@ -38,7 +37,7 @@ class GamelistClient
 public:
         
   //! Returns the singleton instance.  Creates a new one if neccessary.
-  static GamelistClient* getInstance();
+  static GamelistClient* instance();
 
   //! Deletes the singleton instance.
   static void deleteInstance();
@@ -47,23 +46,23 @@ public:
   void disconnect();
 
   void request_game_list();
-  sigc::signal<void, RecentlyPlayedGameList*, Glib::ustring> received_game_list;
+  sigc::signal<void(RecentlyPlayedGameList*, Glib::ustring)> received_game_list;
 
   void request_advertising(RecentlyPlayedGame *game);
-  sigc::signal<void, Glib::ustring, Glib::ustring> received_advertising_response;
+  sigc::signal<void(Glib::ustring, Glib::ustring)> received_advertising_response;
 
   void request_advertising_removal(Glib::ustring scenario_id);
-  sigc::signal<void, Glib::ustring, Glib::ustring> received_advertising_removal_response;
+  sigc::signal<void(Glib::ustring, Glib::ustring)> received_advertising_removal_response;
 
   void request_reload();
-  sigc::signal<void, Glib::ustring> received_reload_response;
+  sigc::signal<void(Glib::ustring)> received_reload_response;
 
   void request_server_terminate();
 
-  sigc::signal<void> client_connected;
-  sigc::signal<void> client_disconnected; 
-  sigc::signal<void> client_forcibly_disconnected; //server went away
-  sigc::signal<void> client_could_not_connect;
+  sigc::signal<void()> client_connected;
+  sigc::signal<void()> client_disconnected; 
+  sigc::signal<void()> client_forcibly_disconnected; //server went away
+  sigc::signal<void()> client_could_not_connect;
   
   Glib::ustring getHost() const{return d_host;};
   guint32 getPort() const{return d_port;};

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2015, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,18 +12,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
-#include "shieldstyle.h"
-#include "xmlhelper.h"
-#include "File.h"
-#include "shieldset.h"
-#include "tarhelper.h"
-#include "gui/image-helpers.h"
-#include "TarFileMaskedImage.h"
+#include "shield-style.h"
+#include "xml-helper.h"
+#include "file.h"
+#include "shield-set.h"
+#include "tar-helper.h"
+#include "image-helpers.h"
+#include "tar-file-masked-image.h"
 
 Glib::ustring ShieldStyle::d_tag = "shieldstyle";
 
@@ -34,8 +33,8 @@ ShieldStyle::ShieldStyle(ShieldStyle::Type type)
  : d_type (type)
 {
   d_mimage =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_ANY);
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
+                            PixMask::DIMENSION_HEIGHT_IS_MARKED);
 }
         
 ShieldStyle::~ShieldStyle()
@@ -52,12 +51,12 @@ ShieldStyle::ShieldStyle(const ShieldStyle &s)
 ShieldStyle::ShieldStyle(XML_Helper* helper)
 {
   d_mimage =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_ANY);
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
+                            PixMask::DIMENSION_HEIGHT_IS_MARKED);
   Glib::ustring type_str;
-  helper->getData(type_str, "type");
+  helper->get(type_str, "type");
   d_type = shieldStyleTypeFromString(type_str);
-  d_mimage->load (helper, "image", "image_num_masks");
+  d_mimage->load (helper, "image");
 }
 
 Glib::ustring ShieldStyle::shieldStyleTypeToString(const ShieldStyle::Type type)
@@ -96,10 +95,10 @@ bool ShieldStyle::save(XML_Helper *helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(d_tag);
+  retval &= helper->open_tag(d_tag);
   Glib::ustring s = shieldStyleTypeToString(ShieldStyle::Type(d_type));
-  retval &= helper->saveData("type", s);
-  retval &= getMaskedImage ()->save (helper, "image", "image_num_masks");
-  retval &= helper->closeTag();
+  retval &= helper->save("type", s);
+  retval &= getMaskedImage ()->save (helper, "image");
+  retval &= helper->close_tag();
   return retval;
 }

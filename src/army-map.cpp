@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,20 +12,19 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
 #include <assert.h>
 
-#include "armymap.h"
+#include "army-map.h"
 
-#include "playerlist.h"
-#include "stacklist.h"
+#include "player-list.h"
+#include "stack-list.h"
 #include "stack.h"
-#include "ImageCache.h"
-#include "GameMap.h"
-#include "FogMap.h"
+#include "image-cache.h"
+#include "game-map.h"
+#include "fog-map.h"
 
 ArmyMap::ArmyMap()
 {
@@ -34,8 +33,8 @@ ArmyMap::ArmyMap()
 void ArmyMap::draw_stacks()
 {
   // Draw stacks as tiny shields
-  for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-       pit != Playerlist::getInstance()->end(); ++pit)
+  for (Playerlist::iterator pit = Playerlist::instance()->begin();
+       pit != Playerlist::instance()->end(); ++pit)
     {
       Stacklist* mylist = (*pit)->getStacklist();
       //Gdk::RGBA cross_color = (*pit)->getColor();
@@ -45,7 +44,7 @@ void ArmyMap::draw_stacks()
           Vector<int> pos = (*it)->getPos();
 
           // don't draw stacks in cities, they could hardly be identified
-          Maptile* mytile = GameMap::getInstance()->getTile(pos.x, pos.y);
+          Maptile* mytile = GameMap::instance()->getTile(pos.x, pos.y);
           if (mytile->getBuilding() == Maptile::CITY)
             continue;
 
@@ -54,9 +53,8 @@ void ArmyMap::draw_stacks()
             continue;
 
           PixMask *tmp = 
-            ImageCache::getInstance()->getShieldPic(1, (*it)->getOwner(),
-                                                    true, 0)->copy();
-          PixMask::scale(tmp, tmp->get_width()/1.4, tmp->get_height()/1.4);
+            ImageCache::instance()->getShieldPic(1, (*it)->getOwner(),
+                                                    true)->copy();
 
           pos = mapToSurface(pos);
           tmp->blit_centered(surface, pos);

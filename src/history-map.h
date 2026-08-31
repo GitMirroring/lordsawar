@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2012, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef HISTORYMAP_H
@@ -23,8 +22,9 @@
 #include <sigc++/connection.h>
 #include <sigc++/trackable.h>
 
-#include "overviewmap.h"
-#include "LocationList.h"
+#include "overview-map.h"
+#include "location-list.h"
+#include "image-cache.h"
 
 class City;
 class Ruin;
@@ -47,11 +47,15 @@ class HistoryMap: public OverviewMap
      //! Destructor.
      ~HistoryMap() {};
 
+    ImageCache::CursorType get_cursor (double, double)
+      {
+        return ImageCache::POINTER;
+      }
      //! Emitted when the cities are finished being drawn on the map surface.
      /**
       * Classes that use HistoryMap must catch this signal to display the map.
       */
-     sigc::signal<void, Cairo::RefPtr<Cairo::Surface> > map_changed;
+     sigc::signal<void(Cairo::RefPtr<Cairo::Surface>)> map_changed;
         
      //! Change which cities are shown on the miniature map graphic.
      /**

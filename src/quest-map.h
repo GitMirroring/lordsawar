@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2012, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef QUESTMAP_H
@@ -21,8 +20,9 @@
 
 #include <sigc++/signal.h>
 
-#include "overviewmap.h"
+#include "overview-map.h"
 #include "vector.h"
+#include "input-events.h"
 
 class Player;
 class Quest;
@@ -43,7 +43,8 @@ class QuestMap : public OverviewMap
      /**
       * @param quest  The quest to depict on the miniature map graphic.
       */
-    QuestMap(Quest *quest);
+    QuestMap(std::vector<Quest *> q);
+    QuestMap(Quest * q);
 
     //! Destructor.
     ~QuestMap() {};
@@ -55,16 +56,40 @@ class QuestMap : public OverviewMap
      * @note This is used to point to a hidden map Reward after a Quest has
      * been completed.
      */
-    void set_target(Vector<int>target){ d_target = target;}
+    void set_target(Vector<int>target)
+      {
+        d_target = target;
+      }
 
+    //! Draw an indicator on the map for the given quest
+    void set_quest (Quest *q)
+      {
+        quest = q;
+      }
 
+    Quest * get_quest ()
+      {
+        return quest;
+      }
+
+    ImageCache::CursorType get_cursor (double x, double y)
+      {
+        Vector<int> pos (x, y);
+
+        Vector<int> tile = mapFromScreen (pos);
+        if (is_hot (tile))
+          return ImageCache::HAND_POINTER;
+        return ImageCache::POINTER;
+      }
+
+    void mouse_button_event(MouseButtonEvent e);
     // Signals
 
     //! Emitted when the quest is finished being drawn on the map surface.
     /**
      * Classes that use QuestMap must catch this signal to display the map.
      */
-    sigc::signal<void, Cairo::RefPtr<Cairo::Surface> > map_changed;
+    sigc::signal<void(Cairo::RefPtr<Cairo::Surface>)> map_changed;
     
  private:
 
@@ -76,6 +101,9 @@ class QuestMap : public OverviewMap
 
     //! Draw a box around a target.
     void draw_target();
+
+    //! Add hero locations to the hot map so we can change cursors
+    void create_hotmap ();
     
     //! Draw the Quest onto the miniature map graphic.
     /**
@@ -87,8 +115,11 @@ class QuestMap : public OverviewMap
 
     // DATA
 
-    //! The Quest to depict on the miniature map graphic.
+    //! The active Quest to depict on the miniature map graphic.
     Quest *quest;
+
+    //the list of quests we can show
+    std::vector<Quest*> quests;
 
     //! The new position to point to on the miniature map graphic.
     Vector<int> d_target;

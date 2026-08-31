@@ -1,8 +1,9 @@
-// Copyright (C) 2000, 2001 Michael Bartl
-// Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2020, 2021 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2000, 2001 Michael Bartl
+//  Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,18 +17,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "ruinlist.h"
-#include "xmlhelper.h"
-#include "playerlist.h"
+#include "ruin-list.h"
+#include "xml-helper.h"
+#include "player-list.h"
 #include "reward.h"
-#include "GameMap.h"
-#include "cityset.h"
-#include "citysetlist.h"
+#include "game-map.h"
+#include "city-set.h"
+#include "city-set-list.h"
 #include "keeper.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -37,7 +37,7 @@ Glib::ustring Ruinlist::d_tag = "ruinlist";
 
 Ruinlist* Ruinlist::s_instance = 0;
 
-Ruinlist* Ruinlist::getInstance()
+Ruinlist* Ruinlist::instance()
 {
     if (s_instance == 0)
         s_instance = new Ruinlist();
@@ -45,7 +45,7 @@ Ruinlist* Ruinlist::getInstance()
     return s_instance;
 }
 
-Ruinlist* Ruinlist::getInstance(XML_Helper* helper)
+Ruinlist* Ruinlist::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -83,19 +83,19 @@ Ruinlist::Ruinlist (const Ruinlist &r, bool sync_ids)
 
 Ruinlist::Ruinlist(XML_Helper* helper)
 {
-    helper->registerTag(Ruin::d_tag, sigc::mem_fun(this, &Ruinlist::load));
+    helper->register_tag(Ruin::d_tag, sigc::mem_fun(*this, &Ruinlist::load));
 }
 
 bool Ruinlist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Ruinlist::d_tag);
+    retval &= helper->open_tag(Ruinlist::d_tag);
 
     for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -112,9 +112,9 @@ bool Ruinlist::load(Glib::ustring tag, XML_Helper* helper)
 
     //! since the ruin has only now been copied to its final state, we need
     //to register the callback for the occupants here.
-    helper->registerTag(Stack::d_tag, sigc::mem_fun(*back(), &Ruin::load));
+    helper->register_tag(Stack::d_tag, sigc::mem_fun(*back(), &Ruin::load));
     // same with rewards in ruins
-    helper->registerTag(Reward::d_tag, sigc::mem_fun(*back(), &Ruin::load));
+    helper->register_tag(Reward::d_tag, sigc::mem_fun(*back(), &Ruin::load));
 
     return true;
 }
@@ -123,7 +123,7 @@ static bool isHiddenAndNotOwnedByActivePlayer(void *r)
 {
   Ruin *ruin = ((Ruin *)r);
   if (ruin->isHidden() == true && 
-      ruin->getOwner() != Playerlist::getInstance()->getActiveplayer())
+      ruin->getOwner() != Playerlist::instance()->getActiveplayer())
     return true;
   return false;
 }
@@ -263,4 +263,13 @@ void Ruinlist::reset (Ruinlist *r)
 {
   delete s_instance;
   s_instance = r;
+}
+        
+guint32 Ruinlist::countUnhiddenRuins () const
+{
+  auto count = 0;
+  for (const_iterator it = begin (); it != end (); ++it)
+    if ((*it)->isHidden () == false)
+      count++;
+  return count;
 }

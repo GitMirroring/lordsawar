@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2020 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef CITYSET_H
@@ -22,7 +21,7 @@
 #include <vector>
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
-#include "PixMask.h"
+#include "pixmask.h"
 #include "set.h"
 
 #include "defs.h"
@@ -74,7 +73,7 @@ class Cityset : public sigc::trackable, public Set
 	 */
         Cityset(XML_Helper* helper, Glib::ustring directory);
 
-	static Cityset *create(Glib::ustring file, bool &unsupported_version);
+        static void create(Glib::ustring filename, sigc::slot<void(Cityset*,bool,bool,Glib::ustring)> finished);
 
         static Cityset *copy (const Cityset *orig);
 	//! Destructor.
@@ -97,10 +96,9 @@ class Cityset : public sigc::trackable, public Set
          * Go get the image files from the cityset file and create the
          * various pixmask objects.
          *
-         * @param scale   The images are clamped to the tile size or not.
          * @param broken  True when things went wrong reading the cityset file.
          */
-	void instantiateImages(bool scale, bool &broken);
+	void instantiateImages(bool &broken);
 
 	void uninstantiateImages();
 
@@ -123,8 +121,11 @@ class Cityset : public sigc::trackable, public Set
 
         static guint32 get_default_tile_size ();
         //! Load the cityset again.
-        void reload(bool &broken);
+        void reload();
         bool calculate_preferred_tile_size(guint32 &ts) const;
+
+        bool get_images_instantiated ();
+
     private:
 
         // DATA
@@ -142,8 +143,8 @@ class Cityset : public sigc::trackable, public Set
 	guint32 d_ruin_tile_width;
 
         std::vector<TarFileImage*> getImages ();
+    public:
+        Cityset& operator=(const Cityset& other);
 };
 
-#endif // CITYSET_H
-
-// End of file
+#endif

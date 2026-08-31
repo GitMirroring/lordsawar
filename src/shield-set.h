@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef SHIELDSET_H
@@ -95,60 +94,13 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
         //! Return all of the mask colors for the given player.
         std::vector<Gdk::RGBA> getColors (guint32 owner) const;
 
-	//! Return the number of pixels high the small shields are.
-	guint32 getSmallHeight() const {return d_small_height;}
-
-	//! Return the number of pixels wide the small shields are.
-	guint32 getSmallWidth() const {return d_small_width;}
-
-	//! Return the number of pixels high the medium shields are.
-	guint32 getMediumHeight() const {return d_medium_height;}
-
-	//! Return the number of pixels wide the medium shields are.
-	guint32 getMediumWidth() const {return d_medium_width;}
-
-	//! Return the number of pixels the large shields are.
-	guint32 getLargeHeight() const {return d_large_height;}
-
-	//! Return the number of pixels wide the large shields are.
-	guint32 getLargeWidth() const {return d_large_width;}
-
 	//! Return the total number of shields in this shieldset.
         guint32 getSize() const {return size();}
 
-        bool isSmallHeightAndWidthSet();
-        bool isMediumHeightAndWidthSet();
-        bool isLargeHeightAndWidthSet();
-
 	// Set Methods
 
-	//! Return the number of pixels high the small shields are.
-	void setSmallHeight(guint32 n) {d_small_height = n;}
-
-	//! Set how wide in pixels small shields are scaled to.
-	void setSmallWidth(guint32 n) {d_small_width = n;}
-
-	//! Set how high in pixels medium shields are scaled to.
-	void setMediumHeight(guint32 n) {d_medium_height = n;}
-
-	//! Set how wide in pixels medium shields are scaled to.
-	void setMediumWidth(guint32 n) {d_medium_width = n;}
-
-	//! Set how high in pixels large shields are scaled to.
-	void setLargeHeight(guint32 n) {d_large_height = n;}
-
-	//! Set how wide in pixels large shields are scaled to.
-	void setLargeWidth(guint32 n) {d_large_width = n;}
-
         //! Load the shieldset again.
-        void reload(bool &broken);
-
-        //! Set the dimensions based on the largest image of that shieldstyle.
-        void setHeightsAndWidthsFromImages(ShieldStyle *s);
-        void setHeightsAndWidthsFromImages();
-        void setSmallHeightsAndWidthsFromImages();
-        void setMediumHeightsAndWidthsFromImages();
-        void setLargeHeightsAndWidthsFromImages();
+        void reload();
 
 	// Methods that operate on the class data but do not modify the class.
 
@@ -199,12 +151,9 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
          * Go get the image files from the shieldset file and create the
          * various pixmask objects.
          *
-         * @param scale   The images are clamped to the sizes held in
-         *                d_small_width, d_small_height (for the small
-         *                shields) and so on.
          * @param broken  True when couldn't read the shieldset file.
          */
-	void instantiateImages(bool scale, bool &broken);
+	void instantiateImages(bool &broken);
 
 	//! Destroy images associated with this shieldset.
 	void uninstantiateImages();
@@ -212,10 +161,12 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
         //! destroy any image that has this name
         void uninstantiateSameNamedImages (Glib::ustring imgname);
 
+        void populate_with_defaults ();
+
 	// Static Methods
 
 	//! Create a shieldset from the given shieldset configuration file.
-	static Shieldset *create(Glib::ustring filename, bool &unsupported);
+        static void create(Glib::ustring filename, sigc::slot<void(Shieldset*,bool,bool,Glib::ustring)> finished);
 
         static Shieldset *copy (const Shieldset *orig);
 
@@ -223,57 +174,16 @@ class Shieldset: public std::list<Shield *>, public sigc::trackable, public Set
         static bool upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version);
         static void support_backward_compatibility();
 
+        bool get_images_instantiated ();
     private:
 
 	//! Callback function to load Shield objects into the Shieldset.
 	bool loadShield(Glib::ustring tag, XML_Helper* helper);
 
-	// DATA
-
-	//! The number of pixels high the small shield images are scaled to.
-	/**
-	 * Equates to the shieldset.d_small_height XML entity in the shieldset 
-	 * configuration file.
-	 */
-	guint32 d_small_height;
-
-	//! The number of pixels wide the small shield images are scaled to.
-	/**
-	 * Equates to the shieldset.d_small_width XML entity in the shieldset 
-	 * configuration file.
-	 */
-	guint32 d_small_width;
-
-	//! The number of pixels high the medium shield images are scaled to.
-	/**
-	 * Equates to the shieldset.d_medium_height XML entity in the shieldset 
-	 * configuration file.
-	 */
-	guint32 d_medium_height;
-
-	//! The number of pixels wide the medium shield images are scaled to.
-	/**
-	 * Equates to the shieldset.d_medium_width XML entity in the shieldset 
-	 * configuration file.
-	 */
-	guint32 d_medium_width;
-
-	//! The number of pixels high the large shield images are scaled to.
-	/**
-	 * Equates to the shieldset.d_large_height XML entity in the shieldset 
-	 * configuration file.
-	 */
-	guint32 d_large_height;
-
-	//! The number of pixels wide the large shield images are scaled to.
-	/**
-	 * Equates to the shieldset.d_large_width XML entity in the shieldset 
-	 * configuration file.
-	 */
-	guint32 d_large_width;
-
         std::vector<TarFileMaskedImage*> getMaskedImages ();
+
+    public:
+        Shieldset& operator=(const Shieldset& other);
 };
 
-#endif // SHIELDSET_H
-
+#endif

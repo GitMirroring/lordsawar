@@ -1,4 +1,4 @@
-// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,14 +12,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "portlist.h"
+#include "port-list.h"
 #include "port.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
 Glib::ustring Portlist::d_tag = "portlist";
 
@@ -28,7 +27,7 @@ Glib::ustring Portlist::d_tag = "portlist";
 
 Portlist* Portlist::s_instance=0;
 
-Portlist* Portlist::getInstance()
+Portlist* Portlist::instance()
 {
     if (s_instance == 0)
         s_instance = new Portlist();
@@ -36,7 +35,7 @@ Portlist* Portlist::getInstance()
     return s_instance;
 }
 
-Portlist* Portlist::getInstance(XML_Helper* helper)
+Portlist* Portlist::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -74,19 +73,19 @@ Portlist::Portlist (const Portlist &p, bool sync_ids)
 
 Portlist::Portlist(XML_Helper* helper)
 {
-    helper->registerTag(Port::d_tag, sigc::mem_fun(this, &Portlist::load));
+    helper->register_tag(Port::d_tag, sigc::mem_fun(*this, &Portlist::load));
 }
 
 bool Portlist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Portlist::d_tag);
+    retval &= helper->open_tag(Portlist::d_tag);
 
     for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }

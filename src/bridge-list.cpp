@@ -12,14 +12,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "bridgelist.h"
+#include "bridge-list.h"
 #include "bridge.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
 Glib::ustring Bridgelist::d_tag = "bridgelist";
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -27,7 +26,7 @@ Glib::ustring Bridgelist::d_tag = "bridgelist";
 
 Bridgelist* Bridgelist::s_instance=0;
 
-Bridgelist* Bridgelist::getInstance()
+Bridgelist* Bridgelist::instance()
 {
     if (s_instance == 0)
         s_instance = new Bridgelist();
@@ -35,7 +34,7 @@ Bridgelist* Bridgelist::getInstance()
     return s_instance;
 }
 
-Bridgelist* Bridgelist::getInstance(XML_Helper* helper)
+Bridgelist* Bridgelist::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -73,19 +72,19 @@ Bridgelist::Bridgelist (const Bridgelist &b, bool sync_ids)
 
 Bridgelist::Bridgelist(XML_Helper* helper)
 {
-    helper->registerTag(Bridge::d_tag, sigc::mem_fun(this, &Bridgelist::load));
+    helper->register_tag(Bridge::d_tag, sigc::mem_fun(*this, &Bridgelist::load));
 }
 
 bool Bridgelist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Bridgelist::d_tag);
+    retval &= helper->open_tag(Bridgelist::d_tag);
 
     for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -101,7 +100,7 @@ bool Bridgelist::load(Glib::ustring tag, XML_Helper* helper)
     return true;
 }
 
-int Bridgelist::calculateType(Vector<int> t) const
+Bridge::Type Bridgelist::calculateType(Vector<int> t) const
 {
     // examine neighbour tiles to discover whether there's a bridge on them
     bool u = getObjectAt(t + Vector<int>(0, -1));

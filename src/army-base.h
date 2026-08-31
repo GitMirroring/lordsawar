@@ -1,8 +1,8 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef ARMY_BASE_H
@@ -42,7 +41,7 @@ class ArmyBase
 	  //! Provides +1 strength to the Army when positioned in the forest.
 	  ADD1STRINFOREST    = 0x00000004,
 	  //! Provides +1 strength to the Army when positioned in the hills.
-	  ADD1STRINHILLS     = 0x00000008, 
+	  ADD1STRINHILLS     = 0x00000008,
 	  //! Provides +1 strength to the Army when positioned in a City.
 	  ADD1STRINCITY      = 0x00000010,
 	  //! Provides +2 strength to the Army when positioned in a City.
@@ -66,13 +65,13 @@ class ArmyBase
           //! Provides a +2 strength to army units in the woods.
 	  ADD2STRINFOREST    = 0x00004000,
           //! Provides a +2 strength to army units in the hills.
-	  ADD2STRINHILLS     = 0x00008000, 
+	  ADD2STRINHILLS     = 0x00008000,
 	  //! Negates 2 strength points from an enemy Stack during a Fight.
 	  SUB2ENEMYSTACK     = 0x00010000,
 	  //! Stack gets whatever movement bonus this army unit has.
 	  CONFER_MOVE_BONUS = 0x00020000
         };
-        
+
 	//! Various kinds of statistics that an instance of Army unit has.
 	/**
 	 * This enumeration assists in getting and setting of statistics in
@@ -102,7 +101,7 @@ class ArmyBase
 
 	//! Loading constructor.
         ArmyBase(XML_Helper* helper);
-        
+
 	//! Create an empty army base.
 	ArmyBase();
 
@@ -111,10 +110,10 @@ class ArmyBase
 
 
         // Set Methods
-        
+
         //! Set how much gold this unit requires per turn.
         void setUpkeep(guint32 upkeep){d_upkeep = upkeep;}
-        
+
         //! Set the strength of the army.
         void setStrength(guint32 strength) {d_strength = strength;}
 
@@ -125,17 +124,17 @@ class ArmyBase
         void setMaxMoves(guint32 max_moves) {d_max_moves = max_moves;}
 
         // Get Methods
-        
+
         //! Returns how many gold pieces this Army needs per turn.
         guint32 getUpkeep() const {return d_upkeep;}
-        
+
 
         //! Get the army bonus of the army.
         guint32 getArmyBonus() const {return d_army_bonus;}
 
         //! Get the move bonus.
 	/**
-	 * Get which kinds of terrain tiles this Army moves efficiently 
+	 * Get which kinds of terrain tiles this Army moves efficiently
 	 * over top of.
 	 *
 	 * @return A bitwise OR-ing of the values in Tile::Type.
@@ -155,13 +154,13 @@ class ArmyBase
         guint32 getSight() const {return d_sight;}
 
 	//! Gets an easy to read string that represents the army's bonuses.
-	Glib::ustring getArmyBonusDescription() const;
+	Glib::ustring getArmyBonusDescription(bool one_per_row = false) const;
 
         //! Returns the number of XP that killing this Army garners it's killer.
         double getXpReward() const {return d_xp_value;}
 
         //! Return an easy to read string that represents the move bonuses.
-        Glib::ustring getMoveBonusDescription () const;
+        Glib::ustring getMoveBonusDescription (bool one_per_row = false) const;
 
 	// Static Methods
 
@@ -183,7 +182,7 @@ class ArmyBase
 
 	//! Convert an ArmyBase::Bonus string to it's enum value.
 	/**
-	 * Converts a string containing a string representation of an 
+	 * Converts a string containing a string representation of an
 	 * ArmyBase::Bonus enumerated value, and converts it to it's enumerated
 	 * value.
 	 */
@@ -213,7 +212,7 @@ class ArmyBase
     protected:
 
         //! Generic method for saving Army base data.
-        bool saveData(XML_Helper* helper) const;
+        bool save(XML_Helper* helper) const;
 
 	//! The amount it costs to maintain this Army unit for this turn.
 	/**
@@ -227,15 +226,15 @@ class ArmyBase
         guint32 d_upkeep;
 
 	/**
-	 * The strength of the Army unit is the prime factor when 
+	 * The strength of the Army unit is the prime factor when
 	 * calculating the outcome of a Fight.  This value should always
 	 * be 1 or more, but not exceeding 15.
 	 *
 	 * This value can permanently increase when the Army unit increases
 	 * it's level.
 	 *
-	 * Temporary increases due to the Army unit being on a certain kind 
-	 * of terrain, or because another Army unit has conferred strength 
+	 * Temporary increases due to the Army unit being on a certain kind
+	 * of terrain, or because another Army unit has conferred strength
 	 * on it (see Army::Bonus) are not reflected in d_strength.
 	 *
 	 * This value does not decrease during gameplay.
@@ -247,13 +246,13 @@ class ArmyBase
 	/**
 	 * This value must always be above 1.  Sane values are above 7.
 	 *
-	 * This value can be permanently increased when the Army unit 
+	 * This value can be permanently increased when the Army unit
 	 * increases it's level.
 	 *
 	 * This value does not decrease during gameplay.
 	 *
 	 * @note When an Army unit is having it's movement doubled, or even
-	 * tripled due to a Hero carrying an Item, this value does not 
+	 * tripled due to a Hero carrying an Item, this value does not
 	 * reflect that doubling or tripling.
 	 */
         guint32 d_max_moves;
@@ -264,7 +263,7 @@ class ArmyBase
 	 * tiles get illuminated or unshaded.  d_sight is the radius of
 	 * tiles that this Army unit can illuminate.
 	 *
-	 * This value can be permanently increased when the Army unit 
+	 * This value can be permanently increased when the Army unit
 	 * increases it's level.
 	 *
 	 * This value does not decrease during gameplay.
@@ -278,7 +277,7 @@ class ArmyBase
 	 * that it only costs 2 movement points to travel over that kind
 	 * of terrain, no matter what the actual terrain movement value is.
 	 *
-	 * The movement bonus is a bitwise OR-ing of the values in 
+	 * The movement bonus is a bitwise OR-ing of the values in
 	 * Tile::Type.
 	 *
 	 * When each of the members of Tile::Type are included in the
@@ -314,4 +313,4 @@ class ArmyBase
     private:
 };
 
-#endif // ARMY_BASE_H
+#endif

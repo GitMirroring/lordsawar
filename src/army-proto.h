@@ -1,8 +1,9 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,17 +17,16 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef ARMY_PROTO_H
 #define ARMY_PROTO_H
 
 #include <gtkmm.h>
-#include "PixMask.h"
+#include "pixmask.h"
 #include "shield.h"
-#include "armyprotobase.h"
+#include "army-proto-base.h"
 #include "hero.h"
 
 class XML_Helper;
@@ -39,6 +39,23 @@ class ArmyProto : public ArmyProtoBase
     public:
 	//! The xml tag of this object in an armyset configuration file.
 	static Glib::ustring d_tag; 
+
+        static inline constexpr int min_production_turns = 1;
+        static inline constexpr int max_production_turns = 5;
+        static inline constexpr int min_upkeep = 0;
+        static inline constexpr int max_upkeep = 20;
+        static inline constexpr int min_moves = 6;
+        static inline constexpr int max_moves = 75;
+        static inline constexpr int min_strength = 1;
+        static inline constexpr int max_strength = 9;
+        static inline constexpr int min_cost = 0;
+        static inline constexpr int max_cost = 50;
+        static inline constexpr int min_new_cost = 0;
+        static inline constexpr int max_new_cost = 20000;
+        static inline constexpr int min_exp = 0;
+        static inline constexpr int max_exp = 50000;
+        static inline constexpr int min_sight = 0;
+        static inline constexpr int max_sight = 25;
 
 	//! Copy constructor.
         ArmyProto(const ArmyProto& armyproto);
@@ -82,6 +99,8 @@ class ArmyProto : public ArmyProtoBase
         TarFileMaskedImage *getMaskedImage (Shield::Color c) const
           {return d_mimage[c];}
 
+        TarFileMaskedImage** getMaskedImages ();
+
 	//! Gets whether or not this army type can found in a ruin.
 	bool getDefendsRuins() const {return d_defends_ruins; }
 
@@ -102,14 +121,15 @@ class ArmyProto : public ArmyProtoBase
 	// Methods that operate on class data and modify the class.
 
 	//! Load the pictures associated with this ArmyProto object.
-	void instantiateImages(guint32 tilesize, Tar_Helper *t, bool scale,
-                               bool &broken);
+	void instantiateImages(Tar_Helper *t, bool &broken);
 
         //! Instantiate the image for the given color from the lwa file.
         bool instantiateImage (Glib::ustring cfgfile, Shield::Color col);
 
 	//! Destroy the images associated with this ArmyProto object.
 	void uninstantiateImages();
+
+        void setMaskedImages (TarFileMaskedImage **images);
 
 	// Methods that operate on class data and do not modify the class.
 
@@ -127,7 +147,7 @@ class ArmyProto : public ArmyProtoBase
     protected:
 
 	//! Callback to read this object from an opened file.
-	bool saveData(XML_Helper* helper) const;
+	bool saveContents(XML_Helper* helper) const;
 
     private:
 
@@ -174,4 +194,4 @@ class ArmyProto : public ArmyProtoBase
         TarFileMaskedImage * d_mimage[MAX_PLAYERS + 1];
 };
 
-#endif // ARMY_PROTO_H
+#endif

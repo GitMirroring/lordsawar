@@ -1,9 +1,9 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
-// 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,19 +17,18 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
-#include "armyproto.h"
-#include "xmlhelper.h"
-#include "armyset.h"
-#include "gui/image-helpers.h"
-#include "Tile.h"
-#include "tarhelper.h"
-#include "TarFileMaskedImage.h"
-#include "File.h"
+#include "army-proto.h"
+#include "xml-helper.h"
+#include "army-set.h"
+#include "image-helpers.h"
+#include "tile.h"
+#include "tar-helper.h"
+#include "tar-file-masked-image.h"
+#include "file.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -50,8 +49,8 @@ ArmyProto::ArmyProto()
   for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
     d_mimage[c] =
       new TarFileMaskedImage
-      (TarFileMaskedImage::HORIZONTAL_MASK,
-       PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
+      (TarFileMaskedImage::VERTICAL_MASK,
+       PixMask::DIMENSION_HEIGHT_IS_MULTIPLE_OF_WIDTH);
 }
 
 ArmyProto::ArmyProto(XML_Helper* helper)
@@ -60,25 +59,23 @@ ArmyProto::ArmyProto(XML_Helper* helper)
   for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
     d_mimage[c] =
       new TarFileMaskedImage
-      (TarFileMaskedImage::HORIZONTAL_MASK,
-       PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
-  helper->getData(d_id, "id");
-  d_mimage[Shield::WHITE]->load (helper, "image_white", "image_white_num_masks");
-  d_mimage[Shield::GREEN]->load (helper, "image_green", "image_green_num_masks");
-  d_mimage[Shield::YELLOW]->load (helper, "image_yellow", "image_yellow_num_masks");
-  d_mimage[Shield::LIGHT_BLUE]->load (helper, "image_light_blue", "image_red_num_masks");
-  d_mimage[Shield::RED]->load (helper, "image_red", "image_red_num_masks");
-  d_mimage[Shield::DARK_BLUE]->load (helper, "image_dark_blue", "image_dark_blue_num_masks");
-  d_mimage[Shield::ORANGE]->load (helper, "image_orange", "image_orange_num_masks");
-  d_mimage[Shield::BLACK]->load (helper, "image_black", "image_black_num_masks");
-  d_mimage[Shield::NEUTRAL]->load (helper, "image_neutral", "image_neutral_num_masks");
-  helper->getData(d_defends_ruins,"defends_ruins");
-  helper->getData(d_awardable,"awardable");
+      (TarFileMaskedImage::VERTICAL_MASK,
+       PixMask::DIMENSION_HEIGHT_IS_MULTIPLE_OF_WIDTH);
+  helper->get(d_id, "id");
+  d_mimage[Shield::WHITE]->load (helper, "image_white");
+  d_mimage[Shield::GREEN]->load (helper, "image_green");
+  d_mimage[Shield::YELLOW]->load (helper, "image_yellow");
+  d_mimage[Shield::LIGHT_BLUE]->load (helper, "image_light_blue");
+  d_mimage[Shield::RED]->load (helper, "image_red");
+  d_mimage[Shield::DARK_BLUE]->load (helper, "image_dark_blue");
+  d_mimage[Shield::ORANGE]->load (helper, "image_orange");
+  d_mimage[Shield::BLACK]->load (helper, "image_black");
+  d_mimage[Shield::NEUTRAL]->load (helper, "image_neutral");
+  helper->get(d_defends_ruins,"defends_ruins");
+  helper->get(d_awardable,"awardable");
   Glib::ustring gender_str;
-  if (!helper->getData(gender_str, "gender"))
-    d_gender = Hero::NONE;
-  else
-    d_gender = Hero::genderFromString(gender_str);
+  helper->get(gender_str, "gender");
+  d_gender = Hero::genderFromString(gender_str);
 }
 
 ArmyProto::~ArmyProto()
@@ -91,50 +88,47 @@ bool ArmyProto::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(d_tag);
+  retval &= helper->open_tag(d_tag);
 
-  retval &= saveData(helper);
+  retval &= saveContents (helper);
 
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
 
-bool ArmyProto::saveData(XML_Helper* helper) const
+bool ArmyProto::saveContents (XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("id", d_id);
-  retval &= ArmyProtoBase::saveData(helper);
-  retval &= d_mimage[Shield::WHITE]->save (helper, "image_white", "image_white_num_masks");
-  retval &= d_mimage[Shield::GREEN]->save (helper, "image_green", "image_green_num_masks");
-  retval &= d_mimage[Shield::GREEN]->save (helper, "image_yellow", "image_yellow_num_masks");
-  retval &= d_mimage[Shield::GREEN]->save (helper, "image_light_blue", "image_light_blue_num_masks");
-  retval &= d_mimage[Shield::GREEN]->save (helper, "image_red", "image_red_num_masks");
-  retval &= d_mimage[Shield::GREEN]->save (helper, "image_dark_blue", "image_dark_blue_num_masks");
-  retval &= d_mimage[Shield::GREEN]->save (helper, "image_orange", "image_orange_num_masks");
-  retval &= d_mimage[Shield::GREEN]->save (helper, "image_black", "image_black_num_masks");
-  retval &= d_mimage[Shield::GREEN]->save (helper, "image_neutral", "image_neutral_num_masks");
-  retval &= helper->saveData("awardable", d_awardable);
-  retval &= helper->saveData("defends_ruins", d_defends_ruins);
-  Glib::ustring gender_str = Hero::genderToString(Hero::Gender(d_gender));
-  retval &= helper->saveData("gender", gender_str);
+  retval &= helper->save("id", d_id);
+  retval &= ArmyProtoBase::save(helper);
+  retval &= d_mimage[Shield::WHITE]->save (helper, "image_white");
+  retval &= d_mimage[Shield::GREEN]->save (helper, "image_green");
+  retval &= d_mimage[Shield::YELLOW]->save (helper, "image_yellow");
+  retval &= d_mimage[Shield::LIGHT_BLUE]->save (helper, "image_light_blue");
+  retval &= d_mimage[Shield::ORANGE]->save (helper, "image_orange");
+  retval &= d_mimage[Shield::DARK_BLUE]->save (helper, "image_dark_blue");
+  retval &= d_mimage[Shield::RED]->save (helper, "image_red");
+  retval &= d_mimage[Shield::BLACK]->save (helper, "image_black");
+  retval &= d_mimage[Shield::NEUTRAL]->save (helper, "image_neutral");
+  retval &= helper->save("awardable", d_awardable);
+  retval &= helper->save("defends_ruins", d_defends_ruins);
+  Glib::ustring gender_str = Hero::genderToString(d_gender);
+  retval &= helper->save("gender", gender_str);
 
   return retval;
 }
 
-void ArmyProto::instantiateImages(guint32 tilesize, Tar_Helper *t, bool scale,
-                                  bool &broken)
+void ArmyProto::instantiateImages(Tar_Helper *t, bool &broken)
 {
   broken = false;
-  Vector<int> dim = Vector<int>(tilesize,tilesize);
-
   for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
     {
       broken = d_mimage[c]->load (t);
       if (broken)
         break;
-      d_mimage[c]->instantiateImages (scale ? dim : Vector<int>(-1,-1));
+      d_mimage[c]->instantiateImages ();
     }
 }
 
@@ -176,4 +170,15 @@ bool ArmyProto::instantiateImage (Glib::ustring cfgfile, Shield::Color col)
       getMaskedImage (col)->instantiateImages();
     }
   return broken;
+}
+
+void ArmyProto::setMaskedImages (TarFileMaskedImage **images)
+{
+  for (unsigned int c = Shield::WHITE; c <= Shield::NEUTRAL; c++)
+    d_mimage[c] = new TarFileMaskedImage (*images[c]);
+}
+
+TarFileMaskedImage** ArmyProto::getMaskedImages ()
+{
+  return d_mimage;
 }

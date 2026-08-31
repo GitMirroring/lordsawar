@@ -1,9 +1,8 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,8 +16,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef STACKLIST_H
@@ -91,6 +89,8 @@ class Stacklist : public std::list<Stack*>, public sigc::trackable
         //! Returns the total number of armies in the list.
         unsigned int countArmies() const;
 
+        unsigned int countArmies(guint army_type) const;
+
 	/**
 	 * Scan through the list of stacks to find one that is not defending, 
 	 * and not parked, and can move to another tile.
@@ -153,6 +153,9 @@ class Stacklist : public std::list<Stack*>, public sigc::trackable
         //! Count the stacks that can move.
         guint32 countMovableStacks() const;
 
+        //! Count the stacks that are parked or movement points aren't maximum
+        guint32 countMovedAndParkedStacks() const;
+
 	// Methods that operate on class data and modify the class.
 
 	//! remove all movement points from every army in every stack.
@@ -178,6 +181,9 @@ class Stacklist : public std::list<Stack*>, public sigc::trackable
 
         //! Army units in boats are disbanded.  return list of affected stacks.
         std::list<Stack*> killArmyUnitsInBoats();
+
+        //! Look for any stacks in ships and put them in stacks.
+        void getArmyUnitsInBoats(std::list<Stack*> &stacks);
 
         //! Kill all the army units in the stack list.
         std::list<Stack*> kill();
@@ -219,16 +225,16 @@ class Stacklist : public std::list<Stack*>, public sigc::trackable
 	// Signals
 
 	//! The stack in the stacklist has been grouped or ungrouped.
-	sigc::signal<void, Stack*, bool> sgrouped;
+	sigc::signal<void(Stack*, bool)> sgrouped;
 
 	//! The stack in the stacklist is arriving on a new tile.
-	sigc::signal<void, Stack*, Vector<int> > snewpos;
+	sigc::signal<void(Stack*, Vector<int>)> snewpos;
 
 	//! The stack in the stacklist is leaving an old tile.
-	sigc::signal<void, Stack*, Vector<int> > soldpos;
+	sigc::signal<void(Stack*, Vector<int>)> soldpos;
 
         //! A stack died
-        sigc::signal<void> sstackDied;
+        sigc::signal<void()> sstackDied;
 
 	// Static Methods
 
@@ -339,6 +345,4 @@ class Stacklist : public std::list<Stack*>, public sigc::trackable
 
 };
 
-#endif // STACKLIST_H
-
-// End of file
+#endif

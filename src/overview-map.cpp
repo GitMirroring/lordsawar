@@ -1,7 +1,7 @@
-// Copyright (C) 2006, 2007 Ulf Lorenz
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017,
-// 2020 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2006, 2007 Ulf Lorenz
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017,
+//  2020, 2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,35 +15,33 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
 #include <assert.h>
 #include <cairomm/context.h>
 
-#include "overviewmap.h"
-#include "citylist.h"
-#include "ruinlist.h"
-#include "templelist.h"
+#include "overview-map.h"
+#include "city-list.h"
+#include "ruin-list.h"
+#include "temple-list.h"
 #include "city.h"
 #include "ruin.h"
 #include "temple.h"
-#include "playerlist.h"
+#include "player-list.h"
 #include "player.h"
-#include "GameMap.h"
-#include "ImageCache.h"
-#include "FogMap.h"
-#include "GameScenarioOptions.h"
-#include "Configuration.h"
-#include "shieldset.h"
-#include "tileset.h"
-#include "roadlist.h"
-#include "bridgelist.h"
+#include "game-map.h"
+#include "image-cache.h"
+#include "fog-map.h"
+#include "game-scenario-options.h"
+#include "configuration.h"
+#include "shield-set.h"
+#include "tile-set.h"
+#include "road-list.h"
+#include "bridge-list.h"
 #include "bridge.h"
 #include "rnd.h"
-#include "gui/font-size.h"
-#include "bigmap.h"
+#include "map-widget.h"
 
 OverviewMap::OverviewMap(bool headless)
 {
@@ -65,27 +63,27 @@ bool OverviewMap::isShadowed(Tile::Type type, int i, int j)
   //if yes, then maybe
   //if the tile above us or beside us is land then this might be a shadow pixel
 
-  if (GameMap::getInstance()->getTile(x,y)->getType() != type)
+  if (GameMap::instance()->getTile(x,y)->getType() != type)
     return false;
-  if (x > 0 && GameMap::getInstance()->getTile(x-1,y)->getType() != type)
+  if (x > 0 && GameMap::instance()->getTile(x-1,y)->getType() != type)
     {
       x2 = int((i-1) / pixels_per_tile);
       y2 = int(j / pixels_per_tile);
-      if (GameMap::getInstance()->getTile(x-1,y) == GameMap::getInstance()->getTile(x2,y2))
+      if (GameMap::instance()->getTile(x-1,y) == GameMap::instance()->getTile(x2,y2))
         return true;
     }
-  if (y > 0 && GameMap::getInstance()->getTile(x,y-1)->getType() != type)
+  if (y > 0 && GameMap::instance()->getTile(x,y-1)->getType() != type)
     {
       x2 = int(i / pixels_per_tile);
       y2 = int((j-1) / pixels_per_tile);
-      if (GameMap::getInstance()->getTile(x,y-1) == GameMap::getInstance()->getTile(x2,y2))
+      if (GameMap::instance()->getTile(x,y-1) == GameMap::instance()->getTile(x2,y2))
         return true;
     }
-  if (y > 0 && x > 0 && GameMap::getInstance()->getTile(x-1,y-1)->getType() != type)
+  if (y > 0 && x > 0 && GameMap::instance()->getTile(x-1,y-1)->getType() != type)
     {
       x2 = int((i-1) / pixels_per_tile);
       y2 = int((j-1) / pixels_per_tile);
-      if (GameMap::getInstance()->getTile(x-1,y-1) == GameMap::getInstance()->getTile(x2,y2))
+      if (GameMap::instance()->getTile(x-1,y-1) == GameMap::instance()->getTile(x2,y2))
         return true;
     }
 
@@ -173,6 +171,7 @@ OverviewMap::draw_line(bool front, int src_x, int src_y, int dst_x, int dst_y, G
   gc->move_to(src_x, src_y);
   gc->set_line_width(pixels_per_tile / 1.5);
   gc->line_to(dst_x, dst_y);
+  gc->stroke ();
 }
 
 void
@@ -187,15 +186,12 @@ OverviewMap::draw_rect(bool front, int x, int y, int width, int height, const Gd
   Cairo::RefPtr<Cairo::Surface> surf;
   Cairo::RefPtr<Cairo::Context> gc;
   choose_surface (front, surf, gc);
+
   gc->set_source_rgba(color.get_red(), color.get_green(), color.get_blue(), color.get_alpha());
-  //gc->rectangle(x, y, width, height);
-   gc->move_to(x, y);
-    gc->rel_line_to(width, 0);
-     gc->rel_line_to(0, height);
-      gc->rel_line_to(-width, 0);
-      gc->rel_line_to(0, -height);
-      gc->set_line_width(pixels_per_tile / 1.5);
-      gc->stroke();
+
+  gc->rectangle (x, y, width, height);
+  gc->set_line_width (pixels_per_tile / 1.5);
+  gc->stroke ();
 }
 
 void OverviewMap::draw_terrain_tile(Cairo::RefPtr<Cairo::Context> gc,
@@ -334,11 +330,11 @@ int OverviewMap::calculatePixelsPerTile(int width, int height)
   int h = height /
     GameMap::calculateTilesPerOverviewMapTile();
 
-  double ratio = 28.36; //overviewmaps are 28.36 font heights tall
-  for (;h * pixels < FontSize::getInstance ()->get_height () * ratio; pixels++)
+  double ratio = 8.102857143;  //overview maps are 8.10 button sizes tall
+  for (;h * pixels < LW_BUTTON_SIZE * ratio; pixels++)
     ;
 
-  return pixels + 1;
+  return pixels;
 }
 
 int OverviewMap::calculatePixelsPerTile()
@@ -374,7 +370,7 @@ Vector<int> OverviewMap::calculate_smallmap_size()
 
 void OverviewMap::resize(Vector<int> max_dimensions, float scale)
 {
-  surface.clear();
+  surface.reset();
 
     // calculate the width and height relations between pixels and maptiles
     Vector<int> bigmap_dim = GameMap::get_dim();
@@ -400,8 +396,7 @@ void OverviewMap::resize(Vector<int> max_dimensions, float scale)
     d.x /= map_tiles_per_tile;
     d.y /= map_tiles_per_tile;
 
-    Cairo::RefPtr<Cairo::Surface> empty = Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, d.x, d.y);
-    static_surface = Cairo::Surface::create(empty, Cairo::CONTENT_COLOR_ALPHA, d.x, d.y);
+    static_surface = Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, d.x, d.y);
     static_surface_gc = Cairo::Context::create(static_surface);
 
     Tileset *ts = GameMap::getTileset();
@@ -410,7 +405,7 @@ void OverviewMap::resize(Vector<int> max_dimensions, float scale)
       draw_radial_gradient(tile->getSmallTile()->getColor(),
                            tile->getSmallTile()->getSecondColor(), d.x, d.y);
     draw_terrain_tiles(LwRectangle(0, 0, d.x, d.y));
-    surface = Cairo::Surface::create(empty, Cairo::CONTENT_COLOR_ALPHA, d.x, d.y);
+    surface = Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, d.x, d.y);
     surface_gc = Cairo::Context::create(surface);
 
 }
@@ -448,7 +443,7 @@ void OverviewMap::redraw_tiles(LwRectangle tiles)
 Maptile* OverviewMap::getTile(int x, int y)
 {
   //look for something interesting so we don't skip over important tiles.
-  Maptile *favoured_tile = GameMap::getInstance()->getTile(x,y);
+  Maptile *favoured_tile = GameMap::instance()->getTile(x,y);
   int xmax = x + map_tiles_per_tile - 1;
   if (xmax >= GameMap::getWidth())
     xmax = GameMap::getWidth() - 1;
@@ -459,14 +454,14 @@ Maptile* OverviewMap::getTile(int x, int y)
     for (int j = y; j < ymax; j++)
       {
         Vector<int> pos(i, j);
-        if (GameMap::getInstance()->getBuilding(pos) == Maptile::TEMPLE)
-          favoured_tile = GameMap::getInstance()->getTile(pos);
-        else if (GameMap::getInstance()->getBuilding(pos) == Maptile::RUIN)
-          favoured_tile = GameMap::getInstance()->getTile(pos);
-        else if (GameMap::getInstance()->getTerrainType(pos) == Tile::WATER)
-          favoured_tile = GameMap::getInstance()->getTile(pos);
-        else if (GameMap::getInstance()->getTerrainType(pos) == Tile::MOUNTAIN)
-          favoured_tile = GameMap::getInstance()->getTile(pos);
+        if (GameMap::instance()->getBuilding(pos) == Maptile::TEMPLE)
+          favoured_tile = GameMap::instance()->getTile(pos);
+        else if (GameMap::instance()->getBuilding(pos) == Maptile::RUIN)
+          favoured_tile = GameMap::instance()->getTile(pos);
+        else if (GameMap::instance()->getTerrainType(pos) == Tile::WATER)
+          favoured_tile = GameMap::instance()->getTile(pos);
+        else if (GameMap::instance()->getTerrainType(pos) == Tile::MOUNTAIN)
+          favoured_tile = GameMap::instance()->getTile(pos);
       }
   return favoured_tile;
 }
@@ -486,14 +481,14 @@ void OverviewMap::draw_terrain_tiles(LwRectangle r)
       }
 
   int size = int(pixels_per_tile) > 1 ? int(pixels_per_tile) : 1;
-  for (auto it : *Roadlist::getInstance())
+  for (auto it : *Roadlist::instance())
       {
         Vector<int> pos = it->getPos();
         pos = mapToSurface(pos);
         pos -= Vector<int>(size,size) / 2;
 	draw_filled_rect(false, pos.x, pos.y, size, size, rd);
       }
-  for (auto it : *Bridgelist::getInstance())
+  for (auto it : *Bridgelist::instance())
       {
         Vector<int> pos = it->getPos();
         pos = mapToSurface(pos);
@@ -511,7 +506,7 @@ void OverviewMap::draw()
   if (d_headless)
     return;
   Tileset *ts = GameMap::getTileset();
-  //Playerlist::getInstance()->setViewingplayer(player);
+  //Playerlist::instance()->setViewingplayer(player);
   int size = int(pixels_per_tile) > 1 ? int(pixels_per_tile) : 1;
   assert(surface);
 
@@ -528,11 +523,11 @@ void OverviewMap::draw()
   // Draw ruins as a white dot
 
   Gdk::RGBA ruindotcolor = ts->getRuinColor();
-  for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
-       it != Ruinlist::getInstance()->end(); ++it)
+  for (Ruinlist::iterator it = Ruinlist::instance()->begin();
+       it != Ruinlist::instance()->end(); ++it)
     {
       Ruin *r = *it;
-      if (BigMap::s_show_hidden_ruins == false)
+      if (MapWidget::s_show_hidden_ruins == false)
         {
           if (r->isHidden() == true &&
               r->getOwner() != Playerlist::getViewingplayer())
@@ -548,8 +543,8 @@ void OverviewMap::draw()
 
   // Draw temples as a white dot
   Gdk::RGBA templedotcolor = ts->getTempleColor();
-  for (Templelist::iterator it = Templelist::getInstance()->begin();
-       it != Templelist::getInstance()->end(); ++it)
+  for (Templelist::iterator it = Templelist::instance()->begin();
+       it != Templelist::instance()->end(); ++it)
     {
       Temple *t = *it;
       if (t->isVisible(Playerlist::getViewingplayer()) == false)
@@ -599,7 +594,7 @@ void OverviewMap::draw()
   after_draw();
 }
 
-Cairo::RefPtr<Cairo::Surface> OverviewMap::get_surface()
+Cairo::RefPtr<Cairo::ImageSurface> OverviewMap::get_surface()
 {
     return surface;
 }
@@ -655,8 +650,8 @@ void OverviewMap::draw_cities (bool all_razed)
 
   // Draw all cities as shields over the city location, in the colors of
   // the players.
-  for (Citylist::iterator it = Citylist::getInstance()->begin();
-      it != Citylist::getInstance()->end(); ++it)
+  for (Citylist::iterator it = Citylist::instance()->begin();
+      it != Citylist::instance()->end(); ++it)
   {
       City *c = *it;
       PixMask *tmp;
@@ -664,23 +659,11 @@ void OverviewMap::draw_cities (bool all_razed)
         continue;
       if (c->isBurnt() == true || all_razed == true)
         {
-          tmp = ImageCache::getInstance()->getSmallRuinedCityImage()->copy ();
-
-          //we need 78 of these per map height
-          double new_height = get_height () / 78.0;
-          int new_width = tmp->get_width () * (new_height / tmp->get_height ());
-
-          PixMask::scale (tmp, new_width, new_height);
+          tmp = ImageCache::instance()->getSmallRuinedCityImage()->copy ();
         }
       else
         {
-          tmp = ImageCache::getInstance()->getShieldPic(csize, c->getOwner(),
-                                                        true, 0)->copy ();
-          //we need 39 of these per map height
-          double new_height = get_height () / 39.0;
-          int new_width = tmp->get_width () * (new_height / tmp->get_height ());
-
-          PixMask::scale (tmp, new_width, new_height);
+          tmp = ImageCache::instance()->getShieldPic(csize, c->getOwner(), true)->copy ();
         }
 
       Vector<int> pos = c->getPos();
@@ -696,23 +679,21 @@ void OverviewMap::blank(bool on)
   draw();
 }
 
-void OverviewMap::draw_hero(Vector<int> pos, bool white)
+void OverviewMap::draw_hero (Vector<int> pos, bool white)
 {
-    // draw the hero picture over top of the host city
+  // draw the hero picture over top of the host city
 
-    Vector<int> start = mapToSurface(pos);
+  //fixme should / 2 be city width in tiles?
 
-    start += Vector<int>(int(pixels_per_tile/2), int(pixels_per_tile/2));
+  Vector<int> start = mapToSurface (pos) +
+    Vector<int> (int (pixels_per_tile / 2), int (pixels_per_tile / 2));
 
-    PixMask *heropic =
-      ImageCache::getInstance()->getSmallHeroImage(white)->copy ();
+  PixMask *heropic =
+    ImageCache::instance ()->getSmallHeroImage (white)->copy ();
 
-    //we need 20.8 of these per map height
-    double new_height = get_height () / 20.8;
-    int new_width = heropic->get_width () * (new_height / heropic->get_height ());
-    PixMask::scale (heropic, new_width, new_height);
-    heropic->blit_centered(surface, start);
-    delete heropic;
+  heropic->blit_centered (surface, start);
+
+  delete heropic;
 }
 
 void OverviewMap::draw_target_box(Vector<int> pos, const Gdk::RGBA c)
@@ -781,3 +762,9 @@ int OverviewMap::get_height()
 {
   return GameMap::get_dim().y / map_tiles_per_tile * pixels_per_tile;
 }
+
+bool OverviewMap::is_fogged (City *c)
+{
+  return c->isVisible (Playerlist::getViewingplayer ()) == false;
+}
+

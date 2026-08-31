@@ -1,6 +1,6 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,15 +14,14 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef TEMPLELIST_H
 #define TEMPLELIST_H
 
 #include <sigc++/trackable.h>
-#include "LocationList.h"
+#include "location-list.h"
 #include "temple.h"
 class Stack;
 class XML_Helper;
@@ -111,7 +110,7 @@ class Templelist : public LocationList<Temple*>, public sigc::trackable
 	// Static Methods
 
         //! Return the singleton instance.  Create a new one if needed.
-        static Templelist* getInstance();
+        static Templelist* instance();
 
         //! Load the temple list from an opened saved-game file.
 	/**
@@ -120,7 +119,7 @@ class Templelist : public LocationList<Temple*>, public sigc::trackable
 	 *
 	 * @return The list of temples.
 	 */
-        static Templelist* getInstance(XML_Helper* helper);
+        static Templelist* instance(XML_Helper* helper);
 
         //! Explicitly delete the singleton instance.
         static void deleteInstance();

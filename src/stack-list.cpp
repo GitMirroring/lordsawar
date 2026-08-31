@@ -1,9 +1,9 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
 #include "signal.h"
@@ -26,19 +25,19 @@
 #include <sigc++/adaptors/bind.h>
 #include <assert.h>
 
-#include "stacklist.h"
+#include "stack-list.h"
 #include "stack.h"
 #include "city.h"
 #include "path.h"
-#include "playerlist.h"
-#include "xmlhelper.h"
-#include "Item.h"
+#include "player-list.h"
+#include "xml-helper.h"
+#include "item.h"
 #include "hero.h"
-#include "Backpack.h"
-#include "LocationList.h"
-#include "GameMap.h"
-#include "stacktile.h"
-#include "stackreflist.h"
+#include "backpack.h"
+#include "location-list.h"
+#include "game-map.h"
+#include "stack-tile.h"
+#include "stack-ref-list.h"
 
 Glib::ustring Stacklist::d_tag = "stacklist";
 
@@ -47,8 +46,8 @@ Glib::ustring Stacklist::d_tag = "stacklist";
 
 Vector<int> Stacklist::getPosition(guint32 id)
 {
-    for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-        pit != Playerlist::getInstance()->end(); ++pit)
+    for (Playerlist::iterator pit = Playerlist::instance()->begin();
+        pit != Playerlist::instance()->end(); ++pit)
     {
         Stacklist* mylist = (*pit)->getStacklist();
         for (const_iterator it = mylist->begin(); it !=mylist->end(); ++it)
@@ -63,8 +62,8 @@ Vector<int> Stacklist::getPosition(guint32 id)
 //search all player's stacklists to find this stack
 bool Stacklist::deleteStack(Stack* s)
 {
-    for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-        pit != Playerlist::getInstance()->end(); ++pit)
+    for (Playerlist::iterator pit = Playerlist::instance()->begin();
+        pit != Playerlist::instance()->end(); ++pit)
     {
         Stacklist* mylist = (*pit)->getStacklist();
         for (const_iterator it = mylist->begin(); it != mylist->end(); ++it)
@@ -76,8 +75,8 @@ bool Stacklist::deleteStack(Stack* s)
 
 bool Stacklist::deleteStack(guint32 id)
 {
-    for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-        pit != Playerlist::getInstance()->end(); ++pit)
+    for (Playerlist::iterator pit = Playerlist::instance()->begin();
+        pit != Playerlist::instance()->end(); ++pit)
     {
         Stacklist* mylist = (*pit)->getStacklist();
         for (const_iterator it = mylist->begin(); it != mylist->end(); ++it)
@@ -179,8 +178,8 @@ unsigned int Stacklist::getNoOfStacks()
 {
     unsigned int mysize = 0;
 
-    for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-        pit != Playerlist::getInstance()->end(); ++pit)
+    for (Playerlist::iterator pit = Playerlist::instance()->begin();
+        pit != Playerlist::instance()->end(); ++pit)
       mysize += (*pit)->getStacklist()->size();
 
     return mysize;
@@ -190,8 +189,8 @@ unsigned int Stacklist::getNoOfArmies()
 {
     unsigned int mysize = 0;
 
-    for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-        pit != Playerlist::getInstance()->end(); ++pit)
+    for (Playerlist::iterator pit = Playerlist::instance()->begin();
+        pit != Playerlist::instance()->end(); ++pit)
       mysize += (*pit)->getStacklist()->countArmies();
 
     return mysize;
@@ -222,7 +221,7 @@ Stacklist::Stacklist(Stacklist *stacklist)
 Stacklist::Stacklist(XML_Helper* helper)
     :d_activestack(0)
 {
-    helper->registerTag(Stack::d_tag, sigc::mem_fun((*this), &Stacklist::load));
+    helper->register_tag(Stack::d_tag, sigc::mem_fun((*this), &Stacklist::load));
     load(Stacklist::d_tag, helper);
 }
 
@@ -237,7 +236,7 @@ Stacklist::~Stacklist()
 
 Stack* Stacklist::getNextMovable() const
 {
-    Player *player = Playerlist::getInstance()->getActiveplayer();
+    Player *player = Playerlist::instance()->getActiveplayer();
     
     const_iterator it = begin();
     
@@ -344,17 +343,17 @@ bool Stacklist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Stacklist::d_tag);
+    retval &= helper->open_tag(Stacklist::d_tag);
     if (d_activestack)
-      retval &= helper->saveData("active", d_activestack->getId());
+      retval &= helper->save("active", d_activestack->getId());
     else
-      retval &= helper->saveData("active", 0);
+      retval &= helper->save("active", 0);
 
     //save stacks
     for (const_iterator it = begin(); it != end(); ++it)
         retval &= (*it)->save(helper);
 
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -377,7 +376,7 @@ bool Stacklist::load(Glib::ustring tag, XML_Helper* helper)
     
     if (tag == Stacklist::d_tag)
     {
-        helper->getData(active, "active");
+        helper->get(active, "active");
         return true;
     }
 
@@ -506,13 +505,13 @@ void Stacklist::add(Stack *stack)
 	assert(1 == 0);
       std::list<sigc::connection> conn;
       conn.push_back(stack->smoving.connect
-	 (sigc::mem_fun (this, &Stacklist::on_stack_starts_moving)));
+	 (sigc::mem_fun (*this, &Stacklist::on_stack_starts_moving)));
       conn.push_back(stack->smoved.connect
-	 (sigc::mem_fun (this, &Stacklist::on_stack_stops_moving)));
+	 (sigc::mem_fun (*this, &Stacklist::on_stack_stops_moving)));
       conn.push_back(stack->sdying.connect
-	 (sigc::mem_fun (this, &Stacklist::on_stack_died)));
+	 (sigc::mem_fun (*this, &Stacklist::on_stack_died)));
       conn.push_back(stack->sgrouped.connect
-	 (sigc::mem_fun (this, &Stacklist::on_stack_grouped)));
+	 (sigc::mem_fun (*this, &Stacklist::on_stack_grouped)));
       d_connections[stack] = conn;
     }
 }
@@ -686,4 +685,29 @@ guint32 Stacklist::countMovableStacks() const
   return count;
 }
 
-// End of file
+guint32 Stacklist::countMovedAndParkedStacks() const
+{
+  guint32 count = 0;
+  for (const_iterator i = begin(); i != end(); ++i)
+    if ((*i)->getParked () || (*i)->getMoves () < (*i)->getMaxMoves ())
+      count++;
+  return count;
+}
+
+void Stacklist::getArmyUnitsInBoats(std::list<Stack*> &stacks)
+{
+  for (iterator it = begin (); it != end (); ++it)
+    if ((*it)->hasShip ())
+      stacks.push_back (*it);
+  return;
+}
+        
+guint32 Stacklist::countArmies (guint32 army_type_id) const
+{
+  guint32 mysize = 0;
+
+  for (const_iterator it = begin (); it != end (); ++it)
+    mysize += (*it)->countArmies (army_type_id);
+
+  return mysize;
+}

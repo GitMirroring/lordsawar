@@ -1,4 +1,4 @@
-//  Copyright (C) 2017, 2021 Ben Asselstine
+//  Copyright (C) 2017, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,13 +12,12 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "turn-actionlist.h"
-#include "xmlhelper.h"
+#include "turn-action-list.h"
+#include "xml-helper.h"
 
 Glib::ustring TurnActionlist::d_tag = "turn";
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -47,7 +46,7 @@ TurnActionlist::~TurnActionlist()
 TurnActionlist::TurnActionlist(XML_Helper* helper)
   : OwnerId(helper)
 {
-  helper->registerTag(Action::d_tag, sigc::mem_fun(this, &TurnActionlist::load));
+  helper->register_tag(Action::d_tag, sigc::mem_fun(*this, &TurnActionlist::load));
 
 }
 
@@ -55,13 +54,13 @@ bool TurnActionlist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(TurnActionlist::d_tag);
+    retval &= helper->open_tag(TurnActionlist::d_tag);
 
     retval &= OwnerId::save(helper);
     for (TurnActionlist::const_iterator it = begin(); it != end(); ++it)
       retval &= (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }

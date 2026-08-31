@@ -12,16 +12,16 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef BRIDGELIST_H
 #define BRIDGELIST_H
 
 #include <sigc++/trackable.h>
-#include "LocationList.h"
+#include "location-list.h"
 
+#include "bridge.h"
 class Bridge;
 class XML_Helper;
 
@@ -55,7 +55,7 @@ class Bridgelist : public LocationList<Bridge*>, public sigc::trackable
 	 * @return The Bridge::Type that makes the most sense for the given 
 	 *         tile.
 	 */
-	int calculateType(Vector<int> t) const;
+        Bridge::Type calculateType(Vector<int> t) const;
 
         //! Give it a bridge, and this method returns the other half.
         Bridge* getOtherSide(Bridge *bridge);
@@ -66,10 +66,10 @@ class Bridgelist : public LocationList<Bridge*>, public sigc::trackable
 	// Static Methods
 
         //! Return the singleton instance.  Create a new one if needed.
-        static Bridgelist* getInstance();
+        static Bridgelist* instance();
 
         //! Load the singleton instance from the opened saved-game file.
-        static Bridgelist* getInstance(XML_Helper* helper);
+        static Bridgelist* instance(XML_Helper* helper);
 
         //! Explicitly delete the singleton instance.
         static void deleteInstance();

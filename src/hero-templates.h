@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2020, 2021, 2026 Ben Asselstine
 //  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -13,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef HERO_TEMPLATES_H
@@ -24,6 +23,7 @@
 #include "hero.h"
 #include "defs.h"
 #include "character.h"
+#include "shield.h"
 
 class ArmyProto;
 class HeroProto;
@@ -45,13 +45,16 @@ class HeroTemplates
 	static Glib::ustring d_tag;
 
         //! Makes a copy of the hero templates.
-        HeroTemplates* copy () {return new HeroTemplates (*this);}
+        HeroTemplates* copy ()
+          {
+            return new HeroTemplates (*this);
+          }
 
         //! Returns the singleton instance.
-	static HeroTemplates* getInstance();
+	static HeroTemplates* instance();
 
         //! Instantiate the object from a saved-game file.
-	static HeroTemplates* getInstance(XML_Helper *helper);
+	static HeroTemplates* instance(XML_Helper *helper);
 
         //! Explicitly deletes the singleton instance.
         static void deleteInstance();
@@ -61,18 +64,16 @@ class HeroTemplates
          * The caller is responsible for freeing the returned objects.
          * (or pass them back with replaceHeroes)
          */
-        std::vector<Character*> getHeroes (guint32 player_id);
+        std::vector<Character*> getHeroes (Shield::Color shield);
 
         //! Replace all the heroes belonging to the player with the given id.
         /**
          * HeroTemplates takes control of the Character objects passed in.
          * This means the caller doesn't free them.
          */
-        void replaceHeroes (guint32 player_id, std::vector<Character*> he);
+        void replaceHeroes (Shield::Color shield, std::vector<Character*> he);
 
-        HeroProto *getRandomHero(int player_id);
-
-	HeroProto *getRandomHero(Hero::Gender gender, int player_id);
+        HeroProto *getRandomHero(Shield::Color shield);
 
         Character*getCharacterById (guint32 hero_id);
 
@@ -110,7 +111,7 @@ class HeroTemplates
         std::list<Character*> d_characters;
 
         /* the hero protos we made from the character data */
-        std::vector<HeroProto*> d_herotemplates[MAX_PLAYERS];
+        std::vector<HeroProto*> d_herotemplates;
 
 	//a list of male hero prototypes contained in the the army set.
 	std::vector<ArmyProto*> d_male_heroes;

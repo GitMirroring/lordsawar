@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2010, 2011, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2010, 2011, 2014, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef TILESTYLESET_H
@@ -23,7 +22,7 @@
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 
-#include "tilestyle.h"
+#include "tile-style.h"
 
 class XML_Helper;
 class Tileset;
@@ -54,7 +53,7 @@ class TileStyleSet : public sigc::trackable, public std::vector<TileStyle*>
          * convenience constructor.
          * tile style ids will be overlapping and need to be given values.
          * */
-        TileStyleSet(Glib::ustring pngfilename, guint32 tilesize, bool &success, TileStyle::Type type = TileStyle::UNKNOWN);
+        TileStyleSet(std::string pngfilename, bool &success, TileStyle::Type type = TileStyle::UNKNOWN);
 
 	//! The loading constuctor loads the TileStyleSet from the config file.
 	/**
@@ -106,13 +105,12 @@ class TileStyleSet : public sigc::trackable, public std::vector<TileStyle*>
 	//Methods that operate on the class data and modify the class.
 
 	//! Instantiate the tilestyleset's images from the given file.
-	void loadImages(int tilesize, Glib::ustring image_filename,
-                        bool scale, bool &broken);
+	void loadImages(std::string image_filename, bool &broken);
 
 	//! Destroy the images associated with this tilestyleset.
 	void uninstantiateImages();
 
-        static bool validate_image(Glib::ustring filename);
+        static bool validate_image(std::string filename);
 
         bool instantiateImages (Tileset *set);
 
@@ -135,6 +133,4 @@ class TileStyleSet : public sigc::trackable, public std::vector<TileStyle*>
 
 };
 
-#endif // TILESTYLESET_H
-
-// End of file
+#endif

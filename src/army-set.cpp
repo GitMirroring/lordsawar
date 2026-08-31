@@ -1,5 +1,5 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
-//  2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,30 +13,29 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <gtkmm.h>
 #include "rectangle.h"
 #include <sigc++/functors/mem_fun.h>
 
-#include "armyset.h"
-#include "File.h"
+#include "army-set.h"
+#include "file.h"
 #include "shield.h"
-#include "gui/image-helpers.h"
-#include "armysetlist.h"
-#include "armyprodbase.h"
-#include "tarhelper.h"
-#include "Configuration.h"
+#include "image-helpers.h"
+#include "army-set-list.h"
+#include "army-prod-base.h"
+#include "tar-helper.h"
+#include "configuration.h"
 #include "file-compat.h"
 #include "ucompose.hpp"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "rnd.h"
 #include "player.h"
-#include "ImageCache.h"
-#include "TarFileMaskedImage.h"
-#include "TarFileImage.h"
+#include "image-cache.h"
+#include "tar-file-masked-image.h"
+#include "tar-file-image.h"
 
 Glib::ustring Armyset::d_tag = "armyset";
 Glib::ustring Armyset::file_extension = ARMYSET_EXT;
@@ -91,7 +90,7 @@ void Armyset::read_selector_name (XML_Helper *helper, Shield::Color c, bool larg
     name += "_large_selector";
   else
     name += "_small_selector";
-  d_selector[large ? 1 : 0][c]->load (helper, name, name + "_num_masks");
+  d_selector[large ? 1 : 0][c]->load (helper, name);
 
 }
 
@@ -116,10 +115,10 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
     }
 
   guint32 ts;
-  helper->getData(ts, "tilesize");
+  helper->get(ts, "tilesize");
   setTileSize(ts);
-  d_stackship->load (helper, "stackship", "stackship_num_masks");
-  d_standard->load (helper, "plantedstandard", "plantedstandard_num_masks");
+  d_stackship->load (helper, "stackship");
+  d_standard->load (helper, "plantedstandard");
   d_bag->load_name (helper, "bag");
 
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
@@ -128,7 +127,7 @@ Armyset::Armyset(XML_Helper *helper, Glib::ustring directory)
   for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
     read_selector_name (helper, Shield::Color(i), false);
 
-  helper->registerTag(ArmyProto::d_tag, 
+  helper->register_tag(ArmyProto::d_tag, 
 		      sigc::mem_fun((*this), &Armyset::loadArmyProto));
 }
 
@@ -157,6 +156,10 @@ Armyset::~Armyset()
   delete d_stackship;
   delete d_standard;
   delete d_bag;
+  for (guint32 i = 0; i < 2; i++)
+    for (guint32 j = Shield::WHITE; j < Shield::NEUTRAL; j++)
+      if (d_selector[i][j])
+        delete d_selector[i][j];
   clear();
   clean_tmp_dir();
 }
@@ -184,7 +187,7 @@ bool Armyset::save(Glib::ustring filename, Glib::ustring ext) const
   helper.close();
   if (broken == true)
     return false;
-  std::vector<Glib::ustring> extrafiles;
+  std::vector<std::string> extrafiles;
   return saveTar(tmpfile, tmpfile + ".tar", goodfilename, extrafiles);
 }
 
@@ -209,20 +212,20 @@ void Armyset::write_selector_name (XML_Helper *helper, Shield::Color c, bool lar
     name += "_large_selector";
   else
     name += "_small_selector";
-  d_selector[large ? 1 : 0][c]->save (helper, name, name + "_num_masks");
+  d_selector[large ? 1 : 0][c]->save (helper, name);
 }
 
 bool Armyset::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(d_tag);
+    retval &= helper->open_tag(d_tag);
 
     retval &= Set::save(helper);
-    retval &= helper->saveData("tilesize", getUnscaledTileSize());
-    retval &= d_stackship->save (helper, "stackship", "stackship_num_masks");
-    retval &= d_standard->save (helper, "plantedstandard", "plantedstandard_num_masks");
-    retval &= helper->saveData("bag", d_bag->getName ());
+    retval &= helper->save("tilesize", getTileSize());
+    retval &= d_stackship->save (helper, "stackship");
+    retval &= d_standard->save (helper, "plantedstandard");
+    retval &= helper->save("bag", d_bag->getName ());
 
     for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
       write_selector_name (helper, Shield::Color(i), true);
@@ -233,7 +236,7 @@ bool Armyset::save(XML_Helper* helper) const
     for (const_iterator it = begin(); it != end(); ++it)
       (*it)->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -510,68 +513,131 @@ bool Armyset::validate()
 class ArmysetLoader
 {
 public:
-    ArmysetLoader(Glib::ustring filename, bool &broken, bool &unsupported)
-      : dir (File::get_dirname (filename)),
-      file (File::get_basename (filename)), armyset (NULL),
-      unsupported_version (false)
+    ArmysetLoader (Glib::ustring f)
+      : filename (f), dir (File::get_dirname (filename)),
+      file (File::get_basename (filename)), bad_version (""),
+      found_top_tag (false)
       {
-	if (File::nameEndsWith(filename, Armyset::file_extension) == false)
-	  filename += Armyset::file_extension;
-        Tar_Helper t(filename, std::ios::in, broken);
+        if (File::nameEndsWith (filename, Armyset::file_extension) == false)
+          filename += Armyset::file_extension;
+      }
+
+    bool parse ()
+      {
+        bool broken = false;
+        Tar_Helper t (filename, std::ios::in, broken);
         if (broken)
-          return;
+          {
+            Glib::ustring err;
+            if (File::exists (filename) && File::is_readonly (filename))
+              err = String::ucompose (_("Couldn't open %1 for reading"),
+                                      filename);
+            else
+              err =
+                String::ucompose
+                (_("Couldn't scan archive in %1, not a valid file"), filename);
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
         Glib::ustring lwafilename = 
-          t.getFirstFile(Armyset::file_extension, broken);
+          t.getFirstFile (Armyset::file_extension, broken);
+        if (lwafilename.empty () == true)
+          {
+            Glib::ustring err = 
+              String::ucompose (_("Army set file `%1' lacks a %2 file"),
+                                filename, Armyset::file_extension);
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
         if (broken)
-          return;
-	XML_Helper helper(lwafilename, std::ios::in);
-	helper.registerTag(Armyset::d_tag, sigc::mem_fun((*this), &ArmysetLoader::load));
-	if (!helper.parseXML())
-	  {
-            unsupported = unsupported_version;
-            std::cerr << String::ucompose(_("Error!  can't load armyset `%1'."), filename) << std::endl;
-	    if (armyset != NULL)
-	      delete armyset;
-	    armyset = NULL;
-	  }
-        helper.close();
-        File::erase(lwafilename);
-        t.Close();
-      };
-    bool load(Glib::ustring tag, XML_Helper* helper)
+          {
+            Glib::ustring err =
+              String::ucompose
+              (_("Could not extract first file from army set file `%1'"),
+               filename);
+            signal_finished.emit (NULL, true, false, err);
+            return false;
+          }
+
+        XML_Helper helper (lwafilename, std::ios::in);
+        helper.register_tag (Armyset::d_tag,
+                            sigc::mem_fun(*this, &ArmysetLoader::load));
+        bool retval = true;
+        if (!helper.parse_XML ())
+          {
+            std::cerr <<
+              String::ucompose (_("Error!  can't load army set `%1'."),
+                                filename) << std::endl;
+            if (bad_version != "")
+              {
+                Glib::ustring err =
+                  String::ucompose (_("Expected version %1 but got %2"),
+                                    LORDSAWAR_ARMYSET_VERSION, bad_version);
+                signal_finished.emit (NULL, false, true, err);
+              }
+            else
+              signal_finished.emit (NULL, true, false,
+                                    _("Unknown parsing error"));
+            retval = false;
+          }
+        else
+          {
+            if (!found_top_tag)
+              {
+                Glib::ustring err =
+                  String::ucompose (_("Couldn't find <%1> tag"),
+                                    Armyset::d_tag);
+                signal_finished.emit (NULL, true, false, err);
+              }
+            else
+              signal_finished.emit (armyset, false, false, "");
+          }
+        helper.close ();
+        File::erase (lwafilename);
+        t.Close ();
+        return retval;
+      }
+
+    bool load (Glib::ustring tag, XML_Helper* helper)
       {
 	if (tag == Armyset::d_tag)
 	  {
-            if (helper->getVersion() == LORDSAWAR_ARMYSET_VERSION)
+            if (helper->get_version () == LORDSAWAR_ARMYSET_VERSION)
               {
-                armyset = new Armyset(helper, dir);
-                armyset->setBaseName(file);
+                found_top_tag = true;
+                armyset = new Armyset (helper, dir);
+                armyset->setBaseName (file);
                 return true;
               }
             else
               {
-                unsupported_version = true;
+                bad_version = helper->get_version ();
                 return false;
               }
 	  }
 	return false;
       };
+    Glib::ustring filename;
     Glib::ustring dir;
     Glib::ustring file;
+    Glib::ustring bad_version;
+    bool found_top_tag;
+    sigc::signal<void(Armyset*, bool, bool, Glib::ustring)> signal_finished;
     Armyset *armyset;
-    bool unsupported_version;
 };
 
-Armyset *Armyset::create(Glib::ustring filename, bool &unsupported_version)
+void Armyset::create(Glib::ustring filename, sigc::slot<void(Armyset*,bool,bool,Glib::ustring)> finished)
 {
-  bool broken = false;
-  ArmysetLoader d(filename, broken, unsupported_version);
-  if (broken)
-    return NULL;
-  return d.armyset;
+  ArmysetLoader d(filename);
+  d.signal_finished.connect
+    ([finished](Armyset *armyset, bool broken, bool unsupported_version, Glib::ustring err)
+     {
+       finished (armyset, broken, unsupported_version, err);
+     });
+  d.parse ();
 }
 
-void Armyset::instantiateImages(bool scale, bool &broken)
+void Armyset::instantiateImages(bool &broken)
 {
   uninstantiateImages();
   broken = false;
@@ -580,26 +646,22 @@ void Armyset::instantiateImages(bool scale, bool &broken)
     return;
 
   for (iterator it = begin(); it != end(); ++it)
-    (*it)->instantiateImages(getUnscaledTileSize(), &t, scale, broken);
-
-  Vector<int> scale_dim = Vector<int>(-1,-1);
-  if (scale)
-    scale_dim = Vector<int>(getUnscaledTileSize(),getUnscaledTileSize ());
+    (*it)->instantiateImages(&t, broken);
 
   broken = d_stackship->load (&t);
   if (broken)
     return;
-  d_stackship->instantiateImages (scale_dim);
+  d_stackship->instantiateImages ();
 
   broken = d_standard->load (&t);
   if (broken)
     return;
-  d_standard->instantiateImages (scale_dim);
+  d_standard->instantiateImages ();
 
   broken = d_bag->load (&t);
   if (broken)
     return;
-  d_bag->instantiateImages (scale_dim);
+  d_bag->instantiateImages ();
 
   bool ret = loadSelectorPics (&t);
   if (ret == false)
@@ -654,7 +716,7 @@ void Armyset::switchArmysetForRuinKeeper(Army *army, const Armyset *armyset)
  
   //go find an equivalent type in the new armyset.
   Armyset *old_armyset
-    = Armysetlist::getInstance()->get(army->getOwner()->getArmyset());
+    = Armysetlist::instance()->get(army->getOwner()->getArmyset());
   ArmyProto *old_armyproto = old_armyset->lookupArmyByType(army->getTypeId());
   if (old_armyproto == NULL)
     return;
@@ -693,7 +755,7 @@ void Armyset::switchArmyset(ArmyProdBase *army, const Armyset *armyset)
 
   //go find an equivalent type in the new armyset.
   Armyset *old_armyset
-    = Armysetlist::getInstance()->get(army->getArmyset());
+    = Armysetlist::instance()->get(army->getArmyset());
   ArmyProto *old_armyproto = old_armyset->lookupArmyByType(army->getTypeId());
   if (old_armyproto == NULL)
     return;
@@ -766,7 +828,7 @@ void Armyset::switchArmyset(Army *army, const Armyset *armyset)
 
   //go find an equivalent type in the new armyset.
   Armyset *old_armyset
-    = Armysetlist::getInstance()->get(army->getOwner()->getArmyset());
+    = Armysetlist::instance()->get(army->getOwner()->getArmyset());
   ArmyProto *old_armyproto = old_armyset->lookupArmyByType(army->getTypeId());
   if (!old_armyproto)
     return;
@@ -879,22 +941,30 @@ const ArmyProto *Armyset::getRandomAwardableAlly() const
   return NULL;
 }
 
-void Armyset::reload(bool &broken)
+void Armyset::reload()
 {
-  broken = false;
-  bool unsupported = false;
-  ArmysetLoader d(getConfigurationFile(), broken, unsupported);
-  if (!broken && d.armyset && d.armyset->validate())
-    {
-      uninstantiateImages();
-      for (iterator it = begin(); it != end(); ++it)
-        delete *it;
-      clear();
-      for (iterator it = d.armyset->begin(); it != d.armyset->end(); ++it)
-        push_back(new ArmyProto(*(*it)));
-      *this = *d.armyset;
-      instantiateImages(true, broken);
-    }
+  ArmysetLoader d(getConfigurationFile());
+  d.signal_finished.connect
+    ([this](Armyset *armyset, bool broken, bool unsupported_version,
+            Glib::ustring)
+     {
+       if (!broken && !unsupported_version && armyset)
+         {
+           if (armyset->validate ())
+             {
+               uninstantiateImages();
+               for (iterator it = begin(); it != end(); ++it)
+                 delete *it;
+               clear();
+               for (iterator it = armyset->begin(); it != armyset->end(); ++it)
+                 push_back(new ArmyProto(*(*it)));
+               *this = *armyset;
+               instantiateImages(broken);
+             }
+         }
+     });
+
+  d.parse ();
 }
 
 bool Armyset::calculate_preferred_tile_size(guint32 &ts) const
@@ -903,16 +973,16 @@ bool Armyset::calculate_preferred_tile_size(guint32 &ts) const
   std::map<guint32, guint32> sizecounts;
 
   if (d_stackship->getName ().empty () == false)
-    sizecounts[d_stackship->getImage(0)->get_unscaled_width()]++;
+    sizecounts[d_stackship->getImage(0)->get_width()]++;
   if (d_standard->getName ().empty () == false)
-    sizecounts[d_standard->getImage(0)->get_unscaled_width()]++;
+    sizecounts[d_standard->getImage(0)->get_width()]++;
   if (d_bag->getImage ())
-    sizecounts[d_bag->getImage ()->get_unscaled_width()]++;
+    sizecounts[d_bag->getImage ()->get_width()]++;
   for (const_iterator it = begin(); it != end(); ++it)
     {
       ArmyProto *a = (*it);
       if (a->getMaskedImage(Shield::NEUTRAL)->getImage () != NULL)
-        sizecounts[a->getMaskedImage(Shield::NEUTRAL)->getImage ()->get_unscaled_width()]++;
+        sizecounts[a->getMaskedImage(Shield::NEUTRAL)->getImage ()->get_width()]++;
     }
 
   guint32 maxcount = 0;
@@ -938,19 +1008,22 @@ bool Armyset::calculate_preferred_tile_size(guint32 &ts) const
 
 bool Armyset::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version)
 {
-  return FileCompat::getInstance()->upgrade(filename, old_version, new_version,
+  return FileCompat::instance()->upgrade(filename, old_version, new_version,
                                             FileCompat::ARMYSET, d_tag);
 }
 
 void Armyset::support_backward_compatibility()
 {
-  FileCompat::getInstance()->support_type(FileCompat::ARMYSET, file_extension, 
+  FileCompat::instance()->support_type(FileCompat::ARMYSET, file_extension, 
                                           d_tag, true);
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::ARMYSET, "0.2.1", "0.3.0",
      sigc::ptr_fun(&Armyset::upgrade));
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::ARMYSET, "0.3.0", "0.3.3",
+     sigc::ptr_fun(&Armyset::upgrade));
+  FileCompat::instance()->support_version
+    (FileCompat::ARMYSET, "0.3.3", "0.4.0",
      sigc::ptr_fun(&Armyset::upgrade));
 }
 
@@ -986,7 +1059,7 @@ ArmyProto *Armyset::lookupWeakestQuickestArmy() const
   Armyset *a = new Armyset(*this);
   a->sort(weakest_quickest);
   guint32 type_id = (*(a->begin()))->getId();
-  ArmyProto *p = Armysetlist::getInstance()->getArmy(getId(), type_id);
+  ArmyProto *p = Armysetlist::instance()->getArmy(getId(), type_id);
   delete a;
   return p;
 }
@@ -994,7 +1067,7 @@ ArmyProto *Armyset::lookupWeakestQuickestArmy() const
 guint32 Armyset::get_default_tile_size ()
 {
   Armyset *a = new Armyset (1, "");
-  guint32 ts = a->getUnscaledTileSize ();
+  guint32 ts = a->getTileSize ();
   delete a;
   return ts;
 }
@@ -1038,4 +1111,49 @@ guint32 Armyset::countSelectors () const
         count++;
     }
   return count;
+}
+
+Armyset& Armyset::operator= (const Armyset& other)
+{
+  if (this != &other)
+    {
+      uninstantiateImages ();
+      for (iterator it = begin (); it != end (); ++it)
+        delete *it;
+      delete d_stackship;
+      delete d_standard;
+      delete d_bag;
+      clear ();
+      clean_tmp_dir ();
+
+      Set::operator=(other);
+
+      for (const_iterator i = other.begin (); i != other.end (); ++i)
+        push_back (new ArmyProto (*(*i)));
+
+      d_stackship = new TarFileMaskedImage (*other.d_stackship);
+      d_standard = new TarFileMaskedImage (*other.d_standard);
+      d_bag = new TarFileImage (*other.d_bag);
+
+      for (guint32 i = Shield::WHITE; i < Shield::NEUTRAL; i++)
+        {
+          d_selector[0][i] = new TarFileMaskedImage (*other.d_selector[0][i]);
+          d_selector[1][i] = new TarFileMaskedImage (*other.d_selector[1][i]);
+        }
+
+    }
+  return *this;
+}
+
+bool Armyset::get_images_instantiated ()
+{
+  for (auto i : getImages ())
+    if (i->getBackingImage () != NULL)
+      return true;
+
+  for (auto i : getMaskedImages ())
+    if (i->getBackingImage () != NULL)
+      return true;
+
+  return false;
 }

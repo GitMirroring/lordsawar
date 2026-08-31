@@ -1,4 +1,4 @@
-// Copyright (C) 2011, 2014 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,21 +12,20 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
 #include <limits.h>
 #include <fstream>
 #include <iostream>
-#include "xmlhelper.h"
-#include "Configuration.h"
+#include "xml-helper.h"
+#include "configuration.h"
 #include "defs.h"
-#include "File.h"
+#include "file.h"
 #include "file-compat.h"
 #include "profile.h"
-#include "profilelist.h"
+#include "profile-list.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -35,7 +34,7 @@ Glib::ustring Profilelist::d_tag = "profilelist";
 
 Profilelist* Profilelist::s_instance = 0;
 
-Profilelist* Profilelist::getInstance()
+Profilelist* Profilelist::instance()
 {
   if (s_instance == 0)
     {
@@ -48,7 +47,7 @@ Profilelist* Profilelist::getInstance()
 
 bool Profilelist::save() const
 {
-  return saveToFile(File::getSaveFile(PROFILE_LIST));
+  return saveToFile(File::getUserProfilesDescription());
 }
 
 bool Profilelist::saveToFile(Glib::ustring filename) const
@@ -62,27 +61,33 @@ bool Profilelist::saveToFile(Glib::ustring filename) const
 
 bool Profilelist::load()
 {
-  return loadFromFile(File::getSaveFile (PROFILE_LIST));
+  return loadFromFile(File::getUserProfilesDescription ());
 }
 
-bool Profilelist::loadFromFile(Glib::ustring filename)
+bool Profilelist::loadFromFile (Glib::ustring filename)
 {
-  std::ifstream in(filename.c_str());
+  std::ifstream in (filename.c_str ());
   if (in)
     {
-      XML_Helper helper(filename.c_str(), std::ios::in);
-      helper.registerTag(Profile::d_tag, 
-                         sigc::mem_fun(this, &Profilelist::load_tag));
-      bool retval = helper.parseXML();
-      helper.close();
+      XML_Helper helper (filename.c_str (), std::ios::in);
+      instance (&helper);
+      bool retval = helper.parse_XML ();
+      helper.close ();
       if (retval == false)
-	File::erase(filename);
+	File::erase (filename);
       return retval;
+    }
+  else
+    {
+      // file not found? create our defaults
+      createDefaultProfile ();
+      createAdminProfile ();
+      save ();
     }
   return true;
 }
 
-Profilelist* Profilelist::getInstance(XML_Helper* helper)
+Profilelist* Profilelist::instance(XML_Helper* helper)
 {
   if (s_instance)
     deleteInstance();
@@ -105,8 +110,10 @@ Profilelist::Profilelist()
 
 Profilelist::Profilelist(XML_Helper* helper)
 {
-  helper->registerTag(Profile::d_tag, 
-                      sigc::mem_fun(this, &Profilelist::load_tag));
+  helper->register_tag(Profile::d_tag, 
+                      sigc::mem_fun(*this, &Profilelist::load_tag));
+  helper->register_tag(Profilelist::d_tag, 
+                      sigc::mem_fun(*this, &Profilelist::load_tag));
 }
 
 Profilelist::~Profilelist()
@@ -120,19 +127,21 @@ bool Profilelist::save(XML_Helper* helper) const
   bool retval = true;
 
   retval &= helper->begin(LORDSAWAR_PROFILES_VERSION);
-  retval &= helper->openTag(Profilelist::d_tag);
+  retval &= helper->open_tag(Profilelist::d_tag);
+
+  helper->save ("default", d_default);
 
   for (const_iterator it = begin(); it != end(); ++it)
     (*it)->save(helper);
 
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
 
 bool Profilelist::load_tag(Glib::ustring tag, XML_Helper* helper)
 {
-  if (helper->getVersion() != LORDSAWAR_PROFILES_VERSION)
+  if (helper->get_version() != LORDSAWAR_PROFILES_VERSION)
     {
       return false;
     }
@@ -142,18 +151,24 @@ bool Profilelist::load_tag(Glib::ustring tag, XML_Helper* helper)
       push_back(p);
       return true;
     }
+  else if (tag == Profilelist::d_tag)
+    {
+      helper->get (d_default, "default");
+      return true;
+    }
   return false;
 }
 
 Profile *Profilelist::findLastPlayedProfileForUser(Glib::ustring user) const
 {
   Profile *p = NULL;
-  Glib::TimeVal latest = Glib::TimeVal(0,0);
+  Glib::DateTime latest =
+    Glib::DateTime::create_local (1900, 1, 1, 0, 0, 0);
   for (Profilelist::const_iterator i = begin(); i != end(); ++i)
     {
       if ((*i)->getUserName() == user)
         {
-          if ((*i)->getLastPlayedOn() > latest)
+          if ((*i)->getLastPlayedOn().to_unix () > latest.to_unix ())
             {
               p = (*i);
               latest = (*i)->getLastPlayedOn();
@@ -175,19 +190,28 @@ Profile *Profilelist::findProfileById(Glib::ustring id) const
 
 bool Profilelist::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version)
 {
-  return FileCompat::getInstance()->upgrade(filename, old_version, new_version,
+  return FileCompat::instance()->upgrade(filename, old_version, new_version,
                                             FileCompat::PROFILELIST, 
                                             d_tag);
 }
 
 void Profilelist::support_backward_compatibility()
 {
-  FileCompat::getInstance()->support_type
+  FileCompat::instance()->support_type
     (FileCompat::PROFILELIST, 
      File::get_extension(File::getUserProfilesDescription()), d_tag, false);
-  FileCompat::getInstance()->support_version
-    (FileCompat::PROFILELIST, "0.2.0", LORDSAWAR_PROFILES_VERSION,
+  FileCompat::instance()->support_version
+    (FileCompat::PROFILELIST, "0.2.0", "0.3.0",
+     sigc::ptr_fun(&Profilelist::upgrade));
+  FileCompat::instance()->support_version
+    (FileCompat::PROFILELIST, "0.3.0", "0.4.0",
      sigc::ptr_fun(&Profilelist::upgrade));
 }
-
-// End of file
+        
+Profile *Profilelist::getDefaultProfile () const
+{
+  if (d_default.empty ())
+    return NULL;
+  auto p = findProfileById (d_default);
+  return p;
+}

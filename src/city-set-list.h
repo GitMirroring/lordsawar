@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2010, 2011, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2010, 2011, 2014, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef CITYSETLIST_H
@@ -22,9 +21,9 @@
 #include <map>
 #include <vector>
 #include <sigc++/trackable.h>
-#include "setlist.h"
+#include "set-list.h"
 
-#include "cityset.h"
+#include "city-set.h"
 
 class Tar_Helper;
 
@@ -40,7 +39,7 @@ class Citysetlist : public SetList<Cityset>, public sigc::trackable
 {
     public:
         //! Return the singleton instance of this class.
-        static Citysetlist* getInstance();
+        static Citysetlist* instance();
 
         //! Explicitly delete the singleton instance of this class.
         static void deleteInstance();
@@ -62,5 +61,4 @@ class Citysetlist : public SetList<Cityset>, public sigc::trackable
         static Citysetlist* s_instance;
 };
 
-#endif // CITYSETLIST_H
-
+#endif

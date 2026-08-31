@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2010, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,31 +12,56 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
-#include "questmap.h"
+#include "quest-map.h"
 
-#include "Quest.h"
-#include "QuestsManager.h"
-#include "ImageCache.h"
-#include "stacklist.h"
+#include "quest.h"
+#include "quest-manager.h"
+#include "image-cache.h"
+#include "stack-list.h"
 #include "player.h"
-#include "maptile.h"
-#include "GameMap.h"
+#include "map-tile.h"
+#include "game-map.h"
 #include "hero.h"
+#include "shield-set.h"
+#include "player-list.h"
+
+QuestMap::QuestMap(std::vector<Quest *>q)
+{
+  quests = q;
+  d_target.x = -1;
+  d_target.y = -1;
+  create_hotmap ();
+}
 
 QuestMap::QuestMap(Quest *q)
 {
-    quest = q;
-    d_target.x = -1;
-    d_target.y = -1;
+  std::vector<Quest*> qs;
+  qs.push_back (q);
+  quests = qs;
+  quest = q;
+  d_target.x = -1;
+  d_target.y = -1;
+  create_hotmap ();
+}
+
+void QuestMap::create_hotmap ()
+{
+  for (auto q : quests)
+    {
+      auto id = q->getHeroId ();
+      Vector<int> pos = 
+        q->getHero ()->getOwner ()->getStacklist ()->getPosition (id);
+      add_to_hotmap (pos);
+    }
 }
 
 void QuestMap::draw_stacks(Player *p, std::list< Vector<int> > targets)
 {
-  Gdk::RGBA cross_color = p->getColor();
+  Gdk::RGBA cross_color =
+    GameMap::getShieldset ()->getColor (p->get_shield ());
   int size = int(pixels_per_tile) > 1 ? int(pixels_per_tile) : 1;
         
   for (std::list< Vector<int> >::iterator it= targets.begin(); it != targets.end(); ++it)
@@ -44,7 +69,7 @@ void QuestMap::draw_stacks(Player *p, std::list< Vector<int> > targets)
       Vector<int> pos = (*it);
 
       // don't draw stacks in cities, they could hardly be identified
-      Maptile* mytile = GameMap::getInstance()->getTile(pos);
+      Maptile* mytile = GameMap::instance()->getTile(pos);
       if (mytile->getBuilding() == Maptile::CITY)
           continue;
 
@@ -141,14 +166,27 @@ void QuestMap::after_draw()
 
   draw_target();
 
-  // draw the hero picture
+  // draw the hero pictures
 
-  start = mapToSurface (start);
+  //draw questing heroes that aren't selected
+  for (auto q : quests)
+    {
+      auto hero_id = q->getHeroId ();
+      Vector<int> pos = 
+        q->getHero ()->getOwner ()->getStacklist ()->getPosition (hero_id);
+      if (q != quest)
+        draw_hero (pos, false);
+    }
 
-  start += Vector<int>(int (pixels_per_tile / 2), int (pixels_per_tile / 2));
-
-  PixMask *heropic = ImageCache::getInstance()->getSmallHeroImage(true);
-  heropic->blit_centered(surface, start);
+  //draw selected questing hero
+  if (quest)
+    {
+      Quest *q = quest;
+      auto hero_id = q->getHeroId ();
+      Vector<int> pos = 
+        q->getHero ()->getOwner ()->getStacklist ()->getPosition (hero_id);
+      draw_hero (pos, true);
+    }
   map_changed.emit(surface);
 }
 
@@ -161,4 +199,28 @@ void QuestMap::draw_target()
   Vector<int> start = sl->getPosition (quest->getHeroId ());
   draw_target(start, d_target);
   map_changed.emit(surface);
+}
+
+void QuestMap::mouse_button_event(MouseButtonEvent e)
+{
+  if (e.button == MouseButtonEvent::LEFT_BUTTON && 
+      e.state == MouseButtonEvent::PRESSED)
+    {
+      Vector<int> dest = mapFromScreen(e.pos);
+      if (!is_hot (dest))
+        return;
+
+      Hero *h =
+        Playerlist::getActiveplayer ()->getNearestHeroWithQuest (dest, 4);
+
+      if (h)
+        {
+          Quest *q = QuestsManager::instance ()->getHeroQuest (h->getId ());
+          if (q)
+            {
+              quest = q;
+              draw ();
+            }
+        }
+    }
 }
