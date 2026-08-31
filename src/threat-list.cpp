@@ -1,7 +1,7 @@
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2004, 2005 Ulf Lorenz
-// Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2007, 2009, 2010, 2014 Ben Asselstine
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2009, 2010, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,16 +15,15 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 
-#include "Threatlist.h"
+#include "threat-list.h"
 #include "stack.h"
 #include "ruin.h"
 #include "player.h"
-#include "AICityInfo.h"
+#include "ai-city-info.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<flush<<std::endl<<std::flush;}
 #define debug(x)
@@ -232,5 +231,3 @@ void Threatlist::changeOwnership(Player *old_owner, Player *new_owner)
       (*it)->changeOwnership(old_owner, new_owner);
     }
 }
-
-// End of file

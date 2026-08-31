@@ -1,8 +1,9 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2004, 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,8 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef STACK_H
@@ -30,12 +30,14 @@
 #include <sigc++/signal.h>
 #include <sstream>
 
-#include "UniquelyIdentified.h"
-#include "OwnerId.h"
-#include "Movable.h"
+#include "uniquely-identified.h"
+#include "owner-id.h"
+#include "movable.h"
+#include "city.h"
 
 class Player;
 class Path;
+class Quest;
 class Army;
 class XML_Helper;
 class Hero;
@@ -107,6 +109,7 @@ class Stack : public ::UniquelyIdentified, public Movable, public OwnerId, publi
 
         bool hasDeadArmies() const;
 
+        guint32 countArmies (guint32 army_type_id) const;
 	// Set Methods
 
         //! Change the loyalty of the stack.
@@ -249,6 +252,13 @@ class Stack : public ::UniquelyIdentified, public Movable, public OwnerId, publi
         void updateShipStatus(Vector<int> dest);
 
         bool removeArmiesWithoutArmyType(guint32 armyset_id);
+
+        //! Set a path to a destination that's a stack
+        bool calculatePath (Stack *dest);
+        //! Set a path to a destination that's a city
+        bool calculatePath (City *dest);
+        //! Set a path to a tile
+        bool calculatePath (Vector<int> pos);
 
 	// Methods that operate on class and do not modify the class
 
@@ -452,19 +462,22 @@ class Stack : public ::UniquelyIdentified, public Movable, public OwnerId, publi
         //! Return the hero that owns this given item.
         Hero* getHeroWithItem(Item *item) const;
 
+        Glib::ustring to_string () const;
+
+        bool hasQuest (Quest *quest) const;
 	// Signals
 
 	//! Emitted when this stack dies.
-        sigc::signal<void, Stack*> sdying;
+        sigc::signal<void(Stack*)> sdying;
 
 	//! Emitted when this stack is about to move one step
-	sigc::signal<void, Stack*> smoving;
+	sigc::signal<void(Stack*)> smoving;
 
 	//! Emitted when this stack has finished moving that one step
-	sigc::signal<void, Stack*> smoved;
+	sigc::signal<void(Stack*)> smoved;
 
 	//! Emitted when this stack is grouped or ungrouped
-	sigc::signal<void, Stack*, bool> sgrouped;
+	sigc::signal<void(Stack*, bool)> sgrouped;
 
 
 	// Static Methods
@@ -486,6 +499,7 @@ class Stack : public ::UniquelyIdentified, public Movable, public OwnerId, publi
 	static Stack* createNonUniqueStack(Player *player, Vector<int> pos);
 
         bool isOnCity() const;
+        bool isOnTemple() const;
     private:    
 
         std::list<guint32> determineArmiesByStrength(float strength) const;
@@ -522,6 +536,4 @@ static bool compareIds(const Army *lhs, const Army *rhs);
 
 guint32 getFightOrder(std::list<guint32> values, guint32 value);
 
-#endif // STACK_H
-
-// End of file
+#endif

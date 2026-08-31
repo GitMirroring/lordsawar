@@ -1,12 +1,15 @@
+# Copyright (C) 2026 Ben Asselstine
+# This file is licensed under the terms of the GNU GPL version 3 or later.
 MAINTAINERCLEANFILES = Makefile.in
 
-lordsawararmydir = $(datadir)/lordsawar/army
+lordsawararmydir = $(pkgdatadir)/armies
 
-duel.lwa: duel.lwa.in
+duel.lwa: duel.lwa.in $(IMAGES)
+	rm -f $(builddir)/duel.lwa 2>/dev/null && \
 	cp $(srcdir)/duel.lwa.in $(builddir)/duel.lwa && \
 	$(top_srcdir)/create-lw-file $(builddir)/duel.lwa $(IMAGES)
 
-DISTCLEANFILES = duel.lwa 
+CLEANFILES = duel.lwa 
 
 lordsawararmy_DATA = duel.lwa
 

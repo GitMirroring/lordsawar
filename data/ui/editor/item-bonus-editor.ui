@@ -1,0 +1,1070 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 1.0.2 -->
+<interface>
+  <!-- interface-name item-bonus-editor.ui -->
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkListStore" id="liststore1">
+    <columns>
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0">Anywhere</col>
+      </row>
+      <row>
+        <col id="0">On a City</col>
+      </row>
+      <row>
+        <col id="0">On a Ruin</col>
+      </row>
+      <row>
+        <col id="0">On a Temple</col>
+      </row>
+      <row>
+        <col id="0">On a Signpost</col>
+      </row>
+      <row>
+        <col id="0">On a Road</col>
+      </row>
+      <row>
+        <col id="0">On a Port</col>
+      </row>
+      <row>
+        <col id="0">On a Bridge</col>
+      </row>
+      <row>
+        <col id="0">On a Standing Stone</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkWindow" id="dialog">
+    <property name="child">
+      <object class="GtkBox" id="dialog-vbox">
+        <property name="margin-bottom">6</property>
+        <property name="margin-end">6</property>
+        <property name="margin-start">6</property>
+        <property name="margin-top">6</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkBox" id="contents_vbox">
+                <property name="orientation">vertical</property>
+                <property name="spacing">12</property>
+                <property name="vexpand">1</property>
+                <child>
+                  <object class="GtkBox" id="vbox1">
+                    <property name="orientation">vertical</property>
+                    <property name="vexpand">1</property>
+                    <child>
+                      <object class="GtkBox" id="hbox1">
+                        <property name="vexpand">1</property>
+                        <child>
+                          <object class="GtkBox" id="item_vbox">
+                            <property name="hexpand">True</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">12</property>
+                            <child>
+                              <object class="GtkBox" id="vbox4">
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkScrolledWindow" id="scrolled_window">
+                                    <property name="focusable">1</property>
+                                    <property name="height-request">333</property>
+                                    <property name="hscrollbar-policy">never</property>
+                                    <property name="vexpand">1</property>
+                                    <child>
+                                      <object class="GtkBox" id="top">
+                                        <property name="margin-bottom">6</property>
+                                        <property name="margin-end">6</property>
+                                        <property name="margin-start">6</property>
+                                        <property name="margin-top">6</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_top</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Steal Gold from Enemy</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_explain_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Takes a percentage of an enemy's treasury</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <property name="spacing">4</property>
+                                                <child>
+                                                  <object class="GtkBox">
+                                                    <property name="orientation">vertical</property>
+                                                    <property name="valign">center</property>
+                                                    <child>
+                                                      <object class="GtkSwitch" id="steals_gold_switch"/>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkSpinButton" id="steal_percent_spinbutton">
+                                                    <property name="adjustment">
+                                                      <object class="GtkAdjustment">
+                                                        <property name="page-increment">10.0</property>
+                                                        <property name="step-increment">1.0</property>
+                                                        <property name="upper">100.0</property>
+                                                      </object>
+                                                    </property>
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <property name="valign">center</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Sink Enemy Ships</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="sinks_ships_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Persuade Neutral City</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="persuade_neutral_city_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Burn Bridge</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="burn_bridge_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Capture Ruin Keeper</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="capture_keeper_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Teleport to City</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="teleport_to_city_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Pick Up Bags</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="pick_up_bags_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Send Disease to Enemy City</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_explain_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Kills a certain percent of Army Units in a city</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <property name="spacing">4</property>
+                                                <child>
+                                                  <object class="GtkBox">
+                                                    <property name="orientation">vertical</property>
+                                                    <property name="valign">center</property>
+                                                    <child>
+                                                      <object class="GtkSwitch" id="disease_city_switch">
+                                                        <property name="valign">center</property>
+                                                      </object>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkSpinButton" id="disease_armies_percent_spinbutton">
+                                                    <property name="adjustment">
+                                                      <object class="GtkAdjustment">
+                                                        <property name="page-increment">10.0</property>
+                                                        <property name="step-increment">1.0</property>
+                                                        <property name="upper">100.0</property>
+                                                      </object>
+                                                    </property>
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Add Movement Points</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_explain_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Temporarily increases stack movement by this much</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <property name="spacing">4</property>
+                                                <child>
+                                                  <object class="GtkBox">
+                                                    <property name="orientation">vertical</property>
+                                                    <property name="valign">center</property>
+                                                    <child>
+                                                      <object class="GtkSwitch" id="add_mp_switch">
+                                                        <property name="valign">center</property>
+                                                      </object>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkSpinButton" id="add_mp_spinbutton">
+                                                    <property name="adjustment">
+                                                      <object class="GtkAdjustment">
+                                                        <property name="page-increment">10.0</property>
+                                                        <property name="step-increment">1.0</property>
+                                                        <property name="upper">16.0</property>
+                                                      </object>
+                                                    </property>
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Kill All Giant Worms</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_explain_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Kills even your own or some other army type</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <property name="spacing">4</property>
+                                                <child>
+                                                  <object class="GtkBox">
+                                                    <property name="orientation">vertical</property>
+                                                    <property name="valign">center</property>
+                                                    <child>
+                                                      <object class="GtkSwitch" id="banish_worms_switch">
+                                                        <property name="valign">center</property>
+                                                      </object>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkButton" id="kill_army_type_button">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Summon Monster</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_explain_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Stand on a building and get an ally</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="orientation">vertical</property>
+                                                <property name="spacing">3</property>
+                                                <child>
+                                                  <object class="GtkBox">
+                                                    <property name="halign">end</property>
+                                                    <property name="hexpand">True</property>
+                                                    <property name="spacing">4</property>
+                                                    <child>
+                                                      <object class="GtkBox">
+                                                        <property name="orientation">vertical</property>
+                                                        <property name="valign">center</property>
+                                                        <child>
+                                                          <object class="GtkSwitch" id="summon_monster_switch">
+                                                            <property name="valign">center</property>
+                                                          </object>
+                                                        </child>
+                                                      </object>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkButton" id="summon_army_type_button">
+                                                        <property name="valign">center</property>
+                                                      </object>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkBox" id="summon_monster_combobox">
+                                                    <property name="halign">end</property>
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_bottom</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Raise Defenders in City</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_explain_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">This many armies instantly arrive in a city</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="orientation">vertical</property>
+                                                <property name="spacing">3</property>
+                                                <child>
+                                                  <object class="GtkBox">
+                                                    <property name="halign">end</property>
+                                                    <property name="hexpand">True</property>
+                                                    <property name="spacing">4</property>
+                                                    <child>
+                                                      <object class="GtkBox">
+                                                        <property name="orientation">vertical</property>
+                                                        <property name="valign">center</property>
+                                                        <child>
+                                                          <object class="GtkSwitch" id="raise_defenders_switch">
+                                                            <property name="valign">center</property>
+                                                          </object>
+                                                        </child>
+                                                      </object>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkSpinButton" id="num_defenders_spinbutton">
+                                                        <property name="adjustment">
+                                                          <object class="GtkAdjustment">
+                                                            <property name="page-increment">10.0</property>
+                                                            <property name="step-increment">1.0</property>
+                                                            <property name="upper">32.0</property>
+                                                          </object>
+                                                        </property>
+                                                        <property name="valign">center</property>
+                                                      </object>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkBox">
+                                                    <property name="halign">end</property>
+                                                    <child>
+                                                      <object class="GtkButton" id="defender_army_type_button">
+                                                        <property name="valign">center</property>
+                                                      </object>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_top</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">+1 to Hero Strength</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_explain_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Holding this item confers one point of strength to the hero</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="add1str_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">+2 to Hero Strength</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="add2str_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">+3 to Hero Strength</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="add3str_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">+1 to Stack Strength</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="add1stack_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">+2 to Stack Strength</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="add2stack_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">+3 to Stack Strength</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="add3stack_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Stack Can Fly</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="flystack_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Double Movement of Stack</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="doublemovestack_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">+2 Gold Per City</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_explain_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Receive this much gold at the start of a turn</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkBox">
+                                                    <child>
+                                                      <object class="GtkSwitch" id="add2goldpercity_switch">
+                                                        <property name="valign">center</property>
+                                                      </object>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">+3 Gold Per City</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="add3goldpercity_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">+4 Gold Per City</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="add4goldpercity_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_middle</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">+5 Gold Per City</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkSwitch" id="add5goldpercity_switch">
+                                                    <property name="valign">center</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="css-classes">setting_bottom</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="margin-end">6</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="valign">center</property>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Player Standard</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="css-classes">setting_explain_label</property>
+                                                    <property name="halign">start</property>
+                                                    <property name="label">Destination for vectored army units when planted</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">end</property>
+                                                <property name="hexpand">True</property>
+                                                <child>
+                                                  <object class="GtkBox">
+                                                    <child>
+                                                      <object class="GtkSwitch" id="plantable_switch">
+                                                        <property name="valign">center</property>
+                                                      </object>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="dialog-action_area1">
+                <property name="halign">end</property>
+                <property name="margin-top">6</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkButton" id="close_button">
+                    <property name="focusable">1</property>
+                    <property name="halign">center</property>
+                    <property name="label">Close</property>
+                    <property name="receives-default">1</property>
+                    <property name="use-underline">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+    <property name="destroy-with-parent">1</property>
+    <property name="modal">1</property>
+    <property name="title" translatable="yes">Item Bonus</property>
+  </object>
+</interface>

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2017, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,25 +12,24 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sstream>
 #include <iostream>
 #include <fstream>
 #include "ucompose.hpp"
 
-#include "CreateScenarioRandomize.h"
+#include "create-scenario-randomize.h"
 
-#include "File.h"
-#include "citylist.h"
+#include "file.h"
+#include "city-list.h"
 #include "city.h"
 #include "ruin.h"
 #include "temple.h"
 #include "signpost.h"
-#include "armysetlist.h"
-#include "playerlist.h"
-#include "SightMap.h"
+#include "army-set-list.h"
+#include "player-list.h"
+#include "sight-map.h"
 #include "reward.h"
 #include "rnd.h"
 #include "keeper.h"
@@ -184,7 +183,7 @@ Glib::ustring CreateScenarioRandomize::getDynamicSignpost(Signpost *signpost)
 {
   int xdir, ydir;
   Vector<int> signpostPos = signpost->getPos();
-  City *nearCity = Citylist::getInstance()->getNearestCity(signpostPos);
+  City *nearCity = Citylist::instance()->getNearestCity(signpostPos);
   if (nearCity == NULL)
     return _("nowhere");
 

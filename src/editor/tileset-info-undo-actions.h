@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,110 +12,170 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef TILESET_INFO_ACTIONS_H
-#define TILESET_INFO_ACTIONS_H
+#ifndef TILESET_INFO_UNDO_H
+#define TILESET_INFO_UNDO_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "undo-action.h"
+#include "undo-mgr.h"
 
-class UndoMgr;
-
-class TileSetInfoAction: public UndoAction
+class TileSetInfoUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      DESCRIPTION = 1,
-      COPYRIGHT = 2,
-      LICENSE = 3,
-      NAME = 4,
-      TILE_SIZE = 5,
-    };
+    enum Type
+      {
+        DESCRIPTION = 1,
+        COPYRIGHT,
+        LICENSE,
+        NAME,
+        TILE_SIZE,
+      };
 
-    TileSetInfoAction(Type type)
-     : UndoAction (UndoAction::AGGREGATE_DELAY), d_type (type) {}
+    TileSetInfoUndoAction (Type type)
+      : UndoAction (UndoAction::AGGREGATE_DELAY), m_type (type)
+      {
+      }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class TileSetInfoAction_Message: public TileSetInfoAction, public UndoCursor
+class TileSetInfoUndoAction_Message: public TileSetInfoUndoAction,
+    public UndoCursor
 {
-    public:
-        TileSetInfoAction_Message (Type t, Glib::ustring m,
-                                   UndoMgr *u, Gtk::TextView *v)
-          : TileSetInfoAction (t), UndoCursor (u, v), d_message (m) {}
-        Glib::ustring getMessage () {return d_message;}
-    private:
-        Glib::ustring d_message;
-};
-
-class TileSetInfoAction_Description: public TileSetInfoAction_Message
-{
-    public:
-        TileSetInfoAction_Description (Glib::ustring m, UndoMgr *u, 
-                                       Gtk::TextView *v)
-          : TileSetInfoAction_Message (DESCRIPTION, m, u, v) {}
-        ~TileSetInfoAction_Description () {}
-
-        Glib::ustring getActionName () const {return "Description";}
-};
-
-class TileSetInfoAction_Copyright: public TileSetInfoAction_Message
-{
-    public:
-        TileSetInfoAction_Copyright (Glib::ustring m, UndoMgr *u, 
-                                     Gtk::TextView *v)
-          : TileSetInfoAction_Message (COPYRIGHT, m, u, v) {}
-        ~TileSetInfoAction_Copyright () {}
-
-        Glib::ustring getActionName () const {return "Copyright";}
-};
-
-class TileSetInfoAction_License: public TileSetInfoAction_Message
-{
-    public:
-        TileSetInfoAction_License (Glib::ustring m, UndoMgr *u, 
+public:
+    TileSetInfoUndoAction_Message (Type t, Glib::ustring m, UndoMgr *u,
                                    Gtk::TextView *v)
-          : TileSetInfoAction_Message (LICENSE, m, u, v) {}
-        ~TileSetInfoAction_License () {}
+      : TileSetInfoUndoAction (t), UndoCursor (u->get_pos (v), v), m_message (m)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "License";}
+    Glib::ustring get_message ()
+      {
+        return m_message;
+      }
+
+private:
+    Glib::ustring m_message;
 };
 
-class TileSetInfoAction_Name: public TileSetInfoAction, public UndoCursor
+class TileSetInfoUndoAction_Description: public TileSetInfoUndoAction_Message
 {
-    public:
-        TileSetInfoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
-          : TileSetInfoAction (NAME), UndoCursor (u, e), d_name (n) {}
-        ~TileSetInfoAction_Name () {}
+public:
+    TileSetInfoUndoAction_Description (Glib::ustring m, UndoMgr *u,
+                                       Gtk::TextView *v)
+      : TileSetInfoUndoAction_Message (DESCRIPTION, m, u, v)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Name";}
-        Glib::ustring getName () {return d_name;}
+    ~TileSetInfoUndoAction_Description ()
+      {
+      }
 
-    private:
-        Glib::ustring d_name;
+    Glib::ustring get_action_name () const
+      {
+        return "Description";
+      }
 };
 
-class TileSetInfoAction_TileSize: public TileSetInfoAction
+class TileSetInfoUndoAction_Copyright: public TileSetInfoUndoAction_Message
 {
-    public:
-        TileSetInfoAction_TileSize (int ts)
-          : TileSetInfoAction (TILE_SIZE), d_tile_size(ts) {};
-        ~TileSetInfoAction_TileSize () {};
+public:
+    TileSetInfoUndoAction_Copyright (Glib::ustring m, UndoMgr *u,
+                                     Gtk::TextView *v)
+      : TileSetInfoUndoAction_Message (COPYRIGHT, m, u, v)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "TileSize";}
-        int getTileSize () {return d_tile_size;}
+    ~TileSetInfoUndoAction_Copyright ()
+      {
+      }
 
-    private:
-        int d_tile_size;
+    Glib::ustring get_action_name () const
+      {
+        return "Copyright";
+      }
 };
-#endif //TILESET_INFO_ACTIONS_H
+
+class TileSetInfoUndoAction_License: public TileSetInfoUndoAction_Message
+{
+public:
+    TileSetInfoUndoAction_License (Glib::ustring m, UndoMgr *u,
+                                   Gtk::TextView *v)
+      : TileSetInfoUndoAction_Message (LICENSE, m, u, v)
+      {
+      }
+
+    ~TileSetInfoUndoAction_License ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "License";
+      }
+};
+
+class TileSetInfoUndoAction_Name: public TileSetInfoUndoAction, public UndoCursor
+{
+public:
+    TileSetInfoUndoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
+      : TileSetInfoUndoAction (NAME), UndoCursor (u->get_pos (e), e), m_name (n)
+      {
+      }
+
+    ~TileSetInfoUndoAction_Name ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Name";
+      }
+
+    Glib::ustring get_name () const
+      {
+        return m_name;
+      }
+
+private:
+    Glib::ustring m_name;
+};
+
+class TileSetInfoUndoAction_TileSize: public TileSetInfoUndoAction
+{
+public:
+    TileSetInfoUndoAction_TileSize (int ts)
+      : TileSetInfoUndoAction (TILE_SIZE), m_tile_size (ts)
+      {
+      }
+
+    ~TileSetInfoUndoAction_TileSize ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "TileSize";
+      }
+
+    int get_tile_size () const
+      {
+        return m_tile_size;
+      }
+
+private:
+    int m_tile_size;
+};
+#endif

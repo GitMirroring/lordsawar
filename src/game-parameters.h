@@ -1,5 +1,5 @@
 //  Copyright (C) 2007 Ole Laursen
-//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef GAME_PARAMETERS_H
@@ -26,7 +25,6 @@
 #include <glibmm.h>
 #include "defs.h"
 #include "ucompose.hpp"
-#include "gui/main.h"
 
 //! Scenario information that can be used to instantiate a new GameScenario.
 class GameParameters
@@ -55,7 +53,7 @@ public:
     // path to map file to load, empty if none
     Glib::ustring map_path;
     Glib::ustring tile_theme;
-    Glib::ustring army_theme;
+    Glib::ustring army_theme[MAX_PLAYERS + 1];
     Glib::ustring shield_theme;
     Glib::ustring city_theme;
 
@@ -113,6 +111,7 @@ public:
     bool cities_can_produce_allies;
     int difficulty;
     Glib::ustring name;
+    Glib::ustring comment;
   static GameParameters::Player::Type player_type_to_player_param(guint32 type)
     {
       if (type == 0) //Player::HUMAN
@@ -148,13 +147,12 @@ public:
         default: return NO_PLAYER_TYPE;
         }
     }
-  std::string dump ()
+  std::string dump (Glib::ustring cmdline_params)
     {
       std::stringstream out;
 
-      out << "This map was made with the following parameters:" << std::endl;
-      out << String::ucompose ("random seed: %1",
-                               Main::instance().random_number_seed) << std::endl;
+      out << "This map was made with the following parameters: " << std::endl;
+      out << cmdline_params << std::endl;
       out << String::ucompose ("%1 players", players.size ()) << std::endl;
       for (guint32 i = 0; i < players.size (); i++)
         {
@@ -188,7 +186,24 @@ public:
          map.cities, map.ruins, map.temples, map.signposts) << std::endl;
       out << String::ucompose ("map path: '%1'", map_path) << std::endl;
       out << String::ucompose ("tile theme: '%1'", tile_theme) << std::endl;
-      out << String::ucompose ("army theme: '%1'", army_theme) << std::endl;
+      int all_same = true;
+      for (guint32 i = 1; i < MAX_PLAYERS + 1; i++)
+        {
+          if (army_theme[i] != army_theme[i - 1])
+            {
+              all_same = false;
+              break;
+            }
+        }
+      if (all_same)
+        out <<
+          String::ucompose ("army theme: '%1'", army_theme[0]) << std::endl;
+      else
+        {
+          for (guint32 i = 0; i < MAX_PLAYERS + 1; i++)
+            out << String::ucompose
+              ("army theme for player %1: '%2'", i, army_theme[i]) << std::endl;
+        }
       out <<
         String::ucompose ("shield theme: '%1'", shield_theme) << std::endl;
       out << String::ucompose ("city theme: '%1'", city_theme) << std::endl;

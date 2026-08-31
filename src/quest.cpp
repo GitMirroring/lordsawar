@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,34 +14,36 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include "army.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "stack.h"
-#include "Quest.h"
-#include "QuestsManager.h"
+#include "quest.h"
+#include "quest-manager.h"
 #include "hero.h"
-#include "playerlist.h"
-#include "stacklist.h"
+#include "player-list.h"
+#include "stack-list.h"
 #include "history.h"
-#include "QCityOccupy.h"
-#include "QCityRaze.h"
-#include "QCitySack.h"
-#include "QEnemyArmies.h"
-#include "QEnemyArmytype.h"
-#include "QKillHero.h"
-#include "QPillageGold.h"
+#include "quest-city-occupy.h"
+#include "quest-city-raze.h"
+#include "quest-city-sack.h"
+#include "quest-enemy-armies.h"
+#include "quest-enemy-army-type.h"
+#include "quest-kill-hero.h"
+#include "quest-pillage-gold.h"
 
+#include "game-map.h"
+#include "city-list.h"
+#include "stack-list.h"
 Glib::ustring Quest::d_tag = "quest";
 #define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 //#define debug(x)
 
 
-Quest::Quest(QuestsManager& q_mgr, guint32 hero, Type type)
-    :d_q_mgr(q_mgr), d_hero(hero), d_type(type), d_pending(false)
+Quest::Quest(guint32 hero, Type type)
+    :d_hero(hero), d_type(type), d_pending(false)
 {
   Hero *h = getHeroById(hero);
   if (h)
@@ -53,26 +55,26 @@ Quest::Quest(QuestsManager& q_mgr, guint32 hero, Type type)
 }
 
 Quest::Quest (const Quest &q)
- : OwnerId (q), d_q_mgr (q.d_q_mgr), d_description (q.d_description),
+ : OwnerId (q), d_description (q.d_description),
     d_hero (q.d_hero), d_type (q.d_type), d_pending (q.d_pending),
     d_hero_name (q.d_hero_name), d_targets (std::list<Vector<int>> (d_targets))
 {
 }
 
-Quest::Quest(QuestsManager& q_mgr, XML_Helper* helper)
-    :OwnerId(helper), d_q_mgr(q_mgr)
+Quest::Quest(XML_Helper* helper)
+    :OwnerId(helper)
 {
     Glib::ustring s;
-    helper->getData(s, "type");
+    helper->get(s, "type");
     d_type = questTypeFromString(s);
-    helper->getData(d_hero, "hero");
-    helper->getData(d_hero_name, "hero_name");
-    helper->getData(d_pending, "pending_deletion");
+    helper->get(d_hero, "hero");
+    helper->get(d_hero_name, "hero_name");
+    helper->get(d_pending, "pending_deletion");
 }
 
 Hero* Quest::getHeroById(guint32 hero, Stack** stack)
 {
-  for (auto pit: *Playerlist::getInstance())
+  for (auto pit: *Playerlist::instance())
     for (auto it: *pit->getStacklist())
       for (auto sit: *it)
         {
@@ -93,10 +95,10 @@ bool Quest::save(XML_Helper* helper) const
 
     Glib::ustring s;
     s = questTypeToString(Quest::Type(d_type));
-    retval &= helper->saveData("type", s);
-    retval &= helper->saveData("hero", d_hero);
-    retval &= helper->saveData("hero_name", d_hero_name);
-    retval &= helper->saveData("pending_deletion", d_pending);
+    retval &= helper->save("type", s);
+    retval &= helper->save("hero", d_hero);
+    retval &= helper->save("hero_name", d_hero_name);
+    retval &= helper->save("pending_deletion", d_pending);
     retval &= OwnerId::save(helper);
 
     return retval;
@@ -110,7 +112,7 @@ Glib::ustring Quest::getHeroNameForDeadHero() const
 Glib::ustring Quest::getHeroNameForDeadHero(guint32 id)
 {
   std::list<History *>events;
-  events = Playerlist::getInstance()->getHistoryForHeroId(id);
+  events = Playerlist::instance()->getHistoryForHeroId(id);
   if (events.size() == 0)
     return "";
   History *history = events.front();
@@ -170,8 +172,65 @@ Quest* Quest::copy(const Quest* q)
     }
   return 0;
 }
-        
-void Quest::setQuestsManager (QuestsManager &q_mgr)
+
+LocationBox Quest::getDestination (Stack *st)
 {
-  d_q_mgr = q_mgr;
+  switch (getType ())
+    {
+    case Quest::KILLHERO:
+        {
+          QuestKillHero *q = static_cast<QuestKillHero*>(this);
+          guint32 hero_id = q->getVictim ();
+          for (auto it: *Playerlist::instance ())
+            {
+              if (it == st->getOwner ())
+                continue;
+              auto enemy = it->getStacklist ()->getArmyStackById (hero_id);
+              if (enemy)
+                return LocationBox (enemy->getPos ());
+            }
+        }
+      break;
+
+    case Quest::KILLARMYTYPE:
+        {
+          QuestEnemyArmytype *q = static_cast<QuestEnemyArmytype*>(this);
+          guint32 army_type = q->getArmytypeToKill ();
+          std::vector<Stack*> s =
+            GameMap::getNearbyEnemyStacks (st->getPos (), GameMap::getWidth ());
+          for (auto i = s.begin (); i != s.end (); ++i)
+            if ((*i)->hasArmyType (army_type) == true)
+              return LocationBox ((*i)->getPos ());
+        }
+      break;
+
+    case Quest::KILLARMIES:
+        {
+          QuestEnemyArmies *q = static_cast<QuestEnemyArmies*>(this);
+          auto enemy = Playerlist::instance ()->get (q->getVictimPlayerId ());
+          auto s =
+            GameMap::getNearbyEnemyStacks (st->getPos (), GameMap::getWidth ());
+          for (auto i = s.begin (); i != s.end (); ++i)
+            {
+              if ((*i)->getOwner () != enemy)
+                continue;
+              return LocationBox ((*i)->getPos ());
+            }
+        }
+      break;
+
+    case Quest::PILLAGEGOLD:
+    case Quest::CITYSACK:
+    case Quest::CITYRAZE:
+    case Quest::CITYOCCUPY:
+      //attack the nearest enemy city.
+        {
+          City *c = Citylist::instance ()->getClosestEnemyCity (st);
+          if (c)
+            return LocationBox (*c);
+        }
+      break;
+    }
+
+  return LocationBox (Vector<int>(-1,-1));
 }

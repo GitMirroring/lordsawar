@@ -1,7 +1,7 @@
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2003, 2004 Ulf Lorenz
-// Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2003, 2004 Ulf Lorenz
+//  Copyright (C) 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef MAPRENDERER_H
@@ -66,6 +65,4 @@ class MapRenderer
 
 };
 
-#endif // MAPRENDERER_H
-
-// End of file
+#endif

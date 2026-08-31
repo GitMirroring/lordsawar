@@ -1,4 +1,4 @@
-// Copyright (C) 2017, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2017, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef SCENARIO_MEDIA_H
@@ -21,13 +20,14 @@
 
 #include <gtkmm.h>
 #include <vector>
-#include "tarhelper.h"
+#include "tar-helper.h"
 #include "snd.h"
-#include "File.h"
+#include "file.h"
 
 class XML_Helper;
 class TarFileMaskedImage;
 class TarFileImage;
+class TarFileSound;
 
 //! Scenario Media provides images/sounds/music for the scenario
 /**
@@ -49,10 +49,10 @@ class ScenarioMedia
         ScenarioMedia * copy () {return new ScenarioMedia (*this);}
 
         //! Returns the singleton instance.
-	static ScenarioMedia* getInstance();
+	static ScenarioMedia* instance();
 
         //! Returns the singleton instance by loading it from a save-file.
-	static ScenarioMedia* getInstance(XML_Helper *helper);
+	static ScenarioMedia* instance(XML_Helper *helper);
 
         //! Explicitly deletes the singleton instance.
         static void deleteInstance();
@@ -75,24 +75,16 @@ class ScenarioMedia
           {return large ? d_medal[1] : d_medal[0];}
         TarFileImage *getCommentatorImage () {return d_commentator;}
 
-        Glib::ustring getBlessSoundName() {return d_bless_name;}
-        Glib::ustring getHeroSoundName() {return d_hero_name;}
-        Glib::ustring getBattleSoundName() {return d_battle_name;}
-        Glib::ustring getDefeatSoundName() {return d_defeat_name;}
-        Glib::ustring getVictorySoundName() {return d_victory_name;}
-        Glib::ustring getBackSoundName() {return d_back_name;}
+        TarFileSound *getBlessSound() {return d_bless_sound;}
+        TarFileSound *getHeroSound() {return d_hero_sound;}
+        TarFileSound *getBattleSound() {return d_battle_sound;}
+        TarFileSound *getDefeatSound() {return d_defeat_sound;}
+        TarFileSound *getVictorySound() {return d_victory_sound;}
+        TarFileSound *getBackSound() {return d_back_sound;}
 
         MusicItem* getSoundEffect(Glib::ustring n);
-        std::vector<Glib::ustring> getBackgroundMusic() const {return d_bgMap;}
+        const std::vector<Glib::ustring>& getBackgroundMusic() const {return d_bgMap;}
         std::map<Glib::ustring, MusicItem*> getSounds() const {return d_musicMap;}
-        //Set methods
-
-        void setBlessSoundName(Glib::ustring n) {d_bless_name = n;}
-        void setHeroSoundName(Glib::ustring n) {d_hero_name = n;}
-        void setBattleSoundName(Glib::ustring n) {d_battle_name = n;}
-        void setDefeatSoundName(Glib::ustring n) {d_defeat_name = n;}
-        void setVictorySoundName(Glib::ustring n) {d_victory_name = n;}
-        void setBackSoundName(Glib::ustring n) {d_back_name = n;}
 
 	// Methods that operate on class data and modify the class.
 
@@ -138,17 +130,17 @@ class ScenarioMedia
         static Glib::ustring getDefaultCommentatorImageFilename ()
           {return File::getVariousFile ("commentator.png");}
         static Glib::ustring getDefaultBlessSoundFilename()
-          {return Snd::getInstance ()->getFile ("bless");}
+          {return Snd::instance ()->getFile ("bless.ogg");}
         static Glib::ustring getDefaultHeroSoundFilename()
-          {return Snd::getInstance ()->getFile ("hero");}
+          {return Snd::instance ()->getFile ("hero.ogg");}
         static Glib::ustring getDefaultBattleSoundFilename ()
-          {return Snd::getInstance ()->getFile ("battle");}
+          {return Snd::instance ()->getFile ("battle.ogg");}
         static Glib::ustring getDefaultDefeatSoundFilename ()
-          {return Snd::getInstance ()->getFile ("defeat");}
+          {return Snd::instance ()->getFile ("defeat.ogg");}
         static Glib::ustring getDefaultVictorySoundFilename ()
-          {return Snd::getInstance ()->getFile ("victory");}
+          {return Snd::instance ()->getFile ("victory.ogg");}
         static Glib::ustring getDefaultBackSoundFilename ()
-          {return Snd::getInstance ()->getFile ("back");}
+          {return Snd::instance ()->getFile ("back.ogg");}
         //! Replace the current scenario media with another.
         static void reset (ScenarioMedia *m);
 
@@ -182,12 +174,12 @@ class ScenarioMedia
         TarFileImage *d_parley_refused;
         TarFileImage *d_commentator;
 
-        Glib::ustring d_bless_name;
-        Glib::ustring d_hero_name;
-        Glib::ustring d_battle_name;
-        Glib::ustring d_defeat_name;
-        Glib::ustring d_victory_name;
-        Glib::ustring d_back_name;
+        TarFileSound *d_bless_sound;
+        TarFileSound *d_hero_sound;
+        TarFileSound *d_battle_sound;
+        TarFileSound *d_defeat_sound;
+        TarFileSound *d_victory_sound;
+        TarFileSound *d_back_sound;
 
         TarFileMaskedImage *d_hero_newlevel[2];
         TarFileImage *d_hero[2]; //male is 0, female is 1
@@ -199,9 +191,9 @@ class ScenarioMedia
         //helpers
         void uninstantiateImages();
         bool anyValueSet() const;
-        void copySound(Tar_Helper &t, Glib::ustring name, Glib::ustring piece, bool &broken);
+        void copySound(Tar_Helper &t, TarFileSound *s, Glib::ustring piece, bool &broken);
         std::vector<TarFileImage*> getImages();
         std::vector<TarFileMaskedImage*> getMaskedImages();
 };
 
-#endif //SCENARIO_MEDIA_H
+#endif

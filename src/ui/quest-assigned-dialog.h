@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2012, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2017, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,40 +12,62 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
-
-#pragma once
-#ifndef QUEST_ASSIGNED_DIALOG_H
-#define QUEST_ASSIGNED_DIALOG_H
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <gtkmm.h>
-
-#include "questmap.h"
-#include "Quest.h"
+#include "lw-dialog-base.h"
+#ifndef QUEST_ASSIGNED_DIALOG_H
+#define QUEST_ASSIGNED_DIALOG_H
+#include "image-helpers.h"
+#include "quest-map.h"
+#include "quest.h"
 #include "hero.h"
-#include "lw-dialog.h"
-
-// dialog for depicting a quest
-class QuestAssignedDialog: public LwDialog
+#include "temple.h"
+class QuestAssignedDialog: public LwDialogBase
 {
- public:
-    QuestAssignedDialog(Gtk::Window &parent, Hero *hero, Quest *quest);
-    ~QuestAssignedDialog() {delete questmap;};
+public:
+    static std::string get_resource_name ()
+      {
+        return "quest-assigned.ui";
+      }
 
-    void run();
-    void hide() {dialog->hide();};
-    
- private:
-    QuestMap* questmap;
+    QuestAssignedDialog (BaseObjectType* o,
+                         const Glib::RefPtr<Gtk::Builder>& xml)
+      : LwDialogBase (o, xml)
+      {
+        m_continue_button = load <Gtk::Button> ("continue_button");
+        m_label = load <Gtk::Label> ("label");
+        m_map_drawing_area = load <Gtk::DrawingArea> ("map_drawing_area");
+      }
 
-    Gtk::Image *map_image;
-    Gtk::Label *label;
-    
-    Hero *hero;
-    Quest *quest;
+    void setup (Hero *hero, Quest *quest)
+      {
+        set_title (String::ucompose (_("Quest for %1"), hero->getName ()));
 
-    void on_map_changed(Cairo::RefPtr<Cairo::Surface> map);
+        set_response (m_continue_button, Gtk::ResponseType::ACCEPT);
+
+        m_quest_map = new QuestMap (quest);
+        m_quest_map->map_changed.connect
+          ([this] (Cairo::RefPtr<Cairo::Surface> map)
+           {
+             cairo_surface_to_drawing_area (map, m_map_drawing_area);
+           });
+
+        m_quest_map->resize ();
+        m_quest_map->draw ();
+
+        m_label->set_text (quest->getDescription ());
+
+        signal_response ().connect
+          ([this](Gtk::ResponseType)
+           {
+             hide ();
+           });
+      }
+private:
+    Gtk::Button *m_continue_button = NULL;
+    Gtk::Label *m_label = NULL;
+    Gtk::DrawingArea *m_map_drawing_area = NULL;
+    QuestMap* m_quest_map = NULL;
 };
-
 #endif

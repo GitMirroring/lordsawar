@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2011, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
@@ -52,11 +51,11 @@ void GameStation::clearNetworkHistorylist(std::list<NetworkHistory*> &h)
 void GameStation::listenForLocalEvents(Player *p)
 {
   sigc::connection connection;
-  connection = p->acting.connect(sigc::mem_fun(this, 
+  connection = p->acting.connect(sigc::mem_fun(*this, 
 					       &GameStation::onActionDone));
   action_listeners[p->getId()] = connection;
   connection = p->history_written.connect
-    (sigc::mem_fun(this, &GameStation::onHistoryDone));
+    (sigc::mem_fun(*this, &GameStation::onHistoryDone));
   history_listeners[p->getId()] = connection;
 }
 
@@ -93,16 +92,26 @@ void GameStation::stopListeningForLocalEvents(Player *p)
 }
 
 bool GameStation::get_message_lobby_activity (Glib::ustring payload, 
-                                             guint32 &player_id, 
+                                              Shield::Color &shield,
+                                             Glib::ustring &profile_id,
                                              gint32 &action, bool &reported,
                                              Glib::ustring &remainder)
 {
   std::stringstream spayload;
   spayload.str(payload);
-  spayload >> player_id;
-  if (player_id >= MAX_PLAYERS + 1)
+
+  Glib::ustring shieldstr;
+  spayload >> shieldstr;
+  int shieldnum = atoi (shieldstr.c_str ());
+  if (shieldnum > (int)Shield::NEUTRAL || shieldnum < 0)
     return false;
-  spayload >> action;
+  shield = Shield::Color (shieldnum);
+
+  spayload >> profile_id;
+
+  Glib::ustring actionstr;
+  spayload >> actionstr;
+  action = atoi (actionstr.c_str ());
   switch (action)
     {
     case LOBBY_MESSAGE_TYPE_SIT:
@@ -124,4 +133,3 @@ bool GameStation::get_message_lobby_activity (Glib::ustring payload,
   remainder = Glib::ustring (buffer);
   return true;
 }
-// End of file

@@ -1,5 +1,5 @@
 Copyright and license notices are held in the comments section of each image file in this directory.
 
-Use the `pnginfo' program from the www.stillhq.com/pngtools/ software package to read the comments in the image files.
+Use the `identify -verbose' command from from imagemagick to read the comments in the image files.
 
 These images were created specifically for lordsawar, with the exception of the medals_mask.gif file that was created as part of the freelords project, and the garrison icon in buttons-medium.png and buttons.png which is a modified version of a similar image by Seamus McGill, and is in the public domain.  See https://commons.wikimedia.org/wiki/File:Icone_chateau_fort.svg

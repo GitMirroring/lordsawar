@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,162 +12,385 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef SWITCH_SETS_EDITOR_ACTIONS_H
-#define SWITCH_SETS_EDITOR_ACTIONS_H
+#ifndef SWITCH_SETS_UNDO_ACTIONS_H
+#define SWITCH_SETS_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "undo-action.h"
-#include "undo-mgr.h"
 
-//! A record of an event in the switch sets editor
+//! A record of an event in the switch sets dialog
 /** 
- * The purpose of these classes is to implement undo/redo in the switch sets
- * editor.
+ * The purpose of these classes is to implement undo/redo in the switch
+ * sets dialog
  */
 
-class SwitchSetsEditorAction: public UndoAction
+class SwitchSetsUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      ARMYSET = 1,
-      TILESET = 2,
-      CITYSET = 3,
-      SHIELDSET = 4,
-      MAKE_SAME = 5,
-      TILE_SIZE = 6,
-    };
+    //! A Switch Sets Action can be one of the following kinds.
+    enum Type
+      {
+        TILESET = 1,
+        ARMYSET = 2,
+        CITYSET = 3,
+        SHIELDSET = 4,
+        TILE_SIZE = 5,
+        MAKE_SAME = 6,
+      };
 
-    SwitchSetsEditorAction(Type type, bool agg = false)
-     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+    //! Default constructor.
+    SwitchSetsUndoAction (Type type, bool agg = false)
+      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                    UndoAction::AGGREGATE_NONE), m_type (type)
+        {
+        }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class SwitchSetsEditorAction_Rows: public SwitchSetsEditorAction
+class SwitchSetsUndoAction_TileSet: public SwitchSetsUndoAction
 {
-    public:
-        SwitchSetsEditorAction_Rows (Type t, std::map<guint32,int> rows)
-          : SwitchSetsEditorAction (t), d_rows (rows) {}
-        ~SwitchSetsEditorAction_Rows () {}
+public:
+    SwitchSetsUndoAction_TileSet (int i)
+      : SwitchSetsUndoAction (TILESET, false), m_index (i)
+      {
+      }
 
-        std::map<guint32,int> getArmysetRows () const {return d_rows;}
+    ~SwitchSetsUndoAction_TileSet ()
+      {
+      }
 
-    private:
-        std::map<guint32,int> d_rows;
+    Glib::ustring get_action_name () const
+      {
+        return "TileSet";
+      }
+
+    int get_index () const
+      {
+        return m_index;
+      }
+private:
+    int m_index;
 };
 
-class SwitchSetsEditorAction_Armyset: public SwitchSetsEditorAction_Rows
+class SwitchSetsUndoAction_ArmySet: public SwitchSetsUndoAction
 {
-    public:
-        SwitchSetsEditorAction_Armyset (std::map<guint32,int> rows)
-          : SwitchSetsEditorAction_Rows (ARMYSET, rows) {}
-        ~SwitchSetsEditorAction_Armyset () {}
+public:
+    SwitchSetsUndoAction_ArmySet (int a, int b, int c, int d, int e, int f,
+                                  int g, int h, int i)
+      : SwitchSetsUndoAction (ARMYSET, false), m_player1_row (a),
+      m_player2_row (b), m_player3_row (c), m_player4_row (d),
+      m_player5_row (e), m_player6_row (f), m_player7_row (g),
+      m_player8_row (h), m_neutral_row (i)
+  {
+  }
 
-        Glib::ustring getActionName () const {return "ArmySet";}
+    ~SwitchSetsUndoAction_ArmySet ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "ArmySet";
+      }
+
+    int get_player1_row () const
+      {
+        return m_player1_row;
+      }
+
+    int get_player2_row () const
+      {
+        return m_player2_row;
+      }
+
+    int get_player3_row () const
+      {
+        return m_player3_row;
+      }
+
+    int get_player4_row () const
+      {
+        return m_player4_row;
+      }
+
+    int get_player5_row () const
+      {
+        return m_player5_row;
+      }
+
+    int get_player6_row () const
+      {
+        return m_player6_row;
+      }
+
+    int get_player7_row () const
+      {
+        return m_player7_row;
+      }
+
+    int get_player8_row () const
+      {
+        return m_player8_row;
+      }
+
+    int get_neutral_row () const
+      {
+        return m_neutral_row;
+      }
+private:
+    int m_player1_row;
+    int m_player2_row;
+    int m_player3_row;
+    int m_player4_row;
+    int m_player5_row;
+    int m_player6_row;
+    int m_player7_row;
+    int m_player8_row;
+    int m_neutral_row;
 };
 
-class SwitchSetsEditorAction_MakeSame: public SwitchSetsEditorAction_Rows
+class SwitchSetsUndoAction_CitySet: public SwitchSetsUndoAction
 {
-    public:
-        SwitchSetsEditorAction_MakeSame (std::map<guint32,int> rows)
-          : SwitchSetsEditorAction_Rows (MAKE_SAME, rows) {}
-        ~SwitchSetsEditorAction_MakeSame () {}
+public:
+    SwitchSetsUndoAction_CitySet (int i)
+      : SwitchSetsUndoAction (CITYSET, false), m_index (i)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "MakeSame";}
+    ~SwitchSetsUndoAction_CitySet ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "CitySet";
+      }
+
+    int get_index () const
+      {
+        return m_index;
+      }
+private:
+    int m_index;
 };
 
-class SwitchSetsEditorAction_Row: public SwitchSetsEditorAction
+class SwitchSetsUndoAction_ShieldSet: public SwitchSetsUndoAction
 {
-    public:
-        SwitchSetsEditorAction_Row (Type t, int row)
-          : SwitchSetsEditorAction (t), d_row (row) {}
-        ~SwitchSetsEditorAction_Row () {}
+public:
+    SwitchSetsUndoAction_ShieldSet (int i)
+      : SwitchSetsUndoAction (SHIELDSET, false), m_index (i)
+      {
+      }
 
-        int getRow () const {return d_row;}
+    ~SwitchSetsUndoAction_ShieldSet ()
+      {
+      }
 
-    private:
-        int d_row;
+    Glib::ustring get_action_name () const
+      {
+        return "ShieldSet";
+      }
+
+    int get_index () const
+      {
+        return m_index;
+      }
+private:
+    int m_index;
 };
 
-class SwitchSetsEditorAction_Set: public SwitchSetsEditorAction
+class SwitchSetsUndoAction_TileSize: public SwitchSetsUndoAction
 {
-    public:
-        SwitchSetsEditorAction_Set (Type t, guint32 id)
-          : SwitchSetsEditorAction (t), d_id (id) {}
-        ~SwitchSetsEditorAction_Set () {}
+public:
+    SwitchSetsUndoAction_TileSize (int a, int b, int c, int d, int e, int f,
+                                   int g, int h, int i, int j, int k, int l)
+      : SwitchSetsUndoAction (TILE_SIZE, false), m_tile_size_row (a),
+      m_tileset_row (b), m_player1_armyset_row (c),
+      m_player2_armyset_row (d), m_player3_armyset_row (e),
+      m_player4_armyset_row (f), m_player5_armyset_row (g),
+      m_player6_armyset_row (h), m_player7_armyset_row (i),
+      m_player8_armyset_row (j), m_neutral_armyset_row (k),
+      m_cityset_row (l)
+  {
+  }
 
-        guint32 getId () const {return d_id;}
+    ~SwitchSetsUndoAction_TileSize ()
+      {
+      }
 
-    private:
-        guint32 d_id;
+    Glib::ustring get_action_name () const
+      {
+        return "TileSize";
+      }
+
+    int get_tile_size_row () const
+      {
+        return m_tile_size_row;
+      }
+
+    int get_tileset_row () const
+      {
+        return m_tileset_row;
+      }
+
+    int get_cityset_row () const
+      {
+        return m_cityset_row;
+      }
+
+    int get_player1_armyset_row () const
+      {
+        return m_player1_armyset_row;
+      }
+
+    int get_player2_armyset_row () const
+      {
+        return m_player2_armyset_row;
+      }
+
+    int get_player3_armyset_row () const
+      {
+        return m_player3_armyset_row;
+      }
+
+    int get_player4_armyset_row () const
+      {
+        return m_player4_armyset_row;
+      }
+
+    int get_player5_armyset_row () const
+      {
+        return m_player5_armyset_row;
+      }
+
+    int get_player6_armyset_row () const
+      {
+        return m_player6_armyset_row;
+      }
+
+    int get_player7_armyset_row () const
+      {
+        return m_player7_armyset_row;
+      }
+
+    int get_player8_armyset_row () const
+      {
+        return m_player8_armyset_row;
+      }
+
+    int get_neutral_armyset_row () const
+      {
+        return m_neutral_armyset_row;
+      }
+
+private:
+    int m_tile_size_row;
+    int m_tileset_row;
+    int m_player1_armyset_row;
+    int m_player2_armyset_row;
+    int m_player3_armyset_row;
+    int m_player4_armyset_row;
+    int m_player5_armyset_row;
+    int m_player6_armyset_row;
+    int m_player7_armyset_row;
+    int m_player8_armyset_row;
+    int m_neutral_armyset_row;
+    int m_cityset_row;
 };
 
-class SwitchSetsEditorAction_Tileset: public SwitchSetsEditorAction_Row
+class SwitchSetsUndoAction_MakeSame: public SwitchSetsUndoAction
 {
-    public:
-        SwitchSetsEditorAction_Tileset (int row)
-          : SwitchSetsEditorAction_Row (TILESET, row) {}
-        ~SwitchSetsEditorAction_Tileset () {}
+public:
+    SwitchSetsUndoAction_MakeSame (int v, int a, int b, int c, int d, int e,
+                                   int f, int g, int h, int i)
+      : SwitchSetsUndoAction (MAKE_SAME, true), m_value (v), m_player1_row (a),
+      m_player2_row (b), m_player3_row (c), m_player4_row (d),
+      m_player5_row (e), m_player6_row (f), m_player7_row (g),
+      m_player8_row (h), m_neutral_row (i)
+  {
+  }
 
-        Glib::ustring getActionName () const {return "Tileset";}
+    ~SwitchSetsUndoAction_MakeSame ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "MakeSame";
+      }
+
+    int get_value () const
+      {
+        return m_value;
+      }
+
+    int get_player1_row () const
+      {
+        return m_player1_row;
+      }
+
+    int get_player2_row () const
+      {
+        return m_player2_row;
+      }
+
+    int get_player3_row () const
+      {
+        return m_player3_row;
+      }
+
+    int get_player4_row () const
+      {
+        return m_player4_row;
+      }
+
+    int get_player5_row () const
+      {
+        return m_player5_row;
+      }
+
+    int get_player6_row () const
+      {
+        return m_player6_row;
+      }
+
+    int get_player7_row () const
+      {
+        return m_player7_row;
+      }
+
+    int get_player8_row () const
+      {
+        return m_player8_row;
+      }
+
+    int get_neutral_row () const
+      {
+        return m_neutral_row;
+      }
+private:
+    int m_value;
+    int m_player1_row;
+    int m_player2_row;
+    int m_player3_row;
+    int m_player4_row;
+    int m_player5_row;
+    int m_player6_row;
+    int m_player7_row;
+    int m_player8_row;
+    int m_neutral_row;
 };
-
-class SwitchSetsEditorAction_Shieldset: public SwitchSetsEditorAction_Row
-{
-    public:
-        SwitchSetsEditorAction_Shieldset (int row)
-          : SwitchSetsEditorAction_Row (SHIELDSET, row) {}
-        ~SwitchSetsEditorAction_Shieldset () {}
-
-        Glib::ustring getActionName () const {return "Shieldset";}
-};
-
-class SwitchSetsEditorAction_Cityset: public SwitchSetsEditorAction_Row
-{
-    public:
-        SwitchSetsEditorAction_Cityset (int row)
-          : SwitchSetsEditorAction_Row (CITYSET, row) {}
-        ~SwitchSetsEditorAction_Cityset () {}
-
-        Glib::ustring getActionName () const {return "Cityset";}
-};
-
-class SwitchSetsEditorAction_TileSize: public SwitchSetsEditorAction
-{
-    public:
-        SwitchSetsEditorAction_TileSize (int tilesize_row, int ts_row,
-                                         int cs_row, int ss_row,
-                                         std::map<guint32,int> map)
-          : SwitchSetsEditorAction (TILE_SIZE), d_tilesize_row (tilesize_row),
-          d_ts_row (ts_row), d_cs_row (cs_row), d_ss_row (ss_row), d_map (map)
-  {}
-        ~SwitchSetsEditorAction_TileSize () {}
-
-        Glib::ustring getActionName () const {return "TileSize";}
-
-        int getRow () const {return d_tilesize_row;}
-        int getTilesetRow () {return d_ts_row;}
-        int getCitysetRow () {return d_cs_row;}
-        int getShieldsetRow () {return d_ss_row;}
-        std::map<guint32,int> getArmysetRows() {return d_map;}
-
-    private:
-        int d_tilesize_row;
-        int d_ts_row;
-        int d_cs_row;
-        int d_ss_row;
-        std::map<guint32,int> d_map;
-};
-
-#endif //SWITCH_SETS_EDITOR_ACTIONS_H
+#endif

@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2010, 2011, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2010, 2011, 2014, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,18 +12,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <vector>
-#include "ItemProto.h"
+#include "item-proto.h"
 #include "ucompose.hpp"
 #include "defs.h"
-#include "maptile.h"
-#include "playerlist.h"
-#include "armysetlist.h"
-#include "armyproto.h"
-#include "xmlhelper.h"
+#include "map-tile.h"
+#include "player-list.h"
+#include "army-set-list.h"
+#include "army-proto.h"
+#include "xml-helper.h"
 
 Glib::ustring ItemProto::d_itemproto_tag = "itemproto";
 
@@ -37,7 +36,7 @@ ItemProto::ItemProto(XML_Helper* helper)
     // such a situation. First, let us deal with the common things.
 
     Glib::ustring bonus_str;
-    helper->getData(bonus_str, "bonus");
+    helper->get(bonus_str, "bonus");
     d_bonus = bonusFlagsFromString(bonus_str);
 
     d_has_army_type_to_summon = false;
@@ -55,30 +54,30 @@ ItemProto::ItemProto(XML_Helper* helper)
 
     if (isUsable())
       {
-        helper->getData(d_uses_left, "uses_left");
+        helper->get(d_uses_left, "uses_left");
         if (d_bonus & ItemProto::STEAL_GOLD)
-          helper->getData(d_steal_gold_percent, "steal_gold_percent");
+          helper->get(d_steal_gold_percent, "steal_gold_percent");
         if (d_bonus & ItemProto::BANISH_WORMS)
           {
-            helper->getData(d_army_type_to_kill, "army_type_to_kill");
+            helper->get(d_army_type_to_kill, "army_type_to_kill");
             d_has_army_type_to_kill = true;
           }
         if (d_bonus & ItemProto::SUMMON_MONSTER)
           {
-            helper->getData(d_army_type_to_summon, "army_type_to_summon");
+            helper->get(d_army_type_to_summon, "army_type_to_summon");
             Glib::ustring str;
-            helper->getData(str, "building_type_to_summon_on");
+            helper->get(str, "building_type_to_summon_on");
             d_building_type_to_summon_on = Maptile::buildingFromString(str);
             d_has_army_type_to_summon = true;
           }
         if (d_bonus & ItemProto::DISEASE_CITY)
-          helper->getData(d_percent_armies_to_kill, "percent_armies_to_kill");
+          helper->get(d_percent_armies_to_kill, "percent_armies_to_kill");
         if (d_bonus & ItemProto::ADD_2MP_STACK)
-          helper->getData(d_mp_to_add, "mp_to_add");
+          helper->get(d_mp_to_add, "mp_to_add");
         if (d_bonus & ItemProto::RAISE_DEFENDERS)
           {
-            helper->getData(d_army_type_to_raise, "army_type_to_raise");
-            helper->getData(d_num_armies_to_raise, "num_armies_to_raise");
+            helper->get(d_army_type_to_raise, "army_type_to_raise");
+            helper->get(d_num_armies_to_raise, "num_armies_to_raise");
             d_has_army_type_to_raise = true;
           }
       }
@@ -114,36 +113,36 @@ bool ItemProto::saveContents(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("name", getName(false));
+  retval &= helper->save("name", getName(false));
   Glib::ustring bonus_str = bonusFlagsToString(d_bonus);
-  retval &= helper->saveData("bonus", bonus_str);
+  retval &= helper->save("bonus", bonus_str);
   if (isUsable())
       {
-        retval &= helper->saveData("uses_left", d_uses_left);
+        retval &= helper->save("uses_left", d_uses_left);
         if (d_bonus & ItemProto::STEAL_GOLD)
-          retval &= helper->saveData("steal_gold_percent", 
+          retval &= helper->save("steal_gold_percent", 
                                      d_steal_gold_percent);
         if (d_bonus & ItemProto::BANISH_WORMS)
-          retval &= helper->saveData("army_type_to_kill", d_army_type_to_kill);
+          retval &= helper->save("army_type_to_kill", d_army_type_to_kill);
         if (d_bonus & ItemProto::SUMMON_MONSTER)
           {
-            retval &= helper->saveData("army_type_to_summon", 
+            retval &= helper->save("army_type_to_summon", 
                                        d_army_type_to_summon);
             Glib::ustring type_str = 
               Maptile::buildingToString
               (Maptile::Building(d_building_type_to_summon_on));
-            retval &= helper->saveData("building_type_to_summon_on", type_str);
+            retval &= helper->save("building_type_to_summon_on", type_str);
           }
         if (d_bonus & ItemProto::DISEASE_CITY)
-          retval &= helper->saveData("percent_armies_to_kill", 
+          retval &= helper->save("percent_armies_to_kill", 
                                      d_percent_armies_to_kill);
         if (d_bonus & ItemProto::ADD_2MP_STACK)
-          retval &= helper->saveData("mp_to_add", d_mp_to_add);
+          retval &= helper->save("mp_to_add", d_mp_to_add);
         if (d_bonus & ItemProto::RAISE_DEFENDERS)
           {
-            retval &= helper->saveData("army_type_to_raise", 
+            retval &= helper->save("army_type_to_raise", 
                                        d_army_type_to_raise);
-            retval &= helper->saveData("num_armies_to_raise", 
+            retval &= helper->save("num_armies_to_raise", 
                                        d_num_armies_to_raise);
           }
       }
@@ -155,9 +154,9 @@ bool ItemProto::save(XML_Helper* helper) const
 {
   bool retval = true;
   
-  retval &= helper->openTag(d_itemproto_tag);
+  retval &= helper->open_tag(d_itemproto_tag);
   retval &= saveContents(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -218,7 +217,7 @@ Glib::ustring ItemProto::getBonusDescription() const
     s.push_back(_("+2 MP to stack"));
   if (getBonus(ItemProto::BANISH_WORMS))
     {
-      ArmyProto *a = Armysetlist::getInstance()->getArmy(Playerlist::getActiveplayer()->getArmyset(), d_army_type_to_kill);
+      ArmyProto *a = Armysetlist::instance()->getArmy(Playerlist::getActiveplayer()->getArmyset(), d_army_type_to_kill);
       s.push_back(String::ucompose(_("Kills all %1"), a->getName()));
     }
   if (getBonus(ItemProto::BURN_BRIDGE))
@@ -229,7 +228,7 @@ Glib::ustring ItemProto::getBonusDescription() const
     s.push_back(_("Kills Defenders in a City"));
   if (getBonus(ItemProto::SUMMON_MONSTER))
     {
-      ArmyProto *a = Armysetlist::getInstance()->getArmy(Playerlist::getActiveplayer()->getArmyset(), d_army_type_to_summon);
+      ArmyProto *a = Armysetlist::instance()->getArmy(Playerlist::getActiveplayer()->getArmyset(), d_army_type_to_summon);
       if (d_building_type_to_summon_on != Maptile::NONE)
         s.push_back(String::ucompose(_("Summons %1 at a %2"), a->getName(),
                                      Maptile::buildingToFriendlyName(d_building_type_to_summon_on)));
@@ -358,7 +357,7 @@ Glib::ustring ItemProto::bonusFlagsToString(guint32 bonus)
 
 guint32 ItemProto::bonusFlagsFromString(Glib::ustring str)
 {
-  return XML_Helper::flagsFromString(str, bonusFlagFromString);
+  return XML_Helper::flags_from_string (str, bonusFlagFromString);
 }
 
 guint32 ItemProto::bonusFlagFromString(Glib::ustring str)
@@ -391,35 +390,4 @@ guint32 ItemProto::bonusFlagFromString(Glib::ustring str)
   else if (str == "ItemProto::TELEPORT_TO_CITY") return ItemProto::TELEPORT_TO_CITY;
   else if (str == "ItemProto::PLANT_TO_VECTOR") return ItemProto::PLANT_TO_VECTOR;
   return ItemProto::ADD1STR;
-}
-
-bool ItemProto::isCurrentlyUsable(guint32 building, bool bags_on_map, bool victims_left, bool ruin_has_occupant, bool friendly_cities_present, bool enemy_cities_present, bool neutral_cities_present)
-{
-  bool usable = false;
-  if (d_bonus & ItemProto::BURN_BRIDGE && building == Maptile::BRIDGE)
-    usable = true;
-  if (d_bonus & ItemProto::SUMMON_MONSTER)
-    {
-      if (getBuildingTypeToSummonOn() == Maptile::NONE ||
-          getBuildingTypeToSummonOn() == building)
-        usable = true;
-    }
-  if (d_bonus & ItemProto::PICK_UP_BAGS && bags_on_map)
-    usable = true;
-  if (d_bonus & ItemProto::CAPTURE_KEEPER && building == Maptile::RUIN &&
-      ruin_has_occupant)
-    usable = true;
-        
-  if (usableOnVictimPlayer() && victims_left)
-    usable = true;
-  if (usableOnFriendlyCity() && friendly_cities_present)
-    usable = true;
-  if (usableOnEnemyCity() && enemy_cities_present)
-    usable = true;
-  if (usableOnNeutralCity() && neutral_cities_present)
-    usable = true;
-  if (usableOnAnyCity())
-    usable = true;
-
-  return usable;
 }

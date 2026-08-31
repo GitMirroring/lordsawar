@@ -1,6 +1,7 @@
-// Copyright (C) 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef TILE_H
@@ -23,7 +23,7 @@
 
 #include <gtkmm.h>
 
-#include "tilestyleset.h"
+#include "tile-style-set.h"
 
 class XML_Helper;
 class SmallTile;
@@ -47,6 +47,8 @@ class Tile : public std::list<TileStyleSet*>
     public:
 	//! The xml tag of this object in a tileset configuration file.
 	static Glib::ustring d_tag; 
+        static inline constexpr int min_moves = 1;
+        static inline constexpr int max_moves = 12;
 
         //! Enumerate the kinds of terrain that a Stack can potentially move on.
         enum Type { 
@@ -162,8 +164,7 @@ class Tile : public std::list<TileStyleSet*>
 	void uninstantiateImages();
 
 	//! Load the images associated with this tile.
-	void instantiateImages(int tilesize, Tar_Helper *t, bool scale,
-                               bool &broken);
+	void instantiateImages(Tar_Helper *t, bool &broken);
 
 
 	// Static Methods
@@ -189,6 +190,9 @@ class Tile : public std::list<TileStyleSet*>
         static Tile * get_default_hills();
         static Tile * get_default_mountains();
         static Tile * get_default_swamp();
+
+        static std::vector<Tile::Type> getTypes ();
+
 	//! Check to see if the grass tilestyles are suitable for in-game use.
 	bool validateGrass(std::list<TileStyle::Type> types) const;
 
@@ -232,6 +236,4 @@ class Tile : public std::list<TileStyleSet*>
 
 };
 
-#endif // TILE_H
-
-// End of file
+#endif

@@ -1,12 +1,15 @@
+# Copyright (C) 2026 Ben Asselstine
+# This file is licensed under the terms of the GNU GPL version 3 or later.
 MAINTAINERCLEANFILES = Makefile.in
 
-lordsawartilesetdir = $(datadir)/lordsawar/tilesets
+lordsawartilesetdir = $(pkgdatadir)/terrain
 
 wesnoth.lwt: wesnoth.lwt.in
+	rm $(builddir)/wesnoth.lwt -f 2>/dev/null && \
 	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/wesnoth.lwt.in $(builddir)/wesnoth.lwt && \
 	$(top_srcdir)/create-lw-file $(builddir)/wesnoth.lwt $(IMAGES)
 
-DISTCLEANFILES = wesnoth.lwt 
+CLEANFILES = wesnoth.lwt 
 
 lordsawartileset_DATA = wesnoth.lwt
 

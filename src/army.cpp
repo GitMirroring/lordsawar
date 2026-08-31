@@ -1,8 +1,8 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2017, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2017, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,21 +16,20 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
 #include "army.h"
-#include "armyprodbase.h"
-#include "armyproto.h"
-#include "armysetlist.h"
+#include "army-prod-base.h"
+#include "army-proto.h"
+#include "army-set-list.h"
 #include "counter.h"
-#include "xmlhelper.h"
-#include "stacklist.h"
-#include "templelist.h"
+#include "xml-helper.h"
+#include "stack-list.h"
+#include "temple-list.h"
 #include "ucompose.hpp"
-#include "Tile.h"
+#include "tile.h"
 #include "player.h"
 
 Glib::ustring Army::d_tag = "army";
@@ -38,7 +37,7 @@ Glib::ustring Army::d_tag = "army";
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
-sigc::signal<void, Army*> Army::sdying;
+sigc::signal<void(Army*)> Army::sdying;
 
 Army::Army(const Army& a, bool sync_id, Player *owner)
     : ArmyBase(a), UniquelyIdentified(a, sync_id), OwnerId(owner),
@@ -136,21 +135,21 @@ Army::Army(XML_Helper* helper)
 
   int ival = -1;
   //get the information which army we are
-  helper->getData(d_type_id, "type");
-  helper->getData(d_armyset, "armyset");
+  helper->get(d_type_id, "type");
+  helper->get(d_armyset, "armyset");
 
-  helper->getData(d_hp, "hp");
-  helper->getData(d_ship, "ship");
-  helper->getData(d_moves, "moves");
-  helper->getData(d_max_moves_multiplier, "max_moves_multiplier");
-  helper->getData(d_xp, "xp");
-  helper->getData(d_level, "level");
+  helper->get(d_hp, "hp");
+  helper->get(d_ship, "ship");
+  helper->get(d_moves, "moves");
+  helper->get(d_max_moves_multiplier, "max_moves_multiplier");
+  helper->get(d_xp, "xp");
+  helper->get(d_level, "level");
 
   Glib::ustring medals;
   std::stringstream smedals;
   bool val;
 
-  helper->getData(medals, "medals");
+  helper->get(medals, "medals");
   smedals.str(medals);
 
   for(int i=0;i<3;i++)
@@ -160,11 +159,11 @@ Army::Army(XML_Helper* helper)
       debug("ARMY-XML-CONSTRUCTOR medalsbonus[" << i << "]=" << d_medal_bonus[i])
     }
 
-  helper->getData(d_battles_number, "battlesnumber");    
+  helper->get(d_battles_number, "battlesnumber");    
 
   Glib::ustring temples;
   std::stringstream stemples;
-  helper->getData(temples, "visited_temples");
+  helper->get(temples, "visited_temples");
   stemples.str(temples);
 
   while (stemples.eof() == false)
@@ -347,41 +346,41 @@ bool Army::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(Army::d_tag);
-  retval &= saveData(helper);
-  retval &= helper->closeTag();
+  retval &= helper->open_tag(Army::d_tag);
+  retval &= saveContents (helper);
+  retval &= helper->close_tag();
 
   return retval;
 }
 
-bool Army::saveData(XML_Helper* helper) const
+bool Army::saveContents (XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= ArmyBase::saveData(helper);
-  retval &= helper->saveData("id", d_id);
-  retval &= helper->saveData("armyset", d_armyset);
-  retval &= helper->saveData("type", d_type_id);
-  retval &= helper->saveData("hp", d_hp);
-  retval &= helper->saveData("ship", d_ship);
-  retval &= helper->saveData("moves", d_moves);
-  retval &= helper->saveData("xp", d_xp);
-  retval &= helper->saveData("max_moves_multiplier", 
+  retval &= ArmyBase::save(helper);
+  retval &= helper->save("id", d_id);
+  retval &= helper->save("armyset", d_armyset);
+  retval &= helper->save("type", d_type_id);
+  retval &= helper->save("hp", d_hp);
+  retval &= helper->save("ship", d_ship);
+  retval &= helper->save("moves", d_moves);
+  retval &= helper->save("xp", d_xp);
+  retval &= helper->save("max_moves_multiplier", 
 			     d_max_moves_multiplier);
-  retval &= helper->saveData("level", d_level);
+  retval &= helper->save("level", d_level);
 
   std::stringstream medals;
   for (int i=0;i<3;i++)
     {
       medals << d_medal_bonus[i] << " ";
     }
-  retval &= helper->saveData("medals", medals.str());
-  retval &= helper->saveData("battlesnumber",d_battles_number);    
+  retval &= helper->save("medals", medals.str());
+  retval &= helper->save("battlesnumber",d_battles_number);    
 
   std::stringstream temples;
   for (auto it: d_visitedTemples)
     temples << it << " ";
-  retval &= helper->saveData("visited_temples", temples.str());
+  retval &= helper->save("visited_temples", temples.str());
 
   return retval;
 }
@@ -425,7 +424,7 @@ bool Army::blessedAtTemple(guint32 temple_id) const
 
 bool Army::getDefendsRuins() const
 {
-  ArmyProto *a = Armysetlist::getInstance()->getArmy(d_armyset, d_type_id);
+  ArmyProto *a = Armysetlist::instance()->getArmy(d_armyset, d_type_id);
   if (a)
     return a->getDefendsRuins();
   else
@@ -434,7 +433,7 @@ bool Army::getDefendsRuins() const
 
 bool Army::getAwardable() const
 {
-  ArmyProto *a = Armysetlist::getInstance()->getArmy(d_armyset, d_type_id);
+  ArmyProto *a = Armysetlist::instance()->getArmy(d_armyset, d_type_id);
   if (a)
     return a->getAwardable();
   else
@@ -443,7 +442,7 @@ bool Army::getAwardable() const
 
 Glib::ustring Army::getName() const
 {
-  ArmyProto *a = Armysetlist::getInstance()->getArmy(d_armyset, d_type_id);
+  ArmyProto *a = Armysetlist::instance()->getArmy(d_armyset, d_type_id);
   if (a)
     return a->getName();
   else

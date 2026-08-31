@@ -1,5 +1,5 @@
-// Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2008, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2008, 2014, 2015, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,21 +13,21 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <fstream>
 
+#include "lw.h"
 #include "game-client-decoder.h"
 
 #include "action.h"
 #include "network-action.h"
 #include "network-history.h"
-#include "network_player.h"
-#include "playerlist.h"
-#include "xmlhelper.h"
-#include "GameScenario.h"
+#include "network-player.h"
+#include "player-list.h"
+#include "xml-helper.h"
+#include "game-scenario.h"
 #include "ucompose.hpp"
 
 GameClientDecoder::GameClientDecoder()
@@ -41,6 +41,7 @@ GameClientDecoder::~GameClientDecoder()
 int GameClientDecoder::decodeActions(std::list<NetworkAction*> actions)
 {
   int count = 0;
+
   for (std::list<NetworkAction *>::iterator i = actions.begin(),
        end = actions.end(); i != end; ++i)
   {
@@ -48,19 +49,28 @@ int GameClientDecoder::decodeActions(std::list<NetworkAction*> actions)
     Glib::ustring desc = action->toString();
     
     Player *p = action->getOwner();
-    std::cerr << String::ucompose(_("decoding action: %1"), desc);
+    if (Lw::app->m_network_debug)
+      std::cerr << String::ucompose(_("%1: decoding action for %2 (%3): %4"),
+                                    Lw::get_prgname (), 
+                                    p->getName (),
+                                    Player::playerTypeToString (Player::Type (p->getType ())),
+                                    desc) << std::endl;
     NetworkPlayer *np = static_cast<NetworkPlayer *>(p);
 
-    if (!np) {
-      std::cerr << String::ucompose(_("warning, ignoring action for player %1"), p) << std::endl;
-      continue;
-    }
+    if (!np)
+      {
+        if (Lw::app->m_network_debug)
+          std::cerr <<
+            String::ucompose(_("%1: warning, ignoring action for player %2"),
+                             Lw::get_prgname (), p) << std::endl;
+        continue;
+      }
 
     np->decodeAction(action->getAction());
     if (action->getAction()->getType() == Action::END_TURN)
-      remote_player_moved.emit((*actions.back()).getOwner());
+      m_remote_player_moved.emit((*actions.back()).getOwner());
     else if (action->getAction()->getType() == Action::INIT_TURN)
-      remote_player_starts_move.emit((*actions.back()).getOwner());
+      m_remote_player_starts_move.emit((*actions.back()).getOwner());
     count++;
   }
 
@@ -77,9 +87,9 @@ void GameClientDecoder::gotActions(const Glib::ustring &payload)
   ActionLoader loader;
   
   XML_Helper helper(&is);
-  helper.registerTag(Action::d_tag, sigc::mem_fun(loader, &ActionLoader::loadAction));
-  helper.registerTag(NetworkAction::d_tag, sigc::mem_fun(loader, &ActionLoader::loadAction));
-  helper.parseXML();
+  helper.register_tag(Action::d_tag, sigc::mem_fun(loader, &ActionLoader::loadAction));
+  helper.register_tag(NetworkAction::d_tag, sigc::mem_fun(loader, &ActionLoader::loadAction));
+  helper.parse_XML();
   helper.close();
 
   decodeActions(loader.actions);
@@ -93,14 +103,17 @@ int GameClientDecoder::decodeHistories(std::list<NetworkHistory *> histories)
   {
     NetworkHistory *history = *i;
     Glib::ustring desc = history->toString();
-    std::cerr << String::ucompose(_("received history: %1"), desc) << std::endl;
+    if (Lw::app->m_network_debug)
+      std::cerr <<
+        String::ucompose(_("%1: received history: %2"),
+                         Lw::get_prgname (), desc) << std::endl;
     
     //just add it to the player's history list.
     Player *p = history->getOwner();
     p->getHistorylist()->push_back(History::copy(history->getHistory()));
     count++;
     if (history->getHistory()->getType() == History::PLAYER_VANQUISHED)
-      remote_player_died.emit(history->getOwner());
+      m_remote_player_died.emit(history->getOwner());
   }
 
   for (std::list<NetworkHistory *>::iterator i = histories.begin(),
@@ -116,9 +129,9 @@ void GameClientDecoder::gotHistories(const Glib::ustring &payload)
   HistoryLoader loader;
   
   XML_Helper helper(&is);
-  helper.registerTag(History::d_tag, sigc::mem_fun(loader, &HistoryLoader::loadHistory));
-  helper.registerTag(NetworkHistory::d_tag, sigc::mem_fun(loader, &HistoryLoader::loadHistory));
-  helper.parseXML();
+  helper.register_tag(History::d_tag, sigc::mem_fun(loader, &HistoryLoader::loadHistory));
+  helper.register_tag(NetworkHistory::d_tag, sigc::mem_fun(loader, &HistoryLoader::loadHistory));
+  helper.parse_XML();
   helper.close();
 
   decodeHistories(loader.histories);

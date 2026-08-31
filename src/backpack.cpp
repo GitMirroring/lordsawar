@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2010, 2014, 2015, 2021 Ben Asselstine
+//  Copyright (C) 2008, 2010, 2014, 2015, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,18 +12,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
 #include <sigc++/functors/mem_fun.h>
 
-#include "Backpack.h"
+#include "backpack.h"
 
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
-#include "Item.h"
+#include "item.h"
 
 Glib::ustring Backpack::d_tag = "backpack";
 
@@ -38,7 +37,7 @@ Backpack::Backpack()
 
 Backpack::Backpack(XML_Helper* helper)
 {
-  helper->registerTag(Item::d_tag, sigc::mem_fun(this, &Backpack::loadItem));
+  helper->register_tag(Item::d_tag, sigc::mem_fun(*this, &Backpack::loadItem));
 }
 
 Backpack::Backpack(const Backpack& backpack)
@@ -54,7 +53,7 @@ Backpack::~Backpack()
     delete (*it);
 }
 
-bool Backpack::saveData(XML_Helper* helper) const
+bool Backpack::saveContents (XML_Helper* helper) const
 {
   bool retval = true;
   for (const_iterator it = begin(); it != end(); ++it)
@@ -66,9 +65,9 @@ bool Backpack::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Backpack::d_tag);
-    retval &= saveData(helper);
-    retval &= helper->closeTag();
+    retval &= helper->open_tag(Backpack::d_tag);
+    retval &= saveContents (helper);
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -245,4 +244,11 @@ bool Backpack::useItem(Item *item)
   return false;
 }
 
-// End of file
+bool Backpack::replace (Item *i1, Item *i2)
+{
+  bool found = true;
+  if (i1)
+    found = removeFromBackpack (i1);
+  bool added = addToBackpack (i2);
+  return found && added;
+}

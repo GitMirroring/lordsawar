@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef ADVERTISED_GAME_H
@@ -52,8 +51,8 @@ class AdvertisedGame : public RecentlyPlayedNetworkedGame
 
 
 	// Get Methods
-        Glib::TimeVal getGameCreatedOn() const {return d_creation_date;};
-        Glib::TimeVal getGameLastPingedOn() const {return d_last_pinged_date;};
+        Glib::DateTime getGameCreatedOn() const {return d_creation_date;};
+        Glib::DateTime getGameLastPingedOn() const {return d_last_pinged_date;};
 
         Profile * getProfile() const {return d_profile;};
 	
@@ -70,14 +69,14 @@ class AdvertisedGame : public RecentlyPlayedNetworkedGame
 
         //signals
   
-        sigc::signal<void, bool> pinged;
+        sigc::signal<void(bool)> pinged;
 
     private:
 
 	// DATA
         
-        Glib::TimeVal d_creation_date;
-        Glib::TimeVal d_last_pinged_date;
+        Glib::DateTime d_creation_date;
+        Glib::DateTime d_last_pinged_date;
         Profile *d_profile;
 
         bool loadProfile(Glib::ustring tag, XML_Helper *helper);
@@ -87,4 +86,4 @@ class AdvertisedGame : public RecentlyPlayedNetworkedGame
 	
 };
 
-#endif // ADVERTISED_GAME_H
+#endif

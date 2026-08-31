@@ -1,8 +1,10 @@
+# Copyright (C) 2026 Ben Asselstine
+# This file is licensed under the terms of the GNU GPL version 3 or later.
 SUBDIRS = items editor xslt
 
 MAINTAINERCLEANFILES= Makefile.in
 
-variousdir = $(datadir)/lordsawar/various
+variousdir = $(pkgdatadir)/various
 various_DATA = \
     waypoints.png \
     buttons.png \
@@ -43,7 +45,9 @@ various_DATA = \
     hero-newlevel-female.png \
     hero-newlevel-male.png \
     tilestyles.png \
-    commentator.png
+    commentator.png \
+    army-unit-selected.svg \
+    army-unit-unselected.svg
 
 EXTRA_DIST = \
     README \
@@ -86,4 +90,6 @@ EXTRA_DIST = \
     hero-newlevel-female.png \
     hero-newlevel-male.png \
     tilestyles.png \
-    commentator.png
+    commentator.png \
+    army-unit-selected.svg \
+    army-unit-unselected.svg

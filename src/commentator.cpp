@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2015, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,23 +12,22 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "Commentator.h"
+#include "commentator.h"
 #include "player.h"
 #include "defs.h"
-#include "playerlist.h"
+#include "player-list.h"
 #include "stack.h"
-#include "GameMap.h"
-#include "stacklist.h"
-#include "citylist.h"
+#include "game-map.h"
+#include "stack-list.h"
+#include "city-list.h"
 #include "city.h"
 #include "rnd.h"
 
 Commentator* Commentator::d_instance = 0;
 
-Commentator* Commentator::getInstance()
+Commentator* Commentator::instance()
 {
     if (!d_instance)
         d_instance = new Commentator();
@@ -103,7 +102,7 @@ std::vector<Glib::ustring> Commentator::getComments(Player *player) const
       comments.push_back(_("You are doing well... ...so far!"));
     }
 
-  if (player == Playerlist::getInstance()->getWinningPlayer())
+  if (player == Playerlist::instance()->getWinningPlayer())
     {
       comments.push_back(_("Beware!  Lest overconfidence consume you!"));
       comments.push_back(_("Your name evokes fear and loathing!"));
@@ -122,7 +121,7 @@ std::vector<Glib::ustring> Commentator::getComments(Player *player) const
   if (attacking_enemy_cities > 4)
     comments.push_back(_("Warlord... a mighty battle is brewing!"));
 
-  City *capital_city = Citylist::getInstance()->getCapitalCity(player);
+  City *capital_city = Citylist::instance()->getCapitalCity(player);
   if (capital_city && capital_city->getOwner() != player)
     comments.push_back(_("As your capital city has fallen, so shall you!"));
   return comments;

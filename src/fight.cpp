@@ -1,9 +1,9 @@
-// Copyright (C) 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2004 Bryan Duff
-// Copyright (C) 2006, 2007, 2008, 2011, 2014, 2015, 2020 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2006 Andrea Paternesi
+//  Copyright (C) 2004 Bryan Duff
+//  Copyright (C) 2006, 2007, 2008, 2011, 2014, 2015, 2020, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,24 +17,23 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include "fight.h"
 #include <assert.h>
 #include <math.h>       // for has_hit()
 #include "army.h"
 #include "hero.h"
-#include "stacklist.h"
+#include "stack-list.h"
 #include "player.h"
-#include "playerlist.h"
-#include "Item.h"
-#include "GameMap.h"
-#include "citylist.h"
+#include "player-list.h"
+#include "item.h"
+#include "game-map.h"
+#include "city-list.h"
 #include "city.h"
 #include "stack.h"
-#include "Backpack.h"
-#include "stacktile.h"
+#include "backpack.h"
+#include "stack-tile.h"
 #include "rnd.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
@@ -67,7 +66,8 @@ void Fight::orderArmies(const std::list<Stack*> &stacks, std::vector<Army*> &arm
 }
 
 Fight::Fight(Stack* attacker, Stack* defender, FightType type)
-    : d_turn(0), d_result(DRAW), d_type(type), d_intense_combat (false)
+    : d_turn(0), d_type(type), d_intense_combat (false),
+    m_fighting_in_city (false)
 {
   std::list<Stack *> attackers;
   std::list<Stack *> defenders;
@@ -85,13 +85,14 @@ Fight::Fight(Stack* attacker, Stack* defender, FightType type)
   // defender gets any other stacks in the cities.
   //
 
-  Maptile *mtile = GameMap::getInstance()->getTile(defender->getPos());
+  Maptile *mtile = GameMap::instance()->getTile(defender->getPos());
   City *city = GameMap::getCity(defender->getPos());
   //Vector<int> p = defender->getPos();
 
   if (city && city->isBurnt() == false &&
       city->getOwner() == defender->getOwner())
     {
+      m_fighting_in_city = true;
       /* we check the owner here because:
        * StackInfoDialog does a fight for kicks with a neutral scout,
        * on the tile of the selected stack, which could be in a city.
@@ -107,7 +108,7 @@ Fight::Fight(Stack* attacker, Stack* defender, FightType type)
         }
     }
   else if ((!city || city->isBurnt() == true) &&
-           defender->getOwner() != Playerlist::getInstance()->getNeutral())
+           defender->getOwner() != Playerlist::getNeutral())
     {
       Vector<int> pos = defender->getPos();
       std::vector<Stack*> stacks =
@@ -129,7 +130,7 @@ Fight::Fight(const std::list<Stack*> &attackers,
              const std::list<Stack*> &defenders,
              const std::list<FightItem> &history)
  : d_attackers (attackers), d_defenders (defenders), d_actions (history),
-    d_turn (0), d_result (DRAW), d_type (FOR_KEEPS), d_intense_combat (false)
+    d_turn (0), d_type (FOR_KEEPS), d_intense_combat (false)
 {
 
   fillInInitialHPs();
@@ -162,7 +163,7 @@ void Fight::setupFight(const std::list<Stack*> &attackers, const std::list<Stack
 
 Fight::Fight(const std::list<Stack*> &attackers, const std::list<Stack*> &defenders, bool city, Tile::Type terrain, FightType type)
   : d_attackers (attackers), d_defenders (defenders), d_turn (0),
-    d_result (DRAW), d_type (FOR_KEEPS), d_intense_combat (false)
+    d_type (FOR_KEEPS), d_intense_combat (false)
 {
   setupFight (attackers, defenders, city, terrain, type);
 }
@@ -219,7 +220,7 @@ void Fight::battle(bool intense)
       }
 
   if (!survivor)
-      d_result = DEFENDER_WON;
+    d_fight_result.set_outcome (FightResult::DEFENDER_WON);
   else
     {
       // Now look if the defender died; also the first in the list
@@ -233,7 +234,7 @@ void Fight::battle(bool intense)
 	  }
 
       if (!survivor)
-	d_result = ATTACKER_WON;
+        d_fight_result.set_outcome (FightResult::ATTACKER_WON);
     }
 
   if (d_type == FOR_KICKS)
@@ -265,7 +266,7 @@ Army *Fight::findArmyById(const std::list<Stack *> &l, guint32 id)
   return 0;
 }
 
-Fight::Result Fight::battleFromHistory()
+FightResult::Outcome Fight::battleFromHistory()
 {
   for (std::list<FightItem>::iterator i = d_actions.begin(),
          end = d_actions.end(); i != end; ++i) {
@@ -283,11 +284,11 @@ Fight::Result Fight::battleFromHistory()
       for (Stack::iterator i = (*it)->begin(); i != (*it)->end(); ++i)
 	{
 	  if ((*i)->getHP() > 0)
-	    return Fight::ATTACKER_WON;
+	    return FightResult::ATTACKER_WON;
 	}
     }
 
-  return Fight::DEFENDER_WON;
+  return FightResult::DEFENDER_WON;
 }
 
 bool Fight::doRound()
@@ -340,7 +341,7 @@ void Fight::calculateTerrainModifiers(std::list<Fighter*> fighters, Maptile *mti
       bool tower = false;
       if (defender)
         tower = (*fit)->army->getFortified();
-      mtile = GameMap::getInstance()->getTile((*fit)->pos);
+      mtile = GameMap::instance()->getTile((*fit)->pos);
       army_bonus = (*fit)->army->getStat(Army::ARMY_BONUS);
 
       if (army_bonus & Army::ADD1STRINOPEN && mtile->isOpenTerrain() == Tile::GRASS && !tower)
@@ -465,8 +466,8 @@ void Fight::calculateModifiedStrengths (std::list<Fighter*>friendly,
       std::list<Fighter*>::iterator ffit = friendly.begin();
       if (mtile->getPos () != Vector<int>(-1,-1))
         {
-          mtile = GameMap::getInstance()->getTile((*ffit)->pos);
-          c = Citylist::getInstance()->getNearestCity((*ffit)->pos);
+          mtile = GameMap::instance()->getTile((*ffit)->pos);
+          c = Citylist::instance()->getNearestCity((*ffit)->pos);
           city_is_burnt = c->isBurnt();
           city_defense_level = c->getDefenseLevel();
         }
@@ -744,7 +745,7 @@ LocationBox Fight::calculateFightBox(Fight &fight)
    maybe defenders can be empty?
    */
   Vector<int> dest = fight.getAttackers().front()->getPos();
-  if (Citylist::getInstance()->getObjectAt(dest) == NULL)
+  if (Citylist::instance()->getObjectAt(dest) == NULL)
     {
       if (!fight.getDefenders().empty())
         return LocationBox(fight.getDefenders().front()->getPos());

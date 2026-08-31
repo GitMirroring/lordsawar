@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,33 +12,15 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef NEW_MAP_ACTIONS_H
-#define NEW_MAP_ACTIONS_H
+#ifndef NEW_MAP_UNDO_ACTIONS_H
+#define NEW_MAP_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "undo-action.h"
-
-    struct Map
-      {
-        int fill_style;
-        int width, height;
-        int grass, water, swamp, forest, hills, mountains;
-        int cities, ruins, temples;
-        int signposts, stones;
-        Glib::ustring tileset;
-        Glib::ustring shieldset;
-        Glib::ustring cityset;
-        Glib::ustring armyset;
-        bool generate_roads;
-        bool random_names;
-        int num_players;
-        int stone_road_chance;
-      };
 
 //! A record of an event in the new map dialog
 /** 
@@ -46,331 +28,793 @@
  * dialog.
  */
 
-class NewMapAction: public UndoAction
+class NewMapUndoAction: public UndoAction
 {
 public:
 
     //! A New Map Action can be one of the following kinds.
-    enum Type {
-      GRASS  = 1,
-      WATER = 2,
-      SWAMP = 3,
-      FOREST = 4,
-      HILLS = 5,
-      MOUNTAINS= 6,
-      CITIES = 7,
-      RUINS = 8,
-      TEMPLES = 9,
-      SIGNPOSTS = 10,
-      STONES = 11,
-      MAP_SIZE = 12,
-      WIDTH = 13,
-      HEIGHT = 14,
-      TILESET = 15,
-      ARMYSET = 16,
-      CITYSET = 17,
-      SHIELDSET = 18,
-      TILE_SIZE = 19,
-      FILL_STYLE = 20,
-      RANDOM_ROADS = 21,
-      RANDOM_NAMES = 22,
-      PLAYERS = 23,
-      STONE_ROAD_CHANCE = 24,
-    };
+    enum Type
+      {
+        TERRAIN = 1,
+        CITIES = 2,
+        RUINS = 3,
+        TEMPLES = 4,
+        SIGNPOSTS = 5,
+        STONES = 6,
+        MAP_SIZE = 7,
+        WIDTH = 8,
+        HEIGHT = 9,
+        TILESET = 10,
+        ARMYSET = 11,
+        CITYSET = 12,
+        SHIELDSET = 13,
+        TILE_SIZE = 14,
+        FILL_STYLE = 15,
+        RANDOM_ROADS = 16,
+        RANDOM_NAMES = 17,
+        PLAYER = 18,
+        STONE_ROAD_CHANCE = 19,
+        MAKE_SAME = 20,
+      };
 
     //! Default constructor.
-    NewMapAction(Type type, bool agg = false)
-     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+    NewMapUndoAction (Type type, bool agg = false)
+      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                    UndoAction::AGGREGATE_NONE), m_type (type)
+        {
+        }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-//-----------------------------------------------------------------------------
-class NewMapAction_Scale: public NewMapAction
+class NewMapUndoAction_Terrain: public NewMapUndoAction
 {
-    public:
-        NewMapAction_Scale (Type t, double v)
-          : NewMapAction (t, true), d_value (v) {}
-        double getValue () {return d_value;}
-    private:
-        double d_value;
-};
-//-----------------------------------------------------------------------------
-class NewMapAction_Grass: public NewMapAction_Scale
-{
-    public:
-        NewMapAction_Grass (double v)
-          : NewMapAction_Scale (GRASS, v) {}
-        ~NewMapAction_Grass () {}
-        Glib::ustring getActionName () const {return "Grass";}
-};
-//-----------------------------------------------------------------------------
-class NewMapAction_Water: public NewMapAction_Scale
-{
-    public:
-        NewMapAction_Water (double v)
-          : NewMapAction_Scale (WATER, v) {}
-        ~NewMapAction_Water () {}
-        Glib::ustring getActionName () const {return "Water";}
-};
-//-----------------------------------------------------------------------------
-class NewMapAction_Swamp: public NewMapAction_Scale
-{
-    public:
-        NewMapAction_Swamp (double v)
-          : NewMapAction_Scale (SWAMP, v) {}
-        ~NewMapAction_Swamp () {}
-        Glib::ustring getActionName () const {return "Swamp";}
+public:
+    NewMapUndoAction_Terrain (double g, double w, double s, double f, double h,
+                              double m)
+      : NewMapUndoAction (TERRAIN, true), m_grass_value (g),
+      m_water_value (w), m_swamp_value (s), m_forest_value (f),
+      m_hills_value (h), m_mountains_value (m)
+      {
+      }
+
+    double get_grass_value () const
+      {
+        return m_grass_value;
+      }
+
+    double get_water_value () const
+      {
+        return m_water_value;
+      }
+
+    double get_swamp_value () const
+      {
+        return m_swamp_value;
+      }
+
+    double get_forest_value () const
+      {
+        return m_forest_value;
+      }
+
+    double get_hills_value () const
+      {
+        return m_hills_value;
+      }
+
+    double get_mountains_value () const
+      {
+        return m_mountains_value;
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Terrain";
+      }
+private:
+    double m_grass_value;
+    double m_water_value;
+    double m_swamp_value;
+    double m_forest_value;
+    double m_hills_value;
+    double m_mountains_value;
 };
 
-//-----------------------------------------------------------------------------
-class NewMapAction_Forest: public NewMapAction_Scale
+class NewMapUndoAction_Scale: public NewMapUndoAction
 {
     public:
-        NewMapAction_Forest (double v)
-          : NewMapAction_Scale (FOREST, v) {}
-        ~NewMapAction_Forest () {}
-        Glib::ustring getActionName () const {return "Forest";}
+        NewMapUndoAction_Scale (Type t, double v)
+          : NewMapUndoAction (t, true), m_value (v)
+          {
+          }
+
+        double get_value () const
+          {
+            return m_value;
+          }
+    private:
+        double m_value;
 };
 
-//-----------------------------------------------------------------------------
-class NewMapAction_Hills: public NewMapAction_Scale
+class NewMapUndoAction_Cities: public NewMapUndoAction_Scale
 {
-    public:
-        NewMapAction_Hills (double v)
-          : NewMapAction_Scale (HILLS, v) {}
-        ~NewMapAction_Hills () {}
-        Glib::ustring getActionName () const {return "Hills";}
+public:
+    NewMapUndoAction_Cities (double v)
+      : NewMapUndoAction_Scale (CITIES, v)
+      {
+      }
+
+    ~NewMapUndoAction_Cities ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Cities";
+      }
 };
 
-//-----------------------------------------------------------------------------
-class NewMapAction_Mountains: public NewMapAction_Scale
+class NewMapUndoAction_Ruins: public NewMapUndoAction_Scale
 {
-    public:
-        NewMapAction_Mountains (double v)
-          : NewMapAction_Scale (MOUNTAINS, v) {}
-        ~NewMapAction_Mountains () {}
-        Glib::ustring getActionName () const {return "Mountains";}
+public:
+    NewMapUndoAction_Ruins (double v)
+      : NewMapUndoAction_Scale (RUINS, v)
+      {
+      }
+
+    ~NewMapUndoAction_Ruins ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Ruins";
+      }
 };
 
-//-----------------------------------------------------------------------------
-class NewMapAction_Cities: public NewMapAction_Scale
+class NewMapUndoAction_Temples: public NewMapUndoAction_Scale
 {
-    public:
-        NewMapAction_Cities (double v)
-          : NewMapAction_Scale (CITIES, v) {}
-        ~NewMapAction_Cities () {}
-        Glib::ustring getActionName () const {return "Cities";}
+public:
+    NewMapUndoAction_Temples (double v)
+      : NewMapUndoAction_Scale (TEMPLES, v)
+      {
+      }
+
+    ~NewMapUndoAction_Temples ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Temples";
+      }
 };
 
-//-----------------------------------------------------------------------------
-class NewMapAction_Ruins: public NewMapAction_Scale
+class NewMapUndoAction_Signposts: public NewMapUndoAction_Scale
 {
-    public:
-        NewMapAction_Ruins (double v)
-          : NewMapAction_Scale (RUINS, v) {}
-        ~NewMapAction_Ruins () {}
-        Glib::ustring getActionName () const {return "Ruins";}
+public:
+    NewMapUndoAction_Signposts (double v)
+      : NewMapUndoAction_Scale (SIGNPOSTS, v)
+      {
+      }
+
+    ~NewMapUndoAction_Signposts ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Signposts";
+      }
 };
 
-//-----------------------------------------------------------------------------
-class NewMapAction_Temples: public NewMapAction_Scale
+class NewMapUndoAction_Stones: public NewMapUndoAction_Scale
 {
-    public:
-        NewMapAction_Temples (double v)
-          : NewMapAction_Scale (TEMPLES, v) {}
-        ~NewMapAction_Temples () {}
-        Glib::ustring getActionName () const {return "Temples";}
+public:
+    NewMapUndoAction_Stones (double v)
+      : NewMapUndoAction_Scale (STONES, v)
+      {
+      }
+
+    ~NewMapUndoAction_Stones ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Stones";
+      }
 };
 
-//-----------------------------------------------------------------------------
-class NewMapAction_Signposts: public NewMapAction_Scale
+class NewMapUndoAction_MapSize: public NewMapUndoAction
 {
-    public:
-        NewMapAction_Signposts (double v)
-          : NewMapAction_Scale (SIGNPOSTS, v) {}
-        ~NewMapAction_Signposts () {}
-        Glib::ustring getActionName () const {return "Signposts";}
+public:
+    NewMapUndoAction_MapSize (int ms, int c, int r, int t, int si, int st,
+                              int w, int h)
+      : NewMapUndoAction (MAP_SIZE, false), m_map_size_row (ms),
+      m_num_cities (c), m_num_ruins (r), m_num_temples (t),
+      m_num_signposts (si), m_num_stones (st), m_width (w), m_height (h)
+      {
+      }
+
+    ~NewMapUndoAction_MapSize ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "MapSize";
+      }
+
+    int get_map_size_row () const
+      {
+        return m_map_size_row;
+      }
+
+    int get_num_cities () const
+      {
+        return m_num_cities;
+      }
+
+    int get_num_ruins () const
+      {
+        return m_num_ruins;
+      }
+
+    int get_num_temples () const
+      {
+        return m_num_temples;
+      }
+
+    int get_num_signposts () const
+      {
+        return m_num_signposts;
+      }
+
+    int get_num_stones () const
+      {
+        return m_num_stones;
+      }
+
+    int get_width () const
+      {
+        return m_width;
+      }
+
+    int get_height () const
+      {
+        return m_height;
+      }
+private:
+    int m_map_size_row;
+    int m_num_cities;
+    int m_num_ruins;
+    int m_num_temples;
+    int m_num_signposts;
+    int m_num_stones;
+    int m_width;
+    int m_height;
 };
 
-//-----------------------------------------------------------------------------
-class NewMapAction_Stones: public NewMapAction_Scale
+class NewMapUndoAction_Width: public NewMapUndoAction
 {
-    public:
-        NewMapAction_Stones (double v)
-          : NewMapAction_Scale (STONES, v) {}
-        ~NewMapAction_Stones () {}
-        Glib::ustring getActionName () const {return "Stones";}
+public:
+    NewMapUndoAction_Width (int w)
+      : NewMapUndoAction (WIDTH, true), m_width (w)
+      {
+      }
+
+    ~NewMapUndoAction_Width ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Width";
+      }
+
+    int get_width () const
+      {
+        return m_width;
+      }
+private:
+    int m_width;
 };
 
-//-----------------------------------------------------------------------------
-class NewMapAction_MapSize: public NewMapAction
+class NewMapUndoAction_Height: public NewMapUndoAction
 {
-    public:
-        NewMapAction_MapSize (Map m, int ms)
-          : NewMapAction (MAP_SIZE, false), d_map (m), d_map_size_id (ms) {}
-        ~NewMapAction_MapSize () {}
-        Glib::ustring getActionName () const {return "MapSize";}
-        Map getMap () const {return d_map;}
-        int getMapSizeId () const {return d_map_size_id;}
-    private:
-        Map d_map;
-        int d_map_size_id;
+public:
+    NewMapUndoAction_Height (int h)
+      : NewMapUndoAction (HEIGHT, true), m_height (h)
+      {
+      }
+
+    ~NewMapUndoAction_Height ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Height";
+      }
+
+    int get_height () const
+      {
+        return m_height;
+      }
+private:
+    int m_height;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_Width: public NewMapAction
+
+class NewMapUndoAction_TileSet: public NewMapUndoAction
 {
-    public:
-        NewMapAction_Width (int w)
-          : NewMapAction (WIDTH, true), d_width (w) {}
-        ~NewMapAction_Width () {}
-        Glib::ustring getActionName () const {return "Width";}
-        int getWidth () {return d_width;}
-    private:
-        int d_width;
+public:
+    NewMapUndoAction_TileSet (int i)
+      : NewMapUndoAction (TILESET, false), m_index (i)
+      {
+      }
+
+    ~NewMapUndoAction_TileSet ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "TileSet";
+      }
+
+    int get_index () const
+      {
+        return m_index;
+      }
+private:
+    int m_index;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_Height: public NewMapAction
+
+class NewMapUndoAction_ArmySet: public NewMapUndoAction
 {
-    public:
-        NewMapAction_Height (int h)
-          : NewMapAction (HEIGHT, true), d_height (h) {}
-        ~NewMapAction_Height () {}
-        Glib::ustring getActionName () const {return "Height";}
-        int getHeight () {return d_height;}
-    private:
-        int d_height;
+public:
+    NewMapUndoAction_ArmySet (int a, int b, int c, int d, int e, int f, int g,
+                              int h, int i)
+      : NewMapUndoAction (ARMYSET, false), m_player1_row (a), m_player2_row (b),
+      m_player3_row (c), m_player4_row (d), m_player5_row (e),
+      m_player6_row (f), m_player7_row (g), m_player8_row (h), m_neutral_row (i)
+      {
+      }
+
+    ~NewMapUndoAction_ArmySet ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "ArmySet";
+      }
+
+    int get_player1_row () const
+      {
+        return m_player1_row;
+      }
+
+    int get_player2_row () const
+      {
+        return m_player2_row;
+      }
+
+    int get_player3_row () const
+      {
+        return m_player3_row;
+      }
+
+    int get_player4_row () const
+      {
+        return m_player4_row;
+      }
+
+    int get_player5_row () const
+      {
+        return m_player5_row;
+      }
+
+    int get_player6_row () const
+      {
+        return m_player6_row;
+      }
+
+    int get_player7_row () const
+      {
+        return m_player7_row;
+      }
+
+    int get_player8_row () const
+      {
+        return m_player8_row;
+      }
+
+    int get_neutral_row () const
+      {
+        return m_neutral_row;
+      }
+private:
+    int m_player1_row;
+    int m_player2_row;
+    int m_player3_row;
+    int m_player4_row;
+    int m_player5_row;
+    int m_player6_row;
+    int m_player7_row;
+    int m_player8_row;
+    int m_neutral_row;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_TileSet: public NewMapAction
+
+class NewMapUndoAction_CitySet: public NewMapUndoAction
 {
-    public:
-        NewMapAction_TileSet (int i)
-          : NewMapAction (TILESET, false), d_index (i) {}
-        ~NewMapAction_TileSet () {}
-        Glib::ustring getActionName () const {return "TileSet";}
-        int getIndex () const {return d_index;}
-    private:
-        int d_index;
+public:
+    NewMapUndoAction_CitySet (int i)
+      : NewMapUndoAction (CITYSET, false), m_index (i)
+      {
+      }
+
+    ~NewMapUndoAction_CitySet ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "CitySet";
+      }
+
+    int get_index () const
+      {
+        return m_index;
+      }
+private:
+    int m_index;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_ArmySet: public NewMapAction
+
+class NewMapUndoAction_ShieldSet: public NewMapUndoAction
 {
-    public:
-        NewMapAction_ArmySet (int i)
-          : NewMapAction (ARMYSET, false), d_index (i) {}
-        ~NewMapAction_ArmySet () {}
-        Glib::ustring getActionName () const {return "ArmySet";}
-        int getIndex () const {return d_index;}
-    private:
-        int d_index;
+public:
+    NewMapUndoAction_ShieldSet (int i)
+      : NewMapUndoAction (SHIELDSET, false), m_index (i)
+      {
+      }
+
+    ~NewMapUndoAction_ShieldSet ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "ShieldSet";
+      }
+
+    int get_index () const
+      {
+        return m_index;
+      }
+private:
+    int m_index;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_CitySet: public NewMapAction
+
+class NewMapUndoAction_TileSize: public NewMapUndoAction
 {
-    public:
-        NewMapAction_CitySet (int i)
-          : NewMapAction (CITYSET, false), d_index (i) {}
-        ~NewMapAction_CitySet () {}
-        Glib::ustring getActionName () const {return "CitySet";}
-        int getIndex () const {return d_index;}
-    private:
-        int d_index;
+public:
+    NewMapUndoAction_TileSize (int a, int b, int c, int d, int e, int f, int g,
+                               int h, int i, int j, int k, int l)
+      : NewMapUndoAction (TILE_SIZE, false), m_tile_size_row (a),
+      m_tileset_row (b), m_player1_armyset_row (c),
+      m_player2_armyset_row (d), m_player3_armyset_row (e),
+      m_player4_armyset_row (f), m_player5_armyset_row (g),
+      m_player6_armyset_row (h), m_player7_armyset_row (i),
+      m_player8_armyset_row (j), m_neutral_armyset_row (k),
+      m_cityset_row (l)
+  {
+  }
+
+    ~NewMapUndoAction_TileSize ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "TileSize";
+      }
+
+    int get_tile_size_row () const
+      {
+        return m_tile_size_row;
+      }
+
+    int get_tileset_row () const
+      {
+        return m_tileset_row;
+      }
+
+    int get_cityset_row () const
+      {
+        return m_cityset_row;
+      }
+
+    int get_player1_armyset_row () const
+      {
+        return m_player1_armyset_row;
+      }
+
+    int get_player2_armyset_row () const
+      {
+        return m_player2_armyset_row;
+      }
+
+    int get_player3_armyset_row () const
+      {
+        return m_player3_armyset_row;
+      }
+
+    int get_player4_armyset_row () const
+      {
+        return m_player4_armyset_row;
+      }
+
+    int get_player5_armyset_row () const
+      {
+        return m_player5_armyset_row;
+      }
+
+    int get_player6_armyset_row () const
+      {
+        return m_player6_armyset_row;
+      }
+
+    int get_player7_armyset_row () const
+      {
+        return m_player7_armyset_row;
+      }
+
+    int get_player8_armyset_row () const
+      {
+        return m_player8_armyset_row;
+      }
+
+    int get_neutral_armyset_row () const
+      {
+        return m_neutral_armyset_row;
+      }
+
+private:
+    int m_tile_size_row;
+    int m_tileset_row;
+    int m_player1_armyset_row;
+    int m_player2_armyset_row;
+    int m_player3_armyset_row;
+    int m_player4_armyset_row;
+    int m_player5_armyset_row;
+    int m_player6_armyset_row;
+    int m_player7_armyset_row;
+    int m_player8_armyset_row;
+    int m_neutral_armyset_row;
+    int m_cityset_row;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_ShieldSet: public NewMapAction
+
+class NewMapUndoAction_FillStyle: public NewMapUndoAction
 {
-    public:
-        NewMapAction_ShieldSet (int i)
-          : NewMapAction (SHIELDSET, false), d_index (i) {}
-        ~NewMapAction_ShieldSet () {}
-        Glib::ustring getActionName () const {return "ShieldSet";}
-        int getIndex () const {return d_index;}
-    private:
-        int d_index;
+public:
+    NewMapUndoAction_FillStyle (int i)
+      : NewMapUndoAction (FILL_STYLE, false), m_index (i)
+      {
+      }
+
+    ~NewMapUndoAction_FillStyle ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "FillStyle";
+      }
+
+    int get_index () const
+      {
+        return m_index;
+      }
+private:
+    int m_index;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_TileSize: public NewMapAction
+
+class NewMapUndoAction_RandomRoads: public NewMapUndoAction
 {
-    public:
-        NewMapAction_TileSize (int a, int b, int c, int d)
-          : NewMapAction (TILE_SIZE, false), d_tile_size_id (a),
-          d_tileset_id (b), d_armyset_id (c), d_cityset_id (d) {}
-        ~NewMapAction_TileSize () {}
-        Glib::ustring getActionName () const {return "TileSize";}
-        int getTileSizeId() const {return d_tile_size_id;}
-        int getTileSetId() const {return d_tileset_id;}
-        int getArmySetId() const {return d_armyset_id;}
-        int getCitySetId() const {return d_cityset_id;}
-    private:
-        int d_tile_size_id;
-        int d_tileset_id;
-        int d_armyset_id;
-        int d_cityset_id;
+public:
+    NewMapUndoAction_RandomRoads (bool r)
+      : NewMapUndoAction (RANDOM_ROADS, false), m_value (r)
+      {
+      }
+
+    ~NewMapUndoAction_RandomRoads ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "RandomRoads";
+      }
+
+    bool get_value () const
+      {
+        return m_value;
+      }
+private:
+    bool m_value;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_FillStyle: public NewMapAction
+
+class NewMapUndoAction_RandomNames: public NewMapUndoAction
 {
-    public:
-        NewMapAction_FillStyle (int i)
-          : NewMapAction (FILL_STYLE, false), d_index (i) {}
-        ~NewMapAction_FillStyle () {}
-        Glib::ustring getActionName () const {return "FillStyle";}
-        int getIndex () const {return d_index;}
-    private:
-        int d_index;
+public:
+    NewMapUndoAction_RandomNames (bool r)
+      : NewMapUndoAction (RANDOM_NAMES, false), m_value (r)
+      {
+      }
+
+    ~NewMapUndoAction_RandomNames ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "RandomNames";
+      }
+
+    bool get_value () const
+      {
+        return m_value;
+      }
+private:
+    bool m_value;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_RandomRoads: public NewMapAction
+
+class NewMapUndoAction_Player: public NewMapUndoAction
 {
-    public:
-        NewMapAction_RandomRoads (bool r)
-          : NewMapAction (RANDOM_ROADS, false), d_value (r) {}
-        ~NewMapAction_RandomRoads () {}
-        Glib::ustring getActionName () const {return "RandomRoads";}
-        bool getValue () const {return d_value;}
-    private:
-        bool d_value;
+public:
+    NewMapUndoAction_Player (int i, bool active)
+      : NewMapUndoAction (PLAYER, true), m_player_id (i), m_active (active)
+      {
+      }
+
+    ~NewMapUndoAction_Player ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Player";
+      }
+
+    int get_player_id () const
+      {
+        return m_player_id;
+      }
+
+    bool get_active () const
+      {
+        return m_active;
+      }
+private:
+    int m_player_id;
+    bool m_active;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_RandomNames: public NewMapAction
+
+class NewMapUndoAction_StoneRoadChance: public NewMapUndoAction
 {
-    public:
-        NewMapAction_RandomNames (bool r)
-          : NewMapAction (RANDOM_NAMES, false), d_value (r) {}
-        ~NewMapAction_RandomNames () {}
-        Glib::ustring getActionName () const {return "RandomNames";}
-        bool getValue () const {return d_value;}
-    private:
-        bool d_value;
+public:
+    NewMapUndoAction_StoneRoadChance (int n)
+      : NewMapUndoAction (STONE_ROAD_CHANCE, true), m_num (n)
+      {
+      }
+
+    ~NewMapUndoAction_StoneRoadChance ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "StoneRoadChance";
+      }
+
+    int get_stone_road_chance () const
+      {
+        return m_num;
+      }
+private:
+    int m_num;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_Players: public NewMapAction
+
+class NewMapUndoAction_MakeSame: public NewMapUndoAction
 {
-    public:
-        NewMapAction_Players (int n)
-          : NewMapAction (PLAYERS, true), d_num (n) {}
-        ~NewMapAction_Players () {}
-        Glib::ustring getActionName () const {return "Players";}
-        int getNumPlayers () {return d_num;}
-    private:
-        int d_num;
+public:
+    NewMapUndoAction_MakeSame (int v, int a, int b, int c, int d, int e, int f,
+                               int g, int h, int i)
+      : NewMapUndoAction (MAKE_SAME, true), m_value (v), m_player1_row (a),
+      m_player2_row (b), m_player3_row (c), m_player4_row (d),
+      m_player5_row (e), m_player6_row (f), m_player7_row (g),
+      m_player8_row (h), m_neutral_row (i)
+      {
+      }
+
+    ~NewMapUndoAction_MakeSame ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "MakeSame";
+      }
+
+    int get_value () const
+      {
+        return m_value;
+      }
+
+    int get_player1_row () const
+      {
+        return m_player1_row;
+      }
+
+    int get_player2_row () const
+      {
+        return m_player2_row;
+      }
+
+    int get_player3_row () const
+      {
+        return m_player3_row;
+      }
+
+    int get_player4_row () const
+      {
+        return m_player4_row;
+      }
+
+    int get_player5_row () const
+      {
+        return m_player5_row;
+      }
+
+    int get_player6_row () const
+      {
+        return m_player6_row;
+      }
+
+    int get_player7_row () const
+      {
+        return m_player7_row;
+      }
+
+    int get_player8_row () const
+      {
+        return m_player8_row;
+      }
+
+    int get_neutral_row () const
+      {
+        return m_neutral_row;
+      }
+private:
+    int m_value;
+    int m_player1_row;
+    int m_player2_row;
+    int m_player3_row;
+    int m_player4_row;
+    int m_player5_row;
+    int m_player6_row;
+    int m_player7_row;
+    int m_player8_row;
+    int m_neutral_row;
 };
-//-----------------------------------------------------------------------------
-class NewMapAction_StoneRoadChance: public NewMapAction
-{
-    public:
-        NewMapAction_StoneRoadChance (int n)
-          : NewMapAction (STONE_ROAD_CHANCE, true), d_num (n) {}
-        ~NewMapAction_StoneRoadChance () {}
-        Glib::ustring getActionName () const {return "StoneRoadChance";}
-        int getStoneRoadChance () {return d_num;}
-    private:
-        int d_num;
-};
-#endif //NEW_MAP_ACTIONS_H
+#endif

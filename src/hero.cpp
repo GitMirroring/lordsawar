@@ -1,7 +1,7 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2014, 2017, 2020, 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2014, 2017, 2020, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,29 +15,28 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sstream>
 #include <fstream>
 #include <sigc++/functors/mem_fun.h>
 
 #include "hero.h"
-#include "stacklist.h"
-#include "templelist.h"
-#include "heroproto.h"
+#include "stack-list.h"
+#include "temple-list.h"
+#include "hero-proto.h"
 #include "counter.h"
-#include "Backpack.h"
-#include "xmlhelper.h"
-#include "playerlist.h"
-#include "QuestsManager.h"
-#include "herotemplates.h"
+#include "backpack.h"
+#include "xml-helper.h"
+#include "player-list.h"
+#include "quest-manager.h"
+#include "hero-templates.h"
 
 Glib::ustring Hero::d_hero_tag = "hero";
 
 Hero::Hero(const HeroProto& a)
   : Army (dynamic_cast<const ArmyProto&>(a)), d_name(a.getName()),
-    d_gender(Gender(a.getGender())), d_hero_type_id (a.getHeroId())
+    d_gender(Gender(a.getGender())), d_character_id (a.getCharacterId())
 {
   d_level = 1;
   d_backpack = new Backpack();
@@ -46,7 +45,7 @@ Hero::Hero(const HeroProto& a)
 
 Hero::Hero(Hero& h, bool sync_id)
   : Army(h, sync_id, h.getOwner ()), d_name(h.d_name), d_gender(h.d_gender),
-    d_hero_type_id (h.d_hero_type_id)
+    d_character_id (h.d_character_id)
 {
   d_backpack = new Backpack(*h.d_backpack);
 }
@@ -54,14 +53,14 @@ Hero::Hero(Hero& h, bool sync_id)
 Hero::Hero(XML_Helper* helper)
     :Army(helper)
 {
-  helper->getData(d_name, "name");
+  helper->get(d_name, "name");
   Glib::ustring gender_str;
-  if (!helper->getData(gender_str, "gender"))
+  if (!helper->get(gender_str, "gender"))
     d_gender = NONE;
   else
     d_gender = genderFromString(gender_str);
-  helper->getData(d_hero_type_id, "hero_type");
-  helper->registerTag(Backpack::d_tag, 
+  helper->get(d_character_id, "hero_type");
+  helper->register_tag(Backpack::d_tag, 
 		      sigc::mem_fun(*this, &Hero::loadBackpack));
 }
 
@@ -75,18 +74,18 @@ bool Hero::save(XML_Helper* helper) const
     bool retval = true;
     std::list<Item*>::const_iterator it;
 
-    retval &= helper->openTag(Hero::d_hero_tag);
+    retval &= helper->open_tag(Hero::d_hero_tag);
 
-    retval &= helper->saveData("name", d_name);
+    retval &= helper->save("name", d_name);
     Glib::ustring gender_str = genderToString(Hero::Gender(d_gender));
-    retval &= helper->saveData("gender", gender_str);
-    retval &= helper->saveData("hero_type", d_hero_type_id);
-    retval &= saveData(helper);
+    retval &= helper->save("gender", gender_str);
+    retval &= helper->save("hero_type", d_character_id);
+    retval &= saveContents (helper);
 
     // Now save the backpack
     retval &= d_backpack->save(helper);
 
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -161,9 +160,21 @@ Hero::Gender Hero::genderFromString(const Glib::ustring str)
   return Hero::FEMALE;
 }
 
-bool Hero::canGainLevel() const
+int Hero::canGainLevels ()
 {
-  return getXP() >= getXpNeededForNextLevel();
+  int old_level = d_level;
+  int old_xp_value = d_xp_value;
+  int count = 0;
+  while (getXP () >= getXpNeededForNextLevel ())
+    {
+      d_xp_value *= 1.2;
+      d_level++;
+      count++;
+    }
+
+  d_level = old_level;
+  d_xp_value = old_xp_value;
+  return count;
 }
 
 guint32 Hero::getXpNeededForNextLevel() const
@@ -191,7 +202,7 @@ int Hero::computeLevelGain(Stat stat) const
 
 int Hero::gainLevel(Stat stat)
 {
-  if (!canGainLevel())
+  if (!canGainLevels())
     return -1;
 
   if (stat == MOVE_BONUS || stat == ARMY_BONUS || stat == SHIP ||
@@ -226,7 +237,7 @@ int Hero::gainLevel(Stat stat)
 
 bool Hero::hasQuest() const
 {
-  return QuestsManager::getInstance()->getHeroQuest(getId()) != NULL;
+  return QuestsManager::instance()->getHeroQuest(getId()) != NULL;
 }
 
 bool Hero::isFlyer() const
@@ -243,9 +254,9 @@ bool Hero::isFlyer() const
 Glib::ustring Hero::getDescription () const
 {
   Character *c =
-    HeroTemplates::getInstance ()->getCharacterById (getHeroTypeId ());
+    HeroTemplates::instance ()->getCharacterById (getCharacterId ());
   if (c)
-    return c->description;
+    return c->get_description ();
   else
     return "";
 }

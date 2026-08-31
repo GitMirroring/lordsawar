@@ -1,7 +1,7 @@
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2004, 2005 Ulf Lorenz
-// Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2009, 2014 Ben Asselstine
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2006 Andrea Paternesi
+//  Copyright (C) 2009, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef AI_ANALYSIS_H
@@ -25,9 +24,11 @@
 #include <gtkmm.h>
 #include <map>
 #include "vector.h"
-#include "AICityInfo.h"
+#include "ai-city-info.h"
 
 class Threatlist;
+class Boonlist;
+class Boon;
 class Player;
 class City;
 class Stack;
@@ -45,7 +46,7 @@ typedef std::map<guint32, AICityInfo *> AICityMap;
   * AI_Allocation (which does the allocation of the AI's troops) as a kind of
   * container.
   *
-  * See ai_smart.h for some more details about the smart AI.
+  * See ai-smart.h for some more details about the smart AI.
   */
 
 class AI_Analysis
@@ -64,6 +65,7 @@ class AI_Analysis
 
 	static void deleteStack(guint32 id);
 
+        void deleteBoon (Boon *b);
         // guess the strength of the given stack. Note: next to useless outside
         // of computer turn.
         static float assessStackStrength(const Stack *stack);
@@ -82,6 +84,18 @@ class AI_Analysis
           * @param pos  the position around which the threats should be ordered
           */
         const Threatlist* getThreatsInOrder(Vector<int> pos);
+        
+        /** get an ordered list of boons (most valuable first)
+          * 
+          * only one of each kind of boon is provided
+          *
+          * @note The returned boonlist has boons that point into
+          * the internal boonlist, so don't toy around with it!
+          */
+        std::list<Boon> getBoonsInOrder(Stack *s);
+
+
+        std::list<std::pair<Boon,Stack*>> getBoonsInOrder ();
 
         // get the danger that this friendly city is in
         float getCityDanger(City *city);
@@ -107,8 +121,17 @@ class AI_Analysis
         // examine the stack list for potential threats
         void examineStacks();
         
-        // examine the ruin list for potential threats
+        // examine the ruin list for potential boons
         void examineRuins();
+
+        // examine the temple list for potential boons
+        void examineTemples();
+        
+        // examine quests for potential boons
+        void examineQuests();
+
+        // examine backpacks on the ground as boons
+        void examineBags();
         
         // calculate danger to all of our cities, populates cityInfo
         void calculateDanger();
@@ -119,11 +142,12 @@ class AI_Analysis
         // DATA
         // the threats to the AI
         Threatlist *d_threats;
+        Boonlist *d_boons;
         Player *d_owner;
         StackReflist *d_stacks;
         AICityMap d_cityInfo;
+
+        Boon* getBoonAlongTheWay (Boon b, Stack *s);
 };
 
-#endif // AI_ANALYSIS_H
-
-// End of file
+#endif

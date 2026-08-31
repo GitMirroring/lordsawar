@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<tileset version="0.3.3">
+<tileset version="0.4.0">
     <d_id>5</d_id>
     <_d_name>Wesnoth</_d_name>
     <d_copyright>Copyright (C) 2007, 2009, 2021 Ben Asselstine</d_copyright>
@@ -7,16 +7,21 @@
     <_d_info>A tileset based on Wesnoth tileset</_d_info>
     <d_tilesize>40</d_tilesize>
     <d_large_selector>selector</d_large_selector>
-    <d_large_selector_num_masks>1</d_large_selector_num_masks>
     <d_small_selector>small_selector</d_small_selector>
-    <d_small_selector_num_masks>1</d_small_selector_num_masks>
     <d_explosion>explosion</d_explosion>
     <d_roads>roads</d_roads>
     <d_standing_stones>stones</d_standing_stones>
     <d_bridges>bridges</d_bridges>
     <d_fog>fog</d_fog>
-    <d_flags>flags</d_flags>
-    <d_flags_num_masks>1</d_flags_num_masks>
+    <d_white_flags>flags</d_white_flags>
+    <d_green_flags>flags</d_green_flags>
+    <d_yellow_flags>flags</d_yellow_flags>
+    <d_dark_blue_flags>flags</d_dark_blue_flags>
+    <d_orange_flags>flags</d_orange_flags>
+    <d_light_blue_flags>flags</d_light_blue_flags>
+    <d_red_flags>flags</d_red_flags>
+    <d_black_flags>flags</d_black_flags>
+    <d_neutral_flags>flags</d_neutral_flags>
     <d_movebonus_all>flight_movebonus</d_movebonus_all>
     <d_movebonus_water>water_movebonus</d_movebonus_water>
     <d_movebonus_forest>forest_movebonus</d_movebonus_forest>
@@ -33,7 +38,7 @@
 	<d_color>255 255 255</d_color>
     </temple_smallmap>
     <tile>
-        <_d_name>Grass</_d_name>
+        <_d_name>grass</_d_name>
         <d_moves>2</d_moves>
         <d_type>Tile::GRASS</d_type>
         <smallmap>
@@ -55,7 +60,7 @@
 	</tilestyleset>
     </tile>
     <tile>
-        <_d_name>Water</_d_name>
+        <_d_name>water</_d_name>
         <d_moves>2</d_moves>
         <d_type>Tile::WATER</d_type>
 	<smallmap>
@@ -103,7 +108,7 @@
 	</tilestyleset>
     </tile>
     <tile>
-        <_d_name>Forest</_d_name>
+        <_d_name>forest</_d_name>
         <d_moves>3</d_moves>
         <d_type>Tile::FOREST</d_type>
 	<smallmap>
@@ -175,7 +180,7 @@
 	</tilestyleset>
     </tile>
     <tile>
-        <_d_name>Hills</_d_name>
+        <_d_name>hills</_d_name>
         <d_moves>4</d_moves>
         <d_type>Tile::HILLS</d_type>
 	<smallmap>
@@ -238,7 +243,7 @@
 	</tilestyleset>
     </tile>
     <tile>
-        <_d_name>Mountains</_d_name>
+        <_d_name>mountains</_d_name>
         <d_moves>6</d_moves>
         <d_type>Tile::MOUNTAIN</d_type>
 	<smallmap>
@@ -310,7 +315,7 @@
 	</tilestyleset>
     </tile>
     <tile>
-        <_d_name>Swamp</_d_name>
+        <_d_name>swamp</_d_name>
         <d_moves>8</d_moves>
         <d_type>Tile::SWAMP</d_type>
 	<smallmap>

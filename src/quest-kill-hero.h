@@ -1,7 +1,7 @@
-// Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2004 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef QUEST_KILL_HERO_H
@@ -25,8 +24,8 @@
 #include <sigc++/trackable.h>
 
 #include <list>
-#include "Quest.h"
-#include "playerlist.h"
+#include "quest.h"
+#include "player-list.h"
 
 class Hero;
 class Army;
@@ -44,10 +43,9 @@ public:
     /**
      * Make a new kill-hero quest.
      *
-     * @param q_mgr  The quests manager to associate this quest with.
      * @param hero   The Id of the Hero who is responsible for the quest.
      */
-    QuestKillHero(QuestsManager& q_mgr, guint32 hero);
+    QuestKillHero(guint32 hero);
 
     //! Copy constructor.
     QuestKillHero (const QuestKillHero &q);
@@ -57,13 +55,12 @@ public:
 
     //! Loading constructor.
     /**
-     * @param q_mgr   The quests manager to associate this quest with.
      * @param helper  The opened saved-game file to load this quest from.
      */
-    QuestKillHero(QuestsManager& q_mgr, XML_Helper* helper);
+    QuestKillHero(XML_Helper* helper);
 
     // Construct from remote action.
-    QuestKillHero(QuestsManager& q_mgr, guint32 hero, guint32 victim);
+    QuestKillHero(guint32 hero, guint32 victim);
 
 
     // Get Methods
@@ -106,7 +103,7 @@ public:
     /**
      * @note This method is not used.
      */
-    void cityAction(City *c, CityDefeatedAction action, 
+    void cityAction(City *c, CityDefeatedChoice action, 
 		    bool heroIsCulprit, int gold);
 
 

@@ -1,7 +1,7 @@
-// Copyright (C) 2001, 2003 Michael Bartl
-// Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2001, 2003 Michael Bartl
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2006 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef TEMPLE_H
@@ -24,7 +23,7 @@
 
 #define DEFAULT_TEMPLE_NAME  "Shrine"
 
-#include "NamedLocation.h"
+#include "named-location.h"
 
 //! A temple on the game map.
 /** 
@@ -54,7 +53,7 @@ class Temple : public NamedLocation
 	 *                     be 0.
          */
         Temple(Vector<int> pos, guint32 width, Glib::ustring name = DEFAULT_TEMPLE_NAME, 
-	       int type = 0);
+	       Type type = TEMPLE);
 
 	//! Copy constructor.
         Temple(const Temple&, bool sync_id = false);
@@ -74,19 +73,12 @@ class Temple : public NamedLocation
 	// Get Methods
         
 	//! Returns the type of the temple.
-        int getType() const {return d_type;};
-
-        //! Returns whether or not the temple can be searched.
-	/**
-	 * @note Temples can always be searched in this game.
-	 */
-        bool searchable() const {return true;}
-
+        Type getType() const {return d_type;};
 
 	// Set Methods
 
         //! Returns the type of the temple.
-        void setType(int type) {d_type=type;};
+        void setType(Type type) {d_type=type;};
 
 
 	// Methods that operate on class data but do not modify the class.
@@ -102,6 +94,12 @@ class Temple : public NamedLocation
 	//! Return the default name of any temple.
 	static Glib::ustring getDefaultName() {return _(DEFAULT_TEMPLE_NAME);};
 
+	//! Convert a Temple::Type enumerated value to a string.
+	static Glib::ustring templeTypeToString(const Temple::Type type);
+
+	//! Convert a string containing a Temple::Type to an enumerated value.
+	static Temple::Type templeTypeFromString(const Glib::ustring str);
+
     protected:
 	
 	// DATA
@@ -111,7 +109,7 @@ class Temple : public NamedLocation
 	 * The temple always has a type of 0, because there is only one kind
 	 * of temple in the game.
 	 */
-        int d_type;
+        Type d_type;
 };
 
-#endif // TEMPLE_H
+#endif

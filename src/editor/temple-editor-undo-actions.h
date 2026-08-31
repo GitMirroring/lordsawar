@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef TEMPLE_EDITOR_ACTIONS_H
-#define TEMPLE_EDITOR_ACTIONS_H
+#ifndef TEMPLE_EDITOR_UNDO_ACTIONS_H
+#define TEMPLE_EDITOR_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
@@ -31,88 +30,137 @@
  * editor.
  */
 
-class TempleEditorAction: public UndoAction
+class TempleEditorUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      NAME = 1,
-      RANDOMIZE_NAME = 2,
-      DESCRIPTION = 3,
-      TYPE = 4,
-    };
+    enum Type
+      {
+        NAME = 1,
+        RANDOMIZE_NAME = 2,
+        DESCRIPTION = 3,
+        TYPE = 4,
+      };
 
-    TempleEditorAction(Type type, bool agg = false)
-     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+    TempleEditorUndoAction(Type type, bool agg = false)
+      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                    UndoAction::AGGREGATE_NONE), m_type (type)
+        {
+        }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class TempleEditorAction_Name: public TempleEditorAction, public UndoCursor
+class TempleEditorUndoAction_Name: public TempleEditorUndoAction, public UndoCursor
 {
-    public:
-        TempleEditorAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
-          : TempleEditorAction (NAME, true), UndoCursor (u, e),
-          d_name (n) {}
-        ~TempleEditorAction_Name () {}
+public:
+    TempleEditorUndoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
+      : TempleEditorUndoAction (NAME, true), UndoCursor (u->get_pos (e), e),
+      m_name (n)
+  {
+  }
+    ~TempleEditorUndoAction_Name ()
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Name";}
+    Glib::ustring get_action_name () const
+      {
+        return "Name";
+      }
 
-        Glib::ustring getName () {return d_name;}
+    Glib::ustring get_name () const
+      {
+        return m_name;
+      }
 
-    private:
-        Glib::ustring d_name;
+private:
+    Glib::ustring m_name;
 };
 
-class TempleEditorAction_RandomizeName: public TempleEditorAction
+class TempleEditorUndoAction_RandomizeName: public TempleEditorUndoAction
 {
-    public:
-        TempleEditorAction_RandomizeName (Glib::ustring n)
-          : TempleEditorAction (RANDOMIZE_NAME), d_name (n) {}
-        ~TempleEditorAction_RandomizeName () {}
+public:
+    TempleEditorUndoAction_RandomizeName (Glib::ustring n)
+      : TempleEditorUndoAction (RANDOMIZE_NAME), m_name (n)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "RandomizeName";}
+    ~TempleEditorUndoAction_RandomizeName ()
+      {
+      }
 
-        Glib::ustring getName () const {return d_name;}
+    Glib::ustring get_action_name () const
+      {
+        return "RandomizeName";
+      }
 
-    private:
-        Glib::ustring d_name;
+    Glib::ustring get_name () const
+      {
+        return m_name;
+      }
+
+private:
+    Glib::ustring m_name;
 };
 
-class TempleEditorAction_Description: public TempleEditorAction, public UndoCursor
+class TempleEditorUndoAction_Description: public TempleEditorUndoAction, public UndoCursor
 {
-    public:
-        TempleEditorAction_Description (Glib::ustring d, UndoMgr *u,
-                                        Gtk::Entry *e)
-          : TempleEditorAction (DESCRIPTION, true), UndoCursor (u, e),
-          d_description (d) {}
-        ~TempleEditorAction_Description () {}
+public:
+    TempleEditorUndoAction_Description (Glib::ustring d, UndoMgr *u,
+                                    Gtk::Entry *e)
+      : TempleEditorUndoAction (DESCRIPTION, true), UndoCursor (u->get_pos (e), e),
+      m_description (d)
+  {
+  }
 
-        Glib::ustring getActionName () const {return "Description";}
+    ~TempleEditorUndoAction_Description ()
+      {
+      }
 
-        Glib::ustring getDescription () {return d_description;}
+    Glib::ustring get_action_name () const
+      {
+        return "Description";
+      }
 
-    private:
-        Glib::ustring d_description;
+    Glib::ustring get_description () const
+      {
+        return m_description;
+      }
+
+private:
+    Glib::ustring m_description;
 };
 
-class TempleEditorAction_Type: public TempleEditorAction
+class TempleEditorUndoAction_Type: public TempleEditorUndoAction
 {
-    public:
-        TempleEditorAction_Type (Temple::Type ty)
-          : TempleEditorAction (TYPE, false), d_temple_type (ty) {}
-        ~TempleEditorAction_Type () {}
+public:
+    TempleEditorUndoAction_Type (Temple::Type ty)
+      : TempleEditorUndoAction (TYPE, false), m_temple_type (ty)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Type";}
+    ~TempleEditorUndoAction_Type ()
+      {
+      }
 
-        Temple::Type getTempleType () const {return d_temple_type;}
+    Glib::ustring get_action_name () const
+      {
+        return "Type";
+      }
 
-    private:
-        Temple::Type d_temple_type;
+    Temple::Type get_temple_type () const
+      {
+        return m_temple_type;
+      }
+
+private:
+    Temple::Type m_temple_type;
 };
-#endif //TEMPLE_EDITOR_ACTIONS_H
+#endif

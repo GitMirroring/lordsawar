@@ -1,7 +1,7 @@
-// Copyright (C) 2003, 2005 Ulf Lorenz
-// Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2003, 2005 Ulf Lorenz
+//  Copyright (C) 2004 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef QUEST_MANAGER_H
@@ -189,8 +188,21 @@ class QuestsManager : public sigc::trackable
 	 * @param player  The player to process Quest objects for.  The Hero
 	 *                object must be owned by this player to be processed.
 	 */
-	void nextTurn(Player *player);
+        bool notifyQuestExpired(Player *player, sigc::slot<void()> after);
 
+	//! Process the Quests and see if the player has completed any.
+	/**
+	 * @param player  The player to process Quest objects for.  The Hero
+	 *                object must be owned by this player to be processed.
+	 */
+        bool notifyQuestCompleted (Player *p, sigc::slot<void()> after);
+
+	//! Process the Quests and see if any of them have become completed.
+	/**
+	 * @param player  The player to process Quest objects for.  The Hero
+	 *                object must be owned by this player to be processed.
+	 */
+        bool completeQuests(Player *player, sigc::slot<void()> after);
 
 	// Methods that operate on the class data and do not modify it.
 
@@ -212,27 +224,19 @@ class QuestsManager : public sigc::trackable
         bool save(XML_Helper* helper) const;
 	
 
-	// Signals
+	sigc::signal<void(Quest *, sigc::slot<void()>)> signal_quest_completed ()
+          {
+            return quest_completed;
+          }
 
-	//! Emitted when a Hero object completes a Quest.
-	/**
-	 * @param quest   A pointer to the Quest object that was successfully 
-	 *                completed.
-	 * @param reward  A pointer to the reward that the Hero is receiving.
-	 */
-	sigc::signal<void, Quest *, Reward *> quest_completed;
-
-	//! Emitted when a Hero object fails to complete a Quest.
-	/**
-	 * @param quest  A pointer to the Ques tobject that was expired.
-	 */
-	sigc::signal<void, Quest *> quest_expired;
-
-
+	sigc::signal<void(Quest *, sigc::slot<void()>)> signal_quest_expired ()
+          {
+            return quest_expired;
+          }
 	// Static Methods
 
         //! Gets the singleton instance or creates a new one.
-        static QuestsManager* getInstance();
+        static QuestsManager* instance();
 
 	/**
 	 * Make a new QuestsManager object by loading all Quest objects from
@@ -243,13 +247,14 @@ class QuestsManager : public sigc::trackable
 	 * @return A pointer to the new QuestsManager object.
 	 */
         //! Loads the questlist from a saved-game file.
-        static QuestsManager* getInstance(XML_Helper* helper);
+        static QuestsManager* instance(XML_Helper* helper);
 
         //! Explicitly deletes the singleton instance.
         static void deleteInstance();
 
-        //! Replace the current quests manager  with another.
+        //! Replace the current quests manager with another.
         static void reset (QuestsManager *q);
+
     protected:
 
 	//! Default constructor.
@@ -305,27 +310,43 @@ class QuestsManager : public sigc::trackable
 	 * @param gold   The number of gold pieces achieved in the sacking or
 	 *               pillaging.
 	 */
-	void cityAction(City *c, Stack *s, CityDefeatedAction action, int gold);
+	void cityAction(City *c, Stack *s, CityDefeatedChoice action, int gold);
 
 
         std::vector<Quest*> getActiveQuests ();
         // DATA
         
 	//! A hash of all Quests in this QuestsManager.  Lookup by HeroId.
-        std::map<guint32,Quest*> d_quests;
+        std::map<guint32,Quest*> d_quests = {};
 
         //! A list of quests that have been marked as expiring
-        std::list<Quest*> d_inactive_quests;
+        std::list<Quest*> d_inactive_quests = {};
 
         //! A list of quests that have been marked as completed
-        std::list<Quest*> d_completed_quests;
+        std::list<Quest*> d_completed_quests = {};
 
 	//! A vector of isFeasible function pointers.
         /** 
 	 * This list of function pointers is used to see if it makes sense to
 	 * give out a quest of a particular kind (Quest::Type).
          */
-        std::vector<QFeasibilityType> d_questsFeasible;
+        std::vector<QFeasibilityType> d_questsFeasible = {};
+
+	// Signals
+
+	//! Emitted when a Hero object fails to complete a Quest.
+	/**
+	 * @param quest  A pointer to the Quest tobject that was expired.
+         * @param finish A slot to call when it's done
+	 */
+	sigc::signal<void(Quest *, sigc::slot<void()>)> quest_expired;
+
+	//! Emitted when a Hero completes a Quest.
+	/**
+	 * @param quest  A pointer to the Quest object that was completed.
+         * @param finish A slot to call when it's done
+	 */
+	sigc::signal<void(Quest *, sigc::slot<void()>)> quest_completed;
 
         //! A static pointer for the singleton instance.
         static QuestsManager * s_instance;

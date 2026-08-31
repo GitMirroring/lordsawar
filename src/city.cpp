@@ -2,7 +2,8 @@
 //  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
 //  Copyright (C) 2002 Mark L. Amidon
 //  Copyright (C) 2005 Andrea Paternesi
-//  Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014, 2015, 2021 Ben Asselstine
+//  Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014, 2015, 2021,
+//  2026 Ben Asselstine
 //  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -17,28 +18,27 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <stdio.h>
 #include <sstream>
 #include "city.h"
 #include "path.h"
 #include "army.h"
-#include "armyprodbase.h"
+#include "army-prod-base.h"
 #include "hero.h"
-#include "stacklist.h"
+#include "stack-list.h"
 #include "stack.h"
-#include "playerlist.h"
-#include "armysetlist.h"
-#include "citylist.h"
-#include "GameMap.h"
-#include "vectoredunitlist.h"
-#include "vectoredunit.h"
+#include "player-list.h"
+#include "army-set-list.h"
+#include "city-list.h"
+#include "game-map.h"
+#include "vectored-unit-list.h"
+#include "vectored-unit.h"
 #include "action.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "rnd.h"
-#include "GameScenarioOptions.h"
+#include "game-scenario-options.h"
 
 Glib::ustring City::d_tag = "city";
 
@@ -58,7 +58,7 @@ City::City(Vector<int> pos, guint32 width, Glib::ustring name, guint32 gold,
     for (unsigned int j = 0; j < getSize(); j++)
       {
 	Vector<int> npos = getPos() + Vector<int>(i, j);
-	GameMap::getInstance()->getTile(npos)->setBuilding(Maptile::CITY);
+	GameMap::instance()->getTile(npos)->setBuilding(Maptile::CITY);
       }
 }
 
@@ -68,17 +68,17 @@ City::City(XML_Helper* helper, guint32 width)
 {
     //initialize the city
 
-    helper->getData(d_defense_level, "defense");
+    helper->get(d_defense_level, "defense");
     
-    helper->getData(d_gold, "gold");
-    helper->getData(d_burnt, "burnt");
-    helper->getData(d_build_production, "build_production");
-    helper->getData(d_capital, "capital");
+    helper->get(d_gold, "gold");
+    helper->get(d_burnt, "burnt");
+    helper->get(d_build_production, "build_production");
+    helper->get(d_capital, "capital");
     if (d_capital)
       {
 	guint32 ui;
-        helper->getData(ui, "capital_owner");
-        d_capital_owner = Playerlist::getInstance()->getPlayer(ui);
+        helper->get(ui, "capital_owner");
+        d_capital_owner = Playerlist::instance()->get (ui);
       }
     else
       d_capital_owner = NULL;
@@ -87,7 +87,7 @@ City::City(XML_Helper* helper, guint32 width)
     std::istringstream svect;
     Glib::ustring s;
 
-    helper->getData(s, "vectoring");
+    helper->get(s, "vectoring");
      svect.str(s);
     svect >> d_vector.x;
     svect >> d_vector.y;
@@ -100,7 +100,7 @@ City::City(XML_Helper* helper, guint32 width)
     //mark the positions on the map as being occupied by a city
     for (unsigned int i = 0; i < d_size; i++)
         for (unsigned int j = 0; j < d_size; j++)
-            GameMap::getInstance()->getTile(getPos().x+i, getPos().y+j)
+            GameMap::instance()->getTile(getPos().x+i, getPos().y+j)
                                   ->setBuilding(Maptile::CITY);
 }
 
@@ -128,30 +128,30 @@ bool City::save(XML_Helper* helper) const
 
     svect << d_vector.x << " " << d_vector.y;
 
-    retval &= helper->openTag(City::d_tag);
-    retval &= helper->saveData("id", d_id);
-    retval &= helper->saveData("x", getPos().x);
-    retval &= helper->saveData("y", getPos().y);
-    retval &= helper->saveData("name", getName(false));
-    retval &= helper->saveData("description", getDescription());
-    retval &= helper->saveData("owner", d_owner_id);
-    retval &= helper->saveData("defense", d_defense_level);
-    retval &= helper->saveData("gold", d_gold);
-    retval &= helper->saveData("burnt", d_burnt);
-    retval &= helper->saveData("build_production", d_build_production);
-    retval &= helper->saveData("capital", d_capital);
+    retval &= helper->open_tag(City::d_tag);
+    retval &= helper->save("id", d_id);
+    retval &= helper->save("x", getPos().x);
+    retval &= helper->save("y", getPos().y);
+    retval &= helper->save("name", getName(false));
+    retval &= helper->save("description", getDescription());
+    retval &= helper->save("owner", d_owner_id);
+    retval &= helper->save("defense", d_defense_level);
+    retval &= helper->save("gold", d_gold);
+    retval &= helper->save("burnt", d_burnt);
+    retval &= helper->save("build_production", d_build_production);
+    retval &= helper->save("capital", d_capital);
     if (d_capital)
-      retval &= helper->saveData("capital_owner", d_capital_owner->getId());
-    retval &= helper->saveData("vectoring", svect.str());
+      retval &= helper->save("capital_owner", d_capital_owner->getId());
+    retval &= helper->save("vectoring", svect.str());
 
     retval &= ProdSlotlist::save(helper);
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
     return retval;
 }
 
 void City::conquer(Player* newowner)
 {
-  Citylist::getInstance()->stopVectoringTo(this);
+  Citylist::instance()->stopVectoringTo(this);
 
   setOwner(newowner);
 
@@ -160,8 +160,8 @@ void City::conquer(Player* newowner)
 
     deFog(newowner);
 
-    VectoredUnitlist::getInstance()->removeVectoredUnitsGoingTo(this);
-    VectoredUnitlist::getInstance()->removeVectoredUnitsComingFrom(this);
+    VectoredUnitlist::instance()->removeVectoredUnitsGoingTo(this);
+    VectoredUnitlist::instance()->removeVectoredUnitsComingFrom(this);
 }
 
 void City::produceStrongestProductionBase()
@@ -200,9 +200,9 @@ void City::produceStrongestProductionBase()
 void City::produceWeakestQuickestArmyInArmyset()
 {
   guint32 set = getOwner ()->getArmyset();
-  ArmyProto *scout = Armysetlist::getInstance()->lookupWeakestQuickestArmy(set);
+  ArmyProto *scout = Armysetlist::instance()->lookupWeakestQuickestArmy(set);
   Army *a = new Army(*scout, getOwner ());
-  GameMap::getInstance()->addArmy(this, a);
+  GameMap::instance()->addArmy(this, a);
 }
 
 void City::produceWeakestProductionBase()
@@ -248,7 +248,7 @@ const Army *City::armyArrives(Stack *& stack)
         new VectoredUnit (getPos(), d_vector, 
                           (*this)[d_active_production_slot]->getArmyProdBase(),
                           turns, getOwner ());
-      VectoredUnitlist::getInstance()->push_back(v);
+      VectoredUnitlist::instance()->push_back(v);
       getOwner ()->cityChangeProduction(this, d_active_production_slot);
       //we don't return an army when we've vectored it.
       //it doesn't really exist until it lands at the destination.
@@ -304,15 +304,15 @@ Army *City::produceArmy(Stack *& stack)
 
   // do not produce an army if the player has no gold.
   // unless it's the neutrals
-  if (getOwner () != Playerlist::getInstance()->getNeutral() && 
+  if (getOwner () != Playerlist::getNeutral() && 
       getOwner ()->getGold() < 0) 
     return NULL;
 
   Army *a =
     new Army(*(getProductionBase(d_active_production_slot)), getOwner ());
-  stack = GameMap::getInstance()->addArmy(this, a);
+  stack = GameMap::instance()->addArmy(this, a);
 
-  if (getOwner ()== Playerlist::getInstance()->getNeutral()) 
+  if (getOwner ()== Playerlist::getNeutral()) 
     {
       //we're an active neutral city
       //check to see if we've made 5 or not.
@@ -335,7 +335,7 @@ bool City::canAcceptMoreVectoring() const
 bool City::canAcceptMoreVectoring(guint32 number_of_cities) const
 {
   //here we presume that it's one unit per city
-  guint32 num = Citylist::getInstance()->countCitiesVectoringTo(this);
+  guint32 num = Citylist::instance()->countCitiesVectoringTo(this);
   if (num + number_of_cities >= MAX_CITIES_VECTORED_TO_ONE_CITY)
     return false;
   return true;
@@ -344,7 +344,7 @@ bool City::canAcceptMoreVectoring(guint32 number_of_cities) const
 bool City::changeVectorDestination(Vector<int> dest)
 {
   setVectoring(dest);
-  VectoredUnitlist::getInstance()->changeDestination(this, dest);
+  VectoredUnitlist::instance()->changeDestination(this, dest);
   return true;
 }
 
@@ -436,7 +436,7 @@ void City::setRandomArmytypes(bool produce_allies, int likely)
     army_type = 0;
   else
     army_type = 1 + likely + (Rnd::rand () % 11);
-  ArmyProto *template_army = Armysetlist::getInstance()->getArmy(set, army_type);
+  ArmyProto *template_army = Armysetlist::instance()->getArmy(set, army_type);
   if (!template_army || 
       (template_army->getAwardable() == true && produce_allies == false) ||
       template_army->isHero())
@@ -456,7 +456,7 @@ void City::setRandomArmytypes(bool produce_allies, int likely)
     }
 
   army_type += 1 + (Rnd::rand() % (2 + (produce_allies ? 2 : 0)));
-  template_army = Armysetlist::getInstance()->getArmy(set, army_type);
+  template_army = Armysetlist::instance()->getArmy(set, army_type);
   if (!template_army ||
       (template_army->getAwardable() == true && produce_allies == false) ||
       template_army->isHero())
@@ -479,7 +479,7 @@ void City::setRandomArmytypes(bool produce_allies, int likely)
     army_type += 1 + (Rnd::rand() % (7 + (produce_allies ? 2 : 0)));
   else
     army_type += 1 + (Rnd::rand() % (2 + (produce_allies ? 2 : 0)));
-  template_army = Armysetlist::getInstance()->getArmy(set, army_type);
+  template_army = Armysetlist::instance()->getArmy(set, army_type);
   if (!template_army ||
       (template_army->getAwardable() == true && produce_allies == false) ||
       template_army->isHero())
@@ -499,7 +499,7 @@ void City::setRandomArmytypes(bool produce_allies, int likely)
     }
 
   army_type += 1 + (Rnd::rand() % (3 + (produce_allies ? 2 : 0)));
-  template_army = Armysetlist::getInstance()->getArmy(set, army_type);
+  template_army = Armysetlist::instance()->getArmy(set, army_type);
   if (!template_army ||
       (template_army->getAwardable() == true && produce_allies == false) ||
       template_army->isHero())
@@ -519,12 +519,12 @@ int City::getDefenseLevel() const
   if (isBurnt()) 
     return 0;
   else if (num_production_bases <= 2 && 
-	   getOwner() == Playerlist::getInstance()->getNeutral())
+	   getOwner() == Playerlist::getNeutral())
     return 1;
   else if (num_production_bases <= 2)
     return 2;
   else if (num_production_bases > 2 && 
-	   getOwner() == Playerlist::getInstance()->getNeutral())
+	   getOwner() == Playerlist::getNeutral())
     return 2;
   else if (num_production_bases > 2)
     return 3;
@@ -550,7 +550,7 @@ std::list<Stack*> City::diseaseDefenders(double percent_to_kill)
       for (Stack::iterator j = stacks[i]->begin(); j != stacks[i]->end(); ++j)
         ids.push_back((*j)->getId());
     }
-  std::random_shuffle(ids.begin(), ids.end());
+  std::shuffle(ids.begin(), ids.end(), Rnd::gen ());
   for (unsigned int i = 0; i < num_armies_to_kill; i++)
     {
       Stack *s = getOwner()->getStacklist()->getArmyStackById(ids[i]);
@@ -586,4 +586,21 @@ void City::persuadeDefenders(Player *new_owner)
     }
   conquer(new_owner);
 }
-// End of file
+
+void City::squeezeProductionSlots ()
+{
+  //sort the production slot ist whether or not
+  //the slot is empty
+  std::sort
+    (begin (), end (),
+     [](const ProdSlot* a, const ProdSlot* b)
+     {
+       bool a_null = (a->getArmyProdBase () == nullptr);
+       bool b_null = (b->getArmyProdBase () == nullptr);
+
+       if (a_null != b_null)
+         return !a_null;
+
+       return a->getArmyProdBase () < b->getArmyProdBase ();
+     });
+}

@@ -1,9 +1,9 @@
-// Copyright (C) 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004 Bryan Duff
-// Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2011, 2014, 2020 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004 Bryan Duff
+//  Copyright (C) 2006 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2011, 2014, 2020, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef FIGHT_H
@@ -29,8 +28,9 @@
 #include <vector>
 #include <map>
 #include "vector.h"
-#include "LocationBox.h"
-#include "Tile.h"
+#include "location-box.h"
+#include "tile.h"
+#include "fight-result.h"
 
 class Stack;
 class Fighter;
@@ -71,21 +71,6 @@ struct FightItem
 class Fight
 {
     public:
-        //! The three possibilities how a fight can end
-        enum Result {
-	  //! There was no winner.
-	  /**
-	   * Although it is in the enumeration, every fight should always
-	   * have a winner.  No draws allowed because MAX_ROUNDS is 0.
-	   */
-	  DRAW = 0,
-
-	  //! The attacking list of stacks won the battle.
-	  ATTACKER_WON = 1,
-
-	  //! The defending list of stacks won the battle.
-	  DEFENDER_WON = 2
-	};
 
 	//! The kind of fight.  Whether the outcome is realized or not.
         enum FightType {
@@ -129,10 +114,13 @@ class Fight
 	 */
         void battle(bool intense);
 
-        Result battleFromHistory();
+        FightResult::Outcome battleFromHistory();
 
         //! Returns the result of the fight.
-        Result getResult() const {return d_result;}
+        FightResult::Outcome get_outcome () const
+          {
+            return d_fight_result.get_outcome ();
+          }
 
         //! Returns the list of things that happened in chronological order.
         std::list<FightItem> getCourseOfEvents() const {return d_actions;};
@@ -169,6 +157,16 @@ class Fight
 	static LocationBox calculateFightBox(Fight &fight);
 
         Glib::ustring getStrongestLivingHeroName(std::vector<Army *> s) const;
+
+        bool get_fighting_in_city () const
+          {
+            return m_fighting_in_city;
+          }
+
+        FightResult& get_fight_result ()
+          {
+            return d_fight_result;
+          }
     private:
 	//! Calculates one round of the fight.
         /** 
@@ -242,14 +240,16 @@ class Fight
 	//! The round of the fight.
         int d_turn;
 
-	//! The result of the fight.
-        Result d_result;
-
 	//! The kind of fight.
 	FightType d_type;
 
 	//! Whether or not we're rolling 24-sided dice or 20 sided dice.
 	bool d_intense_combat;
+
+        //! Whether or not the attacker stack has moved into a city.
+        bool m_fighting_in_city;
+
+        FightResult d_fight_result;
 };
 
 // Helper class; the single units participating in the fight are saved with
@@ -271,5 +271,4 @@ class Fighter
 };
 
 
-#endif // FIGHT_H
-
+#endif

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, Ben Asselstine
+//  Copyright (C) 2008, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,15 +12,14 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef IMMOVABLE_H
 #define IMMOVABLE_H
 
 #include "vector.h"
-#include "Positioned.h"
+#include "positioned.h"
 
 class XML_Helper;
 
@@ -50,6 +49,12 @@ class Immovable: private Positioned
     //! Return the position of the object on the game map.
     Vector<int> getPos() const {return d_pos;}
 
+    Immovable& operator=(const Immovable& other)
+      {
+        if (this != &other)
+            Positioned::operator=(other);
+        return *this;
+      }
 };
 
 #endif

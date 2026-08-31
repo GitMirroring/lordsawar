@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,38 +12,37 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sstream>
 #include <sigc++/functors/mem_fun.h>
 #include "ucompose.hpp"
 
 #include "army.h"
-#include "QPillageGold.h"
-#include "QuestsManager.h"
-#include "playerlist.h"
+#include "quest-pillage-gold.h"
+#include "quest-manager.h"
+#include "player-list.h"
 #include "city.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "hero.h"
 #include "rnd.h"
-#include "GameScenarioOptions.h"
+#include "game-scenario-options.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
-QuestPillageGold::QuestPillageGold(QuestsManager& q_mgr, guint32 hero)
-  : Quest(q_mgr, hero, Quest::PILLAGEGOLD), 
+QuestPillageGold::QuestPillageGold(guint32 hero)
+  : Quest(hero, Quest::PILLAGEGOLD), 
     d_to_pillage (850 + (Rnd::rand() % 630)), d_pillaged(0)
 {
   initDescription();
 }
 
-QuestPillageGold::QuestPillageGold(QuestsManager& q_mgr, XML_Helper* helper) 
-  : Quest(q_mgr, helper)
+QuestPillageGold::QuestPillageGold(XML_Helper* helper) 
+  : Quest(helper)
 {
-  helper->getData(d_to_pillage, "to_pillage");
-  helper->getData(d_pillaged, "pillaged");
+  helper->get(d_to_pillage, "to_pillage");
+  helper->get(d_pillaged, "pillaged");
 
   initDescription();
 }
@@ -54,8 +53,8 @@ QuestPillageGold::QuestPillageGold (const QuestPillageGold &q)
 {
 }
 
-QuestPillageGold::QuestPillageGold(QuestsManager& q_mgr, guint32 hero, guint32 gold)
-  : Quest(q_mgr, hero, Quest::PILLAGEGOLD), d_to_pillage (gold), d_pillaged(0)
+QuestPillageGold::QuestPillageGold(guint32 hero, guint32 gold)
+  : Quest(hero, Quest::PILLAGEGOLD), d_to_pillage (gold), d_pillaged(0)
 {
   initDescription();
 }
@@ -64,11 +63,11 @@ bool QuestPillageGold::save(XML_Helper *helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(Quest::d_tag);
+  retval &= helper->open_tag(Quest::d_tag);
   retval &= Quest::save(helper);
-  retval &= helper->saveData("to_pillage", d_to_pillage);
-  retval &= helper->saveData("pillaged",  d_pillaged);
-  retval &= helper->closeTag();
+  retval &= helper->save("to_pillage", d_to_pillage);
+  retval &= helper->save("pillaged",  d_pillaged);
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -81,7 +80,6 @@ Glib::ustring QuestPillageGold::getProgress() const
 void QuestPillageGold::getSuccessMsg(std::queue<Glib::ustring>& msgs) const
 {
   msgs.push(String::ucompose(_("You have managed to sack and pillage %1 gold."), d_pillaged));
-  msgs.push(_("Well done!"));
 }
 
 void QuestPillageGold::getExpiredMsg(std::queue<Glib::ustring>& msgs) const
@@ -101,7 +99,7 @@ void QuestPillageGold::armyDied(Army *a, bool heroIsCulprit)
   (void) heroIsCulprit;
 }
 
-void QuestPillageGold::cityAction(City *c, CityDefeatedAction action, 
+void QuestPillageGold::cityAction(City *c, CityDefeatedChoice action, 
 				  bool heroIsCulprit, int gold)
 {
   (void) c;
@@ -122,7 +120,7 @@ void QuestPillageGold::cityAction(City *c, CityDefeatedAction action,
 	  if (d_pillaged > d_to_pillage)
 	    {
 	      d_pillaged = d_to_pillage;
-	      d_q_mgr.questCompleted(d_hero);
+              QuestsManager::instance ()->questCompleted(d_hero);
 	    }
 	}
     }

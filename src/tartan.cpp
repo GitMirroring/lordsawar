@@ -1,4 +1,4 @@
-//  Copyright (C) 2017, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2017, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,19 +12,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-//#include <iostream>
 #include <fstream>
 #include <sstream>
 #include "tartan.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "ucompose.hpp"
-#include "shieldset.h"
-#include "tarhelper.h"
-#include "gui/image-helpers.h"
-#include "TarFileMaskedImage.h"
+#include "shield-set.h"
+#include "tar-helper.h"
+#include "image-helpers.h"
+#include "tar-file-masked-image.h"
 
 Glib::ustring Tartan::d_tartan_tag = "tartan";
 
@@ -34,18 +32,18 @@ Glib::ustring Tartan::d_tartan_tag = "tartan";
 Tartan::Tartan(XML_Helper* helper)
 {
   d_left_mimage =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
                             PixMask::DIMENSION_ANY);
   d_center_mimage =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
                             PixMask::DIMENSION_ANY);
   d_right_mimage =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
                             PixMask::DIMENSION_ANY);
 
-  d_left_mimage->load (helper, "left_image", "left_image_num_masks");
-  d_center_mimage->load (helper, "center_image", "center_image_num_masks");
-  d_right_mimage->load (helper, "right_image", "right_image_num_masks");
+  d_left_mimage->load (helper, "left_image");
+  d_center_mimage->load (helper, "center_image");
+  d_right_mimage->load (helper, "right_image");
 }
 
 Tartan::Tartan(const Tartan& t)
@@ -58,13 +56,13 @@ Tartan::Tartan(const Tartan& t)
 Tartan::Tartan()
 {
   d_left_mimage =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
                             PixMask::DIMENSION_ANY);
   d_center_mimage =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
                             PixMask::DIMENSION_ANY);
   d_right_mimage =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
                             PixMask::DIMENSION_ANY);
 }
 
@@ -79,11 +77,11 @@ bool Tartan::saveTartan(XML_Helper *helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(d_tartan_tag);
-  retval &= d_left_mimage->save (helper, "left_image", "left_image_num_masks");
-  retval &= d_center_mimage->save (helper, "center_image", "center_image_num_masks");
-  retval &= d_right_mimage->save (helper, "right_image", "right_image_num_masks");
-  retval &= helper->closeTag();
+  retval &= helper->open_tag(d_tartan_tag);
+  retval &= d_left_mimage->save (helper, "left_image");
+  retval &= d_center_mimage->save (helper, "center_image");
+  retval &= d_right_mimage->save (helper, "right_image");
+  retval &= helper->close_tag();
   return retval;
 }
 
@@ -107,4 +105,34 @@ Glib::ustring Tartan::tartanTypeToFriendlyName(const Tartan::Type type)
       case Tartan::RIGHT: return _("Right");
     }
   return _("Left");
+}
+
+int Tartan::get_tallest_tartan_component () const
+{
+  int height = 0;
+  if (d_left_mimage)
+    {
+      if (d_left_mimage->getImage ())
+        {
+          if (d_left_mimage->getImage ()->get_height () > height)
+            height = d_left_mimage->getImage ()->get_height ();
+        }
+    }
+  if (d_center_mimage)
+    {
+      if (d_center_mimage->getImage ())
+        {
+          if (d_center_mimage->getImage ()->get_height () > height)
+            height = d_center_mimage->getImage ()->get_height ();
+        }
+    }
+  if (d_right_mimage)
+    {
+      if (d_right_mimage->getImage ())
+        {
+          if (d_right_mimage->getImage ()->get_height () > height)
+            height = d_right_mimage->getImage ()->get_height ();
+        }
+    }
+  return height;
 }

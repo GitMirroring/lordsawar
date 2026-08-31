@@ -1,96 +1,52 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.96.3 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
-  <object class="GtkDialog" id="dialog">
-    <property name="can-focus">False</property>
+  <!-- interface-name item-bonus.ui -->
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkWindow" id="dialog">
+    <property name="destroy-with-parent">1</property>
     <property name="title" translatable="yes">Item Bonus</property>
-    <property name="window-position">center-on-parent</property>
-    <property name="destroy-with-parent">True</property>
-    <property name="type-hint">dialog</property>
-    <child internal-child="vbox">
+    <child>
       <object class="GtkBox" id="dialog-vbox">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="margin-start">6</property>
-        <property name="margin-end">6</property>
-        <property name="margin-top">6</property>
         <property name="margin-bottom">6</property>
+        <property name="margin-end">6</property>
+        <property name="margin-start">6</property>
+        <property name="margin-top">6</property>
         <property name="orientation">vertical</property>
         <property name="spacing">12</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area1">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <child>
-              <object class="GtkButton" id="close_button">
-                <property name="label" translatable="yes">Close</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="has-focus">True</property>
-                <property name="is-focus">True</property>
-                <property name="can-default">True</property>
-                <property name="has-default">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-underline">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack-type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
         <child>
           <object class="GtkBox" id="contents_vbox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
             <property name="orientation">vertical</property>
             <property name="spacing">18</property>
+            <property name="vexpand">1</property>
             <child>
               <object class="GtkScrolledWindow" id="treeview_scrolledwindow">
-                <property name="width-request">400</property>
                 <property name="height-request">250</property>
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
                 <property name="hscrollbar-policy">never</property>
-                <property name="shadow-type">in</property>
+                <property name="width-request">400</property>
                 <child>
-                  <object class="GtkTreeView" id="treeview">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="headers-visible">False</property>
-                    <property name="enable-search">False</property>
-                    <child internal-child="selection">
-                      <object class="GtkTreeSelection"/>
-                    </child>
-                  </object>
+                  <object class="GtkColumnView" id="treeview"/>
                 </child>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
             </child>
           </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="dialog-action_area1">
+            <property name="halign">end</property>
+            <property name="margin-top">6</property>
+            <child>
+              <object class="GtkButton" id="close_button">
+                <property name="focusable">1</property>
+                <property name="halign">center</property>
+                <property name="label" translatable="yes">Close</property>
+                <property name="receives-default">1</property>
+                <property name="use-underline">1</property>
+              </object>
+            </child>
+          </object>
         </child>
       </object>
     </child>
-    <action-widgets>
-      <action-widget response="-3">close_button</action-widget>
-    </action-widgets>
   </object>
 </interface>

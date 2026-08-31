@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2021 Ben Asselstine
+//  Copyright (C) 2008, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "MapBackpack.h"
-#include "Item.h"
-#include "xmlhelper.h"
+#include "map-backpack.h"
+#include "item.h"
+#include "xml-helper.h"
 
 Glib::ustring MapBackpack::d_mapbackpack_tag = "itemstack";
 
@@ -38,20 +37,20 @@ MapBackpack::MapBackpack(const MapBackpack& object, bool sync_id)
 MapBackpack::MapBackpack(XML_Helper* helper)
   :OwnerId (helper), Immovable(helper), UniquelyIdentified((guint32)0)
 {
-  helper->registerTag(Backpack::d_tag, sigc::mem_fun(this, &MapBackpack::loadItem));
-  helper->registerTag(Item::d_tag, sigc::mem_fun(this, &MapBackpack::loadItem));
+  helper->register_tag(Backpack::d_tag, sigc::mem_fun(*this, &MapBackpack::loadItem));
+  helper->register_tag(Item::d_tag, sigc::mem_fun(*this, &MapBackpack::loadItem));
 }
 
 bool MapBackpack::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(MapBackpack::d_mapbackpack_tag);
+  retval &= helper->open_tag(MapBackpack::d_mapbackpack_tag);
   retval &= OwnerId::save (helper);
-  retval &= helper->saveData("x", getPos().x);
-  retval &= helper->saveData("y", getPos().y);
-  retval &= Backpack::saveData(helper);
-  retval &= helper->closeTag();
+  retval &= helper->save("x", getPos().x);
+  retval &= helper->save("y", getPos().y);
+  retval &= Backpack::save(helper);
+  retval &= helper->close_tag();
 
   return retval;
 }

@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2014, 2017, 2020, 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2014, 2017, 2020, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,8 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef HERO_H
@@ -100,10 +99,10 @@ class Hero : public Army
 	bool isHero() const {return true;};
 
         //! Return the gender of the hero.
-        guint32 getGender() const {return d_gender;}
+        Gender getGender() const {return d_gender;}
 
         //! Return the id of the heroproto in hero templates
-        guint32 getHeroTypeId () const {return d_hero_type_id;}
+        guint32 getCharacterId () const {return d_character_id;}
 
         //! Can the hero fly?
         bool isFlyer() const;
@@ -129,7 +128,7 @@ class Hero : public Army
         void setGender(Gender gender){d_gender = gender;}
 
         //! Set the character/hero proto that the hero is based on.
-        void setHeroTypeId (guint32 id) {d_hero_type_id = id;}
+        void setCharacterId (guint32 id) {d_character_id = id;}
 
 	// Methods that operate on class data and do not modify the class.
 
@@ -184,7 +183,7 @@ class Hero : public Army
         int computeLevelGain(Stat stat) const;
 
         //! Checks whether or not the Hero unit can advance a level.
-        bool canGainLevel() const;
+        int canGainLevels();
 
 	//! Returns how many experience points the next level requires.
         guint32 getXpNeededForNextLevel() const;
@@ -204,7 +203,7 @@ class Hero : public Army
 	Hero::Gender d_gender;
 
         //! The hero id of the hero
-        guint32 d_hero_type_id;
+        guint32 d_character_id;
 };
 
-#endif //HERO_H
+#endif

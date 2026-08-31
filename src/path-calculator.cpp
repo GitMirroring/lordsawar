@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010, 2014, 2015, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2014, 2015, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,22 +12,21 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <stdlib.h>
 #include <string.h>
 #include <queue>
-#include "PathCalculator.h"
+#include "path-calculator.h"
 #include "army.h"
-#include "GameMap.h"
+#include "game-map.h"
 #include "path.h"
 #include "stack.h"
-#include "maptile.h"
+#include "map-tile.h"
 #include "city.h"
-#include "stacklist.h"
-#include "armysetlist.h"
-#include "armyprodbase.h"
+#include "stack-list.h"
+#include "army-set-list.h"
+#include "army-prod-base.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::flush<<std::endl;}
 #define debug(x)
@@ -347,7 +346,7 @@ bool PathCalculator::load_or_unload(Vector<int> src, Vector<int> dest, bool &shi
 
 int PathCalculator::pointsToMoveTo(Vector<int> pos, Vector<int> next) const
 {
-  Maptile* tile = GameMap::getInstance()->getTile(next);
+  Maptile* tile = GameMap::instance()->getTile(next);
   if (pos == next) //probably shouldn't happen
     return 0;
 
@@ -355,7 +354,7 @@ int PathCalculator::pointsToMoveTo(Vector<int> pos, Vector<int> next) const
 
   if (enemy_city_avoidance >= 1)
     {
-      if (GameMap::getInstance()->getBuilding(pos) == Maptile::CITY)
+      if (GameMap::instance()->getBuilding(pos) == Maptile::CITY)
         {
           //We will still try to avoid enemy cities a little.
           City *enemy = GameMap::getEnemyCity(pos);
@@ -400,9 +399,9 @@ bool PathCalculator::isBlockedDir(Vector<int> p, Vector<int> next)
             { 5, 6, 7 },
         };
       if (mountains)
-        return GameMap::getInstance()->getTile(p)->d_blocked[1][i[dx+1][dy+1]];
+        return GameMap::instance()->getTile(p)->d_blocked[1][i[dx+1][dy+1]];
       else
-        return GameMap::getInstance()->getTile(p)->d_blocked[0][i[dx+1][dy+1]];
+        return GameMap::instance()->getTile(p)->d_blocked[0][i[dx+1][dy+1]];
     }
 
   return false;
@@ -410,7 +409,7 @@ bool PathCalculator::isBlockedDir(Vector<int> p, Vector<int> next)
 
 bool PathCalculator::isBlocked(const Stack *s, Vector<int> pos, bool enemy_cities_block, bool enemy_stacks_block)
 {
-  const Maptile* tile = GameMap::getInstance()->getTile(pos);
+  const Maptile* tile = GameMap::instance()->getTile(pos);
 
   // Return true on every condition which may prevent the stack from
   // entering the tile, which are...
@@ -441,7 +440,7 @@ bool PathCalculator::isBlocked(Vector<int> pos)
   return isBlocked(stack, pos, enemy_city_avoidance < 0, enemy_stack_avoidance < 0);
 }
 
-int PathCalculator::calculate(Vector<int> dest, bool zig)
+int PathCalculator::calculateMoves(Vector<int> dest, bool zig)
 {
   int retval = 0;
   guint32 moves = 0, turns = 0, left = 0;
@@ -671,4 +670,25 @@ std::list<Vector<int> > PathCalculator::getReachablePositions(int mp)
 	positions.push_back(Vector<int>(i % width, i / width));
     }
   return positions;
+}
+    
+Vector<int> PathCalculator::getClosestPoint (std::vector<Vector<int>> positions)
+{
+  std::vector<std::pair<Vector<int>,int>> result;
+  for (auto pos : positions)
+    {
+      int mp = nodes[pos.toIndex ()].moves;
+      if (mp >= 0)
+        result.push_back (std::pair<Vector<int>,int>(pos, mp));
+    }
+  if (result.empty () == true)
+    return Vector<int>(-1,-1);
+  std::sort
+    (result.begin (), result.end (),
+     [] (const std::pair<Vector<int>, int>& a,
+         const std::pair<Vector<int>, int>& b)
+     {
+       return a.second < b.second;
+     });
+  return result.front ().first;
 }

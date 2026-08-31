@@ -1,4 +1,5 @@
-//  Copyright (C) 2007-2009, 2011, 2014, 2015, 2017, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2017, 2021,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef REWARD_H
@@ -22,7 +22,7 @@
 #include <gtkmm.h>
 #include <glibmm.h>
 #include "vector.h"
-#include "ruinlist.h"
+#include "ruin-list.h"
 
 class SightMap;
 class Player;
@@ -118,6 +118,8 @@ class Reward
         //! Returns the name of the reward.
         Glib::ustring getName() const {return d_name;}
 
+        //! Returns whether or not the reward is a unique one.
+        virtual bool is_renewable () const = 0;
 
 	// Set Methods
 
@@ -127,12 +129,12 @@ class Reward
 
 	// Methods that operate on the class data but do not modify the class.
 
-	//! Generates a description of this reward.
+	//! Generates a descriptive name for this reward.
 	/**
 	 * This method inspects the underlying reward and generates an
-	 * appropriate description.
+	 * appropriate name.
 	 */
-	Glib::ustring getDescription() const;
+	Glib::ustring generate_name () const;
 
 	//! Saves the data elements common to all rewards.
         /**
@@ -170,14 +172,16 @@ class Reward
         //! get a random reward type.  (when not hidden map, we don't get maps)
         static Type getRandomRewardType(bool no_ruins);
 
+        static bool is_valid (Reward *r);
         //! Make a random reward. (like for when we complete a quest)
         /**
-         * Usually rewards come from the rewardlist object, which is
-         * exhaustible, but this method can create a brand new reward.
-         * It won't give a map reward if we're not playing with a hidden map.
+         * Renewable rewards get created on the fly (gold, allies) and
+         * non-renewable rewards get pulled form the rewardlist object.
+         * When it is exhausted the non-renewable rewards don't get created
+         * and instead a gold reward is produced in its place.
          *
          */
-        static Reward* createRandomReward(bool take_from_list, bool no_ruins);
+        static Reward* createRandomReward(bool no_ruins);
     protected:
 
 	// DATA
@@ -216,6 +220,12 @@ class Reward_Gold : public Reward
 
 	//! Return the number of gold pieces associated with this reward.
 	guint32 getGold() const {return d_gold;}
+
+        //! Returns whether or not the reward is a unique one.
+        bool is_renewable () const
+          {
+            return true;
+          }
 
 	// Set Methods
 
@@ -291,6 +301,12 @@ class Reward_Allies: public Reward
 
 	//! Return the number allies that this reward will create.
 	guint32 getNoOfAllies() const {return d_count;}
+
+        //! Returns whether or not the reward is a unique one.
+        bool is_renewable () const
+          {
+            return true;
+          }
 
 	// Set Methods
 
@@ -416,6 +432,12 @@ class Reward_Item: public Reward
 	//! Get the Item object associated with this reward.
 	Item *getItem() const {return d_item;}
 
+        //! Returns whether or not the reward is a unique one.
+        bool is_renewable () const
+          {
+            return false;
+          }
+
         // Set Methods
 
         //! Set the item for this reward.
@@ -495,9 +517,20 @@ class Reward_Ruin: public Reward
 
 	// Get Methods
 
+        Vector<int> get_ruin_pos () const
+          {
+            return d_ruin_pos;
+          }
+
 	//! Return the Ruin object associated with this Reward_Ruin.
 	Ruin* getRuin() const 
-	  {return Ruinlist::getInstance()->getObjectAt(d_ruin_pos);}
+	  {return Ruinlist::instance()->getObjectAt(d_ruin_pos);}
+
+        //! Returns whether or not the reward is a unique one.
+        bool is_renewable () const
+          {
+            return false;
+          }
 
 	// Set Methods
 
@@ -602,6 +635,12 @@ class Reward_Map: public Reward
 
 	//! Return the name of the map in this reward.
 	Glib::ustring getMapName() const;
+
+        //! Returns whether or not the reward is a unique one.
+        bool is_renewable () const
+          {
+            return false;
+          }
 
 	// Methods that operate on the class data and modify the class.
 

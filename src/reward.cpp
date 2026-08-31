@@ -1,4 +1,5 @@
-//  Copyright (C) 2007-2009, 2011, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2017, 2020, 2021,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,29 +13,28 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sstream>
 #include <vector>
 #include <sigc++/functors/mem_fun.h>
 
-#include "SightMap.h"
+#include "sight-map.h"
 #include "reward.h"
 #include "army.h"
-#include "armysetlist.h"
-#include "playerlist.h"
-#include "ruinlist.h"
+#include "army-set-list.h"
+#include "player-list.h"
+#include "ruin-list.h"
 #include "ruin.h"
-#include "rewardlist.h"
-#include "Itemlist.h"
-#include "Item.h"
-#include "GameMap.h"
+#include "reward-list.h"
+#include "item-list.h"
+#include "item.h"
+#include "game-map.h"
 #include "ucompose.hpp"
-#include "stackreflist.h"
-#include "xmlhelper.h"
+#include "stack-ref-list.h"
+#include "xml-helper.h"
 #include "rnd.h"
-#include "GameScenarioOptions.h"
+#include "game-scenario-options.h"
 
 Glib::ustring Reward::d_tag = "reward";
 
@@ -46,9 +46,9 @@ Reward::Reward(Type type, Glib::ustring name)
 Reward::Reward(XML_Helper *helper)
 {
   Glib::ustring type_str;
-  helper->getData(type_str, "type");
+  helper->get(type_str, "type");
   d_type = rewardTypeFromString(type_str);
-  helper->getData(d_name, "name");
+  helper->get(d_name, "name");
 }
 
 Reward::Reward (const Reward& orig, bool sync_id)
@@ -61,7 +61,7 @@ Reward* Reward::handle_load(XML_Helper* helper)
 {
     guint32 t;
     Glib::ustring type_str;
-    helper->getData(type_str, "type");
+    helper->get(type_str, "type");
     t = rewardTypeFromString(type_str);
     switch (t)
       {
@@ -92,43 +92,28 @@ Reward::Type Reward::getRandomRewardType(bool exclude_ruins)
   return types[Rnd::rand() % types.size()];
 }
 
-Reward* Reward::createRandomReward(bool take_from_list, bool exclude_ruins)
+Reward* Reward::createRandomReward (bool exclude_ruins)
 {
+  bool take_from_list = true;
   Reward::Type reward_type = Reward::getRandomRewardType (exclude_ruins);
   switch (reward_type)
     {
     case Reward::GOLD:
-        {
-          Reward *goldReward;
-          if (take_from_list)
-            {
-              goldReward = Rewardlist::getInstance()->pop (Reward::GOLD);
-              if (goldReward)
-                return goldReward;
-            }
-          goldReward = Reward_Gold::createRandomReward();
-          return goldReward;
-        }
+      // renewable rewards aren't in the reward list
+      return Reward_Gold::createRandomReward();
       break;
+
     case Reward::ALLIES:
-        {
-          Reward *alliesReward;
-          if (take_from_list)
-            {
-              alliesReward = Rewardlist::getInstance()->pop (Reward::ALLIES);
-              if (alliesReward)
-                return alliesReward;
-            }
-          alliesReward = Reward_Allies::createRandomReward();
-          return alliesReward;
-        }
+      // renewable rewards aren't in the reward list
+      return Reward_Allies::createRandomReward();
       break;
+
     case Reward::ITEM:
         {
           Reward *itemReward;
           if (take_from_list)
             {
-              itemReward = Rewardlist::getInstance()->pop(Reward::ITEM);
+              itemReward = Rewardlist::instance()->pop(Reward::ITEM);
               if (itemReward)
                 return itemReward;
             }
@@ -136,12 +121,13 @@ Reward* Reward::createRandomReward(bool take_from_list, bool exclude_ruins)
           return itemReward;
         }
       break;
+
     case Reward::RUIN:
         {
           Reward *ruinReward;
           if (take_from_list)
             {
-              ruinReward = Rewardlist::getInstance()->pop (Reward::RUIN);
+              ruinReward = Rewardlist::instance()->pop (Reward::RUIN);
               if (ruinReward)
                 return ruinReward;
             }
@@ -149,12 +135,13 @@ Reward* Reward::createRandomReward(bool take_from_list, bool exclude_ruins)
           return ruinReward;
         }
       break;
+
     case Reward::MAP:
         {
           Reward *mapReward;
           if (take_from_list)
             {
-              mapReward = Rewardlist::getInstance()->pop (Reward::MAP);
+              mapReward = Rewardlist::instance()->pop (Reward::MAP);
               if (mapReward)
                 return mapReward;
             }
@@ -175,7 +162,7 @@ Reward_Gold::Reward_Gold(XML_Helper* helper)
     :Reward(helper)
 {
   d_type = Reward::GOLD;
-  helper->getData(d_gold, "gold");
+  helper->get(d_gold, "gold");
 }
 
 Reward_Gold::Reward_Gold (const Reward_Gold & orig, bool sync_id)
@@ -186,12 +173,12 @@ Reward_Gold::Reward_Gold (const Reward_Gold & orig, bool sync_id)
 bool Reward_Gold::save(XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->openTag(Reward::d_tag);
+  retval &= helper->open_tag(Reward::d_tag);
   Glib::ustring type_str = rewardTypeToString(Reward::Type(d_type));
-  retval &= helper->saveData("type", type_str);
-  retval &= helper->saveData("name", d_name);
-  retval &= helper->saveData("gold", d_gold);
-  retval &= helper->closeTag();
+  retval &= helper->save("type", type_str);
+  retval &= helper->save("name", d_name);
+  retval &= helper->save("gold", d_gold);
+  retval &= helper->close_tag();
   return retval;
 }
 
@@ -223,7 +210,7 @@ Reward_Allies::Reward_Allies()
 
 Reward_Allies::Reward_Allies(guint32 army_type, guint32 army_set, guint32 count)
     :Reward(Reward::ALLIES), 
-    d_army (Armysetlist::getInstance()->getArmy (army_set, army_type)),
+    d_army (Armysetlist::instance()->getArmy (army_set, army_type)),
     d_army_set (army_set), d_army_type (army_type), d_count(count)
 {
 }
@@ -238,10 +225,10 @@ Reward_Allies::Reward_Allies(XML_Helper* helper)
     :Reward(helper)
 {
   d_type = Reward::ALLIES;
-  helper->getData(d_count, "num_allies");
-  helper->getData(d_army_type, "ally_type");
-  helper->getData(d_army_set, "ally_armyset");
-  d_army = Armysetlist::getInstance()->getArmy (d_army_set, d_army_type);
+  helper->get(d_count, "num_allies");
+  helper->get(d_army_type, "ally_type");
+  helper->get(d_army_set, "ally_armyset");
+  d_army = Armysetlist::instance()->getArmy (d_army_set, d_army_type);
 }
 
 Reward_Allies::Reward_Allies (const Reward_Allies& orig, bool sync_id)
@@ -254,14 +241,14 @@ Reward_Allies::Reward_Allies (const Reward_Allies& orig, bool sync_id)
 bool Reward_Allies::save(XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->openTag(Reward::d_tag);
+  retval &= helper->open_tag(Reward::d_tag);
   Glib::ustring type_str = rewardTypeToString(Reward::Type(d_type));
-  retval &= helper->saveData("type", type_str);
-  retval &= helper->saveData("name", d_name);
-  retval &= helper->saveData("num_allies", d_count);
-  retval &= helper->saveData("ally_type", d_army_type);
-  retval &= helper->saveData("ally_armyset", d_army_set);
-  retval &= helper->closeTag();
+  retval &= helper->save("type", type_str);
+  retval &= helper->save("name", d_name);
+  retval &= helper->save("num_allies", d_count);
+  retval &= helper->save("ally_type", d_army_type);
+  retval &= helper->save("ally_armyset", d_army_set);
+  retval &= helper->close_tag();
   return retval;
 }
 	
@@ -290,10 +277,10 @@ guint32 Reward_Allies::getRandomAmountOfAllies()
 
 const ArmyProto* Reward_Allies::randomArmyAlly()
 {
-  Player *p = Playerlist::getInstance()->getActiveplayer();
+  Player *p = Playerlist::instance()->getActiveplayer();
   if (!p)
-    p = Playerlist::getInstance()->getNeutral();
-  return Armysetlist::getInstance()->get(p->getArmyset())->getRandomAwardableAlly();
+    p = Playerlist::getNeutral();
+  return Armysetlist::instance()->get(p->getArmyset())->getRandomAwardableAlly();
 }
 
 bool Reward_Allies::addAllies(Player *p, Vector<int> pos, const ArmyProto *army, guint32 alliesCount, StackReflist *stacks)
@@ -302,7 +289,7 @@ bool Reward_Allies::addAllies(Player *p, Vector<int> pos, const ArmyProto *army,
     {
       Army* ally = new Army(*army, p);
       ally->setUpkeep(0);
-      Stack *s = GameMap::getInstance()->addArmy(pos, ally);
+      Stack *s = GameMap::instance()->addArmy(pos, ally);
       if (s == NULL)
         return false;
       else if (stacks)
@@ -320,7 +307,7 @@ bool Reward_Allies::addAllies(Player *p, Location *l, const Army *army, guint32 
     {
       Army* ally = new Army(*army, p);
       ally->setUpkeep(0);
-      Stack *s = GameMap::getInstance()->addArmy(l, ally);
+      Stack *s = GameMap::instance()->addArmy(l, ally);
       if (s == NULL)
         return false;
       else if (stacks)
@@ -386,7 +373,7 @@ Reward_Item::Reward_Item(XML_Helper* helper)
  : Reward(helper)
 {
   d_type = Reward::ITEM;
-  helper->registerTag(Item::d_tag, sigc::mem_fun(this, &Reward_Item::loadItem));
+  helper->register_tag(Item::d_tag, sigc::mem_fun(*this, &Reward_Item::loadItem));
 }
 
 Reward_Item::Reward_Item (const Reward_Item& orig, bool sync_id)
@@ -401,19 +388,19 @@ Reward_Item::Reward_Item (const Reward_Item& orig, bool sync_id)
 bool Reward_Item::save(XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->openTag(Reward::d_tag);
+  retval &= helper->open_tag(Reward::d_tag);
   Glib::ustring type_str = rewardTypeToString(Reward::Type(d_type));
-  retval &= helper->saveData("type", type_str);
-  retval &= helper->saveData("name", d_name);
+  retval &= helper->save("type", type_str);
+  retval &= helper->save("name", d_name);
   retval &= d_item->save(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
   return retval;
 }
 
 Item *Reward_Item::getRandomItem()
 {
-  Itemlist::iterator it = Itemlist::getInstance()->begin();
-  guint32 id = Rnd::rand() % Itemlist::getInstance()->size();
+  Itemlist::iterator it = Itemlist::instance()->begin();
+  guint32 id = Rnd::rand() % Itemlist::instance()->size();
   std::advance(it, id);
   ItemProto *i = it->second;
   return new Item(*i, id);
@@ -445,8 +432,8 @@ Reward_Ruin::Reward_Ruin(XML_Helper* helper)
   d_type = Reward::RUIN;
   guint32 x;
   guint32 y;
-  helper->getData(x, "x");
-  helper->getData(y, "y");
+  helper->get(x, "x");
+  helper->get(y, "y");
   d_ruin_pos = Vector<int>(x,y);
 }
 
@@ -458,28 +445,28 @@ Reward_Ruin::Reward_Ruin (const Reward_Ruin& orig, bool sync_id)
 bool Reward_Ruin::save(XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->openTag(Reward::d_tag);
+  retval &= helper->open_tag(Reward::d_tag);
   Glib::ustring type_str = rewardTypeToString(Reward::Type(d_type));
-  retval &= helper->saveData("type", type_str);
-  retval &= helper->saveData("name", d_name);
-  retval &= helper->saveData("x", getRuin()->getPos().x);
-  retval &= helper->saveData("y", getRuin()->getPos().y);
-  retval &= helper->closeTag();
+  retval &= helper->save("type", type_str);
+  retval &= helper->save("name", d_name);
+  retval &= helper->save("x", getRuin()->getPos().x);
+  retval &= helper->save("y", getRuin()->getPos().y);
+  retval &= helper->close_tag();
   return retval;
 }
 
 Ruin *Reward_Ruin::getRandomHiddenRuin()
 {
   std::vector<Ruin *>hidden_ruins;
-  for (auto it: *Ruinlist::getInstance())
+  for (auto it: *Ruinlist::instance())
     {
       if (it->isHidden())
 	if (it->getOwner() == NULL || 
-	    it->getOwner() == Playerlist::getInstance()->getNeutral())
+	    it->getOwner() == Playerlist::getNeutral())
 	  {
 	    //is it already being pointed to by a reward in the rewardlist?
 	    bool found = false;
-	    for (auto i: *Rewardlist::getInstance())
+	    for (auto i: *Rewardlist::instance())
 	      {
 		if (i->getType() == Reward::RUIN)
 		  {
@@ -528,7 +515,7 @@ bool Reward_Map::loadMap(Glib::ustring tag, XML_Helper* helper)
 Reward_Map::Reward_Map(XML_Helper* helper)
     :Reward(helper)
 {
-  helper->registerTag(SightMap::d_tag, sigc::mem_fun(this, &Reward_Map::loadMap));
+  helper->register_tag(SightMap::d_tag, sigc::mem_fun(*this, &Reward_Map::loadMap));
 }
 
 Reward_Map::Reward_Map (const Reward_Map& orig, bool sync_id)
@@ -540,20 +527,20 @@ Reward_Map::Reward_Map (const Reward_Map& orig, bool sync_id)
 bool Reward_Map::save(XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->openTag(Reward::d_tag);
+  retval &= helper->open_tag(Reward::d_tag);
   Glib::ustring type_str = rewardTypeToString(Reward::Type(d_type));
-  retval &= helper->saveData("type", type_str);
-  retval &= helper->saveData("name", d_sightmap->getName());
+  retval &= helper->save("type", type_str);
+  retval &= helper->save("name", d_sightmap->getName());
   retval &= d_sightmap->save(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
   return retval;
 }
 
 void Reward_Map::getRandomMap(int *x, int *y, int *width, int *height)
 {
-  int map_width = GameMap::getInstance()->getWidth();
+  int map_width = GameMap::instance()->getWidth();
   *x = Rnd::rand() % (map_width - (map_width / 10));
-  int map_height = GameMap::getInstance()->getHeight();
+  int map_height = GameMap::instance()->getHeight();
   *y = Rnd::rand() % (map_height - (map_height / 10));
   *width = ((Rnd::rand() % (map_width - *x)) + (map_width / 10));
   *height = ((Rnd::rand() % (map_height - *y)) + (map_height / 10));
@@ -573,51 +560,51 @@ Reward_Map *Reward_Map::createRandomReward()
                         Reward_Map::getRandomName(), height, width);
 }
 
-Glib::ustring Reward::getDescription() const
+Glib::ustring Reward::generate_name () const
 {
-  Glib::ustring s = "";
   switch (getType())
     {
     case Reward::GOLD:
 	{
-	  const Reward_Gold *g = dynamic_cast<const Reward_Gold*>(this);
-	  s += String::ucompose(ngettext("%1 Gold Piece", "%1 Gold Pieces", 
-					 g->getGold()), g->getGold());
-	  return s;
+	  const Reward_Gold *r = dynamic_cast<const Reward_Gold*>(this);
+	  return
+            String::ucompose (ngettext ("%1 Gold Piece", "%1 Gold Pieces",
+                                        r->getGold ()), r->getGold ());
 	}
+
     case Reward::ALLIES:
 	{
-	  const Reward_Allies *a = dynamic_cast<const Reward_Allies *>(this);
-	  if (a->getArmy())
-	    s += String::ucompose(_("%1 x %2"), a->getArmy()->getName(),
-				  a->getNoOfAllies());
-	  return s;
+	  const Reward_Allies *r = dynamic_cast<const Reward_Allies *>(this);
+	  if (r->getArmy ())
+            return
+              String::ucompose (_("%1 x %2"), r->getArmy ()->getName (),
+                                r->getNoOfAllies ());
+	  return "";
 	}
+
     case Reward::ITEM:
 	{
-	  const Reward_Item *i = dynamic_cast<const Reward_Item *>(this);
-	  if (i->getItem())
-	    s += i->getItem()->getName();
-	  return s;
+	  const Reward_Item *r = dynamic_cast<const Reward_Item *>(this);
+	  if (r->getItem ())
+	    return r->getItem ()->getName ();
+	  return "";
 	}
+
     case Reward::RUIN:
 	{
 	  const Reward_Ruin *r = dynamic_cast<const Reward_Ruin *>(this);
 	  if (r->getRuin())
-	    s += r->getRuin()->getName();
-	  return s;
+	    return r->getRuin ()->getName ();
+	  return "";
 	}
+
     case Reward::MAP:
 	{
-	  const Reward_Map *m = dynamic_cast<const Reward_Map *>(this);
-	  s += String::ucompose(_("Map: %1,%2 %3x%4"), 
-				  m->getLocation().x, m->getLocation().y,
-				  m->getSightMap()->h, 
-                                  m->getSightMap()->w);
-	  return s;
+	  const Reward_Map *r = dynamic_cast<const Reward_Map *>(this);
+          return r->getMapName ();
 	}
     }
-  return s;
+  return "";
 }
 
 Glib::ustring Reward::rewardTypeToString(const Reward::Type type)
@@ -695,4 +682,42 @@ Glib::ustring Reward_Map::getRandomName()
   names.push_back(_("dusty map"));
   names.push_back(_("blood-stained map"));
   return names[Rnd::rand() % names.size()];
+}
+
+bool Reward::is_valid (Reward *r)
+{
+  switch(r->getType ())
+    {
+    case Reward::GOLD:
+      return true;
+
+    case Reward::ALLIES:
+        {
+          auto a = dynamic_cast<Reward_Allies*> (r);
+          if (a->getNoOfAllies () <= 0)
+            return false;
+          return a->getArmy () != NULL;
+        }
+
+    case Reward::ITEM:
+        {
+          auto i = dynamic_cast<Reward_Item*> (r);
+          return i->getItem () != NULL;
+        }
+
+    case Reward::RUIN:
+        {
+          auto ru = dynamic_cast<Reward_Ruin*> (r);
+          return ru->getRuin () != NULL;
+        }
+
+    case Reward::MAP:
+        {
+          auto m = dynamic_cast<Reward_Map*> (r);
+          return m->getMapName () != "";
+        }
+
+      return true;
+    }
+  return true;
 }

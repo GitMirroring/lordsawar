@@ -1,6 +1,8 @@
+# Copyright (C) 2026 Ben Asselstine
+# This file is licensed under the terms of the GNU GPL version 3 or later.
 MAINTAINERCLEANFILES= Makefile.in
 
-editordir = $(datadir)/lordsawar/various/editor
+editordir = $(pkgdatadir)/various/editor
 editor_DATA = button_selector.png \
 			button_1x1.png \
 			button_2x2.png \
@@ -21,6 +23,14 @@ editor_DATA = button_selector.png \
 			button_flag.png \
 			button_move.png \
 			button_fight.png \
-			button_stone.png
+			button_stone.png \
+			button_1x1_dark.png \
+			button_2x2_dark.png \
+			button_3x3_dark.png \
+			button_6x6_dark.png \
+			button_12x12_dark.png \
+			button_erase_dark.png \
+			button_move_dark.png \
+			button_tilestyle.png
 
 EXTRA_DIST = $(editor_DATA) README

@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,97 +12,274 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef HERO_STRATEGY_EDITOR_ACTIONS_H
-#define HERO_STRATEGY_EDITOR_ACTIONS_H
+#ifndef CHARACTER_UNDO_ACTIONS_H
+#define CHARACTER_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
-
 #include "undo-action.h"
-#include "hero-strategy.h"
+#include "hero-proto.h"
+#include "hero-templates.h"
 #include "undo-mgr.h"
 
-//! A record of an event in the hero strategy editor
+//! A record of an event in the character editor
 /** 
- * The purpose of these classes is to implement undo/redo in the hero
- * strategy editor.
+ * The purpose of these classes is to implement undo/redo in the character
+ * editor.
  */
 
-class HeroStrategyEditorAction: public UndoAction
+class CharacterUndoAction: public UndoAction
+{
+public:
+
+    enum Type
+      {
+        NAME = 1,
+        GENDER = 2,
+        ADD = 3,
+        REMOVE = 4,
+        STRATEGY = 5,
+        BACKPACK = 6,
+        DESCRIPTION = 7,
+      };
+
+    CharacterUndoAction(Type type, bool agg = false)
+      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                    UndoAction::AGGREGATE_NONE), m_type (type)
+        {
+        }
+
+    Type get_type() const
+      {
+        return m_type;
+      }
+
+protected:
+
+    Type m_type;
+};
+
+class CharacterUndoAction_Index: public CharacterUndoAction
+{
+public:
+    CharacterUndoAction_Index (Type t, guint32 i, bool agg = false)
+      : CharacterUndoAction (t, agg), m_index (i)
+      {
+      }
+
+    ~CharacterUndoAction_Index ()
+      {
+      }
+
+    guint32 get_index () const
+      {
+        return m_index;
+      }
+private:
+    guint32 m_index;
+};
+
+class CharacterUndoAction_Name: public CharacterUndoAction_Index,
+    public UndoCursor
+{
+public:
+    CharacterUndoAction_Name (guint32 i, Glib::ustring n, UndoMgr *u,
+                              Gtk::Entry *e)
+      : CharacterUndoAction_Index (NAME, i, true),
+      UndoCursor (u->get_pos (e), e), m_name (n)
+  {
+  }
+
+    ~CharacterUndoAction_Name ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Name";
+      }
+
+    Glib::ustring get_name () const
+      {
+        return m_name;
+      }
+
+private:
+    Glib::ustring m_name;
+};
+
+class CharacterUndoAction_Gender: public CharacterUndoAction_Index
+{
+public:
+    CharacterUndoAction_Gender (guint32 i, Hero::Gender g)
+      : CharacterUndoAction_Index (GENDER, i), m_gender (g)
+      {
+      }
+
+    ~CharacterUndoAction_Gender ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Gender";
+      }
+
+    Hero::Gender get_gender () const
+      {
+        return m_gender;
+      }
+
+private:
+    Hero::Gender m_gender;
+};
+
+class CharacterUndoAction_Save : public CharacterUndoAction
 {
     public:
-
-        enum Type
+        CharacterUndoAction_Save (Type t, HeroTemplates *h)
+          :CharacterUndoAction (t, false), m_heroes (h)
           {
-            TYPE = 1,
-            TURNS = 2,
-            NUM_HELPERS = 3,
-            FALLBACK_TYPE = 4,
-          };
+          }
 
-	//! Default constructor.
-        HeroStrategyEditorAction(Type type, UndoAction::AggregateType aggregate = UndoAction::AGGREGATE_NONE) : UndoAction (aggregate), d_type(type) {}
+        ~CharacterUndoAction_Save ()
+          {
+            delete m_heroes;
+          }
 
-        Type getType() const {return d_type;}
+        void clear_heroes ()
+          {
+            m_heroes = NULL;
+          }
 
-    protected:
-
-        Type d_type;
-};
-
-class HeroStrategyEditorAction_Strategy: public HeroStrategyEditorAction
-{
-    public:
-        HeroStrategyEditorAction_Strategy (Type t, HeroStrategy *s, bool agg = false)
-          : HeroStrategyEditorAction (t, agg ? UndoAction::AGGREGATE_DELAY : UndoAction::AGGREGATE_NONE), d_strategy (HeroStrategy::copy (s)) { }
-        ~HeroStrategyEditorAction_Strategy () { delete d_strategy; }
-
-        HeroStrategy *getStrategy () const {return d_strategy;}
+        HeroTemplates * get_heroes () const
+          {
+            return m_heroes;
+          }
     private:
-        HeroStrategy *d_strategy;
+        HeroTemplates *m_heroes;
 };
 
-class HeroStrategyEditorAction_Type : public HeroStrategyEditorAction_Strategy
+class CharacterUndoAction_Add: public CharacterUndoAction_Save
 {
-    public:
-        HeroStrategyEditorAction_Type (HeroStrategy *s)
-          :HeroStrategyEditorAction_Strategy (TYPE, s, false) {}
-        ~HeroStrategyEditorAction_Type () {}
+public:
+    CharacterUndoAction_Add (HeroTemplates *t)
+      :CharacterUndoAction_Save (ADD, t)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Type";}
+    ~CharacterUndoAction_Add ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Add";
+      }
 };
 
-class HeroStrategyEditorAction_Turns : public HeroStrategyEditorAction_Strategy
+class CharacterUndoAction_Remove: public CharacterUndoAction_Save
 {
-    public:
-        HeroStrategyEditorAction_Turns (HeroStrategy *s)
-          :HeroStrategyEditorAction_Strategy (TURNS, s, false) {}
-        ~HeroStrategyEditorAction_Turns () {}
+public:
+    CharacterUndoAction_Remove (HeroTemplates *t)
+      :CharacterUndoAction_Save (REMOVE, t)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Turns";}
+    ~CharacterUndoAction_Remove ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Remove";
+      }
 };
 
-class HeroStrategyEditorAction_NumHelpers : public HeroStrategyEditorAction_Strategy
+class CharacterUndoAction_Strategy: public CharacterUndoAction_Index
 {
-    public:
-        HeroStrategyEditorAction_NumHelpers (HeroStrategy *s)
-          :HeroStrategyEditorAction_Strategy (NUM_HELPERS, s, false) {}
-        ~HeroStrategyEditorAction_NumHelpers () {}
+public:
+    CharacterUndoAction_Strategy (guint32 i, HeroStrategy *s)
+      : CharacterUndoAction_Index (STRATEGY, i),
+      m_strategy (HeroStrategy::copy (s))
+  {
+  }
 
-        Glib::ustring getActionName () const {return "NumHelpers";}
+    ~CharacterUndoAction_Strategy ()
+      {
+        delete m_strategy;
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Strategy";
+      }
+
+    HeroStrategy *get_strategy () const
+      {
+        return m_strategy;
+      }
+
+private:
+    HeroStrategy* m_strategy;
 };
 
-class HeroStrategyEditorAction_FallbackType : public HeroStrategyEditorAction_Strategy
+class CharacterUndoAction_Backpack: public CharacterUndoAction_Index
 {
-    public:
-        HeroStrategyEditorAction_FallbackType (HeroStrategy *s)
-          :HeroStrategyEditorAction_Strategy (FALLBACK_TYPE, s, false) {}
-        ~HeroStrategyEditorAction_FallbackType () {}
+public:
+    CharacterUndoAction_Backpack (guint32 i, std::list<guint32> items)
+      : CharacterUndoAction_Index (BACKPACK, i), m_items (items)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "FallbackType";}
+    ~CharacterUndoAction_Backpack ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Backpack";
+      }
+
+    std::list<guint32> get_backpack () const
+      {
+        return m_items;
+      }
+
+private:
+    std::list<guint32> m_items;
 };
-#endif //HERO_STRATEGY_EDITOR_ACTIONS_H
+
+class CharacterUndoAction_Desc: public CharacterUndoAction_Index,
+    public UndoCursor
+{
+public:
+    CharacterUndoAction_Desc (guint32 i, Glib::ustring d, UndoMgr *u,
+                              Gtk::Entry *e)
+      : CharacterUndoAction_Index (DESCRIPTION, i, true),
+      UndoCursor (u->get_pos (e), e), m_desc (d)
+  {
+  }
+
+    ~CharacterUndoAction_Desc ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Description";
+      }
+
+    Glib::ustring get_description () const
+      {
+        return m_desc;
+      }
+
+private:
+    Glib::ustring m_desc;
+};
+
+#endif

@@ -1,14 +1,8 @@
+# Copyright (C) 2026 Ben Asselstine
+# This file is licensed under the terms of the GNU GPL version 3 or later.
 MAINTAINERCLEANFILES = Makefile.in
 
-lordsawarshielddir = $(datadir)/lordsawar/shield
-
-dol.lws: dol.lws.in
-	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/dol.lws.in $(builddir)/dol.lws && \
-	$(top_srcdir)/create-lw-file $(builddir)/dol.lws $(IMAGES)
-
-DISTCLEANFILES = dol.lws 
-
-lordsawarshield_DATA = dol.lws
+lordsawarshielddir = $(pkgdatadir)/shields
 
 IMAGES = \
 	$(srcdir)/large-black-shield.png \
@@ -41,6 +35,15 @@ IMAGES = \
 	$(srcdir)/left-tartan.png \
 	$(srcdir)/center-tartan.png \
 	$(srcdir)/right-tartan.png
+
+dol.lws: dol.lws.in $(IMAGES)
+	rm $(builddir)/dol.lws -f 2>/dev/null && \
+	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/dol.lws.in $(builddir)/dol.lws && \
+	$(top_srcdir)/create-lw-file $(builddir)/dol.lws $(IMAGES)
+
+CLEANFILES = dol.lws 
+
+lordsawarshield_DATA = dol.lws
 
 EXTRA_DIST = \
 	dol.lws.in \

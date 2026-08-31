@@ -1,4 +1,4 @@
-//  Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sstream>
 #include <vector>
@@ -32,7 +31,7 @@ HeroStrategy::HeroStrategy (Type type)
 HeroStrategy::HeroStrategy (XML_Helper *helper)
 {
   Glib::ustring type_str;
-  helper->getData (type_str, "type");
+  helper->get (type_str, "type");
 }
 
 HeroStrategy::HeroStrategy (const HeroStrategy& orig)
@@ -44,7 +43,7 @@ HeroStrategy* HeroStrategy::handle_load (XML_Helper* helper)
 {
     guint32 t;
     Glib::ustring type_str;
-    helper->getData (type_str, "type");
+    helper->get (type_str, "type");
     t = heroStrategyTypeFromString (type_str);
     switch (t)
       {
@@ -77,11 +76,11 @@ HeroStrategy_None::HeroStrategy_None (const HeroStrategy_None & orig)
 bool HeroStrategy_None::save (XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->openTag (HeroStrategy::d_tag);
+  retval &= helper->open_tag (HeroStrategy::d_tag);
   Glib::ustring type_str =
     heroStrategyTypeToString (HeroStrategy::Type (d_type));
-  retval &= helper->saveData ("type", type_str);
-  retval &= helper->closeTag ();
+  retval &= helper->save ("type", type_str);
+  retval &= helper->close_tag ();
   return retval;
 }
 
@@ -103,7 +102,7 @@ HeroStrategy_Random::HeroStrategy_Random (XML_Helper* helper)
  : HeroStrategy (helper)
 {
   d_type = HeroStrategy::RANDOM;
-  helper->getData (d_turns, "turns");
+  helper->get (d_turns, "turns");
 }
 
 HeroStrategy_Random::HeroStrategy_Random (const HeroStrategy_Random& orig)
@@ -114,12 +113,12 @@ HeroStrategy_Random::HeroStrategy_Random (const HeroStrategy_Random& orig)
 bool HeroStrategy_Random::save (XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->openTag (HeroStrategy::d_tag);
+  retval &= helper->open_tag (HeroStrategy::d_tag);
   Glib::ustring type_str =
     heroStrategyTypeToString (HeroStrategy::Type (d_type));
-  retval &= helper->saveData ("type", type_str);
-  retval &= helper->saveData ("turns", d_turns);
-  retval &= helper->closeTag ();
+  retval &= helper->save ("type", type_str);
+  retval &= helper->save ("turns", d_turns);
+  retval &= helper->close_tag ();
   return retval;
 }
 
@@ -157,9 +156,9 @@ HeroStrategy_SimpleQuester::HeroStrategy_SimpleQuester (XML_Helper* helper)
 {
   d_type = HeroStrategy::SIMPLE_QUESTER;
   Glib::ustring type_str;
-  helper->getData (type_str, "fallback_type");
+  helper->get (type_str, "fallback_type");
   d_fallback_type = heroStrategyTypeFromString (type_str);
-  helper->getData (d_num_helpers, "num_helpers");
+  helper->get (d_num_helpers, "num_helpers");
 }
 
 HeroStrategy_SimpleQuester::HeroStrategy_SimpleQuester (const HeroStrategy_SimpleQuester& orig)
@@ -171,14 +170,14 @@ HeroStrategy_SimpleQuester::HeroStrategy_SimpleQuester (const HeroStrategy_Simpl
 bool HeroStrategy_SimpleQuester::save (XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->openTag (HeroStrategy::d_tag);
+  retval &= helper->open_tag (HeroStrategy::d_tag);
   Glib::ustring type_str =
     heroStrategyTypeToString (HeroStrategy::Type (d_type));
-  retval &= helper->saveData ("type", type_str);
+  retval &= helper->save ("type", type_str);
   type_str = heroStrategyTypeToString (HeroStrategy::Type (d_fallback_type));
-  retval &= helper->saveData ("fallback_type", type_str);
-  retval &= helper->saveData ("num_helpers", d_num_helpers);
-  retval &= helper->closeTag ();
+  retval &= helper->save ("fallback_type", type_str);
+  retval &= helper->save ("num_helpers", d_num_helpers);
+  retval &= helper->close_tag ();
   return retval;
 }
 

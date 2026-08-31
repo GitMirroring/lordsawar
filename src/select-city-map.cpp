@@ -1,4 +1,4 @@
-// Copyright (C) 2011, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2017, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,20 +12,20 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
 #include "select-city-map.h"
 
 #include "city.h"
-#include "citylist.h"
-#include "playerlist.h"
+#include "city-list.h"
+#include "player-list.h"
 #include <assert.h>
 
 SelectCityMap::SelectCityMap(SelectCityMap::Type type)
 {
   d_type = type;
+  create_hotmap ();
 }
 
 void SelectCityMap::after_draw()
@@ -41,7 +41,9 @@ void SelectCityMap::mouse_button_event(MouseButtonEvent e)
       e.state == MouseButtonEvent::PRESSED)
     {
       Vector<int> dest = mapFromScreen(e.pos);
-      City* nearestCity = Citylist::getInstance()->getNearestVisibleCity(dest, 4);
+      if (!is_hot (dest))
+        return;
+      City* nearestCity = Citylist::instance()->getNearestVisibleCity(dest, 4);
       if (nearestCity)
         {
           bool valid = false;
@@ -52,11 +54,11 @@ void SelectCityMap::mouse_button_event(MouseButtonEvent e)
               valid = true;
               break;
             case NEUTRAL_CITY:
-              if (owner == Playerlist::getInstance()->getNeutral())
+              if (owner == Playerlist::getNeutral())
                 valid = true;
               break;
             case FRIENDLY_CITY:
-              if (owner == Playerlist::getInstance()->getActiveplayer())
+              if (owner == Playerlist::getActiveplayer())
                 valid = true;
               break;
             case ENEMY_CITY:
@@ -73,5 +75,39 @@ void SelectCityMap::mouse_button_event(MouseButtonEvent e)
               map_changed.emit(surface);
             }
         }
+    }
+}
+
+void SelectCityMap::create_hotmap ()
+{
+  clear_hotmap ();
+  switch (d_type)
+    {
+    case ANY_CITY:
+      for (auto c : *Citylist::instance ())
+        if (!c->isBurnt () && !is_fogged (c))
+          add_to_hotmap (*c);
+      break;
+
+    case NEUTRAL_CITY:
+      for (auto c : *Citylist::instance ())
+        if (!c->isBurnt () && !is_fogged (c) &&
+            c->getOwner () == Playerlist::getNeutral ())
+          add_to_hotmap (*c);
+      break;
+
+    case FRIENDLY_CITY:
+      for (auto c : *Citylist::instance ())
+        if (!c->isBurnt () && !is_fogged (c) &&
+            c->getOwner () == Playerlist::getActiveplayer ())
+          add_to_hotmap (*c);
+      break;
+
+    case ENEMY_CITY:
+      for (auto c : *Citylist::instance ())
+        if (!c->isBurnt () && !is_fogged (c) &&
+            c->getOwner () != Playerlist::getActiveplayer ())
+          add_to_hotmap (*c);
+      break;
     }
 }

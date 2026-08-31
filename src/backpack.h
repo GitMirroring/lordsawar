@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2010, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2008, 2010, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef BACKPACK_H
@@ -72,7 +71,7 @@ class Backpack: public std::list<Item*>
 	 *
          * @return True if saving went well, false otherwise.
          */
-        bool saveData(XML_Helper* helper) const;
+        bool saveContents (XML_Helper* helper) const;
 
         //! Remove an Item from the backpack of the hero.
         /**
@@ -143,6 +142,9 @@ class Backpack: public std::list<Item*>
 
 	//! Tally the items that let stacks fly.
 	guint32 countStackFlightGivers();
+
+        //! remove i1 and add i2
+        bool replace (Item *i1, Item *i2);
     protected:
 	bool loadItem(Glib::ustring tag, XML_Helper* helper);
     private:
@@ -150,5 +152,3 @@ class Backpack: public std::list<Item*>
 };
 
 #endif
-
-// End of file

@@ -1,12 +1,15 @@
+# Copyright (C) 2026 Ben Asselstine
+# This file is licensed under the terms of the GNU GPL version 3 or later.
 MAINTAINERCLEANFILES = Makefile.in
 
-lordsawararmydir = $(datadir)/lordsawar/army
+lordsawararmydir = $(pkgdatadir)/armies
 
-default.lwa: default.lwa.in
+default.lwa: default.lwa.in $(IMAGES)
+	rm -f $(builddir)/default.lwa 2>/dev/null && \
 	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/default.lwa.in $(builddir)/default.lwa && \
 	$(top_srcdir)/create-lw-file $(builddir)/default.lwa $(IMAGES)
 
-DISTCLEANFILES = default.lwa 
+CLEANFILES = default.lwa 
 
 lordsawararmy_DATA = default.lwa
 

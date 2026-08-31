@@ -1,0 +1,54 @@
+event chains
+
+at certain moments in gameplay, a event chain is entered into.
+this means there's some sort of ui blocking happening, where one thing necessarily happens after the other.
+e.g. where we have to wait before proceeding.
+
+these chains are the annoying bits in the codebase.
+
+there are the following chains:
+end of round
+move
+initialize turn
+
+the end of round chain
+
+the end of round chain is simple, if there are any players who've lost all their cities we display a dialog for each one.
+when we're done with the dialogs we finish the round and kick off the next one.  the important thing here is that the dialogs are chained, we have to click close on one of them to see the next one and so on, for the gameplay to continue.
+
+the move chain
+
+the move chain is more complex.
+
+in the case where we're not attacking anything, we simply wait for each step on a delay.
+we treat the final step as its own thing in the chain.
+
+in the case where we attack in the field, there are a series of things that might happen:
+1. one or more quests might be completed
+2. one or more heroes could advance in levels
+3. one or more armies might get a medal
+
+in the case where we attack a city, this is the series of things that might happen if we won:
+1. one or more heroes could advance in levels
+2. one or more armies might get a medal
+3. the city might be looted, that's a dialog.
+4. one or more quests might be completed, that's a series of dialogs. (maybe we killed a hero)
+5. the city defeat dialog where we select occupy/sack etc. 
+6. we might show the 'city has been razed' dialog.
+7. we might show *another* quest completion dialog based on occupy/sack etc.
+8. we show the city dialog
+
+initialize turn
+
+at the start of a turn:
+1. maybe show the next turn dialog
+2. maybe show the commentator (the warlord says something )
+3. maybe show the hero recruit dialog
+4. maybe show the hero brings allies dialog
+5. maybe show the quest expired dialog
+6. maybe show the city too poor to produce dialog
+7. maybe show the city dialog
+8. maybe show the surrender offer dialog
+
+game over is emitted at end of round or after a surrender at the start of a turn, and its dialog doesn't block.
+

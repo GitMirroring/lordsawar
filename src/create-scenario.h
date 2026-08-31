@@ -1,8 +1,8 @@
-// Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2006, 2007, 2008, 2009, 2012, 2014, 2015, 2020,
-// 2021 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2006, 2007, 2008, 2009, 2012, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef CREATE_SCENARIO_H
@@ -27,7 +26,10 @@
 #include <list>
 #include <gtkmm.h>
 #include <sigc++/signal.h>
-#include "CreateScenarioRandomize.h"
+#include "create-scenario-randomize.h"
+#include "road.h"
+#include "bridge.h"
+#include "stone.h"
 #include "vector.h"
 
 class GameParameters;
@@ -98,23 +100,21 @@ class CreateScenario : public CreateScenarioRandomize
           * 
           * @param name     the name of the player
           * @param armyset  the name of the player's armyset
-          * @param colors   the colors of the player
+          * @param shield   the index into the Shieldset
           * @param type     the type of the player (see class player for more info)
           * @return a pointer to the created player
           */
         Player* addPlayer(Glib::ustring name, guint32 armyset,
-                          std::vector<Gdk::RGBA> colors, int type);
+                          Shield::Color, int type);
 
         /** Almost the same as addPlayer, but performs some additional checks
           * 
           * @param name     the name of the player
           * @param armyset  the name of the player's armyset
-          * @param colors   the colors of the player
           * @param type     the type of the player (see class player for more info)
           * @return false if a neutral player already exists, true otherwise
           */
-        bool addNeutral(Glib::ustring name, guint32 armyset,
-                        std::vector<Gdk::RGBA> colors, int type);
+        bool addNeutral(Glib::ustring name, guint32 armyset, int type);
 
         /** Creates a map
           * 
@@ -135,12 +135,12 @@ class CreateScenario : public CreateScenarioRandomize
         bool dump(Glib::ustring filename) const;
 
 	MapGenerator *getGenerator() const {return d_generator;};
-	static int calculateRoadType (Vector<int> t);
-	static int calculateBridgeType (Vector<int> t);
-        static int calculateStoneType (Vector<int> t);
+	static Road::Type calculateRoadType (Vector<int> t);
+	static Bridge::Type calculateBridgeType (Vector<int> t);
+        static Stone::Type calculateStoneType (Vector<int> t);
         
         //! Emitted when the generator generates something
-	sigc::signal<void> progress;
+	sigc::signal<void(double)> progress;
 
         static int calculateNumberOfSignposts(int width, int height, int grass);
 
@@ -206,7 +206,7 @@ class CreateScenario : public CreateScenarioRandomize
 	//players do not have to pay for more armies.
 	void getCityDifficulty (int difficulty, int *number_of_armies_factor);
 
-	void on_progress();
+	void on_progress(double fraction);
 
         //data
         //for map creation
@@ -219,4 +219,4 @@ class CreateScenario : public CreateScenarioRandomize
         int d_height;
 };
 
-#endif  //CREATE_SCENARIO_H
+#endif

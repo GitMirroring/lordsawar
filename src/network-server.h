@@ -1,5 +1,5 @@
-// Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2008, 2011, 2014, 2015 Ben Asselstine 
+//  Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2008, 2011, 2014, 2015, 2026 Ben Asselstine 
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef NETWORK_SERVER_H
@@ -39,7 +38,7 @@ public:
   NetworkServer();
   ~NetworkServer();
 
-  bool isListening();
+  bool isRunning();
   void startListening(int port);
   void send(void *conn, int type, const Glib::ustring &payload);
   void sendFile(void *c, int type, const Glib::ustring &payload);
@@ -47,10 +46,10 @@ public:
   bool is_local_connection(void *conn);
 
   void stop();
-  sigc::signal<bool, void *, int, Glib::ustring> got_message;
-  sigc::signal<void, void *> connection_made;
-  sigc::signal<void, void *> connection_lost;
-  sigc::signal<void, int> port_in_use;
+  sigc::signal<bool(void *, int, Glib::ustring)> got_message;
+  sigc::signal<void(void *)> connection_made;
+  sigc::signal<void(void *)> connection_lost;
+  sigc::signal<void(int)> port_in_use;
   
   // private callback
   bool gotClientConnection(const Glib::RefPtr<Gio::SocketConnection>& c);

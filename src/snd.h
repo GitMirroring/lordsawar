@@ -1,6 +1,6 @@
-// Copyright (C) 2006 Ulf Lorenz
-// Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2007, 2009, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2006 Ulf Lorenz
+//  Copyright (C) 2006 Andrea Paternesi
+//  Copyright (C) 2007, 2009, 2014, 2015, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,8 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef SND_H
@@ -26,9 +25,6 @@
 #include <sigc++/trackable.h>
 
 class XML_Helper;
-namespace Gst{
-class Message;
-}
 
 //! A helper struct to represent a single item in the sound configuration file.
 struct MusicItem
@@ -61,6 +57,7 @@ struct MusicItem
   * and goes away again with the background music taking its place again
   * afterwards.
   */
+        
 class Snd : public sigc::trackable
 {
     public:
@@ -124,7 +121,7 @@ class Snd : public sigc::trackable
 	// Static Methods
 
         //! Singleton getter
-        static Snd* getInstance();
+        static Snd* instance();
 
         //! Explicitly delete the singleton
         static void deleteInstance();
@@ -146,24 +143,14 @@ class Snd : public sigc::trackable
         std::vector<Glib::ustring> d_bgMap;  // shallow copy of background pieces
 
 
-        // how many more times we have to loop an effect.
-        gint32 d_nloops;
-
         // if initialization failed, set this to true => no music/sound played
         bool d_broken;
 
         // if set to true, play background music
         bool d_background;
 
-        struct Impl;
-        Impl *impl;
-        // callbacks
-
-        bool on_bus_message(const Glib::RefPtr<Gst::Message> & msg, guint32 source);
-        bool on_effect_fade (double step);
-
         // static instanton pointer
         static Snd* s_instance;
 };
 
-#endif //SND_H
+#endif

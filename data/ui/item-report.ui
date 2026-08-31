@@ -1,122 +1,68 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.96.3 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
-  <object class="GtkDialog" id="dialog">
-    <property name="can-focus">False</property>
+  <!-- interface-name item-report.ui -->
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkWindow" id="dialog">
     <property name="title" translatable="yes">Item Report</property>
-    <property name="type-hint">dialog</property>
-    <child internal-child="vbox">
+    <child>
       <object class="GtkBox" id="dialog-vbox">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="margin-start">6</property>
-        <property name="margin-end">6</property>
-        <property name="margin-top">6</property>
         <property name="margin-bottom">6</property>
+        <property name="margin-end">6</property>
+        <property name="margin-start">6</property>
+        <property name="margin-top">6</property>
         <property name="orientation">vertical</property>
         <property name="spacing">12</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area1">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <child>
-              <object class="GtkButton" id="close_button">
-                <property name="label" translatable="yes">Close</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="has-focus">True</property>
-                <property name="is-focus">True</property>
-                <property name="can-default">True</property>
-                <property name="has-default">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-underline">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack-type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
         <child>
           <object class="GtkBox" id="contents_hbox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
+            <property name="homogeneous">True</property>
+            <property name="vexpand">1</property>
             <child>
               <object class="GtkBox" id="vbox1">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
+                <property name="halign">center</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkEventBox" id="map_eventbox">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
+                  <object class="GtkBox" id="map_eventbox">
                     <child>
-                      <object class="GtkImage" id="map_image">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
+                      <object class="GtkDrawingArea" id="map_drawing_area"/>
                     </child>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
             </child>
             <child>
               <object class="GtkBox" id="contents_vbox">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="margin-start">12</property>
+                <property name="hexpand">1</property>
                 <property name="margin-end">12</property>
+                <property name="margin-start">12</property>
                 <property name="orientation">vertical</property>
                 <property name="spacing">12</property>
                 <child>
                   <object class="GtkLabel" id="label">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
                     <property name="label" translatable="yes">label</property>
+                    <property name="vexpand">1</property>
                   </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
               </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
             </child>
           </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="dialog-action_area1">
+            <property name="halign">end</property>
+            <property name="margin-top">6</property>
+            <child>
+              <object class="GtkButton" id="close_button">
+                <property name="focusable">1</property>
+                <property name="halign">center</property>
+                <property name="label" translatable="yes">Close</property>
+                <property name="receives-default">1</property>
+                <property name="use-underline">1</property>
+              </object>
+            </child>
+          </object>
         </child>
       </object>
     </child>
-    <action-widgets>
-      <action-widget response="-3">close_button</action-widget>
-    </action-widgets>
   </object>
 </interface>

@@ -1,10 +1,10 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2017, 2020,
-// 2021 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2004, 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2017, 2020,
+//  2021, 2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,55 +18,54 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
 #include <sigc++/functors/mem_fun.h>
 
-#include "CreateScenario.h"
-#include "GameScenario.h"
+#include "create-scenario.h"
+#include "game-scenario.h"
 #include "army.h"
-#include "GameMap.h"
+#include "game-map.h"
 #include "counter.h"
 #include "player.h"
-#include "playerlist.h"
-#include "stacklist.h"
-#include "citylist.h"
+#include "player-list.h"
+#include "stack-list.h"
+#include "city-list.h"
 #include "city.h"
-#include "ruinlist.h"
+#include "ruin-list.h"
 #include "ruin.h"
-#include "SightMap.h"
-#include "rewardlist.h"
-#include "Itemlist.h"
-#include "templelist.h"
+#include "sight-map.h"
+#include "reward-list.h"
+#include "item-list.h"
+#include "temple-list.h"
 #include "temple.h"
-#include "signpostlist.h"
+#include "signpost-list.h"
 #include "signpost.h"
-#include "portlist.h"
+#include "port-list.h"
 #include "port.h"
-#include "bridgelist.h"
+#include "bridge-list.h"
 #include "bridge.h"
-#include "roadlist.h"
+#include "road-list.h"
 #include "road.h"
-#include "stonelist.h"
+#include "stone-list.h"
 #include "stone.h"
-#include "armysetlist.h"
-#include "citysetlist.h"
-#include "tilesetlist.h"
-#include "shieldsetlist.h"
-#include "real_player.h"
-#include "AI_Analysis.h"
-#include "AI_Diplomacy.h"
-#include "ai_fast.h"
-#include "ai_smart.h"
-#include "ai_dummy.h"
-#include "File.h"
-#include "MapGenerator.h"
-#include "QuestsManager.h"
-#include "Configuration.h"
-#include "FogMap.h"
+#include "army-set-list.h"
+#include "city-set-list.h"
+#include "tile-set-list.h"
+#include "shield-set-list.h"
+#include "real-player.h"
+#include "ai-analysis.h"
+#include "ai-diplomacy.h"
+#include "ai-fast.h"
+#include "ai-smart.h"
+#include "ai-dummy.h"
+#include "file.h"
+#include "map-generator.h"
+#include "quest-manager.h"
+#include "configuration.h"
+#include "fog-map.h"
 #include "history.h"
 #include "game-parameters.h"
 #include "rnd.h"
@@ -93,14 +92,14 @@ CreateScenario::CreateScenario(int width, int height)
 
     QuestsManager::deleteInstance();
 
-    fl_counter = new FL_Counter();
+    id_counter = new ID_Counter();
 
     setWidth(width);
     setHeight(height);
 
     d_generator = new MapGenerator();
     d_generator->progress.connect
-      (sigc::hide(sigc::mem_fun(*this, &CreateScenario::on_progress)));
+      (sigc::mem_fun(*this, &CreateScenario::on_progress));
 }
 
 CreateScenario::~CreateScenario()
@@ -115,9 +114,9 @@ CreateScenario::~CreateScenario()
     cleanup();
 }
 
-void CreateScenario::on_progress()
+void CreateScenario::on_progress(double fraction)
 {
-  progress.emit();
+  progress.emit(fraction);
 }
 
 void CreateScenario::setPercentages(int pgrass, int pwater, int pforest,
@@ -148,23 +147,23 @@ void CreateScenario::setMapTiles(Glib::ustring tilesname)
 {
     debug("CreateScenario::setMapTiles")
     d_tilesname = tilesname;
-    GameMap::getInstance()->setTileset(tilesname);
+    GameMap::instance()->setTileset(tilesname);
 }
 
 void CreateScenario::setShieldset(Glib::ustring shieldset)
 {
     debug("CreateScenario::setShieldset")
     d_shieldsname = shieldset;
-    GameMap::getInstance()->setShieldset(shieldset);
+    GameMap::instance()->setShieldset(shieldset);
 }
 
 void CreateScenario::setCityset(Glib::ustring citysetname)
 {
     debug("CreateScenario::setCityset")
     d_citysetname = citysetname;
-    Cityset *cs = Citysetlist::getInstance()->get(citysetname);
+    Cityset *cs = Citysetlist::instance()->get(citysetname);
     d_generator->setCityset(cs);
-    GameMap::getInstance()->setCityset(citysetname);
+    GameMap::instance()->setCityset(citysetname);
 }
 
 void CreateScenario::setNoCities(int nocities)
@@ -234,26 +233,25 @@ void CreateScenario::setHeight(int height)
 }
 
 Player* CreateScenario::addPlayer(Glib::ustring name, guint32 armyset,
-                                std::vector<Gdk::RGBA> colors, int type)
+                                Shield::Color shield, int type)
 {
     debug("CreateScenario::addPlayer")
 
-    Player* p = Player::create(name, armyset, colors, d_width, d_height,
+    Player* p = Player::create(name, armyset, shield, d_width, d_height,
 			       Player::Type(type));
-    Playerlist::getInstance()->add(p);
+    Playerlist::instance()->add(p);
 
     return p;
 }
 
-bool CreateScenario::addNeutral(Glib::ustring name, guint32 armyset,
-                                std::vector<Gdk::RGBA> colors, int type)
+bool CreateScenario::addNeutral(Glib::ustring name, guint32 armyset, int type)
 {
     // for consistency, we only allow exactly one neutral player
-    if (Playerlist::getInstance()->getNeutral() != 0)
+    if (Playerlist::getNeutral() != 0)
         return false;
 
-    Player* p = addPlayer(name, armyset, colors, Player::Type(type));
-    Playerlist::getInstance()->setNeutral(p);
+    Player* p = addPlayer(name, armyset, Shield::NEUTRAL, Player::Type(type));
+    Playerlist::instance()->setNeutral(p);
     return true;
 }
 
@@ -261,7 +259,7 @@ bool CreateScenario::create(const GameParameters &g)
 {
   debug("CreateScenario::create");
 
-  d_scenario = new GameScenario("AutoGenerated", "AutoGenerated");
+  d_scenario = new GameScenario (g.name, g.comment);
 
   GameScenario::s_see_opponents_stacks = g.see_opponents_stacks;
   GameScenario::s_see_opponents_production = g.see_opponents_production;
@@ -284,8 +282,8 @@ bool CreateScenario::create(const GameParameters &g)
   // fog it up
   if (GameScenario::s_hidden_map)
     {
-      for (Playerlist::iterator pit = Playerlist::getInstance()->begin();
-           pit != Playerlist::getInstance()->end(); ++pit)
+      for (Playerlist::iterator pit = Playerlist::instance()->begin();
+           pit != Playerlist::instance()->end(); ++pit)
         (*pit)->getFogMap()->fill(FogMap::CLOSED);
     }
 
@@ -350,18 +348,20 @@ bool CreateScenario::createMap()
 
     const Maptile::Building* map;
     
-    Rewardlist::getInstance();
+    Rewardlist::instance();
 
+    auto old_counter = id_counter->copy ();
     //have the generator make the map...
     d_generator->makeMap(d_width, d_height, true);
+    id_counter->reset (old_counter);
     
     //...fill the terrain...
-    GameMap::getInstance(d_tilesname, d_shieldsname,
+    GameMap::instance(d_tilesname, d_shieldsname,
 			 d_citysetname)->fill(d_generator);
 
     //...and create cities, temples, ruins ,signposts
     map = d_generator->getBuildings(d_width, d_height);
-    Cityset *cityset = Citysetlist::getInstance()->get(d_citysetname);
+    Cityset *cityset = Citysetlist::instance()->get(d_citysetname);
     
     for (int y = 0; y < d_height; y++)
         for (int x = 0; x < d_width; x++)
@@ -369,35 +369,35 @@ bool CreateScenario::createMap()
             switch (map[y*d_width + x])
             {
                 case Maptile::SIGNPOST:
-                    Signpostlist::getInstance()->add(new Signpost(Vector<int>(x,y)));
+                    Signpostlist::instance()->add(new Signpost(Vector<int>(x,y)));
                     break;
                 case Maptile::TEMPLE:
-                    Templelist::getInstance()->add
+                    Templelist::instance()->add
 		      (new Temple(Vector<int>(x,y), 
 				  cityset->getTempleTileWidth(),
 				  popRandomTempleName()));
                     break;
                 case Maptile::RUIN:
-		    Ruinlist::getInstance()->add
+		    Ruinlist::instance()->add
 		      (new Ruin(Vector<int>(x,y), 
 				cityset->getRuinTileWidth(),
 				popRandomRuinName()));
 		    break;
                 case Maptile::CITY:
-                    Citylist::getInstance()->add
+                    Citylist::instance()->add
 		      (new City(Vector<int>(x,y), cityset->getCityTileWidth()));
                     break;
                 case Maptile::ROAD:
-                    Roadlist::getInstance()->add(new Road(Vector<int>(x,y)));
+                    Roadlist::instance()->add(new Road(Vector<int>(x,y)));
                     break;
                 case Maptile::PORT:
-                    Portlist::getInstance()->add(new Port(Vector<int>(x,y)));
+                    Portlist::instance()->add(new Port(Vector<int>(x,y)));
                     break;
                 case Maptile::BRIDGE:
-                    Bridgelist::getInstance()->add(new Bridge(Vector<int>(x,y)));
+                    Bridgelist::instance()->add(new Bridge(Vector<int>(x,y)));
                     break;
                 case Maptile::STONE:
-                    Stonelist::getInstance()->add(new Stone(Vector<int>(x,y)));
+                    Stonelist::instance()->add(new Stone(Vector<int>(x,y)));
                     break;
                 case Maptile::NONE:
 		    break;
@@ -411,11 +411,9 @@ bool CreateScenario::createMap()
 void CreateScenario::createCapitalCity(Player *player, City *city)
 {
   // distribute capitals for the players
-  city->conquer(player);
+  player->conquerCity(city, NULL);
   city->setCapitalOwner(player);
   city->setCapital(true);
-
-  player->conquerCity(city, NULL);
 }
 
 bool CreateScenario::tooNearToOtherCapitalCities(City *c, std::list<City*> capitals, guint32 distance)
@@ -435,22 +433,22 @@ bool CreateScenario::distributePlayers()
   debug("CreateScenario::distributePlayers")
 
   //okay, everyone starts out as neutral.
-  for (auto c: *Citylist::getInstance())
+  for (auto c: *Citylist::instance())
     if (c->isBurnt() == false)
-      c->setOwner(Playerlist::getInstance()->getNeutral());
+      c->setOwner(Playerlist::getNeutral());
 
   std::list<City*> capitals;
   //now pick some equidistant cities for capitals, that aren't too close.
-  for (auto pit: *Playerlist::getInstance())
+  for (auto pit: *Playerlist::instance())
     {
       int tries = 0;
-      if (pit == Playerlist::getInstance()->getNeutral())
+      if (pit == Playerlist::getNeutral())
         continue;
       while (1)
         {
           Vector<int> pos = 
             Vector<int>(Rnd::rand() % d_width, Rnd::rand() % d_height);
-          City *city = Citylist::getInstance()->getNearestCity(pos);
+          City *city = Citylist::instance()->getNearestCity(pos);
           if (city->isBurnt() == false && city->isCapital() == false)
             {
               if (tooNearToOtherCapitalCities(city, capitals, 30) == false || 
@@ -478,7 +476,7 @@ bool CreateScenario::setupCities(bool cities_can_produce_allies,
 {
   debug("CreateScenario::setupCities")
 
-  for (auto c: *Citylist::getInstance())
+  for (auto c: *Citylist::instance())
     {
       //1. set a reasonable cityname
       c->setName(popRandomCityName());
@@ -497,25 +495,28 @@ bool CreateScenario::setupCities(bool cities_can_produce_allies,
 
 bool CreateScenario::setupRoads()
 {
-  for (auto it: *Roadlist::getInstance())
+  for (auto it: *Roadlist::instance())
     it->setType(calculateRoadType(it->getPos()));
   return true;
 }
 
 bool CreateScenario::setupBridges()
 {
-  for (auto it: *Bridgelist::getInstance())
-    it->setType(Bridgelist::getInstance()->calculateType(it->getPos()));
+  for (auto it: *Bridgelist::instance())
+    it->setType(Bridgelist::instance()->calculateType(it->getPos()));
   return true;
 }
 
 bool CreateScenario::setupTemples()
 {
-  for (auto it: *Templelist::getInstance())
+  for (auto it: *Templelist::instance())
     {
-      // set a random temple type
-      int type = Rnd::rand () % TEMPLE_TYPES;
-      it->setType(type);
+      // set a random temple type, there are 2
+      // we rarely get the 2nd one
+      if (Rnd::rand () % 100 >= 10)
+        it->setType (Temple::TEMPLE);
+      else
+        it->setType (Temple::HENGE);
     }
   return true;
 }
@@ -528,8 +529,8 @@ bool CreateScenario::setupRuins(bool strongholds_invisible, int sage_factor,
     //The aim of this function is to put a strong stack as sentinel in all
     //ruins.
 
-    for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
-        it != Ruinlist::getInstance()->end(); ++it)
+    for (Ruinlist::iterator it = Ruinlist::instance()->begin();
+        it != Ruinlist::instance()->end(); ++it)
     {
         // set a random ruin type
         if (Rnd::rand() % stronghold_factor == 0) //one in six ruins is a stronghold
@@ -572,7 +573,7 @@ bool CreateScenario::setupSignposts(int ratio)
   int dynamicPercent = static_cast<int>(1.0 / ratio * 100);
   debug("CreateScenario::setupSignposts")
 
-  for (auto it: *Signpostlist::getInstance())
+  for (auto it: *Signpostlist::instance())
     {
       if (randomSignpostsEmpty())
         randno = dynamicPercent;
@@ -589,16 +590,16 @@ bool CreateScenario::setupSignposts(int ratio)
 
 bool CreateScenario::setupStandingStones(std::vector<Vector<int> > road_stones)
 {
-  for (auto s : *Stonelist::getInstance ())
+  for (auto s : *Stonelist::instance ())
     s->setType (CreateScenario::calculateStoneType(s->getPos ()));
 
   for (auto pos : road_stones)
     {
-      Road *r = Roadlist::getInstance()->getObjectAt (pos);
+      Road *r = Roadlist::instance()->getObjectAt (pos);
       if (r)
         {
           int type = CreateScenario::calculateStoneType(r->getPos ());
-          Stonelist::getInstance ()->add (new Stone (pos, type));
+          Stonelist::instance ()->add (new Stone (pos, type));
         }
     }
   return true;
@@ -609,12 +610,12 @@ bool CreateScenario::setupPlayers(bool random_turns,
 				  int base_gold)
 {
   debug("CreateScenario::setupPlayers");
-  for (auto pit: *Playerlist::getInstance())
+  for (auto pit: *Playerlist::instance())
     pit->setGold(adjustBaseGold(base_gold));
 
 
   if (random_turns)
-    Playerlist::getInstance()->randomizeOrder();
+    Playerlist::instance()->randomizeOrder();
   return true;
 }
 
@@ -701,21 +702,21 @@ void CreateScenario::getCityDifficulty(int difficulty,
     *number_of_armies_factor = 0;
 }
 
-int CreateScenario::calculateStoneType (Vector<int> t)
+Stone::Type CreateScenario::calculateStoneType (Vector<int> t)
 {
-  Road *r = Roadlist::getInstance()->getObjectAt(t);
+  Road *r = Roadlist::instance()->getObjectAt(t);
   if (r)
     return Stone::getRandomType(Road::Type(r->getType()));
   else
     return Stone::getRandomType();
 }
 
-int CreateScenario::calculateBridgeType (Vector<int> t)
+Bridge::Type CreateScenario::calculateBridgeType (Vector<int> t)
 {
-  return Bridgelist::getInstance()->calculateType(t);
+  return Bridgelist::instance()->calculateType(t);
 }
 
-int CreateScenario::calculateRoadType (Vector<int> t)
+Road::Type CreateScenario::calculateRoadType (Vector<int> t)
 {
     // examine neighbour tiles to discover whether there's a road or
     // bridge on them
@@ -725,58 +726,58 @@ int CreateScenario::calculateRoadType (Vector<int> t)
     bool r = false; //right
 
     if (t.y > 0)
-      u = Roadlist::getInstance()->getObjectAt(t + Vector<int>(0, -1));
+      u = Roadlist::instance()->getObjectAt(t + Vector<int>(0, -1));
     if (t.y < GameMap::getHeight() - 1)
-      b = Roadlist::getInstance()->getObjectAt(t + Vector<int>(0, 1));
+      b = Roadlist::instance()->getObjectAt(t + Vector<int>(0, 1));
     if (t.x > 0)
-      l = Roadlist::getInstance()->getObjectAt(t + Vector<int>(-1, 0));
+      l = Roadlist::instance()->getObjectAt(t + Vector<int>(-1, 0));
     if (t.x < GameMap::getWidth() - 1)
-      r = Roadlist::getInstance()->getObjectAt(t + Vector<int>(1, 0));
+      r = Roadlist::instance()->getObjectAt(t + Vector<int>(1, 0));
 
     if (!u && t.y > 0)
-      u = Bridgelist::getInstance()->getObjectAt(t + Vector<int>(0, -1));
+      u = Bridgelist::instance()->getObjectAt(t + Vector<int>(0, -1));
     if (!b && t.y < GameMap::getHeight() - 1)
-      b = Bridgelist::getInstance()->getObjectAt(t + Vector<int>(0, 1));
+      b = Bridgelist::instance()->getObjectAt(t + Vector<int>(0, 1));
     if (!l && t.x > 0)
-      l = Bridgelist::getInstance()->getObjectAt(t + Vector<int>(-1, 0));
+      l = Bridgelist::instance()->getObjectAt(t + Vector<int>(-1, 0));
     if (!r && t.x < GameMap::getWidth() - 1)
-      r = Bridgelist::getInstance()->getObjectAt(t + Vector<int>(1, 0));
+      r = Bridgelist::instance()->getObjectAt(t + Vector<int>(1, 0));
 
     // then translate this to the type
-    int type = 2; 
+    Road::Type type = Road::CONNECTS_ALL_DIRECTIONS;
     //show road type 2 when no other road tiles are around
     if (!u && !b && !l && !r)
-	type = 2;
+      type = Road::CONNECTS_ALL_DIRECTIONS;
     else if (u && b && l && r)
-	type = 2;
+      type = Road::CONNECTS_ALL_DIRECTIONS;
     else if (!u && b && l && r)
-	type = 9;
+      type = Road::CONNECTS_EAST_WEST_AND_SOUTH;
     else if (u && !b && l && r)
-	type = 8;
+      type = Road::CONNECTS_EAST_WEST_AND_NORTH;
     else if (u && b && !l && r)
-	type = 7;
+      type = Road::CONNECTS_NORTH_AND_SOUTH_AND_EAST;
     else if (u && b && l && !r)
-	type = 10;
+      type = Road::CONNECTS_NORTH_SOUTH_AND_WEST;
     else if (u && b && !l && !r)
-	type = 1;
+      type = Road::CONNECTS_NORTH_AND_SOUTH;
     else if (!u && !b && l && r)
-	type = 0;
+      type = Road::CONNECTS_EAST_AND_WEST;
     else if (u && !b && l && !r)
-	type = 3;
+      type = Road::CONNECTS_NORTH_AND_WEST;
     else if (u && !b && !l && r)
-	type = 4;
+      type = Road::CONNECTS_NORTH_AND_EAST;
     else if (!u && b && l && !r)
-	type = 6;
+      type = Road::CONNECTS_WEST_AND_SOUTH;
     else if (!u && b && !l && r)
-	type = 5;
+      type = Road::CONNECTS_SOUTH_AND_EAST;
     else if (u && !b && !l && !r)
-	type = Road::CONNECTS_NORTH;
+      type = Road::CONNECTS_NORTH;
     else if (!u && b && !l && !r)
-	type = Road::CONNECTS_SOUTH;
+      type = Road::CONNECTS_SOUTH;
     else if (!u && !b && l && !r)
-	type = Road::CONNECTS_WEST;
+      type = Road::CONNECTS_WEST;
     else if (!u && !b && !l && r)
-	type = Road::CONNECTS_EAST;
+      type = Road::CONNECTS_EAST;
     return type;
 }
 
@@ -788,11 +789,11 @@ int CreateScenario::calculateNumberOfSignposts(int width, int height, int grass)
 
 void CreateScenario::updateRoadsBridgesAndStones()
 {
-  for (auto i : *Roadlist::getInstance ())
+  for (auto i : *Roadlist::instance ())
     i->setType(CreateScenario::calculateRoadType(i->getPos()));
-  for (auto i : *Bridgelist::getInstance ())
+  for (auto i : *Bridgelist::instance ())
     i->setType(CreateScenario::calculateBridgeType(i->getPos()));
-  for (auto i : *Stonelist::getInstance ())
+  for (auto i : *Stonelist::instance ())
     i->setType(CreateScenario::calculateStoneType(i->getPos()));
 }
 

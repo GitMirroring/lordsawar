@@ -1,5 +1,5 @@
-// Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2008, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2008, 2014, 2015, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef GAME_CLIENT_DECODER_H
@@ -27,7 +26,7 @@
 #include <memory>
 #include <sigc++/trackable.h>
 #include <sigc++/signal.h>
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "network-action.h"
 #include "network-history.h"
 
@@ -37,14 +36,33 @@ class Player;
 class GameClientDecoder: public ChatClient
 {
 public:
-  GameClientDecoder();
-  ~GameClientDecoder();
+  GameClientDecoder ();
+  ~GameClientDecoder ();
 
-  sigc::signal<void, Glib::ustring> game_scenario_received;
-  sigc::signal<void, Player *> remote_player_moved;
-  sigc::signal<void, Player *> remote_player_starts_move;
-  sigc::signal<void, Player *> remote_player_named;
-  sigc::signal<void, Player *> remote_player_died;
+  sigc::signal<void(std::string)> signal_game_scenario_received ()
+    {
+      return m_game_scenario_received;
+    }
+
+  sigc::signal<void(Player *)> signal_remote_player_moved ()
+    {
+      return m_remote_player_moved;
+    }
+
+  sigc::signal<void(Player *)> signal_remote_player_starts_move ()
+    {
+      return m_remote_player_starts_move;
+    }
+
+  sigc::signal<void(Player *)> signal_remote_player_named ()
+    {
+      return m_remote_player_named;
+    }
+
+  sigc::signal<void(Player *)> signal_remote_player_died ()
+    {
+      return m_remote_player_died;
+    }
 
 protected:
   class ActionLoader 
@@ -99,6 +117,11 @@ protected:
   int decodeActions(std::list<NetworkAction*> actions);
   int decodeHistories(std::list<NetworkHistory*> histories);
 
+  sigc::signal<void(std::string)> m_game_scenario_received;
+  sigc::signal<void(Player *)> m_remote_player_moved;
+  sigc::signal<void(Player *)> m_remote_player_starts_move;
+  sigc::signal<void(Player *)> m_remote_player_named;
+  sigc::signal<void(Player *)> m_remote_player_died;
 };
 
 #endif

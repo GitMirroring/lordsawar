@@ -1,10 +1,10 @@
-// Copyright (C) 2002 Vibhu Rishi
-// Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2004 David Barnsdale
-// Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2014, 2020 Ben Asselstine
-// Copyright (C) 2008 Janek Kozicki
+//  Copyright (C) 2002 Vibhu Rishi
+//  Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2004 David Barnsdale
+//  Copyright (C) 2004 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2014, 2020, 2026 Ben Asselstine
+//  Copyright (C) 2008 Janek Kozicki
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef MAPGENERATOR_H
@@ -31,8 +30,8 @@
 #include <sigc++/signal.h>
 
 // we need the enums from these classes
-#include "Tile.h"
-#include "maptile.h"
+#include "tile.h"
+#include "map-tile.h"
 
 class Cityset;
 class RoadPathCalculator;
@@ -155,7 +154,7 @@ class MapGenerator
          * @param status   A description of what's being generated.
          */
         //! Emitted when the generator generates something
-        sigc::signal<void, double> progress;
+        sigc::signal<void(double)> progress;
 
     protected:
         //! Fills the terrain map with grass
@@ -274,7 +273,7 @@ class MapGenerator
          * @param place        the method to actually place the building
          */
         void makeBuildings(int total, int width,
-                           sigc::slot<void,Vector<int> > place);
+                           sigc::slot<void(Vector<int>)> place);
 
         //! Check if we can put a building on the map
         /**
@@ -360,5 +359,3 @@ class MapGenerator
 };
 
 #endif
-
-// End of file

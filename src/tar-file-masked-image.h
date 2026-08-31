@@ -1,4 +1,4 @@
-// Copyright (C) 2020, 2021 Ben Asselstine
+//  Copyright (C) 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef TAR_FILE_MASKED_IMAGE_H
@@ -21,13 +20,14 @@
 
 #include <gtkmm.h>
 #include "vector.h"
-#include "PixMask.h"
+#include "pixmask.h"
 
 class PixMask;
 class Tar_Helper;
 class TarFile;
 class XML_Helper;
 class Player;
+class Shieldset;
 
 /**
  * A helper class to handle image files in tar files that have masks.
@@ -44,9 +44,6 @@ public:
 
     enum MaskOrientation
       {
-        // The mask is to the right of the image
-        HORIZONTAL_MASK = 0,
-
         // The mask is below the image
         VERTICAL_MASK,
       };
@@ -73,7 +70,7 @@ public:
   guint32 getNumberOfFrames () const {return frames.size ();}
 
   //! Return the basename of the image (archive member in tar file)
-  Glib::ustring getName () const {return name;}
+  std::string getName () const {return name;}
 
   //! Return the number of masks in the image file
   guint32 getNumMasks () const {return maskcount;}
@@ -87,51 +84,48 @@ public:
   //! Return the first image
   PixMask *getImage () const {return frames.empty () ? NULL :frames[0][0];}
 
-  //! Apply the mask onto the image in the player's color
+  //! Apply the mask onto the image in the shield's color
   /**
    * @return a pointer to a new PixMask that must be deleted.
    */
-  PixMask *applyMask (Player *p) const;
+  PixMask *applyMask (Shieldset *s, guint32 shield) const;
+  PixMask *applyMask (guint32 shield) const;
   PixMask *applyMask (std::vector<Gdk::RGBA> colors) const;
 
-  //! Apply the mask onto the image at the given index in the player's color
+  //! Apply the mask onto the image at the given index in the shield's color
   /**
    * @return a pointer to a new PixMask that must be deleted.
    */
-  PixMask *applyMask (guint32 i, Player *p) const;
+  PixMask *applyMask (guint32 i, guint32 shield) const;
   PixMask *applyMask (guint32 i, std::vector<Gdk::RGBA> colors) const;
 
   //! Return all of the images
   std::vector<PixMask*> getImages () const
     { std::vector<PixMask*> o; for (auto f : frames) o.push_back (f.front ()); return o; }
 
-  //! Return the dimensions that the images are scaled to
-  Vector<int> getScaledImageDimensions () const {return scale_dimension;}
-
   //! Return the dimensions of the images in the backing image
   Vector<int> getImageDimensions () const  {return dimension;}
 
   //! Does the image in file F have the correct dimensions for this?
-  bool checkDimension (Glib::ustring f);
+  bool checkDimension (std::string f);
 
   //! Set the basename of the image (archive member in the tar file)
-  void setImageName (Glib::ustring n) {name = n;}
+  void setImageName (std::string n) {name = n;}
 
   //! Set the name of the archive member in the tar file that holds the image
-  void setName (Glib::ustring n) {name = n;}
+  void setName (std::string n) {name = n;}
 
   //! Set the number of masks in the image file
   void setNumMasks (guint32 n) {maskcount = n;}
 
   //! Try to calculate the number of masks, return false if we can't.
-  bool calculateNumberOfMasks (Glib::ustring file, bool &bad_dimension);
+  bool calculateNumberOfMasks (std::string file, bool &bad_dimension);
 
   //! Set the opened tar file
   void setTarFile (Tar_Helper *t) {tarfile = t;}
 
   //! Read the data tag from an opened xml file and put it in our name member
-  void load (XML_Helper *helper, Glib::ustring name_tag,
-             Glib::ustring mask_tag);
+  void load (XML_Helper *helper, std::string name_tag);
 
   //! Load an image from a tar file, with bname already provided
   /**
@@ -139,7 +133,7 @@ public:
    * @param bname    the archive member containing the image
    * @return         true if something went wrong
    */
-  bool load (TarFile *t, Glib::ustring bname);
+  bool load (TarFile *t, std::string bname);
 
   //! Load an image from the tar file, with bname already set by setName
   /**
@@ -160,28 +154,27 @@ public:
    * @param bname    the archive member containing the image
    * @return         true if something went wrong
    */
-  bool load (Tar_Helper *t, Glib::ustring bname);
+  bool load (Tar_Helper *t, std::string bname);
 
   //! Load an image named bname from the tar file
   /**
    * @param          bname the archive member containing the image
    * @return         true if something went wrong
    */
-  bool load (Glib::ustring bname);
+  bool load (std::string bname);
 
   //! Load an image named filename from disk
   /**
    * @param filename the file holding the image
    * @return         true if something went wrong
    */
-  bool loadFromFile (Glib::ustring filename);
+  bool loadFromFile (std::string filename);
 
   //! write the name and maskcount elements to an opened xml file
-  bool save (XML_Helper *helper, Glib::ustring name_tag,
-             Glib::ustring mask_tag);
+  bool save (XML_Helper *helper, std::string name_tag);
 
   //! Process the backing image into a set of images and masks
-  void instantiateImages (Vector<int> scale_to_dimension = Vector<int>(-1,-1));
+  void instantiateImages ();
 
   //! Destroy the images
   void uninstantiateImages ();
@@ -193,12 +186,12 @@ public:
   void dropBackingImage ();
 
   //! copy this to DEST in T
-  bool copy (TarFile *t, TarFileMaskedImage *dest);
+  bool copy (TarFile *t, TarFileMaskedImage *dest, Glib::ustring &err);
 
   void copyFrames (TarFileMaskedImage *dest);
 
   //! uninstantiate all images named NAME in IMAGES
-  static void uninstantiate (Glib::ustring name, std::vector<TarFileMaskedImage*> images);
+  static void uninstantiate (std::string name, std::vector<TarFileMaskedImage*> images);
 private:
 
   //! The orientation of the masked image
@@ -208,13 +201,10 @@ private:
   Tar_Helper *tarfile;
 
   //! The basename of the archive member holding the image
-  Glib::ustring name;
+  std::string name;
 
   //! When we extract the file from the tar file, this is where it is
-  Glib::ustring file_on_disk;
-
-  //! What we want to scale the images to
-  Vector<int> scale_dimension;
+  std::string file_on_disk;
 
   //! The original dimensions of the images in the backing image
   Vector<int> dimension;
@@ -237,11 +227,8 @@ private:
    */
   std::vector<std::vector<PixMask*> > frames;
 
-  //! Process a horizontally masked image
   void instantiateVertical  ();
 
-  //! Process a vertically masked image
-  void instantiateHorizontal ();
 
   //! Overlay the masks on the image in the given color.
   /**

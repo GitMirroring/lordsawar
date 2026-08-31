@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2014, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,8 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef NEXT_TURN_H
@@ -23,6 +22,7 @@
 
 #include <sigc++/trackable.h>
 #include <sigc++/connection.h>
+#include <sigc++/signal.h>
 
 class Player;
 /**
@@ -58,7 +58,7 @@ class NextTurn: public sigc::trackable
            if there is none active. For starting a game. This should be the
            lowest of all scenario-related functions in the stack.
          */
-        virtual void start()=0;
+        virtual void start ()=0;
 
         /**
            \brief go on to the next player
@@ -77,19 +77,24 @@ class NextTurn: public sigc::trackable
         /**
            \brief signals for announcing events
          */
-        sigc::signal<void, Player*> splayerStart;
+        sigc::signal<void(Player*)> splayerStart;
 
-	// emitted whenever a new player's turn starts.
-        sigc::signal<void, Player*> snextTurn;
-        
         //! Signal which is emitted whenever a new round starts
-        sigc::signal<void> snextRound;
+        sigc::signal<void()> snextRound;
 
         //! Signal as a workaround for a display bug; updates the screen
-        sigc::signal<void> supdating;
+        sigc::signal<void()> supdating;
 
 	//! Signal when we're done doing next-turn duties.
-        sigc::signal<void> srequestAbort;
+        sigc::signal<void()> srequestAbort;
+
+
+        sigc::signal<void(Player*, std::shared_ptr<sigc::slot<void()>> finish)> m_signal_player_died;
+
+        sigc::signal<void ()> signal_game_over ()
+          {
+            return m_signal_game_over;
+          }
 
     protected:
 
@@ -101,7 +106,8 @@ class NextTurn: public sigc::trackable
 
     protected:
 
-	sigc::connection abort;
+	sigc::connection game_abort;
+        sigc::signal<void ()> m_signal_game_over;
 };
 
-#endif //NEXT_TURN_H
+#endif

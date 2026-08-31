@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2008, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,17 +12,16 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
 #include <string.h>
 
-#include "Triumphs.h"
-#include "playerlist.h"
+#include "triumphs.h"
+#include "player-list.h"
 
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
 Glib::ustring Triumphs::d_tag = "triumphs";
 
@@ -45,19 +44,19 @@ Triumphs::Triumphs(XML_Helper* helper)
       switch (TriumphType(i))
 	{
 	case TALLY_HERO:
-	  helper->getData(tally, "hero");
+	  helper->get(tally, "hero");
 	  break;
 	case TALLY_NORMAL:
-	  helper->getData(tally, "normal");
+	  helper->get(tally, "normal");
 	  break;
 	case TALLY_SPECIAL:
-	  helper->getData(tally, "special");
+	  helper->get(tally, "special");
 	  break;
 	case TALLY_SHIP:
-	  helper->getData(tally, "ship");
+	  helper->get(tally, "ship");
 	  break;
 	case TALLY_FLAG:
-	  helper->getData(tally, "flag");
+	  helper->get(tally, "flag");
 	  break;
 	}
       stally.str(tally);
@@ -80,7 +79,7 @@ bool Triumphs::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(Triumphs::d_tag);
+  retval &= helper->open_tag(Triumphs::d_tag);
   for (unsigned int i = 0; i < 5; i++)
     {
       std::stringstream tally;
@@ -89,24 +88,24 @@ bool Triumphs::save(XML_Helper* helper) const
       switch (TriumphType(i))
 	{
 	case TALLY_HERO:
-	  retval &= helper->saveData("hero", tally.str());
+	  retval &= helper->save("hero", tally.str());
 	  break;
 	case TALLY_NORMAL:
-	  retval &= helper->saveData("normal", tally.str());
+	  retval &= helper->save("normal", tally.str());
 	  break;
 	case TALLY_SPECIAL:
-	  retval &= helper->saveData("special", tally.str());
+	  retval &= helper->save("special", tally.str());
 	  break;
 	case TALLY_SHIP:
-	  retval &= helper->saveData("ship", tally.str());
+	  retval &= helper->save("ship", tally.str());
 	  break;
 	case TALLY_FLAG:
-	  retval &= helper->saveData("flag", tally.str());
+	  retval &= helper->save("flag", tally.str());
 	  break;
 	}
     }
 
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -118,10 +117,8 @@ void Triumphs::tallyTriumph(Player *p, TriumphType type)
     return;
   guint32 id = p->getId();
   //let's not tally neutrals
-  if (p == Playerlist::getInstance()->getNeutral()) 
+  if (p == Playerlist::getNeutral()) 
     return;
   //we (this player) have killed P's army. it was of type TYPE.
   d_triumph[id][type]++;
 }
-
-// End of file

@@ -1,5 +1,5 @@
-// Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2008, 2011, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2008, 2011, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef GAME_SERVER_H
@@ -42,29 +41,50 @@ class GameParameters;
 class GameServer: public GameStation
 {
 public:
-        
+
+  /* a client needs to be joined for 5 minutes before a seat is reserved for
+   * them should they disconnect. */
+  static const int m_min_join_time_to_reserve_seat = 5 * 60;
+  /* a grace period of 1 hour is given for the disconnected client to return
+   * to their seat. */
+  static const int m_time_to_hold_reserved_seat = 60 * 60;
+  static const int m_total_secs_to_countdown = 2;
+
   //! Returns the singleton instance.  Creates a new one if neccessary.
-  static GameServer * getInstance();
+  static GameServer * instance();
 
   //! Deletes the singleton instance.
   static void deleteInstance();
 
-  bool isListening();
+  bool isRunning();
   void start(GameScenario *game_scenario, int port, Glib::ustring profile_id, Glib::ustring nick);
 
-  void sit_down (Player *player);
-  void stand_up (Player *player);
+  void sit_down (Shield::Color shield, Glib::ustring profile_id);
+  void stand_up (Shield::Color shield, Glib::ustring profile_id);
   void type_change (Player *player, int type);
   void chat(Glib::ustring message);
   void sendTurnOrder();
   void sendKillPlayer(Player *player);
   void sendOffPlayer(Player *player);
-  void notifyClientsGameMayBeginNow();
+  void sendGameBegin ();
+  void sendGameCanBegin ();
   void notifyRoundOver();
-  sigc::signal<void> remote_participant_connected;
-  sigc::signal<void> remote_participant_disconnected;
-  sigc::signal<Player*> get_next_player;
-  sigc::signal<void, int> port_in_use;
+  sigc::signal<void()> signal_remote_participant_connected ()
+    {
+      return m_remote_participant_connected;
+    }
+  sigc::signal<void()> signal_remote_participant_disconnected ()
+    {
+      return m_remote_participant_disconnected;
+    }
+  sigc::signal<Player*()> signal_get_next_player ()
+    {
+      return m_get_next_player;
+    }
+  sigc::signal<void(int)> signal_port_in_use ()
+    {
+      return m_port_in_use;
+    }
 
   void setGameScenario(GameScenario *scenario) {d_game_scenario = scenario;};
 
@@ -76,34 +96,44 @@ public:
   void on_turn_aborted();
   bool check_end_of_round();
   void saveMessages (Glib::ustring f);
+
+  void add_mod (Glib::ustring id);
+  void kick (Glib::ustring id);
 protected:
   GameServer();
   ~GameServer();
 
+protected:
+  sigc::signal<void()> m_remote_participant_connected;
+  sigc::signal<void()> m_remote_participant_disconnected;
+  sigc::signal<Player*()> m_get_next_player;
+  sigc::signal<void(int)> m_port_in_use;
 private:
   GameScenario *d_game_scenario;
   bool d_game_has_begun;
+  guint32 m_countdown_secs;
   void onActionDone(Action *action, guint32 id);
   void onHistoryDone(History *history, guint32 id);
 
   void send (void *conn, int type, Glib::ustring payload);
   void join(void *conn, Glib::ustring payload);
-  void notifyJoin (Glib::ustring nickname);
+  void notifyJoin (Glib::ustring profile_id, Glib::ustring nickname);
   void depart(void *conn);
-  void notifyDepart (void *conn, Glib::ustring nickname);
+  void notifyDepart (void *conn, Glib::ustring profile_id, Glib::ustring nickname);
   void sit(void *conn, Player *player, Glib::ustring nickname);
-  void notifySit(Player *player, Glib::ustring nickname);
+  void notifySit(Player *player, Glib::ustring profile_id, Glib::ustring nickname);
   void stand(void *conn, Player *player, Glib::ustring nickname);
-  void notifyStand(Player *player, Glib::ustring nickname);
+  void notifyStand(Player *player, Glib::ustring profile_id, Glib::ustring nickname);
   void change_type(void *conn, Player *player, int type);
-  void notifyTypeChange(Player *player, int type);
+  void notifyTypeChange(Player *player, Glib::ustring profile_id, int type);
   void gotRemoteActions(void *conn, const Glib::ustring &payload);
   void gotRemoteHistory(void *conn, const Glib::ustring &payload);
   void notifyChat(Glib::ustring message);
 
   void sendMap(Participant *part);
   void sendSeats(void *conn);
-  void sendSeat(void *conn, GameParameters::Player player, Glib::ustring nickname);
+  void sendSeat(void *conn, GameParameters::Player player,
+                Glib::ustring profile_id);
   void sendChatRoster(void *conn);
 
   void sendActions(Participant *part);
@@ -112,6 +142,7 @@ private:
   std::unique_ptr<NetworkServer> network_server;
 
   std::list<Participant *> participants;
+  std::list<Participant *> disconnected_participants;
   std::list<GameParameters::Player> players_seated_locally;
   std::map<guint32, bool> id_end_turn; //whether local players ended their turn
 
@@ -120,7 +151,7 @@ private:
   Participant *findParticipantByConn(void *conn);
   Participant *findParticipantByNick(Glib::ustring nickname);
   Participant *findParticipantByPlayerId(guint32 id);
-  
+
   bool onGotMessage(void *conn, int type, Glib::ustring message);
   void onConnectionLost(void *conn);
   void onConnectionMade(void *conn);
@@ -149,6 +180,20 @@ private:
 
   Glib::ustring getPeerHostName (void *conn);
   void remove_all_participants();
+
+  void remove_disconnected_participant (Glib::ustring profile_id);
+  void reseat_disconnected_client (Glib::ustring profile_id);
+  Participant * find_disconnected_profile (Glib::ustring profile_id);
+  bool seat_is_reserved (Shield::Color shield);
+  void send_reserved_seat_message (void *conn, Player *player);
+  int get_reservation_duration (Player *player);
+  bool all_are_seated ();
+  void record_client_ready (void *conn);
+  bool all_ready ();
+  bool player_is_ready (Player *p);
+  guint32 get_num_waiting ();
+  void sendWaitingForReady ();
+  void sendCountdown ();
 
   bool d_stop;
   Glib::ustring d_save_messages;

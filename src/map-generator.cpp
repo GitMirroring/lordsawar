@@ -1,11 +1,11 @@
-// Copyright (C) 2002 Vibhu Rishi
-// Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004 David Barnsdale
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2017,
-// 2020 Ben Asselstine
-// Copyright (C) 2008 Janek Kozicki
+//  Copyright (C) 2002 Vibhu Rishi
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004 David Barnsdale
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2020,
+//  2026 Ben Asselstine
+//  Copyright (C) 2008 Janek Kozicki
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,42 +19,41 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <algorithm>
 #include <math.h>  
 #include <set>
 
-#include "MapGenerator.h"
+#include "map-generator.h"
 #include "army.h"
-#include "GameMap.h"
+#include "game-map.h"
 #include "stack.h"
 #include "path.h"
-#include "File.h"
-#include "citylist.h"
+#include "file.h"
+#include "city-list.h"
 #include "city.h"
-#include "roadlist.h"
+#include "road-list.h"
 #include "road.h"
-#include "stonelist.h"
+#include "stone-list.h"
 #include "stone.h"
-#include "portlist.h"
+#include "port-list.h"
 #include "port.h"
-#include "ruinlist.h"
+#include "ruin-list.h"
 #include "ruin.h"
-#include "templelist.h"
+#include "temple-list.h"
 #include "temple.h"
-#include "bridgelist.h"
+#include "bridge-list.h"
 #include "bridge.h"
-#include "armysetlist.h"
-#include "tilesetlist.h"
+#include "army-set-list.h"
+#include "tile-set-list.h"
 #include "vector.h"
-#include "RoadPathCalculator.h"
-#include "cityset.h"
-#include "overviewmap.h"
+#include "road-path-calculator.h"
+#include "city-set.h"
+#include "overview-map.h"
 #include "rnd.h"
-#include "signpostlist.h"
+#include "signpost-list.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -239,7 +238,7 @@ void MapGenerator::makeMap(int width, int height, bool roads)
     debug("building cities");
     progress.emit(.560);
     makeBuildings (d_nocities, cityset->getCityTileWidth (),
-                   sigc::mem_fun(this, &MapGenerator::placeCity));
+                   sigc::mem_fun(*this, &MapGenerator::placeCity));
 
     if (roads)
       {
@@ -251,12 +250,12 @@ void MapGenerator::makeMap(int width, int height, bool roads)
     debug("ruining ruins");
     progress.emit(.700);
     makeBuildings (d_noruins, cityset->getRuinTileWidth (),
-                   sigc::mem_fun(this, &MapGenerator::placeRuin));
+                   sigc::mem_fun(*this, &MapGenerator::placeRuin));
 
     debug("spawning temples");
     progress.emit(.770);
     makeBuildings (d_notemples, cityset->getTempleTileWidth (),
-                   sigc::mem_fun(this, &MapGenerator::placeTemple));
+                   sigc::mem_fun(*this, &MapGenerator::placeTemple));
 
     debug("building bridges");
     if (roads == true)
@@ -269,7 +268,7 @@ void MapGenerator::makeMap(int width, int height, bool roads)
     debug("raising signs");
     progress.emit(.910);
     makeBuildings (d_nosignposts, 1,
-                   sigc::mem_fun(this, &MapGenerator::placeSign));
+                   sigc::mem_fun(*this, &MapGenerator::placeSign));
 
     rescueLoneTiles(Tile::MOUNTAIN, Tile::HILLS, false);
 
@@ -292,17 +291,17 @@ void MapGenerator::placeBridge(Vector<int> pos, int type)
     {
       d_building[pos.y*d_width + pos.x] = Maptile::BRIDGE;
       d_building[(pos.y + 1)*d_width + pos.x] = Maptile::BRIDGE;
-      Bridgelist::getInstance()->add(new Bridge(Vector<int>(pos.x, pos.y)));
-      Bridgelist::getInstance()->add(new Bridge(Vector<int>(pos.x+1, pos.y)));
+      Bridgelist::instance()->add(new Bridge(Vector<int>(pos.x, pos.y)));
+      Bridgelist::instance()->add(new Bridge(Vector<int>(pos.x+1, pos.y)));
     }
   else if (type == EAST_WEST_BRIDGE)
     {
       d_building[pos.y*d_width + pos.x] = Maptile::BRIDGE;
       d_building[pos.y*d_width + pos.x + 1] = Maptile::BRIDGE;
-      Bridgelist::getInstance()->add(new Bridge(Vector<int>(pos.x, pos.y)));
-      Bridgelist::getInstance()->add(new Bridge(Vector<int>(pos.x, pos.y+1)));
+      Bridgelist::instance()->add(new Bridge(Vector<int>(pos.x, pos.y)));
+      Bridgelist::instance()->add(new Bridge(Vector<int>(pos.x, pos.y+1)));
     }
-  GameMap::getInstance()->calculateBlockedAvenues();
+  GameMap::instance()->calculateBlockedAvenues();
 }
 
 bool MapGenerator::findBridgePurpose(Vector<int> pos, int type, 
@@ -310,13 +309,13 @@ bool MapGenerator::findBridgePurpose(Vector<int> pos, int type,
 {
   if (type == EAST_WEST_BRIDGE)
     {
-      src = GameMap::getInstance()->findNearestObjectToTheWest(pos);
-      dest = GameMap::getInstance()->findNearestObjectToTheEast(pos);
+      src = GameMap::instance()->findNearestObjectToTheWest(pos);
+      dest = GameMap::instance()->findNearestObjectToTheEast(pos);
     }
   else if (type == NORTH_SOUTH_BRIDGE)
     {
-      src = GameMap::getInstance()->findNearestObjectToTheNorth(pos);
-      dest = GameMap::getInstance()->findNearestObjectToTheSouth(pos);
+      src = GameMap::instance()->findNearestObjectToTheNorth(pos);
+      dest = GameMap::instance()->findNearestObjectToTheSouth(pos);
     }
   if (src == Vector<int>(-1,-1) || dest == Vector<int>(-1,-1))
     return false;
@@ -344,9 +343,9 @@ bool MapGenerator::canPlaceBridge(Vector<int> pos, int type, Vector<int> &src, V
 std::vector<Vector<int> > MapGenerator::makeStandingStones(bool also_roads)
 {
   std::vector<Vector<int> > road_stones;
-  Glib::ustring orig_tileset = GameMap::getInstance()->getTilesetBaseName();
-  Glib::ustring orig_shieldset = GameMap::getInstance()->getShieldsetBaseName();
-  Glib::ustring orig_cityset = GameMap::getInstance()->getCitysetBaseName();
+  Glib::ustring orig_tileset = GameMap::instance()->getTilesetBaseName();
+  Glib::ustring orig_shieldset = GameMap::instance()->getShieldsetBaseName();
+  Glib::ustring orig_cityset = GameMap::instance()->getCitysetBaseName();
   Citylist::deleteInstance ();
   Roadlist::deleteInstance();
   Ruinlist::deleteInstance ();
@@ -356,30 +355,30 @@ std::vector<Vector<int> > MapGenerator::makeStandingStones(bool also_roads)
 
   GameMap::setWidth(d_width);
   GameMap::setHeight(d_height);
-  GameMap::getInstance("default", "default", "default")->fill(this);
+  GameMap::instance("default", "default", "default")->fill(this);
 
   //the game map class smooths the map, so let's take what it smoothed.
   for (int y = 0; y < d_height; y++)
     for (int x = 0; x < d_width; x++)
       d_terrain[y*d_width + x] = 
-        GameMap::getInstance()->getTile(x, y)->getType();
+        GameMap::instance()->getTile(x, y)->getType();
   for (int y = 0; y < d_height; y++)
     for (int x = 0; x < d_width; x++)
       {
         Vector<int> pos = Vector<int>(x,y);
 	if (d_building[y*d_width + x] == Maptile::CITY)
-	  Citylist::getInstance()->add
+	  Citylist::instance()->add
 	    (new City(pos, cityset->getCityTileWidth()));
 	else if (d_building[y*d_width + x] == Maptile::ROAD)
-	  Roadlist::getInstance()->add(new Road(pos));
+	  Roadlist::instance()->add(new Road(pos));
 	else if (d_building[y*d_width + x] == Maptile::RUIN)
-	  Ruinlist::getInstance()->add
+	  Ruinlist::instance()->add
 	    (new Ruin(pos, cityset->getRuinTileWidth()));
 	else if (d_building[y*d_width + x] == Maptile::TEMPLE)
-	  Templelist::getInstance()->add
+	  Templelist::instance()->add
 	    (new Temple(pos, cityset->getTempleTileWidth()));
 	else if (d_building[y*d_width + x] == Maptile::SIGNPOST)
-	  Signpostlist::getInstance()->add(new Signpost(pos));
+	  Signpostlist::instance()->add(new Signpost(pos));
       }
 
   std::vector<Vector<int> > grass;
@@ -387,16 +386,16 @@ std::vector<Vector<int> > MapGenerator::makeStandingStones(bool also_roads)
     for (int j = 0; j < d_width; j++)
       {
         Vector<int> pos = Vector<int> (j, i);
-        bool city = Citylist::getInstance ()->getObjectAt (pos) != NULL;
-        bool temple = Templelist::getInstance ()->getObjectAt (pos) != NULL;
-        bool ruin = Ruinlist::getInstance ()->getObjectAt (pos) != NULL;
+        bool city = Citylist::instance ()->getObjectAt (pos) != NULL;
+        bool temple = Templelist::instance ()->getObjectAt (pos) != NULL;
+        bool ruin = Ruinlist::instance ()->getObjectAt (pos) != NULL;
         if (d_terrain[i*d_width + j] == Tile::GRASS &&
-            GameMap::getInstance()->getBuilding (pos) == Maptile::NONE &&
+            GameMap::instance()->getBuilding (pos) == Maptile::NONE &&
             !city && !temple && !ruin)
           grass.push_back (pos);
       }
 
-  std::random_shuffle (grass.begin (), grass.end ());
+  std::shuffle (grass.begin (), grass.end (), Rnd::gen ());
   unsigned int limit = d_nostones;
   if (grass.size () < limit)
     limit = grass.size ();
@@ -428,16 +427,16 @@ std::vector<Vector<int> > MapGenerator::makeStandingStones(bool also_roads)
   Signpostlist::deleteInstance();
   Stonelist::deleteInstance();
   Bridgelist::deleteInstance();
-  GameMap::getInstance(orig_tileset, orig_shieldset, orig_cityset);
+  GameMap::instance(orig_tileset, orig_shieldset, orig_cityset);
   return road_stones;
 }
 
 
 void MapGenerator::makeBridges()
 {
-  Glib::ustring orig_tileset = GameMap::getInstance()->getTilesetBaseName();
-  Glib::ustring orig_shieldset = GameMap::getInstance()->getShieldsetBaseName();
-  Glib::ustring orig_cityset = GameMap::getInstance()->getCitysetBaseName();
+  Glib::ustring orig_tileset = GameMap::instance()->getTilesetBaseName();
+  Glib::ustring orig_shieldset = GameMap::instance()->getShieldsetBaseName();
+  Glib::ustring orig_cityset = GameMap::instance()->getCitysetBaseName();
   GameMap::deleteInstance();
   Citylist::deleteInstance();
   Roadlist::deleteInstance();
@@ -448,13 +447,13 @@ void MapGenerator::makeBridges()
 
   GameMap::setWidth(d_width);
   GameMap::setHeight(d_height);
-  GameMap::getInstance("default", "default", "default")->fill(this);
+  GameMap::instance("default", "default", "default")->fill(this);
 
   //the game map class smooths the map, so let's take what it smoothed.
   for (int y = 0; y < d_height; y++)
     for (int x = 0; x < d_width; x++)
       d_terrain[y*d_width + x] = 
-        GameMap::getInstance()->getTile(x, y)->getType();
+        GameMap::instance()->getTile(x, y)->getType();
 
   //load up the roadlist, and stuff.
 
@@ -462,20 +461,20 @@ void MapGenerator::makeBridges()
     for (int x = 0; x < d_width; x++)
       {
 	if (d_building[y*d_width + x] == Maptile::CITY)
-	  Citylist::getInstance()->add
+	  Citylist::instance()->add
 	    (new City(Vector<int>(x,y), cityset->getCityTileWidth()));
 	else if (d_building[y*d_width + x] == Maptile::ROAD)
-	  Roadlist::getInstance()->add(new Road(Vector<int>(x,y)));
+	  Roadlist::instance()->add(new Road(Vector<int>(x,y)));
 	else if (d_building[y*d_width + x] == Maptile::RUIN)
-	  Ruinlist::getInstance()->add
+	  Ruinlist::instance()->add
 	    (new Ruin(Vector<int>(x,y), cityset->getRuinTileWidth()));
 	else if (d_building[y*d_width + x] == Maptile::TEMPLE)
-	  Templelist::getInstance()->add
+	  Templelist::instance()->add
 	    (new Temple(Vector<int>(x,y), cityset->getTempleTileWidth()));
 	else if (d_building[y*d_width + x] == Maptile::PORT)
-	  Portlist::getInstance()->add(new Port(Vector<int>(x,y)));
+	  Portlist::instance()->add(new Port(Vector<int>(x,y)));
       }
-  GameMap::getInstance()->calculateBlockedAvenues();
+  GameMap::instance()->calculateBlockedAvenues();
 
   Vector<int> src, dest;
   std::vector<std::pair<int , Vector<int> > >  bridges;
@@ -549,7 +548,7 @@ void MapGenerator::makeBridges()
   Citylist::deleteInstance();
   Portlist::deleteInstance();
   Bridgelist::deleteInstance();
-  GameMap::getInstance(orig_tileset, orig_shieldset, orig_cityset);
+  GameMap::instance(orig_tileset, orig_shieldset, orig_cityset);
 }
 
 void MapGenerator::printMap(int j, int i)
@@ -1279,7 +1278,7 @@ bool MapGenerator::canPutBuildingTile(Vector<int> pos, guint32 width, const std:
 }
 
 void MapGenerator::makeBuildings(int total, int width,
-                                 sigc::slot<void,Vector<int> > place)
+                                 sigc::slot<void(Vector<int>)> place)
 {
   int count = 0;
 
@@ -1289,7 +1288,7 @@ void MapGenerator::makeBuildings(int total, int width,
     for (int j = width; j < d_width - width; j++)
       if (d_building[j*d_width + i] == Maptile::NONE) 
         points.push_back (Vector<int>(j, i));
-  std::random_shuffle (points.begin (), points.end ());
+  std::shuffle (points.begin (), points.end (), Rnd::gen ());
 
   std::vector<Vector<int> > positions;
   std::vector<Tile::Type> allowed;
@@ -1318,7 +1317,7 @@ void MapGenerator::makeBuildings(int total, int width,
         if (canPlaceBuilding (pos, width, allowed))
           positions.push_back (pos);
 
-      std::random_shuffle (positions.begin (), positions.end ());
+      std::shuffle (positions.begin (), positions.end (), Rnd::gen ());
 
       unsigned int limit = total;
       if (positions.size () + count < limit)
@@ -1442,19 +1441,19 @@ void MapGenerator::calculateBlockedAvenue(int x, int y)
 	    continue;
 	  if (j < 0 || j >= d_height)
 	    continue;
-	  GameMap::getInstance()->calculateBlockedAvenue(i, j);
+	  GameMap::instance()->calculateBlockedAvenue(i, j);
 	}
     }
 }
 
 bool MapGenerator::placePort(int x, int y)
 {
-  //if (Citylist::getInstance()->getNearestCity(Vector<int>(x, y), 2) == NULL)
+  //if (Citylist::instance()->getNearestCity(Vector<int>(x, y), 2) == NULL)
     {
       if (d_building[y*d_width + x] == Maptile::NONE)
 	{
 	  d_building[y*d_width + x] = Maptile::PORT;
-          Portlist::getInstance()->add(new Port(Vector<int>(x, y)));
+          Portlist::instance()->add(new Port(Vector<int>(x, y)));
 	  calculateBlockedAvenue(x, y);
 	  return true;
 	}
@@ -1473,18 +1472,18 @@ bool MapGenerator::makeRoad(Vector<int> src, Vector<int>dest)
     {
       for (auto it: *p)
 	{
-	  if (GameMap::getInstance()->getTile(it)->getType() == Tile::WATER &&
-	      GameMap::getInstance()->getTile(it)->getBuilding() != Maptile::BRIDGE)
+	  if (GameMap::instance()->getTile(it)->getType() == Tile::WATER &&
+	      GameMap::instance()->getTile(it)->getBuilding() != Maptile::BRIDGE)
 	    {
 	      retval = false;
 	      break;
 	    }
-	  if (Citylist::getInstance()->getObjectAt(it) == NULL)
+	  if (Citylist::instance()->getObjectAt(it) == NULL)
 	    {
 	      if (d_building[it.y*d_width + it.x] == Maptile::NONE)
 		{
 		  d_building[it.y*d_width + it.x] = Maptile::ROAD;
-                  Roadlist::getInstance()->add(new Road(Vector<int>(it)));
+                  Roadlist::instance()->add(new Road(Vector<int>(it)));
 		  calculateBlockedAvenue(it.x, it.y);
 		}
 	    }
@@ -1506,18 +1505,18 @@ bool MapGenerator::makeRoad2(Path *p)
     {
       for (auto it: *p)
 	{
-	  if (GameMap::getInstance()->getTile(it)->getType() == Tile::WATER &&
-	      GameMap::getInstance()->getTile(it)->getBuilding() != Maptile::BRIDGE)
+	  if (GameMap::instance()->getTile(it)->getType() == Tile::WATER &&
+	      GameMap::instance()->getTile(it)->getBuilding() != Maptile::BRIDGE)
 	    {
 	      retval = false;
 	      break;
 	    }
-	  if (Citylist::getInstance()->getObjectAt(it) == NULL)
+	  if (Citylist::instance()->getObjectAt(it) == NULL)
 	    {
 	      if (d_building[it.y*d_width + it.x] == Maptile::NONE)
 		{
 		  d_building[it.y*d_width + it.x] = Maptile::ROAD;
-                  Roadlist::getInstance()->add(new Road(Vector<int>(it)));
+                  Roadlist::instance()->add(new Road(Vector<int>(it)));
 		  calculateBlockedAvenue(it.x, it.y);
 		}
 	    }
@@ -1550,7 +1549,7 @@ bool MapGenerator::makeAccessible(RoadPathCalculator *pc_land, RoadPathCalculato
 	  if (d_terrain[y*d_width + x] == Tile::MOUNTAIN)
 	    {
 	      d_terrain[y*d_width +x] = Tile::HILLS;
-              GameMap::getInstance()->setTileIndex(x, y, GameMap::getTileset()->lookupIndexByType(Tile::HILLS));
+              GameMap::instance()->setTileIndex(x, y, GameMap::getTileset()->lookupIndexByType(Tile::HILLS));
 	      calculateBlockedAvenue(x, y);
 	    }
 	  if (d_terrain[y*d_width + x] == Tile::WATER &&
@@ -1678,7 +1677,7 @@ std::vector<std::pair<int , Vector<int> > > MapGenerator::findBridgePlaces()
             }
         }
     // randomize
-    std::random_shuffle(result.begin(),result.end());
+    std::shuffle(result.begin(),result.end(), Rnd::gen ());
 
     // remove those that are too close to each other
     std::set<int> bad;bad.clear();
@@ -1697,9 +1696,9 @@ std::vector<std::pair<int , Vector<int> > > MapGenerator::findBridgePlaces()
 
 void MapGenerator::makeCitiesAccessible()
 {
-  Glib::ustring orig_tileset = GameMap::getInstance()->getTilesetBaseName();
-  Glib::ustring orig_shieldset = GameMap::getInstance()->getShieldsetBaseName();
-  Glib::ustring orig_cityset = GameMap::getInstance()->getCitysetBaseName();
+  Glib::ustring orig_tileset = GameMap::instance()->getTilesetBaseName();
+  Glib::ustring orig_shieldset = GameMap::instance()->getShieldsetBaseName();
+  Glib::ustring orig_cityset = GameMap::instance()->getCitysetBaseName();
   GameMap::deleteInstance();
   Citylist::deleteInstance();
   Roadlist::deleteInstance();
@@ -1707,27 +1706,27 @@ void MapGenerator::makeCitiesAccessible()
 
   GameMap::setWidth(d_width);
   GameMap::setHeight(d_height);
-  GameMap::getInstance("default", "default", cityset->getBaseName())->fill(this);
+  GameMap::instance("default", "default", cityset->getBaseName())->fill(this);
   //the game map class smooths the map, so let's take what it smoothed.
   for (int y = 0; y < d_height; y++)
     for (int x = 0; x < d_width; x++)
       d_terrain[y*d_width + x] =
-	GameMap::getInstance()->getTile(x, y)->getType();
+	GameMap::instance()->getTile(x, y)->getType();
 
   for (int y = 0; y < d_height; y++)
     for (int x = 0; x < d_width; x++)
       {
 	if (d_building[y*d_width + x] == Maptile::CITY)
-	  Citylist::getInstance()->add
+	  Citylist::instance()->add
 	    (new City(Vector<int>(x,y), cityset->getCityTileWidth()));
       }
-  GameMap::getInstance()->calculateBlockedAvenues();
+  GameMap::instance()->calculateBlockedAvenues();
 
   //make all cities accessible by allowing movement to a central city
-  City *center = Citylist::getInstance()->getNearestCity(GameMap::getCenterOfMap());
+  City *center = Citylist::instance()->getNearestCity(GameMap::getCenterOfMap());
   RoadPathCalculator pc_land (center->getPos());
   RoadPathCalculator pc_fly (center->getPos(), true);
-  for (auto it: *Citylist::getInstance())
+  for (auto it: *Citylist::instance())
     {
       if (center == it)
 	continue;
@@ -1743,14 +1742,14 @@ void MapGenerator::makeCitiesAccessible()
   GameMap::deleteInstance();
   Citylist::deleteInstance();
   Portlist::deleteInstance();
-  GameMap::getInstance(orig_tileset, orig_shieldset, orig_cityset);
+  GameMap::instance(orig_tileset, orig_shieldset, orig_cityset);
 }
 
 void MapGenerator::makeRoads()
 {
-  Glib::ustring orig_tileset = GameMap::getInstance()->getTilesetBaseName();
-  Glib::ustring orig_shieldset = GameMap::getInstance()->getShieldsetBaseName();
-  Glib::ustring orig_cityset = GameMap::getInstance()->getCitysetBaseName();
+  Glib::ustring orig_tileset = GameMap::instance()->getTilesetBaseName();
+  Glib::ustring orig_shieldset = GameMap::instance()->getShieldsetBaseName();
+  Glib::ustring orig_cityset = GameMap::instance()->getCitysetBaseName();
   GameMap::deleteInstance();
   Citylist::deleteInstance();
   Roadlist::deleteInstance();
@@ -1758,36 +1757,36 @@ void MapGenerator::makeRoads()
 
   GameMap::setWidth(d_width);
   GameMap::setHeight(d_height);
-  GameMap::getInstance("default", "default", cityset->getBaseName())->fill(this);
+  GameMap::instance("default", "default", cityset->getBaseName())->fill(this);
   //the game map class smooths the map, so let's take what it smoothed.
   for (int y = 0; y < d_height; y++)
     for (int x = 0; x < d_width; x++)
       d_terrain[y*d_width + x] = 
-	GameMap::getInstance()->getTile(x, y)->getType();
+	GameMap::instance()->getTile(x, y)->getType();
 
   for (int y = 0; y < d_height; y++)
     for (int x = 0; x < d_width; x++)
       {
 	if (d_building[y*d_width + x] == Maptile::CITY)
-	  Citylist::getInstance()->add
+	  Citylist::instance()->add
 	    (new City(Vector<int>(x,y), cityset->getCityTileWidth()));
       }
-  GameMap::getInstance()->calculateBlockedAvenues();
+  GameMap::instance()->calculateBlockedAvenues();
 
   guint32 roads_built = 0;
-  for (auto it: *Citylist::getInstance())
+  for (auto it: *Citylist::instance())
     {
-      City *c = Citylist::getInstance()->getNearestCityPast(it->getPos(), 13);
+      City *c = Citylist::instance()->getNearestCityPast(it->getPos(), 13);
       Vector<int> dest = c->getPos();
       Vector<int> src = it->getPos();
       //does it already have a road going to it?
-      if (Roadlist::getInstance()->getNearestObjectBefore(dest, c->getSize() + 1))
+      if (Roadlist::instance()->getNearestObjectBefore(dest, c->getSize() + 1))
 	continue;
 
       if (makeRoad(src, dest))
         {
           roads_built++;
-          if (roads_built > Citylist::getInstance()->size()/3)
+          if (roads_built > Citylist::instance()->size()/3)
             break;
         }
     }
@@ -1796,7 +1795,7 @@ void MapGenerator::makeRoads()
   GameMap::deleteInstance();
   Citylist::deleteInstance();
   Portlist::deleteInstance();
-  GameMap::getInstance(orig_tileset, orig_shieldset, orig_cityset);
+  GameMap::instance(orig_tileset, orig_shieldset, orig_cityset);
 }
 
 void MapGenerator::rescueLoneTiles(Tile::Type FIND_THIS, Tile::Type REPLACE, bool grow)

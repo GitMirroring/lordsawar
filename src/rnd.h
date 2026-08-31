@@ -1,4 +1,4 @@
-//  Copyright (C) 2015 Ben Asselstine
+//  Copyright (C) 2015, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,31 +12,44 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef RND_H
 #define RND_H
 
+#include <random>
 #include <glibmm.h>
 //! A simple random number provider
 /**
   */
+
 class Rnd
 {
- public:
-  static Rnd* instance();
+public:
+    static Rnd* instance ();
 
-  static void set_seed(guint32 seed) {instance()->rnd->set_seed(seed);}
-  static guint32 rand();
+    static void set_seed (uint32_t seed)
+      {
+        instance ()->engine.seed (seed);
+      }
 
- private:
-    Rnd();
-    Rnd(const Rnd &r);
-    ~Rnd();
-  static Rnd *s_instance;
-  Glib::Rand *rnd;
+    static uint32_t rand ()
+      {
+        static std::uniform_int_distribution<uint32_t> dist;
+        return dist (instance ()->engine);
+      }
+
+    static std::mt19937& gen () { return instance ()->engine; }
+private:
+    Rnd () : engine(std::random_device{}()) {}
+    Rnd (const Rnd&) = delete;
+    Rnd& operator=(const Rnd&) = delete;
+    ~Rnd () = default;
+
+    static Rnd* s_instance;
+
+    std::mt19937 engine;
 };
 
 #endif

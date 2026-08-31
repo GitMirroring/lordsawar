@@ -1,41 +1,29 @@
 <?xml version="1.0"?>
-<shieldset version="0.3.3">
+<shieldset version="0.4.0">
     <d_id>3</d_id>
     <_d_name>Dol</_d_name>
     <d_copyright>Copyright (C) 2007, 2009, 2021 Ben Asselstine</d_copyright>
     <d_license>Licensed under the GPL Version 3 or later at your option.</d_license>
     <_d_info>This is the shieldset associated with the dol scenario.</_d_info>
-    <d_small_width>8</d_small_width>
-    <d_small_height>8</d_small_height>
-    <d_medium_width>11</d_medium_width>
-    <d_medium_height>14</d_medium_height>
-    <d_large_width>31</d_large_width>
-    <d_large_height>36</d_large_height>
     <shield>
         <d_owner>0</d_owner>
         <d_color>252 252 252</d_color>
         <shieldstyle>
             <d_type>ShieldStyle::SMALL</d_type>
             <d_image>small-white-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::MEDIUM</d_type>
             <d_image>medium-white-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::LARGE</d_type>
             <d_image>large-white-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <tartan>
             <d_left_image>left-tartan</d_left_image>
-            <d_left_image_num_masks>1</d_left_image_num_masks>
             <d_center_image>center-tartan</d_center_image>
-            <d_center_image_num_masks>1</d_center_image_num_masks>
             <d_right_image>right-tartan</d_right_image>
-            <d_right_image_num_masks>1</d_right_image_num_masks>
         </tartan>
     </shield>
     <shield>
@@ -44,25 +32,19 @@
         <shieldstyle>
             <d_type>ShieldStyle::SMALL</d_type>
             <d_image>small-green-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::MEDIUM</d_type>
             <d_image>medium-green-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::LARGE</d_type>
             <d_image>large-green-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <tartan>
             <d_left_image>left-tartan</d_left_image>
-            <d_left_image_num_masks>1</d_left_image_num_masks>
             <d_center_image>center-tartan</d_center_image>
-            <d_center_image_num_masks>1</d_center_image_num_masks>
             <d_right_image>right-tartan</d_right_image>
-            <d_right_image_num_masks>1</d_right_image_num_masks>
         </tartan>
     </shield>
     <shield>
@@ -71,25 +53,19 @@
         <shieldstyle>
             <d_type>ShieldStyle::SMALL</d_type>
             <d_image>small-yellow-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::MEDIUM</d_type>
             <d_image>medium-yellow-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::LARGE</d_type>
             <d_image>large-yellow-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <tartan>
             <d_left_image>left-tartan</d_left_image>
-            <d_left_image_num_masks>1</d_left_image_num_masks>
             <d_center_image>center-tartan</d_center_image>
-            <d_center_image_num_masks>1</d_center_image_num_masks>
             <d_right_image>right-tartan</d_right_image>
-            <d_right_image_num_masks>1</d_right_image_num_masks>
         </tartan>
     </shield>
     <shield>
@@ -98,25 +74,19 @@
         <shieldstyle>
             <d_type>ShieldStyle::SMALL</d_type>
             <d_image>small-lightblue-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::MEDIUM</d_type>
             <d_image>medium-lightblue-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::LARGE</d_type>
             <d_image>large-lightblue-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <tartan>
             <d_left_image>left-tartan</d_left_image>
-            <d_left_image_num_masks>1</d_left_image_num_masks>
             <d_center_image>center-tartan</d_center_image>
-            <d_center_image_num_masks>1</d_center_image_num_masks>
             <d_right_image>right-tartan</d_right_image>
-            <d_right_image_num_masks>1</d_right_image_num_masks>
         </tartan>
     </shield>
     <shield>
@@ -125,25 +95,19 @@
         <shieldstyle>
             <d_type>ShieldStyle::SMALL</d_type>
             <d_image>small-red-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::MEDIUM</d_type>
             <d_image>medium-red-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::LARGE</d_type>
             <d_image>large-red-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <tartan>
             <d_left_image>left-tartan</d_left_image>
-            <d_left_image_num_masks>1</d_left_image_num_masks>
             <d_center_image>center-tartan</d_center_image>
-            <d_center_image_num_masks>1</d_center_image_num_masks>
             <d_right_image>right-tartan</d_right_image>
-            <d_right_image_num_masks>1</d_right_image_num_masks>
         </tartan>
     </shield>
     <shield>
@@ -152,25 +116,19 @@
         <shieldstyle>
             <d_type>ShieldStyle::SMALL</d_type>
             <d_image>small-darkblue-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::MEDIUM</d_type>
             <d_image>medium-darkblue-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::LARGE</d_type>
             <d_image>large-darkblue-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <tartan>
             <d_left_image>left-tartan</d_left_image>
-            <d_left_image_num_masks>1</d_left_image_num_masks>
             <d_center_image>center-tartan</d_center_image>
-            <d_center_image_num_masks>1</d_center_image_num_masks>
             <d_right_image>right-tartan</d_right_image>
-            <d_right_image_num_masks>1</d_right_image_num_masks>
         </tartan>
     </shield>
     <shield>
@@ -179,25 +137,19 @@
         <shieldstyle>
             <d_type>ShieldStyle::SMALL</d_type>
             <d_image>small-orange-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::MEDIUM</d_type>
             <d_image>medium-orange-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::LARGE</d_type>
             <d_image>large-orange-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <tartan>
             <d_left_image>left-tartan</d_left_image>
-            <d_left_image_num_masks>1</d_left_image_num_masks>
             <d_center_image>center-tartan</d_center_image>
-            <d_center_image_num_masks>1</d_center_image_num_masks>
             <d_right_image>right-tartan</d_right_image>
-            <d_right_image_num_masks>1</d_right_image_num_masks>
         </tartan>
     </shield>
     <shield>
@@ -206,25 +158,19 @@
         <shieldstyle>
             <d_type>ShieldStyle::SMALL</d_type>
             <d_image>small-black-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::MEDIUM</d_type>
             <d_image>medium-black-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::LARGE</d_type>
             <d_image>large-black-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <tartan>
             <d_left_image>left-tartan</d_left_image>
-            <d_left_image_num_masks>1</d_left_image_num_masks>
             <d_center_image>center-tartan</d_center_image>
-            <d_center_image_num_masks>1</d_center_image_num_masks>
             <d_right_image>right-tartan</d_right_image>
-            <d_right_image_num_masks>1</d_right_image_num_masks>
         </tartan>
     </shield>
     <shield>
@@ -233,25 +179,19 @@
         <shieldstyle>
             <d_type>ShieldStyle::SMALL</d_type>
             <d_image>small-neutral-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::MEDIUM</d_type>
             <d_image>medium-neutral-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <shieldstyle>
             <d_type>ShieldStyle::LARGE</d_type>
             <d_image>large-neutral-shield</d_image>
-            <d_image_num_masks>1</d_image_num_masks>
         </shieldstyle>
         <tartan>
             <d_left_image>left-tartan</d_left_image>
-            <d_left_image_num_masks>1</d_left_image_num_masks>
             <d_center_image>center-tartan</d_center_image>
-            <d_center_image_num_masks>1</d_center_image_num_masks>
             <d_right_image>right-tartan</d_right_image>
-            <d_right_image_num_masks>1</d_right_image_num_masks>
         </tartan>
     </shield>
 </shieldset>

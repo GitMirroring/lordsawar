@@ -1,4 +1,4 @@
-//  Copyright (C) 2014 Ben Asselstine
+//  Copyright (C) 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,30 +12,219 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#pragma once
+#include <gtkmm.h>
+#include <iostream>
+#include "defs.h"
 #ifndef LW_DIALOG_H
 #define LW_DIALOG_H
-
-#include <sigc++/trackable.h>
-#include <gtkmm.h>
-
-class LwDialog: public sigc::trackable
+#include "file-filter.h"
+class LwDialog
 {
- public:
-    LwDialog(Gtk::Window &parent, Glib::ustring file);
-    ~LwDialog();
+public:
+    template <typename T>
+    static T* build (Gtk::Window *parent)
+      {
+        try
+          {
+            Glib::RefPtr<Gtk::Builder> builder =
+              Gtk::Builder::create_from_resource
+              (std::string (RESOURCE) + T::get_resource_name ());
+            T *dialog = Gtk::Builder::get_widget_derived<T>(builder, "dialog");
+            if (dialog->get_title () == "") //odd workaround here
+              dialog->set_title ("");
+            dialog->set_modal (true);
+            dialog->set_transient_for (*parent);
+            dialog->present ();
+            return dialog;
+          }
+        catch (Glib::Error &ex)
+          {
+            std::cerr << T::get_resource_name () << ": " << ex.what () <<
+              std::endl;
+          }
+        return NULL;
+      }
 
-    int run_and_hide();
+    static Glib::RefPtr<Gtk::AlertDialog> alert (Glib::ustring msg, Glib::ustring detail = "")
+      {
+        auto dialog = Gtk::AlertDialog::create (msg);
+        dialog->set_buttons ({_("Close")});
+        if (detail != "")
+          dialog->set_detail (detail);
+        dialog->set_cancel_button (0);
+        dialog->set_default_button (0);
+        dialog->set_modal (true);
+        return dialog;
+      }
 
-    Glib::RefPtr<Gtk::Builder> get_builder() const {return xml;};
-    void set_title(Glib::ustring s) {dialog->set_title(s);};
-    Gtk::Dialog *get() {return dialog;};
- protected:
-    Gtk::Dialog* dialog;
-    Glib::RefPtr<Gtk::Builder> xml;
+    static Glib::RefPtr<Gtk::AlertDialog> alert_yn (Glib::ustring msg, Glib::ustring detail = "")
+      {
+        auto dialog = Gtk::AlertDialog::create (msg);
+        if (detail != "")
+          dialog->set_detail (detail);
+        dialog->set_buttons ({_("No"), _("Yes")});
+        dialog->set_cancel_button (0);
+        dialog->set_default_button (1);
+        dialog->set_modal (true);
+        return dialog;
+      }
+
+    static void open (Gtk::Window &parent, Glib::ustring title, FileFilter::Extension ext, sigc::slot<void(std::string)> after)
+      {
+        auto d = Gtk::FileDialog::create ();
+        d->set_title (title);
+
+        std::string folder = "";
+        switch (ext)
+          {
+          case FileFilter::PNG:
+            FileFilter (_("PNG Files"), {".png"}).add (d);
+            break;
+
+          case FileFilter::IMAGE:
+            FileFilter (_("Image Files"), {".png", ".svg"}).add (d);
+            break;
+
+          case FileFilter::SOUND:
+            FileFilter (_("Audio Files"), {".ogg"}).add (d);
+            break;
+
+          case FileFilter::ARMYSET:
+            FileFilter (_("Army Set Files"), {ARMYSET_EXT}).add (d);
+            folder = File::get_user_armyset_dir ();
+            break;
+
+          case FileFilter::CITYSET:
+            FileFilter (_("City Set Files"), {CITYSET_EXT}).add (d);
+            folder = File::get_user_cityset_dir ();
+            break;
+
+          case FileFilter::SHIELDSET:
+            FileFilter (_("Shield Set Files"), {SHIELDSET_EXT}).add (d);
+            folder = File::get_user_shieldset_dir ();
+            break;
+
+          case FileFilter::TILESET:
+            FileFilter (_("Tile Set Files"), {TILESET_EXT}).add (d);
+            folder = File::get_user_tileset_dir ();
+            break;
+
+          case FileFilter::SAVED_GAME:
+            FileFilter (_("Saved Game Files"), {SAVE_EXT}).add (d);
+            folder = File::getSavePath ();
+            break;
+
+          case FileFilter::SCENARIO:
+            FileFilter (_("Scenario Files"), {MAP_EXT}).add (d);
+            folder = File::get_user_map_dir ();
+            break;
+
+          }
+
+        if (folder != "")
+          d->set_initial_folder (Gio::File::create_for_path (folder));
+
+        d->open
+          (parent,
+           [d, after](const Glib::RefPtr<Gio::AsyncResult>& result)
+           {
+             try
+               {
+                 auto file = d->open_finish (result);
+                 if (file)
+                   after (file->get_path ());
+               }
+             catch (const Gtk::DialogError& e)
+               {
+                 if (e.code () == Gtk::DialogError::Code::DISMISSED)
+                   return;
+               }
+             catch (const Glib::Error& e)
+               {
+                 std::cerr << "Error: " << e.what () << '\n';
+               }
+           });
+      }
+
+    static void save (Gtk::Window &parent, Glib::ustring title, Glib::ustring filename, FileFilter::Extension ext, sigc::slot<void(std::string)> after)
+      {
+        auto d = Gtk::FileDialog::create ();
+        d->set_title (title);
+        if (filename != "")
+          d->set_initial_name (filename + FileFilter::get_extension (ext));
+
+        std::string folder = "";
+        switch (ext)
+          {
+          case FileFilter::PNG:
+            FileFilter (_("PNG Files"), {".png"}).add (d);
+            break;
+
+          case FileFilter::IMAGE:
+            FileFilter (_("Image Files"), {".png", ".svg"}).add (d);
+            break;
+
+          case FileFilter::SOUND:
+            FileFilter (_("Audio Files"), {".ogg"}).add (d);
+            break;
+
+          case FileFilter::ARMYSET:
+            FileFilter (_("Army Set Files"), {ARMYSET_EXT}).add (d);
+            folder = File::get_user_armyset_dir ();
+            break;
+
+          case FileFilter::CITYSET:
+            FileFilter (_("City Set Files"), {CITYSET_EXT}).add (d);
+            folder = File::get_user_cityset_dir ();
+            break;
+
+          case FileFilter::SHIELDSET:
+            FileFilter (_("Shield Set Files"), {SHIELDSET_EXT}).add (d);
+            folder = File::get_user_shieldset_dir ();
+            break;
+
+          case FileFilter::TILESET:
+            FileFilter (_("Tile Set Files"), {TILESET_EXT}).add (d);
+            folder = File::get_user_tileset_dir ();
+            break;
+
+          case FileFilter::SAVED_GAME:
+            FileFilter (_("Saved Game Files"), {SAVE_EXT}).add (d);
+            folder = File::getSavePath ();
+            break;
+
+          case FileFilter::SCENARIO:
+            FileFilter (_("Scenario Files"), {MAP_EXT}).add (d);
+            folder = File::get_user_map_dir ();
+            break;
+
+          }
+
+        if (folder != "")
+          d->set_initial_folder (Gio::File::create_for_path (folder));
+
+        d->save
+          (parent,
+           [d, after](const Glib::RefPtr<Gio::AsyncResult>& result)
+           {
+             try
+               {
+                 auto file = d->save_finish (result);
+                 if (file)
+                   after (file->get_path ());
+               }
+             catch (const Gtk::DialogError& e)
+               {
+                 if (e.code () == Gtk::DialogError::Code::DISMISSED)
+                   return;
+               }
+             catch (const Glib::Error& e)
+               {
+                 std::cerr << "Error: " << e.what () << '\n';
+               }
+           });
+      }
 };
-
 #endif

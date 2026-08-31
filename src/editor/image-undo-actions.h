@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,67 +12,85 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef IMAGE_EDITOR_ACTIONS_H
-#define IMAGE_EDITOR_ACTIONS_H
+#ifndef IMAGE_UNDO_ACTIONS_H
+#define IMAGE_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "undo-action.h"
 #include <vector>
-#include "PixMask.h"
+#include "pixmask.h"
 
 //! A record of an event in the image editor
-/** 
- * The purpose of these classes is to implement undo/redo in the image 
+/**
+ * The purpose of these classes is to implement undo/redo in the image
  * editor.
  */
 
-class ImageEditorAction: public UndoAction
+class ImageUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      SET = 1,
-    };
+    enum Type
+      {
+        SET = 1,
+      };
 
-    ImageEditorAction(Type type)
-     : UndoAction (UndoAction::AGGREGATE_NONE), d_type (type) {}
+    ImageUndoAction (Type type)
+     : UndoAction (UndoAction::AGGREGATE_NONE), m_type (type)
+      {
+      }
 
-    virtual ~ImageEditorAction() {}
+    virtual ~ImageUndoAction ()
+      {
+      }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class ImageEditorAction_Set: public ImageEditorAction
+class ImageUndoAction_Set: public ImageUndoAction
 {
     public:
-        ImageEditorAction_Set (Glib::ustring f, std::vector<PixMask *> im)
-          : ImageEditorAction (SET), d_file (f)
+        ImageUndoAction_Set (Glib::ustring f, std::vector<PixMask *> im)
+          : ImageUndoAction (SET), m_file (f)
           {
             for (auto i : im)
-              d_frames.push_back (i->copy ());
+              m_frames.push_back (i->copy ());
           }
-        ~ImageEditorAction_Set ()
+
+        ~ImageUndoAction_Set ()
           {
-            for (auto i : d_frames)
+            for (auto i : m_frames)
               delete i;
           }
 
-        Glib::ustring getActionName () const {return "Set";}
+        Glib::ustring get_action_name () const
+          {
+            return "Set";
+          }
 
-        Glib::ustring getFile () const {return d_file;}
-        std::vector<PixMask *> getFrames () const {return d_frames;}
+        Glib::ustring get_file () const
+          {
+            return m_file;
+          }
+
+        std::vector<PixMask *> get_frames () const
+          {
+            return m_frames;
+          }
 
     private:
-        Glib::ustring d_file;
-        std::vector<PixMask *> d_frames;
+        Glib::ustring m_file;
+        std::vector<PixMask *> m_frames;
 };
-#endif //IMAGE_EDITOR_ACTIONS_H
+#endif

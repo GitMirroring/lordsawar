@@ -1,4 +1,4 @@
-// Copyright (C) 2020, 2021 Ben Asselstine
+//  Copyright (C) 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef TAR_FILE_IMAGE_H
@@ -21,7 +20,7 @@
 
 #include <gtkmm.h>
 #include "vector.h"
-#include "PixMask.h"
+#include "pixmask.h"
 
 class PixMask;
 class Tar_Helper;
@@ -69,9 +68,6 @@ public:
 
   //! Return all of the images
   std::vector<PixMask*> getImages () const {return frames;}
-
-  //! Return the dimensions that the images are scaled to
-  Vector<int> getScaledImageDimensions () const {return scale_dimension;}
 
   //! Return the dimensions of the images in the backing image
   Vector<int> getImageDimensions () const  {return dimension;}
@@ -132,7 +128,7 @@ public:
   bool loadFromFile (Glib::ustring filename);
 
   //! Process the backing image into a set of images
-  void instantiateImages (Vector<int> scale_to_dimension = Vector<int>(-1,-1));
+  bool instantiateImages ();
 
   //! Destroy the images
   void uninstantiateImages ();
@@ -156,9 +152,6 @@ private:
 
   //! When we extract the file from the tar file, this is where it is
   Glib::ustring file_on_disk;
-
-  //! What we want to scale the images to
-  Vector<int> scale_dimension;
 
   //! The original dimensions of the images in the backing image
   Vector<int> dimension;

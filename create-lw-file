@@ -9,7 +9,7 @@ tmpdir=`mktemp -q -d /tmp/lw-tar.XXXXXX `
 # see the benefit of the explanatory power of long options.
 file=`basename $1`
 if [ "x$tmpdir" != "x" ]; then
-  cp $files $tmpdir
+  cp -v $files $tmpdir
   tarball=$file.tar
   origdir=`pwd`
   cd $tmpdir

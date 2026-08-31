@@ -1,7 +1,7 @@
-// Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2004 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef QUEST_ENEMY_ARMIES_H
@@ -25,7 +24,7 @@
 #include <sigc++/trackable.h>
 
 #include <list>
-#include "Quest.h"
+#include "quest.h"
 
 class Army;
 class Player;
@@ -43,16 +42,15 @@ public:
     /**
      * Make a new kill-armies quest.
      *
-     * @param q_mgr  The quests manager to associate this quest with.
      * @param hero   The Id of the Hero who is responsible for the quest.
      */
-    QuestEnemyArmies(QuestsManager& q_mgr, guint32 hero);
+    QuestEnemyArmies(guint32 hero);
 
     //! Copy constructor.
     QuestEnemyArmies (const QuestEnemyArmies &q);
 
     // Construct from remote action.
-    QuestEnemyArmies(QuestsManager& q_mgr, guint32 hero,
+    QuestEnemyArmies(guint32 hero,
 		     guint32 armies_to_kill, guint32 victim_player);
 
     //! Destructor.
@@ -60,10 +58,9 @@ public:
 
     //! Loading constructor.
     /**
-     * @param q_mgr   The quests manager to associate this quest with.
      * @param helper  The opened saved-game file to load this quest from.
      */
-    QuestEnemyArmies(QuestsManager& q_mgr, XML_Helper* helper);
+    QuestEnemyArmies(XML_Helper* helper);
 
 
     // Get Methods
@@ -108,7 +105,7 @@ public:
     /**
      * @note This method is not used.
      */
-    void cityAction(City *city, CityDefeatedAction action, 
+    void cityAction(City *city, CityDefeatedChoice action, 
 		    bool heroIsCulprit, int gold);
 
 

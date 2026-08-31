@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,23 +12,22 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sstream>
 #include <sigc++/functors/mem_fun.h>
 #include "ucompose.hpp"
 
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "stack.h"
-#include "QEnemyArmytype.h"
-#include "QuestsManager.h"
-#include "playerlist.h"
-#include "stacklist.h"
-#include "armysetlist.h"
-#include "GameMap.h"
+#include "quest-enemy-army-type.h"
+#include "quest-manager.h"
+#include "player-list.h"
+#include "stack-list.h"
+#include "army-set-list.h"
+#include "game-map.h"
 #include "player.h"
-#include "armyproto.h"
+#include "army-proto.h"
 #include "hero.h"
 #include "rnd.h"
 
@@ -40,7 +39,7 @@ int getVictimArmytype(Player *p, std::list<Vector<int> >&targets)
   Stacklist::const_iterator sit;
   Stack::iterator it;
   Stacklist *sl;
-  for (auto pit: *Playerlist::getInstance())
+  for (auto pit: *Playerlist::instance())
     {
       if (pit == p)
 	continue;
@@ -65,8 +64,8 @@ int getVictimArmytype(Player *p, std::list<Vector<int> >&targets)
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
-QuestEnemyArmytype::QuestEnemyArmytype(QuestsManager& q_mgr, guint32 hero)
-  : Quest(q_mgr, hero, Quest::KILLARMYTYPE),
+QuestEnemyArmytype::QuestEnemyArmytype(guint32 hero)
+  : Quest(hero, Quest::KILLARMYTYPE),
   d_type_to_kill (getVictimArmytype (getHero ()->getOwner (), d_targets))
 {
   initDescription();
@@ -77,17 +76,17 @@ QuestEnemyArmytype::QuestEnemyArmytype (const QuestEnemyArmytype &q)
 {
 }
 
-QuestEnemyArmytype::QuestEnemyArmytype(QuestsManager& q_mgr, XML_Helper* helper) 
-  : Quest(q_mgr, helper)
+QuestEnemyArmytype::QuestEnemyArmytype(XML_Helper* helper) 
+  : Quest(helper)
 {
-  helper->getData(d_type_to_kill, "type_to_kill");
+  helper->get(d_type_to_kill, "type_to_kill");
 
   initDescription();
 }
 
-QuestEnemyArmytype::QuestEnemyArmytype(QuestsManager& q_mgr, guint32 hero,
+QuestEnemyArmytype::QuestEnemyArmytype(guint32 hero,
 				       guint32 type_to_kill)
-  : Quest(q_mgr, hero, Quest::KILLARMYTYPE), d_type_to_kill (type_to_kill)
+  : Quest(hero, Quest::KILLARMYTYPE), d_type_to_kill (type_to_kill)
 {
   initDescription();
 }
@@ -96,28 +95,27 @@ bool QuestEnemyArmytype::save(XML_Helper *helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(Quest::d_tag);
+  retval &= helper->open_tag(Quest::d_tag);
   retval &= Quest::save(helper);
-  retval &= helper->saveData("type_to_kill", d_type_to_kill);
-  retval &= helper->closeTag();
+  retval &= helper->save("type_to_kill", d_type_to_kill);
+  retval &= helper->close_tag();
 
   return retval;
 }
 
 Glib::ustring QuestEnemyArmytype::getProgress() const
 {
-  guint32 set = Playerlist::getInstance()->getActiveplayer()->getArmyset();
-  const ArmyProto *a = Armysetlist::getInstance()->getArmy(set, d_type_to_kill);
+  guint32 set = Playerlist::instance()->getActiveplayer()->getArmyset();
+  const ArmyProto *a = Armysetlist::instance()->getArmy(set, d_type_to_kill);
   return String::ucompose(
 			  _("You have not killed a unit of enemy %1 yet."), a->getName());
 }
 
 void QuestEnemyArmytype::getSuccessMsg(std::queue<Glib::ustring>& msgs) const
 {
-  guint32 set = Playerlist::getInstance()->getActiveplayer()->getArmyset();
-  const ArmyProto *a = Armysetlist::getInstance()->getArmy(set, d_type_to_kill);
+  guint32 set = Playerlist::instance()->getActiveplayer()->getArmyset();
+  const ArmyProto *a = Armysetlist::instance()->getArmy(set, d_type_to_kill);
   msgs.push(String::ucompose(_("You have killed a unit of enemy %1."), a->getName()));
-  msgs.push(_("Well done!"));
 }
 
 void QuestEnemyArmytype::getExpiredMsg(std::queue<Glib::ustring>& msgs) const
@@ -128,8 +126,8 @@ void QuestEnemyArmytype::getExpiredMsg(std::queue<Glib::ustring>& msgs) const
 
 void QuestEnemyArmytype::initDescription()
 {
-  guint32 set = Playerlist::getInstance()->getActiveplayer()->getArmyset();
-  const ArmyProto *a = Armysetlist::getInstance()->getArmy(set, d_type_to_kill);
+  guint32 set = Playerlist::instance()->getActiveplayer()->getArmyset();
+  const ArmyProto *a = Armysetlist::instance()->getArmy(set, d_type_to_kill);
   d_description = String::ucompose(_("You must destroy a unit of enemy %1."), 
 				   a->getName());
 }
@@ -149,7 +147,7 @@ void QuestEnemyArmytype::armyDied(Army *a, bool heroIsCulprit)
 
   debug("QuestEnemyArmytype: armyDied - pending = " << (int)d_pending);
 
-  if (!isPendingDeletion())
+  if (isPendingDeletion())
     return;
   Hero *h = getHero();
   if (!h || h->getHP() <= 0)
@@ -163,12 +161,12 @@ void QuestEnemyArmytype::armyDied(Army *a, bool heroIsCulprit)
       if (heroIsCulprit)
 	{
 	  debug("CONGRATULATIONS: QUEST 'KILL ENEMY ARMYTYPE' IS COMPLETED!");
-	  d_q_mgr.questCompleted(d_hero);
+          QuestsManager::instance()->questCompleted(d_hero);
 	}
     }
 }
 
-void QuestEnemyArmytype::cityAction(City *c, CityDefeatedAction action, 
+void QuestEnemyArmytype::cityAction(City *c, CityDefeatedChoice action, 
 				    bool heroIsCulprit, int gold)
 {
   (void) c;

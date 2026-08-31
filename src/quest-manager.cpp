@@ -1,7 +1,8 @@
-// Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2007-2009, 2011, 2014, 2015, 2017, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2004, 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2015, 2017, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,30 +16,30 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
-#include "QuestsManager.h"
+#include "quest-manager.h"
 
-#include "Quest.h"
-#include "QKillHero.h"
-#include "QEnemyArmies.h"
-#include "QCitySack.h"
-#include "QCityRaze.h"
-#include "QCityOccupy.h"
-#include "QEnemyArmytype.h"
-#include "QPillageGold.h"
-#include "stacklist.h"
-#include "SightMap.h"
-#include "rewardlist.h"
+#include "quest.h"
+#include "quest-kill-hero.h"
+#include "quest-enemy-armies.h"
+#include "quest-city-sack.h"
+#include "quest-city-raze.h"
+#include "quest-city-occupy.h"
+#include "quest-enemy-army-type.h"
+#include "quest-pillage-gold.h"
+#include "stack-list.h"
+#include "sight-map.h"
+#include "reward-list.h"
 #include "army.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "history.h"
-#include "stackreflist.h"
+#include "stack-ref-list.h"
 #include "hero.h"
 #include "rnd.h"
+#include "game-scenario-options.h"
 
 Glib::ustring QuestsManager::d_tag = "questlist";
 
@@ -48,14 +49,14 @@ QuestsManager* QuestsManager::s_instance = NULL;
 #define debug(x)
 
 
-QuestsManager* QuestsManager::getInstance()
+QuestsManager* QuestsManager::instance()
 {
     if (s_instance == 0)
         s_instance = new QuestsManager();
     return s_instance;
 }
 
-QuestsManager* QuestsManager::getInstance(XML_Helper* helper)
+QuestsManager* QuestsManager::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -86,21 +87,18 @@ QuestsManager::QuestsManager(const QuestsManager &q)
   for (auto a : q.d_quests)
     {
       Quest *quest = Quest::copy (a.second);
-      quest->setQuestsManager (*this);
       d_quests[a.first] = quest;
     }
 
   for (auto b : q.d_inactive_quests)
     {
       Quest *quest = Quest::copy (b);
-      quest->setQuestsManager (*this);
       d_inactive_quests.push_back (quest);
     }
 
   for (auto c : q.d_completed_quests)
     {
       Quest *quest = Quest::copy (c);
-      quest->setQuestsManager (*this);
       d_completed_quests.push_back (quest);
     }
 }
@@ -108,8 +106,8 @@ QuestsManager::QuestsManager(const QuestsManager &q)
 QuestsManager::QuestsManager(XML_Helper* helper)
 {
     sharedInit();
-    debug("QuestsManager: registerTag!");
-    helper->registerTag(Quest::d_tag, sigc::mem_fun(this, &QuestsManager::load));
+    debug("QuestsManager: register_tag!");
+    helper->register_tag(Quest::d_tag, sigc::mem_fun(*this, &QuestsManager::load));
 }
 
 QuestsManager::~QuestsManager()
@@ -145,28 +143,28 @@ Quest* QuestsManager::createNewQuest(guint32 heroId, bool razing_possible)
     switch (which)
     {
         case 1:
-            quest = new QuestKillHero(*this, heroId);
+            quest = new QuestKillHero(heroId);
             break;
         case 2:
-            quest = new QuestEnemyArmies(*this, heroId);
+            quest = new QuestEnemyArmies(heroId);
             break;
         case 3:
-            quest = new QuestCitySack(*this, heroId);
+            quest = new QuestCitySack(heroId);
             break;
         case 4:
 	    if (razing_possible)
-	      quest = new QuestCityRaze(*this, heroId);
+	      quest = new QuestCityRaze(heroId);
 	    else
-	      quest = new QuestCitySack(*this, heroId);
+	      quest = new QuestCitySack(heroId);
             break;
         case 5:
-            quest = new QuestCityOccupy(*this, heroId);
+            quest = new QuestCityOccupy(heroId);
             break;
         case 6:
-            quest = new QuestEnemyArmytype(*this, heroId);
+            quest = new QuestEnemyArmytype(heroId);
             break;
         case 7:
-            quest = new QuestPillageGold(*this, heroId);
+            quest = new QuestPillageGold(heroId);
             break;
     }
 
@@ -180,7 +178,7 @@ Quest* QuestsManager::createNewQuest(guint32 heroId, bool razing_possible)
 
 Quest* QuestsManager::createNewKillHeroQuest(guint32 heroId, guint32 targetHeroId)
 {
-  Quest *quest = new QuestKillHero(*this, heroId, targetHeroId);
+  Quest *quest = new QuestKillHero(heroId, targetHeroId);
 
   d_quests[heroId] = quest;
 
@@ -191,7 +189,7 @@ Quest* QuestsManager::createNewEnemyArmiesQuest(guint32 heroId,
 						guint32 num_armies,
 						guint32 victim_player_id)
 {
-  Quest *quest = new QuestEnemyArmies(*this, heroId, num_armies,
+  Quest *quest = new QuestEnemyArmies(heroId, num_armies,
 				      victim_player_id);
 
   d_quests[heroId] = quest;
@@ -201,7 +199,7 @@ Quest* QuestsManager::createNewEnemyArmiesQuest(guint32 heroId,
 
 Quest* QuestsManager::createNewCitySackQuest(guint32 heroId, guint32 cityId)
 {
-  Quest *quest = new QuestCitySack(*this, heroId, cityId);
+  Quest *quest = new QuestCitySack(heroId, cityId);
 
   d_quests[heroId] = quest;
 
@@ -210,7 +208,7 @@ Quest* QuestsManager::createNewCitySackQuest(guint32 heroId, guint32 cityId)
 
 Quest* QuestsManager::createNewCityRazeQuest(guint32 heroId, guint32 cityId)
 {
-  Quest *quest = new QuestCityRaze(*this, heroId, cityId);
+  Quest *quest = new QuestCityRaze(heroId, cityId);
 
   d_quests[heroId] = quest;
 
@@ -219,7 +217,7 @@ Quest* QuestsManager::createNewCityRazeQuest(guint32 heroId, guint32 cityId)
 
 Quest* QuestsManager::createNewCityOccupyQuest(guint32 heroId, guint32 cityId)
 {
-  Quest *quest = new QuestCityOccupy(*this, heroId, cityId);
+  Quest *quest = new QuestCityOccupy(heroId, cityId);
 
   d_quests[heroId] = quest;
 
@@ -229,7 +227,7 @@ Quest* QuestsManager::createNewCityOccupyQuest(guint32 heroId, guint32 cityId)
 Quest* QuestsManager::createNewEnemyArmytypeQuest(guint32 heroId,
 						  guint32 armyTypeId)
 {
-  Quest *quest = new QuestEnemyArmytype(*this, heroId, armyTypeId);
+  Quest *quest = new QuestEnemyArmytype(heroId, armyTypeId);
 
   d_quests[heroId] = quest;
 
@@ -238,7 +236,7 @@ Quest* QuestsManager::createNewEnemyArmytypeQuest(guint32 heroId,
 
 Quest* QuestsManager::createNewPillageGoldQuest(guint32 heroId, guint32 amount)
 {
-  Quest *quest = new QuestPillageGold(*this, heroId, amount);
+  Quest *quest = new QuestPillageGold(heroId, amount);
 
   d_quests[heroId] = quest;
 
@@ -253,10 +251,10 @@ void QuestsManager::questCompleted(guint32 heroId)
     p->heroCompletesQuest(quest->getHero());
     Stack *stack = p->getStacklist()->getArmyStackById(heroId);
 
-    Reward *reward = Reward::createRandomReward(true, true);
+    Reward *reward =
+      Reward::createRandomReward(GameScenarioOptions::s_hidden_map == false);
     StackReflist *stacks = new StackReflist();
     p->giveReward(stack, reward, stacks, true);
-    quest_completed.emit(quest, reward);
     if (reward->getType() == Reward::ALLIES)
       p->addHistory(new History_HeroFindsAllies(quest->getHero()));
     else if (reward->getType() == Reward::RUIN)
@@ -264,8 +262,12 @@ void QuestsManager::questCompleted(guint32 heroId)
         Ruin *r = dynamic_cast<Reward_Ruin*>(reward)->getRuin();
         p->addHistory(new History_HeroRewardRuin(dynamic_cast<Hero*>(quest->getHero()), r));
       }
-    delete reward;
     delete stacks;
+
+    if (p->getType () != Player::HUMAN)
+      delete reward;
+    else
+      quest->setReward (reward); //save it for the quest completed dialog
 
     //debug("deactivate quest");
 
@@ -334,7 +336,7 @@ bool QuestsManager::save(XML_Helper* helper) const
   debug("Saving quests\n");
 
   bool retval = true;
-  retval &= helper->openTag(QuestsManager::d_tag);
+  retval &= helper->open_tag(QuestsManager::d_tag);
 
   for (std::map<guint32,Quest*>::const_iterator it = d_quests.begin();
        it != d_quests.end(); ++it)
@@ -348,7 +350,7 @@ bool QuestsManager::save(XML_Helper* helper) const
     retval &= (*it)->save(helper);
 
   debug("Quests saved\n");
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
   return retval;
 }
 
@@ -360,34 +362,34 @@ bool QuestsManager::load(Glib::ustring tag, XML_Helper* helper)
     {
       guint32  questType, hero;
       Glib::ustring quest_type_str;
-      helper->getData(quest_type_str, "type");
+      helper->get(quest_type_str, "type");
       questType = Quest::questTypeFromString(quest_type_str);
-      helper->getData(hero, "hero");
+      helper->get(hero, "hero");
 
       debug("quest load: type = " << questType << ", heroId = " << hero);
 
       Quest *quest=0;
       switch (static_cast<Quest::Type>(questType)) {
       case Quest::KILLHERO:
-	quest = new QuestKillHero(*this, helper);
+	quest = new QuestKillHero(helper);
 	break;
       case Quest::KILLARMIES:
-	quest = new QuestEnemyArmies(*this, helper);
+	quest = new QuestEnemyArmies(helper);
 	break;
       case Quest::CITYSACK:
-	quest = new QuestCitySack(*this, helper);
+	quest = new QuestCitySack(helper);
 	break;
       case Quest::CITYRAZE:
-	quest = new QuestCityRaze(*this, helper);
+	quest = new QuestCityRaze(helper);
 	break;
       case Quest::CITYOCCUPY:
-	quest = new QuestCityOccupy(*this, helper);
+	quest = new QuestCityOccupy(helper);
 	break;
       case Quest::KILLARMYTYPE:
-	quest = new QuestEnemyArmytype(*this, helper);
+	quest = new QuestEnemyArmytype(helper);
 	break;
       case Quest::PILLAGEGOLD:
-	quest = new QuestPillageGold(*this, helper);
+	quest = new QuestPillageGold(helper);
 	break;
       }
 
@@ -486,7 +488,7 @@ void QuestsManager::armyDied(Army *a, std::vector<guint32>& culprits)
 }
 
 void QuestsManager::cityAction(City *c, Stack *s,
-			       CityDefeatedAction action, int gold)
+			       CityDefeatedChoice action, int gold)
 {
   std::vector<Quest *> quests = getActiveQuests ();
   for (auto q : quests)
@@ -535,26 +537,82 @@ void QuestsManager::cityOccupied(City *c, Stack *s)
   cityAction(c, s, CITY_DEFEATED_OCCUPY, 0);
 }
 
-void QuestsManager::nextTurn(Player *p)
+bool QuestsManager::notifyQuestExpired (Player *p, sigc::slot<void()> after)
 {
   d_completed_quests.unique ();
   for (auto q : d_completed_quests)
     delete q;
   d_completed_quests.clear ();
-  // go through our inactive list and remove quests belonging to us
-  for (std::list<Quest*>::iterator it = d_inactive_quests.begin();
-       it != d_inactive_quests.end(); ++it)
+  // go through our inactive list and get the quests belonging to us
+  std::vector<Quest*> expired_quests;
+  for (auto q : d_inactive_quests)
+    if (q->getOwner () == p)
+      expired_quests.push_back (q);
+
+  bool retval = !expired_quests.empty ();
+  if (expired_quests.empty () == false)
     {
-      if ((*it)->getOwner() == p)
-	{
-	  Quest *q = *it;
-	  quest_expired.emit(q);
-	  it = d_inactive_quests.erase(it);
-	  if (q)
-	    delete q;
-	}
+      // this recursive lambda is called for every quest in expired_quests
+      // the idea is that we're waiting for the window to be closed before
+      // showing the next.
+      sigc::slot<void()> finish;
+      finish =
+         [this, &finish, after, expired_quests, p] () mutable
+         {
+           Quest *q = expired_quests.front ();
+           p->heroQuestExpired (q->getHero ());
+           d_inactive_quests.remove (q);
+           delete q;
+
+           //do the next if there is one, or end
+           expired_quests.erase (expired_quests.begin ());
+           if (expired_quests.empty () == false)
+             quest_expired.emit (expired_quests.front (), finish);
+           else
+             after ();
+         };
+      quest_expired.emit (expired_quests.front (), finish);
     }
+
+  return retval;
 }
+
+bool QuestsManager::notifyQuestCompleted (Player *p, sigc::slot<void()> after)
+{
+  std::vector<Quest*> completed_quests;
+  for (auto q : d_completed_quests)
+    {
+      if (q->getOwner () == p)
+        completed_quests.push_back (q);
+    }
+  bool retval = !completed_quests.empty ();
+  if (completed_quests.empty () == false)
+    {
+      // this recursive lambda is called for every quest in expired_quests
+      // the idea is that we're waiting for the window to be closed before
+      // showing the next.
+      sigc::slot<void()> finish;
+      finish =
+         [this, &finish, after, completed_quests, p] () mutable
+         {
+           Quest *q = completed_quests.front ();
+           p->heroCompletesQuest (q->getHero ());
+           d_completed_quests.remove (q);
+           delete q;
+
+           //do the next if there is one, or end
+           completed_quests.erase (completed_quests.begin ());
+           if (completed_quests.empty () == false)
+             quest_completed.emit (completed_quests.front (), finish);
+           else
+             after ();
+         };
+      quest_completed.emit (completed_quests.front (), finish);
+    }
+
+  return retval;
+}
+
 
 void QuestsManager::reset (QuestsManager *q)
 {

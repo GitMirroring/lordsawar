@@ -1,6 +1,7 @@
-// Copyright (C) 2001, 2003 Michael Bartl
-// Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2001, 2003 Michael Bartl
+//  Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2017, 2020, 2021,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,21 +15,20 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include "ruin.h"
-#include "playerlist.h"
-#include "GameMap.h"
-#include "rewardlist.h"
-#include "Sage.h"
+#include "player-list.h"
+#include "game-map.h"
+#include "reward-list.h"
+#include "sage.h"
 #include "keeper.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "rnd.h"
 
 Glib::ustring Ruin::d_tag = "ruin";
 
-Ruin::Ruin(Vector<int> pos, guint32 width, Glib::ustring name, int type, Keeper* occupant, bool searched, bool hidden, Player *owner, bool sage)
+Ruin::Ruin(Vector<int> pos, guint32 width, Glib::ustring name, Type type, Keeper* occupant, bool searched, bool hidden, Player *owner, bool sage)
 :NamedLocation(pos, width, name,
 	        name + _(" is inhabited by monsters and full of treasure!")), 
     d_searched(searched), 
@@ -42,7 +42,7 @@ Ruin::Ruin(Vector<int> pos, guint32 width, Glib::ustring name, int type, Keeper*
       for (unsigned int j = 0; j < getSize(); j++)
 	{
 	  Vector<int> p = getPos() + Vector<int>(i, j);
-	  GameMap::getInstance()->getTile(p)->setBuilding(Maptile::RUIN);
+	  GameMap::instance()->getTile(p)->setBuilding(Maptile::RUIN);
 	}
 }
 
@@ -77,22 +77,22 @@ Ruin::Ruin(const Ruin& ruin, Vector<int> pos)
 }
 
 Ruin::Ruin(XML_Helper* helper, guint32 width)
-    :NamedLocation(helper, width), d_type(0), d_occupant(0), 
+    :NamedLocation(helper, width), d_type(RUIN), d_occupant(0), 
     d_hidden(0), d_owner(0), d_sage(0), d_reward(0)
 {
-  helper->registerTag(Keeper::d_tag, sigc::mem_fun(this, &Ruin::load));
+  helper->register_tag(Keeper::d_tag, sigc::mem_fun(*this, &Ruin::load));
   guint32 ui;
   Glib::ustring type_str;
-  helper->getData(type_str, "type");
+  helper->get(type_str, "type");
   d_type = ruinTypeFromString(type_str);
-  helper->getData(d_searched, "searched");
-  helper->getData(d_sage, "sage");
-  helper->getData(d_hidden, "hidden");
+  helper->get(d_searched, "searched");
+  helper->get(d_sage, "sage");
+  helper->get(d_hidden, "hidden");
   if (d_hidden || d_searched)
     {
-      helper->getData(ui, "owner");
+      helper->get(ui, "owner");
       if (ui != MAX_PLAYERS)
-        d_owner = Playerlist::getInstance()->getPlayer(ui);
+        d_owner = Playerlist::instance()->get (ui);
       else
         d_owner = NULL;
     }
@@ -104,7 +104,7 @@ Ruin::Ruin(XML_Helper* helper, guint32 width)
     for (unsigned int j = 0; j < getSize(); j++)
       {
         Vector<int> pos = getPos() + Vector<int>(i, j);
-        GameMap::getInstance()->getTile(pos)->setBuilding(Maptile::RUIN);
+        GameMap::instance()->getTile(pos)->setBuilding(Maptile::RUIN);
       }
 }
 
@@ -120,26 +120,26 @@ bool Ruin::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(Ruin::d_tag);
-  retval &= helper->saveData("id", d_id);
-  retval &= helper->saveData("x", getPos().x);
-  retval &= helper->saveData("y", getPos().y);
-  retval &= helper->saveData("name", getName(false));
-  retval &= helper->saveData("description", getDescription());
-  Glib::ustring type_str = ruinTypeToString(Ruin::Type(d_type));
-  retval &= helper->saveData("type", type_str);
-  retval &= helper->saveData("searched", d_searched);
-  retval &= helper->saveData("sage", d_sage);
-  retval &= helper->saveData("hidden", d_hidden);
+  retval &= helper->open_tag(Ruin::d_tag);
+  retval &= helper->save("id", d_id);
+  retval &= helper->save("x", getPos().x);
+  retval &= helper->save("y", getPos().y);
+  retval &= helper->save("name", getName(false));
+  retval &= helper->save("description", getDescription());
+  Glib::ustring type_str = ruinTypeToString(d_type);
+  retval &= helper->save("type", type_str);
+  retval &= helper->save("searched", d_searched);
+  retval &= helper->save("sage", d_sage);
+  retval &= helper->save("hidden", d_hidden);
   if (d_owner != NULL)
-    retval &= helper->saveData("owner", d_owner->getId());
+    retval &= helper->save("owner", d_owner->getId());
   else
-    retval &= helper->saveData("owner", MAX_PLAYERS);
+    retval &= helper->save("owner", MAX_PLAYERS);
   if (d_occupant)
     retval &= d_occupant->save(helper);
   if (d_sage == false && d_reward)
     retval &= d_reward->save(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -150,7 +150,7 @@ bool Ruin::load(Glib::ustring tag, XML_Helper* helper)
     {
 	guint32 t;
 	Glib::ustring type_str;
-	helper->getData(type_str, "type");
+	helper->get(type_str, "type");
 	t = Reward::rewardTypeFromString(type_str);
 	switch (t)
 	  {
@@ -180,7 +180,8 @@ bool Ruin::load(Glib::ustring tag, XML_Helper* helper)
 
 void Ruin::populateWithRandomReward()
 {
-  Reward *reward = Reward::createRandomReward(true, false);
+  //maps never get handed out at a ruin
+  Reward *reward = Reward::createRandomReward (false);
   setReward (reward);
 }
 
@@ -247,5 +248,3 @@ void Ruin::clearOccupant()
   //and now we need to make sure this pointer isn't hanging around.
   d_occupant = NULL;
 }
-        
-// End of file

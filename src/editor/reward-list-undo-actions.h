@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,107 +12,158 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef REWARDLIST_EDITOR_ACTIONS_H
-#define REWARDLIST_EDITOR_ACTIONS_H
+#ifndef REWARD_LIST_UNDO_ACTIONS_H
+#define REWARD_LIST_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "undo-action.h"
-#include "rewardlist.h"
+#include "reward-list.h"
 #include "undo-mgr.h"
 #include "reward.h"
 
-//! A record of an event in the rewards editor
-/** 
+//! A record of an event in the reward list editor in the scenario builder
+/**
  * The purpose of these classes is to implement undo/redo in the rewards
  * editor.
  */
 
-class RewardlistEditorAction: public UndoAction
+class RewardListUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      ADD = 1,
-      REMOVE = 2,
-      EDIT = 3,
-    };
+    enum Type
+      {
+        ADD = 1,
+        REMOVE = 2,
+        EDIT = 3,
+      };
 
-    RewardlistEditorAction(Type type, bool agg = false)
-     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+    RewardListUndoAction (Type type, bool agg = false)
+      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                    UndoAction::AGGREGATE_NONE), m_type (type)
+        {
+        }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class RewardlistEditorAction_Index: public RewardlistEditorAction
+class RewardListUndoAction_Index: public RewardListUndoAction
 {
-    public:
-        RewardlistEditorAction_Index (Type t, guint32 i, bool agg = false)
-          : RewardlistEditorAction (t, agg), d_index (i) {}
-        ~RewardlistEditorAction_Index () {}
+public:
+    RewardListUndoAction_Index (Type t, guint32 i, bool agg = false)
+      : RewardListUndoAction (t, agg), m_index (i)
+      {
+      }
 
-        guint32 getIndex () {return d_index;}
-    private:
-        guint32 d_index;
+    ~RewardListUndoAction_Index ()
+      {
+      }
+
+    guint32 get_index () const
+      {
+        return m_index;
+      }
+private:
+    guint32 m_index;
 };
 
-class RewardlistEditorAction_Edit: public RewardlistEditorAction_Index
+class RewardListUndoAction_Edit: public RewardListUndoAction_Index
 {
-    public:
-        RewardlistEditorAction_Edit (guint32 i, Reward *r)
-          : RewardlistEditorAction_Index (EDIT, i), d_reward (Reward::copy (r))
-          {}
-        ~RewardlistEditorAction_Edit () {delete d_reward;}
+public:
+    RewardListUndoAction_Edit (guint32 i, Reward *r)
+      : RewardListUndoAction_Index (EDIT, i), m_reward (Reward::copy (r))
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Edit";}
-        Reward *getReward () const {return d_reward;}
-    private:
-        Reward *d_reward;
+    ~RewardListUndoAction_Edit ()
+      {
+        delete m_reward;
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Edit";
+      }
+
+    Reward *get_reward () const
+      {
+        return m_reward;
+      }
+private:
+    Reward *m_reward;
 };
 
-class RewardlistEditorAction_Save : public RewardlistEditorAction
+class RewardListUndoAction_Save : public RewardListUndoAction
 {
-    public:
-        RewardlistEditorAction_Save (Type t, Rewardlist *r)
-          :RewardlistEditorAction (t, false), d_rewardlist (r->copy ()) {}
-        ~RewardlistEditorAction_Save ()
-          {
-            if (d_rewardlist)
-              delete d_rewardlist;
-          }
+public:
+    RewardListUndoAction_Save (Type t, Rewardlist *r)
+      :RewardListUndoAction (t, false), m_rewardlist (r->copy ())
+      {
+      }
 
-        Rewardlist *getRewards() const { return d_rewardlist; }
-        void clearRewards () {d_rewardlist = NULL;}
-    private:
-        Rewardlist *d_rewardlist;
+    ~RewardListUndoAction_Save ()
+      {
+        if (m_rewardlist)
+          delete m_rewardlist;
+      }
+
+    Rewardlist *get_rewards () const
+      {
+        return m_rewardlist;
+      }
+
+    void clear_rewards ()
+      {
+        m_rewardlist = NULL;
+      }
+private:
+    Rewardlist *m_rewardlist;
 };
 
-class RewardlistEditorAction_Add: public RewardlistEditorAction_Save
+class RewardListUndoAction_Add: public RewardListUndoAction_Save
 {
-    public:
-        RewardlistEditorAction_Add (Rewardlist *r)
-          :RewardlistEditorAction_Save (ADD, r) {}
-        ~RewardlistEditorAction_Add () {}
+public:
+    RewardListUndoAction_Add (Rewardlist *r)
+      :RewardListUndoAction_Save (ADD, r)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Add";}
+    ~RewardListUndoAction_Add ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Add";
+      }
 };
 
-class RewardlistEditorAction_Remove: public RewardlistEditorAction_Save
+class RewardListUndoAction_Remove: public RewardListUndoAction_Save
 {
-    public:
-        RewardlistEditorAction_Remove (Rewardlist *r)
-          :RewardlistEditorAction_Save (REMOVE, r) {}
-        ~RewardlistEditorAction_Remove () {}
+public:
+    RewardListUndoAction_Remove (Rewardlist *r)
+      :RewardListUndoAction_Save (REMOVE, r)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Remove";}
+    ~RewardListUndoAction_Remove ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Remove";
+      }
 };
-#endif //REWARDLIST_EDITOR_ACTIONS_H
+#endif

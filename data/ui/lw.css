@@ -1,0 +1,270 @@
+button.flat.small
+{
+  min-width: 16px;
+  min-height: 16px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+  padding: 0px;
+}
+
+.setting_label
+{
+}
+
+.setting_explain_label
+{
+  font-size: 0.9em;
+  color: @insensitive_fg_color;
+}
+
+.setting_lone
+{
+  margin-top: 10px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  background-color: @theme_base_color;
+  border-top: 2px solid @borders;
+  border-left: 2px solid @borders;
+  border-right: 2px solid @borders;
+  border-bottom: 2px solid @borders;
+  padding: 10px;
+}
+.setting_lone:hover
+{
+  background-color: @theme_bg_color;
+}
+
+.setting_top
+{
+  margin-top: 10px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  background-color: @theme_base_color;
+  border-top: 2px solid @borders;
+  border-left: 2px solid @borders;
+  border-right: 2px solid @borders;
+  padding: 10px;
+}
+
+.setting_top:hover
+{
+  background-color: @theme_bg_color;
+}
+
+.setting_middle
+{
+  background-color: @theme_base_color;
+  border-left: 2px solid @borders;
+  border-right: 2px solid @borders;
+  padding: 10px;
+}
+
+.setting_middle:hover
+{
+  background-color: @theme_bg_color;
+}
+
+.setting_bottom
+{
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  background-color: @theme_base_color;
+  margin-bottom: 10px;
+  border-left: 2px solid @borders;
+  border-right: 2px solid @borders;
+  border-bottom: 2px solid @borders;
+  padding: 10px;
+}
+
+.setting_bottom:hover
+{
+  background-color: @theme_bg_color;
+}
+
+.setting_heading
+{
+  margin-top: 24px;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+progressbar trough
+{
+  min-height: 16px;
+}
+
+progressbar trough progress
+{
+  min-height: 16px;
+}
+
+.att-title
+{
+  text-decoration: underline;
+  margin-bottom: 3px;
+}
+
+.att-value-label
+{
+  font-weight: bold;
+}
+
+.att-long-value-label
+{
+  font-style: italic;
+}
+
+.att-box
+{
+  padding: 3px;
+}
+
+.red-text
+{
+  color: #e01b24;
+}
+
+.error
+{
+  background: #ff5555;
+  color: white;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.rounded
+{
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.progressmodal
+{
+  background: #505050;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.border-image
+{
+  border: 2px solid black;
+  border-radius: 4px;
+  padding: 6px;
+}
+
+.info-statistic-title
+{
+  font-style: italic;
+}
+
+.info-statistic-value
+{
+  font-style: italic;
+}
+
+.readonly
+{
+  font-style: italic;
+}
+
+.file-label-unset
+{
+  font-style: italic;
+}
+
+.file-label-override
+{
+  font-style: italic;
+}
+
+.file-label
+{
+}
+
+.status-label
+{
+  font-style: italic;
+}
+
+.heading
+{
+  font-weight: bold;
+}
+
+.editor-splash-title
+{
+  font-weight: bold;
+  font-style: italic;
+  font-size: 3.0em;
+}
+
+.editor-splash-subtitle
+{
+  font-size: 1em;
+  letter-spacing: 0.3em;
+}
+
+.editor-control-button:checked
+{
+  border: 1px solid rgba(255, 0, 0, 0.66);
+}
+
+.editor-control-button:not(:checked)
+{
+  border: 1px solid transparent;
+}
+
+.army-type-label-unset
+{
+  font-style: italic;
+}
+
+.army-type-label
+{
+}
+
+.army-type-icon
+{
+}
+
+.compact-button
+{
+  background: transparent;
+  padding: 0px;
+  color: white;
+  border: 0px;
+}
+
+.keeper-label
+{
+  font-style: italic;
+}
+
+.reward-label
+{
+  font-style: italic;
+}
+
+.item-label
+{
+  font-style: italic;
+}
+
+.ruin-label
+{
+  font-style: italic;
+}
+
+.button-label
+{
+  font-style: italic;
+}
+
+.clearbox
+{
+  background: transparent;
+}

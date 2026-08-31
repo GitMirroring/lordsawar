@@ -1,7 +1,7 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2000, 2001, 2002, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2014 Ben Asselstine
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2000, 2001, 2002, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,16 +15,15 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef LOCATION_H
 #define LOCATION_H
 
 #include "vector.h"
-#include "LocationBox.h"
-#include "UniquelyIdentified.h"
+#include "location-box.h"
+#include "uniquely-identified.h"
 
 //! A feature constructed on the game map.
 /** 

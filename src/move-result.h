@@ -1,6 +1,6 @@
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2005, 2007 Ulf Lorenz
-// Copyright (C) 2009, 2010, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2005, 2007 Ulf Lorenz
+//  Copyright (C) 2009, 2010, 2014, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,14 +14,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef MOVE_RESULT_H
 #define MOVE_RESULT_H
 
-#include "fight.h"
+#include "fight-result.h"
 
 class Stack;
 
@@ -35,8 +34,15 @@ class MoveResult
         MoveResult();
         ~MoveResult() {};
 
+        bool is_alive ()
+          {
+            return
+              d_fightResult != FightResult::DEFENDER_WON &&
+              d_ruinfightResult != FightResult::DEFENDER_WON;
+          }
+
         //! set the result of any fight that happened
-        void setFightResult(Fight::Result d_fightResult);
+        void setFightOutcome(FightResult::Outcome d_fightResult);
 
         //! set how many steps were taken in this move
         void setStepCount(int stepCount) { d_stepCount = stepCount; }
@@ -44,7 +50,10 @@ class MoveResult
         int getStepCount() const {return d_stepCount;};
 
         //! return the result of the fight, if there was one
-        Fight::Result getFightResult() const { return d_fightResult; }
+        FightResult::Outcome getFightOutcome() const { return d_fightResult; }
+
+        //! return whether we had a fight or not
+        bool fought () const { return d_fightResult != FightResult::DRAW; }
 
         //! did anything actually happen in this move?
         bool didSomething() const { return (d_fight || (d_stepCount > 0) ); }
@@ -75,13 +84,12 @@ class MoveResult
         void setComputerSearchedRuin(bool searched) {d_computer_searched_ruin = searched;}
         bool getComputerSearchedRuin() {return d_computer_searched_ruin;}
 
-        void setRuinFightResult(Fight::Result result) {d_ruinfightResult = result;}
-        Fight::Result getRuinFightResult() const {return d_ruinfightResult;}
+        void setRuinFightResult(FightResult::Outcome result) {d_ruinfightResult = result;}
+        FightResult::Outcome getRuinFightResult() const {return d_ruinfightResult;}
 
         void setComputerPickedUpBag(bool picked_up) {d_computer_picked_up_bag = picked_up;}
         bool getComputerPickedUpBag() {return d_computer_picked_up_bag;}
-	//! fill up d_out_of_moves, d_reached_end, and d_stepCount
-	void fillData(Stack *s, int stepCount, bool searched_temple, bool searched_ruin, bool got_quest, bool picked_up);
+	void fillData(Stack *s, int stepCount);
 
     private:
         bool d_result;
@@ -93,15 +101,13 @@ class MoveResult
 	bool d_considered_treachery;
         //this is when we can't jump over a friendly stack.
         bool d_too_large_stack_in_the_way;
-        Fight::Result d_fightResult;
+        FightResult::Outcome d_fightResult;
         bool d_move_aborted;
         bool d_computer_searched_temple;
         bool d_computer_searched_ruin;
         bool d_computer_got_quest;
-        Fight::Result d_ruinfightResult;
+        FightResult::Outcome d_ruinfightResult;
         bool d_computer_picked_up_bag;
 };
 
-#endif // MOVE_RESULT_H
-
-// End of file
+#endif

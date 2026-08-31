@@ -1,4 +1,4 @@
-//  Copyright (C) 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2015, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef FILE_COMPAT_H
@@ -59,7 +58,7 @@ class FileCompat: public std::list<FileDetails>, public sigc::trackable
         //! upgrade common files.
         void initialize();
 
-        typedef sigc::slot<bool, Glib::ustring, Glib::ustring, Glib::ustring> Slot;
+        typedef sigc::slot<bool(Glib::ustring, Glib::ustring, Glib::ustring)> Slot;
         void support_type (guint32 k, Glib::ustring f, Glib::ustring t, bool ta) 
           {push_back(FileDetails(k,f,t,ta));};
         void support_version(guint32 k, Glib::ustring from, Glib::ustring to, FileCompat::Slot slot);
@@ -87,7 +86,7 @@ class FileCompat: public std::list<FileDetails>, public sigc::trackable
         static Glib::ustring typeToCode(const FileCompat::Type type);
 
         //! return the singleton instance of this class.
-        static FileCompat * getInstance();
+        static FileCompat * instance();
 
         //! Explicitly delete the singleton instance of this class.
         static void deleteInstance();
@@ -131,5 +130,4 @@ public:
 };
 
 
-#endif // FILE_COMPAT_H
-
+#endif

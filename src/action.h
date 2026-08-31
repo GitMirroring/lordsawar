@@ -1,7 +1,7 @@
-// Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef ACTION_H
@@ -30,8 +29,8 @@
 #include "army.h"
 #include "player.h"
 #include "ucompose.hpp"
-#include "armyprodbase.h"
-#include "heroproto.h"
+#include "army-prod-base.h"
+#include "hero-proto.h"
 
 class Quest;
 class Stack;
@@ -414,7 +413,6 @@ class Action_Fight : public Action
 	std::list<guint32> getAttackerArmyIds() const {return d_attacker_army_ids;};
 	std::list<guint32> getDefenderArmyIds() const {return d_defender_army_ids;};
 
-        bool is_army_id_in_stacks(guint32 id, const std::list<guint32> &stack_ids) const;
         private:
         
         std::list<FightItem> d_history;
@@ -422,8 +420,6 @@ class Action_Fight : public Action
         std::list<guint32> d_defenders;
         std::list<guint32> d_attacker_army_ids;
         std::list<guint32> d_defender_army_ids;
-
-        bool stack_ids_to_stacks(std::list<guint32> stack_ids, std::list<Stack*> &stacks, guint32 &stack_id) const;
 
         bool loadItem(XML_Helper* helper);
 };
@@ -871,7 +867,7 @@ class Action_Quest : public Action
 
 	guint32 getHeroId() const {return d_hero;};
 	guint32 getQuestType() const {return d_questtype;};
-	guint32 getData() const {return d_data;};
+	guint32 get() const {return d_data;};
 	guint32 getVictimPlayerId() const {return d_victim_player;};
 
         private:
@@ -2184,4 +2180,4 @@ class Action_DeselectStack: public Action
         virtual bool doSave(XML_Helper* helper) const;
 };
 
-#endif //ACTION_H
+#endif

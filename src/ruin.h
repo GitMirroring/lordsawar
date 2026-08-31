@@ -1,6 +1,6 @@
-// Copyright (C) 2001, 2003 Michael Bartl
-// Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2001, 2003 Michael Bartl
+//  Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,8 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef RUIN_H
@@ -23,7 +22,7 @@
 
 #define DEFAULT_RUIN_NAME  "Ruin"
 #include <sigc++/trackable.h>
-#include "NamedLocation.h"
+#include "named-location.h"
 #include "stack.h"
 
 class Stack;
@@ -71,7 +70,7 @@ class Ruin : public NamedLocation, public sigc::trackable
 	  * @param sage         if this ruin contains a sage or not.
           */
         Ruin(Vector<int> pos, guint32 width, 
-	     Glib::ustring name = DEFAULT_RUIN_NAME, int type = Ruin::RUIN, 
+	     Glib::ustring name = DEFAULT_RUIN_NAME, Type type = Ruin::RUIN, 
 	     Keeper* occupant = 0, bool searched = false, bool hidden = false, 
 	     Player *owner = 0, bool sage = false);
 
@@ -94,7 +93,7 @@ class Ruin : public NamedLocation, public sigc::trackable
 	// Get Methods
 
         //! Returns the type of the ruin.
-        int getType() const {return d_type;};
+        Type getType() const {return d_type;};
 
         //! Return whether or not the ruin has been searched already.
         bool isSearched() const {return d_searched;}
@@ -124,7 +123,7 @@ class Ruin : public NamedLocation, public sigc::trackable
 	// Set Methods
 
         //! Sets the type of the ruin.
-        void setType(int type) {d_type = type;};
+        void setType(Type type) {d_type = type;};
 
         //! Change whether or not the ruin has been successfully searched.
         void setSearched(bool searched) {d_searched = searched; }
@@ -192,7 +191,7 @@ class Ruin : public NamedLocation, public sigc::trackable
         bool d_searched;
 
 	//! The type of the ruin.
-        guint32 d_type;
+        Type d_type;
 
 	//! The keeper of the ruin.
 	/**
@@ -226,4 +225,4 @@ class Ruin : public NamedLocation, public sigc::trackable
 	Reward *d_reward;
 };
 
-#endif // RUIN_H
+#endif

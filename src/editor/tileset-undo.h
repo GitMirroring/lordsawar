@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,18 +12,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef TILESET_EDITOR_ACTIONS_H
-#define TILESET_EDITOR_ACTIONS_H
+#ifndef TILESET_UNDO_H
+#define TILESET_UNDO_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
-#include "Tile.h"
-#include "SmallTile.h"
-#include "tilestyle.h"
+#include "tile.h"
+#include "small-tile.h"
+#include "tile-style.h"
 #include "defs.h"
 #include "undo-action.h"
 #include "undo-mgr.h"
@@ -36,83 +35,108 @@ class Tileset;
  * editor.
  */
 
-class TileSetEditorAction: public UndoAction
+class TileSetUndoAction: public UndoAction
 {
 public:
 
-    //! A TileSet Editor Action can be one of the following kinds.
-    enum Type {
-      CHANGE_PROPERTIES = 1,
-      NAME = 2,
-      TYPE = 3,
-      PATTERN = 4,
-      MOVES = 5,
-      COLOR = 6,
-      ADD_TILESTYLESET = 7,
-      REMOVE_TILESTYLESET = 8,
-      TILESTYLE = 9,
-      ADD_TILE = 10,
-      REMOVE_TILE = 11,
-      SELECTOR = 12,
-      EXPLOSION = 13,
-      ROADS = 14,
-      STONES = 15,
-      BRIDGES = 16,
-      FOG = 17,
-      FLAGS = 18,
-      TILESTYLES = 19,
-      BUILDING_COLORS = 20,
-      MOVE_BONUS = 21,
-    };
+    //! A TileSet Undo Action can be one of the following kinds.
+    enum Type
+      {
+        CHANGE_PROPERTIES = 1,
+        NAME = 2,
+        TYPE = 3,
+        PATTERN = 4,
+        MOVES = 5,
+        COLOR = 6,
+        ADD_TILE = 7,
+        REMOVE_TILE = 8,
+        ADD_IMAGE = 9,
+        CLEAR_IMAGE = 10,
+        TILESTYLES = 11,
+        BUILDING_COLORS = 12,
+      };
 
     //! Default constructor.
-    TileSetEditorAction(Type type, bool agg = false)
+    TileSetUndoAction(Type type, bool agg = false)
      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+                   UndoAction::AGGREGATE_NONE), m_type (type)
+       {
+       }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of the tileset's properties changing in the editor.
 /**
- * The purpose of the TileSetEditorAction_Properties class is to record
+ * The purpose of the TileSetUndoAction_Properties class is to record
  * when a tileset's name, description, copyright, license, and tilesize have
  * changed.
  */
-class TileSetEditorAction_Properties: public TileSetEditorAction
+class TileSetUndoAction_Properties: public TileSetUndoAction
 {
-    public:
-	//! Make a new change properties action
-	/**
-         * Populate the properties action with the new name, description,
-         * copyright, license text, and tile size.
-         */
-        TileSetEditorAction_Properties (Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 ts)
-          : TileSetEditorAction (CHANGE_PROPERTIES), d_name (n), d_desc (d),
-          d_copyright (c), d_license (l), d_tile_size (ts) {}
-	//! Destroy a change properties action.
-        ~TileSetEditorAction_Properties () {}
+public:
+    //! Make a new change properties action
+    /**
+     * Populate the properties action with the new name, description,
+     * copyright, license text, and tile size.
+     */
+    TileSetUndoAction_Properties (Glib::ustring n, Glib::ustring d,
+                                  Glib::ustring c, Glib::ustring l,
+                                  guint32 ts)
+      : TileSetUndoAction (CHANGE_PROPERTIES), m_name (n), m_desc (d),
+      m_copyright (c), m_license (l), m_tile_size (ts)
+  {
+  }
+    //! Destroy a change properties action.
+    ~TileSetUndoAction_Properties ()
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Properties");}
+    Glib::ustring get_action_name () const
+      {
+        return "Properties";
+      }
 
-        Glib::ustring getName () {return d_name;}
-        Glib::ustring getDescription () {return d_desc;}
-        Glib::ustring getCopyright () {return d_copyright;}
-        Glib::ustring getLicense () {return d_license;}
-        guint32 getTileSize () {return d_tile_size;}
+    Glib::ustring get_name () const
+      {
+        return m_name;
+      }
 
-    private:
-        Glib::ustring d_name;
-        Glib::ustring d_desc;
-        Glib::ustring d_copyright;
-        Glib::ustring d_license;
-        guint32 d_tile_size;
+    Glib::ustring get_description () const
+      {
+        return m_desc;
+      }
+
+    Glib::ustring get_copyright () const
+      {
+        return m_copyright;
+      }
+
+    Glib::ustring get_license () const
+      {
+        return m_license;
+      }
+
+    guint32 get_tile_size () const
+      {
+        return m_tile_size;
+      }
+
+private:
+    Glib::ustring m_name;
+    Glib::ustring m_desc;
+    Glib::ustring m_copyright;
+    Glib::ustring m_license;
+    guint32 m_tile_size;
 };
 
 //-----------------------------------------------------------------------------
@@ -120,179 +144,246 @@ class TileSetEditorAction_Properties: public TileSetEditorAction
 //! A helper class for events that require referencing the tile's place
 //in the set. this equates to the position in the treeview.
 
-class TileSetEditorAction_TileIndex: public TileSetEditorAction
+class TileSetUndoAction_TileIndex: public TileSetUndoAction
 {
     public:
-        TileSetEditorAction_TileIndex (Type t, guint32 i, bool agg = false)
-          : TileSetEditorAction (t, agg), d_index (i) {}
-        ~TileSetEditorAction_TileIndex () {}
+        TileSetUndoAction_TileIndex (Type t, guint32 i, bool agg = false)
+          : TileSetUndoAction (t, agg), m_index (i)
+          {
+          }
 
-        guint32 getIndex () {return d_index;}
+        ~TileSetUndoAction_TileIndex ()
+          {
+          }
+
+        guint32 get_index () const
+          {
+            return m_index;
+          }
     private:
-        guint32 d_index;
+        guint32 m_index;
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of a tile's name being changed
 /**
- * The purpose of the TileSetEditorAction_Name class is to record
+ * The purpose of the TileSetUndoAction_Name class is to record
  * when we change the tile's name.  This happens letter by letter.
  *
  */
-class TileSetEditorAction_Name: public TileSetEditorAction_TileIndex, public UndoCursor
+class TileSetUndoAction_Name: public TileSetUndoAction_TileIndex, public UndoCursor
 {
-    public:
-	//! Make a new name action
-	/**
-         * Populate the action with the name of the tile.
-         * Also supply the index of the tile whose name we're modifying.
-         */
-        TileSetEditorAction_Name (guint32 i, Glib::ustring n, UndoMgr *u,
-                                  Gtk::Entry *e)
-          : TileSetEditorAction_TileIndex (NAME, i, true), UndoCursor (u, e),
-          d_name (n) {}
-	//! Destroy a name action.
-        ~TileSetEditorAction_Name () {}
+public:
+    //! Make a new name action
+    /**
+     * Populate the action with the name of the tile.
+     * Also supply the index of the tile whose name we're modifying.
+     */
+    TileSetUndoAction_Name (guint32 i, Glib::ustring n, UndoMgr *u,
+                            Gtk::Entry *e)
+      : TileSetUndoAction_TileIndex (NAME, i, true),
+      UndoCursor (u->get_pos (e), e), m_name (n)
+  {
+  }
+    //! Destroy a name action.
+    ~TileSetUndoAction_Name ()
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Name");}
+    Glib::ustring get_action_name () const
+      {
+        return "Name";
+      }
 
-        Glib::ustring getName () {return d_name;}
+    Glib::ustring get_name () const
+      {
+        return m_name;
+      }
 
-    private:
-        Glib::ustring d_name;
+private:
+    Glib::ustring m_name;
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of a tile's type being changed
 /**
- * The purpose of the TileSetEditorAction_Type class is to record
+ * The purpose of the TileSetUndoAction_Type class is to record
  * when we change the tile's type.  e.g. grass, water, forest, etc.
  *
  */
-class TileSetEditorAction_Type: public TileSetEditorAction_TileIndex
+class TileSetUndoAction_Type: public TileSetUndoAction_TileIndex
 {
-    public:
-	//! Make a new type action
-	/**
-         * Populate the action with the type of the tile.
-         * Also supply the index of the tile whose type we're modifying.
-         */
-        TileSetEditorAction_Type (guint32 i, Tile::Type t)
-          : TileSetEditorAction_TileIndex (TYPE, i), d_tile_type (t) {}
-	//! Destroy a type action.
-        ~TileSetEditorAction_Type () {}
+public:
+    //! Make a new type action
+    /**
+     * Populate the action with the type of the tile.
+     * Also supply the index of the tile whose type we're modifying.
+     */
+    TileSetUndoAction_Type (guint32 i, Tile *t)
+      : TileSetUndoAction_TileIndex (TYPE, i), m_tile (new Tile (*t))
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Type");}
+    //! Destroy a type action.
+    ~TileSetUndoAction_Type ()
+      {
+        delete m_tile;
+      }
 
-        Tile::Type getTileType () {return d_tile_type;}
+    Glib::ustring get_action_name () const
+      {
+        return "Type";
+      }
 
-    private:
-        Tile::Type d_tile_type;
+    Tile * get_tile () const
+      {
+        return m_tile;
+      }
+
+private:
+    Tile *m_tile;
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of a tile's pattern being changed
 /**
- * The purpose of the TileSetEditorAction_Pattern class is to record
+ * The purpose of the TileSetUndoAction_Pattern class is to record
  * when we change the tile's pattern.  e.g. solid, stippled, etc.
  *
  */
-class TileSetEditorAction_Pattern: public TileSetEditorAction_TileIndex
+class TileSetUndoAction_Pattern: public TileSetUndoAction_TileIndex
 {
-    public:
-	//! Make a new pattern action
-	/**
-         * Populate the action with the pattern of the tile.
-         * Also supply the index of the tile whose pattern we're modifying.
-         */
-        TileSetEditorAction_Pattern (guint32 i, SmallTile::Pattern p)
-          : TileSetEditorAction_TileIndex (PATTERN, i), d_pattern (p) {}
-	//! Destroy a pattern action.
-        ~TileSetEditorAction_Pattern () {}
+public:
+    //! Make a new pattern action
+    /**
+     * Populate the action with the pattern of the tile.
+     * Also supply the index of the tile whose pattern we're modifying.
+     */
+    TileSetUndoAction_Pattern (guint32 i, SmallTile::Pattern p)
+      : TileSetUndoAction_TileIndex (PATTERN, i), m_pattern (p)
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Pattern");}
+    //! Destroy a pattern action.
+    ~TileSetUndoAction_Pattern ()
+      {
+      }
 
-        SmallTile::Pattern getPattern () {return d_pattern;}
+    Glib::ustring get_action_name () const
+      {
+        return "Pattern";
+      }
 
-    private:
-        SmallTile::Pattern d_pattern;
+    SmallTile::Pattern get_pattern () const
+      {
+        return m_pattern;
+      }
+
+private:
+    SmallTile::Pattern m_pattern;
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of a tile's moves being changed
 /**
- * The purpose of the TileSetEditorAction_Moves class is to record
+ * The purpose of the TileSetUndoAction_Moves class is to record
  * when we change the tile's moves.  e.g. how many movement points it takes
  * to cross this kind of terrain.
  *
  */
-class TileSetEditorAction_Moves: public TileSetEditorAction_TileIndex
+class TileSetUndoAction_Moves: public TileSetUndoAction_TileIndex
 {
-    public:
-	//! Make a new moves action
-	/**
-         * Populate the action with the moves of the tile.
-         * Also supply the index of the tile whose moves we're modifying.
-         */
-        TileSetEditorAction_Moves (guint32 i, guint32 mp)
-          : TileSetEditorAction_TileIndex (MOVES, i, true), d_moves (mp) {}
-	//! Destroy a moves action.
-        ~TileSetEditorAction_Moves () {}
+public:
+    //! Make a new moves action
+    /**
+     * Populate the action with the moves of the tile.
+     * Also supply the index of the tile whose moves we're modifying.
+     */
+    TileSetUndoAction_Moves (guint32 i, guint32 mp)
+      : TileSetUndoAction_TileIndex (MOVES, i, true), m_moves (mp)
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Moves");}
+    //! Destroy a moves action.
+    ~TileSetUndoAction_Moves ()
+      {
+      }
 
-        guint32 getMoves () {return d_moves;}
+    Glib::ustring get_action_name () const
+      {
+        return "Moves";
+      }
 
-    private:
-        guint32 d_moves;
+    guint32 get_moves () const
+      {
+        return m_moves;
+      }
+
+private:
+    guint32 m_moves;
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of the tile's color changing in the tileset editor.
 /**
- * The purpose of the TileSetEditorAction_Color class is to record
+ * The purpose of the TileSetUndoAction_Color class is to record
  * when a tile's first, second or third color has been modified.
  */
-class TileSetEditorAction_Color: public TileSetEditorAction_TileIndex
+class TileSetUndoAction_Color: public TileSetUndoAction_TileIndex
 {
-    public:
-	//! Make a new color action
-	/**
-         * Populate the color action with the index of the tile, the
-         * color number (e.g. 1, 2 or 3), and finally the actual color.
-         */
-        TileSetEditorAction_Color (guint32 i, guint32 n, Gdk::RGBA color)
-          : TileSetEditorAction_TileIndex (COLOR, i), d_color_number (n),
-          d_color (color) {}
-	//! Destroy a color action.
-        ~TileSetEditorAction_Color () {}
+public:
+    //! Make a new color action
+    /**
+     * Populate the color action with the index of the tile, the
+     * color number (e.g. 1, 2 or 3), and finally the actual color.
+     */
+    TileSetUndoAction_Color (guint32 i, guint32 n, Gdk::RGBA color)
+      : TileSetUndoAction_TileIndex (COLOR, i), m_color_number (n),
+      m_color (color)
+  {
+  }
+    //! Destroy a color action.
+    ~TileSetUndoAction_Color ()
+      {
+      }
 
-        Glib::ustring getActionName () const 
+    Glib::ustring get_action_name () const 
+      {
+        switch (m_color_number)
           {
-            switch (d_color_number)
-              {
-              case 0:
-                return _("First Color");
-              case 1:
-                return _("Second Color");
-              case 2:
-                return _("Third Color");
-              default:
-                break;
-              }
-            return "";
-          }
-        guint32 getColorNumber () {return d_color_number;}
-        Gdk::RGBA getColor () const {return d_color;}
+          case 0:
+            return "First Color";
 
-    private:
-        guint32 d_color_number;
-        Gdk::RGBA d_color;
+          case 1:
+            return "Second Color";
+
+          case 2:
+            return "Third Color";
+
+          default:
+            break;
+          }
+        return "";
+      }
+
+    guint32 get_color_number () const
+      {
+        return m_color_number;
+      }
+
+    Gdk::RGBA get_color () const
+      {
+        return m_color;
+      }
+
+private:
+    guint32 m_color_number;
+    Gdk::RGBA m_color;
 };
 
 //-----------------------------------------------------------------------------
@@ -303,392 +394,217 @@ class TileSetEditorAction_Color: public TileSetEditorAction_TileIndex
  * Several actions require saving the whole tar file because it's the
  * easiest way to implement undo/redo.
  */
-class TileSetEditorAction_Save: public TileSetEditorAction
+class TileSetUndoAction_Save: public TileSetUndoAction
 {
-    public:
-        TileSetEditorAction_Save (Tileset *s, Type t);
-        ~TileSetEditorAction_Save ();
+public:
+    TileSetUndoAction_Save (Tileset *s, Type t)
+      :TileSetUndoAction (t)
+      {
+        m_tileset = new Tileset (*s);
+        m_filename = File::get_tmp_file () + TILESET_EXT;
+        s->save (m_filename, TILESET_EXT);
+      }
 
-        Glib::ustring getTilesetFilename () const {return d_filename;}
-        Tileset *getTileset () const {return d_tileset;}
-    private:
-        Glib::ustring d_filename;
-        Tileset *d_tileset;
+    ~TileSetUndoAction_Save ()
+      {
+        File::erase (m_filename);
+        delete m_tileset;
+      }
+
+    Glib::ustring get_tileset_filename () const
+      {
+        return m_filename;
+      }
+
+    Tileset *get_tileset () const
+      {
+        return m_tileset;
+      }
+private:
+    Glib::ustring m_filename;
+    Tileset *m_tileset;
 };
 
-//-----------------------------------------------------------------------------
-
-//! A record of a new tilestyle set being added to the tileset
-/**
- * The purpose of the TileSetEditorAction_AddTileStyleSet class is to record
- * when a new image is added to the set, which is called a "tile style set".
- *
- * We take a copy of the whole tileset just to make it easy.  Our copy is a
- * file on disk and is deleted when this class is destroyed.
- */
-class TileSetEditorAction_AddTileStyleSet: public TileSetEditorAction_Save
-{
-    public:
-	//! Make a new add tilestyleset action
-	/**
-         * Populate the add tilestyleset action with the tileset.
-         */
-        TileSetEditorAction_AddTileStyleSet (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::ADD_TILESTYLESET) {}
-	//! Destroy an add tilestyleset action, and delete the file.
-        ~TileSetEditorAction_AddTileStyleSet () {}
-
-        Glib::ustring getActionName () const {return _("Add TileStyle Set");}
-};
-
-//-----------------------------------------------------------------------------
-
-//! A record of a new tilestyle set being erased from the tileset
-/**
- * The purpose of the TileSetEditorAction_RemoveTileStyleSet class is to record
- * when a "tile style set" image is deleted from the set.
- *
- * We take a copy of the whole tileset just to make it easy.  Our copy is a
- * file on disk and is deleted when this class is destroyed.
- */
-class TileSetEditorAction_RemoveTileStyleSet: public TileSetEditorAction_Save
-{
-    public:
-	//! Make a new remove tilestyleset action
-	/**
-         * Populate the remove tilestyleset action with the tileset.
-         */
-        TileSetEditorAction_RemoveTileStyleSet (Tileset *t)
-          :TileSetEditorAction_Save
-           (t, TileSetEditorAction::REMOVE_TILESTYLESET) {}
-	//! Destroy a remove tilestyleset action, and delete the file.
-        ~TileSetEditorAction_RemoveTileStyleSet () {}
-
-        Glib::ustring getActionName () const {return _("Remove TileStyle Set");}
-};
-
-//-----------------------------------------------------------------------------
-
-//! A record of a tilestyle being changed
-/**
- * The purpose of the TileSetEditorAction_TileStyle class is to record
- * when we change a tilestyle's type.
- *
- */
-class TileSetEditorAction_TileStyle: public TileSetEditorAction_TileIndex
-{
-    public:
-	//! Make a new tilestyle action
-	/**
-         * Populate the action with the index of the tile whose tilestyle
-         * we're modifying, the index of the tilestyle, and lastly the new
-         * tilestyle type.
-         */
-        TileSetEditorAction_TileStyle (guint32 i, guint32 v, TileStyle::Type t)
-          : TileSetEditorAction_TileIndex (TILESTYLE, i), d_tilestyle_index (v),
-          d_tilestyle_type (t) {}
-	//! Destroy a tilestyle action.
-        ~TileSetEditorAction_TileStyle () {}
-
-        Glib::ustring getActionName () const {return _("TileStyle Type");}
-
-        guint32 getTileStyleIndex () {return d_tilestyle_index;}
-        TileStyle::Type getTileStyleType () {return d_tilestyle_type;}
-    private:
-        guint32 d_tilestyle_index;
-        TileStyle::Type d_tilestyle_type;
-};
 
 //-----------------------------------------------------------------------------
 
 //! A record of a new tile being added to the tileset
 /**
- * The purpose of the TileSetEditorAction_AddTile class is to record
+ * The purpose of the TileSetUndoAction_AddTile class is to record
  * when a new blank tile has been added to the set.
  *
  * We take a copy of the whole tileset just to make it easy.  Our copy is a
  * file on disk and is deleted when this class is destroyed.
  */
-class TileSetEditorAction_AddTile: public TileSetEditorAction_Save
+class TileSetUndoAction_AddTile: public TileSetUndoAction_Save
 {
-    public:
-	//! Make a new add tile action
-	/**
-         * Populate the add tile action with the tileset.
-         */
-        TileSetEditorAction_AddTile (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::ADD_TILE) {}
-	//! Destroy an add tile action, and delete the file.
-        ~TileSetEditorAction_AddTile () {}
+public:
+    //! Make a new add tile action
+    /**
+     * Populate the add tile action with the tileset.
+     */
+    TileSetUndoAction_AddTile (Tileset *t)
+      :TileSetUndoAction_Save (t, TileSetUndoAction::ADD_TILE)
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Add Tile");}
+    //! Destroy an add tile action, and delete the file.
+    ~TileSetUndoAction_AddTile ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Add Tile";
+      }
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of a tile being erased to the tileset
 /**
- * The purpose of the TileSetEditorAction_RemoveTile class is to record
+ * The purpose of the TileSetUndoAction_RemoveTile class is to record
  * when a tile has been deleted from the set.
  *
  * We take a copy of the whole tileset just to make it easy.  Our copy is a
  * file on disk and is deleted when this class is destroyed.
  */
-class TileSetEditorAction_RemoveTile: public TileSetEditorAction_Save
+class TileSetUndoAction_RemoveTile: public TileSetUndoAction_Save
 {
-    public:
-	//! Make a new remove tile action
-	/**
-         * Populate the remove tile action with the tileset.
-         */
-        TileSetEditorAction_RemoveTile (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::REMOVE_TILE) {}
-	//! Destroy a remove tile action, and delete the file.
-        ~TileSetEditorAction_RemoveTile () {}
+public:
+    //! Make a new remove tile action
+    /**
+     * Populate the remove tile action with the tileset.
+     */
+    TileSetUndoAction_RemoveTile (Tileset *t)
+      :TileSetUndoAction_Save (t, TileSetUndoAction::REMOVE_TILE)
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Remove Tile");}
+    //! Destroy a remove tile action, and delete the file.
+    ~TileSetUndoAction_RemoveTile ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Remove Tile";
+      }
 };
 
 //-----------------------------------------------------------------------------
 
-//! A record of the selector images being modified in the tileset
+//! A record of an image being modified in the tileset
 /**
- * The purpose of the TileSetEditorAction_Selector class is to record
- * when the tileset's selector images have been changed.
- *
- * We take a copy of the whole tileset just to make it easy.  Our copy is a
- * file on disk and is deleted when this class is destroyed.
  */
-class TileSetEditorAction_Selector: public TileSetEditorAction_Save
+class TileSetUndoAction_AddImage: public TileSetUndoAction_Save
 {
-    public:
-	//! Make a new selector action
-	/**
-         * Populate the selector action with the tileset.
-         */
-        TileSetEditorAction_Selector (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::SELECTOR) {}
-	//! Destroy a selector action, and delete the file.
-        ~TileSetEditorAction_Selector () {}
-        Glib::ustring getActionName () const {return _("Selector");}
+public:
+
+    TileSetUndoAction_AddImage (Tileset *t)
+      :TileSetUndoAction_Save (t, TileSetUndoAction::ADD_IMAGE)
+      {
+      }
+
+    ~TileSetUndoAction_AddImage ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Add Image";
+      }
 };
 
 //-----------------------------------------------------------------------------
 
-//! A record of the explosion image being modified in the tileset
+//! A record of an image being cleared in the tileset
 /**
- * The purpose of the TileSetEditorAction_Explosion class is to record
- * when the tileset's explosion image has been changed.
- *
- * We take a copy of the whole tileset just to make it easy.  Our copy is a
- * file on disk and is deleted when this class is destroyed.
  */
-class TileSetEditorAction_Explosion: public TileSetEditorAction_Save
+class TileSetUndoAction_ClearImage: public TileSetUndoAction_Save
 {
-    public:
-	//! Make a new explosion action
-	/**
-         * Populate the explosion action with the tileset.
-         */
-        TileSetEditorAction_Explosion (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::EXPLOSION) {}
-	//! Destroy a explosion action, and delete the file.
-        ~TileSetEditorAction_Explosion () {}
-        Glib::ustring getActionName () const {return _("Explosion");}
-};
+public:
 
-//-----------------------------------------------------------------------------
+    TileSetUndoAction_ClearImage (Tileset *t)
+      :TileSetUndoAction_Save (t, TileSetUndoAction::CLEAR_IMAGE)
+      {
+      }
 
-//! A record of the road images being modified in the tileset
-/**
- * The purpose of the TileSetEditorAction_Roads class is to record
- * when the tileset's road images have been changed.
- *
- * We take a copy of the whole tileset just to make it easy.  Our copy is a
- * file on disk and is deleted when this class is destroyed.
- */
-class TileSetEditorAction_Roads: public TileSetEditorAction_Save
-{
-    public:
-	//! Make a new roads action
-	/**
-         * Populate the roads action with the tileset.
-         */
-        TileSetEditorAction_Roads (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::ROADS) {}
-	//! Destroy a roads action, and delete the file.
-        ~TileSetEditorAction_Roads () {}
-        Glib::ustring getActionName () const {return _("Roads");}
-};
+    ~TileSetUndoAction_ClearImage ()
+      {
+      }
 
-//-----------------------------------------------------------------------------
-
-//! A record of the standing stone images being modified in the tileset
-/**
- * The purpose of the TileSetEditorAction_Stones class is to record
- * when the tileset's standing stone images have been changed.
- *
- * We take a copy of the whole tileset just to make it easy.  Our copy is a
- * file on disk and is deleted when this class is destroyed.
- */
-class TileSetEditorAction_Stones: public TileSetEditorAction_Save
-{
-    public:
-	//! Make a new stones action
-	/**
-         * Populate the stones action with the tileset.
-         */
-        TileSetEditorAction_Stones (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::STONES) {}
-	//! Destroy a stones action, and delete the file.
-        ~TileSetEditorAction_Stones () {}
-        Glib::ustring getActionName () const {return _("Stones");}
-};
-
-//-----------------------------------------------------------------------------
-
-//! A record of the bridge images being modified in the tileset
-/**
- * The purpose of the TileSetEditorAction_Bridges class is to record
- * when the tileset's bridge images have been changed.
- *
- * We take a copy of the whole tileset just to make it easy.  Our copy is a
- * file on disk and is deleted when this class is destroyed.
- */
-class TileSetEditorAction_Bridges: public TileSetEditorAction_Save
-{
-    public:
-	//! Make a new bridges action
-	/**
-         * Populate the bridges action with the tileset.
-         */
-        TileSetEditorAction_Bridges (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::BRIDGES) {}
-	//! Destroy a bridges action, and delete the file.
-        ~TileSetEditorAction_Bridges () {}
-        Glib::ustring getActionName () const {return _("Bridges");}
-};
-
-//-----------------------------------------------------------------------------
-
-//! A record of the fog images being modified in the tileset
-/**
- * The purpose of the TileSetEditorAction_Fog class is to record
- * when the tileset's fog images have been changed.
- *
- * We take a copy of the whole tileset just to make it easy.  Our copy is a
- * file on disk and is deleted when this class is destroyed.
- */
-class TileSetEditorAction_Fog: public TileSetEditorAction_Save
-{
-    public:
-	//! Make a new fog action
-	/**
-         * Populate the fog action with the tileset.
-         */
-        TileSetEditorAction_Fog (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::FOG) {}
-	//! Destroy a fog action, and delete the file.
-        ~TileSetEditorAction_Fog () {}
-        Glib::ustring getActionName () const {return _("Fog");}
-};
-
-//-----------------------------------------------------------------------------
-
-//! A record of the flag images being modified in the tileset
-/**
- * The purpose of the TileSetEditorAction_Flag class is to record
- * when the tileset's flag images have been changed.
- *
- * We take a copy of the whole tileset just to make it easy.  Our copy is a
- * file on disk and is deleted when this class is destroyed.
- */
-class TileSetEditorAction_Flag: public TileSetEditorAction_Save
-{
-    public:
-	//! Make a new flag action
-	/**
-         * Populate the flag action with the tileset.
-         */
-        TileSetEditorAction_Flag (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::FLAGS) {}
-	//! Destroy a flag action, and delete the file.
-        ~TileSetEditorAction_Flag () {}
-        Glib::ustring getActionName () const {return _("Flags");}
+    Glib::ustring get_action_name () const
+      {
+        return "Clear Image";
+      }
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of the tilestyles being organized within the tileset
 /**
- * The purpose of the TileSetEditorAction_TileStyles class is to record
+ * The purpose of the TileSetUndoAction_TileStyles class is to record
  * when the tileset's tilestyles have been changed en masse.
  *
  * We take a copy of the whole tileset just to make it easy.  Our copy is a
  * file on disk and is deleted when this class is destroyed.
  */
-class TileSetEditorAction_TileStyles: public TileSetEditorAction_Save
+class TileSetUndoAction_TileStyles: public TileSetUndoAction_Save
 {
-    public:
-	//! Make a new tilestyles action
-	/**
-         * Populate the tilestyles action with the tileset.
-         */
-        TileSetEditorAction_TileStyles (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::TILESTYLES) {}
-	//! Destroy a tilestyles action, and delete the file.
-        ~TileSetEditorAction_TileStyles () {}
-        Glib::ustring getActionName () const {return _("TileStyles");}
+public:
+    //! Make a new tilestyles action
+    /**
+     * Populate the tilestyles action with the tileset.
+     */
+    TileSetUndoAction_TileStyles (Tileset *t)
+      :TileSetUndoAction_Save (t, TileSetUndoAction::TILESTYLES)
+      {
+      }
+
+    //! Destroy a tilestyles action, and delete the file.
+    ~TileSetUndoAction_TileStyles ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "TileStyles";
+      }
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of the building colors being modified in the tileset
 /**
- * The purpose of the TileSetEditorAction_BuildingColors class is to record
+ * The purpose of the TileSetUndoAction_BuildingColors class is to record
  * when the tileset's building colors have been changed.  e.g. the color of
  * the roads on the smallmap, the color of the temple dots, etc.
  *
  * We take a copy of the whole tileset just to make it easy.  Our copy is a
  * file on disk and is deleted when this class is destroyed.
  */
-class TileSetEditorAction_BuildingColors: public TileSetEditorAction_Save
+class TileSetUndoAction_BuildingColors: public TileSetUndoAction_Save
 {
-    public:
-	//! Make a new building colors action
-	/**
-         * Populate the building colors action with the tileset.
-         */
-        TileSetEditorAction_BuildingColors (Tileset *t)
-          :TileSetEditorAction_Save
-           (t, TileSetEditorAction::BUILDING_COLORS) {}
-	//! Destroy a building colors action, and delete the file.
-        ~TileSetEditorAction_BuildingColors () {}
-        Glib::ustring getActionName () const {return _("Building Colors");}
+public:
+    //! Make a new building colors action
+    /**
+     * Populate the building colors action with the tileset.
+     */
+    TileSetUndoAction_BuildingColors (Tileset *t)
+      :TileSetUndoAction_Save (t, TileSetUndoAction::BUILDING_COLORS)
+      {
+      }
+
+    //! Destroy a building colors action, and delete the file.
+    ~TileSetUndoAction_BuildingColors ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Building Colors";
+      }
 };
 
-//-----------------------------------------------------------------------------
-
-//! A record of the move bonus images being modified in the tileset
-/**
- * The purpose of the TileSetEditorAction_MoveBonus class is to record
- * when the tileset's move bonus images have been changed.  e.g. flight,
- * faster in forests, faster in hills, etc.
- *
- * We take a copy of the whole tileset just to make it easy.  Our copy is a
- * file on disk and is deleted when this class is destroyed.
- */
-class TileSetEditorAction_MoveBonus: public TileSetEditorAction_Save
-{
-    public:
-	//! Make a new move bonus action
-	/**
-         * Populate the move bonus action with the tileset.
-         */
-        TileSetEditorAction_MoveBonus (Tileset *t)
-          :TileSetEditorAction_Save (t, TileSetEditorAction::MOVE_BONUS) {}
-	//! Destroy a move bonus action, and delete the file.
-        ~TileSetEditorAction_MoveBonus () {}
-        Glib::ustring getActionName () const {return _("Move Bonus");}
-};
-#endif //TILESET_EDITOR_ACTIONS_H
+#endif

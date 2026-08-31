@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2009, 2010, 2011, 2014, 2015, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,26 +12,24 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include "defs.h"
-#include "PixMask.h"
+#include "pixmask.h"
 #include <string.h>
 #include <cairomm/cairomm.h>
 #include <gdkmm.h>
 #include "ucompose.hpp"
-#include "gui/main.h"
 
 
 PixMask::PixMask(Glib::RefPtr<Gdk::Pixbuf> p)
- : pixmap (Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, p->get_width(),
+ : pixmap (Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, p->get_width(),
                                         p->get_height())),
-  mask (Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, p->get_width(),
+  mask (Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, p->get_width(),
                                      p->get_height())),
   gc (Cairo::Context::create(pixmap)), width(p->get_width ()),
-    height(p->get_height ()), unscaled_width(width), unscaled_height(height)
+    height(p->get_height ())
 {
   Gdk::Cairo::set_source_pixbuf(gc, p, 0, 0);
   gc->paint();
@@ -39,9 +37,9 @@ PixMask::PixMask(Glib::RefPtr<Gdk::Pixbuf> p)
 
 PixMask::~PixMask()
 {
-  pixmap.clear();
-  mask.clear();
-  gc.clear();
+  pixmap.reset();
+  mask.reset();
+  gc.reset();
 }
 
 PixMask::PixMask(Cairo::RefPtr<Cairo::Surface> p, Cairo::RefPtr<Cairo::Surface> m)
@@ -53,7 +51,7 @@ PixMask::PixMask(Cairo::RefPtr<Cairo::Surface> p, Cairo::RefPtr<Cairo::Surface> 
   width = x2 - x1;
   height = y2 - y1;
 
-  pixmap = Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, width, height);
+  pixmap = Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, width, height);
   if (p)
     {
       gc = Cairo::Context::create(pixmap);
@@ -67,7 +65,7 @@ PixMask::PixMask(Cairo::RefPtr<Cairo::Surface> p, Cairo::RefPtr<Cairo::Surface> 
       gc->restore();
     }
 
-  mask = Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, width, height);
+  mask = Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, width, height);
   if (m)
     {
       Cairo::RefPtr<Cairo::Context> context = Cairo::Context::create(mask);
@@ -80,17 +78,13 @@ PixMask::PixMask(Cairo::RefPtr<Cairo::Surface> p, Cairo::RefPtr<Cairo::Surface> 
       context->paint();
       context->restore();
     }
-  unscaled_width = width;
-  unscaled_height = height;
 }
 
 PixMask::PixMask(const PixMask&p)
 {
   width = p.width;
   height = p.height;
-  unscaled_width = p.unscaled_width;
-  unscaled_height = p.unscaled_height;
-  pixmap = Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, width, height);
+  pixmap = Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, width, height);
   if (p.pixmap)
     {
       gc = Cairo::Context::create(pixmap);
@@ -104,7 +98,7 @@ PixMask::PixMask(const PixMask&p)
       gc->restore();
     }
 
-  mask = Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, width, height);
+  mask = Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, width, height);
   if (p.mask)
     {
       Cairo::RefPtr<Cairo::Context> context = Cairo::Context::create(mask);
@@ -129,21 +123,19 @@ PixMask::PixMask(Glib::ustring filename, bool &broken)
     {
       pixbuf = Gdk::Pixbuf::create_from_file(filename);
     }
-  catch (const Glib::Exception &ex)
+  catch (const Glib::Error &ex)
     {
       std::cerr << String::ucompose(_("Could not load image file `%1'."), filename) << std::endl;
       broken = true;
       return;
     }
-  pixmap = Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, pixbuf->get_width(), pixbuf->get_height());
+  pixmap = Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, pixbuf->get_width(), pixbuf->get_height());
   gc = Cairo::Context::create(pixmap);
   Gdk::Cairo::set_source_pixbuf(gc, pixbuf, 0, 0);
   gc->paint();
-  mask = Cairo::ImageSurface::create (Cairo::FORMAT_ARGB32, pixbuf->get_width(), pixbuf->get_height());
+  mask = Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, pixbuf->get_width(), pixbuf->get_height());
   width = pixbuf->get_width();
   height = pixbuf->get_height();
-  unscaled_width = width;
-  unscaled_height = height;
 }
 
 PixMask* PixMask::create(Glib::ustring filename, bool &broken)
@@ -156,9 +148,14 @@ PixMask* PixMask::create(Glib::RefPtr<Gdk::Pixbuf> pixbuf)
   return new PixMask(pixbuf);
 }
 
-PixMask* PixMask::create(Cairo::RefPtr<Cairo::Surface> pixmap, Cairo::RefPtr<Cairo::Surface> mask)
+PixMask* PixMask::create(Cairo::RefPtr<Cairo::Surface> p, Cairo::RefPtr<Cairo::Surface> m)
 {
-  return new PixMask(pixmap, mask);
+  return new PixMask(p, m);
+}
+
+PixMask* PixMask::create(Cairo::RefPtr<Cairo::Surface> p)
+{
+  return new PixMask(p, NULL);
 }
 
 PixMask* PixMask::copy()
@@ -208,31 +205,27 @@ void PixMask::blit(Vector<int> tile, int ts, Cairo::RefPtr<Cairo::Surface> p, Ve
   blit (LwRectangle(src.x, src.y, ts, ts), p, dest);
 }
 
-void PixMask::scale(PixMask*& p, int xsize, int ysize, Gdk::InterpType interp)
+void PixMask::blit(Vector<int> tile, int span, int ts, Cairo::RefPtr<Cairo::Surface> p, Vector<int> dest)
 {
-  PixMask *scaled = p->scale(xsize, ysize, interp);
-  delete p;
-  p = scaled;
-  p->set_unscaled_width(p->get_unscaled_width());
-  p->set_unscaled_height(p->get_unscaled_height());
-  return;
-}
+  // the graphic is tilesize pixels high and wide
+  // logically it spans span tiles right and down
+  // we want the given tile to be blitted
+  //
+  // if span is 1 we take the whole thing and scale to ts
+  // if span is 2 we take a quadrant and scale to ts
+  // if span is 3 we take a third
+  // if span if 4 we take a quarter
+  //
+  // and then we scale it to the correct size (always tilesize)
+  // and then we put it at dest
 
-void PixMask::scale(PixMask*& p, double perc, Gdk::InterpType interp)
-{
-  int xsize = p->get_unscaled_width () * perc;
-  int ysize = p->get_unscaled_height () * perc;
-  PixMask::scale (p, xsize, ysize, interp);
-}
-
-PixMask * PixMask::scale(int xsize, int ysize, Gdk::InterpType interp)
-{
-  Glib::RefPtr<Gdk::Pixbuf> pixbuf = to_pixbuf();
-  PixMask *pix = PixMask::create(pixbuf->scale_simple(xsize, ysize, interp));
-  pix->set_unscaled_width(get_unscaled_width());
-  pix->set_unscaled_height(get_unscaled_height());
-  pixbuf.reset();
-  return pix;
+  auto pp = PixMask::create (width / span);
+  Vector<int> src = tile * (width / span);
+  blit (LwRectangle(src.x, src.y, width/span, height/span), pp->get_pixmap (), Vector<int>(0,0));
+  auto np = pp->scale (ts, ts);
+  delete pp;
+  np->blit (p, dest);
+  delete np;
 }
 
 Glib::RefPtr<Gdk::Pixbuf> PixMask::to_pixbuf() const
@@ -241,7 +234,14 @@ Glib::RefPtr<Gdk::Pixbuf> PixMask::to_pixbuf() const
   Glib::RefPtr<Gdk::Pixbuf> alphabuf = buf->add_alpha(true, 255, 87, 204);
   return alphabuf;
 }
-      
+
+Glib::RefPtr<Gdk::Texture> PixMask::to_texture () const
+{
+  auto im = to_pixbuf ();
+  auto texture = Gdk::Texture::create_for_pixbuf (im);
+  return texture;
+}
+
 void PixMask::draw_pixbuf(Glib::RefPtr<Gdk::Pixbuf> pixbuf, int src_x, int src_y, int dest_x, int dest_y, int w, int h)
 {
 
@@ -270,60 +270,55 @@ Vector<int> PixMask::get_dim() const
   return Vector<int>(width, height);
 }
 
-Vector<int> PixMask::get_unscaled_dim() const
-{
-  return Vector<int>(unscaled_width, unscaled_height);
-}
-
 PixMask* PixMask::cropLeftHalf () const
 {
-  guint32 new_width = (double)unscaled_width * (1.0 / 2.0);
+  guint32 new_width = (double)width * (1.0 / 2.0);
   Glib::RefPtr<Gdk::Pixbuf> pic =
-    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, new_width,
-                        unscaled_height);
+    Gdk::Pixbuf::create(Gdk::Colorspace::RGB, true, 8, new_width,
+                        height);
   to_pixbuf ()->copy_area (0, 0, new_width, height, pic, 0, 0);
   return PixMask::create (pic);
 }
 
 PixMask* PixMask::cropRightHalf () const
 {
-  guint32 new_width = (double)unscaled_width * (1.0 / 2.0);
+  guint32 new_width = (double)width * (1.0 / 2.0);
   Glib::RefPtr<Gdk::Pixbuf> pic =
-    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, new_width,
-                        unscaled_height);
-  to_pixbuf ()->copy_area (unscaled_width - new_width, 0,
+    Gdk::Pixbuf::create(Gdk::Colorspace::RGB, true, 8, new_width,
+                        height);
+  to_pixbuf ()->copy_area (width - new_width, 0,
                            new_width, height, pic, 0, 0);
   return PixMask::create (pic);
 }
 
 PixMask* PixMask::cropCenterHalf () const
 {
-  guint32 new_width = (double)unscaled_width * (1.0 / 2.0);
+  guint32 new_width = (double)width * (1.0 / 2.0);
   Glib::RefPtr<Gdk::Pixbuf> pic =
-    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, new_width,
-                        unscaled_height);
-  to_pixbuf ()->copy_area ((unscaled_width / 2) - (new_width / 2), 0, new_width, height, pic, 0, 0);
+    Gdk::Pixbuf::create(Gdk::Colorspace::RGB, true, 8, new_width,
+                        height);
+  to_pixbuf ()->copy_area ((width / 2) - (new_width / 2), 0, new_width, height, pic, 0, 0);
   return PixMask::create (pic);
 
 }
 
 PixMask* PixMask::cropLeftTwoThirds () const
 {
-  guint32 new_width = (double)unscaled_width * (2.0 / 3.0);
+  guint32 new_width = (double)width * (2.0 / 3.0);
   Glib::RefPtr<Gdk::Pixbuf> pic =
-    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, new_width,
-                        unscaled_height);
+    Gdk::Pixbuf::create(Gdk::Colorspace::RGB, true, 8, new_width,
+                        height);
   to_pixbuf ()->copy_area (0, 0, new_width, height, pic, 0, 0);
   return PixMask::create (pic);
 }
 
 PixMask* PixMask::cropRightTwoThirds () const
 {
-  guint32 new_width = (double)unscaled_width * (2.0 / 3.0);
+  guint32 new_width = (double)width * (2.0 / 3.0);
   Glib::RefPtr<Gdk::Pixbuf> pic =
-    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, new_width,
-                        unscaled_height);
-  to_pixbuf ()->copy_area (unscaled_width - new_width, 0,
+    Gdk::Pixbuf::create(Gdk::Colorspace::RGB, true, 8, new_width,
+                        height);
+  to_pixbuf ()->copy_area (width - new_width, 0,
   new_width, height, pic, 0, 0);
   return PixMask::create (pic);
 }
@@ -350,26 +345,81 @@ bool PixMask::checkDimension (Glib::ustring file, DimensionType t, guint32 rows)
       match = true;
       break;
     case DIMENSION_SAME_HEIGHT_AND_WIDTH:
-      match = p->get_unscaled_width () == p->get_unscaled_height ();
+      match = p->get_width () == p->get_height ();
       break;
     case DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT:
-      match = p->get_unscaled_width () % p->get_unscaled_height () == 0;
+      match = p->get_width () % p->get_height () == 0;
       break;
     case DIMENSION_WIDTH_IS_MULTIPLE_OF_ROW_HEIGHT:
       if (rows)
         {
-          guint32 row_height = p->get_unscaled_height () / rows;
-          match = p->get_unscaled_width () % row_height == 0;
+          guint32 row_height = p->get_height () / rows;
+          match = p->get_width () % row_height == 0;
         }
       break;
     case DIMENSION_WIDTH_IS_FIXED_MAX_PLAYERS:
         {
-          guint32 column_width = p->get_unscaled_width () / MAX_PLAYERS;
-          match = p->get_unscaled_height () % column_width == 0;
+          guint32 column_width = p->get_width () / MAX_PLAYERS;
+          match = p->get_height () % column_width == 0;
         }
+      break;
+    case DIMENSION_HEIGHT_IS_MULTIPLE_OF_WIDTH:
+        {
+          guint32 column_width = p->get_width ();
+          match = p->get_height () % column_width == 0;
+        }
+      break;
+    case DIMENSION_HEIGHT_IS_MARKED:
+      match = true;
       break;
     }
   if (p)
     delete p;
   return match;
+}
+
+PixMask* PixMask::scale (guint32 w, guint32 h)
+{
+  if (w == (guint32)width && h == (guint32)height)
+    return copy ();
+
+  auto scaled =
+    Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, w, h);
+
+  auto cr = Cairo::Context::create (scaled);
+
+  cr->scale ((double)w / get_width (), (double)h / get_height ());
+
+  auto pattern = Cairo::SurfacePattern::create (get_pixmap ());
+  pattern->set_extend (Cairo::SurfacePattern::Extend::NONE);
+  cr->set_source (pattern);
+  cr->paint ();
+
+  auto mmask =
+    Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, w, h);
+  cr = Cairo::Context::create (mmask);
+
+  cr->scale ((double)w / get_width (), (double)h / get_height ());
+
+  pattern = Cairo::SurfacePattern::create (get_mask ());
+  pattern->set_extend (Cairo::SurfacePattern::Extend::NONE);
+  cr->set_source (pattern);
+  cr->paint ();
+
+  return PixMask::create (scaled, mmask);
+}
+     
+void PixMask::blit_center_tile(Cairo::RefPtr<Cairo::Surface> dest, guint32 tilesize, Vector<int> pos)
+{
+  Vector<int> delta =
+    Vector<int>((tilesize / 2) - (get_width () / 2),
+                (tilesize / 2) - (get_height () / 2));
+  blit (dest, pos + delta);
+}
+
+PixMask * PixMask::create (guint32 ts)
+{
+  auto p = Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, ts, ts);
+  auto m = Cairo::ImageSurface::create (Cairo::Surface::Format::ARGB32, ts, ts);
+  return PixMask::create (p, m);
 }

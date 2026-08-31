@@ -1,10 +1,10 @@
-// Copyright (C) 2002, 2003 Michael Bartl
-// Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2004 Bryan Duff
-// Copyright (C) 2006, 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2002, 2003 Michael Bartl
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2006 Andrea Paternesi
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2004 Bryan Duff
+//  Copyright (C) 2006, 2007, 2008, 2009, 2014, 2015, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,32 +18,31 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <fstream>
 
-#include "real_player.h"
+#include "real-player.h"
 #include "action.h"
 #include "history.h"
-#include "playerlist.h"
-#include "stacklist.h"
-#include "citylist.h"
+#include "player-list.h"
+#include "stack-list.h"
+#include "city-list.h"
 #include "city.h"
-#include "herotemplates.h"
+#include "hero-templates.h"
 #include "game.h"
-#include "xmlhelper.h"
-#include "GameScenarioOptions.h"
-#include "SightMap.h"
-#include "Sage.h"
+#include "xml-helper.h"
+#include "game-scenario-options.h"
+#include "sight-map.h"
+#include "sage.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
 RealPlayer::RealPlayer(Glib::ustring name, guint32 armyset,
-                       std::vector<Gdk::RGBA> colors, int width, int height,
-                       Player::Type type, int player_no)
-    :Player(name, armyset, colors, width, height, type, player_no),
+                       Shield::Color shield, int width, int height,
+                       Player::Type type)
+    :Player(name, armyset, shield, width, height, type),
     d_abort_requested(false)
 {
 }
@@ -62,12 +61,11 @@ RealPlayer::RealPlayer(XML_Helper* helper)
 
 bool RealPlayer::save(XML_Helper* helper) const
 {
-    // This may seem a bit dumb, but allows derived players (especially
-    // AI's) to save additional data, such as character types or so.
+    // This allows computer players to save additional data
     bool retval = true;
-    retval &= helper->openTag(Player::d_tag);
-    retval &= Player::save(helper);
-    retval &= helper->closeTag();
+    retval &= helper->open_tag(Player::d_tag);
+    retval &= Player::saveContents(helper);
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -77,15 +75,15 @@ void RealPlayer::abortTurn()
   aborted_turn.emit();
 }
 
-bool RealPlayer::startTurn()
+void RealPlayer::startTurn(sigc::slot<void(bool)> finish)
 {
-  return false;
+  finish (false);
 }
 
 void RealPlayer::endTurn()
 {
   pruneActionlist();
-  reportEndOfTurn();
+  recordEndOfTurn();
   //this is where a lot of signals are piling up
 }
 
@@ -143,15 +141,22 @@ bool RealPlayer::chooseQuest(Hero *hero)
   return true;
 }
 
-void RealPlayer::heroGainsLevel(Hero* a)
+void RealPlayer::heroGainsLevel(Hero* a, Army::Stat stat)
 {
     // the standard human player just asks the GUI what to do
-    Army::Stat stat = sheroGainsLevel.emit(a);
     doHeroGainsLevel(a, stat);
     addAction(new Action_Level(a, stat));
 }
 
-bool RealPlayer::computerChooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+CityDefeatedChoice RealPlayer::chooseCityDefeatedAction (City *c, Stack *s)
+{
+  (void) c;
+  (void) s;
+  //we don't do this, instead we go out to the gui to ask
+  return CityDefeatedChoice::CITY_DEFEATED_OCCUPY;
+}
+
+bool RealPlayer::chooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -161,7 +166,7 @@ bool RealPlayer::computerChooseVisitRuin(Stack *stack, Vector<int> dest, guint32
   return true;
 }
 
-bool RealPlayer::computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool RealPlayer::choosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -171,7 +176,7 @@ bool RealPlayer::computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32
   return true;
 }
 
-bool RealPlayer::computerChooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool RealPlayer::chooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -181,7 +186,7 @@ bool RealPlayer::computerChooseVisitTempleForBlessing(Stack *stack, Vector<int> 
   return true;
 }
 
-bool RealPlayer::computerChooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool RealPlayer::chooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -191,7 +196,7 @@ bool RealPlayer::computerChooseVisitTempleForQuest(Stack *stack, Vector<int> des
   return true;
 }
 
-bool RealPlayer::computerChooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns)
+bool RealPlayer::chooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) quest;
@@ -201,4 +206,3 @@ bool RealPlayer::computerChooseContinueQuest(Stack *stack, Quest *quest, Vector<
   //this decision callback is only for computer players
   return true;
 }
-// End of file

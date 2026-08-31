@@ -1,73 +1,188 @@
-//  Copyright (C) 2011, 2014, 2015 Ben Asselstine
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU Library General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
-
-#pragma once
-#ifndef NEW_NETWORK_GAME_DIALOG_H
-#define NEW_NETWORK_GAME_DIALOG_H
-
 #include <gtkmm.h>
-
-#include "ucompose.hpp"
+#include "lw-dialog-base.h"
+#ifndef NEW_NET_GAME_DIALOG_H
+#define NEW_NET_GAME_DIALOG_H
+#include "join-game-dialog.h"
+#include "profile-list.h"
+#include "profile.h"
 #include "lw-dialog.h"
-class Profile;
-// dialog for choosing between a hosted game and a game we connect to
-class NewNetworkGameDialog: public LwDialog
+#include "profile-manager-dialog.h"
+
+class NewNetGameDialog: public LwDialogBase
 {
- public:
-    NewNetworkGameDialog(Gtk::Window &parent, bool force_server);
-    ~NewNetworkGameDialog() {};
+public:
+    static std::string get_resource_name ()
+      {
+        return "new-net-game.ui";
+      }
 
-    Profile* getProfile() const {return d_profile;};
-    bool isClient() {return client_radiobutton->get_active();};
-    bool isAdvertised() {return advertise_checkbutton->get_active();};
-    bool isRemotelyHosted() {return remote_checkbutton->get_active();};
-    void hide() {dialog->hide();};
-    bool run();
-    
- private:
-  Gtk::RadioButton *client_radiobutton;
-  Gtk::RadioButton *server_radiobutton;
-  Gtk::Button *accept_button;
-  Gtk::Button *add_button;
-  Gtk::Button *remove_button;
-  Gtk::CheckButton *advertise_checkbutton;
-  Gtk::CheckButton *remote_checkbutton;
-  Gtk::TreeView *profiles_treeview;
-    class ProfilesColumns: public Gtk::TreeModelColumnRecord {
-    public:
-	ProfilesColumns() 
-        { add(nickname); add(profile);}
-	
-	Gtk::TreeModelColumn<Glib::ustring> nickname;
-	Gtk::TreeModelColumn<Profile*> profile;
-    };
-    const ProfilesColumns profiles_columns;
-    Glib::RefPtr<Gtk::ListStore> profiles_list;
-    Profile *d_profile;
+    NewNetGameDialog (BaseObjectType* o,
+                      const Glib::RefPtr<Gtk::Builder>& xml)
+      : LwDialogBase (o, xml)
+      {
+        m_cancel_button = load <Gtk::Button> ("cancel_button");
+        m_host_button = load <Gtk::Button> ("host_button");
+        m_join_button = load <Gtk::Button> ("join_button");
+        m_listbox = load <Gtk::ListBox> ("profiles_listbox");
+        m_profile_manager_button = load <Gtk::Button> ("profile_manager_button");
+      }
 
-  void update_buttons();
-  void add_profile(Profile *profile);
-  void on_remove_button_clicked();
-  void on_add_button_clicked();
-  void select_preferred_profile(Glib::ustring user);
-  void on_profile_selected();
-  void on_client_radiobutton_toggled();
-  void on_remote_checkbutton_toggled();
-  void on_profile_activated();
+    void setup ()
+      {
+        set_response (m_cancel_button, Gtk::ResponseType::CANCEL);
+        set_response (m_host_button, Gtk::ResponseType::ACCEPT);
+        set_response (m_join_button, Gtk::ResponseType::REJECT);
+
+        fill_profiles ();
+        update_buttons ();
+
+        m_profile_manager_button->signal_clicked ().connect
+          ([this] ()
+           {
+              auto d = LwDialog::build<ProfileManagerDialog> (this);
+              d->setup ();
+              d->signal_response ().connect
+                ([this, d] (Gtk::ResponseType)
+                 {
+                   Profilelist::instance ()->save ();
+                   fill_profiles ();
+                   update_buttons ();
+                   delete d;
+                 });
+           });
+
+        m_conn = m_listbox->signal_row_selected ().connect
+          ([this] (Gtk::ListBoxRow*)
+           {
+             update_buttons ();
+           });
+
+        signal_response ().connect
+          ([this](Gtk::ResponseType resp)
+           {
+             m_conn.disconnect ();
+             hide ();
+
+             auto it = Profilelist::instance ()->begin ();
+             std::advance (it, get_selected_index ());
+             auto profile = *it;
+
+             switch (resp)
+               {
+               case Gtk::ResponseType::ACCEPT: //host a game
+                 m_start_server.emit (profile);
+                 break;
+
+               case Gtk::ResponseType::REJECT: //join a game
+                   {
+                     auto d = LwDialog::build<JoinGameDialog> (this);
+                     d->setup (profile);
+                     d->signal_game_selected ().connect
+                       ([this, profile] (Glib::ustring host, guint32 port)
+                        {
+                          m_start_client.emit (host, port, profile);
+                        });
+                   }
+                 break;
+
+               default:
+                 break;
+               }
+           });
+      }
+
+    sigc::signal<void(Glib::ustring,unsigned short, Profile*)> signal_start_client ()
+      {
+        return m_start_client;
+      }
+
+    sigc::signal<void(Profile*)> signal_start_server ()
+      {
+        return m_start_server;
+      }
+
+private:
+    Gtk::ListBox *m_listbox;
+    Gtk::Button *m_cancel_button;
+    Gtk::Button *m_host_button;
+    Gtk::Button *m_join_button;
+    Gtk::Button *m_profile_manager_button;
+    int m_default_index = -1;
+    sigc::connection m_conn;
+
+    sigc::signal<void(Glib::ustring,unsigned short, Profile*)> m_start_client;
+    sigc::signal<void(Profile*)> m_start_server;
+
+    void fill_profiles ()
+      {
+        m_default_index = -1;
+        int i = 0;
+        for (auto p : *Profilelist::instance ())
+          {
+            if (p == Profilelist::instance ()->getDefaultProfile ())
+              m_default_index = i;
+            i++;
+          }
+        refresh_list ();
+      }
+
+    void refresh_list ()
+      {
+        while (auto* child = m_listbox->get_first_child ())
+          m_listbox->remove (*child);
+
+        int i = 0;
+        for (auto p : *Profilelist::instance ())
+          {
+            auto* row_box =
+              Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 8);
+
+            auto* name_label = Gtk::make_managed<Gtk::Label>(p->getNickname ());
+
+            name_label->set_hexpand (true);
+            name_label->set_halign (Gtk::Align::START);
+
+            row_box->append (*name_label);
+
+            if (i == m_default_index)
+              {
+                auto* default_label =
+                  Gtk::make_managed<Gtk::Label>("(" + _("Default") + ")");
+
+                default_label->add_css_class ("dim-label");
+                row_box->append (*default_label);
+              }
+
+            auto* row = Gtk::make_managed<Gtk::ListBoxRow> ();
+            row->set_child (*row_box);
+
+            m_listbox->append (*row);
+            i++;
+          }
+
+        if (m_default_index >= 0)
+          {
+            auto* row = m_listbox->get_row_at_index (m_default_index);
+            if (row)
+              m_listbox->select_row (*row);
+          }
+      }
+
+    int get_selected_index ()
+      {
+        auto* row = m_listbox->get_selected_row ();
+
+        if (!row)
+          return -1;
+
+        return row->get_index ();
+      }
+
+    void update_buttons ()
+      {
+        bool active = get_selected_index () != -1;
+        m_join_button->set_sensitive (active);
+        m_host_button->set_sensitive (active);
+      }
 };
-
 #endif

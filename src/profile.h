@@ -1,4 +1,4 @@
-//  Copyright (C) 2011, 2014 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef PROFILE_H
@@ -64,10 +63,10 @@ class Profile
         Glib::ustring getNickname() const {return d_nickname;};
 
         //! Get the date of the last time this profile played a network game.
-        Glib::TimeVal getLastPlayedOn() const {return d_last_played_date;};
+        Glib::DateTime getLastPlayedOn() const {return d_last_played_date;};
 
         //! Get the date of when this profile was created.
-        Glib::TimeVal getCreatedOn() const {return d_creation_date;};
+        Glib::DateTime getCreatedOn() const {return d_creation_date;};
 
         //! Get the user name of the profile.
         Glib::ustring getUserName() const {return d_user;};
@@ -98,17 +97,17 @@ class Profile
 
 	// DATA
 	
-	//! The id of the game.
+	//! The id of the profile.
 	Glib::ustring d_id;
 
         Glib::ustring d_nickname;
 
         Glib::ustring d_user;
 
-        Glib::TimeVal d_creation_date;
+        Glib::DateTime d_creation_date;
 
-        Glib::TimeVal d_last_played_date;
+        Glib::DateTime d_last_played_date;
 
 };
 
-#endif // PROFILE_H
+#endif

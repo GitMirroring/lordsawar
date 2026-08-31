@@ -1,7 +1,7 @@
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2003, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2003, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,58 +15,61 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include "counter.h"
 
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
-Glib::ustring FL_Counter::d_tag = "counter";
+#include "defs.h"
+Glib::ustring ID_Counter::d_tag = "counter";
 
-FL_Counter* fl_counter;
+ID_Counter* id_counter;
 
-FL_Counter::FL_Counter(guint32 start)
-    :d_curID(start)
+ID_Counter::ID_Counter ()
+{
+  //we reserve the first bunch of ids for players
+  //and those ids equate to what we see in shield.h for Shield::Color.
+  //8 is neutral, so that means 9 is our first id
+  m_current_id = MAX_PLAYERS + 1;
+}
+
+ID_Counter::ID_Counter (const ID_Counter &c)
+ : sigc::trackable (c), m_current_id (c.m_current_id)
 {
 }
 
-FL_Counter::FL_Counter (const FL_Counter &c)
- : sigc::trackable (c), d_curID (c.d_curID)
+ID_Counter::ID_Counter (XML_Helper* helper)
 {
+  helper->get (m_current_id, "curID");
 }
 
-FL_Counter::FL_Counter(XML_Helper* helper)
+void ID_Counter::sync_to_id (guint32 id)
 {
-    helper->getData(d_curID, "curID");
+  if (id > m_current_id)
+    m_current_id = id;
 }
 
-void FL_Counter::syncToId(guint32 id)
+guint32 ID_Counter::get_next_id ()
 {
-  if (id > d_curID)
-    d_curID = id;
-}
-
-guint32 FL_Counter::getNextId()
-{
-  guint32 ret = d_curID;
-  d_curID++;
+  guint32 ret = m_current_id;
+  m_current_id++;
   return ret;
 }
 
-bool FL_Counter::save(XML_Helper* helper)
+bool ID_Counter::save (XML_Helper* helper)
 {
-    bool retval =true;
+  bool retval =true;
 
-    retval &= helper->openTag(FL_Counter::d_tag);
-    retval &= helper->saveData("curID", d_curID);
-    retval &= helper->closeTag();
+  retval &= helper->open_tag (ID_Counter::d_tag);
+  retval &= helper->save ("curID", m_current_id);
+  retval &= helper->close_tag ();
 
-    return retval;
+  return retval;
 }
 
-void FL_Counter::reset (FL_Counter *f)
+void ID_Counter::reset (ID_Counter *f)
 {
-  delete fl_counter;
-  fl_counter = f;
+  delete id_counter;
+  id_counter = f;
 }

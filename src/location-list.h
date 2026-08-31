@@ -1,8 +1,8 @@
-// Copyright (C) 2001, 2003 Michael Bartl
-// Copyright (C) 2004 Ulf Lorenz
-// Copyright (C) 2005, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2001, 2003 Michael Bartl
+//  Copyright (C) 2004 Ulf Lorenz
+//  Copyright (C) 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2012, 2014, 2015, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef LOCATIONLIST_H
@@ -27,11 +26,11 @@
 #include <algorithm>
 #include <list>
 #include <map>
-#include "PathCalculator.h"
+#include "path-calculator.h"
 #include "vector.h"
 #include "stack.h"
-#include "maptile.h"
-#include "Location.h"
+#include "map-tile.h"
+#include "location.h"
 
 //! A template for holding and operatig on lists of Location objects.
 /** A list for object instances
@@ -60,11 +59,13 @@ template<class T> class LocationList : public std::list<T>
 	    d_object[pos] = t;
 	  }
     }
+
   void replace (T o, T n)
     {
       subtract (o);
       add (n);
     }
+
   void subtract(T t)
     {
       this->erase(std::find(this->begin(), this->end(), t));
@@ -153,7 +154,7 @@ void resizeLocations(Maptile::Building building_type, guint32 tile_width, guint3
       PathCalculator pc(stack, true, 0, 0);
       for (typename LocationList<T>::const_iterator it = this->begin(); it != this->end(); ++it)
         {
-          int delta = pc.calculate((*it)->getPos());
+          int delta = pc.calculateMoves((*it)->getPos());
           if (delta <= 0)
             continue;
 	  if (filters)
@@ -297,6 +298,4 @@ void resizeLocations(Maptile::Building building_type, guint32 tile_width, guint3
 
 };
 
-#endif // LOCATIONLIST_H
-
-// End of file
+#endif

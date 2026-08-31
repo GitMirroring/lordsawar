@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2011, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,16 +12,15 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 //#include <iostream>
 #include <fstream>
 #include <sstream>
 #include "recently-played-game.h"
-#include "playerlist.h"
-#include "citylist.h"
-#include "xmlhelper.h"
+#include "player-list.h"
+#include "city-list.h"
+#include "xml-helper.h"
 #include "profile.h"
 
 Glib::ustring RecentlyPlayedGame::d_tag = "recentlyplayedgame";
@@ -30,30 +29,33 @@ Glib::ustring RecentlyPlayedGame::d_tag = "recentlyplayedgame";
 #define debug(x)
 
 RecentlyPlayedGame::RecentlyPlayedGame(GameScenario *game_scenario, Profile *p)
- : d_id (game_scenario->getId()), d_last_played(Glib::TimeVal()),
+ : d_id (game_scenario->getId()), d_last_played(Glib::DateTime()),
     d_round (game_scenario->getRound()),
-    d_number_of_cities (Citylist::getInstance()->size()),
-    d_number_of_players (Playerlist::getInstance()->size() - 1),
+    d_number_of_cities (Citylist::instance()->size()),
+    d_number_of_players (Playerlist::instance()->size() - 1),
     d_playmode (GameScenario::PlayMode(game_scenario->getPlayMode())),
     d_name (game_scenario->getName()), d_profile_id (p->getId())
 {
-  d_last_played.assign_current_time();
+  d_last_played = Glib::DateTime::create_now_local ();
 }
 
 RecentlyPlayedGame::RecentlyPlayedGame(XML_Helper* helper)
 {
-  helper->getData(d_id, "id");
+  helper->get(d_id, "id");
   Glib::ustring s;
-  helper->getData(s, "last_played_on");
-  d_last_played.assign_from_iso8601(s);
-  helper->getData(d_round, "round");
-  helper->getData(d_number_of_cities, "number_of_cities");
-  helper->getData(d_number_of_players, "number_of_players");
+  helper->get(s, "last_played_on");
+  if (s == "")
+    d_last_played = Glib::DateTime::create_now_local ();
+  else
+    d_last_played = Glib::DateTime::create_from_iso8601(s);
+  helper->get(d_round, "round");
+  helper->get(d_number_of_cities, "number_of_cities");
+  helper->get(d_number_of_players, "number_of_players");
   Glib::ustring playmode_str;
-  helper->getData(playmode_str, "playmode");
+  helper->get(playmode_str, "playmode");
   d_playmode = GameScenario::playModeFromString(playmode_str);
-  helper->getData(d_name, "name");
-  helper->getData(d_profile_id, "profile_id");
+  helper->get(d_name, "name");
+  helper->get(d_profile_id, "profile_id");
 }
         
 RecentlyPlayedGame::RecentlyPlayedGame(Glib::ustring id, Glib::ustring profile_id, 
@@ -61,11 +63,10 @@ RecentlyPlayedGame::RecentlyPlayedGame(Glib::ustring id, Glib::ustring profile_i
                                        guint32 num_players, 
                                        GameScenario::PlayMode mode, 
                                        Glib::ustring name)
-: d_id(id), d_last_played(Glib::TimeVal()), d_round(round), 
+: d_id(id), d_last_played(Glib::DateTime::create_now_local ()), d_round(round), 
     d_number_of_cities(num_cities), d_number_of_players(num_players),
     d_playmode(mode), d_name(name), d_profile_id(profile_id)
 {
-  d_last_played.assign_current_time();
 }
 
 RecentlyPlayedGame::RecentlyPlayedGame(const RecentlyPlayedGame &orig)
@@ -79,16 +80,16 @@ RecentlyPlayedGame::RecentlyPlayedGame(const RecentlyPlayedGame &orig)
 bool RecentlyPlayedGame::saveContents(XML_Helper *helper) const
 {
   bool retval = true;
-  retval &= helper->saveData("id", d_id);
-  Glib::ustring s = d_last_played.as_iso8601();
-  retval &= helper->saveData("last_played_on", s);
-  retval &= helper->saveData("round", d_round);
-  retval &= helper->saveData("number_of_cities", d_number_of_cities);
-  retval &= helper->saveData("number_of_players", d_number_of_players);
+  retval &= helper->save("id", d_id);
+  Glib::ustring s = d_last_played.format_iso8601();
+  retval &= helper->save("last_played_on", s);
+  retval &= helper->save("round", d_round);
+  retval &= helper->save("number_of_cities", d_number_of_cities);
+  retval &= helper->save("number_of_players", d_number_of_players);
   Glib::ustring playmode_str = GameScenario::playModeToString(d_playmode);
-  retval &= helper->saveData("playmode", playmode_str);
-  retval &= helper->saveData("name", d_name);
-  retval &= helper->saveData("profile_id", d_profile_id);
+  retval &= helper->save("playmode", playmode_str);
+  retval &= helper->save("name", d_name);
+  retval &= helper->save("profile_id", d_profile_id);
   retval &= doSave(helper);
   return retval;
 }
@@ -96,7 +97,7 @@ bool RecentlyPlayedGame::saveContents(XML_Helper *helper) const
 RecentlyPlayedGame* RecentlyPlayedGame::handle_load(XML_Helper *helper)
 {
   Glib::ustring mode_str;
-  helper->getData(mode_str, "playmode");
+  helper->get(mode_str, "playmode");
   GameScenario::PlayMode mode = GameScenario::playModeFromString(mode_str);
   switch (mode)
     {
@@ -111,9 +112,9 @@ RecentlyPlayedGame* RecentlyPlayedGame::handle_load(XML_Helper *helper)
 bool RecentlyPlayedGame::save(XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->openTag(RecentlyPlayedGame::d_tag);
+  retval &= helper->open_tag(RecentlyPlayedGame::d_tag);
   retval &= saveContents(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
   return retval;
 }
 
@@ -134,7 +135,7 @@ RecentlyPlayedHotseatGame::RecentlyPlayedHotseatGame(const RecentlyPlayedHotseat
 RecentlyPlayedHotseatGame::RecentlyPlayedHotseatGame(XML_Helper *helper)
 	:RecentlyPlayedGame(helper)
 {
-  helper->getData(d_filename, "filename");
+  helper->get(d_filename, "filename");
 }
 
 RecentlyPlayedHotseatGame::~RecentlyPlayedHotseatGame()
@@ -144,7 +145,7 @@ RecentlyPlayedHotseatGame::~RecentlyPlayedHotseatGame()
 bool RecentlyPlayedHotseatGame::doSave(XML_Helper *helper) const
 {
   bool retval = true;
-  retval &= helper->saveData("filename", d_filename);
+  retval &= helper->save("filename", d_filename);
   return retval;
 }
 
@@ -182,8 +183,8 @@ RecentlyPlayedNetworkedGame::RecentlyPlayedNetworkedGame(const RecentlyPlayedNet
 RecentlyPlayedNetworkedGame::RecentlyPlayedNetworkedGame(XML_Helper *helper)
 	:RecentlyPlayedGame(helper)
 {
-  helper->getData(d_host, "host");
-  helper->getData(d_port, "port");
+  helper->get(d_host, "host");
+  helper->get(d_port, "port");
 }
 
 RecentlyPlayedNetworkedGame::~RecentlyPlayedNetworkedGame()
@@ -193,8 +194,8 @@ RecentlyPlayedNetworkedGame::~RecentlyPlayedNetworkedGame()
 bool RecentlyPlayedNetworkedGame::doSave(XML_Helper *helper) const
 {
   bool retval = true;
-  retval &= helper->saveData("host", d_host);
-  retval &= helper->saveData("port", d_port);
+  retval &= helper->save("host", d_host);
+  retval &= helper->save("port", d_port);
   return retval;
 }
 

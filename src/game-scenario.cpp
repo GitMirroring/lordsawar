@@ -1,9 +1,9 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014, 2015, 2017, 2020,
-// 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014, 2015, 2017, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
 #include <iostream>
@@ -29,61 +28,63 @@
 #include <string.h>
 
 #include "ucompose.hpp"
-#include "GameScenario.h"
-#include "MapGenerator.h"
-#include "playerlist.h"
-#include "FogMap.h"
-#include "citylist.h"
-#include "ruinlist.h"
-#include "SightMap.h"
-#include "rewardlist.h"
-#include "templelist.h"
-#include "bridgelist.h"
-#include "portlist.h"
-#include "roadlist.h"
-#include "stonelist.h"
-#include "signpostlist.h"
+#include "game-scenario.h"
+#include "map-generator.h"
+#include "player-list.h"
+#include "fog-map.h"
+#include "city-list.h"
+#include "ruin-list.h"
+#include "sight-map.h"
+#include "reward-list.h"
+#include "temple-list.h"
+#include "bridge-list.h"
+#include "port-list.h"
+#include "road-list.h"
+#include "stone-list.h"
+#include "signpost-list.h"
 #include "city.h"
 #include "ruin.h"
-#include "File.h"
-#include "armysetlist.h"
-#include "tilesetlist.h"
-#include "citysetlist.h"
-#include "shieldsetlist.h"
-#include "stacklist.h"
+#include "file.h"
+#include "army-set-list.h"
+#include "tile-set-list.h"
+#include "city-set-list.h"
+#include "shield-set-list.h"
+#include "stack-list.h"
 #include "stack.h"
-#include "GameMap.h"
+#include "game-map.h"
 #include "player.h"
-#include "Configuration.h"
-#include "real_player.h"
-#include "ai_dummy.h"
-#include "AI_Diplomacy.h"
-#include "AI_Analysis.h"
-#include "ai_fast.h"
+#include "configuration.h"
+#include "real-player.h"
+#include "ai-dummy.h"
+#include "ai-diplomacy.h"
+#include "ai-analysis.h"
+#include "ai-fast.h"
 #include "counter.h"
 #include "army.h"
-#include "QuestsManager.h"
-#include "Itemlist.h"
-#include "vectoredunitlist.h"
+#include "quest-manager.h"
+#include "item-list.h"
+#include "vectored-unit-list.h"
 #include "history.h"
-#include "xmlhelper.h"
-#include "tarhelper.h"
-#include "stacktile.h"
+#include "xml-helper.h"
+#include "tar-helper.h"
+#include "stack-tile.h"
 #include "file-compat.h"
-#include "Item.h"
+#include "item.h"
 #include "rnd.h"
-#include "game-actionlist.h"
-#include "ScenarioMedia.h"
-#include "herotemplates.h"
-#include "heroproto.h"
+#include "game-action-list.h"
+#include "scenario-media.h"
+#include "hero-templates.h"
+#include "hero-proto.h"
 #include "character.h"
 #include "keeper.h"
+#include "create-scenario.h"
+#include "create-scenario-randomize.h"
 
 Glib::ustring GameScenario::d_tag = "scenario";
 Glib::ustring GameScenario::d_top_tag = PACKAGE;
 
-sigc::signal<void> GameScenario::load_tick;
-sigc::signal<void> GameScenario::load_finish;
+sigc::signal<void(double)> GameScenario::load_tick;
+sigc::signal<void(GameScenario *)> GameScenario::load_finished;
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -94,59 +95,125 @@ GameScenario::GameScenario(Glib::ustring name,Glib::ustring comment,
     d_license(""), d_playmode(playmode), inhibit_autosave_removal(false),
     loaded_game_filename(""), d_unique (true)
 {
-    Armysetlist::getInstance();
-    Tilesetlist::getInstance();
-    Shieldsetlist::getInstance();
+    Armysetlist::instance();
+    Tilesetlist::instance();
+    Shieldsetlist::instance();
 
-    if (fl_counter == 0)
-      fl_counter = new FL_Counter();
-
+    if (id_counter == 0)
+      id_counter = new ID_Counter();
     setNewRandomId();
 }
 
 //savegame has an absolute path
-GameScenario::GameScenario(Glib::ustring savegame, bool& broken)
+GameScenario::GameScenario(Glib::ustring savegame, bool& broken, Glib::ustring &err)
  : TarFile (File::get_dirname (savegame), File::get_basename (savegame, false),
             File::get_extension (savegame)),
     d_playmode(GameScenario::HOTSEAT), inhibit_autosave_removal(false),
     loaded_game_filename(""), d_unique (true)
 {
-  Tar_Helper t(savegame, std::ios::in, broken);
-  load_tick.emit ();
+  err = "";
+  load_tick.emit (0.03);
+  Tar_Helper t (savegame, std::ios::in, broken);
+  load_tick.emit (0.06);
   if (broken == false)
     {
+      bool success;
       loaded_game_filename = savegame;
-      loadArmysets(&t);
-      load_tick.emit ();
-      loadTilesets(&t);
-      load_tick.emit ();
-      loadCitysets(&t);
-      load_tick.emit ();
-      loadShieldsets(&t);
-      load_tick.emit ();
-      std::list<Glib::ustring> ext;
-      ext.push_back(MAP_EXT);
-      ext.push_back(SAVE_EXT);
-      Glib::ustring filename = t.getFirstFile(ext, broken);
-      XML_Helper helper(filename, std::ios::in);
-      broken = loadWithHelper(helper);
-      load_tick.emit ();
-      ScenarioMedia::getInstance()->instantiateImages(t, broken);
-      load_tick.emit ();
-      ScenarioMedia::getInstance()->copySounds(t, broken);
-      load_tick.emit ();
-      helper.close();
-      File::erase(filename);
-      t.Close();
-      if (broken)
-        cleanup();
-      load_finish.emit();
+      success = loadArmysets (&t);
+      if (!success && err == "")
+        {
+          err = String::ucompose (_("Couldn't load armyset in %1"),
+                                  savegame);
+          broken = true;
+        }
+      else
+        {
+          load_tick.emit (0.13);
+          success = loadTilesets (&t);
+          if (!success && err == "")
+            {
+              err = String::ucompose (_("Couldn't load tileset in %1"),
+                                      savegame);
+              broken = true;
+            }
+          else
+            {
+              load_tick.emit (0.26);
+              success = loadCitysets (&t);
+              if (!success && err == "")
+                {
+                  err = String::ucompose (_("Couldn't load cityset in %1"),
+                                          savegame);
+                  broken = true;
+                }
+              else
+                {
+                  load_tick.emit (0.39);
+                  success = loadShieldsets (&t);
+                  if (!success && err == "")
+                    {
+                      err =
+                        String::ucompose (_("Couldn't load shieldset in %1"),
+                                          savegame);
+                      broken = true;
+                    }
+                  else
+                    {
+                      load_tick.emit (0.52);
+                      std::list<std::string> ext;
+                      ext.push_back (MAP_EXT);
+                      ext.push_back (SAVE_EXT);
+                      Glib::ustring filename = t.getFirstFile (ext, broken);
+                      XML_Helper helper (filename, std::ios::in);
+                      broken = loadWithHelper (helper);
+                      if (broken && err == "")
+                        err =
+                          String::ucompose (_("Couldn't parse scenario in %1"),
+                                            savegame);
+                      else
+                        {
+                          load_tick.emit (0.65);
+                          ScenarioMedia::instance ()->instantiateImages
+                            (t, broken);
+                          if (broken && err == "")
+                            err =
+                              String::ucompose
+                              (_("Couldn't load scenario images in %1"),
+                               savegame);
+                          else
+                            {
+                              load_tick.emit (0.78);
+
+                              ScenarioMedia::instance ()->copySounds
+                                (t, broken);
+                              if (broken && err == "")
+                                err =
+                                  String::ucompose
+                                  (_("Couldn't load scenario sounds in %1"),
+                                   savegame);
+                              load_tick.emit (0.91);
+                            }
+                        }
+                      helper.close ();
+                      File::erase (filename);
+                    }
+                }
+            }
+        }
     }
   else
     {
-      t.Close();
-      cleanup();
+      if (File::exists (savegame) && File::is_readonly (savegame))
+        err = String::ucompose (_("Couldn't open %1 for reading"), savegame);
+      else
+        err = String::ucompose (_("Couldn't scan archive in %1, not a valid file"), savegame);
     }
+                      
+  if (broken)
+    cleanup();
+  load_tick.emit (1.0);
+  load_finished.emit (this);
+  t.Close ();
 }
 
 GameScenario::GameScenario (const GameScenario &g, bool unique)
@@ -161,13 +228,18 @@ GameScenario::GameScenario (const GameScenario &g, bool unique)
 bool GameScenario::loadArmysets(Tar_Helper *t)
 {
   bool broken = false;
-  std::list<Glib::ustring> armysets = t->getFilenames(Armyset::file_extension);
-  for (std::list<Glib::ustring>::iterator it = armysets.begin();
+  std::list<std::string> armysets = t->getFilenames(Armyset::file_extension);
+  for (std::list<std::string>::iterator it = armysets.begin();
        it != armysets.end(); ++it)
     {
-      guint32 id = Armysetlist::getInstance()->import(t, *it, broken);
-      if (!broken)
-        Armysetlist::getInstance()->get(id)->instantiateImages(true, broken);
+      Armysetlist::instance()->signal_imported().connect
+        ([](int id)
+         {
+           bool broke;
+           Armysetlist::instance()->get(id)->instantiateImages(broke);
+           return;
+         });
+      Armysetlist::instance()->import_file (t, *it, broken);
     }
   return !broken;
 }
@@ -175,12 +247,17 @@ bool GameScenario::loadArmysets(Tar_Helper *t)
 bool GameScenario::loadTilesets(Tar_Helper *t)
 {
   bool broken = false;
-  std::list<Glib::ustring> tilesets = t->getFilenames(Tileset::file_extension);
+  std::list<std::string> tilesets = t->getFilenames(Tileset::file_extension);
   for (auto it: tilesets)
     {
-      guint32 id = Tilesetlist::getInstance()->import(t, it, broken);
-      if (!broken)
-        Tilesetlist::getInstance()->get(id)->instantiateImages(true, broken);
+      Tilesetlist::instance()->signal_imported().connect
+        ([](int id)
+         {
+           bool broke;
+           Tilesetlist::instance()->get(id)->instantiateImages(broke);
+           return;
+         });
+      Tilesetlist::instance()->import_file (t, it, broken);
     }
   return !broken;
 }
@@ -188,12 +265,17 @@ bool GameScenario::loadTilesets(Tar_Helper *t)
 bool GameScenario::loadCitysets(Tar_Helper *t)
 {
   bool broken = false;
-  std::list<Glib::ustring> citysets = t->getFilenames(Cityset::file_extension);
+  std::list<std::string> citysets = t->getFilenames(Cityset::file_extension);
   for (auto it: citysets)
     {
-      guint32 id = Citysetlist::getInstance()->import(t, it, broken);
-      if (!broken)
-        Citysetlist::getInstance()->get(id)->instantiateImages(true, broken);
+      Citysetlist::instance()->signal_imported().connect
+        ([](int id)
+         {
+           bool broke;
+           Citysetlist::instance()->get(id)->instantiateImages(broke);
+           return;
+         });
+      Citysetlist::instance()->import_file (t, it, broken);
     }
   return !broken;
 }
@@ -201,24 +283,29 @@ bool GameScenario::loadCitysets(Tar_Helper *t)
 bool GameScenario::loadShieldsets(Tar_Helper *t)
 {
   bool broken = false;
-  std::list<Glib::ustring> shieldsets =
+  std::list<std::string> shieldsets =
     t->getFilenames(Shieldset::file_extension);
   for (auto it: shieldsets)
     {
-      guint32 id = Shieldsetlist::getInstance()->import(t, it, broken);
-      if (!broken)
-        Shieldsetlist::getInstance()->get(id)->instantiateImages(true, broken);
+      Shieldsetlist::instance()->signal_imported().connect
+        ([](int id)
+         {
+           bool broke;
+           Shieldsetlist::instance()->get(id)->instantiateImages(broke);
+           return;
+         });
+      Shieldsetlist::instance()->import_file (t, it, broken);
     }
   return !broken;
 }
 
 void GameScenario::quickStartEvenlyDivided()
 {
-  Playerlist *plist = Playerlist::getInstance();
+  Playerlist *plist = Playerlist::instance();
   Vector <int> pos;
   // no neutral cities
   // divvy up the neutral cities among other non-neutral players
-  int cities_left = Citylist::getInstance()->size() - plist->size() + 1;
+  int cities_left = Citylist::instance()->size() - plist->size() + 1;
   unsigned int citycount[MAX_PLAYERS];
   memset (citycount, 0, sizeof (citycount));
   Playerlist::iterator pit = plist->begin();
@@ -240,13 +327,13 @@ void GameScenario::quickStartEvenlyDivided()
     {
       for (unsigned int j = 0; j < citycount[i]; j++)
 	{
-	  Player *p = plist->getPlayer(i);
+	  Player *p = plist->get (i);
 	  if (!p)
 	    continue;
 	  if (p == plist->getNeutral())
 	    continue;
-	  pos = Citylist::getInstance()->getCapitalCity(p)->getPos();
-	  City *c = Citylist::getInstance()->getNearestNeutralCity(pos);
+	  pos = Citylist::instance()->getCapitalCity(p)->getPos();
+	  City *c = Citylist::instance()->getNearestNeutralCity(pos);
 	  if (c)
 	    {
 	      //does the city contain any stacks yet?
@@ -276,25 +363,25 @@ void GameScenario::quickStartAIHeadStart()
   float head_start_factor = 0.05;
   //each AI player gets this percent of total cities.
 
-  Playerlist *plist = Playerlist::getInstance();
+  Playerlist *plist = Playerlist::instance();
   Vector <int> pos;
 
-  unsigned int citycount = Citylist::getInstance()->size() * head_start_factor;
+  unsigned int citycount = Citylist::instance()->size() * head_start_factor;
   if (citycount == 0)
     citycount = 1;
   for (unsigned int i = 0; i < MAX_PLAYERS; i++)
     {
       for (unsigned int j = 0; j < citycount; j++)
 	{
-	  Player *p = plist->getPlayer(i);
+	  Player *p = plist->get (i);
 	  if (!p)
 	    continue;
 	  if (p == plist->getNeutral())
 	    continue;
 	  if (p->getType() == Player::HUMAN)
 	    continue;
-	  pos = Citylist::getInstance()->getCapitalCity(p)->getPos();
-	  City *c = Citylist::getInstance()->getNearestNeutralCity(pos);
+	  pos = Citylist::instance()->getCapitalCity(p)->getPos();
+	  City *c = Citylist::instance()->getNearestNeutralCity(pos);
 	  if (c)
 	    {
 	      //does the city contain any stacks yet?
@@ -321,7 +408,7 @@ void GameScenario::quickStartAIHeadStart()
 
 bool GameScenario::setupFog(bool hidden_map)
 {
-  for (auto it: *Playerlist::getInstance())
+  for (auto it: *Playerlist::instance())
     {
       if (hidden_map)
 	it->getFogMap()->fill(FogMap::CLOSED);
@@ -335,10 +422,10 @@ bool GameScenario::setupStacks(bool hidden_map)
 {
   if (!hidden_map)
     return true;
-  for (Playerlist::iterator it = Playerlist::getInstance()->begin();
-       it != Playerlist::getInstance()->end(); ++it)
+  for (Playerlist::iterator it = Playerlist::instance()->begin();
+       it != Playerlist::instance()->end(); ++it)
     {
-      if ((*it) == Playerlist::getInstance()->getNeutral())
+      if ((*it) == Playerlist::getNeutral())
 	continue;
       for (Stacklist::iterator sit = (*it)->getStacklist()->begin();
 	   sit != (*it)->getStacklist()->end(); ++sit)
@@ -356,47 +443,31 @@ bool GameScenario::setupMapRewards()
 				 GameMap::getHeight() / 3);
   Reward_Map *reward = new Reward_Map(Vector<int>(step.x * 0, 0), 
 				      _("Northwestern map"), step.x, step.y);
-  Rewardlist::getInstance()->push_back(reward);
+  Rewardlist::instance()->push_back(reward);
   reward = new Reward_Map(Vector<int>(step.x * 1, 0), 
 			  _("Northern map"), step.x, step.y);
-  Rewardlist::getInstance()->push_back(reward);
+  Rewardlist::instance()->push_back(reward);
   reward = new Reward_Map(Vector<int>(step.x * 2, 0), 
 			  _("Northeastern map"), step.x, step.y);
-  Rewardlist::getInstance()->push_back(reward);
+  Rewardlist::instance()->push_back(reward);
   reward = new Reward_Map(Vector<int>(step.x * 0, step.y * 1), 
 			  _("Western map"), step.x, step.y);
-  Rewardlist::getInstance()->push_back(reward);
+  Rewardlist::instance()->push_back(reward);
   reward = new Reward_Map(Vector<int>(step.x * 1, step.y * 1), 
 			  _("Central map"), step.x, step.y);
-  Rewardlist::getInstance()->push_back(reward);
+  Rewardlist::instance()->push_back(reward);
   reward = new Reward_Map(Vector<int>(step.x * 2, step.y * 1), 
 			  _("Eastern map"), step.x, step.y);
-  Rewardlist::getInstance()->push_back(reward);
+  Rewardlist::instance()->push_back(reward);
   reward = new Reward_Map(Vector<int>(step.x * 0, step.y * 2), 
 			  _("Southwestern map"), step.x, step.y);
-  Rewardlist::getInstance()->push_back(reward);
+  Rewardlist::instance()->push_back(reward);
   reward = new Reward_Map(Vector<int>(step.x * 1, step.y * 2), 
 			  _("Southern map"), step.x, step.y);
-  Rewardlist::getInstance()->push_back(reward);
+  Rewardlist::instance()->push_back(reward);
   reward = new Reward_Map(Vector<int>(step.x * 2, step.y * 2), 
 			  _("Southeastern map"), step.x, step.y);
-  Rewardlist::getInstance()->push_back(reward);
-  return true;
-}
-
-bool GameScenario::setupRuinOccupants()
-{
-  debug("GameScenario::setupRuinOccupants")
-    for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
-	 it != Ruinlist::getInstance()->end(); ++it)
-      {
-        if ((*it)->getOccupant () == NULL)
-          {
-            const ArmyProto *a = Keeper::randomRuinDefender ();
-            Keeper *keeper = new Keeper (a, (*it)->getPos ());
-            (*it)->setOccupant (keeper);
-          }
-      }
+  Rewardlist::instance()->push_back(reward);
   return true;
 }
 
@@ -417,14 +488,14 @@ bool GameScenario::setupRuinRewards(int difficulty)
       chance = 4;
 
     guint32 num_hidden = 0;
-    for (auto i : *Ruinlist::getInstance ())
+    for (auto i : *Ruinlist::instance ())
       if (i->isHidden ())
         num_hidden++;
-    guint32 num_not_hidden = Ruinlist::getInstance ()->size () - num_hidden;
+    guint32 num_not_hidden = Ruinlist::instance ()->size () - num_hidden;
     // first, mark some ruins as hidden for rewards
     // only til we have as many hidden ruins as we have non-hidden ruins
-    for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
-         it != Ruinlist::getInstance()->end(); ++it)
+    for (Ruinlist::iterator it = Ruinlist::instance()->begin();
+         it != Ruinlist::instance()->end(); ++it)
       {
         if ((*it)->isHidden () == false && Rnd::rand() % 100 < chance &&
             (*it)->hasSage() == false && (*it)->getReward() == NULL &&
@@ -437,15 +508,15 @@ bool GameScenario::setupRuinRewards(int difficulty)
       }
 
   // now we populate the rewards
-  for (Ruinlist::iterator it = Ruinlist::getInstance()->begin();
-       it != Ruinlist::getInstance()->end(); ++it)
+  for (Ruinlist::iterator it = Ruinlist::instance()->begin();
+       it != Ruinlist::instance()->end(); ++it)
     {
       if ((*it)->isHidden() == true)
         {
           //add it to the reward list
           Reward_Ruin *newReward = new Reward_Ruin((*it)); //make a reward
-          newReward->setName(newReward->getDescription());
-          Rewardlist::getInstance()->push_back(newReward); //add it
+          newReward->setName(newReward->generate_name ());
+          Rewardlist::instance()->push_back(newReward); //add it
         }
       else
         {
@@ -460,14 +531,14 @@ bool GameScenario::setupItemRewards()
 {
   guint32 count = 0;
   debug("GameScenario::setupItemRewards")
-  for (auto iter : *Itemlist::getInstance())
+  for (auto iter : *Itemlist::instance())
     {
       const ItemProto* templateItem = iter.second;
       Item *newItem = new Item(*templateItem, count); //instantiate it
       Reward_Item *newReward = new Reward_Item(newItem); //make a reward
       delete newItem;
-      newReward->setName(newReward->getDescription());
-      Rewardlist::getInstance()->push_back(newReward); //add it
+      newReward->setName(newReward->generate_name());
+      Rewardlist::instance()->push_back(newReward); //add it
       count++;
     }
 
@@ -476,10 +547,7 @@ bool GameScenario::setupItemRewards()
 
 bool GameScenario::setupRewards(bool hidden_map, int difficulty)
 {
-  if (Rewardlist::getInstance()->size() != 0)
-    return true;
   setupItemRewards();
-  setupRuinOccupants ();
   setupRuinRewards(difficulty);
   if (hidden_map)
     setupMapRewards();
@@ -489,19 +557,27 @@ bool GameScenario::setupRewards(bool hidden_map, int difficulty)
 bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
                                GameParameters::BuildProductionMode build)
 {
-  debug("GameScenario::setupCities")
-
-  for (Playerlist::iterator it = Playerlist::getInstance()->begin();
-       it != Playerlist::getInstance()->end(); ++it)
+  //non-random scenarios need this fixup
+  for (auto p : *Playerlist::instance ())
     {
-      if ((*it) == Playerlist::getInstance()->getNeutral())
+      if (p->getFirstCity () == NULL)
+        {
+          for (auto c : *Citylist::instance ())
+            {
+              if (c->isCapital () && c->getCapitalOwner () == p)
+                p->conquerCity (c, NULL);
+            }
+        }
+    }
+
+  for (Playerlist::iterator it = Playerlist::instance()->begin();
+       it != Playerlist::instance()->end(); ++it)
+    {
+      if ((*it) == Playerlist::getNeutral())
 	continue;
-      City *city = Citylist::getInstance()->getCapitalCity(*it);
+      City *city = Citylist::instance()->getCapitalCity(*it);
       if (city)
-	{
-	  city->deFog(city->getOwner());
-          (*it)->conquerCity(city, NULL);
-	}
+        city->deFog(city->getOwner());
     }
 
   if (quick_start == GameParameters::EVENLY_DIVIDED)
@@ -509,12 +585,12 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
   else if (quick_start == GameParameters::AI_HEAD_START)
     quickStartAIHeadStart();
 
-  for (Citylist::iterator it = Citylist::getInstance()->begin();
-       it != Citylist::getInstance()->end(); ++it)
+  for (Citylist::iterator it = Citylist::instance()->begin();
+       it != Citylist::instance()->end(); ++it)
     {
       if ((*it)->isBurnt())
         continue;
-      if ((*it)->getOwner() == Playerlist::getInstance()->getNeutral())
+      if ((*it)->getOwner() == Playerlist::getNeutral())
 	{
 	  switch (GameScenario::s_neutral_cities)
 	    {
@@ -550,8 +626,8 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
 
   //set up build production
   std::list<City*> cities;
-  for (Citylist::iterator it = Citylist::getInstance()->begin();
-       it != Citylist::getInstance()->end(); ++it)
+  for (Citylist::iterator it = Citylist::instance()->begin();
+       it != Citylist::instance()->end(); ++it)
     {
       if ((*it)->isBurnt())
         continue;
@@ -564,8 +640,8 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
   switch (build)
     {
     case GameParameters::BUILD_PRODUCTION_ALWAYS:
-      for (Citylist::iterator it = Citylist::getInstance()->begin();
-           it != Citylist::getInstance()->end(); ++it)
+      for (Citylist::iterator it = Citylist::instance()->begin();
+           it != Citylist::instance()->end(); ++it)
         {
           if ((*it)->isBurnt())
             continue;
@@ -575,12 +651,12 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
     case GameParameters::BUILD_PRODUCTION_USUALLY:
         {
           //usually means 66% have their build production turned on.
-          int target = (double)Citylist::getInstance()->size() * 0.33;
+          int target = (double)Citylist::instance()->size() * 0.33;
           int to_turn_off = cities.size() - target;
           if (to_turn_off > 0)
             {
-              for (Citylist::iterator it = Citylist::getInstance()->begin();
-                   it != Citylist::getInstance()->end(); ++it)
+              for (Citylist::iterator it = Citylist::instance()->begin();
+                   it != Citylist::instance()->end(); ++it)
                 {
                   if ((*it)->isBurnt())
                     continue;
@@ -599,12 +675,12 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
     case GameParameters::BUILD_PRODUCTION_SELDOM:
         {
           //seldom means 90% have their build production turned off.
-          int target = (double)Citylist::getInstance()->size() * 0.90;
+          int target = (double)Citylist::instance()->size() * 0.90;
           int to_turn_off = target - cities.size ();
           if (to_turn_off > 0)
             {
-              for (Citylist::iterator it = Citylist::getInstance()->begin();
-                   it != Citylist::getInstance()->end(); ++it)
+              for (Citylist::iterator it = Citylist::instance()->begin();
+                   it != Citylist::instance()->end(); ++it)
                 {
                   if ((*it)->isBurnt())
                     continue;
@@ -621,8 +697,8 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
         }
       break;
     case GameParameters::BUILD_PRODUCTION_NEVER:
-      for (Citylist::iterator it = Citylist::getInstance()->begin();
-           it != Citylist::getInstance()->end(); ++it)
+      for (Citylist::iterator it = Citylist::instance()->begin();
+           it != Citylist::instance()->end(); ++it)
         {
           if ((*it)->isBurnt())
             continue;
@@ -636,13 +712,13 @@ bool GameScenario::setupCities(GameParameters::QuickStartPolicy quick_start,
 
 void GameScenario::setupDiplomacy(bool diplomacy)
 {
-  for (auto pit: *Playerlist::getInstance())
+  for (auto pit: *Playerlist::instance())
     {
-      if (Playerlist::getInstance()->getNeutral() == pit)
+      if (Playerlist::getNeutral() == pit)
         continue;
-      for (auto it: *Playerlist::getInstance())
+      for (auto it: *Playerlist::instance())
         {
-          if (Playerlist::getInstance()->getNeutral() == it)
+          if (Playerlist::getNeutral() == it)
             continue;
           if (pit == it)
             continue;
@@ -659,46 +735,46 @@ void GameScenario::setupDiplomacy(bool diplomacy)
         }
     }
     if (diplomacy)
-      Playerlist::getInstance()->calculateDiplomaticRankings();
+      Playerlist::instance()->calculateDiplomaticRankings();
 }
 
 bool GameScenario::loadWithHelper(XML_Helper& helper)
 {
-  Armysetlist::getInstance();
-  Tilesetlist::getInstance();
-  Shieldsetlist::getInstance();
+  Armysetlist::instance();
+  Tilesetlist::instance();
+  Shieldsetlist::instance();
 
   bool broken = false;
 
-  helper.registerTag(d_top_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(Itemlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(Playerlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(GameMap::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(Citylist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(Templelist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(Ruinlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(Rewardlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(Signpostlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(Roadlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(Stonelist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(FL_Counter::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(QuestsManager::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(Bridgelist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(Portlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(VectoredUnitlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(GameActionlist::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(ScenarioMedia::d_tag, sigc::mem_fun(this, &GameScenario::load));
-  helper.registerTag(HeroTemplates::d_tag, sigc::mem_fun(this, &GameScenario::load));
+  helper.register_tag(d_top_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(Itemlist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(Playerlist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(GameMap::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(Citylist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(Templelist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(Ruinlist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(Rewardlist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(Signpostlist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(Roadlist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(Stonelist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(ID_Counter::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(QuestsManager::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(Bridgelist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(Portlist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(VectoredUnitlist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(GameActionlist::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(ScenarioMedia::d_tag, sigc::mem_fun(*this, &GameScenario::load));
+  helper.register_tag(HeroTemplates::d_tag, sigc::mem_fun(*this, &GameScenario::load));
 
-  if (!helper.parseXML())
+  if (!helper.parse_XML())
     broken = true;
 
   if (!broken)
     {
-      GameMap::getInstance()->updateStackPositions();
-      GameMap::getInstance()->calculateBlockedAvenues();
-      HeroTemplates::getInstance ()->populateHeroProtos ();
+      GameMap::instance()->updateStackPositions();
+      GameMap::instance()->calculateBlockedAvenues();
+      HeroTemplates::instance ()->populateHeroProtos ();
     }
 
   return broken;
@@ -733,6 +809,8 @@ bool GameScenario::dump(Glib::ustring filename, Glib::ustring extension) const
   Glib::ustring goodfilename = File::add_ext_if_necessary(filename, extension);
   debug("saving game to " + goodfilename);
 
+  File::erase (goodfilename);
+
   Glib::ustring tmpfile = File::get_tmp_file();
   XML_Helper helper(tmpfile, std::ios::out);
   retval &= saveWithHelper(helper);
@@ -759,7 +837,7 @@ bool GameScenario::dump(Glib::ustring filename, Glib::ustring extension) const
   t.saveFile(ts->getConfigurationFile());
  
   std::list<guint32> armysets;
-  for (auto it: *Playerlist::getInstance())
+  for (auto it: *Playerlist::instance())
     {
       guint32 armyset = it->getArmyset();
       if (std::find(armysets.begin(), armysets.end(), armyset) == armysets.end())
@@ -768,7 +846,7 @@ bool GameScenario::dump(Glib::ustring filename, Glib::ustring extension) const
 
   for (auto it: armysets)
     {
-      Armyset *as = Armysetlist::getInstance()->get(it);
+      Armyset *as = Armysetlist::instance()->get(it);
       t.saveFile(as->getConfigurationFile());
     }
 
@@ -795,15 +873,35 @@ bool GameScenario::saveGame(Glib::ustring filename, Glib::ustring extension) con
   return retval;
 }
 
-std::vector<Glib::ustring> GameScenario::getSetFiles () const
+std::vector<std::string> GameScenario::getSetFiles () const
 {
-  std::vector<Glib::ustring> sets;
+  std::vector<std::string> sets;
   sets.push_back (GameMap::getTileset()->getConfigurationFile ());
   sets.push_back (GameMap::getCityset()->getConfigurationFile ());
   sets.push_back (GameMap::getShieldset()->getConfigurationFile ());
 
+  std::vector<Armyset*> v;
   for (auto a : GameMap::getArmysets ())
+    {
+      if (a)
+        v.push_back (a);
+    }
+
+  std::sort (v.begin (), v.end (),
+    [](Armyset* a, Armyset* b)
+    {
+      return a->getId () < b->getId ();
+    });
+
+  v.erase (std::unique (v.begin (), v.end (),
+    [](Armyset* a, Armyset* b) 
+    {
+      return a->getId () == b->getId ();
+    }), v.end());
+
+  for (auto a: v)
     sets.push_back (a->getConfigurationFile ());
+
   return sets;
 }
 
@@ -813,67 +911,68 @@ bool GameScenario::saveWithHelper(XML_Helper &helper) const
 
   //start writing
   retval &= helper.begin(LORDSAWAR_SAVEGAME_VERSION);
-  retval &= helper.openTag(d_top_tag);
+  retval &= helper.open_tag(d_top_tag);
 
   //if retval is still true it propably doesn't change throughout the rest
   //now save the single object's data
-  retval &= fl_counter->save(&helper);
-  retval &= Itemlist::getInstance()->save(&helper);
-  retval &= Playerlist::getInstance()->save(&helper);
-  retval &= GameMap::getInstance()->save(&helper);
-  retval &= Citylist::getInstance()->save(&helper);
-  retval &= Templelist::getInstance()->save(&helper);
-  retval &= Ruinlist::getInstance()->save(&helper);
-  retval &= Rewardlist::getInstance()->save(&helper);
-  retval &= Signpostlist::getInstance()->save(&helper);
-  retval &= Roadlist::getInstance()->save(&helper);
-  retval &= Stonelist::getInstance()->save(&helper);
-  retval &= Portlist::getInstance()->save(&helper);
-  retval &= Bridgelist::getInstance()->save(&helper);
-  retval &= QuestsManager::getInstance()->save(&helper);
-  retval &= VectoredUnitlist::getInstance()->save(&helper);
-  retval &= GameActionlist::getInstance()->save(&helper);
-  if (HeroTemplates::getInstance()->isDefault () == false)
-    retval &= HeroTemplates::getInstance()->save(&helper);
+  retval &= id_counter->save(&helper);
+  retval &= Itemlist::instance()->save(&helper);
+  retval &= Playerlist::instance()->save(&helper);
+  retval &= GameMap::instance()->save(&helper);
+  retval &= Citylist::instance()->save(&helper);
+  retval &= Templelist::instance()->save(&helper);
+  retval &= Ruinlist::instance()->save(&helper);
+  retval &= Rewardlist::instance()->save(&helper);
+  retval &= Signpostlist::instance()->save(&helper);
+  retval &= Roadlist::instance()->save(&helper);
+  retval &= Stonelist::instance()->save(&helper);
+  retval &= Portlist::instance()->save(&helper);
+  retval &= Bridgelist::instance()->save(&helper);
+  retval &= QuestsManager::instance()->save(&helper);
+  retval &= VectoredUnitlist::instance()->save(&helper);
+  retval &= GameActionlist::instance()->save(&helper);
+  if (HeroTemplates::instance()->isDefault () == false)
+    retval &= HeroTemplates::instance()->save(&helper);
 
   //save the private GameScenario data last due to dependencies
-  retval &= helper.openTag(GameScenario::d_tag);
-  retval &= helper.saveData("id", d_id);
-  retval &= helper.saveData("name", d_name);
-  retval &= helper.saveData("comment", d_comment);
-  retval &= helper.saveData("copyright", d_copyright);
-  retval &= helper.saveData("license", d_license);
-  retval &= helper.saveData("turn", s_round);
-  retval &= helper.saveData("view_enemies", s_see_opponents_stacks);
-  retval &= helper.saveData("view_production", s_see_opponents_production);
+  retval &= helper.open_tag(GameScenario::d_tag);
+  retval &= helper.save("id", d_id);
+  retval &= helper.save("name", d_name);
+  retval &= helper.save("comment", d_comment);
+  retval &= helper.save("copyright", d_copyright);
+  retval &= helper.save("license", d_license);
+  retval &= helper.save("turn", s_round);
+  retval &= helper.save("view_enemies", s_see_opponents_stacks);
+  retval &= helper.save("view_production", s_see_opponents_production);
   Glib::ustring quest_policy_str = Configuration::questPolicyToString(GameParameters::QuestPolicy(s_play_with_quests));
-  retval &= helper.saveData("quests", quest_policy_str);
-  retval &= helper.saveData("hidden_map", s_hidden_map);
-  retval &= helper.saveData("diplomacy", s_diplomacy);
-  retval &= helper.saveData("cusp_of_war", s_cusp_of_war);
+  retval &= helper.save("quests", quest_policy_str);
+  retval &= helper.save("hidden_map", s_hidden_map);
+  retval &= helper.save("diplomacy", s_diplomacy);
+  retval &= helper.save("cusp_of_war", s_cusp_of_war);
   Glib::ustring neutral_cities_str = Configuration::neutralCitiesToString(GameParameters::NeutralCities(s_neutral_cities));
-  retval &= helper.saveData("neutral_cities", neutral_cities_str);
+  retval &= helper.save("neutral_cities", neutral_cities_str);
   Glib::ustring razing_cities_str = Configuration::razingCitiesToString(GameParameters::RazingCities(s_razing_cities));
-  retval &= helper.saveData("razing_cities", razing_cities_str);
+  retval &= helper.save("razing_cities", razing_cities_str);
   Glib::ustring vectoring_mode_str = Configuration::vectoringModeToString(GameParameters::VectoringMode(s_vectoring_mode));
-  retval &= helper.saveData("vectoring_mode", vectoring_mode_str);
+  retval &= helper.save("vectoring_mode", vectoring_mode_str);
   Glib::ustring build_prod_mode_str = Configuration::buildProductionModeToString(GameParameters::BuildProductionMode(s_build_production_mode));
-  retval &= helper.saveData("build_production_mode", build_prod_mode_str);
+  retval &= helper.save("build_production_mode", build_prod_mode_str);
   Glib::ustring sacking_mode_str = Configuration::sackingModeToString(GameParameters::SackingMode(s_sacking_mode));
-  retval &= helper.saveData("sacking_mode", sacking_mode_str);
-  retval &= helper.saveData("intense_combat", s_intense_combat);
-  retval &= helper.saveData("military_advisor", s_military_advisor);
-  retval &= helper.saveData("random_turns", s_random_turns);
-  retval &= helper.saveData("surrender_already_offered", 
+  retval &= helper.save("sacking_mode", sacking_mode_str);
+  retval &= helper.save("intense_combat", s_intense_combat);
+  retval &= helper.save("military_advisor", s_military_advisor);
+  retval &= helper.save("random_turns", s_random_turns);
+  retval &= helper.save("cities_can_produce_allies", s_cities_can_produce_allies);
+  retval &= helper.save("surrender_already_offered", 
 			    s_surrender_already_offered);
   Glib::ustring playmode_str = playModeToString(GameScenario::PlayMode(d_playmode));
-  retval &= helper.saveData("playmode", playmode_str);
+  retval &= helper.save("playmode", playmode_str);
 
-  retval &= helper.closeTag();
+  retval &= helper.close_tag();
 
-  retval &= ScenarioMedia::getInstance()->save(&helper);
+  retval &= ScenarioMedia::instance()->save(&helper);
 
-  retval &= helper.closeTag();
+  retval &= helper.close_tag();
 
   return retval;
 }
@@ -882,9 +981,9 @@ bool GameScenario::load(Glib::ustring tag, XML_Helper* helper)
 {
   if (tag == d_top_tag)
     {
-      if (helper->getVersion() != LORDSAWAR_SAVEGAME_VERSION)
+      if (helper->get_version() != LORDSAWAR_SAVEGAME_VERSION)
 	{
-          std::cerr << String::ucompose(_("saved game file has wrong version.  Expecting %1 but got %2."), LORDSAWAR_SAVEGAME_VERSION, helper->getVersion()) << std::endl;
+          std::cerr << String::ucompose(_("saved game file has wrong version.  Expecting %1 but got %2."), LORDSAWAR_SAVEGAME_VERSION, helper->get_version()) << std::endl;
 	  return false;
 	}
       return true;
@@ -893,72 +992,73 @@ bool GameScenario::load(Glib::ustring tag, XML_Helper* helper)
     {
       debug("loading scenario")
 
-      helper->getData(d_id, "id");
-      helper->getData(d_name, "name");
-      helper->getData(d_comment, "comment");
-      helper->getData(d_copyright, "copyright");
-      helper->getData(d_license, "license");
-      helper->getData(s_round, "turn");
-      helper->getData(s_see_opponents_stacks, "view_enemies");
-      helper->getData(s_see_opponents_production, "view_production");
+      helper->get(d_id, "id");
+      helper->get(d_name, "name");
+      helper->get(d_comment, "comment");
+      helper->get(d_copyright, "copyright");
+      helper->get(d_license, "license");
+      helper->get(s_round, "turn");
+      helper->get(s_see_opponents_stacks, "view_enemies");
+      helper->get(s_see_opponents_production, "view_production");
       Glib::ustring quest_policy_str;
-      helper->getData(quest_policy_str, "quests");
+      helper->get(quest_policy_str, "quests");
       s_play_with_quests = Configuration::questPolicyFromString(quest_policy_str);
-      helper->getData(s_hidden_map, "hidden_map");
-      helper->getData(s_diplomacy, "diplomacy");
-      helper->getData(s_cusp_of_war, "cusp_of_war");
+      helper->get(s_hidden_map, "hidden_map");
+      helper->get(s_diplomacy, "diplomacy");
+      helper->get(s_cusp_of_war, "cusp_of_war");
       Glib::ustring neutral_cities_str;
-      helper->getData(neutral_cities_str, "neutral_cities");
+      helper->get(neutral_cities_str, "neutral_cities");
       s_neutral_cities = Configuration::neutralCitiesFromString(neutral_cities_str);
       Glib::ustring razing_cities_str;
-      helper->getData(razing_cities_str, "razing_cities");
+      helper->get(razing_cities_str, "razing_cities");
       s_razing_cities = Configuration::razingCitiesFromString(razing_cities_str);
       Glib::ustring vectoring_mode_str;
-      helper->getData(vectoring_mode_str, "vectoring_mode");
+      helper->get(vectoring_mode_str, "vectoring_mode");
       s_vectoring_mode = Configuration::vectoringModeFromString(vectoring_mode_str);
       Glib::ustring build_prod_mode_str;
-      helper->getData(build_prod_mode_str, "build_production_mode");
+      helper->get(build_prod_mode_str, "build_production_mode");
       s_build_production_mode = Configuration::buildProductionModeFromString(build_prod_mode_str);
       Glib::ustring sacking_mode_str;
-      helper->getData(sacking_mode_str, "sacking_mode");
+      helper->get(sacking_mode_str, "sacking_mode");
       s_sacking_mode = Configuration::sackingModeFromString(sacking_mode_str);
-      helper->getData(s_intense_combat, "intense_combat");
-      helper->getData(s_military_advisor, "military_advisor");
-      helper->getData(s_random_turns, "random_turns");
-      helper->getData(s_surrender_already_offered, 
+      helper->get(s_intense_combat, "intense_combat");
+      helper->get(s_military_advisor, "military_advisor");
+      helper->get(s_random_turns, "random_turns");
+      helper->get(s_cities_can_produce_allies, "cities_can_produce_allies");
+      helper->get(s_surrender_already_offered, 
 		      "surrender_already_offered");
       Glib::ustring playmode_str;
-      helper->getData(playmode_str, "playmode");
+      helper->get(playmode_str, "playmode");
       d_playmode = GameScenario::playModeFromString(playmode_str);
 
       return true;
     }
   
-  if (tag == FL_Counter::d_tag)
+  if (tag == ID_Counter::d_tag)
     {
       debug("loading counter")
-	fl_counter = new FL_Counter(helper);
+	id_counter = new ID_Counter(helper);
       return true;
     }
 
   if (tag == Itemlist::d_tag)
     {
       debug("loading items");
-      Itemlist::getInstance(helper);
+      Itemlist::instance(helper);
       return true;
     }
 
   if (tag == Playerlist::d_tag)
     {
       debug("loading players");
-      Playerlist::getInstance(helper);
+      Playerlist::instance(helper);
       return true;
     }
 
   if (tag == GameMap::d_tag)
     {
       debug("loading map")
-	GameMap::getInstance(helper);
+	GameMap::instance(helper);
       return true;
     }
 
@@ -966,95 +1066,95 @@ bool GameScenario::load(Glib::ustring tag, XML_Helper* helper)
     {
       debug("loading cities")
 
-	Citylist::getInstance(helper);
+	Citylist::instance(helper);
       return true;
     }
 
   if (tag == Templelist::d_tag)
     {
       debug("loading temples")
-	Templelist::getInstance(helper);
+	Templelist::instance(helper);
       return true;
     }
 
   if (tag == Ruinlist::d_tag)
     {
       debug("loading ruins")
-	Ruinlist::getInstance(helper);
+	Ruinlist::instance(helper);
       return true;
     }
 
   if (tag == Rewardlist::d_tag)
     {
       debug("loading rewards")
-	Rewardlist::getInstance(helper);
+	Rewardlist::instance(helper);
       return true;
     }
 
   if (tag == Signpostlist::d_tag)
     {
       debug("loading signposts")
-	Signpostlist::getInstance(helper);
+	Signpostlist::instance(helper);
       return true;
     }
 
   if (tag == Roadlist::d_tag)
     {
       debug("loading roads")
-	Roadlist::getInstance(helper);
+	Roadlist::instance(helper);
       return true;
     }
 
   if (tag == Stonelist::d_tag)
     {
       debug("loading stones")
-	Stonelist::getInstance(helper);
+	Stonelist::instance(helper);
       return true;
     }
 
   if (tag == QuestsManager::d_tag)
     {
       debug("loading quests")
-	QuestsManager::getInstance(helper);
+	QuestsManager::instance(helper);
       return true;
     }
 
   if (tag == VectoredUnitlist::d_tag)
     {
       debug("loading vectored units")
-	VectoredUnitlist::getInstance(helper);
+	VectoredUnitlist::instance(helper);
       return true;
     }
 
   if (tag == Portlist::d_tag)
     {
       debug("loading ports")
-	Portlist::getInstance(helper);
+	Portlist::instance(helper);
       return true;
     }
 
   if (tag == Bridgelist::d_tag)
     {
       debug("loading bridges")
-	Bridgelist::getInstance(helper);
+	Bridgelist::instance(helper);
       return true;
     }
 
   if (tag == GameActionlist::d_tag)
     {
-      GameActionlist::getInstance(helper);
+      GameActionlist::instance(helper);
       return true;
     }
 
   if (tag == ScenarioMedia::d_tag)
     {
-      ScenarioMedia::getInstance(helper);
+      ScenarioMedia::instance(helper);
       return true;
     }
 
   if (tag == HeroTemplates::d_tag)
     {
-      HeroTemplates::getInstance(helper);
+      HeroTemplates::instance(helper);
       return true;
     }
   return false;
@@ -1133,11 +1233,11 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
   Glib::ustring newline = ss.str();
 
   Glib::ustring s;
-  guint32 num = Playerlist::getInstance()->countPlayersAlive();
+  guint32 num = Playerlist::instance()->countPlayersAlive();
   if (num < 2)
     errors.push_back(_("There must be at least 2 players in the scenario."));
 
-  num = Citylist::getInstance()->countCities();
+  num = Citylist::instance()->countCities();
   if (num < 2)
     errors.push_back(_("There must be at least 2 cities in the scenario."));
 
@@ -1146,9 +1246,9 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
       String::utrim (getName ()).empty () == true)
     errors.push_back(_("The scenario does not have a name."));
 
-  for (auto it: *Playerlist::getInstance())
+  for (auto it: *Playerlist::instance())
     {
-      if (it == Playerlist::getInstance()->getNeutral())
+      if (it == Playerlist::getNeutral())
         {
           if (it->getHeroes().size ())
             errors.push_back(_("Neutrals have one or more heroes."));
@@ -1156,8 +1256,8 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
         }
       if (it->isDead() == true)
 	continue;
-      if (Citylist::getInstance()->getCapitalCity(it) == NULL ||
-          Citylist::getInstance()->getCapitalCity(it)->isBurnt() == true)
+      if (Citylist::instance()->getCapitalCity(it) == NULL ||
+          Citylist::instance()->getCapitalCity(it)->isBurnt() == true)
 	{
 	  s = String::ucompose
 	    (_("The player called `%1' lacks a capital city."), 
@@ -1166,17 +1266,17 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
 	  break;
 	}
       std::vector<Character*> heroes =
-        HeroTemplates::getInstance()->getHeroes (it->getId());
-      Itemlist *il = Itemlist::getInstance ();
+        HeroTemplates::instance()->getHeroes (it->get_shield());
+      Itemlist *il = Itemlist::instance ();
       for (auto h : heroes)
         {
-          for (auto item : h->item_ids)
+          for (auto item : h->get_starting_item_ids ())
             {
               if (il->find (item) == il->end ())
                 {
                   s = String::ucompose
                     (_("The hero type called `%1' belonging to '%2' has bad starting items."),
-                     h->name, Playerlist::getInstance ()->getPlayer (h->owner)->getName ());
+                     h->get_name (), Shield::colorToFriendlyName (h->get_shield ()));
                   errors.push_back(s);
                 }
             }
@@ -1193,11 +1293,11 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
         }
       for (auto h : it->getHeroes())
         {
-          HeroTemplates *templates = HeroTemplates::getInstance ();
-          Character *c = templates->getCharacterById (h->getHeroTypeId ());
-          if (c->owner == Playerlist::getInstance ()->getNeutral ()->getId ())
+          HeroTemplates *templates = HeroTemplates::instance ();
+          Character *c = templates->getCharacterById (h->getCharacterId ());
+          if (c->get_shield () == Shield::NEUTRAL)
             continue;
-          if (!c || c->owner != it->getId ())
+          if (!c || c->get_shield () != it->get_shield ())
             {
               Vector<int> pos =
                 it->getStacklist ()->getArmyStackById (h->getId ())->getPos ();
@@ -1210,7 +1310,7 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
     }
 
   std::vector<Vector<int> >unnamed_city_pos;
-  for (auto it: *Citylist::getInstance())
+  for (auto it: *Citylist::instance())
     if (it->isUnnamed() == true)
       unnamed_city_pos.push_back (it->getPos ());
   if (unnamed_city_pos.size () > 0)
@@ -1237,7 +1337,7 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
     }
 
   std::vector<Vector<int> >unnamed_ruin_pos;
-  for (auto it: *Ruinlist::getInstance())
+  for (auto it: *Ruinlist::instance())
     if (it->isUnnamed() == true)
       unnamed_ruin_pos.push_back (it->getPos ());
   if (unnamed_ruin_pos.size () > 0)
@@ -1261,7 +1361,7 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
       warnings.push_back(s);
     }
 
-  for (auto it: *Ruinlist::getInstance())
+  for (auto it: *Ruinlist::instance())
     {
       if (it->getOccupant () && it->getOccupant ()->getName () == "" &&
           it->getOccupant()->getStack ())
@@ -1269,10 +1369,24 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
           s = String::ucompose("%1 has an unnamed keeper", it->getName ());
           errors.push_back(s);
         }
+      if (it->getReward ())
+        {
+          auto reward = it->getReward ();
+          if (reward->getType () == Reward::RUIN)
+            {
+              auto ruin_reward = dynamic_cast<Reward_Ruin*> (reward);
+              if (ruin_reward->getRuin () == NULL)
+                {
+                  s = String::ucompose("The ruin reward in %1 isn't specified", it->getName ());
+                  errors.push_back(s);
+                }
+            }
+
+        }
     }
 
   std::vector<Vector<int> >unnamed_temple_pos;
-  for (auto it: *Templelist::getInstance())
+  for (auto it: *Templelist::instance())
     {
       if (it->isUnnamed() == true)
         unnamed_temple_pos.push_back (it->getPos ());
@@ -1299,9 +1413,9 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
     }
 
   guint32 count = 0;
-  for (auto it: *Playerlist::getInstance()->getNeutral()->getStacklist())
+  for (auto it: *Playerlist::getNeutral()->getStacklist())
     {
-      if (Citylist::getInstance()->getObjectAt(it->getPos()) == NULL)
+      if (Citylist::instance()->getObjectAt(it->getPos()) == NULL)
 	count++;
     }
   if (count > 0)
@@ -1311,8 +1425,8 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
     }
 
       
-  GameMap::getInstance()->calculateBlockedAvenues();
-  if (GameMap::getInstance()->checkCityAccessibility() == false)
+  GameMap::instance()->calculateBlockedAvenues();
+  if (GameMap::instance()->checkCityAccessibility() == false)
     errors.push_back(_("Not all cities are reachable by a non-flying unit."));
 
   //any ports or bridges on land?
@@ -1332,7 +1446,7 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
   if (GameMap::checkBuildingTerrain(Maptile::SIGNPOST, false))
     errors.push_back(_("One or more signs are on water."));
   
-  for (auto it: *Itemlist::getInstance())
+  for (auto it: *Itemlist::instance())
     {
       ItemProto *i = it.second;
       if (i->getBonus (ItemProto::BANISH_WORMS) &&
@@ -1356,31 +1470,55 @@ bool GameScenario::validate(std::list<Glib::ustring> &errors, std::list<Glib::us
   return false;
 }
 
+void GameScenario::setupRuins ()
+{
+  debug("GameScenario::setupRuins")
+  for (auto r : *Ruinlist::instance ())
+    {
+      if (r->getOccupant () == NULL)
+        {
+          const ArmyProto *a = Keeper::randomRuinDefender ();
+          Keeper *keeper = new Keeper (a, r->getPos ());
+          r->setOccupant (keeper);
+        }
+    }
+  return;
+}
+
 void GameScenario::initialize(GameParameters g)
 {
-  Playerlist::getInstance()->clearAllActions();
+  Playerlist::instance()->clearAllActions();
   setupFog(g.hidden_map);
   setupCities(g.quick_start, g.build_production_mode);
+  setupRuins ();
   setupStacks(g.hidden_map);
   setupRewards(g.hidden_map, g.difficulty);
   setupDiplomacy(g.diplomacy);
   if (s_random_turns)
-    Playerlist::getInstance()->randomizeOrder();
-  nextRound();
+    Playerlist::instance()->randomizeOrder();
   if (d_playmode == GameScenario::NETWORKED)
     {
-      GameMap::getInstance()->clearStackPositions();
-      Playerlist::getInstance()->turnHumansIntoNetworkPlayers();
+      GameMap::instance()->clearStackPositions();
+      Playerlist::instance()->turnHumansIntoNetworkPlayers();
     }
   else
     autoSave();
-  GameMap::getInstance()->updateStackPositions();
+  GameMap::instance()->updateStackPositions();
 
   if (d_name == "AutoGenerated")
     {
-      if (GameMap::getInstance()->checkCityAccessibility() == false)
+      if (GameMap::instance()->checkCityAccessibility() == false)
 	exit (0);
     }
+  // the neutral player starts on round 0 and being the last in the list causes
+  // round 1 to start when it completes its first turn.
+  //
+  // this has the negative side effect of giving the neutral player a turn
+  // before anyone else.  it's not usually a problem but when they're active
+  // or defensive they can produce an extra army unit.
+  // so we take special care in the dummy (neutral) player to avoid doing
+  // anything when round is zero.
+  Playerlist::instance ()->setActiveplayer (Playerlist::getNeutral ());
 }
 
 //! Grabs the game option information out of a scenario file.
@@ -1391,20 +1529,20 @@ public:
       Tar_Helper t(filename, std::ios::in, broken);
       if (broken)
         return;
-      std::list<Glib::ustring> ext;
+      std::list<std::string> ext;
       ext.push_back(MAP_EXT);
       ext.push_back(SAVE_EXT);
-      Glib::ustring tmpfile = t.getFirstFile(ext, broken);
+      std::string tmpfile = t.getFirstFile(ext, broken);
       XML_Helper helper(tmpfile, std::ios::in);
-      helper.registerTag(GameMap::d_tag, 
-			 sigc::mem_fun(this, &ParamLoader::loadParam));
-      helper.registerTag(GameScenario::d_tag, 
-			 sigc::mem_fun(this, &ParamLoader::loadParam));
-      helper.registerTag(Playerlist::d_tag, 
-			 sigc::mem_fun(this, &ParamLoader::loadParam));
-      helper.registerTag(Player::d_tag, 
-			 sigc::mem_fun(this, &ParamLoader::loadParam));
-      bool retval = helper.parseXML();
+      helper.register_tag(GameMap::d_tag, 
+			 sigc::mem_fun(*this, &ParamLoader::loadParam));
+      helper.register_tag(GameScenario::d_tag, 
+			 sigc::mem_fun(*this, &ParamLoader::loadParam));
+      helper.register_tag(Playerlist::d_tag, 
+			 sigc::mem_fun(*this, &ParamLoader::loadParam));
+      helper.register_tag(Player::d_tag, 
+			 sigc::mem_fun(*this, &ParamLoader::loadParam));
+      bool retval = helper.parse_XML();
       helper.close();
       File::erase(tmpfile);
       if (broken == false)
@@ -1414,18 +1552,19 @@ public:
       {
 	if (tag == Playerlist::d_tag)
 	  {
-	    helper->getData(d_neutral, "neutral");
+	    helper->get(d_neutral, "neutral");
 	    return true;
 	  }
 	if (tag == Player::d_tag)
 	  {
+            int armyset_id;
 	    int type;
 	    int id;
 	    Glib::ustring name;
 	    GameParameters::Player p;
-	    helper->getData(id, "id");
+	    helper->get(id, "id");
 	    p.id = id;
-	    helper->getData(type, "type");
+	    helper->get(type, "type");
 	    switch (Player::Type(type))
 	      {
 	      case Player::HUMAN: 
@@ -1444,63 +1583,61 @@ public:
 		p.type = GameParameters::Player::HUMAN;
 		break;
 	      }
-	    helper->getData(name, "name");
+	    helper->get(name, "name");
 	    p.name = name;
-	    if (p.id != d_neutral) //is not neutral
-	      game_params.players.push_back(p);
-	    else
-	      {
-		int armyset_id;
-		helper->getData(armyset_id, "armyset");
-		Armyset *armyset = Armysetlist::getInstance()->get(armyset_id);
-		game_params.army_theme = armyset->getBaseName();
-	      }
+
+            helper->get(armyset_id, "armyset");
+            Armyset *armyset = Armysetlist::instance()->get(armyset_id);
+            game_params.army_theme[p.id] = armyset->getBaseName();
+            if (p.id != d_neutral)
+              game_params.players.push_back(p);
 
 	    return true;
 	  }
 	if (tag == GameMap::d_tag)
 	  {
-	    helper->getData(game_params.shield_theme, "shieldset");
-	    helper->getData(game_params.tile_theme, "tileset");
-	    helper->getData(game_params.city_theme, "cityset");
+	    helper->get(game_params.shield_theme, "shieldset");
+	    helper->get(game_params.tile_theme, "tileset");
+	    helper->get(game_params.city_theme, "cityset");
 	    return true;
 	  }
 	if (tag == GameScenario::d_tag)
 	  {
-	    helper->getData(game_params.name, "name");
-	    helper->getData(game_params.see_opponents_stacks, 
+	    helper->get(game_params.name, "name");
+	    helper->get(game_params.comment, "comment");
+	    helper->get(game_params.see_opponents_stacks, 
 			    "view_enemies");
-	    helper->getData(game_params.see_opponents_production, 
+	    helper->get(game_params.see_opponents_production, 
 			    "view_production");
 	    Glib::ustring quest_policy_str;
-	    helper->getData(quest_policy_str, "quests");
+	    helper->get(quest_policy_str, "quests");
 	    game_params.play_with_quests = 
 	      Configuration::questPolicyFromString(quest_policy_str);
-	    helper->getData(game_params.hidden_map, "hidden_map");
-	    helper->getData(game_params.diplomacy, "diplomacy");
-	    helper->getData(game_params.cusp_of_war, "cusp_of_war");
+	    helper->get(game_params.hidden_map, "hidden_map");
+	    helper->get(game_params.diplomacy, "diplomacy");
+	    helper->get(game_params.cusp_of_war, "cusp_of_war");
 	    Glib::ustring neutral_cities_str;
-	    helper->getData(neutral_cities_str, "neutral_cities");
+	    helper->get(neutral_cities_str, "neutral_cities");
 	    game_params.neutral_cities = 
 	      Configuration::neutralCitiesFromString(neutral_cities_str);
 	    Glib::ustring razing_cities_str;
-	    helper->getData(razing_cities_str, "razing_cities");
+	    helper->get(razing_cities_str, "razing_cities");
 	    game_params.razing_cities = 
 	      Configuration::razingCitiesFromString(razing_cities_str);
 	    Glib::ustring vectoring_mode_str;
-	    helper->getData(vectoring_mode_str, "vectoring_mode");
+	    helper->get(vectoring_mode_str, "vectoring_mode");
 	    game_params.vectoring_mode = 
 	      Configuration::vectoringModeFromString(vectoring_mode_str);
-	    helper->getData(game_params.intense_combat, 
+	    helper->get(game_params.intense_combat, 
 			    "intense_combat");
-	    helper->getData(game_params.military_advisor, 
+	    helper->get(game_params.military_advisor, 
 			    "military_advisor");
-	    helper->getData(game_params.random_turns, "random_turns");
+	    helper->get(game_params.random_turns, "random_turns");
 	    return true;
 	  }
 	return false;
       };
-    GameParameters game_params;
+    GameParameters game_params = {};
     guint32 d_neutral;
 };
 
@@ -1521,19 +1658,19 @@ public:
       if (broken)
         return;
       Glib::ustring file = File::get_basename(filename, true);
-      std::list<Glib::ustring> ext;
+      std::list<std::string> ext;
       ext.push_back(MAP_EXT);
       ext.push_back(SAVE_EXT);
-      Glib::ustring tmpfile = t.getFirstFile(ext, broken);
+      std::string tmpfile = t.getFirstFile(ext, broken);
       if (tmpfile == "")
         {
           broken = true;
           return;
         }
       XML_Helper helper(tmpfile, std::ios::in);
-      helper.registerTag(GameScenario::d_tag, 
-			 sigc::mem_fun(this, &PlayModeLoader::loadParam));
-      bool retval = helper.parseXML();
+      helper.register_tag(GameScenario::d_tag, 
+			 sigc::mem_fun(*this, &PlayModeLoader::loadParam));
+      bool retval = helper.parse_XML();
       helper.close();
       File::erase(tmpfile);
       if (broken == false)
@@ -1544,7 +1681,7 @@ public:
 	if (tag == GameScenario::d_tag)
 	  {
 	    Glib::ustring playmode_str;
-	    helper->getData(playmode_str, "playmode");
+	    helper->get(playmode_str, "playmode");
 	    play_mode = GameScenario::playModeFromString(playmode_str);
 	    return true;
 	  }
@@ -1572,18 +1709,18 @@ public:
         Tar_Helper tar(filename, std::ios::in, broken);
         if (broken)
           return;
-        std::list<Glib::ustring> ext;
+        std::list<std::string> ext;
         ext.push_back(MAP_EXT);
         ext.push_back(SAVE_EXT);
-        Glib::ustring tmpfile = tar.getFirstFile(ext, broken);
+        std::string tmpfile = tar.getFirstFile(ext, broken);
         XML_Helper helper(tmpfile, std::ios::in);
-        helper.registerTag(GameScenario::d_tag, 
-                           sigc::mem_fun(this, &DetailsLoader::loadDetails));
-        helper.registerTag(Player::d_tag, 
-                           sigc::mem_fun(this, &DetailsLoader::loadDetails));
-        helper.registerTag(City::d_tag, 
-                           sigc::mem_fun(this, &DetailsLoader::loadDetails));
-        bool retval = helper.parseXML();
+        helper.register_tag(GameScenario::d_tag, 
+                           sigc::mem_fun(*this, &DetailsLoader::loadDetails));
+        helper.register_tag(Player::d_tag, 
+                           sigc::mem_fun(*this, &DetailsLoader::loadDetails));
+        helper.register_tag(City::d_tag, 
+                           sigc::mem_fun(*this, &DetailsLoader::loadDetails));
+        bool retval = helper.parse_XML();
         helper.close();
         File::erase(tmpfile);
         if (!broken)
@@ -1594,9 +1731,9 @@ public:
       {
 	if (tag == GameScenario::d_tag)
 	  {
-	    helper->getData(name, "name");
-	    helper->getData(comment, "comment");
-	    helper->getData(id, "id");
+	    helper->get(name, "name");
+	    helper->get(comment, "comment");
+	    helper->get(id, "id");
 	    return true;
 	  }
 	if (tag == Player::d_tag)
@@ -1678,34 +1815,100 @@ void GameScenario::cleanup()
   GameActionlist::deleteInstance();
   ScenarioMedia::deleteInstance();
   HeroTemplates::deleteInstance ();
-  if (fl_counter)
+  if (id_counter)
     {
-      delete fl_counter;
-      fl_counter = 0;
+      delete id_counter;
+      id_counter = 0;
     }
   GameScenarioOptions::s_round = 0;
 }
 
 bool GameScenario::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version)
 {
-  return FileCompat::getInstance()->upgrade(filename, old_version, new_version,
+  return FileCompat::instance()->upgrade(filename, old_version, new_version,
                                             FileCompat::GAMESCENARIO, 
                                             d_top_tag);
 }
 
 void GameScenario::support_backward_compatibility()
 {
-  FileCompat::getInstance()->support_type (FileCompat::GAMESCENARIO, MAP_EXT, 
+  FileCompat::instance()->support_type (FileCompat::GAMESCENARIO, MAP_EXT, 
                                            d_top_tag, true);
-  FileCompat::getInstance()->support_type (FileCompat::GAMESCENARIO, SAVE_EXT, 
+  FileCompat::instance()->support_type (FileCompat::GAMESCENARIO, SAVE_EXT, 
                                            d_top_tag, true);
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::GAMESCENARIO, "0.2.0", "0.2.1",
      sigc::ptr_fun(&GameScenario::upgrade));
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::GAMESCENARIO, "0.2.1", "0.3.2",
      sigc::ptr_fun(&GameScenario::upgrade));
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::GAMESCENARIO, "0.3.2", "0.3.3",
      sigc::ptr_fun(&GameScenario::upgrade));
+  FileCompat::instance()->support_version
+    (FileCompat::GAMESCENARIO, "0.3.3", "0.4.0",
+     sigc::ptr_fun(&GameScenario::upgrade));
+}
+
+void GameScenario::create_and_dump (const std::string file,
+                                    const GameParameters &g,
+                                    sigc::slot<void(double)> *progress,
+                                    sigc::slot<void()> finish)
+{
+  /*
+   * this check here of file != "" is there so that
+   * creator is cleaned up before finish () is called.
+   */
+  if (file != "")
+    {
+      CreateScenario creator (g.map.width, g.map.height);
+
+      for (std::vector<GameParameters::Player>::const_iterator
+           i = g.players.begin (), end = g.players.end ();
+           i != end; ++i)
+        {
+          Player::Type type;
+          if (i->type == GameParameters::Player::EASY)
+            type = Player::AI_FAST;
+          else if (i->type == GameParameters::Player::HARD)
+            type = Player::AI_SMART;
+          else
+            type = Player::HUMAN;
+
+          int army_id = 
+            Armysetlist::instance ()->get (g.army_theme[i->id])->getId ();
+          creator.addPlayer (i->name, army_id, Shield::Color (i->id), type);
+        }
+
+      int army_id = 
+        Armysetlist::instance ()->get (g.army_theme[MAX_PLAYERS])->getId ();
+      CreateScenarioRandomize random;
+
+      creator.addNeutral (random.getPlayerName (Shield::NEUTRAL), army_id, 
+                          Player::AI_DUMMY);
+
+      creator.setMapTiles (g.tile_theme);
+      creator.setShieldset (g.shield_theme);
+      creator.setCityset (g.city_theme);
+      creator.setNoCities (g.map.cities);
+      creator.setNoRuins (g.map.ruins);
+      creator.setNoTemples (g.map.temples);
+      int num_signposts = g.map.signposts;
+      if (num_signposts == -1)
+        num_signposts = CreateScenario::calculateNumberOfSignposts
+          (g.map.width, g.map.height, g.map.grass);
+      creator.setNoSignposts (num_signposts);
+
+      creator.setPercentages (g.map.grass, g.map.water, g.map.forest,
+                              g.map.swamp, g.map.hills, g.map.mountains);
+
+      if (progress)
+        creator.progress.connect (*progress);
+
+      creator.create (g);
+      creator.dump (file);
+      random.cleanup ();
+    }
+  finish ();
+  return;
 }

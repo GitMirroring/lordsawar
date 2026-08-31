@@ -1,299 +1,126 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.96.3 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
-  <object class="GtkDialog" id="dialog">
-    <property name="can-focus">False</property>
-    <property name="title" translatable="yes">Flag Details</property>
-    <property name="destroy-with-parent">True</property>
-    <property name="type-hint">dialog</property>
-    <child internal-child="vbox">
+  <!-- interface-name tileset-flag-editor.ui -->
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkWindow" id="dialog">
+    <property name="child">
       <object class="GtkBox" id="dialog-vbox">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="margin-start">6</property>
-        <property name="margin-end">6</property>
-        <property name="margin-top">6</property>
         <property name="margin-bottom">6</property>
+        <property name="margin-end">6</property>
+        <property name="margin-start">6</property>
+        <property name="margin-top">6</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">12</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area1">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <child>
-              <object class="GtkButton" id="undo_button">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="focus-on-click">False</property>
-                <property name="receives-default">False</property>
-                <property name="opacity">0</property>
-                <property name="relief">none</property>
-                <child>
-                  <placeholder/>
-                </child>
-                <accelerator key="z" signal="activate" modifiers="GDK_CONTROL_MASK"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="redo_button">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="focus-on-click">False</property>
-                <property name="receives-default">False</property>
-                <property name="opacity">0</property>
-                <property name="relief">none</property>
-                <child>
-                  <placeholder/>
-                </child>
-                <accelerator key="z" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
-                <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="close_button">
-                <property name="label">Close</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="has-focus">True</property>
-                <property name="can-default">True</property>
-                <property name="has-default">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-underline">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack-type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
         <child>
-          <object class="GtkBox" id="outer_hbox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="spacing">24</property>
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
             <child>
-              <object class="GtkBox" id="hbox1">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
+              <object class="GtkBox" id="outer_hbox">
+                <property name="spacing">24</property>
+                <property name="vexpand">1</property>
                 <child>
-                  <object class="GtkBox" id="vbox1">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="orientation">vertical</property>
-                    <property name="spacing">12</property>
+                  <object class="GtkBox" id="hbox1">
+                    <property name="hexpand">1</property>
                     <child>
-                      <!-- n-columns=3 n-rows=3 -->
-                      <object class="GtkGrid">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="halign">center</property>
-                        <property name="column-spacing">12</property>
+                      <object class="GtkBox" id="vbox1">
+                        <property name="hexpand">1</property>
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">12</property>
                         <child>
-                          <object class="GtkBox" id="hbox2">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="orientation">vertical</property>
-                            <property name="spacing">6</property>
+                          <object class="GtkGrid">
+                            <property name="column-spacing">12</property>
+                            <property name="halign">center</property>
                             <child>
-                              <object class="GtkLabel" id="label2">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Image</property>
-                                <attributes>
-                                  <attribute name="underline" value="True"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkBox">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="halign">center</property>
+                              <object class="GtkBox" id="hbox2">
+                                <property name="orientation">vertical</property>
+                                <property name="spacing">6</property>
                                 <child>
-                                  <object class="GtkButton" id="flag_imagebutton">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">True</property>
+                                  <object class="GtkLabel" id="label2">
+                                    <property name="label" translatable="yes">Image</property>
+                                    <property name="valign">center</property>
+                                    <attributes>
+                                      <attribute name="underline" value="True"/>
+                                    </attributes>
                                   </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">0</property>
-                                  </packing>
                                 </child>
-                              </object>
-                              <packing>
-                                <property name="expand">True</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkBox" id="hbox3">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="orientation">vertical</property>
-                            <property name="spacing">6</property>
-                            <child>
-                              <object class="GtkLabel" id="label4">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Shield Set</property>
-                                <attributes>
-                                  <attribute name="underline" value="True"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkBox" id="shieldset_box">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
                                 <child>
-                                  <placeholder/>
+                                  <object class="GtkBox">
+                                    <property name="halign">center</property>
+                                    <property name="vexpand">1</property>
+                                    <child>
+                                      <object class="GtkButton" id="flag_imagebutton">
+                                        <property name="focusable">1</property>
+                                        <property name="receives-default">1</property>
+                                      </object>
+                                    </child>
+                                  </object>
                                 </child>
+                                <layout>
+                                  <property name="column">0</property>
+                                  <property name="row">0</property>
+                                </layout>
                               </object>
-                              <packing>
-                                <property name="expand">True</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="hbox3">
+                                <property name="orientation">vertical</property>
+                                <property name="spacing">6</property>
+                                <child>
+                                  <object class="GtkLabel" id="label4">
+                                    <property name="label" translatable="yes">Shield Set</property>
+                                    <property name="valign">center</property>
+                                    <attributes>
+                                      <attribute name="underline" value="True"/>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkBox" id="shieldset_box">
+                                    <property name="vexpand">1</property>
+                                  </object>
+                                </child>
+                                <layout>
+                                  <property name="column">1</property>
+                                  <property name="row">0</property>
+                                </layout>
+                              </object>
                             </child>
                           </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">0</property>
-                          </packing>
                         </child>
                         <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
+                          <object class="GtkGrid" id="preview_table">
+                            <property name="column-spacing">6</property>
+                            <property name="halign">center</property>
+                            <property name="row-spacing">6</property>
+                            <property name="vexpand">1</property>
+                          </object>
                         </child>
                       </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <!-- n-columns=3 n-rows=3 -->
-                      <object class="GtkGrid" id="preview_table">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="halign">center</property>
-                        <property name="row-spacing">6</property>
-                        <property name="column-spacing">6</property>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
                     </child>
                   </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
               </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="dialog-action_area1">
+                <property name="halign">end</property>
+                <property name="margin-top">6</property>
+                <child>
+                  <object class="GtkButton" id="close_button">
+                    <property name="focusable">1</property>
+                    <property name="halign">center</property>
+                    <property name="label">Close</property>
+                    <property name="receives-default">1</property>
+                    <property name="use-underline">1</property>
+                  </object>
+                </child>
+              </object>
             </child>
           </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
         </child>
       </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-3">close_button</action-widget>
-    </action-widgets>
+    </property>
+    <property name="destroy-with-parent">1</property>
+    <property name="title" translatable="yes">Flag Details</property>
   </object>
 </interface>

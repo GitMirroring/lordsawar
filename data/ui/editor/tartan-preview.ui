@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 1.0.2 -->
+<interface>
+  <!-- interface-name tartan-preview.ui -->
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkWindow" id="dialog">
+    <property name="child">
+      <object class="GtkBox" id="dialog-vbox">
+        <property name="margin-bottom">6</property>
+        <property name="margin-end">6</property>
+        <property name="margin-start">6</property>
+        <property name="margin-top">6</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkBox" id="contents_vbox">
+                <property name="orientation">vertical</property>
+                <property name="spacing">12</property>
+                <property name="vexpand">1</property>
+                <child>
+                  <object class="GtkBox" id="tartan_box">
+                    <property name="homogeneous">1</property>
+                    <property name="valign">center</property>
+                    <property name="vexpand">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="dialog-action_area1">
+                <property name="halign">end</property>
+                <property name="margin-top">6</property>
+                <child>
+                  <object class="GtkButton" id="close_button">
+                    <property name="focusable">1</property>
+                    <property name="halign">center</property>
+                    <property name="label">Close</property>
+                    <property name="margin-end">3</property>
+                    <property name="margin-start">3</property>
+                    <property name="use-underline">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+    <property name="modal">True</property>
+    <property name="title" translatable="yes">Preview Tartan</property>
+    <property name="width-request">0</property>
+  </object>
+</interface>

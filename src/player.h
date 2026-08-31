@@ -1,10 +1,11 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2003 Marek Publicewicz
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2005 Bryan Duff
-// Copyright (C) 2006-2011, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2003 Marek Publicewicz
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2005 Bryan Duff
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010 2011, 2014, 2015, 2017, 2020,
+//  2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,8 +19,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef PLAYER_H
@@ -36,13 +36,16 @@
 #include "army.h"
 #include "defs.h"
 #include "callback-enums.h"
+#include "shield.h"
 
+class FightResult;
 class XML_Helper;
 class Stacklist;
 class Hero;
 class HeroProto;
 class Action;
 class Action_Produce;
+class Action_Move;
 class NetworkAction;
 class History;
 class NetworkHistory;
@@ -167,16 +170,14 @@ class Player: public sigc::trackable
          *
          * @param name         The name of the player.
          * @param armyset      The Id of the player's Armyset.
-         * @param color        The player's color.
+         * @param shield       The player's index into the Shieldset.
 	 * @param width        The width of the player's FogMap.
 	 * @param height       The height of the player's FogMap.
 	 * @param type         The kind of player (Player::Type).
-	 * @param player_no    The Id of the player.  If this value is -1,
-	 *                     the next free Id it used.
          */
 	//! Default constructor.
-        Player (Glib::ustring name, guint32 armyset, std::vector<Gdk::RGBA> colors, int width,
-		int height, Type type, int player_no = -1);
+        Player (Glib::ustring name, guint32 armyset, Shield::Color shield, int width,
+		int height, Type type);
 
         //! Copy constructor.
         Player(const Player&, bool sync_ids = false);
@@ -199,11 +200,10 @@ class Player: public sigc::trackable
         //! Set the type of the player (to be used by derived classes only.)
         void setType(Type type) {d_type = type;}
 
-        //! Change the player's color.
-        void setColor(Gdk::RGBA c);
-
-        //! Change all the player's colors.
-        void setColors(std::vector<Gdk::RGBA> l);
+        void set_shield (Shield::Color shield)
+          {
+            d_shield = shield;
+          }
 
         //! Makes a player unable to die, even when having no units or cities.
         void setMortality(bool ismortal) {d_immortal = !ismortal;}
@@ -260,7 +260,9 @@ class Player: public sigc::trackable
         bool isImmortal() const {return d_immortal;}
 
         //! Return the type of the player (Player::Type).
-        guint32 getType() const {return d_type;}
+        Type getType() const {return d_type;}
+
+        bool isHuman () const {return d_type == Player::HUMAN;}
 
         /**
 	 * Return the amount of upkeep in gold pieces that the player spent 
@@ -278,10 +280,10 @@ class Player: public sigc::trackable
 	//! What rank do we have?  As a name.
 	Glib::ustring getDiplomaticTitle() const {return d_diplomatic_title;};
 
-        //! Returns the color of the player.
-	Gdk::RGBA getColor() const {return d_colors[0];}
-
-        std::vector<Gdk::RGBA> getColors () const {return d_colors;}
+        Shield::Color get_shield () const
+          {
+            return d_shield;
+          }
 
         //! Returns the amount of gold pieces the player has in the treasury.
         int getGold() const {return d_gold;}
@@ -364,6 +366,9 @@ class Player: public sigc::trackable
 	//! Count the turns we've completed.
 	guint32 countEndTurnHistoryEntries() const;
 
+        //! Return the stack move actions we've accrued this turn.
+        std::list<Action_Move*> getStackMoveActionEntries () const;
+
 	//! Add a new history item to the player's history list.
 	void addHistory(History *history);
 
@@ -378,9 +383,6 @@ class Player: public sigc::trackable
 
 	//! Return the player's currently selected stack.
 	Stack * getActivestack() const;
-
-	//! Select this stack.
-	void setActivestack(Stack *);
 
 	//! Return the position on the map for the given army unit.
 	Vector<int> getPositionOfArmyById(guint32 id) const;
@@ -456,6 +458,9 @@ class Player: public sigc::trackable
 	 * RealPlayer, AI_Fast, AI_Smart and AI_Dummy.
          */
 	//! Save the player to a saved-game file.
+        bool saveContents(XML_Helper* helper) const;
+
+        //! Like saveContents but also saves the open and close player tags.
         virtual bool save(XML_Helper* helper) const;
 
 
@@ -487,14 +492,15 @@ class Player: public sigc::trackable
          * @return False if an error occured, else true.
 	 */
         //! Callback to move a stack on the map.
-        bool stackMove(Stack* s);
-        MoveResult* stackMove(Stack* s, Vector<int> dest);
+        void stackMove(Stack* s, sigc::slot<void(MoveResult*)> after);
+
 
 	//! Callback to take the armies from the stack that have at least
 	//! enough moves to reach the end of the stack's path.
-	bool stackSplitAndMove(Stack* s, Stack *& new_stack);
-	bool stackSplitAndMoveToAttack(Stack* s, Stack *& new_stack);
-	bool stackSplitAndMoveToJoin(Stack* s, Stack *join, Stack *& new_stack);
+
+	void stackSplitAndMove(Stack* s, sigc::slot<void(MoveResult*,Stack*)> after); //stack in callback is the newly split stack
+	void stackSplitAndMoveToAttack(Stack* s, sigc::slot<void(MoveResult*, Stack*)> after);
+	void stackSplitAndMoveToJoin(Stack* s, Stack *join, sigc::slot<void(MoveResult*, Stack *)> after);
 
         /** 
 	 * Called to adjudicate a fight between two lists of stacks.
@@ -514,10 +520,10 @@ class Player: public sigc::trackable
          *         finishStackFight.
          */
 	//! Callback to adjudicate fights.
-        Fight * stackFight(Stack** attacker, Stack** defender);
+        void stackFight (Stack* attacker, Stack* defender, sigc::slot<void(Fight*)> finish);
 
         //! Finalize a fight (drop bags, delete stacks, etc)
-        void finishStackFight (Fight *fight, Stack **attacker, Stack **def);
+        void finishStackFight (Fight *fight, Stack *attacker, Stack *def);
         
         /** 
 	 * A stack searches a ruin.  The stack must contain a hero.
@@ -534,7 +540,9 @@ class Player: public sigc::trackable
 	 *                         NULL if the keeper could not be defeated.
          */
 	//! Callback to have a stack visit a ruin.
-        Reward* stackSearchRuin(Stack* stack, Ruin* ruin, bool &stackdied);
+        void stack_search_ruin
+          (Stack* stack, Ruin* ruin,
+           sigc::slot<void(Ruin*,Reward*,bool,Stack*)> finish);
 
         /** 
 	 * A stack visits a temple and becomes blessed. By blessing, the 
@@ -549,7 +557,7 @@ class Player: public sigc::trackable
          * @return The number of blessed armies.
          */
 	//! Callback to have a stack visit a temple.
-        int stackVisitTemple(Stack* stack, Temple* temple);
+        void stack_search_temple (Stack* stack, Temple* temple, sigc::slot<void(Stack *,Temple*, int)> finish);
         
         /** 
 	 * Called to ask the military advisor about what would happen 
@@ -661,21 +669,21 @@ class Player: public sigc::trackable
 
 
 	/**
-	 * Callback to pickup an Item at a particular position on the game 
+	 * Callback to pick up an Item at a particular position on the game 
 	 * map.  The item is removed from a tile on the game map, and placed
 	 * into the Hero's backback.
 	 *
 	 * For this method to make sense, the Hero should be in a Stack
-	 * that is co-located with the pickup position.  E.g. Heroes should
-	 * pickup items from the tile they are on.
+	 * that is co-located with the pick up position.  E.g. Heroes should
+	 * pick up items from the tile they are on.
 	 *
 	 * This callback must result in an Action_Equip element being 
 	 * given to the addAction method.
 	 *
 	 * @param hero             The Hero that holds the item.
-	 * @param item             The Item to pickup off of the ground.
+	 * @param item             The Item to pick up off of the ground.
 	 * @param pos              The position of the tile on the game map to 
-	 *                         pickup the item from.
+	 *                         pick up the item from.
 	 *
          * @return False on error, true otherwise.
 	 */
@@ -706,6 +714,23 @@ class Player: public sigc::trackable
         //! Callback to have a Hero complete a quest.
         bool heroCompletesQuest(Hero *hero);
 
+	/**
+	 * An expired quest.
+	 * The QuestsManager class handles removal of expired or completed 
+	 * quests.
+	 * This callback doesn't do much except record the event for
+	 * posterity (see HistoryReportDialog).
+	 *
+	 * This callback must result in a History_QuestExpired element being
+	 * added to the player's History list (Player::d_history).
+	 *
+	 * @param hero             The Hero having a quest expire.
+	 *
+         * @return False on error, true otherwise.
+	 */
+        //! Callback to have a Hero complete a quest.
+        bool heroQuestExpired (Hero *h);
+
         /** 
 	 * A hero visits a temple and receives a Quest from the temple's 
          * priests.  If there is more than one hero in the stack, the quest is 
@@ -731,6 +756,8 @@ class Player: public sigc::trackable
 	 * Called whenever a hero emerges in a city
 	 *
          * @param  hero    The hero who has offered his or her service.
+         * @param  name    The name we want to give to this hero.
+         * @param  gender  The gender we want to assign to this hero.
          * @param  city    The city where the hero is emerging.
          * @param  cost    The amount of gold pieces neccessary to recruit 
 	 *                 the hero.
@@ -738,7 +765,7 @@ class Player: public sigc::trackable
 	 * 
          * @note Only change the name and gender attributes of the Hero.
          */
-        void recruitHero(HeroProto* hero, City *city, int cost, int alliesCount, const ArmyProto *ally, StackReflist *stacks);
+        void recruitHero(HeroProto* hero, Glib::ustring name, Hero::Gender gender, City *city, int cost, int alliesCount, const ArmyProto *ally, StackReflist *stacks);
 
         /** 
 	 * Called whenever a hero advances a level.
@@ -753,7 +780,7 @@ class Player: public sigc::trackable
          * @param army     The army to raise (is always a Hero.)
          */
 	//! Callback to advance an Army's level.
-        virtual void heroGainsLevel(Hero * a) = 0;
+        virtual void heroGainsLevel(Hero * a, Army::Stat stat) = 0;
 
 
 
@@ -1007,16 +1034,19 @@ class Player: public sigc::trackable
         //! Decision callback for when a hero visits a temple.
         virtual bool chooseQuest(Hero *hero) = 0;
 
+        //! Decision callback for when a hero visits a temple.
+        virtual CityDefeatedChoice chooseCityDefeatedAction (City *c, Stack *s) = 0;
+
         //! Decision callback for when an ai player considers going to a ruin.
-        virtual bool computerChooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns) = 0;
+        virtual bool chooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns) = 0;
         //! Decision callback for when an ai player considers picking up a bag.
-        virtual bool computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns) = 0;
+        virtual bool choosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns) = 0;
         //! Decision callback for when the ai going to a temple.
-        virtual bool computerChooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns) = 0;
+        virtual bool chooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns) = 0;
         //! Decision callback for when the ai considers obtaining a quest.
-        virtual bool computerChooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns) = 0;
+        virtual bool chooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns) = 0;
         //! Decision callback for considering the next target in a quest.
-        virtual bool computerChooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns) = 0;
+        virtual bool chooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns) = 0;
 
 	// Player related actions the player can take.
 
@@ -1026,10 +1056,9 @@ class Player: public sigc::trackable
 	 * Results in a History_StartTurn event going into the player's 
 	 * Historylist.
          *
-         * @return True if everything went well.
          */
 	//! Callback to start a Player's turn.
-        virtual bool startTurn() = 0;
+        virtual void startTurn(sigc::slot<void(bool)>) = 0;
 
         virtual void abortTurn() = 0;
 
@@ -1037,6 +1066,8 @@ class Player: public sigc::trackable
 	 * This function is called before a player's turn starts.
          * The idea here is that it happens before heroes are recruited,
          * and before new army units show up in cities.
+         * It increases the player's income from cities and pays the upkeep
+         * for army units.
          */
 	//! Initialise a Player's turn.
         void initTurn();
@@ -1047,7 +1078,7 @@ class Player: public sigc::trackable
         void reportEndOfRound(guint32 score);
 
         //! record the player's end of turn.
-        void reportEndOfTurn();
+        void recordEndOfTurn();
 
         /** 
 	 * This method gives the player the specified Reward.  There are 
@@ -1077,7 +1108,7 @@ class Player: public sigc::trackable
                          bool quest);
 
         //! have a hero show up, or not.
-        bool maybeRecruitHero ();
+        void maybeRecruitHero (sigc::slot<void(int)> finish);
 
         //! Mark the player as dead. Kills all Army units in the Stacklist.
         void kill(bool record_action = true);
@@ -1095,55 +1126,12 @@ class Player: public sigc::trackable
         void stackUnpark(Stack *s);
 
         //! Select the given stack.
-        void stackSelect(Stack *s);
+        void stackSelect (Stack *s);
 
         //! Deselect any and all stacks.
-        void stackDeselect();
+        void stackDeselect ();
 
-	//! Go to a temple if we're near enough.
-	/**
-	 * Helper method to take a stack on a mission to get blessed.
-	 * If the method returns false initially, it means that the nearest 
-	 * temple is unsuitable.
-	 * @note The idea is that this method is called over subsequent turns, 
-	 * until the blessed parameter gets filled with a value of true.
-	 *
-	 * @param s            The stack to visit a temple.
-	 * @param dist         The maximum number of tiles that a temple
-	 *                     can be away from the stack, and be considered
-	 *                     for visiting.
-	 * @param percent_can_be_blessed  If the stack has this many army 
-	 *                                units that have not been blessed
-	 *                                at the temple (expressed as a
-	 *                                percent), then the temple will be
-	 *                                considered for visiting.
-	 * @param blessed      Gets filled with false if the stack didn't get 
-	 *                     blessed.  Gets filled with true if the stack 
-	 *                     got blessed at the temple.
-	 * @param stack_died   Gets filled with true if the stack got killed
-	 *                     by an enemy stack on the same square as the
-	 *                     temple.
-	 *
-	 * Returns true if the stack moved, false if it stayed still.
-	 */
-	bool AI_maybeVisitTempleForBlessing(Stack *s, int dist,
-					    double percent_can_be_blessed, 
-					    bool &blessed, bool &stack_died);
-
-        bool AI_maybeVisitTempleForQuest(Stack *s, int dist, bool &got_quest,
-                                         bool &stack_died);
-
-        bool AI_maybeVisitRuin(Stack *s, int dist, bool &visited_ruin,
-                               bool &stack_died);
-
-        Vector<int> AI_getQuestDestination(Quest *quest, Stack *stack) const;
-        bool AI_invadeCityQuestPreference(City *c, CityDefeatedAction &action) const;
-        bool AI_maybeContinueQuest(Stack *s, Quest *quest, 
-                                   bool &completed_quest, bool &stack_died);
-
-	bool AI_maybePickUpItems (Stack *s, int dist, bool &picked_up,
-				  bool &stack_died);
-
+        bool AI_invadeCityQuestPreference(City *c, CityDefeatedChoice &action) const;
 	/**
 	 * Callback to have the Player resign.  This entails disbanding
 	 * all of the player's stacks and then razing all of the player's 
@@ -1250,40 +1238,48 @@ class Player: public sigc::trackable
         //! Keeps stats of what kind of units we killed in a battle.
         void tallyDeadArmyTriumphs(std::list<Stack*> &stacks);
 
+        //! Calculate the player's score
+        /*
+         * the player's score is calculated relative to the total number of
+         * cities, gold and armies.
+         */
+        guint32 calculate_score (guint32 total_cities, guint32 total_gold,
+                                 guint32 total_armies) const;
+
+        Hero * getNearestHeroWithQuest (Vector<int> pos, int dist) const;
 
 	// Signals
 
-	/**
-	 * @param city   The city being invaded.
-	 * @param loot   The gold looted.
-	 */
-	//! Emitted when the player defeats a City.
-        sigc::signal<void, City*, int> sinvadingCity;
+        //! A city has been looted for a certain number of gp
+        sigc::signal<void(int, sigc::slot<void()>)> m_looting_city;
+
+        //! A city has been defeated by a stack and responds occupy/pillage/etc.
+        sigc::signal<void(City *, Stack *s, sigc::slot<void(CityDefeatedChoice)>)> m_city_defeated;
+
+        //! A city was pillaged for a number of gp, and an army type
+        sigc::signal<void(City*,int,int,sigc::slot<void()>)> m_city_pillaged;
+
+        //! A city was sacked for a number of gp, and a set of army types.
+        sigc::signal<void(City*,int,std::list<guint32>,sigc::slot<void()>)> m_city_sacked;
+
+        //! Asking if we should raze a city, and responding with the answer.
+        sigc::signal<void(City*,sigc::slot<void(bool)>)> m_city_raze_query;
+
+        //! Simply causing the city dialog to open at a particular city.
+        sigc::signal<void(City *, sigc::slot<void()>)> m_open_city_dialog;
+
+        //! A notififcation that a city was razed
+        sigc::signal<void(City *, sigc::slot<void()>)> m_city_razed;
 
 	/**
 	 * @param hero   The new hero that is emerging.
 	 * @param city   The city in which the hero is emerging.
 	 * @param gold   The amount of gold pieces the hero costs.
+         * @param finish The method to run when we've accepted the offer.
 	 *
-	 * @return True if we're accepting a hero, false if not.
 	 */
         //! Emitted whenever a hero is recruited.
-        sigc::signal<bool, HeroProto*, City *, int> srecruitingHero;
-
-	/**
-	 * @param army   The army that has gained a level.
-	 *
-	 * @return One of Army::Stat::STRENGTH, Army::Stat::MOVES, or 
-	 *         Army::Stat::SIGHT.
-	 */
-        //! Emitted when an Army advances a level; returns stat to raise.
-        sigc::signal<Army::Stat, Hero*> sheroGainsLevel;
-
-	/**
-	 * @param army   The army that has gotten a medal.
-	 */
-        //! Emitted whever a player's army gets a new medal.
-        sigc::signal<void, Army*, int> snewMedalArmy;
+        sigc::signal<void(HeroProto*, City *, int, sigc::slot<void(bool,Glib::ustring,Hero::Gender)> finish)> srecruitingHero;
 
 	/**
 	 * @param ruin    The ruin being searched.
@@ -1292,60 +1288,30 @@ class Player: public sigc::trackable
          * Returns whether or not the stack was deleted as a result.
 	 */
         //! Emitted by the player to search a ruin.
-        sigc::signal<bool, Ruin*, Stack*> ssearchingRuin;
+        sigc::signal<void(Stack*, sigc::slot<void(bool)> after)> ssearchingRuin;
+        //bool is if we died or not
 
 	/**
 	 * @param temple  The temple being visited.
 	 * @param stack   The stack to be blessed.
          *
-         * Returns whether or not a hero got a quest.
+         * Returns whether or not a hero got a quest, and how many army units
+         * were blessed.
 	 */
         //! Emitted by the player to visit a temple.
-        sigc::signal<bool, Temple*, Stack*> svisitingTemple;
-
-	/**
-	 * @param city   The city being occupied.
-	 * @param stack  The stack doing the occupying.
-	 */
-	//! Emitted when the player occupies a City.
-        sigc::signal<void, City*, Stack*> soccupyingCity;
-
-	/**
-	 * @param city        The city that has been pillaged.
-	 * @param stack       The stack doing the pillaging.
-	 * @param gold        The amount of gold pieces pillaged.
-	 * @param army_types  The list of Army types traded-in for gold pieces.
-	 */
-        //! Emitted whenever the player pillages a city.
-        sigc::signal<void, City*, Stack*, int, guint32> spillagingCity;
-
-	/**
-	 * @param city        The city that has been sacked.
-	 * @param stack       The stack doing the sacked.
-	 * @param gold        The amount of gold pieces sacked.
-	 * @param army_types  The list of Army types traded-in for gold pieces.
-	 */
-        //! Emitted whenever the player sacks a city.
-        sigc::signal<void, City*, Stack*, int, std::list<guint32> > ssackingCity;
-
-	/**
-	 * @param city        The city that has been razed.
-	 * @param stack       The razing stack.
-	 */
-        //! Emitted whenever the player razes a city.
-        sigc::signal<void, City*, Stack*> srazingCity;
+        sigc::signal<void (Stack*, sigc::slot<void(bool,int)> after)> svisitingTemple;
 
 	/**
 	 * Emitted when the player's treasury has been changed.
 	 */
         //! Emitted whenever a player's stats changes.
-        sigc::signal<void> schangingStats;
+        sigc::signal<void()> schangingStats;
 
 	//! Emitted whenever a computer player does something of note.
-        sigc::signal<void, Glib::ustring> schangingStatus;
+        sigc::signal<void(Glib::ustring)> schangingStatus;
 
 	//! Emitted whenever any player does anything at all.
-	sigc::signal<void> sbusy;
+	sigc::signal<void()> sbusy;
 
 	/**
 	 * Emitted when the player's stack moves, is disbanded, gets blessed,
@@ -1354,19 +1320,25 @@ class Player: public sigc::trackable
 	 * @param stack    The stack that has been altered.
 	 */
         //! Emitted whenever the stack's status has changed.
-        sigc::signal<void, Stack*> supdatingStack;
+        sigc::signal<void(Stack*)> supdatingStack;
 
         //! Emitted whenever a hero drops a bag.
-        sigc::signal<void> sbagdropped;
+        sigc::signal<void()> sbagdropped;
 
         //! Emitted whenever the active stack comes to a stop.
-        sigc::signal<void, Stack*> shaltedStack;
+        sigc::signal<void(Stack*)> shaltedStack;
 
         //! Emitted whenever the active stack comes to a stop.
-        sigc::signal<void> sstoppingStack;
+        sigc::signal<void()> sstoppingStack;
 
         //! Emitted whenever the active stack starts moving.
-        sigc::signal<void, Stack*> smovingStack;
+        sigc::signal<void(Stack*)> smovingStack;
+
+        //! Emitted whenever a stack is made active
+        sigc::signal<void(Stack*)> sselectStack;
+
+        //! Emitted whenever a stack is deselected
+        sigc::signal<void()> sdeselectStack;
 
 	/**
 	 * Emitted whenever a city is conquered or razed.
@@ -1374,72 +1346,61 @@ class Player: public sigc::trackable
 	 * @param city     The city that has been altered.
 	 */
         //! Emitted whenever the status of a city has changed.
-        sigc::signal<void, City*> supdatingCity;
+        sigc::signal<void(City*)> supdatingCity;
 
 	/**
 	 * @param fight  The details of the upcoming fight.
 	 */
 	//! Emitted when a fight has started against a city or stack.
-        sigc::signal<void, Fight &> fight_started;
+        sigc::signal<void(Fight *, sigc::slot<void(Fight*)>)> fight_started;
 
 	/**
 	 * @param city     The city we attacked.
 	 * @param result   If we won or not.
 	 */
 	//! Emitted after we attack a city.
-        sigc::signal<void, City *, Fight::Result> cityfight_finished;
+        sigc::signal<void(City *, FightResult::Outcome)> cityfight_finished;
 	
-	/**
-	 * @param attacker The player's attacking stack.
-	 * @param keeper   The keeper of the ruin.
-	 */
-	//! Emitted when a fight in a ruin is started.
-        sigc::signal<void, Stack *, Keeper *> ruinfight_started;
-
 	/**
 	 * @param result   If we defeated the ruin's keeper or not.
 	 */
 	//! Emitted when a fight in a ruin has finished.
-        sigc::signal<void, Fight::Result> ruinfight_finished;
+        sigc::signal<void(Glib::ustring hero_name, Glib::ustring keeper_name, FightResult, sigc::slot<void()> after)> m_ruinfight;
 
 	/**
 	 * @param chance   The percent chance that we will prevail in battle.
 	 */
 	//! Emitted when a player asks for help from a military advisor.
-        sigc::signal<void, float> advice_asked;
+        sigc::signal<void(float)> advice_asked;
 
 	//! Signal raised when a stack is considering an act of treachery.
-        sigc::signal<bool, Stack *, Player *, Vector<int> > streacheryStack;
+        sigc::signal<void(Stack *, Player *, Vector<int>, sigc::slot<void(bool)>)> streacheryStack;
 
         //! Player would like to end the turn.
-        sigc::signal<void> ending_turn;
+        sigc::signal<void()> ending_turn;
 
         //! Player has confirmed to abort the turn.
-        sigc::signal<void> aborted_turn;
+        sigc::signal<void()> aborted_turn;
 
-        sigc::signal<void, int> hero_arrives_with_allies;
-
-        sigc::signal<void, Item*> using_item;
-
-        sigc::signal<void, Action *, guint32> acting;
-        sigc::signal<void, History *, guint32> history_written;
+        sigc::signal<void(Action *, guint32)> acting;
+        sigc::signal<void(History *, guint32)> history_written;
 
         //! Results of using items
-        sigc::signal<void, Player*, guint32> stole_gold;
-        sigc::signal<void, Player*, guint32> sunk_ships;
-        sigc::signal<void, Hero *, guint32> bags_picked_up;
-        sigc::signal<void, Hero *, guint32> mp_added_to_hero_stack;
-        sigc::signal<void, Hero *, Glib::ustring, guint32> worms_killed;
-        sigc::signal<void, Hero *> bridge_burned;
-        sigc::signal<void, Hero *, Ruin*, Glib::ustring> keeper_captured;
-        sigc::signal<void, Hero *, Glib::ustring> monster_summoned;
-        sigc::signal<void, Hero *, Glib::ustring, guint32> city_diseased;
-        sigc::signal<void, Hero *, Glib::ustring, Glib::ustring, guint32> city_defended;
-        sigc::signal<void, Hero *, Glib::ustring, guint32> city_persuaded;
-        sigc::signal<void, Hero *, Glib::ustring> stack_teleported;
+        sigc::signal<void(Player*, guint32)> stole_gold;
+        sigc::signal<void(Player*, guint32)> sunk_ships;
+        sigc::signal<void(Hero *, guint32)> bags_picked_up;
+        sigc::signal<void(Hero *, guint32)> mp_added_to_hero_stack;
+        sigc::signal<void(Hero *, Glib::ustring, guint32)> worms_killed;
+        sigc::signal<void(Hero *)> bridge_burned;
+        sigc::signal<void(Hero *, Ruin*, Glib::ustring)> keeper_captured;
+        sigc::signal<void(Hero *, Glib::ustring)> monster_summoned;
+        sigc::signal<void(Glib::ustring, guint32)> city_diseased;
+        sigc::signal<void(Glib::ustring, Glib::ustring, guint32)> city_defended;
+        sigc::signal<void(Glib::ustring, guint32)> city_persuaded;
+        sigc::signal<void(Hero *, Glib::ustring)> stack_teleported;
         
-        sigc::signal<void, Glib::ustring> save_game;
-        sigc::signal<guint32> get_round;
+        sigc::signal<void(Glib::ustring)> save_game;
+        sigc::signal<guint32()> get_round;
 	//! Check the history to see if we ever conquered the given city.
 
 
@@ -1461,14 +1422,14 @@ class Player: public sigc::trackable
          *
          * @param name     The name of the player.
          * @param armyset  The Id of the player's Armyset.
-         * @param color    The player's colors.
+         * @param shield   The player's index into the Shieldset.
          * @param width    The width of the player's FogMap.
          * @param height   The height of the player's FogMap.
          * @param type     The player's type (Player::Type).
          */
 	//! Create a player.
         static Player* create(Glib::ustring name, guint32 armyset, 
-			      std::vector<Gdk::RGBA> colors, int width, int height, 
+			      Shield::Color shield, int width, int height, 
 			      Type type);
         
         /** 
@@ -1501,11 +1462,15 @@ class Player: public sigc::trackable
     
 
     protected:
+        void setActivestack (Stack *s);
         // do some fight cleaning up, setting
         void cleanupAfterFight(std::list<Stack*> &attackers,
                                std::list<Stack*> &defenders,
                                std::list<History*> &attacker_history,
                                std::list<History*> &defender_history);
+        void gainXPAfterFight (std::list<Stack*> &attackers,
+                               std::list<Stack*> &defenders,
+                               Fight *fight);
         
         void clearHistorylist(std::list<History*> &history);
         //! Move stack s one step forward on it's Path.
@@ -1517,11 +1482,12 @@ class Player: public sigc::trackable
         void addAction(Action *action);
 
         // DATA
-	//! The player's color.
+	//! The player's shield.
 	/**
-	 * Mask portions of images are shaded in these colors.
+         * It's an index into the shieldset.
+         * we use the colors therein to mask portions of images.
 	 */
-        std::vector<Gdk::RGBA> d_colors;
+        Shield::Color d_shield;
 
 	//! The name of the Player.
         Glib::ustring d_name;
@@ -1539,7 +1505,7 @@ class Player: public sigc::trackable
         bool d_immortal;
 
 	//! The kind of Player (see Player::Type).
-        guint32 d_type;
+        Type d_type;
 
 	//! A unique numeric identifier identifying this Player.
         guint32 d_id;
@@ -1571,14 +1537,14 @@ class Player: public sigc::trackable
 	//! How many gold pieces the Player made from taxes in the last turn.
 	guint32 d_income;
 
-	//! The diplomatic view that this Player has of each other Player.
-	DiplomaticState d_diplomatic_state[MAX_PLAYERS];
-
 	//! The diplomatic rank this Player has among all other Players.
 	guint32 d_diplomatic_rank;
 
 	//! The title that goes along with the diplomatic rank.
 	Glib::ustring d_diplomatic_title;
+
+	//! The diplomatic view that this Player has of each other Player.
+	DiplomaticState d_diplomatic_state[MAX_PLAYERS];
 
 	//! The proposals that this Player is making this turn.
 	DiplomaticProposal d_diplomatic_proposal[MAX_PLAYERS];
@@ -1595,6 +1561,8 @@ class Player: public sigc::trackable
         //! Whether or not someone has closed the main game window.
         bool abort_requested;
 
+        sigc::connection m_mover;
+
 	//! assists in scorekeeping for diplomacy
 	void alterDiplomaticRelationshipScore (Player *player, int amount);
 
@@ -1603,7 +1571,7 @@ class Player: public sigc::trackable
         Stack *doStackSplit(Stack *s);
 	bool doStackSplitArmy(Stack *s, Army *a, Stack *& new_stack);
         void doStackJoin(Stack* receiver, Stack* joining);
-        int doStackVisitTemple(Stack *s);
+        int doStackSearchTemple(Stack *s);
         void doCityOccupy(City *c);
         void doCityPillage(City *c, int& gold, int* pillaged_army_type);
         void doCitySack(City *c, int& gold, std::list<guint32> *sacked_types);
@@ -1673,7 +1641,7 @@ class Player: public sigc::trackable
 
         void doStackSort(Stack *s, std::list<guint32> army_ids);
 
-        void doStackSearchRuin(Stack *s, Ruin *r, Fight::Result result);
+        void doStackSearchRuin(Stack *s, Ruin *r, FightResult::Outcome result);
         /** 
 	 * Called to adjudicate a fight between two lists of stacks in a ruin.
          *
@@ -1691,11 +1659,11 @@ class Player: public sigc::trackable
 	 *  If the Hero loses the battle, only the Hero unit is removed
 	 *  from the attacker's stack.
          *
-         * @return One of Fight::ATTACKER_WON, Fight::DEFENDER_WON, or
-	 *         Fight::DRAW (Fight::Result).
+         * @return One of FightResult::ATTACKER_WON, FightResult::DEFENDER_WON,
+         *  or Fight::DRAW (FightResult::Outcome).
          */
 	//! Callback to adjudicate fights in ruins.
-        Fight::Result stackRuinFight(Stack** attacker, Keeper* defender, bool &stackdied, std::list<History*> &attacker_history, std::list<History*> &defender_history);
+        FightResult stackRuinFight(Stack** attacker, Keeper* defender, bool &stackdied, std::list<History*> &attacker_history, std::list<History*> &defender_history);
 
 	void AI_maybeBuyScout(City *c);
 
@@ -1767,43 +1735,37 @@ class Player: public sigc::trackable
          * @param xp_sum           The number of XP to distribute.
          */
 	//! update Army state after a Fight.
-        void updateArmyValues(std::list<Stack*>& stacks, double xp_sum);
+        void updateArmyValues(std::list<Stack*>& stacks, double xp_sum, FightResult *res);
 
-
-        /** 
-	 * Called to move a Stack to a specified position.
-         *
-         * The Path is calculated on the fly unless follow is set to true. 
-	 * In this case, an existing path is checked and iterated over.  
-	 * This is useful if a stack didn't reach its target within one 
-	 * round and should continue the movement.
-         *
-	 * This callback must result in an Action_Move element being 
-	 * given to the addAction method.
-	 *
-         * @param s                The stack to be moved.
-         * @param dest             The destination of the move.
-         * @param follow           If set to false, calculate the path.
-	 *
-         * @return False on error, true otherwise.
-         */
-        //! Callback to move a stack on the map.
-        MoveResult *stackMove(Stack* s, Vector<int> dest, bool follow);
 
 	bool nextStepOnEnemyStackOrCity(Stack *s) const;
 
-        void lootCity(City *city, Player *looted);
-	void calculateLoot(Player *looted, guint32 &added, guint32 &subtracted);
+        void lootCity(City *city, Stack *stack, MoveResult *result, sigc::slot<void(MoveResult*)> after);
+	bool calculateLoot (Player *looted, guint32 &added, guint32 &subtracted);
         void takeCityInPossession(City* c);
 	static void pruneCityVectorings(std::list<Action*> &actions);
 	static void pruneCityProductions(std::list<Action*> &actions);
 
         std::list<Action *> getActionsThisTurn(int type) const;
 
-        bool computerSearch(Stack *s, MoveResult *r);
+        void stackMoveFinalStep (Stack *s, MoveResult *result, sigc::slot<void(MoveResult*)> after);
+
+        //the move chain of dialogs
+        void fight_in_the_field (Stack *s, Stack *target, MoveResult *result, int stepCount, sigc::slot<void(MoveResult*)> after);
+        void field_fight_after_quest_completed (MoveResult *result, sigc::slot<void(MoveResult*)> a);
+        void field_fight_after_battle (MoveResult *result, sigc::slot<void(MoveResult*)> after);
+
+        void fight_in_the_city (Stack *s, Vector<int> target, MoveResult *result, int stepCount, sigc::slot<void(MoveResult*)> after);
+        void city_fight_after_battle (City *city, Stack *s, MoveResult *result, sigc::slot<void(MoveResult*)> after);
+        void city_fight_after_looting (City *c, Stack *s, MoveResult *result, sigc::slot<void(MoveResult*)> after);
+        void city_fight_after_quest1_completed (City *c, Stack *s, MoveResult *result, sigc::slot<void(MoveResult*)> after);
+        void city_fight_after_city_defeated (City *city, CityDefeatedChoice a, MoveResult *result, sigc::slot<void(MoveResult*)> after);
+        void city_fight_after_raze_notification (City *c, CityDefeatedChoice a, MoveResult *result, sigc::slot<void(MoveResult*)> after);
+        void city_fight_after_quest2_completed (City *city, CityDefeatedChoice a, MoveResult *result, sigc::slot<void(MoveResult*)> after);
+        void city_fight_after_city_window (City *c, MoveResult *result, sigc::slot<void(MoveResult *)> after);
+
+        
 };
 
-Fight::Result ruinfight (Stack **attacker, Stack **defender);
-#endif // PLAYER_H
-
-// End of file
+FightResult::Outcome ruinfight (Stack **attacker, Stack **defender);
+#endif

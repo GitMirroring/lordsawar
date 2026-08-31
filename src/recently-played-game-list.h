@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2011, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef RECENTLYPLAYEDGAMELIST_H
@@ -81,10 +80,10 @@ class RecentlyPlayedGameList: public std::list<RecentlyPlayedGame*>, public sigc
 	// Static Methods
 
         //! return the singleton instance of this class.
-        static RecentlyPlayedGameList * getInstance();
+        static RecentlyPlayedGameList * instance();
 
         //! Loads the singleton instance from an opened file.
-        static RecentlyPlayedGameList * getInstance(XML_Helper *helper);
+        static RecentlyPlayedGameList * instance(XML_Helper *helper);
 
         //! Explicitly delete the singleton instance of this class.
         static void deleteInstance();
@@ -132,5 +131,4 @@ class RecentlyPlayedGameList: public std::list<RecentlyPlayedGame*>, public sigc
         static RecentlyPlayedGameList* s_instance;
 };
 
-#endif // RECENTLYPLAYEDGAMELIST_H
-
+#endif

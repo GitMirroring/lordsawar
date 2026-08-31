@@ -1,4 +1,4 @@
-//  Copyright (C) 2015 Ben Asselstine
+//  Copyright (C) 2015, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
@@ -23,7 +22,7 @@
 
 ConnectionManager* ConnectionManager::s_instance = 0;
 
-ConnectionManager* ConnectionManager::getInstance()
+ConnectionManager* ConnectionManager::instance()
 {
     if (s_instance == 0)
         s_instance = new ConnectionManager();
@@ -51,14 +50,14 @@ ConnectionManager::~ConnectionManager()
 
 void ConnectionManager::manage(NetworkConnection*conn)
 {
-  getInstance()->push_back(conn);
-  conn->queue_flushed.connect(sigc::bind(sigc::mem_fun(getInstance(), &ConnectionManager::on_messages_flushed), conn));
+  instance()->push_back(conn);
+  conn->queue_flushed.connect(sigc::bind(sigc::mem_fun(*instance(), &ConnectionManager::on_messages_flushed), conn));
 }
 
 NetworkConnection *ConnectionManager::create_connection(const Glib::RefPtr<Gio::SocketConnection> &c)
 {
   NetworkConnection *nc = new NetworkConnection(c);
-  Glib::signal_idle().connect_once(sigc::bind(sigc::mem_fun(*getInstance(), &ConnectionManager::launch_thread), nc));
+  Glib::signal_idle().connect_once(sigc::bind(sigc::mem_fun(*instance(), &ConnectionManager::launch_thread), nc));
   ConnectionManager::manage (nc);
   return nc;
 }
@@ -66,7 +65,7 @@ NetworkConnection *ConnectionManager::create_connection(const Glib::RefPtr<Gio::
 NetworkConnection *ConnectionManager::create_connection()
 {
   NetworkConnection *nc = new NetworkConnection();
-  Glib::signal_idle().connect_once(sigc::bind(sigc::mem_fun(*getInstance(), &ConnectionManager::launch_thread), nc));
+  Glib::signal_idle().connect_once(sigc::bind(sigc::mem_fun(*instance(), &ConnectionManager::launch_thread), nc));
 
   ConnectionManager::manage (nc);
   return nc;
@@ -79,7 +78,7 @@ void ConnectionManager::launch_thread(NetworkConnection *nc)
       {
         nc->send_queued_messages();
       });
-  getInstance()->threads[nc] = consumer;
+  instance()->threads[nc] = consumer;
 }
 
 void ConnectionManager::on_messages_flushed(NetworkConnection*conn)
@@ -88,7 +87,7 @@ void ConnectionManager::on_messages_flushed(NetworkConnection*conn)
   if (i != end())
     erase(i);
   if (threads[conn])
-    Glib::signal_idle().connect_once(sigc::bind(sigc::mem_fun(this, &ConnectionManager::join), conn));
+    Glib::signal_idle().connect_once(sigc::bind(sigc::mem_fun(*this, &ConnectionManager::join), conn));
 }
 
 void ConnectionManager::join(NetworkConnection *nc)
@@ -96,4 +95,3 @@ void ConnectionManager::join(NetworkConnection *nc)
   threads[nc]->join();
   delete nc;
 }
-// End of file

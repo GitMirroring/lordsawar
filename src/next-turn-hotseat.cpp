@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2009, 2011, 2014 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2009, 2011, 2014, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,22 +14,22 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "NextTurnHotseat.h"
+#include "next-turn-hotseat.h"
 
-#include "playerlist.h"
-#include "citylist.h"
-#include "ruinlist.h"
-#include "stacklist.h"
-#include "armysetlist.h"
+#include "player-list.h"
+#include "city-list.h"
+#include "ruin-list.h"
+#include "stack-list.h"
+#include "army-set-list.h"
 #include "hero.h"
-#include "vectoredunitlist.h"
-#include "FogMap.h"
+#include "vectored-unit-list.h"
+#include "fog-map.h"
 #include "history.h"
-#include "QuestsManager.h"
-#include "GameScenarioOptions.h"
+#include "quest-manager.h"
+#include "game-scenario-options.h"
+#include "configuration.h"
 
 #include "path.h"
 
@@ -41,63 +41,106 @@ NextTurnHotseat::NextTurnHotseat()
 {
   continuing_turn = false;
   
-  for (auto p: *Playerlist::getInstance())
-    p->ending_turn.connect(sigc::mem_fun(this, &NextTurn::endTurn));
+  for (auto p: *Playerlist::instance())
+    p->ending_turn.connect(sigc::mem_fun(*this, &NextTurn::endTurn));
 }
 
-void NextTurnHotseat::start()
+void NextTurnHotseat::end_of_round_after_player_died ()
 {
-    //We need the playerlist a lot, so maintain a copy of it.
-
-    //set first player as active if no active player exists
-    if (!Playerlist::getActiveplayer())
-      nextPlayer();
-	
-    while (!d_stop)
+  if (Playerlist::instance ()->getNoOfPlayers () <= 1)
+    m_signal_game_over.emit ();
+  else
     {
-      supdating.emit();
-
-        // do various start-up tasks
-        if (continuing_turn)
-	  {
-	    continuing_turn = false;
-	    return;
-	  }
-
-	startTurn();
-       
-	// inform everyone about the next turn 
-	snextTurn.emit(Playerlist::getActiveplayer());
-    
-	splayerStart.emit(Playerlist::getActiveplayer());
-
-	// let the player do his or her duties...
-	bool continue_loop = Playerlist::getActiveplayer()->startTurn();
-	if (!continue_loop || d_stop)
-	  return;
-	
-	//Now do some cleanup at the end of the turn.
-	finishTurn();
-
-        //...and initiate the next one.
-	nextPlayer();
-        
-        //if it is the first player's turn now, a new round has started
-        if (Playerlist::getInstance()->getActiveplayer() == 
-	    Playerlist::getInstance()->getFirstLiving())
-        
-	  {
-	    if (Playerlist::getInstance()->checkPlayers() == true)
-	      {
-		if (Playerlist::getInstance()->getNoOfPlayers() <= 1)
-		  break;
-		if (Playerlist::getActiveplayer()->isDead())
-		  nextPlayer();
-	      }
-	    finishRound();
-	    snextRound.emit();
-	  }
+      finishRound();
+      snextRound.emit();
+      start ();
     }
+}
+
+// this routine handles end of round and then starts the next player
+void NextTurnHotseat::check_end_of_round ()
+{
+  //if it is the first player's turn now, a new round has started
+  if (Playerlist::getActiveplayer () == Playerlist::getFirstLiving ())
+    {
+      // the end of round chain of dialogs
+      auto dead = Playerlist::instance ()->getDeadPlayers ();
+
+      if (dead.empty () == false)
+        {
+          auto finish = std::make_shared<sigc::slot<void()>>();
+
+          *finish =
+            [this, finish, dead] () mutable
+              {
+                auto player = dead.front ();
+                player->kill ();
+
+                //do the next if there is one, or end
+                dead.erase (dead.begin ());
+                if (dead.empty () == false)
+                  m_signal_player_died.emit (dead.front (), finish);
+                else
+                  {
+                    if (Playerlist::getActiveplayer ()->isDead ())
+                      nextPlayer ();
+                    end_of_round_after_player_died ();
+                  }
+              };
+          m_signal_player_died.emit (dead.front (), finish);
+        }
+      else
+        {
+          end_of_round_after_player_died ();
+        }
+    }
+  else
+    start ();
+}
+
+void NextTurnHotseat::start ()
+{
+  //set first player as active if no active player exists
+  if (!Playerlist::getActiveplayer ())
+    nextPlayer ();
+
+  supdating.emit ();
+
+  // do various start-up tasks
+  if (continuing_turn)
+    {
+      continuing_turn = false;
+      return;
+    }
+
+  startTurn ();
+
+  // inform everyone about the next turn 
+  splayerStart.emit (Playerlist::getActiveplayer ());
+
+  // let the player do his or her duties...
+  Playerlist::getActiveplayer ()->startTurn
+    ([this] (bool continue_loop)
+     {
+       if (!continue_loop)
+         return;
+
+       //Now do some cleanup at the end of the turn.
+       finishTurn ();
+
+       //...and initiate the next one.
+       nextPlayer ();
+
+       guint32 millisecs =  Configuration::s_displaySpeedDelay * 3;
+       if (Playerlist::getActiveplayer () == Playerlist::getNeutral ())
+         millisecs = 10;
+       Glib::signal_timeout ().connect
+         ([this] ()
+          {
+            check_end_of_round ();
+            return false;
+          }, millisecs);
+     });
 }
 
 void NextTurnHotseat::endTurn()
@@ -105,24 +148,11 @@ void NextTurnHotseat::endTurn()
   // Finish off the player and transfers the control to the start function
   // again.
   finishTurn();
-  if (Playerlist::getInstance()->checkPlayers() == true)
-    {
-      if (d_stop)
-	return;
-      if (Playerlist::getInstance()->getNoOfPlayers() <= 1)
-	return;
-    }
-  nextPlayer();
+       
+  //...and initiate the next player.
+  nextPlayer ();
 
-  //this is problematic when the first player dies.
-  //end the turn if all living players have ended their turn.
-  if (Playerlist::getInstance()->isEndOfRound() == true)
-    {
-      finishRound();
-      snextRound.emit();
-    }
-
-  start();
+  check_end_of_round ();
 }
 
 void NextTurnHotseat::startTurn()
@@ -135,12 +165,6 @@ void NextTurnHotseat::startTurn()
   Player* p = Playerlist::getActiveplayer();
 
   p->initTurn();
-
-  //calculate upkeep and income
-  p->calculateUpkeep();
-  p->calculateIncome();
-
-  QuestsManager::getInstance()->nextTurn(p);
 }
 
 void NextTurnHotseat::finishTurn()
@@ -158,7 +182,7 @@ void NextTurnHotseat::finishRound()
   //E.g. increase the round number in GameScenario. (this is done with
   //the snextRound signal, but useful for an example).
 
-  for (auto it: *Playerlist::getInstance())
+  for (auto it: *Playerlist::instance())
     {
       if (it->isDead())
         continue;
@@ -169,18 +193,18 @@ void NextTurnHotseat::finishRound()
       it->stacksReset();
 
       //vector armies (needs to preceed city's next turn)
-      VectoredUnitlist::getInstance()->nextTurn(it);
+      VectoredUnitlist::instance()->nextTurn(it);
 
       //produce new armies
-      Citylist::getInstance()->nextTurn(it);
+      Citylist::instance()->nextTurn(it);
     }
 
   // heal the stacks in the ruins
-  Playerlist::getInstance()->getNeutral()->ruinsReset();
+  Playerlist::getNeutral()->ruinsReset();
     
   if (GameScenarioOptions::s_random_turns)
     {
-      Playerlist::getInstance()->randomizeOrder();
+      Playerlist::instance()->randomizeOrder();
       nextPlayer();
     }
 

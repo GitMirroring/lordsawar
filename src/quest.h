@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,8 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef QUEST_H
@@ -24,7 +23,7 @@
 #include <list>
 #include <queue>
 #include "callback-enums.h"
-#include "OwnerId.h"
+#include "owner-id.h"
 #include "vector.h"
 
 class XML_Helper;
@@ -33,6 +32,8 @@ class Hero;
 class Stack;
 class City;
 class Army;
+class Reward;
+class LocationBox;
 
 //! Base class for Quest objects. Hero units go on quests for Reward objects.
 /** 
@@ -78,11 +79,10 @@ class Quest: public OwnerId
 	 * Make a new Quest object.  This object is not called directly -- it
 	 * is only called by the derived classes.
 	 *
-	 * @param q_mgr The quest manager this quest is being associated with.
 	 * @param hero  The Id of the Hero object that owns this quest.
 	 * @param type  The type of Quest the Hero is going on.
 	 */
-        Quest(QuestsManager& q_mgr, guint32 hero, Type type);
+        Quest(guint32 hero, Type type);
         
         //! Copy constructor.
         Quest (const Quest &q);
@@ -92,10 +92,9 @@ class Quest: public OwnerId
 	 * Make a new quest by loading it in from an opened saved-game file.
 	 * @note This only reads the data that is common to all quests.
 	 *
-	 * @param q_mgr   The quest manager to associate the new Quest with.
 	 * @param helper  The opened saved-game file to load the Quest from.
 	 */
-        Quest(QuestsManager& q_mgr, XML_Helper* helper);
+        Quest(XML_Helper* helper);
 
 	//! Destructor.
         virtual ~Quest() {};
@@ -134,15 +133,16 @@ class Quest: public OwnerId
 	 */
 	std::list< Vector<int> > getTargets() const {return d_targets;}
 
+        Reward *getReward () const {return d_reward;}
 
 	// Set Methods
+
+        // temporarily store the reward on the quest object
+        void setReward (Reward *r) {d_reward = r;}
 
 	//! Set the Quest as not mattering anymore.
         void deactivate() {d_pending = true;}
 
-        //! Set quests manager
-        void setQuestsManager (QuestsManager &q);
-	
 	// Methods that operate on the class data but do not modify the class.
 
         //! Return a pointer to the Hero object responsible for the Quest.
@@ -207,14 +207,14 @@ class Quest: public OwnerId
 	 *
 	 * @param city           The City object that has been conquered.
 	 * @param action         What action was taken by the Player.  See
-	 *                       CityDefeatedAction for more information.
+	 *                       CityDefeatedChoice for more information.
 	 * @param heroIsCulprit  Whether or not the Hero object associated with
 	 *                       this Quest object is responsible for 
 	 *                       conquering the given City object.
 	 * @param gold           How many gold pieces were taken as a result
 	 *                       of the action.
 	 */
-	virtual void cityAction(City *city, CityDefeatedAction action, 
+	virtual void cityAction(City *city, CityDefeatedChoice action, 
 				bool heroIsCulprit, int gold)=0;
 
 
@@ -243,11 +243,10 @@ class Quest: public OwnerId
          */
         static Hero* getHeroById(guint32 hero, Stack** stack = NULL);
 
+        //! get the nearest locationbox that helps us complete the quest.
+        LocationBox getDestination (Stack *st);
     protected:
 	// DATA
-
-	//! The QuestsManager object that this Quest object is associated with.
-        QuestsManager& d_q_mgr;
 
 	//! A description of the Quest (this text does not change).
         /** 
@@ -276,6 +275,10 @@ class Quest: public OwnerId
 	 * The derived Quest classes fill in this value.
 	 */
 	std::list< Vector<int> > d_targets;
+
+        //a tag-along member here, we don't have to save it because it lasts
+        //from when we complete the quest to when we show the dialog.
+        Reward *d_reward;
 };
 
 #endif

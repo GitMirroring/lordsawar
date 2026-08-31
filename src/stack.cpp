@@ -1,11 +1,11 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2000, Anluan O'Brien
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
-// 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2000, Anluan O'Brien
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,28 +19,28 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 #include <assert.h>
 
 #include "stack.h"
-#include "playerlist.h"
+#include "player-list.h"
 #include "path.h"
-#include "armysetlist.h"
+#include "army-set-list.h"
 #include "counter.h"
 #include "army.h"
 #include "hero.h"
-#include "GameMap.h"
+#include "game-map.h"
 #include "vector.h"
-#include "xmlhelper.h"
-#include "FogMap.h"
+#include "xml-helper.h"
+#include "fog-map.h"
 #include "player.h"
-#include "Backpack.h"
-#include "AI_Analysis.h"
+#include "backpack.h"
+#include "ai-analysis.h"
 #include "ruin.h"
-#include "Item.h"
+#include "item.h"
+#include "quest.h"
 
 Glib::ustring Stack::d_tag = "stack";
 
@@ -86,12 +86,12 @@ Stack::Stack(XML_Helper* helper)
   : UniquelyIdentified(helper), Movable(helper), OwnerId(helper), 
     d_deleting(false)
 {
-  helper->getData(d_defending, "defending");
-  helper->getData(d_parked, "parked");
+  helper->get(d_defending, "defending");
+  helper->get(d_parked, "parked");
 
-  helper->registerTag(Path::d_tag, sigc::mem_fun((*this), &Stack::load));
-  helper->registerTag(Army::d_tag, sigc::mem_fun((*this), &Stack::load));
-  helper->registerTag(Hero::d_hero_tag, sigc::mem_fun((*this), &Stack::load));
+  helper->register_tag(Path::d_tag, sigc::mem_fun((*this), &Stack::load));
+  helper->register_tag(Army::d_tag, sigc::mem_fun((*this), &Stack::load));
+  helper->register_tag(Hero::d_hero_tag, sigc::mem_fun((*this), &Stack::load));
 }
 
 Stack::~Stack()
@@ -126,8 +126,8 @@ void Stack::moveOneStep(bool skipping)
 bool Stack::isMovingToOrFromAShip(Vector<int> dest, bool &on_ship) const
 {
   Vector<int> pos = getPos();
-  Maptile::Building src_building = GameMap::getInstance()->getBuilding(pos);
-  Maptile::Building dst_building = GameMap::getInstance()->getBuilding(dest);
+  Maptile::Building src_building = GameMap::instance()->getBuilding(pos);
+  Maptile::Building dst_building = GameMap::instance()->getBuilding(dest);
 
   bool to_city = dst_building == Maptile::CITY;
   bool on_city = src_building == Maptile::CITY;
@@ -135,8 +135,8 @@ bool Stack::isMovingToOrFromAShip(Vector<int> dest, bool &on_ship) const
   bool on_port = src_building == Maptile::PORT;
   bool on_bridge = src_building == Maptile::BRIDGE;
   bool to_bridge = dst_building == Maptile::BRIDGE;
-  bool on_water = (GameMap::getInstance()->getTerrainType(pos) == Tile::WATER);
-  bool to_water = (GameMap::getInstance()->getTerrainType(dest) == Tile::WATER);
+  bool on_water = (GameMap::instance()->getTerrainType(pos) == Tile::WATER);
+  bool to_water = (GameMap::instance()->getTerrainType(dest) == Tile::WATER);
   //here we mark the armies as being on or off a boat
   /* skipping refers to when we have to move over another friendly stack
    * of a size that's too big to join with. */
@@ -182,7 +182,7 @@ void Stack::moveToDest(Vector<int> dest, bool skipping)
 	(*it)->setInShip(false);
     }
 
-  guint32 maptype = GameMap::getInstance()->getTile(dest.x,dest.y)->getType();
+  guint32 maptype = GameMap::instance()->getTile(dest.x,dest.y)->getType();
   //how many moves does the stack need to travel to dest?
   int needed_moves = calculateTileMovementCost(dest);
 
@@ -246,7 +246,7 @@ guint32 Stack::getMoves() const
 
 int Stack::getMinTileMoves() const
 {
-  LwRectangle bounds = GameMap::getInstance()->get_boundary();
+  LwRectangle bounds = GameMap::instance()->get_boundary();
 
   std::vector<Vector<int> > tiles;
   tiles.push_back(Vector<int>(getPos().x + 1, getPos().y - 1));
@@ -263,7 +263,7 @@ int Stack::getMinTileMoves() const
   for (auto tile: tiles)
     if (is_inside(bounds, tile))
       {
-	int v = GameMap::getInstance()->getTile(tile)->getMoves();
+	int v = GameMap::instance()->getTile(tile)->getMoves();
 	if (min == -1)
 	  min = v;
 	else
@@ -394,7 +394,7 @@ int Stack::bless()
 
 guint32 Stack::calculateTileMovementCost(Vector<int> pos) const
 {
-  Maptile* tile = GameMap::getInstance()->getTile(pos);
+  Maptile* tile = GameMap::instance()->getTile(pos);
   guint32 moves = tile->getMoves();
   guint32 bonus = calculateMoveBonus();
   if (bonus & tile->getType() && moves > 1)
@@ -518,16 +518,16 @@ bool Stack::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(Stack::d_tag);
-  retval &= helper->saveData("id", d_id);
-  retval &= helper->saveData("x", getPos().x);
-  retval &= helper->saveData("y", getPos().y);
+  retval &= helper->open_tag(Stack::d_tag);
+  retval &= helper->save("id", d_id);
+  retval &= helper->save("x", getPos().x);
+  retval &= helper->save("y", getPos().y);
   if (isOwnerIdSet ())
-    retval &= helper->saveData("owner", d_owner_id);
+    retval &= helper->save("owner", d_owner_id);
   else
-    retval &= helper->saveData("owner", -1);
-  retval &= helper->saveData("defending", d_defending);
-  retval &= helper->saveData("parked", d_parked);
+    retval &= helper->save("owner", -1);
+  retval &= helper->save("defending", d_defending);
+  retval &= helper->save("parked", d_parked);
 
 
   //save path
@@ -537,7 +537,7 @@ bool Stack::save(XML_Helper* helper) const
   for (const_iterator it = begin(); it != end(); ++it)
     retval &= (*it)->save(helper);
 
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -914,7 +914,7 @@ Stack* Stack::createNonUniqueStack(Player *player, Vector<int> pos)
 
 guint32 Stack::getMaxMoves() const
 {
-  if (GameMap::getInstance()->getTile(getPos())->getType() != Tile::WATER)
+  if (GameMap::instance()->getTile(getPos())->getType() != Tile::WATER)
     return getMaxLandMoves();
   else
     return getMaxBoatMoves();
@@ -1056,6 +1056,7 @@ Stack *Stack::splitArmies(const std::list<guint32> & armies)
 	  erase(found_army_it);
 	}
     }
+  new_stack->setPath (*d_path);
   return new_stack;
 }
 
@@ -1064,6 +1065,7 @@ void Stack::join(Stack *s)
   for (iterator i = s->begin(); i != s->end(); ++i)
     push_back(*i);
   s->clear();
+  sortForViewing (true);
 }
 
 bool Stack::validate() const
@@ -1101,7 +1103,14 @@ bool Stack::clearPath()
 
 bool Stack::isOnCity() const
 {
-  if (GameMap::getInstance()->getBuilding(getPos()) == Maptile::CITY)
+  if (GameMap::instance()->getBuilding(getPos()) == Maptile::CITY)
+    return true;
+  return false;
+}
+
+bool Stack::isOnTemple() const
+{
+  if (GameMap::instance()->getBuilding(getPos()) == Maptile::TEMPLE)
     return true;
   return false;
 }
@@ -1197,38 +1206,19 @@ bool Stack::hasUsableItem() const
         
 void Stack::getUsableItems(std::list<Item*> &items) const
 {
-  for (const_iterator it = begin(); it != end(); ++it)
+  for (const_iterator it = begin (); it != end (); ++it)
     {
-      if ((*it)->isHero() == false)
+      if ((*it)->isHero () == false)
         continue;
       Hero *hero = dynamic_cast<Hero*>(*it);
-      Backpack *backpack = hero->getBackpack();
+      Backpack *backpack = hero->getBackpack ();
       std::list<Item*> backpack_items;
-      backpack->getUsableItems(backpack_items);
-      //now we dwindle the items from the backpack, depending on whether or
-      //not they're actually usable.
-      for (std::list<Item*>::iterator i = backpack_items.begin(); 
-           i !=backpack_items.end(); ++i)
-        {
-          Maptile::Building b = GameMap::getInstance()->getBuilding(getPos());
-          Ruin *ruin = GameMap::getInstance()->getRuin(getPos());
-          bool ruin_has_occupant = false;
-          if (ruin)
-            {
-              if (ruin->isSearched() == false && ruin->getOccupant() != NULL)
-                ruin_has_occupant = true;
-            }
-          bool victims = Playerlist::getInstance()->countPlayersAlive() > 1;
-          if ((*i)->isCurrentlyUsable(b, !GameMap::getInstance()->getBackpacks().empty(),
-                                      victims, ruin_has_occupant,
-                                      GameMap::friendlyCitiesPresent(),
-                                      GameMap::enemyCitiesPresent(),
-                                      GameMap::neutralCitiesPresent()) == false)
-            i = backpack_items.erase(i);
-        }
-      if (backpack_items.size() > 0)
-        items.insert(std::end(items),
-                     std::begin(backpack_items), std::end(backpack_items));
+      backpack->getUsableItems (backpack_items);
+
+      if (backpack_items.size () > 0)
+        items.insert
+          (std::end (items),
+           std::begin (backpack_items), std::end (backpack_items));
     }
   return;
 }
@@ -1257,7 +1247,7 @@ void Stack::kill()
 bool Stack::killArmyUnitsInBoats()
 {
   bool retval = false;
-  if (GameMap::getInstance()->getTile(getPos())->getType() != Tile::WATER)
+  if (GameMap::instance()->getTile(getPos())->getType() != Tile::WATER)
     return retval;
   if (isFlying())
     return retval;
@@ -1351,7 +1341,7 @@ void Stack::sortByIds(const std::list<guint32> &ids)
 
 void Stack::updateShipStatus(Vector<int> dest)
 {
-  bool to_water = (GameMap::getInstance()->getTile(dest)->getType() == Tile::WATER);
+  bool to_water = (GameMap::instance()->getTile(dest)->getType() == Tile::WATER);
   bool to_bridge = (GameMap::getBridge(dest) != NULL);
   for (Stack::iterator it = begin(); it != end(); ++it)
     {
@@ -1376,7 +1366,7 @@ bool Stack::removeArmiesWithoutArmyType(guint32 armyset)
   bool removedArmy = false;
   for (iterator i = begin(); i != end(); ++i)
     {
-      Armyset *a = Armysetlist::getInstance()->get(armyset);
+      Armyset *a = Armysetlist::instance()->get(armyset);
       ArmyProto *armyproto = a->lookupArmyByType((*i)->getTypeId());
       if (armyproto == NULL)
         {
@@ -1401,7 +1391,7 @@ bool Stack::removeArmiesWithoutArmyType(guint32 armyset)
  */
 bool Stack::fliesWithItemAndNonFlyersOverWaterOrMountains() const
 {
-  Maptile *mtile = GameMap::getInstance()->getTile(getPos());
+  Maptile *mtile = GameMap::instance()->getTile(getPos());
   bool on_water = mtile->getType() == Tile::WATER &&
     mtile->getBuilding() != Maptile::BRIDGE;
   bool on_mountains = mtile->getType() == Tile::MOUNTAIN &&
@@ -1428,4 +1418,53 @@ bool Stack::canMoveThroughMountains () const
     return false;
   return (bonus & Tile::MOUNTAIN) > 0;
 }
-// End of file
+        
+guint32 Stack::countArmies (guint32 army_type_id) const
+{
+  guint32 count = 0;
+  for (const_iterator it = begin (); it != end (); ++it)
+    if ((*it)->getTypeId() == army_type_id)
+      count++;
+  return count;
+}
+        
+bool Stack::calculatePath (Stack *dest)
+{
+  return d_path->calculate (this, dest->getPos ()) != 0;
+}
+              
+bool Stack::calculatePath (City *dest)
+{
+  return d_path->calculateToCity (this, dest) != 0;
+}
+
+bool Stack::calculatePath (Vector<int> dest)
+{
+  return d_path->calculate (this, dest) != 0;
+}
+
+Glib::ustring Stack::to_string () const
+{
+  char buf[32];
+  snprintf (buf, sizeof (buf), "%d", getId ());
+  Glib::ustring s = String::ucompose ("stack %1:\n", std::string (buf));
+  for (const_iterator it = begin (); it != end (); ++it)
+    s += " " + (*it)->getName () +"\n";
+  return s;
+}
+  
+bool Stack::hasQuest (Quest *quest) const
+{
+  bool found = false;
+  std::vector<guint32> hero_ids;
+  getHeroes (hero_ids);
+  for (auto hero_id : hero_ids)
+    {
+      if (hero_id == quest->getHeroId ())
+        {
+          found = true;
+          break;
+        }
+    }
+  return found;
+}

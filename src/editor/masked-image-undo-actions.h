@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,77 +12,108 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef TAR_FILE_MASKED_IMAGE_EDITOR_ACTIONS_H
-#define TAR_FILE_MASKED_IMAGE_EDITOR_ACTIONS_H
+#ifndef MASKED_IMAGE_UNDO_ACTIONS_H
+#define MASKED_IMAGE_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "undo-action.h"
 #include <vector>
-#include "PixMask.h"
-#include "TarFileMaskedImage.h"
+#include "pixmask.h"
+#include "tar-file-masked-image.h"
 
-//! A record of an event in the image editor
+//! A record of an event in the masked image editor
 /** 
  * The purpose of these classes is to implement undo/redo in the tar-file
  * masked image editor.
  */
 
-class TarFileMaskedImageEditorAction: public UndoAction
+class MaskedImageUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      SET = 1,
-      SHIELD = 2,
-    };
+    enum Type
+      {
+        SET = 1,
+        SHIELD,
+      };
 
-    TarFileMaskedImageEditorAction(Type type)
-     : UndoAction (UndoAction::AGGREGATE_NONE), d_type (type) {}
+    MaskedImageUndoAction(Type type)
+      : UndoAction (UndoAction::AGGREGATE_NONE), m_type (type)
+      {
+      }
 
-    virtual ~TarFileMaskedImageEditorAction() {}
+    virtual ~MaskedImageUndoAction ()
+      {
+      }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
-
-    Type d_type;
+    Type m_type;
 };
 
-class TarFileMaskedImageEditorAction_Set: public TarFileMaskedImageEditorAction
+class MaskedImageUndoAction_Set: public MaskedImageUndoAction
+{
+public:
+    MaskedImageUndoAction_Set (TarFileMaskedImage *i, Glib::ustring f)
+      : MaskedImageUndoAction (SET),
+      m_image (new TarFileMaskedImage (*i)), m_filename (f)
+  {
+  }
+    ~MaskedImageUndoAction_Set ()
+      {
+        delete m_image;
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Set";
+      }
+
+    Glib::ustring get_file_name () const
+      {
+        return m_filename;
+      }
+
+    TarFileMaskedImage* get_image () const
+      {
+        return m_image;
+      }
+private:
+    TarFileMaskedImage *m_image;
+    Glib::ustring m_filename;
+};
+
+class MaskedImageUndoAction_Shield: public MaskedImageUndoAction
 {
     public:
-        TarFileMaskedImageEditorAction_Set (TarFileMaskedImage *i,
-                                            Glib::ustring f)
-          : TarFileMaskedImageEditorAction (SET),
-          d_image (new TarFileMaskedImage (*i)), d_filename (f) {}
-        ~TarFileMaskedImageEditorAction_Set () {delete d_image;}
+        MaskedImageUndoAction_Shield (int s)
+          : MaskedImageUndoAction (SHIELD), m_shield (s)
+          {
+          }
 
-        Glib::ustring getActionName () const {return "Set";}
+        ~MaskedImageUndoAction_Shield ()
+          {
+          }
 
-        Glib::ustring getFileName () const {return d_filename;}
-        TarFileMaskedImage* getTarFileMaskedImage() const {return d_image;}
-    private:
-        TarFileMaskedImage *d_image;
-        Glib::ustring d_filename;
-};
+        Glib::ustring get_action_name () const
+          {
+            return "Shield";
+          }
 
-class TarFileMaskedImageEditorAction_Shield: public TarFileMaskedImageEditorAction
-{
-    public:
-        TarFileMaskedImageEditorAction_Shield (int s)
-          : TarFileMaskedImageEditorAction (SHIELD), d_shield (s) {}
-        ~TarFileMaskedImageEditorAction_Shield () {}
-
-        Glib::ustring getActionName () const {return "Shield";}
-
-        int getShield () const {return d_shield;}
+        int get_shield () const
+          {
+            return m_shield;
+          }
 
     private:
-        int d_shield;
+        int m_shield;
 };
-#endif //TAR_FILE_MASKED_IMAGE_EDITOR_ACTIONS_H
+#endif

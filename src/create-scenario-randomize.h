@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2014, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2017, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef CREATE_SCENARIO_RANDOMIZE_H
@@ -23,7 +22,7 @@
 #include <vector>
 #include <gtkmm.h>
 #include "shield.h"
-#include "namelist.h"
+#include "name-list.h"
 #include <sigc++/signal.h>
 
 class Signpost;
@@ -66,13 +65,13 @@ class CreateScenarioRandomize
 
 	int adjustBaseGold (int base_gold);
 
-        sigc::signal<std::list<Glib::ustring> > signal_collect_city_names ()
+        sigc::signal<std::list<Glib::ustring>()> signal_collect_city_names ()
           {return collect_city_names;}
-        sigc::signal<std::list<Glib::ustring> > signal_collect_temple_names ()
+        sigc::signal<std::list<Glib::ustring>()> signal_collect_temple_names ()
           {return collect_temple_names;}
-        sigc::signal<std::list<Glib::ustring> > signal_collect_ruin_names ()
+        sigc::signal<std::list<Glib::ustring>()> signal_collect_ruin_names ()
           {return collect_ruin_names;}
-        sigc::signal<std::list<Glib::ustring> > signal_collect_signposts ()
+        sigc::signal<std::list<Glib::ustring>()> signal_collect_signposts ()
           {return collect_signposts;}
 	//! Get the default player name for the given shield color.
 	static Glib::ustring getPlayerName(Shield::Color id);
@@ -87,13 +86,13 @@ class CreateScenarioRandomize
 
     private:
 
-        sigc::signal<std::list<Glib::ustring> > collect_city_names;
-        sigc::signal<std::list<Glib::ustring> > collect_temple_names;
-        sigc::signal<std::list<Glib::ustring> > collect_ruin_names;
-        sigc::signal<std::list<Glib::ustring> > collect_signposts;
+        sigc::signal<std::list<Glib::ustring>()> collect_city_names;
+        sigc::signal<std::list<Glib::ustring>()> collect_temple_names;
+        sigc::signal<std::list<Glib::ustring>()> collect_ruin_names;
+        sigc::signal<std::list<Glib::ustring>()> collect_signposts;
 	Glib::ustring popRandomListName(std::vector<Glib::ustring>& list);
         Glib::ustring get_direction(int xdir, int ydir);
 	bool loadNames(std::vector<Glib::ustring>& list, std::ifstream& file);
 };
 
-#endif  //CREATE_SCENARIO_RANDOMIZE_H
+#endif

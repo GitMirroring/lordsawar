@@ -1,4 +1,4 @@
-//  Copyright (C) 2020, 2021 Ben Asselstine
+//  Copyright (C) 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,15 +12,14 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include "keeper.h"
 
-#include "armyproto.h"
-#include "playerlist.h"
-#include "armysetlist.h"
-#include "xmlhelper.h"
+#include "army-proto.h"
+#include "player-list.h"
+#include "army-set-list.h"
+#include "xml-helper.h"
 
 Glib::ustring Keeper::d_tag = "keeper";
 
@@ -34,7 +33,7 @@ Keeper::Keeper(const ArmyProto *army, Vector<int> pos)
 
 void Keeper::add (const ArmyProto *army, Vector<int> pos)
 {
-  Player *neutral = Playerlist::getInstance ()->getNeutral ();
+  Player *neutral = Playerlist::getNeutral ();
   clearStack ();
   d_stack = new Stack (neutral, pos);
   Army *a = new Army(*army, neutral);
@@ -62,7 +61,7 @@ Keeper::Keeper(const Keeper& object)
 Keeper::Keeper(XML_Helper* helper)
   :Renamable(helper)
 {
-  helper->registerTag(Stack::d_tag, sigc::mem_fun(this, &Keeper::load));
+  helper->register_tag(Stack::d_tag, sigc::mem_fun(*this, &Keeper::load));
   d_stack = NULL;
 }
 
@@ -70,13 +69,18 @@ bool Keeper::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(Keeper::d_tag);
-  retval &= helper->saveData("name", getName(false));
+  retval &= helper->open_tag(Keeper::d_tag);
+  retval &= helper->save("name", getName(false));
   if (d_stack)
     retval &= d_stack->save(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
+}
+
+Keeper::~Keeper ()
+{
+  clearStack ();
 }
 
 void Keeper::clearStack ()
@@ -90,9 +94,9 @@ void Keeper::clearStack ()
 
 const ArmyProto* Keeper::randomRuinDefender()
 {
-  Player *p = Playerlist::getInstance()->getNeutral();
+  Player *p = Playerlist::getNeutral();
   return
-    Armysetlist::getInstance()->get(p->getArmyset())->getRandomRuinKeeper();
+    Armysetlist::instance()->get(p->getArmyset())->getRandomRuinKeeper();
 }
 
 bool Keeper::load (Glib::ustring tag, XML_Helper *helper)
@@ -103,4 +107,15 @@ bool Keeper::load (Glib::ustring tag, XML_Helper *helper)
       return true;
     }
   return false;
+}
+
+int Keeper::getTypeId () const
+{
+  int id = -1;
+  if (d_stack)
+    {
+      if (d_stack->empty () == false)
+        id = d_stack->front ()->getTypeId ();
+    }
+  return id;
 }

@@ -1,9 +1,9 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015,
-// 2021 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015,
+//  2021 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef FILE_H
@@ -40,119 +39,129 @@ class File
 {
     public:
 
-        static Glib::ustring getSetDir(Glib::ustring ext, bool system = true);
 
         //! load misc file
-        static Glib::ustring getMiscFile(Glib::ustring filename);
+        static std::string getMiscFile(std::string filename);
 
         //! load a file from the various dir
-        static Glib::ustring getVariousFile(Glib::ustring filename);
+        static std::string getVariousFile(std::string filename);
 
-        static Glib::ustring getGladeFile(Glib::ustring filename);
-        static Glib::ustring getEditorGladeFile(Glib::ustring filename);
-        static Glib::ustring getSaveFile(Glib::ustring filename);
-        static Glib::ustring getTempFile(Glib::ustring tmpdir, Glib::ustring filename);
-        static Glib::ustring getTarTempDir(Glib::ustring dir);
-        static Glib::ustring getConfigDir ();
-        static Glib::ustring getConfigFile(Glib::ustring filename);
-        static Glib::ustring getUserDataDir ();
-        static Glib::ustring getCacheDir ();
+        static std::string getEditorGladeFile(std::string filename);
+        static std::string getSaveFile(std::string filename);
+        static std::string getTempFile(std::string tmpdir, std::string filename);
+        static std::string getTarTempDir(std::string dir);
+        static std::string getConfigDir ();
+        static std::string getConfigFile(std::string filename);
+        static std::string getUserDataDir ();
+        static std::string getCacheDir ();
 
         //! load an xslt file.
-        static Glib::ustring getXSLTFile(guint32 type, Glib::ustring old_version, Glib::ustring new_version);
+        static std::string getXSLTFile(guint32 type, std::string old_version, std::string new_version);
         
         //! Load the xml file describing the items
-        static Glib::ustring getItemDescription();
+        static std::string getItemDescription();
         
         //! Get the path to an editor image
-	static Glib::ustring getEditorFile(Glib::ustring filename);
+	static std::string getEditorFile(std::string filename);
     
         // Returns the filename of a music file (description or actual piece)
-        static Glib::ustring getMusicFile(Glib::ustring filename);
+        static std::string getMusicFile(std::string filename);
         
         // get save game path
-        static Glib::ustring getSavePath();
+        static std::string getSavePath();
 
 	//! get game data path
-	static Glib::ustring getDataPath();
-
-	//! the location of the system directory that holds scenario terrains.
-	static Glib::ustring getMapDir();
-
-	//! the location of the system directory that holds personal terrains.
-	static Glib::ustring getUserMapDir();
+	static std::string getPath();
 
 	//! get the path of a system scenario file called file.
-	static Glib::ustring getMapFile(Glib::ustring file);
+	static std::string getMapFile(std::string file);
 
 	//! get the path of a personal scenario called file.
-	static Glib::ustring getUserMapFile(Glib::ustring file);
+	static std::string getUserMapFile(std::string file);
 
-        static Glib::ustring getUserProfilesDescription();
-        static Glib::ustring getUserRecentlyPlayedGamesDescription();
-        static Glib::ustring getUserRecentlyHostedGamesDescription();
-        static Glib::ustring getUserRecentlyAdvertisedGamesDescription();
-        static Glib::ustring getUserRecentlyEditedFilesDescription();
+        static std::string getUserProfilesDescription();
+        static std::string getUserRecentlyPlayedGamesDescription();
+        static std::string getUserRecentlyHostedGamesDescription();
+        static std::string getUserRecentlyAdvertisedGamesDescription();
+        static std::string getUserRecentlyEditedFilesDescription();
 
         // get the available scenarios
-        static std::list<Glib::ustring> scanMaps();
+        static std::list<std::string> scanMaps();
 
 	// get the available scenarios in the user's personal collection
-	static std::list<Glib::ustring> scanUserMaps();
+	static std::list<std::string> scanUserMaps();
 
 
 	//! Copy a file from one place to another.
-	static bool copy (Glib::ustring from, Glib::ustring to);
+	static bool copy (std::string from, std::string to);
 
 	//! make a directory if it doesn't already exist.
-	static bool create_dir(Glib::ustring dir);
+	static bool create_dir(std::string dir);
 
 	//! simple basename routine, but also strips the file extension.
-	static Glib::ustring get_basename(Glib::ustring path, bool keep_ext=false);
+	static std::string get_basename(std::string path, bool keep_ext=false);
 
 	//! does a file exist?
-	static bool exists(Glib::ustring f);
+	static bool exists(std::string f);
 
         //! does a directory exist
-        static bool directory_exists(Glib::ustring d);
+        static bool directory_exists(std::string d);
 
 	//! does filename end with extension?
-	static bool nameEndsWith(Glib::ustring filename, Glib::ustring extension);
+	static bool nameEndsWith(std::string filename, std::string extension);
 
 	//! delete a file from the filesystem.
-	static bool erase(Glib::ustring filename);
+	static bool erase(std::string filename);
 
 	//! delete an empty directory from the filesystem.
-	static void erase_dir(Glib::ustring filename);
+	static void erase_dir(std::string filename);
 
         //! delete a directory and the files it contains from the filesystem.
-        static void clean_dir(Glib::ustring filename);
+        static void clean_dir(std::string filename);
 
-	static Glib::ustring add_slash_if_necessary(Glib::ustring dir);
+	static std::string add_slash_if_necessary(std::string dir);
 
-	static Glib::ustring get_dirname(Glib::ustring path);
+	static std::string get_dirname(std::string path);
 
-        static std::list<Glib::ustring> scanForFiles(Glib::ustring dir, Glib::ustring extension);
+        static std::list<std::string> scanForFiles(std::string dir, std::string extension);
 
-        static Glib::ustring add_ext_if_necessary(Glib::ustring file, Glib::ustring ext);
+        static std::string add_ext_if_necessary(std::string file, std::string ext);
 
         static char *_sanify(const char *string);
-        static Glib::ustring sanify (Glib::ustring s);
+        static std::string sanify (std::string s);
 
-        static Glib::ustring get_tmp_file(Glib::ustring ext = "");
+        static std::string get_tmp_file(std::string ext = "");
 
-        static Glib::ustring get_extension(Glib::ustring filename);
+        static std::string get_extension(std::string filename);
 
-        static bool rename(Glib::ustring src, Glib::ustring dest);
+        static bool rename(std::string src, std::string dest);
 
-        static bool add_png_if_no_ext (Glib::ustring &filename);
+        static bool add_png_if_no_ext (std::string &filename);
+
+        static bool add_ogg_if_no_ext (std::string &filename);
 
         //! get the file's size in bytes
-        static goffset get_size (Glib::ustring filename);
+        static goffset get_size (std::string filename);
+
+        static std::string getRandomlyGeneratedMapFile ();
+
+        static bool is_readonly (std::string path);
+
+        static std::string get_user_shieldset_dir ();
+        static std::string get_user_cityset_dir ();
+        static std::string get_user_armyset_dir ();
+        static std::string get_user_tileset_dir ();
+        static std::string get_user_map_dir ();
+
+        static std::string get_shieldset_dir ();
+        static std::string get_cityset_dir ();
+        static std::string get_armyset_dir ();
+        static std::string get_tileset_dir ();
+        static std::string get_map_dir ();
+
+        static std::string getSetDir(std::string ext, bool system = true);
 };
 
-bool case_insensitive (const Glib::ustring& first, const Glib::ustring& second);
+bool case_insensitive (const std::string& first, const std::string& second);
 
-#endif //FILE_H
-
-// End of file
+#endif

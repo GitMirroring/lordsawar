@@ -1,7 +1,7 @@
-// Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sstream>
 #include <sigc++/functors/mem_fun.h>
@@ -28,25 +27,24 @@
 #include "signpost.h"
 #include "ruin.h"
 #include "temple.h"
-#include "Quest.h"
-#include "QKillHero.h"
-#include "QEnemyArmies.h"
-#include "QEnemyArmytype.h"
-#include "QCitySack.h"
-#include "QCityRaze.h"
-#include "QCityOccupy.h"
-#include "QPillageGold.h"
-#include "armysetlist.h"
-#include "playerlist.h"
+#include "quest.h"
+#include "quest-kill-hero.h"
+#include "quest-enemy-armies.h"
+#include "quest-enemy-army-type.h"
+#include "quest-city-sack.h"
+#include "quest-city-raze.h"
+#include "quest-city-occupy.h"
+#include "quest-pillage-gold.h"
+#include "army-set-list.h"
+#include "player-list.h"
 #include "player.h"
-#include "armyprodbase.h"
-#include "heroproto.h"
-#include "Item.h"
-#include "stacklist.h" //remove me
+#include "army-prod-base.h"
+#include "hero-proto.h"
+#include "item.h"
 #include "ucompose.hpp"
-#include "SightMap.h"
+#include "sight-map.h"
 #include "reward.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
 Glib::ustring Action::d_tag = "action";
 
@@ -66,7 +64,7 @@ Action::Action(const Action &action)
 Action::Action(XML_Helper *helper)
 {
   Glib::ustring type_str;
-  helper->getData(type_str, "type");
+  helper->get(type_str, "type");
   d_type = actionTypeFromString(type_str);
 }
 
@@ -74,9 +72,9 @@ bool Action::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Action::d_tag);
+    retval &= helper->open_tag(Action::d_tag);
     retval &= saveContents(helper);
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -86,7 +84,7 @@ bool Action::saveContents(XML_Helper* helper) const
     bool retval = true;
 
     Glib::ustring type_str = actionTypeToString(Action::Type(d_type));
-    retval &= helper->saveData("type", type_str);
+    retval &= helper->save("type", type_str);
     retval &= doSave(helper);
 
     return retval;
@@ -96,7 +94,7 @@ Action* Action::handle_load(XML_Helper* helper)
 {
   Glib::ustring type_str;
 
-  helper->getData(type_str, "type");
+  helper->get(type_str, "type");
   Action::Type t = actionTypeFromString(type_str);
 
   switch (t)
@@ -356,28 +354,28 @@ Action_Move::Action_Move (const Action_Move &a)
 Action_Move::Action_Move(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_stack, "stack");
-    helper->getData(d_dest.x, "x");
-    helper->getData(d_dest.y, "y");
-    helper->getData(d_delta.x, "delta_x");
-    helper->getData(d_delta.y, "delta_y");
-    helper->getData(d_moves_left, "moves_left");
-    helper->getData(d_has_ship, "has_ship");
-    helper->getData(d_had_ship, "had_ship");
+    helper->get(d_stack, "stack");
+    helper->get(d_dest.x, "x");
+    helper->get(d_dest.y, "y");
+    helper->get(d_delta.x, "delta_x");
+    helper->get(d_delta.y, "delta_y");
+    helper->get(d_moves_left, "moves_left");
+    helper->get(d_has_ship, "has_ship");
+    helper->get(d_had_ship, "had_ship");
 }
 
 bool Action_Move::doSave(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->saveData("stack", d_stack);
-    retval &= helper->saveData("x", d_dest.x);
-    retval &= helper->saveData("y", d_dest.y);
-    retval &= helper->saveData("delta_x", d_delta.x);
-    retval &= helper->saveData("delta_y", d_delta.y);
-    retval &= helper->saveData("moves_left", d_moves_left);
-    retval &= helper->saveData("has_ship", d_has_ship);
-    retval &= helper->saveData("had_ship", d_had_ship);
+    retval &= helper->save("stack", d_stack);
+    retval &= helper->save("x", d_dest.x);
+    retval &= helper->save("y", d_dest.y);
+    retval &= helper->save("delta_x", d_delta.x);
+    retval &= helper->save("delta_y", d_delta.y);
+    retval &= helper->save("moves_left", d_moves_left);
+    retval &= helper->save("has_ship", d_has_ship);
+    retval &= helper->save("had_ship", d_had_ship);
 
     return retval;
 }
@@ -412,13 +410,13 @@ Action_Split::Action_Split(const Action_Split &action)
 Action_Split::Action_Split(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_orig, "orig_stack");
-    helper->getData(d_added, "new_stack");
+    helper->get(d_orig, "orig_stack");
+    helper->get(d_added, "new_stack");
 
     Glib::ustring s;
     std::istringstream si;
 
-    helper->getData(s, "moved");
+    helper->get(s, "moved");
     si.str(s);
     for (unsigned int i = 0; i < MAX_STACK_SIZE; i++)
         si >>d_armies_moved[i];
@@ -433,9 +431,9 @@ bool Action_Split::doSave(XML_Helper* helper) const
       s += String::ucompose("%1 ", d_armies_moved[i]);
     s += String::ucompose("%1 ", d_armies_moved[MAX_STACK_SIZE - 1]);
 
-    retval &= helper->saveData("orig_stack", d_orig);
-    retval &= helper->saveData("new_stack", d_added);
-    retval &= helper->saveData("moved", s);
+    retval &= helper->save("orig_stack", d_orig);
+    retval &= helper->save("new_stack", d_added);
+    retval &= helper->save("moved", s);
 
     return retval;
 }
@@ -478,11 +476,11 @@ Action_Fight::Action_Fight(XML_Helper* helper)
     std::istringstream si;
     int ival = -1;
 
-    helper->registerTag(Item::d_tag, 
-                        sigc::hide<0>(sigc::mem_fun(this, &Action_Fight::loadItem)));
+    helper->register_tag(Item::d_tag, 
+                        sigc::hide<0>(sigc::mem_fun(*this, &Action_Fight::loadItem)));
 
     // get attacking and defending stacks
-    helper->getData(s, "attackers");
+    helper->get(s, "attackers");
     si.str(s);
     while (si.eof() == false)
       {
@@ -493,7 +491,7 @@ Action_Fight::Action_Fight(XML_Helper* helper)
       }
     si.clear();
 
-    helper->getData(s, "defenders");
+    helper->get(s, "defenders");
     si.str(s);
     while (si.eof() == false)
       {
@@ -504,7 +502,7 @@ Action_Fight::Action_Fight(XML_Helper* helper)
       }
     // get attacking and defending army ids
     si.clear();
-    helper->getData(s, "attacker_army_ids");
+    helper->get(s, "attacker_army_ids");
     si.str(s);
     while (si.eof() == false)
       {
@@ -514,7 +512,7 @@ Action_Fight::Action_Fight(XML_Helper* helper)
           d_attacker_army_ids.push_back((guint32)ival);
       }
     si.clear();
-    helper->getData(s, "defender_army_ids");
+    helper->get(s, "defender_army_ids");
     si.str(s);
     while (si.eof() == false)
       {
@@ -558,92 +556,45 @@ bool Action_Fight::doSave(XML_Helper* helper) const
     for (std::list<guint32>::const_iterator uit = d_attackers.begin();
          uit != d_attackers.end(); ++uit)
       s += String::ucompose("%1 ", (*uit));
-    retval &= helper->saveData("attackers", s);
+    retval &= helper->save("attackers", s);
 
     s = "";
     for (std::list<guint32>::const_iterator uit = d_defenders.begin();
          uit != d_defenders.end(); ++uit)
       s += String::ucompose("%1 ", (*uit));
-    retval &= helper->saveData("defenders", s);
+    retval &= helper->save("defenders", s);
 
     s = "";
     for (auto i : d_attacker_army_ids)
       s += String::ucompose("%1 ", i);
-    retval &= helper->saveData("attacker_army_ids", s);
+    retval &= helper->save("attacker_army_ids", s);
 
     s = "";
     for (auto i : d_defender_army_ids)
       s += String::ucompose("%1 ", i);
-    retval &= helper->saveData("defender_army_ids", s);
+    retval &= helper->save("defender_army_ids", s);
 
     // save what happened
     for (std::list<FightItem>::const_iterator fit = d_history.begin(); 
             fit != d_history.end(); ++fit)
     {
-        retval &= helper->openTag(Item::d_tag);
-        retval &= helper->saveData("turn", (*fit).turn);
-        retval &= helper->saveData("id", (*fit).id);
-        retval &= helper->saveData("damage", (*fit).damage);
-        retval &= helper->closeTag();
+        retval &= helper->open_tag(Item::d_tag);
+        retval &= helper->save("turn", (*fit).turn);
+        retval &= helper->save("id", (*fit).id);
+        retval &= helper->save("damage", (*fit).damage);
+        retval &= helper->close_tag();
     }
 
     return retval;
-}
-
-bool Action_Fight::stack_ids_to_stacks(std::list<guint32> stack_ids, std::list<Stack*> &stacks, guint32 &stack_id) const
-{
-  for (std::list<guint32>::iterator i = stack_ids.begin(); i != stack_ids.end(); ++i)
-    {
-      bool found = false;
-      for (Playerlist::iterator j = Playerlist::getInstance()->begin(), jend = Playerlist::getInstance()->end();
-           j != jend; ++j) 
-        {
-          Stack *s = (*j)->getStacklist()->getStackById(*i);
-          if (s)
-            {
-              found = true;
-              stacks.push_back(s);
-              break;
-            }
-        }
-      if (found == false)
-        {
-          stack_id = *i;
-          return false;
-        }
-    }
-  return true;
-}
-
-bool Action_Fight::is_army_id_in_stacks(guint32 id, const std::list<guint32> &stack_ids) const
-{
-  std::list<Stack*> stacks;
-  guint32 stack_id = 0;
-  bool success = stack_ids_to_stacks(stack_ids, stacks, stack_id);
-  if (!success)
-    return false;
-  bool found = false;
-  for (std::list<Stack*>::iterator i = stacks.begin(); i != stacks.end(); ++i)
-    {
-      if ((*i)->getArmyById(id))
-        {
-          found = true;
-          break;
-        }
-    }
-  if (found)
-    return true;
-  else
-    return false;
 }
 
 bool Action_Fight::loadItem(XML_Helper* helper)
 {
     FightItem item;
     
-    helper->getData(item.turn, "turn");
-    helper->getData(item.id, "id");
-    helper->getData(item.damage, "damage");
+    helper->get(item.turn, "turn");
+    helper->get(item.id, "id");
+    helper->get(item.damage, "damage");
 
     d_history.push_back(item);
 
@@ -671,16 +622,16 @@ Action_Join::Action_Join(const Action_Join &a)
 Action_Join::Action_Join(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_orig_id, "receiver");
-    helper->getData(d_joining_id, "joining");
+    helper->get(d_orig_id, "receiver");
+    helper->get(d_joining_id, "joining");
 }
 
 bool Action_Join::doSave(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->saveData("receiver", d_orig_id);
-    retval &= helper->saveData("joining", d_joining_id);
+    retval &= helper->save("receiver", d_orig_id);
+    retval &= helper->save("joining", d_joining_id);
 
     return retval;
 }
@@ -704,18 +655,18 @@ Action_Ruin::Action_Ruin(const Action_Ruin&a)
 Action_Ruin::Action_Ruin(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_ruin, "ruin");
-    helper->getData(d_stack, "seeker");
-    helper->getData(d_searched, "searched");
+    helper->get(d_ruin, "ruin");
+    helper->get(d_stack, "seeker");
+    helper->get(d_searched, "searched");
 }
 
 bool Action_Ruin::doSave(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->saveData("ruin", d_ruin);
-    retval &= helper->saveData("seeker", d_stack);
-    retval &= helper->saveData("searched", d_searched);
+    retval &= helper->save("ruin", d_ruin);
+    retval &= helper->save("seeker", d_stack);
+    retval &= helper->save("searched", d_searched);
 
     return retval;
 }
@@ -736,16 +687,16 @@ Action_Temple::Action_Temple(const Action_Temple &action)
 Action_Temple::Action_Temple(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_temple, "temple");
-    helper->getData(d_stack, "stack");
+    helper->get(d_temple, "temple");
+    helper->get(d_stack, "stack");
 }
 
 bool Action_Temple::doSave(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->saveData("temple", d_temple);
-    retval &= helper->saveData("stack", d_stack);
+    retval &= helper->save("temple", d_temple);
+    retval &= helper->save("stack", d_stack);
 
     return retval;
 }
@@ -766,12 +717,12 @@ Action_Occupy::Action_Occupy(const Action_Occupy &action)
 Action_Occupy::Action_Occupy(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_city, "city");
+    helper->get(d_city, "city");
 }
 
 bool Action_Occupy::doSave(XML_Helper* helper) const
 {
-    return helper->saveData("city", d_city);
+    return helper->save("city", d_city);
 }
 
 //-----------------------------------------------------------------------------
@@ -790,12 +741,12 @@ Action_Pillage::Action_Pillage(const Action_Pillage &action)
 Action_Pillage::Action_Pillage(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_city, "city");
+    helper->get(d_city, "city");
 }
 
 bool Action_Pillage::doSave(XML_Helper* helper) const
 {
-    return helper->saveData("city", d_city);
+    return helper->save("city", d_city);
 }
 
 //-----------------------------------------------------------------------------
@@ -814,12 +765,12 @@ Action_Sack::Action_Sack(const Action_Sack &action)
 Action_Sack::Action_Sack(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_city, "city");
+    helper->get(d_city, "city");
 }
 
 bool Action_Sack::doSave(XML_Helper* helper) const
 {
-    return helper->saveData("city", d_city);
+    return helper->save("city", d_city);
 }
 
 //-----------------------------------------------------------------------------
@@ -838,12 +789,12 @@ Action_Raze::Action_Raze(const Action_Raze &action)
 Action_Raze::Action_Raze(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_city, "city");
+    helper->get(d_city, "city");
 }
 
 bool Action_Raze::doSave(XML_Helper* helper) const
 {
-    return helper->saveData("city", d_city);
+    return helper->save("city", d_city);
 }
 
 //-----------------------------------------------------------------------------
@@ -862,18 +813,18 @@ Action_Buy::Action_Buy(const Action_Buy &a)
 Action_Buy::Action_Buy(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_city, "city");
-    helper->getData(d_slot, "slot");
-    helper->getData(d_prod, "production");
+    helper->get(d_city, "city");
+    helper->get(d_slot, "slot");
+    helper->get(d_prod, "production");
 }
 
 bool Action_Buy::doSave(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->saveData("city", d_city);
-    retval &= helper->saveData("slot", d_slot);
-    retval &= helper->saveData("production", d_prod);
+    retval &= helper->save("city", d_city);
+    retval &= helper->save("slot", d_slot);
+    retval &= helper->save("production", d_prod);
 
     return retval;
 }
@@ -894,16 +845,16 @@ Action_Production::Action_Production (const Action_Production &action)
 Action_Production::Action_Production(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_city, "city");
-    helper->getData(d_prod, "production");
+    helper->get(d_city, "city");
+    helper->get(d_prod, "production");
 }
 
 bool Action_Production::doSave(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->saveData("city", d_city);
-    retval &= helper->saveData("production", d_prod);
+    retval &= helper->save("city", d_city);
+    retval &= helper->save("production", d_prod);
 
     return retval;
 }
@@ -928,7 +879,7 @@ bool Action_Reward::load(Glib::ustring tag, XML_Helper *helper)
       {
 	guint32 t;
 	Glib::ustring type_str;
-	helper->getData(type_str, "type");
+	helper->get(type_str, "type");
 	t = Reward::rewardTypeFromString(type_str);
 	switch (t)
 	  {
@@ -961,9 +912,9 @@ Action_Reward::Action_Reward (const Action_Reward &action)
 Action_Reward::Action_Reward(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_stack, "stack");
+  helper->get(d_stack, "stack");
   d_reward = NULL;
-  helper->registerTag(Reward::d_tag, sigc::mem_fun(this, &Action_Reward::load));
+  helper->register_tag(Reward::d_tag, sigc::mem_fun(*this, &Action_Reward::load));
 }
 
 Glib::ustring Action_Reward::dump() const
@@ -1000,7 +951,7 @@ bool Action_Reward::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("stack", d_stack);
+  retval &= helper->save("stack", d_stack);
   if (d_reward->getType() == Reward::GOLD)
     retval &= dynamic_cast<Reward_Gold*>(d_reward)->save(helper);
   else if (d_reward->getType() == Reward::ALLIES)
@@ -1060,23 +1011,23 @@ Action_Quest::Action_Quest(XML_Helper* helper)
 :Action(helper)
 {
 
-  helper->getData(d_hero, "hero");
+  helper->get(d_hero, "hero");
   Glib::ustring s;
-  helper->getData(s, "quest");
+  helper->get(s, "quest");
   d_questtype = Quest::questTypeFromString(s);
-  helper->getData(d_data, "data");
-  helper->getData(d_victim_player, "victim_player");
+  helper->get(d_data, "data");
+  helper->get(d_victim_player, "victim_player");
 }
 
 bool Action_Quest::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("hero", d_hero);
+  retval &= helper->save("hero", d_hero);
   Glib::ustring s = Quest::questTypeToString(Quest::Type(d_questtype));
-  retval &= helper->saveData("quest", s);
-  retval &= helper->saveData("data", d_data);
-  retval &= helper->saveData("victim_player", d_victim_player);
+  retval &= helper->save("quest", s);
+  retval &= helper->save("data", d_data);
+  retval &= helper->save("victim_player", d_victim_player);
 
   return retval;
 }
@@ -1099,13 +1050,13 @@ Action_Equip::Action_Equip (const Action_Equip &a)
 Action_Equip::Action_Equip(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_hero, "hero");
-  helper->getData(d_item, "item");
-  helper->getData(d_slot, "dest");
+  helper->get(d_hero, "hero");
+  helper->get(d_item, "item");
+  helper->get(d_slot, "dest");
   int i;
-  helper->getData(i, "x");
+  helper->get(i, "x");
   d_pos.x = i;
-  helper->getData(i, "y");
+  helper->get(i, "y");
   d_pos.y = i;
 }
 
@@ -1113,13 +1064,13 @@ bool Action_Equip::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("hero", d_hero);
-  retval &= helper->saveData("item", d_item);
-  retval &= helper->saveData("dest", d_slot);
+  retval &= helper->save("hero", d_hero);
+  retval &= helper->save("item", d_item);
+  retval &= helper->save("dest", d_slot);
   int i = d_pos.x;
-  retval &= helper->saveData("x", i);
+  retval &= helper->save("x", i);
   i = d_pos.y;
-  retval &= helper->saveData("y", i);
+  retval &= helper->save("y", i);
 
   return retval;
 }
@@ -1140,16 +1091,16 @@ Action_Level::Action_Level (const Action_Level &action)
 Action_Level::Action_Level(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_army, "army");
-  helper->getData(d_stat, "stat");
+  helper->get(d_army, "army");
+  helper->get(d_stat, "stat");
 }
 
 bool Action_Level::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("army", d_army);
-  retval &= helper->saveData("stat", d_stat);
+  retval &= helper->save("army", d_army);
+  retval &= helper->save("stat", d_stat);
 
   return retval;
 }
@@ -1170,12 +1121,12 @@ Action_Disband::Action_Disband(const Action_Disband &action)
 Action_Disband::Action_Disband(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_stack, "stack");
+  helper->get(d_stack, "stack");
 }
 
 bool Action_Disband::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("stack", d_stack);
+  return helper->save("stack", d_stack);
 }
 
 //-----------------------------------------------------------------------------
@@ -1194,16 +1145,16 @@ Action_ModifySignpost::Action_ModifySignpost(const Action_ModifySignpost &a)
 Action_ModifySignpost::Action_ModifySignpost(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_signpost, "signpost");
-  helper->getData(d_message, "message");
+  helper->get(d_signpost, "signpost");
+  helper->get(d_message, "message");
 }
 
 bool Action_ModifySignpost::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("signpost", d_signpost);
-  retval &= helper->saveData("message", d_message);
+  retval &= helper->save("signpost", d_signpost);
+  retval &= helper->save("message", d_message);
 
   return retval;
 }
@@ -1224,16 +1175,16 @@ Action_RenameCity::Action_RenameCity(const Action_RenameCity &action)
 Action_RenameCity::Action_RenameCity(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_city, "city");
-  helper->getData(d_name, "name");
+  helper->get(d_city, "city");
+  helper->get(d_name, "name");
 }
 
 bool Action_RenameCity::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("city", d_city);
-  retval &= helper->saveData("name", d_name);
+  retval &= helper->save("city", d_city);
+  retval &= helper->save("name", d_name);
 
   return retval;
 }
@@ -1254,18 +1205,18 @@ Action_Vector::Action_Vector(const Action_Vector &action)
 Action_Vector::Action_Vector(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_city, "city");
-  helper->getData(d_dest.x, "x");
-  helper->getData(d_dest.y, "y");
+  helper->get(d_city, "city");
+  helper->get(d_dest.x, "x");
+  helper->get(d_dest.y, "y");
 }
 
 bool Action_Vector::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("city", d_city);
-  retval &= helper->saveData("x", d_dest.x);
-  retval &= helper->saveData("y", d_dest.y);
+  retval &= helper->save("city", d_city);
+  retval &= helper->save("x", d_dest.x);
+  retval &= helper->save("y", d_dest.y);
 
   return retval;
 }
@@ -1289,10 +1240,10 @@ Action_FightOrder::Action_FightOrder(XML_Helper* helper)
   Glib::ustring fight_order;
   std::stringstream sfight_order;
   guint32 val;
-  helper->getData(fight_order, "order");
+  helper->get(fight_order, "order");
   sfight_order.str(fight_order);
   //XXX XXX XXX this business of looking up the first living seems wrong.
-  Armyset *as = Armysetlist::getInstance()->get(Playerlist::getInstance()->getFirstLiving()->getArmyset());
+  Armyset *as = Armysetlist::instance()->get(Playerlist::instance()->getFirstLiving()->getArmyset());
   for (Armyset::iterator i = as->begin(); i != as->end(); ++i)
     {
       sfight_order >> val;
@@ -1308,7 +1259,7 @@ bool Action_FightOrder::doSave(XML_Helper* helper) const
   for (std::list<guint32>::const_iterator it = d_order.begin();
        it != d_order.end(); ++it)
     s += String::ucompose("%1 ", (*it));
-  retval &= helper->saveData("order", s);
+  retval &= helper->save("order", s);
 
   return retval;
 }
@@ -1332,16 +1283,16 @@ Action_Plant::Action_Plant(const Action_Plant &action)
 Action_Plant::Action_Plant(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_hero, "hero");
-  helper->getData(d_item, "item");
+  helper->get(d_hero, "hero");
+  helper->get(d_item, "item");
 }
 
 bool Action_Plant::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("hero", d_hero);
-  retval &= helper->saveData("item", d_item);
+  retval &= helper->save("hero", d_hero);
+  retval &= helper->save("item", d_item);
 
   return retval;
 }
@@ -1371,14 +1322,14 @@ Action_Produce::Action_Produce(const Action_Produce &a)
 Action_Produce::Action_Produce(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_city, "city");
-  helper->getData(d_vectored, "vectored");
-  helper->getData(d_dest.x, "dest_x");
-  helper->getData(d_dest.y, "dest_y");
-  helper->getData(d_army_id, "army_id");
-  helper->getData(d_stack_id, "stack_id");
+  helper->get(d_city, "city");
+  helper->get(d_vectored, "vectored");
+  helper->get(d_dest.x, "dest_x");
+  helper->get(d_dest.y, "dest_y");
+  helper->get(d_army_id, "army_id");
+  helper->get(d_stack_id, "stack_id");
   d_army = NULL;
-  helper->registerTag(ArmyProdBase::d_tag, sigc::mem_fun(this, &Action_Produce::load));
+  helper->register_tag(ArmyProdBase::d_tag, sigc::mem_fun(*this, &Action_Produce::load));
 }
 
 bool Action_Produce::load(Glib::ustring tag, XML_Helper *helper)
@@ -1402,12 +1353,12 @@ bool Action_Produce::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("city", d_city);
-  retval &= helper->saveData("vectored", d_vectored);
-  retval &= helper->saveData("dest_x", d_dest.x);
-  retval &= helper->saveData("dest_y", d_dest.y);
-  retval &= helper->saveData("army_id", d_army_id);
-  retval &= helper->saveData("stack_id", d_stack_id);
+  retval &= helper->save("city", d_city);
+  retval &= helper->save("vectored", d_vectored);
+  retval &= helper->save("dest_x", d_dest.x);
+  retval &= helper->save("dest_y", d_dest.y);
+  retval &= helper->save("army_id", d_army_id);
+  retval &= helper->save("stack_id", d_stack_id);
   retval &= d_army->save(helper);
 
   return retval;
@@ -1441,14 +1392,14 @@ Action_ProduceVectored::Action_ProduceVectored(const Action_ProduceVectored &a)
 Action_ProduceVectored::Action_ProduceVectored(XML_Helper* helper)
 :Action(helper), d_army(NULL)
 {
-  helper->getData(d_dest.x, "dest_x");
-  helper->getData(d_dest.y, "dest_y");
-  helper->getData(d_src.x, "src_x");
-  helper->getData(d_src.y, "src_y");
-  helper->getData(d_target_army_id, "target_army_id");
-  helper->getData(d_target_stack_id, "target_stack_id");
+  helper->get(d_dest.x, "dest_x");
+  helper->get(d_dest.y, "dest_y");
+  helper->get(d_src.x, "src_x");
+  helper->get(d_src.y, "src_y");
+  helper->get(d_target_army_id, "target_army_id");
+  helper->get(d_target_stack_id, "target_stack_id");
   d_army = NULL;
-  helper->registerTag(ArmyProdBase::d_tag, sigc::mem_fun(this, &Action_ProduceVectored::load));
+  helper->register_tag(ArmyProdBase::d_tag, sigc::mem_fun(*this, &Action_ProduceVectored::load));
 }
 
 bool Action_ProduceVectored::load(Glib::ustring tag, XML_Helper *helper)
@@ -1472,12 +1423,12 @@ bool Action_ProduceVectored::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("dest_x", d_dest.x);
-  retval &= helper->saveData("dest_y", d_dest.y);
-  retval &= helper->saveData("src_x", d_src.x);
-  retval &= helper->saveData("src_y", d_src.y);
-  retval &= helper->saveData("target_army_id", d_target_army_id);
-  retval &= helper->saveData("target_stack_id", d_target_stack_id);
+  retval &= helper->save("dest_x", d_dest.x);
+  retval &= helper->save("dest_y", d_dest.y);
+  retval &= helper->save("src_x", d_src.x);
+  retval &= helper->save("src_y", d_src.y);
+  retval &= helper->save("target_army_id", d_target_army_id);
+  retval &= helper->save("target_stack_id", d_target_stack_id);
   retval &= d_army->save(helper);
 
   return retval;
@@ -1503,8 +1454,8 @@ Action_DiplomacyState::Action_DiplomacyState(XML_Helper* helper)
 :Action(helper)
 {
   guint32 diplomatic_state;
-  helper->getData(d_opponent_id, "opponent_id");
-  helper->getData(diplomatic_state, "state");
+  helper->get(d_opponent_id, "opponent_id");
+  helper->get(diplomatic_state, "state");
   d_diplomatic_state = Player::DiplomaticState(diplomatic_state);
 }
 
@@ -1512,8 +1463,8 @@ bool Action_DiplomacyState::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("opponent_id", d_opponent_id);
-  retval &= helper->saveData("state", (guint32)d_diplomatic_state);
+  retval &= helper->save("opponent_id", d_opponent_id);
+  retval &= helper->save("state", (guint32)d_diplomatic_state);
 
   return retval;
 }
@@ -1539,8 +1490,8 @@ Action_DiplomacyProposal::Action_DiplomacyProposal(XML_Helper* helper)
 :Action(helper)
 {
   guint32 diplomatic_proposal;
-  helper->getData(d_opponent_id, "opponent_id");
-  helper->getData(diplomatic_proposal, "proposal");
+  helper->get(d_opponent_id, "opponent_id");
+  helper->get(diplomatic_proposal, "proposal");
   d_diplomatic_proposal = Player::DiplomaticProposal(diplomatic_proposal);
 }
 
@@ -1548,8 +1499,8 @@ bool Action_DiplomacyProposal::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("opponent_id", d_opponent_id);
-  retval &= helper->saveData("proposal", (guint32)d_diplomatic_proposal);
+  retval &= helper->save("opponent_id", d_opponent_id);
+  retval &= helper->save("proposal", (guint32)d_diplomatic_proposal);
 
   return retval;
 }
@@ -1570,16 +1521,16 @@ Action_DiplomacyScore::Action_DiplomacyScore(const Action_DiplomacyScore &a)
 Action_DiplomacyScore::Action_DiplomacyScore(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_opponent_id, "opponent_id");
-  helper->getData(d_amount, "amount");
+  helper->get(d_opponent_id, "opponent_id");
+  helper->get(d_amount, "amount");
 }
 
 bool Action_DiplomacyScore::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("opponent_id", d_opponent_id);
-  retval &= helper->saveData("amount", d_amount);
+  retval &= helper->save("opponent_id", d_opponent_id);
+  retval &= helper->save("amount", d_amount);
 
   return retval;
 }
@@ -1604,12 +1555,12 @@ Action_ConquerCity::Action_ConquerCity(const Action_ConquerCity &action)
 Action_ConquerCity::Action_ConquerCity(XML_Helper* helper)
   :Action(helper)
 {
-    helper->getData(d_city, "city");
+    helper->get(d_city, "city");
 }
 
 bool Action_ConquerCity::doSave(XML_Helper* helper) const
 {
-    return helper->saveData("city", d_city);
+    return helper->save("city", d_city);
 }
 
 //-----------------------------------------------------------------------------
@@ -1628,11 +1579,11 @@ Action_RecruitHero::Action_RecruitHero(HeroProto* h, City *c, int cost, int alli
 Action_RecruitHero::Action_RecruitHero(XML_Helper* helper)
   :Action(helper)
 {
-    helper->getData(d_city, "city");
-    helper->getData(d_cost, "cost");
-    helper->getData(d_allies, "allies");
-    helper->getData(d_ally_army_type, "ally_army_type");
-    helper->registerTag(HeroProto::d_heroproto_tag, sigc::mem_fun(this, &Action_RecruitHero::load));
+    helper->get(d_city, "city");
+    helper->get(d_cost, "cost");
+    helper->get(d_allies, "allies");
+    helper->get(d_ally_army_type, "ally_army_type");
+    helper->register_tag(HeroProto::d_heroproto_tag, sigc::mem_fun(*this, &Action_RecruitHero::load));
 }
 
 Action_RecruitHero::Action_RecruitHero(const Action_RecruitHero &a)
@@ -1664,10 +1615,10 @@ bool Action_RecruitHero::doSave(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->saveData("city", d_city);
-    retval &= helper->saveData("cost", d_cost);
-    retval &= helper->saveData("allies", d_allies);
-    retval &= helper->saveData("ally_army_type", d_ally_army_type);
+    retval &= helper->save("city", d_city);
+    retval &= helper->save("cost", d_cost);
+    retval &= helper->save("allies", d_allies);
+    retval &= helper->save("ally_army_type", d_ally_army_type);
     retval &= d_hero->save(helper);
 
     return retval;
@@ -1690,16 +1641,16 @@ Action_CityTooPoorToProduce::Action_CityTooPoorToProduce(const Action_CityTooPoo
 Action_CityTooPoorToProduce::Action_CityTooPoorToProduce(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_city, "city");
-    helper->getData(d_army_type, "army_type");
+    helper->get(d_city, "city");
+    helper->get(d_army_type, "army_type");
 }
 
 bool Action_CityTooPoorToProduce::doSave(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->saveData("city", d_city);
-    retval &= helper->saveData("army_type", d_army_type);
+    retval &= helper->save("city", d_city);
+    retval &= helper->save("army_type", d_army_type);
 
     return retval;
 }
@@ -1720,13 +1671,13 @@ Action_InitTurn::Action_InitTurn(const Action_InitTurn &action)
 Action_InitTurn::Action_InitTurn(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_order, "order");
+  helper->get(d_order, "order");
 }
 
 bool Action_InitTurn::doSave(XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->saveData("order", d_order);
+  retval &= helper->save("order", d_order);
   return retval;
 }
 
@@ -1751,20 +1702,20 @@ Action_Loot::Action_Loot(const Action_Loot &a)
 Action_Loot::Action_Loot(XML_Helper* helper)
     :Action(helper)
 {
-    helper->getData(d_looting_player_id, "looting_player_id");
-    helper->getData(d_looted_player_id, "looted_player_id");
-    helper->getData(d_gold_added, "gold_added");
-    helper->getData(d_gold_removed, "gold_removed");
+    helper->get(d_looting_player_id, "looting_player_id");
+    helper->get(d_looted_player_id, "looted_player_id");
+    helper->get(d_gold_added, "gold_added");
+    helper->get(d_gold_removed, "gold_removed");
 }
 
 bool Action_Loot::doSave(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->saveData("looting_player_id", d_looting_player_id);
-    retval &= helper->saveData("looted_player_id", d_looted_player_id);
-    retval &= helper->saveData("gold_added", d_gold_added);
-    retval &= helper->saveData("gold_removed", d_gold_removed);
+    retval &= helper->save("looting_player_id", d_looting_player_id);
+    retval &= helper->save("looted_player_id", d_looted_player_id);
+    retval &= helper->save("gold_added", d_gold_added);
+    retval &= helper->save("gold_removed", d_gold_removed);
 
     return retval;
 }
@@ -1801,26 +1752,26 @@ Action_UseItem::Action_UseItem(XML_Helper* helper)
 :Action(helper)
 {
 
-  helper->getData(d_hero, "hero");
-  helper->getData(d_item, "item");
-  helper->getData(d_victim_player, "victim_player");
-  helper->getData(d_friendly_city, "friendly_city");
-  helper->getData(d_enemy_city, "enemy_city");
-  helper->getData(d_neutral_city, "neutral_city");
-  helper->getData(d_city, "city");
+  helper->get(d_hero, "hero");
+  helper->get(d_item, "item");
+  helper->get(d_victim_player, "victim_player");
+  helper->get(d_friendly_city, "friendly_city");
+  helper->get(d_enemy_city, "enemy_city");
+  helper->get(d_neutral_city, "neutral_city");
+  helper->get(d_city, "city");
 }
 
 bool Action_UseItem::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("hero", d_hero);
-  retval &= helper->saveData("item", d_item);
-  retval &= helper->saveData("victim_player", d_victim_player);
-  retval &= helper->saveData("friendly_city", d_friendly_city);
-  retval &= helper->saveData("enemy_city", d_enemy_city);
-  retval &= helper->saveData("neutral_city", d_neutral_city);
-  retval &= helper->saveData("city", d_city);
+  retval &= helper->save("hero", d_hero);
+  retval &= helper->save("item", d_item);
+  retval &= helper->save("victim_player", d_victim_player);
+  retval &= helper->save("friendly_city", d_friendly_city);
+  retval &= helper->save("enemy_city", d_enemy_city);
+  retval &= helper->save("neutral_city", d_neutral_city);
+  retval &= helper->save("city", d_city);
 
   return retval;
 }
@@ -1846,10 +1797,10 @@ Action_ReorderArmies::Action_ReorderArmies(XML_Helper* helper)
 :Action(helper)
 {
 
-  helper->getData(d_stack_id, "stack_id");
-  helper->getData(d_player_id, "player_id");
+  helper->get(d_stack_id, "stack_id");
+  helper->get(d_player_id, "player_id");
   Glib::ustring armies;
-  helper->getData(armies, "armies");
+  helper->get(armies, "armies");
   std::stringstream sarmies;
   sarmies.str(armies);
   int ival = -1;
@@ -1866,13 +1817,13 @@ bool Action_ReorderArmies::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("stack_id", d_stack_id);
-  retval &= helper->saveData("player_id", d_player_id);
+  retval &= helper->save("stack_id", d_stack_id);
+  retval &= helper->save("player_id", d_player_id);
 
   Glib::ustring s;
   for (auto it: d_army_ids)
     s += String::ucompose("%1 ", it);
-  retval &= helper->saveData("armies", s);
+  retval &= helper->save("armies", s);
   return retval;
 }
 
@@ -1892,12 +1843,12 @@ Action_ResetStacks::Action_ResetStacks(const Action_ResetStacks &action)
 Action_ResetStacks::Action_ResetStacks(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_player_id, "player_id");
+  helper->get(d_player_id, "player_id");
 }
 
 bool Action_ResetStacks::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("player_id", d_player_id);
+  return helper->save("player_id", d_player_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -1942,15 +1893,15 @@ Action_CollectTaxesAndPayUpkeep::Action_CollectTaxesAndPayUpkeep(const Action_Co
 Action_CollectTaxesAndPayUpkeep::Action_CollectTaxesAndPayUpkeep(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_from_gold, "from_gold");
-  helper->getData(d_to_gold, "to_gold");
+  helper->get(d_from_gold, "from_gold");
+  helper->get(d_to_gold, "to_gold");
 }
 
 bool Action_CollectTaxesAndPayUpkeep::doSave(XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->saveData("from_gold", d_from_gold);
-  retval &= helper->saveData("to_gold", d_to_gold);
+  retval &= helper->save("from_gold", d_from_gold);
+  retval &= helper->save("to_gold", d_to_gold);
   return retval;
 }
 
@@ -1973,12 +1924,12 @@ Action_DefendStack::Action_DefendStack(const Action_DefendStack &action)
 Action_DefendStack::Action_DefendStack(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_stack_id, "stack_id");
+  helper->get(d_stack_id, "stack_id");
 }
 
 bool Action_DefendStack::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("stack_id", d_stack_id);
+  return helper->save("stack_id", d_stack_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -1997,12 +1948,12 @@ Action_UndefendStack::Action_UndefendStack(const Action_UndefendStack &action)
 Action_UndefendStack::Action_UndefendStack(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_stack_id, "stack_id");
+  helper->get(d_stack_id, "stack_id");
 }
 
 bool Action_UndefendStack::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("stack_id", d_stack_id);
+  return helper->save("stack_id", d_stack_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -2021,12 +1972,12 @@ Action_ParkStack::Action_ParkStack(const Action_ParkStack &action)
 Action_ParkStack::Action_ParkStack(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_stack_id, "stack_id");
+  helper->get(d_stack_id, "stack_id");
 }
 
 bool Action_ParkStack::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("stack_id", d_stack_id);
+  return helper->save("stack_id", d_stack_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -2045,12 +1996,12 @@ Action_UnparkStack::Action_UnparkStack(const Action_UnparkStack &action)
 Action_UnparkStack::Action_UnparkStack(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_stack_id, "stack_id");
+  helper->get(d_stack_id, "stack_id");
 }
 
 bool Action_UnparkStack::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("stack_id", d_stack_id);
+  return helper->save("stack_id", d_stack_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -2069,12 +2020,12 @@ Action_SelectStack::Action_SelectStack(const Action_SelectStack &action)
 Action_SelectStack::Action_SelectStack(XML_Helper* helper)
 :Action(helper)
 {
-  helper->getData(d_stack_id, "stack_id");
+  helper->get(d_stack_id, "stack_id");
 }
 
 bool Action_SelectStack::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("stack_id", d_stack_id);
+  return helper->save("stack_id", d_stack_id);
 }
 
 //-----------------------------------------------------------------------------

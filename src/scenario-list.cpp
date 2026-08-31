@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <assert.h>
 #include <algorithm>
@@ -21,11 +20,11 @@
 
 #include "scenario-list.h"
 #include "scenario-details.h"
-#include "File.h"
+#include "file.h"
 
 ScenarioList* ScenarioList::s_instance = 0;
 
-ScenarioList* ScenarioList::getInstance()
+ScenarioList* ScenarioList::instance()
 {
   if (s_instance == 0)
     s_instance = new ScenarioList();
@@ -69,7 +68,7 @@ ScenarioList::ScenarioList()
 
 bool ScenarioList::compare(const ScenarioDetails *lhs, const ScenarioDetails *rhs)
 {
-  return lhs->getName().compare (rhs->getName ()) < 0;
+  return lhs->get_name ().compare (rhs->get_name ()) < 0;
 }
 
 ScenarioList::~ScenarioList()
@@ -95,7 +94,7 @@ bool ScenarioList::remove_file (Glib::ustring filename)
 {
   std::list<ScenarioDetails*> del;
   for (iterator i = begin (); i != end (); ++i)
-    if ((*i)->getFilename () == filename)
+    if ((*i)->get_filename () == filename)
       del.push_back (*i);
 
   del.reverse ();
@@ -103,7 +102,7 @@ bool ScenarioList::remove_file (Glib::ustring filename)
   bool success = true;
   for (auto f : del)
     {
-      success = File::erase (f->getFilename ());
+      success = File::erase (f->get_filename  ());
       if (success)
         remove (f);
       break;
@@ -111,7 +110,7 @@ bool ScenarioList::remove_file (Glib::ustring filename)
   return success;
 }
 
-Glib::ustring ScenarioList::findFreeName (Glib::ustring name)
+Glib::ustring ScenarioList::find_free_name (Glib::ustring name)
 {
   Glib::ustring new_name;
   guint32 max = 1000;
@@ -121,7 +120,7 @@ Glib::ustring ScenarioList::findFreeName (Glib::ustring name)
       bool found = false;
       for (iterator i = begin (); i != end (); ++i)
         {
-          if ((*i)->getName () == new_name)
+          if ((*i)->get_name () == new_name)
             {
               found = true;
               break;

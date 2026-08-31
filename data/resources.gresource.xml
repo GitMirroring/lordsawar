@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2026 Ben Asselstine
+This file is licensed under the terms of the GNU GPL version 3 or later.
+-->
+<gresources>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="lw.css">../data/ui/lw.css</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="main-prefs.ui">../data/ui/main-prefs.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="new-net-game.ui">../data/ui/new-net-game.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="army-bonus.ui">../data/ui/army-bonus.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="hero-gains-level.ui">../data/ui/hero-gains-level.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="buy-production.ui">../data/ui/buy-production.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="characters.ui">../data/ui/characters.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city-defeated.ui">../data/ui/city-defeated.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city-looted.ui">../data/ui/city-looted.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city-pillaged.ui">../data/ui/city-pillaged.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city-sacked.ui">../data/ui/city-sacked.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city.ui">../data/ui/city.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="destination.ui">../data/ui/destination.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="diplomacy-report.ui">../data/ui/diplomacy-report.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="diplomacy.ui">../data/ui/diplomacy.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="disband-stack.ui">../data/ui/disband-stack.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="fight-order.ui">../data/ui/fight-order.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="game-loaded.ui">../data/ui/game-loaded.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="game-lobby.ui">../data/ui/game-lobby.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="gold-stolen.ui">../data/ui/gold-stolen.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="game-options.ui">../data/ui/game-options.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="game-over.ui">../data/ui/game-over.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="setup-new-game.ui">../data/ui/setup-new-game.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="game-quit.ui">../data/ui/game-quit.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="hero-brings-allies.ui">../data/ui/hero-brings-allies.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="hero-levels.ui">../data/ui/hero-levels.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="hero-offer.ui">../data/ui/hero-offer.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="hero.ui">../data/ui/hero.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="history-report.ui">../data/ui/history-report.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="item-bonus.ui">../data/ui/item-bonus.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="item-report.ui">../data/ui/item-report.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="choose-scenario.ui">../data/ui/choose-scenario.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="army-awarded-medal.ui">../data/ui/army-awarded-medal.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="military-advisor.ui">../data/ui/military-advisor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="add-profile.ui">../data/ui/add-profile.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="new-random-map.ui">../data/ui/new-random-map.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="next-turn.ui">../data/ui/next-turn.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="join-game.ui">../data/ui/join-game.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="player-died.ui">../data/ui/player-died.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="player-resign.ui">../data/ui/player-resign.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="player-resign-completed.ui">../data/ui/player-resign-completed.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="preferences.ui">../data/ui/preferences.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="quest-assigned.ui">../data/ui/quest-assigned.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="quest-completed.ui">../data/ui/quest-completed.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="quest-expired.ui">../data/ui/quest-expired.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="quest-report.ui">../data/ui/quest-report.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="report.ui">../data/ui/report.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="ruinfight-finished.ui">../data/ui/ruinfight-finished.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="ruinfight-started.ui">../data/ui/ruinfight-started.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="ruin-report.ui">../data/ui/ruin-report.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="ruin-rewarded.ui">../data/ui/ruin-rewarded.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="ruin-searched.ui">../data/ui/ruin-searched.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="sage.ui">../data/ui/sage.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="ships-sunk.ui">../data/ui/ships-sunk.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="signpost-change.ui">../data/ui/signpost-change.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="stack-info.ui">../data/ui/stack-info.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="surrender-refused.ui">../data/ui/surrender-refused.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="surrender.ui">../data/ui/surrender.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="search-temple.ui">../data/ui/search-temple.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="treachery.ui">../data/ui/treachery.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="triumphs.ui">../data/ui/triumphs.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="use-item-on-city.ui">../data/ui/use-item-on-city.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="use-item-on-player.ui">../data/ui/use-item-on-player.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="use-item.ui">../data/ui/use-item.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="armyset-info.ui">../data/ui/editor/armyset-info.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="armyset-selector-editor.ui">../data/ui/editor/armyset-selector-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="backpack-editor.ui">../data/ui/editor/backpack-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="battle-calculator.ui">../data/ui/editor/battle-calculator.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city-editor.ui">../data/ui/editor/city-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="cityset-info.ui">../data/ui/editor/cityset-info.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="fight-order-editor.ui">../data/ui/editor/fight-order-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="hero-editor.ui">../data/ui/editor/hero-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="character-editor.ui">../data/ui/editor/character-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="image-editor.ui">../data/ui/editor/image-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="item-editor.ui">../data/ui/editor/item-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="itemlist.ui">../data/ui/editor/itemlist.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="keeper.ui">../data/ui/editor/keeper.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="map-info.ui">../data/ui/editor/map-info.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="media.ui">../data/ui/editor/media.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="new-map.ui">../data/ui/editor/new-map.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="planted-standard-editor.ui">../data/ui/editor/planted-standard-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="players.ui">../data/ui/editor/players.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="reward-editor.ui">../data/ui/editor/reward-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="reward-list.ui">../data/ui/editor/reward-list.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="ruin-editor.ui">../data/ui/editor/ruin-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="select-army.ui">../data/ui/editor/select-army.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="select-character.ui">../data/ui/editor/select-character.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="select-hidden-ruin.ui">../data/ui/editor/select-hidden-ruin.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="select-item.ui">../data/ui/editor/select-item.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="shieldset-info.ui">../data/ui/editor/shieldset-info.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="signpost-editor.ui">../data/ui/editor/signpost-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="stack-editor.ui">../data/ui/editor/stack-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="stone-editor.ui">../data/ui/editor/stone-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="select-strategy.ui">../data/ui/editor/select-strategy.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="switch-sets.ui">../data/ui/editor/switch-sets.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="masked-image-editor.ui">../data/ui/editor/masked-image-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="temple-editor.ui">../data/ui/editor/temple-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="tile-preview.ui">../data/ui/editor/tile-preview.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="tileset-explosion-picture-editor.ui">../data/ui/editor/tileset-explosion-picture-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="tileset-flag-editor.ui">../data/ui/editor/tileset-flag-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="tileset-info.ui">../data/ui/editor/tileset-info.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="tileset-move-bonus-image.ui">../data/ui/editor/tileset-move-bonus-image.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="tileset-selector-editor.ui">../data/ui/editor/tileset-selector-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="tileset-smallmap-building-colors.ui">../data/ui/editor/tileset-smallmap-building-colors.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="tilestyles.ui">../data/ui/editor/tilestyles.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="validation.ui">../data/ui/editor/validation.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="status-box.ui">../data/ui/status-box.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="stack-tile-box.ui">../data/ui/stack-tile-box.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="stack-army-button.ui">../data/ui/stack-army-button.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="commentator.ui">../data/ui/commentator.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="surrender-accepted.ui">../data/ui/surrender-accepted.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city-rename.ui">../data/ui/city-rename.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city-raze.ui">../data/ui/city-raze.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city-razed.ui">../data/ui/city-razed.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="bags-picked-up.ui">../data/ui/bags-picked-up.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="worms-killed.ui">../data/ui/worms-killed.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="bridge-burned.ui">../data/ui/bridge-burned.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="keeper-captured.ui">../data/ui/keeper-captured.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="monster-summoned.ui">../data/ui/monster-summoned.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="stack-teleported.ui">../data/ui/stack-teleported.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city-defended.ui">../data/ui/city-defended.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city-diseased.ui">../data/ui/city-diseased.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="city-persuaded.ui">../data/ui/city-persuaded.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="mp-added-to-hero-stack.ui">../data/ui/mp-added-to-hero-stack.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="profile-manager.ui">../data/ui/profile-manager.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="tartan-preview.ui">../data/ui/editor/tartan-preview.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="armies-preview.ui">../data/ui/editor/armies-preview.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="item-bonus-editor.ui">../data/ui/editor/item-bonus-editor.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="starting-items.ui">../data/ui/editor/starting-items.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="randomize.ui">../data/ui/editor/randomize.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="scenario-info.ui">../data/ui/scenario-info.ui</file>
+  </gresource>
+  <gresource prefix="/com/gitlab/benhorst/lw">
+    <file alias="new-connection.ui">../data/ui/new-connection.ui</file>
+  </gresource>
+</gresources>

@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,144 +12,181 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef SHIELDSET_EDITOR_ACTIONS_H
-#define SHIELDSET_EDITOR_ACTIONS_H
+#ifndef SHIELDSET_UNDO_H
+#define SHIELDSET_UNDO_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "defs.h"
 #include "undo-action.h"
+#include "file.h"
+#include "shield-set.h"
 
 class Shieldset;
 
 //! A record of an event in the shieldset editor
-/** 
+/**
  * The purpose of these classes is to implement undo/redo in the shieldset
  * editor.
  */
 
-class ShieldSetEditorAction: public UndoAction
+class ShieldSetUndoAction: public UndoAction
 {
-    public:
+public:
 
-	//! A ShieldSet Editor Action can be one of the following kinds.
-        enum Type {
-	        /** Modify a player's shield colors. */
-                CHANGE_COLORS = 1,
-	        /** Modify description/copyright/license. */
-                CHANGE_PROPERTIES = 2,
-	        /** Modify the non white shields to be the same as white. */
-                COPY_WHITE_DOWN = 3,
-                /** A shield or tartan image has been set */
-                ADD_IMAGE = 4,
-                /** A shield or tartan image has been cleared*/
-                CLEAR_IMAGE = 5,
-        };
+    //! A ShieldSet Undo Action can be one of the following kinds.
+    enum Type
+      {
+        /** Modify a player's shield colors. */
+        CHANGE_COLORS = 1,
+        /** Modify description/copyright/license. */
+        CHANGE_PROPERTIES,
+        /** Modify the non white shields to be the same as white. */
+        COPY_WHITE_DOWN,
+        /** A shield or tartan image has been set */
+        ADD_IMAGE,
+        /** A shield or tartan image has been cleared*/
+        CLEAR_IMAGE,
+      };
 
-	//! Default constructor.
-        ShieldSetEditorAction(Type type,
-                              UndoAction::AggregateType a = UndoAction::AGGREGATE_NONE)
-          : UndoAction (a), d_type(type) {}
+    //! Default constructor.
+    ShieldSetUndoAction (Type type,
+                         UndoAction::AggregateType a =
+                         UndoAction::AGGREGATE_NONE)
+      : UndoAction (a), m_type (type)
+      {
+      }
 
-        Type getType() const {return d_type;}
+    Type get_type() const
+      {
+        return m_type;
+      }
 
-    protected:
+protected:
 
-        Type d_type;
+    Type m_type;
 };
 
-class ShieldSetEditorAction_ShieldIndex: public ShieldSetEditorAction
+class ShieldSetUndoAction_ShieldIndex: public ShieldSetUndoAction
 {
-    public:
-        ShieldSetEditorAction_ShieldIndex (Type t, guint32 i, bool agg = false)
-          : ShieldSetEditorAction (t, agg ? UndoAction::AGGREGATE_DELAY : UndoAction::AGGREGATE_NONE), d_index (i) {}
-        ~ShieldSetEditorAction_ShieldIndex () {}
+public:
+    ShieldSetUndoAction_ShieldIndex (Type t, guint32 i, bool agg = false)
+      : ShieldSetUndoAction (t, agg ? UndoAction::AGGREGATE_DELAY :
+                             UndoAction::AGGREGATE_NONE), m_index (i)
+      {
+      }
 
-        guint32 getIndex () {return d_index;}
-    private:
-        guint32 d_index;
+    ~ShieldSetUndoAction_ShieldIndex ()
+      {
+      }
+
+    guint32 get_index () const
+      {
+        return m_index;
+      }
+private:
+    guint32 m_index;
 };
 //-----------------------------------------------------------------------------
 
 //! A record of the player's colors changing in the shieldset editor.
 /**
- * The purpose of the ShieldSetEditorAction_Color class is to record
+ * The purpose of the ShieldSetUndoAction_Color class is to record
  * when a player's colors have been modified.
  */
-class ShieldSetEditorAction_Colors: public ShieldSetEditorAction_ShieldIndex
+class ShieldSetUndoAction_Colors: public ShieldSetUndoAction_ShieldIndex
 {
-    public:
-	//! Make a new change color action
-	/**
-         * Populate the change color action with the player id and the
-         * set of colors.
-         */
-        ShieldSetEditorAction_Colors (guint32 id, std::vector<Gdk::RGBA> c)
-          : ShieldSetEditorAction_ShieldIndex(CHANGE_COLORS, id),
-          d_colors (c) {}
-	//! Destroy a change color action.
-        ~ShieldSetEditorAction_Colors () {}
+public:
+    //! Make a new change color action
+    /**
+     * Populate the change color action with the player id and the
+     * set of colors.
+     */
+    ShieldSetUndoAction_Colors (guint32 id, std::vector<Gdk::RGBA> c)
+      : ShieldSetUndoAction_ShieldIndex (CHANGE_COLORS, id),
+      m_colors (c)
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Color");}
+    //! Destroy a change color action.
+    ~ShieldSetUndoAction_Colors ()
+      {
+      }
 
-        std::vector<Gdk::RGBA> getColors () const {return d_colors;}
+    Glib::ustring get_action_name () const
+      {
+        return "Color";
+      }
 
-    private:
-        std::vector<Gdk::RGBA> d_colors;
+    std::vector<Gdk::RGBA> get_colors () const
+      {
+        return m_colors;
+      }
+
+private:
+    std::vector<Gdk::RGBA> m_colors;
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of the shieldset's properties changing in the editor.
 /**
- * The purpose of the ShieldSetEditorAction_Properties class is to record
+ * The purpose of the ShieldSetUndoAction_Properties class is to record
  * when a shieldset's name, description, copyright and license have changed.
  */
-class ShieldSetEditorAction_Properties: public ShieldSetEditorAction
+class ShieldSetUndoAction_Properties: public ShieldSetUndoAction
 {
-    public:
-	//! Make a new change properties action
-	/**
-         * Populate the properties action with the new name, description,
-         * copyright, license text, and shield image dimensions:
-         * small medium large, and width and heights.
-         */
-        ShieldSetEditorAction_Properties (Glib::ustring n, Glib::ustring d, Glib::ustring c, Glib::ustring l, guint32 sw, guint32 sh, guint32 mw, guint32 mh, guint32 lw, guint32 lh)
-          :ShieldSetEditorAction(ShieldSetEditorAction::CHANGE_PROPERTIES),
-          d_name (n), d_desc (d), d_copyright (c), d_license (l),
-          d_small_width (sw), d_small_height (sh), d_medium_width (mw),
-          d_medium_height (mh), d_large_width (lw), d_large_height (lh) {}
-	//! Destroy a change properties action.
-        ~ShieldSetEditorAction_Properties () {}
+public:
+    //! Make a new change properties action
+    /**
+     * Populate the properties action with the new name, description,
+     * copyright, and license text
+     */
+    ShieldSetUndoAction_Properties (Glib::ustring n, Glib::ustring d,
+                                    Glib::ustring c, Glib::ustring l)
+      :ShieldSetUndoAction (ShieldSetUndoAction::CHANGE_PROPERTIES),
+      m_name (n), m_desc (d), m_copyright (c), m_license (l)
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Properties");}
+    //! Destroy a change properties action.
+    ~ShieldSetUndoAction_Properties ()
+      {
+      }
 
-        Glib::ustring getName () {return d_name;}
-        Glib::ustring getDescription () {return d_desc;}
-        Glib::ustring getCopyright () {return d_copyright;}
-        Glib::ustring getLicense () {return d_license;}
+    Glib::ustring get_action_name () const
+      {
+        return "Properties";
+      }
 
-        guint32 getSmallWidth () {return d_small_width;}
-        guint32 getSmallHeight () {return d_small_height;}
-        guint32 getMediumWidth () {return d_medium_width;}
-        guint32 getMediumHeight () {return d_medium_height;}
-        guint32 getLargeWidth () {return d_large_width;}
-        guint32 getLargeHeight  () {return d_large_height;}
-    private:
-        Glib::ustring d_name;
-        Glib::ustring d_desc;
-        Glib::ustring d_copyright;
-        Glib::ustring d_license;
-        guint32 d_small_width;
-        guint32 d_small_height;
-        guint32 d_medium_width;
-        guint32 d_medium_height;
-        guint32 d_large_width;
-        guint32 d_large_height;
+    Glib::ustring get_name () const
+      {
+        return m_name;
+      }
+
+    Glib::ustring get_description () const
+      {
+        return m_desc;
+      }
+
+    Glib::ustring get_copyright () const
+      {
+        return m_copyright;
+      }
+
+    Glib::ustring get_license () const
+      {
+        return m_license;
+      }
+
+private:
+    Glib::ustring m_name;
+    Glib::ustring m_desc;
+    Glib::ustring m_copyright;
+    Glib::ustring m_license;
 };
 
 //-----------------------------------------------------------------------------
@@ -160,44 +197,70 @@ class ShieldSetEditorAction_Properties: public ShieldSetEditorAction
  * Several actions require saving the whole tar file because it's the
  * easiest way to implement undo/redo.
  */
-class ShieldSetEditorAction_Save: public ShieldSetEditorAction
+class ShieldSetUndoAction_Save: public ShieldSetUndoAction
 {
-    public:
-        ShieldSetEditorAction_Save (Shieldset *s, Type t);
-        ~ShieldSetEditorAction_Save ();
+public:
+    ShieldSetUndoAction_Save (Shieldset *s, Type t)
+      :ShieldSetUndoAction (t)
+      {
+        m_shieldset = new Shieldset (*s);
 
-        Glib::ustring getShieldsetFilename () const {return d_filename;}
-        Shieldset *getShieldset () const {return d_shieldset;}
-    private:
-        Glib::ustring d_filename;
-        Shieldset *d_shieldset;
+        m_filename = File::get_tmp_file () + SHIELDSET_EXT;
+        s->save (m_filename, SHIELDSET_EXT);
+      }
+
+    ~ShieldSetUndoAction_Save ()
+      {
+        File::erase (m_filename);
+        delete m_shieldset;
+      }
+
+    Glib::ustring get_shieldset_filename () const
+      {
+        return m_filename;
+      }
+
+    Shieldset *get_shieldset () const
+      {
+        return m_shieldset;
+      }
+private:
+    Glib::ustring m_filename;
+    Shieldset *m_shieldset;
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of the shieldset's shields changing in the editor en masse.
 /**
- * The purpose of the ShieldSetEditorAction_WhiteDown class is to record
+ * The purpose of the ShieldSetUndoAction_WhiteDown class is to record
  * when a shieldset's white shields are copied down to the other shields.
  *
  * We take a copy of the whole shieldset to get all of the images in one
- * go.  Our copy is a file on disk and is deleted when this class is 
+ * go.  Our copy is a file on disk and is deleted when this class is
  * destroyed.
  */
-class ShieldSetEditorAction_WhiteDown: public ShieldSetEditorAction_Save
+class ShieldSetUndoAction_WhiteDown: public ShieldSetUndoAction_Save
 {
-    public:
-	//! Make a new copy white shields down action
-	/**
-         * Populate the white down action with the shieldset.
-         */
-        ShieldSetEditorAction_WhiteDown (Shieldset *s)
-          :ShieldSetEditorAction_Save(s,
-                                      ShieldSetEditorAction::COPY_WHITE_DOWN){}
-	//! Destroy a white down action, and delete the file.
-        ~ShieldSetEditorAction_WhiteDown () {}
+public:
+    //! Make a new copy white shields down action
+    /**
+     * Populate the white down action with the shieldset.
+     */
+    ShieldSetUndoAction_WhiteDown (Shieldset *s)
+      :ShieldSetUndoAction_Save (s, ShieldSetUndoAction::COPY_WHITE_DOWN)
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Copy White Shields");}
+    //! Destroy a white down action, and delete the file.
+    ~ShieldSetUndoAction_WhiteDown ()
+      {
+      }
+
+    Glib::ustring getActionName () const
+      {
+        return "Copy White Shields";
+      }
 
 };
 
@@ -205,49 +268,65 @@ class ShieldSetEditorAction_WhiteDown: public ShieldSetEditorAction_Save
 
 //! A record of a shieldset image being added or replaced
 /**
- * The purpose of the ShieldSetEditorAction_AddImage class is to record
+ * The purpose of the ShieldSetUndoAction_AddImage class is to record
  * when we select a new file.
  *
  * We take a copy of the whole shieldset.  Our copy is a file on disk and
  * is deleted when this class is destroyed.
  */
-class ShieldSetEditorAction_AddImage: public ShieldSetEditorAction_Save
+class ShieldSetUndoAction_AddImage: public ShieldSetUndoAction_Save
 {
-    public:
-	//! Make a new add-file action
-	/**
-         * Populate the add image action with the shieldset.
-         */
-        ShieldSetEditorAction_AddImage (Shieldset *s)
-          :ShieldSetEditorAction_Save(s, ShieldSetEditorAction::ADD_IMAGE) {}
-	//! Destroy an add-image action, and delete the file.
-        ~ShieldSetEditorAction_AddImage () {}
+public:
+    //! Make a new add-file action
+    /**
+     * Populate the add image action with the shieldset.
+     */
+    ShieldSetUndoAction_AddImage (Shieldset *s)
+      :ShieldSetUndoAction_Save (s, ShieldSetUndoAction::ADD_IMAGE)
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Add Image");}
+    //! Destroy an add-image action, and delete the file.
+    ~ShieldSetUndoAction_AddImage ()
+      {
+      }
+
+    Glib::ustring getActionName () const
+      {
+        return "Add Image";
+      }
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of a shieldset image being cleared
 /**
- * The purpose of the ShieldSetEditorAction_ClearImage class is to record
+ * The purpose of the ShieldSetUndoAction_ClearImage class is to record
  * when we disassociate an image file with a shield or tartan.
  *
  * We take a copy of the whole shieldset.  Our copy is a file on disk and
  * is deleted when this class is destroyed.
  */
-class ShieldSetEditorAction_ClearImage: public ShieldSetEditorAction_Save
+class ShieldSetUndoAction_ClearImage: public ShieldSetUndoAction_Save
 {
-    public:
-	//! Make a new clear-file action
-	/**
-         * Populate the clear image action with the shieldset.
-         */
-        ShieldSetEditorAction_ClearImage (Shieldset *s)
-          :ShieldSetEditorAction_Save(s, ShieldSetEditorAction::CLEAR_IMAGE){}
-	//! Destroy an clear-image action, and delete the file.
-        ~ShieldSetEditorAction_ClearImage () {}
+public:
+    //! Make a new clear-file action
+    /**
+     * Populate the clear image action with the shieldset.
+     */
+    ShieldSetUndoAction_ClearImage (Shieldset *s)
+      :ShieldSetUndoAction_Save (s, ShieldSetUndoAction::CLEAR_IMAGE)
+      {
+      }
 
-        Glib::ustring getActionName () const {return _("Clear Image");}
+    //! Destroy an clear-image action, and delete the file.
+    ~ShieldSetUndoAction_ClearImage ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Clear Image";
+      }
 };
-#endif //SHIELDSET_EDITOR_ACTIONS_H
+#endif

@@ -1,10 +1,10 @@
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2004 Bryan Duff
-// Copyright (C) 2006, 2007, 2008, 2009, 2014, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004 Andrea Paternesi
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2004 Bryan Duff
+//  Copyright (C) 2006, 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef REAL_PLAYER_H
@@ -52,8 +51,8 @@ class RealPlayer : public Player
 
 	//! Default constructor.
         RealPlayer(Glib::ustring name, guint32 armyset,
-                   std::vector<Gdk::RGBA> colors, int width, int height,
-                   Player::Type type = Player::HUMAN, int player_no = -1);
+                   Shield::Color shield, int width, int height,
+                   Player::Type type = Player::HUMAN);
 
 	//! Copy constructor.
         RealPlayer(const Player&, bool sync_ids = false);
@@ -70,7 +69,7 @@ class RealPlayer : public Player
 
 	virtual void abortTurn();
 
-        virtual bool startTurn();
+        virtual void startTurn(sigc::slot<void(bool)> finish);
 
         virtual void endTurn();
 
@@ -80,22 +79,21 @@ class RealPlayer : public Player
 
         virtual Reward *chooseReward(Ruin *ruin, Sage *sage, Stack *stack);
 
-        virtual void heroGainsLevel(Hero * a);
+        virtual void heroGainsLevel(Hero * a, Army::Stat stat);
 
 	virtual bool chooseTreachery (Stack *stack, Player *player, Vector <int> pos);
         virtual Army::Stat chooseStat(Hero *hero);
+        virtual CityDefeatedChoice chooseCityDefeatedAction (City *c, Stack *s);
         
         virtual bool chooseQuest(Hero *hero);
-        virtual bool computerChooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool chooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool choosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool chooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool chooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool chooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns);
 
 	bool d_abort_requested;
 
 };
 
-#endif // REAL_PLAYER_H
-
-// End of file
+#endif

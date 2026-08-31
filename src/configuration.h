@@ -2,7 +2,7 @@
 //  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 //  Copyright (C) 2004, 2005 Andrea Paternesi
 //  Copyright (C) 2005 Josef Spillner
-//  Copyright (C) 2006, 2010, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2006, 2010, 2011, 2014, 2015, 2017, 2020, 2026 Ben Asselstine
 //  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -17,8 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef CONFIGURATION_H
@@ -72,7 +71,6 @@ class Configuration : public sigc::trackable
         static Glib::ustring s_configuration_file_path;
 	
         // as the name implies
-        static bool s_showNextPlayer;
         static int s_displaySpeedDelay;
         static int s_displayFightRoundDelayFast;
         static int s_displayFightRoundDelaySlow;
@@ -82,14 +80,8 @@ class Configuration : public sigc::trackable
         static Glib::ustring s_dataPath;
         static Glib::ustring s_savePath;
 
-        // Language setting
-        static Glib::ustring s_lang;
-
         //the maximum size of the graphics cache
         static guint32 s_cacheSize;
-
-        //zip and obfuscate save files
-        static bool s_zipfiles;
 
 	// when to save autosave files
 	// 0 = never, 1 = once a round overwrting, 
@@ -99,7 +91,6 @@ class Configuration : public sigc::trackable
         // music settings; the cache size is given in pieces instead of memory
         static bool s_musicenable;
         static guint32 s_musicvolume;
-        static guint32 s_musiccache;
 
         // the hostname of the game-list server
         static Glib::ustring s_gamelist_server_hostname;
@@ -125,21 +116,22 @@ class Configuration : public sigc::trackable
         static bool s_random_turns;
         static GameParameters::QuickStartPolicy s_quick_start;
         static bool s_cusp_of_war;
+        static bool s_cities_can_produce_allies;
         static bool s_decorated;
         static bool s_remember_recent_games;
         static bool s_remember_recently_edited_files;
 	static guint32 s_double_click_threshold;
-        static guint32 s_font_size_override;
 
 	static GameParameters::NeutralCities neutralCitiesFromString(const Glib::ustring str);
 	static Glib::ustring neutralCitiesToString(const GameParameters::NeutralCities neutrals);
 	static GameParameters::RazingCities razingCitiesFromString(const Glib::ustring str);
 	static Glib::ustring razingCitiesToString(const GameParameters::RazingCities razing);
-        enum SavingPolicy {
-	  NO_SAVING = 0,
-	  WRITE_UNNUMBERED_AUTOSAVE_FILE = 1,
-	  WRITE_NUMBERED_AUTOSAVE_FILE = 2
-	};
+        enum SavingPolicy
+          {
+            NO_AUTOSAVING = 0,
+            WRITE_UNNUMBERED_AUTOSAVE_FILE = 1,
+            WRITE_NUMBERED_AUTOSAVE_FILE = 2
+          };
 	static Configuration::SavingPolicy savingPolicyFromString(const Glib::ustring str);
 	static Glib::ustring savingPolicyToString(const Configuration::SavingPolicy policy);
 	static GameParameters::QuickStartPolicy quickStartPolicyFromString(const Glib::ustring str);
@@ -167,4 +159,4 @@ class Configuration : public sigc::trackable
         static Glib::ustring s_filename;
 };
 
-#endif // CONFIGURATION_H
+#endif

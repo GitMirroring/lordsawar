@@ -12,14 +12,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 //#include <iostream>
 #include <fstream>
 #include <sstream>
 #include "advertised-game.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "profile.h"
 #include "network-connection.h"
 #include "connection-manager.h"
@@ -33,8 +32,8 @@ Glib::ustring AdvertisedGame::d_tag_name = "advertisedgame";
 AdvertisedGame::AdvertisedGame(GameScenario *scen, Profile *p)
 	:RecentlyPlayedNetworkedGame(scen, p)
 {
-  d_creation_date.assign_current_time();
-  d_last_pinged_date.assign_current_time();
+  d_creation_date = Glib::DateTime::create_now_local();
+  d_last_pinged_date = Glib::DateTime::create_now_local();
   d_profile = new Profile(*p);
 }
 	
@@ -42,8 +41,8 @@ AdvertisedGame::AdvertisedGame(GameScenario *scen, Profile *p)
 AdvertisedGame::AdvertisedGame(const RecentlyPlayedNetworkedGame &orig, Profile *p)
         :RecentlyPlayedNetworkedGame(orig)
 {
-  d_creation_date.assign_current_time();
-  d_last_pinged_date.assign_current_time();
+  d_creation_date = Glib::DateTime::create_now_local();
+  d_last_pinged_date = Glib::DateTime::create_now_local();
   d_profile = new Profile(*p);
 }
 
@@ -59,11 +58,11 @@ AdvertisedGame::AdvertisedGame(XML_Helper *helper)
 	:RecentlyPlayedNetworkedGame(helper)
 {
   Glib::ustring s;
-  helper->getData(s, "created_on");
-  d_creation_date.assign_from_iso8601(s);
-  helper->getData(s, "last_pinged_on");
-  d_last_pinged_date.assign_from_iso8601(s);
-  helper->registerTag(Profile::d_tag, 
+  helper->get(s, "created_on");
+  d_creation_date = Glib::DateTime::create_from_iso8601(s);
+  helper->get(s, "last_pinged_on");
+  d_last_pinged_date = Glib::DateTime::create_from_iso8601(s);
+  helper->register_tag(Profile::d_tag, 
 		      sigc::mem_fun(*this, &AdvertisedGame::loadProfile));
 }
 
@@ -75,12 +74,12 @@ AdvertisedGame::~AdvertisedGame()
 bool AdvertisedGame::doSave(XML_Helper *helper) const
 {
   bool retval = true;
-  Glib::ustring s = d_creation_date.as_iso8601();
-  retval &= helper->saveData("created_on", s);
-  s = d_last_pinged_date.as_iso8601();
-  retval &= helper->saveData("last_pinged_on", s);
-  retval &= helper->saveData("host", getHost());
-  retval &= helper->saveData("port", getPort());
+  Glib::ustring s = d_creation_date.format_iso8601();
+  retval &= helper->save("created_on", s);
+  s = d_last_pinged_date.format_iso8601();
+  retval &= helper->save("last_pinged_on", s);
+  retval &= helper->save("host", getHost());
+  retval &= helper->save("port", getPort());
   retval &= d_profile->save(helper);
   return retval;
 }
@@ -88,9 +87,9 @@ bool AdvertisedGame::doSave(XML_Helper *helper) const
 bool AdvertisedGame::saveEntry(XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->openTag(d_tag_name);
+  retval &= helper->open_tag(d_tag_name);
   retval &= dynamic_cast<const RecentlyPlayedGame*>(this)->saveContents(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
   return retval;
 }
 
@@ -121,7 +120,7 @@ void AdvertisedGame::ping()
 void AdvertisedGame::on_connected_to_game(NetworkConnection *conn)
 {
   conn->tear_down_connection();
-  d_last_pinged_date.assign_current_time();
+  d_last_pinged_date = Glib::DateTime::create_now_local();
   pinged.emit(true);
 }
 

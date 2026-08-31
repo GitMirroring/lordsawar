@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2014, 2015, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2015, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,14 +12,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef ROAD_H
 #define ROAD_H
 
-#include "Location.h"
+#include "location.h"
 
 //! A single tile on the map that has a road on it.
 /**
@@ -56,7 +55,7 @@ class Road: public Location
           * @param pos          The location of the road.
           * @param type 	The type of road.
           */
-        Road(Vector<int> pos, int type = CONNECTS_ALL_DIRECTIONS);
+        Road(Vector<int> pos, Type type = CONNECTS_ALL_DIRECTIONS);
 
 	//! Copy constructor.
         Road(const Road&, bool sync_id = false);
@@ -80,13 +79,13 @@ class Road: public Location
 	// Get Methods
 
         //! Returns the type of the road.
-        int getType() const {return d_type;};
+        Type getType() const {return d_type;};
 
 
 	// Set Methods
 
         //! Sets the type of the road.
-        void setType(int type) {d_type = type;};
+        void setType(Type type) {d_type = type;};
 
 
 	// Methods that operate on class data but do not modify the class
@@ -103,6 +102,9 @@ class Road: public Location
 	//! Convert a string containing a Road::Type to it's enumerated value.
 	static Road::Type roadTypeFromString(const Glib::ustring str);
 
+        //! Get a list of all the types of road
+        static std::vector<Road::Type> getTypes ();
+
     protected:
 
 	// DATA
@@ -114,8 +116,8 @@ class Road: public Location
 	 *
 	 * The Roadlist::calculateType method can calculate this value.
 	 */
-	int d_type;
+	Type d_type;
 
 };
 
-#endif // ROAD_H
+#endif

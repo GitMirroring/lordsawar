@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef RUIN_EDITOR_ACTIONS_H
-#define RUIN_EDITOR_ACTIONS_H
+#ifndef RUIN_UNDO_ACTIONS_H
+#define RUIN_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
@@ -27,142 +26,278 @@
 #include "undo-mgr.h"
 
 //! A record of an event in the ruin editor
-/** 
+/**
  * The purpose of these classes is to implement undo/redo in the ruin
  * editor.
  */
 
-class RuinEditorAction: public UndoAction
+class RuinUndoAction: public UndoAction
 {
-    public:
+public:
 
-        enum Type
-          {
-            NAME = 1,
-            RANDOMIZE_NAME = 2,
-            DESCRIPTION = 3,
-            RANDOM_KEEPER = 4,
-            KEEPER = 5,
-            ONLY_SEEN_BY = 6,
-            ONLY_SEEN_PLAYER = 7,
-            TYPE = 8,
-            RANDOM_REWARD = 9,
-            REWARD = 10
-          };
+    enum Type
+      {
+        NAME = 1,
+        RANDOMIZE_NAME = 2,
+        DESCRIPTION = 3,
+        RANDOM_KEEPER = 4,
+        KEEPER = 5,
+        ONLY_SEEN_BY = 6,
+        ONLY_SEEN_PLAYER = 7,
+        TYPE = 8,
+        RANDOM_REWARD = 9,
+        REWARD = 10
+      };
 
-	//! Default constructor.
-        RuinEditorAction(Type type, UndoAction::AggregateType aggregate = UndoAction::AGGREGATE_NONE) : UndoAction (aggregate), d_type(type) {}
+    //! Default constructor.
+    RuinUndoAction (Type type,
+                    UndoAction::AggregateType aggregate =
+                    UndoAction::AGGREGATE_NONE)
+      : UndoAction (aggregate), m_type (type)
+      {
+      }
 
-        Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
-    protected:
+protected:
 
-        Type d_type;
+    Type m_type;
 };
 
-class RuinEditorAction_Ruin: public RuinEditorAction
+class RuinUndoAction_Ruin: public RuinUndoAction
 {
-    public:
-        RuinEditorAction_Ruin (Type t, Ruin *r, bool agg = false)
-          : RuinEditorAction (t, agg ? UndoAction::AGGREGATE_DELAY : UndoAction::AGGREGATE_NONE), d_ruin (new Ruin (*r)) { }
-        ~RuinEditorAction_Ruin () { delete d_ruin; }
+public:
+    RuinUndoAction_Ruin (Type t, Ruin *r, bool agg = false)
+      : RuinUndoAction (t,
+                        agg ? UndoAction::AGGREGATE_DELAY :
+                        UndoAction::AGGREGATE_NONE),
+      m_ruin (new Ruin (*r))
+        {
+        }
 
-        Ruin *getRuin () const {return d_ruin;}
-    private:
-        Ruin *d_ruin;
+    ~RuinUndoAction_Ruin ()
+      {
+        delete m_ruin;
+      }
+
+    Ruin *get_ruin () const
+      {
+        return m_ruin;
+      }
+private:
+    Ruin *m_ruin;
 };
 
-class RuinEditorAction_Name : public RuinEditorAction_Ruin, public UndoCursor
+class RuinUndoAction_Name : public RuinUndoAction_Ruin, public UndoCursor
 {
-    public:
-        RuinEditorAction_Name (Ruin *r, UndoMgr *u, Gtk::Entry *e)
-          :RuinEditorAction_Ruin (NAME, r, true), UndoCursor (u, e) {}
-        ~RuinEditorAction_Name () {}
+public:
+    RuinUndoAction_Name (Ruin *r, UndoMgr *u, Gtk::Entry *e)
+      : RuinUndoAction_Ruin (NAME, r, true), UndoCursor (u->get_pos (e), e)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Name";}
+    ~RuinUndoAction_Name ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Name";
+      }
 };
-class RuinEditorAction_RandomizeName : public RuinEditorAction_Ruin
+
+class RuinUndoAction_RandomizeName : public RuinUndoAction_Ruin
 {
-    public:
-        RuinEditorAction_RandomizeName (Ruin *r)
-          :RuinEditorAction_Ruin (RANDOMIZE_NAME, r, false) {}
-        ~RuinEditorAction_RandomizeName () {}
+public:
+    RuinUndoAction_RandomizeName (Ruin *r)
+      : RuinUndoAction_Ruin (RANDOMIZE_NAME, r, false)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "RandomizeName";}
+    ~RuinUndoAction_RandomizeName ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "RandomizeName";
+      }
 };
-class RuinEditorAction_Description : public RuinEditorAction_Ruin, public UndoCursor
+
+class RuinUndoAction_Description : public RuinUndoAction_Ruin, public UndoCursor
 {
-    public:
-        RuinEditorAction_Description (Ruin *r, UndoMgr *u, Gtk::Entry *e)
-          :RuinEditorAction_Ruin (DESCRIPTION, r, true), UndoCursor (u, e) {}
-        ~RuinEditorAction_Description () {}
+public:
+    RuinUndoAction_Description (Ruin *r, UndoMgr *u, Gtk::Entry *e)
+      :RuinUndoAction_Ruin (DESCRIPTION, r, true),
+      UndoCursor (u->get_pos (e), e)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Description";}
+    ~RuinUndoAction_Description ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Description";
+      }
 };
-class RuinEditorAction_RandomKeeper : public RuinEditorAction_Ruin
+
+class RuinUndoAction_RandomKeeper : public RuinUndoAction_Ruin
 {
-    public:
-        RuinEditorAction_RandomKeeper (Ruin *r)
-          :RuinEditorAction_Ruin (RANDOM_KEEPER, r, false) {}
-        ~RuinEditorAction_RandomKeeper () {}
+public:
+    RuinUndoAction_RandomKeeper (Ruin *r, bool state)
+      :RuinUndoAction_Ruin (RANDOM_KEEPER, r, false), m_active (state)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "RandomKeeper";}
+    ~RuinUndoAction_RandomKeeper ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "RandomKeeper";
+      }
+
+    bool get_active () const
+      {
+        return m_active;
+      }
+private:
+    bool m_active;
 };
-class RuinEditorAction_Keeper : public RuinEditorAction_Ruin
+
+class RuinUndoAction_Keeper : public RuinUndoAction_Ruin
 {
-    public:
-        RuinEditorAction_Keeper (Ruin *r)
-          :RuinEditorAction_Ruin (KEEPER, r, false) {}
-        ~RuinEditorAction_Keeper () {}
+public:
+    RuinUndoAction_Keeper (Ruin *r)
+      :RuinUndoAction_Ruin (KEEPER, r, false)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Keeper";}
+    ~RuinUndoAction_Keeper ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Keeper";
+      }
 };
-class RuinEditorAction_OnlySeenBy : public RuinEditorAction_Ruin
+
+class RuinUndoAction_OnlySeenBy : public RuinUndoAction_Ruin
 {
-    public:
-        RuinEditorAction_OnlySeenBy (Ruin *r)
-          :RuinEditorAction_Ruin (ONLY_SEEN_BY, r, false) {}
-        ~RuinEditorAction_OnlySeenBy () {}
+public:
+    RuinUndoAction_OnlySeenBy (Ruin *r, bool state)
+      :RuinUndoAction_Ruin (ONLY_SEEN_BY, r, false), m_active (state)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "OnlySeenBy";}
+    ~RuinUndoAction_OnlySeenBy ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "OnlySeenBy";
+      }
+
+    bool get_active () const
+      {
+        return m_active;
+      }
+private:
+    bool m_active;
 };
-class RuinEditorAction_OnlySeenPlayer : public RuinEditorAction_Ruin
+
+class RuinUndoAction_OnlySeenPlayer : public RuinUndoAction_Ruin
 {
-    public:
-        RuinEditorAction_OnlySeenPlayer (Ruin *r)
-          :RuinEditorAction_Ruin (ONLY_SEEN_PLAYER, r, false) {}
-        ~RuinEditorAction_OnlySeenPlayer () {}
+public:
+    RuinUndoAction_OnlySeenPlayer (Ruin *r, int row)
+      :RuinUndoAction_Ruin (ONLY_SEEN_PLAYER, r, false), m_row (row)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "OnlySeenPlayer";}
+    ~RuinUndoAction_OnlySeenPlayer ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "OnlySeenPlayer";
+      }
+
+    int get_row () const
+      {
+        return m_row;
+      }
+private:
+    int m_row;
+
 };
-class RuinEditorAction_Type : public RuinEditorAction_Ruin
+
+class RuinUndoAction_Type : public RuinUndoAction_Ruin
 {
-    public:
-        RuinEditorAction_Type (Ruin *r)
-          :RuinEditorAction_Ruin (TYPE, r, false) {}
-        ~RuinEditorAction_Type () {}
+public:
+    RuinUndoAction_Type (Ruin *r)
+      :RuinUndoAction_Ruin (TYPE, r, false)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Type";}
+    ~RuinUndoAction_Type ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Type";
+      }
 };
-class RuinEditorAction_RandomReward : public RuinEditorAction_Ruin
+
+class RuinUndoAction_RandomReward : public RuinUndoAction_Ruin
 {
-    public:
-        RuinEditorAction_RandomReward (Ruin *r, bool state)
-          :RuinEditorAction_Ruin (RANDOM_REWARD, r, false), d_active (state) {}
-        ~RuinEditorAction_RandomReward () {}
+public:
+    RuinUndoAction_RandomReward (Ruin *r, bool state)
+      :RuinUndoAction_Ruin (RANDOM_REWARD, r, false), m_active (state)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "RandomReward";}
-        bool getActive () const {return d_active;}
-    private:
-        bool d_active;
+    ~RuinUndoAction_RandomReward ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "RandomReward";
+      }
+
+    bool get_active () const
+      {
+        return m_active;
+      }
+private:
+    bool m_active;
 };
-class RuinEditorAction_Reward : public RuinEditorAction_Ruin
+
+class RuinUndoAction_Reward : public RuinUndoAction_Ruin
 {
-    public:
-        RuinEditorAction_Reward (Ruin *r)
-          :RuinEditorAction_Ruin (REWARD, r, false) {}
-        ~RuinEditorAction_Reward () {}
+public:
+    RuinUndoAction_Reward (Ruin *r)
+      :RuinUndoAction_Ruin (REWARD, r, false)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Reward";}
+    ~RuinUndoAction_Reward ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Reward";
+      }
 };
-#endif //RUIN_EDITOR_ACTIONS_H
+#endif

@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef FIGHT_ORDER_EDITOR_ACTIONS_H
@@ -25,79 +24,125 @@
 #include "undo-mgr.h"
 
 //! A record of an event in the fight order editor
-/** 
+/**
  * The purpose of these classes is to implement undo/redo in the fight order
  * editor.
  */
 
-class FightOrderEditorAction: public UndoAction
+class FightOrderUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      ORDER = 1,
-      OWNER = 2,
-      MAKE_SAME = 3,
-    };
+    enum Type
+      {
+        ORDER = 1,
+        MAKE_SAME = 2,
+        OWNER = 3,
+      };
 
-    FightOrderEditorAction(Type type, bool agg = false)
-     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+    FightOrderUndoAction (Type type, bool agg = false)
+      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                    UndoAction::AGGREGATE_NONE), m_type (type)
+        {
+        }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class FightOrderEditorAction_Order: public FightOrderEditorAction
+class FightOrderUndoAction_Order: public FightOrderUndoAction
 {
-    public:
-        FightOrderEditorAction_Order (guint32 id, std::list<guint32> o)
-          : FightOrderEditorAction (ORDER), d_player_id (id), d_fight_order (o)
-          {}
-        ~FightOrderEditorAction_Order () {}
+public:
+    FightOrderUndoAction_Order (int row, std::list<guint32> o)
+      : FightOrderUndoAction (ORDER), m_row (row), m_fight_order (o)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Order";}
+    ~FightOrderUndoAction_Order ()
+      {
+      }
 
-        std::list<guint32> getFightOrder () const {return d_fight_order;}
+    Glib::ustring get_action_name () const
+      {
+        return "Order";
+      }
 
-        guint32 getPlayerId () const {return d_player_id;}
-    private:
-        guint32 d_player_id;
-        std::list<guint32> d_fight_order;
+    std::list<guint32> get_fight_order () const
+      {
+        return m_fight_order;
+      }
+
+    int get_row () const
+      {
+        return m_row;
+      }
+private:
+    int m_row;
+    std::list<guint32> m_fight_order;
 };
 
-class FightOrderEditorAction_Owner: public FightOrderEditorAction
+class FightOrderUndoAction_MakeSame: public FightOrderUndoAction
 {
-    public:
-        FightOrderEditorAction_Owner (int r)
-          : FightOrderEditorAction (OWNER), d_row (r) {}
-        ~FightOrderEditorAction_Owner () {}
+public:
+    FightOrderUndoAction_MakeSame (int r,
+                                   std::list<std::list<guint32> > o)
+      : FightOrderUndoAction (MAKE_SAME), m_row (r), m_orders (o)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Owner";}
+    ~FightOrderUndoAction_MakeSame ()
+      {
+      }
 
-        int getRow () const {return d_row;}
+    Glib::ustring get_action_name () const
+      {
+        return "MakeSame";
+      }
 
-    private:
-        int d_row;
+    int get_row () const
+      {
+        return m_row;
+      }
+
+    std::list<std::list<guint32> >get_fight_orders () const
+      {
+        return m_orders;
+      }
+private:
+    int m_row;
+    std::list<std::list<guint32> > m_orders;
 };
 
-class FightOrderEditorAction_MakeSame: public FightOrderEditorAction
+class FightOrderUndoAction_Owner: public FightOrderUndoAction
 {
-    public:
-        FightOrderEditorAction_MakeSame (int r,
-                                         std::list<std::list<guint32> > o)
-          : FightOrderEditorAction (MAKE_SAME), d_row (r), d_orders (o) {}
-        ~FightOrderEditorAction_MakeSame () {}
+public:
+    FightOrderUndoAction_Owner (int r)
+      : FightOrderUndoAction (OWNER), m_row (r)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "MakeSame";}
+    ~FightOrderUndoAction_Owner ()
+      {
+      }
 
-        int getRow () const {return d_row;}
-        std::list<std::list<guint32> >getFightOrders () const {return d_orders;}
-    private:
-        int d_row;
-        std::list<std::list<guint32> > d_orders;
+    Glib::ustring get_action_name () const
+      {
+        return "Owner";
+      }
+
+    int get_row () const
+      {
+        return m_row;
+      }
+
+private:
+    int m_row;
 };
-#endif //FIGHT_ORDER_EDITOR_ACTIONS_H
+
+#endif

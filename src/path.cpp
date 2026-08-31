@@ -1,9 +1,9 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,20 +17,19 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <assert.h>
 #include <sstream>
 #include <queue>
 
-#include "PathCalculator.h"
+#include "path-calculator.h"
 #include "path.h"
 #include "army.h"
-#include "GameMap.h"
+#include "game-map.h"
 #include "city.h"
-#include "stacklist.h"
-#include "xmlhelper.h"
+#include "stack-list.h"
+#include "xml-helper.h"
 #include "stack.h"
 #include "player.h"
 
@@ -60,12 +59,12 @@ Path::Path(XML_Helper* helper)
     std::istringstream sx, sy;
     Glib::ustring s;
 
-    helper->getData(d_moves_exhausted_at_point, "moves_exhausted_at_point");
-    helper->getData(i, "size");
+    helper->get(d_moves_exhausted_at_point, "moves_exhausted_at_point");
+    helper->get(i, "size");
 
-    helper->getData(s, "x");
+    helper->get(s, "x");
     sx.str(s);
-    helper->getData(s, "y");
+    helper->get(s, "y");
     sy.str(s);
 
     for (; i > 0; i--)
@@ -94,13 +93,13 @@ bool Path::save(XML_Helper* helper) const
         sy <<(*it).y <<" ";
     }
 
-    retval &= helper->openTag(Path::d_tag);
-    retval &= helper->saveData("size", (guint32) size());
-    retval &= helper->saveData("moves_exhausted_at_point", 
+    retval &= helper->open_tag(Path::d_tag);
+    retval &= helper->save("size", (guint32) size());
+    retval &= helper->save("moves_exhausted_at_point", 
                                d_moves_exhausted_at_point);
-    retval &= helper->saveData("x", sx.str());
-    retval &= helper->saveData("y", sy.str());
-    retval &= helper->closeTag();
+    retval &= helper->save("x", sx.str());
+    retval &= helper->save("y", sy.str());
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -301,4 +300,49 @@ void Path::eraseFirstPoint()
     setMovesExhaustedAtPoint(getMovesExhaustedAtPoint()-1);
 }
 
-// End of file
+std::vector<Vector<int>> Path::getNearbyPoints (int dist) const
+{
+  std::vector<Vector<int>> points;
+  for (const_iterator it = begin (); it != end (); ++it)
+    {
+      auto p = GameMap::getNearbyPoints (*it, dist);
+      points.insert (points.end (), p.begin (), p.end ());
+    }
+
+  //sort
+  std::sort
+    (points.begin (), points.end (),
+     [](const Vector<int>& a, const Vector<int>& b)
+     {
+       if (a.x != b.x)
+         return a.x < b.x;
+       return a.y < b.y;
+     });
+
+  //only take unique points
+  points.erase
+    (std::unique
+     (points.begin (), points.end (),
+      [](const Vector<int>& a, const Vector<int>& b)
+      {
+        return a.x == b.x && a.y == b.y;
+      }),
+     points.end ());
+
+  //remove any point that's in our path
+  auto it =
+    std::remove_if
+    (points.begin (), points.end (),
+     [&](const Vector<int>& p)
+     {
+       return std::find_if
+         (begin (), end (),
+          [&](const Vector<int>& e)
+          {
+            return e.x == p.x && e.y == p.y;
+          }) != end ();
+     });
+
+  points.erase (it, points.end ());
+  return points;
+}

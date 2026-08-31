@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<armyset version="0.3.3">
+<armyset version="0.4.0">
 	<d_id>1</d_id>
 	<_d_name>Default</_d_name>
 	<d_copyright>Copyright (C) 2007, 2009, 2021 Ben Asselstine</d_copyright>
@@ -7,42 +7,24 @@
         <_d_info>The default armyset of LordsAWar!  Initally created by Sune Theodorsen of Fata Morgana in 2007 specifically for this game.</_d_info>
 	<d_tilesize>40</d_tilesize>
 	<d_stackship>stackship</d_stackship>
-	<d_stackship_num_masks>1</d_stackship_num_masks>
 	<d_plantedstandard>plantedstandard</d_plantedstandard>
-	<d_plantedstandard_num_masks>1</d_plantedstandard_num_masks>
 	<d_bag>items</d_bag>
         <d_white_small_selector></d_white_small_selector>
-        <d_white_small_selector_num_masks>0</d_white_small_selector_num_masks>
         <d_green_small_selector></d_green_small_selector>
-        <d_green_small_selector_num_masks>0</d_green_small_selector_num_masks>
         <d_yellow_small_selector></d_yellow_small_selector>
-        <d_yellow_small_selector_num_masks>0</d_yellow_small_selector_num_masks>
         <d_dark_blue_small_selector></d_dark_blue_small_selector>
-        <d_dark_blue_small_selector_num_masks>0</d_dark_blue_small_selector_num_masks>
         <d_orange_small_selector></d_orange_small_selector>
-        <d_orange_small_selector_num_masks>0</d_orange_small_selector_num_masks>
         <d_light_blue_small_selector></d_light_blue_small_selector>
-        <d_light_blue_small_selector_num_masks>0</d_light_blue_small_selector_num_masks>
         <d_red_small_selector></d_red_small_selector>
-        <d_red_small_selector_num_masks>0</d_red_small_selector_num_masks>
         <d_black_small_selector>small_selector</d_black_small_selector>
-        <d_black_small_selector_num_masks>1</d_black_small_selector_num_masks>
         <d_white_large_selector></d_white_large_selector>
-        <d_white_large_selector_num_masks>0</d_white_large_selector_num_masks>
         <d_green_large_selector></d_green_large_selector>
-        <d_green_large_selector_num_masks>0</d_green_large_selector_num_masks>
         <d_yellow_large_selector></d_yellow_large_selector>
-        <d_yellow_large_selector_num_masks>0</d_yellow_large_selector_num_masks>
         <d_dark_blue_large_selector></d_dark_blue_large_selector>
-        <d_dark_blue_large_selector_num_masks>0</d_dark_blue_large_selector_num_masks>
         <d_orange_large_selector></d_orange_large_selector>
-        <d_orange_large_selector_num_masks>0</d_orange_large_selector_num_masks>
         <d_light_blue_large_selector></d_light_blue_large_selector>
-        <d_light_blue_large_selector_num_masks>0</d_light_blue_large_selector_num_masks>
         <d_red_large_selector></d_red_large_selector>
-        <d_red_large_selector_num_masks>0</d_red_large_selector_num_masks>
         <d_black_large_selector>selector</d_black_large_selector>
-        <d_black_large_selector_num_masks>1</d_black_large_selector_num_masks>
 	<armyproto>
                 <d_id>0</d_id>
 		<_d_name>Scouts</_d_name>
@@ -55,16 +37,6 @@
 		<d_image_orange>scouts</d_image_orange>
 		<d_image_black>scouts</d_image_black>
 		<d_image_neutral>scouts</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>1</d_production>
 		<d_new_production_cost>10</d_new_production_cost>
 		<d_production_cost>2</d_production_cost>
@@ -91,16 +63,6 @@
 		<d_image_orange>lightinf</d_image_orange>
 		<d_image_black>lightinf</d_image_black>
 		<d_image_neutral>lightinf</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>1</d_production>
 		<d_new_production_cost>50</d_new_production_cost>
 		<d_production_cost>3</d_production_cost>
@@ -127,16 +89,6 @@
 		<d_image_orange>orcishmob</d_image_orange>
 		<d_image_black>orcishmob</d_image_black>
 		<d_image_neutral>orcishmob</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>2</d_production>
 		<d_new_production_cost>100</d_new_production_cost>
 		<d_production_cost>4</d_production_cost>
@@ -163,16 +115,6 @@
 		<d_image_orange>heavyinf</d_image_orange>
 		<d_image_black>heavyinf</d_image_black>
 		<d_image_neutral>heavyinf</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>2</d_production>
 		<d_new_production_cost>300</d_new_production_cost>
 		<d_production_cost>5</d_production_cost>
@@ -199,16 +141,6 @@
 		<d_image_orange>pikeman</d_image_orange>
 		<d_image_black>pikeman</d_image_black>
 		<d_image_neutral>pikeman</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>3</d_production>
 		<d_new_production_cost>400</d_new_production_cost>
 		<d_production_cost>5</d_production_cost>
@@ -235,16 +167,6 @@
 		<d_image_orange>archers</d_image_orange>
 		<d_image_black>archers</d_image_black>
 		<d_image_neutral>archers</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>2</d_production>
 		<d_new_production_cost>400</d_new_production_cost>
 		<d_production_cost>7</d_production_cost>
@@ -271,16 +193,6 @@
 		<d_image_orange>dwarves</d_image_orange>
 		<d_image_black>dwarves</d_image_black>
 		<d_image_neutral>dwarves</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>2</d_production>
 		<d_new_production_cost>400</d_new_production_cost>
 		<d_production_cost>7</d_production_cost>
@@ -307,16 +219,6 @@
 		<d_image_orange>minotaurs</d_image_orange>
 		<d_image_black>minotaurs</d_image_black>
 		<d_image_neutral>minotaurs</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>2</d_production>
 		<d_new_production_cost>800</d_new_production_cost>
 		<d_production_cost>10</d_production_cost>
@@ -343,16 +245,6 @@
 		<d_image_orange>giants</d_image_orange>
 		<d_image_black>giants</d_image_black>
 		<d_image_neutral>giants</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>2</d_production>
 		<d_new_production_cost>800</d_new_production_cost>
 		<d_production_cost>10</d_production_cost>
@@ -379,16 +271,6 @@
 		<d_image_orange>spiders</d_image_orange>
 		<d_image_black>spiders</d_image_black>
 		<d_image_neutral>spiders</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>2</d_production>
 		<d_new_production_cost>1000</d_new_production_cost>
 		<d_production_cost>12</d_production_cost>
@@ -415,16 +297,6 @@
 		<d_image_orange>lightcav</d_image_orange>
 		<d_image_black>lightcav</d_image_black>
 		<d_image_neutral>lightcav</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>2</d_production>
 		<d_production_cost>6</d_production_cost>
 		<d_new_production_cost>300</d_new_production_cost>
@@ -451,16 +323,6 @@
 		<d_image_orange>wolfriders</d_image_orange>
 		<d_image_black>wolfriders</d_image_black>
 		<d_image_neutral>wolfriders</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>2</d_production>
 		<d_new_production_cost>500</d_new_production_cost>
 		<d_production_cost>8</d_production_cost>
@@ -487,16 +349,6 @@
 		<d_image_orange>heavycav</d_image_orange>
 		<d_image_black>heavycav</d_image_black>
 		<d_image_neutral>heavycav</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>3</d_production>
 		<d_new_production_cost>500</d_new_production_cost>
 		<d_production_cost>8</d_production_cost>
@@ -523,16 +375,6 @@
 		<d_image_orange>catapults</d_image_orange>
 		<d_image_black>catapults</d_image_black>
 		<d_image_neutral>catapults</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>4</d_production>
 		<d_new_production_cost>500</d_new_production_cost>
 		<d_production_cost>16</d_production_cost>
@@ -559,16 +401,6 @@
 		<d_image_orange>elephants</d_image_orange>
 		<d_image_black>elephants</d_image_black>
 		<d_image_neutral>elephants</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>4</d_production>
 		<d_new_production_cost>1500</d_new_production_cost>
 		<d_production_cost>15</d_production_cost>
@@ -595,16 +427,6 @@
 		<d_image_orange>giantbats</d_image_orange>
 		<d_image_black>giantbats</d_image_black>
 		<d_image_neutral>giantbats</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>1</d_production>
 		<d_new_production_cost>30</d_new_production_cost>
 		<d_production_cost>5</d_production_cost>
@@ -631,16 +453,6 @@
 		<d_image_orange>pegasi</d_image_orange>
 		<d_image_black>pegasi</d_image_black>
 		<d_image_neutral>pegasi</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>3</d_production>
 		<d_new_production_cost>1000</d_new_production_cost>
 		<d_production_cost>12</d_production_cost>
@@ -667,16 +479,6 @@
 		<d_image_orange>griffins</d_image_orange>
 		<d_image_black>griffins</d_image_black>
 		<d_image_neutral>griffins</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>3</d_production>
 		<d_new_production_cost>1500</d_new_production_cost>
 		<d_production_cost>15</d_production_cost>
@@ -703,16 +505,6 @@
 		<d_image_orange>giantworms</d_image_orange>
 		<d_image_black>giantworms</d_image_black>
 		<d_image_neutral>giantworms</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>4</d_production>
 		<d_new_production_cost>0</d_new_production_cost>
 		<d_production_cost>12</d_production_cost>
@@ -739,16 +531,6 @@
 		<d_image_orange>ghosts</d_image_orange>
 		<d_image_black>ghosts</d_image_black>
 		<d_image_neutral>ghosts</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>4</d_production>
 		<d_new_production_cost>0</d_new_production_cost>
 		<d_production_cost>12</d_production_cost>
@@ -775,16 +557,6 @@
 		<d_image_orange>wizards</d_image_orange>
 		<d_image_black>wizards</d_image_black>
 		<d_image_neutral>wizards</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>4</d_production>
 		<d_new_production_cost>0</d_new_production_cost>
 		<d_production_cost>12</d_production_cost>
@@ -811,16 +583,6 @@
 		<d_image_orange>unicorns</d_image_orange>
 		<d_image_black>unicorns</d_image_black>
 		<d_image_neutral>unicorns</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>4</d_production>
 		<d_new_production_cost>1500</d_new_production_cost>
 		<d_production_cost>15</d_production_cost>
@@ -847,16 +609,6 @@
 		<d_image_orange>elementals</d_image_orange>
 		<d_image_black>elementals</d_image_black>
 		<d_image_neutral>elementals</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>4</d_production>
 		<d_new_production_cost>0</d_new_production_cost>
 		<d_production_cost>15</d_production_cost>
@@ -883,16 +635,6 @@
 		<d_image_orange>devils</d_image_orange>
 		<d_image_black>devils</d_image_black>
 		<d_image_neutral>devils</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>4</d_production>
 		<d_new_production_cost>0</d_new_production_cost>
 		<d_production_cost>15</d_production_cost>
@@ -919,16 +661,6 @@
 		<d_image_orange>daemons</d_image_orange>
 		<d_image_black>daemons</d_image_black>
 		<d_image_neutral>daemons</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>4</d_production>
 		<d_new_production_cost>0</d_new_production_cost>
 		<d_production_cost>15</d_production_cost>
@@ -955,16 +687,6 @@
 		<d_image_orange>archons</d_image_orange>
 		<d_image_black>archons</d_image_black>
 		<d_image_neutral>archons</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>4</d_production>
 		<d_new_production_cost>0</d_new_production_cost>
 		<d_production_cost>20</d_production_cost>
@@ -991,16 +713,6 @@
 		<d_image_orange>dragons</d_image_orange>
 		<d_image_black>dragons</d_image_black>
 		<d_image_neutral>dragons</d_image_neutral>
-		<d_image_white_num_masks>1</d_image_white_num_masks>
-		<d_image_green_num_masks>1</d_image_green_num_masks>
-		<d_image_yellow_num_masks>1</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>1</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>1</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>1</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>1</d_image_orange_num_masks>
-		<d_image_black_num_masks>1</d_image_black_num_masks>
-		<d_image_neutral_num_masks>1</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>4</d_production>
 		<d_new_production_cost>0</d_new_production_cost>
 		<d_production_cost>20</d_production_cost>
@@ -1027,16 +739,6 @@
 		<d_image_orange>hero</d_image_orange>
 		<d_image_black>hero</d_image_black>
 		<d_image_neutral>hero</d_image_neutral>
-		<d_image_white_num_masks>2</d_image_white_num_masks>
-		<d_image_green_num_masks>2</d_image_green_num_masks>
-		<d_image_yellow_num_masks>2</d_image_yellow_num_masks>
-		<d_image_light_blue_num_masks>2</d_image_light_blue_num_masks>
-		<d_image_red_num_masks>2</d_image_red_num_masks>
-		<d_image_dark_blue_num_masks>2</d_image_dark_blue_num_masks>
-		<d_image_orange_num_masks>2</d_image_orange_num_masks>
-		<d_image_black_num_masks>2</d_image_black_num_masks>
-		<d_image_neutral_num_masks>2</d_image_neutral_num_masks>
-		<_d_description></_d_description>
 		<d_production>0</d_production>
 		<d_new_production_cost>0</d_new_production_cost>
 		<d_production_cost>0</d_production_cost>

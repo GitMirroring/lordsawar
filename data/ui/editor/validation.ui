@@ -1,138 +1,79 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 1.0.2 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <!-- interface-name validation.ui -->
+  <requires lib="gtk" version="4.0"/>
   <object class="GtkTextBuffer" id="textbuffer1"/>
-  <object class="GtkDialog" id="dialog">
-    <property name="can-focus">False</property>
-    <property name="title" translatable="yes">Scenario Validation</property>
-    <property name="type-hint">dialog</property>
-    <child internal-child="vbox">
+  <object class="GtkWindow" id="dialog">
+    <property name="child">
       <object class="GtkBox" id="dialog-vbox">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="margin-start">6</property>
-        <property name="margin-end">6</property>
-        <property name="margin-top">6</property>
         <property name="margin-bottom">6</property>
+        <property name="margin-end">6</property>
+        <property name="margin-start">6</property>
+        <property name="margin-top">6</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">12</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area1">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <object class="GtkButton" id="close_button">
-                <property name="label">Close</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="has-focus">True</property>
-                <property name="can-default">True</property>
-                <property name="has-default">True</property>
-                <property name="receives-default">False</property>
-                <property name="use-underline">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack-type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
         <child>
-          <object class="GtkBox" id="contents_vbox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
+          <object class="GtkBox">
             <property name="orientation">vertical</property>
-            <property name="spacing">12</property>
             <child>
-              <object class="GtkBox" id="hbox1">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="homogeneous">True</property>
+              <object class="GtkBox" id="contents_vbox">
+                <property name="orientation">vertical</property>
+                <property name="spacing">12</property>
+                <property name="vexpand">1</property>
                 <child>
-                  <object class="GtkBox">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="orientation">vertical</property>
-                    <property name="spacing">24</property>
+                  <object class="GtkBox" id="hbox1">
+                    <property name="homogeneous">1</property>
+                    <property name="vexpand">1</property>
                     <child>
-                      <object class="GtkLabel" id="label">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkScrolledWindow" id="scrolledwindow">
-                        <property name="width-request">400</property>
-                        <property name="height-request">100</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="shadow-type">in</property>
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">24</property>
                         <child>
-                          <object class="GtkViewport">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <child>
-                              <object class="GtkTextView" id="textview">
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="editable">False</property>
-                                <property name="buffer">textbuffer1</property>
+                          <object class="GtkLabel" id="label"/>
+                        </child>
+                        <child>
+                          <object class="GtkScrolledWindow" id="scrolled_window">
+                            <property name="child">
+                              <object class="GtkViewport">
+                                <property name="child">
+                                  <object class="GtkTextView" id="textview">
+                                    <property name="buffer">textbuffer1</property>
+                                    <property name="editable">0</property>
+                                    <property name="focusable">1</property>
+                                  </object>
+                                </property>
                               </object>
-                            </child>
+                            </property>
+                            <property name="focusable">1</property>
+                            <property name="height-request">100</property>
+                            <property name="vexpand">1</property>
+                            <property name="width-request">400</property>
                           </object>
                         </child>
                       </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
                     </child>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
               </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="dialog-action_area1">
+                <property name="halign">end</property>
+                <property name="margin-top">6</property>
+                <child>
+                  <object class="GtkButton" id="close_button">
+                    <property name="focusable">1</property>
+                    <property name="halign">center</property>
+                    <property name="label">Close</property>
+                    <property name="use-underline">1</property>
+                  </object>
+                </child>
+              </object>
             </child>
           </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
         </child>
       </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-3">close_button</action-widget>
-    </action-widgets>
+    </property>
+    <property name="title" translatable="yes">Scenario Validation</property>
   </object>
 </interface>

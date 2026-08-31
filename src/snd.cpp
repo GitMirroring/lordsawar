@@ -1,6 +1,6 @@
-// Copyright (C) 2006 Ulf Lorenz
-// Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2006 Ulf Lorenz
+//  Copyright (C) 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2014, 2015, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,8 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
 
@@ -23,284 +22,338 @@
 #include <iostream>
 #include <sigc++/functors/mem_fun.h>
 #include "snd.h"
-#include "File.h"
-#include "Configuration.h"
+#include "file.h"
+#include "configuration.h"
 #include "defs.h"
-#include "xmlhelper.h"
-#include "timing.h"
+#include "xml-helper.h"
 #include "rnd.h"
-#include "ScenarioMedia.h"
+#include "scenario-media.h"
 
-#ifdef LW_SOUND
-#include <gstreamermm.h>
-#include <gstreamermm/playbin.h>
-#endif
+#include <gst/gst.h>
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
-struct Snd::Impl
+struct Impl
 {
-#ifdef LW_SOUND
-  // currently playing background and foreground piece
-  Glib::RefPtr<Gst::PlayBin> back;
-  Glib::RefPtr<Gst::PlayBin> effect;
-#endif
-  int placeholder;
+  GstElement *back;
+  GstElement *effect;
+  Snd *snd;
 };
+struct Impl *impl;
 
-Snd* Snd::s_instance = 0;
+int nloops;
 
-Snd* Snd::getInstance()
+gboolean on_bus_message (GstBus *bus, GstMessage *message, gpointer user_data)
 {
-    if (s_instance == 0)
-        s_instance = new Snd();
-
-    return s_instance;
-}
-
-void Snd::deleteInstance()
-{
-    if (s_instance == 0)
-        return;
-
-    delete s_instance;
-    s_instance = 0;
-}
-
-Snd::Snd()
-    :d_nloops(1), d_broken(false), d_background(false), impl(new Impl())
-{
-    debug("Snd constructor")
-
-    XML_Helper helper(File::getMusicFile("music.xml"), std::ios::in);
-    helper.registerTag("piece", sigc::mem_fun(this, &Snd::loadMusic));
-
-    if (!helper.parseXML())
+  (void)bus;
+  int source = GPOINTER_TO_INT (user_data);
+  switch (GST_MESSAGE_TYPE (message))
     {
-        std::cerr<< _("Error loading music descriptions; disabling music.") << std::endl;
-        d_broken = true;
-	return;
-    }
-    helper.close();
-
-#ifdef LW_SOUND
-    impl->back = Gst::PlayBin::create();
-    impl->effect = Gst::PlayBin::create();
-    impl->effect->get_bus()->add_watch(sigc::bind(sigc::hide<0>(sigc::mem_fun(*this, &Snd::on_bus_message)), 0));
-    impl->back->get_bus()->add_watch(sigc::bind(sigc::hide<0>(sigc::mem_fun(*this, &Snd::on_bus_message)), 1));
-#endif
-    debug("Music list contains " <<d_musicMap.size <<" entries.")
-    debug("background list has " <<d_bgMap.size <<" entries.")
-}
-
-Snd::~Snd()
-{
-    debug("Snd destructor")
-    halt(false);
-    disableBackground();
-    
-    // remove all music pieces
-    std::map<Glib::ustring, MusicItem*>::iterator it;
-    for (it = d_musicMap.begin(); it != d_musicMap.end(); ++it)
-        delete (*it).second;
-}
-
-bool Snd::isMusicEnabled()
-{
-    return Configuration::s_musicenable;
-}
-
-int Snd::getMusicVolume()
-{
-    return Configuration::s_musicvolume;
-}
-
-bool Snd::play(Glib::ustring piece, int nloops, bool fade)
-{
-  (void)piece;
-  (void)nloops;
-  (void)fade;
-  debug("playing Music")
-    if (d_broken || !Configuration::s_musicenable)
-      return true;
-
-  MusicItem *item = ScenarioMedia::getInstance()->getSoundEffect(piece);
-  if (!item)
-    item = d_musicMap[piece];
-  // first, load the music piece
-  if (item == NULL)
-    return false;
-
-#ifdef LW_SOUND
-  d_nloops = nloops;
-  impl->effect->set_state(Gst::STATE_NULL);
-  impl->effect->property_uri() = 
-    Glib::filename_to_uri(File::getMusicFile(item->file));
-  impl->effect->property_video_sink() = Gst::FakeSink::create();
-  impl->effect->property_audio_sink() = Gst::ElementFactory::create_element("autoaudiosink", "output");
-  if (fade)
-    {
-      impl->effect->property_volume() = 0.0;
-      Timing::instance().register_timer
-        (sigc::bind(sigc::mem_fun(this, &Snd::on_effect_fade), 0.01), 100);
-    }
-  else
-    impl->effect->property_volume() = (double)Configuration::s_musicvolume/128.0;
-  impl->effect->set_state(Gst::STATE_PLAYING);
-
-#endif
-  return true;
-}
-
-bool Snd::on_bus_message(const Glib::RefPtr<Gst::Message> & msg, guint32 source)
-{
-  (void)msg;
-  (void)source;
-#ifdef LW_SOUND
-  switch (msg->get_message_type())
-    {
-    case Gst::MESSAGE_EOS:
+    case GST_MESSAGE_EOS:
       if (source == 0)
         {
-          if (d_nloops > 0)
-            d_nloops--;
-          if (d_nloops == 0)
+          if (nloops > 0)
+            nloops--;
+          if (nloops == 0)
             return TRUE;
-          impl->effect->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, 0);
+          gst_element_seek
+            (impl->effect,
+             1.0,
+             GST_FORMAT_TIME,
+             GST_SEEK_FLAG_FLUSH,
+             GST_SEEK_TYPE_SET, 0,
+             GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
         }
       else if (source == 1)
         {
-          nextPiece();
+          impl->snd->nextPiece ();
         }
       break;
     default:
       break;
     }
-#endif
   return true;
 }
+
+Snd* Snd::s_instance = 0;
+
+Snd* Snd::instance ()
+{
+  if (s_instance == 0)
+    s_instance = new Snd ();
+
+  return s_instance;
+}
+
+void Snd::deleteInstance ()
+{
+  if (s_instance == 0)
+    return;
+
+  delete s_instance;
+  s_instance = 0;
+}
+
+Snd::Snd ()
+        :d_broken (false), d_background (false)
+{
+    impl = new Impl ();
+    impl->snd = this;
+    nloops = 1;
+    debug("Snd constructor")
+
+    XML_Helper helper (File::getMusicFile ("music.xml"), std::ios::in);
+    helper.register_tag ("piece", sigc::mem_fun(*this, &Snd::loadMusic));
+
+    if (!helper.parse_XML ())
+      {
+        std::cerr<<
+          _("Error loading music descriptions; disabling music.") << std::endl;
+        d_broken = true;
+        return;
+      }
+    helper.close ();
+
+    impl->back = gst_element_factory_make ("playbin", NULL);
+    impl->effect = gst_element_factory_make ("playbin", NULL);
+    GstBus *effect_bus = gst_element_get_bus (impl->effect);
+    GstBus *back_bus = gst_element_get_bus (impl->back);
+    gst_bus_add_watch (effect_bus, (GstBusFunc) on_bus_message,
+                       GINT_TO_POINTER(0));
+    gst_bus_add_watch (back_bus, (GstBusFunc) on_bus_message,
+                       GINT_TO_POINTER(1));
+
+    debug("Music list contains " << d_musicMap.size <<" entries.")
+    debug("background list has " << d_bgMap.size <<" entries.")
+}
+
+Snd::~Snd ()
+{
+  debug("Snd destructor")
+    halt (false);
+  disableBackground ();
+
+  // remove all music pieces
+  std::map<Glib::ustring, MusicItem*>::iterator it;
+  for (it = d_musicMap.begin (); it != d_musicMap.end (); ++it)
+    delete (*it).second;
+
+  gst_element_set_state (impl->effect, GST_STATE_NULL);
+  gst_element_set_state (impl->back, GST_STATE_NULL);
+
+  gst_object_unref (impl->effect);
+  gst_object_unref (impl->back);
+
+  impl->effect = NULL;
+  impl->back   = NULL;
+}
+
+bool Snd::isMusicEnabled ()
+{
+  return Configuration::s_musicenable;
+}
+
+int Snd::getMusicVolume ()
+{
+  return Configuration::s_musicvolume;
+}
+
+typedef struct
+{
+  GstElement *effect;
+  double step;
+} FadeData;
+
+
+gboolean on_effect_fade_callback (gpointer user_data)
+{
+  gdouble max = (double)Configuration::s_musicvolume / 128.0;
+
+  FadeData *fade = (FadeData*)user_data;
+
+  gdouble volume = 0.0;
+  g_object_get (fade->effect, "volume", &volume, NULL);
+
+  if (fade->step < 0)
+    {
+      if (volume > std::abs (fade->step))
+        g_object_set (fade->effect, "volume", volume + fade->step, NULL);
+      else
+        g_object_set (fade->effect, "volume", 0, NULL);
+    }
+  else if (fade->step > 0)
+    {
+      if (volume < max - fade->step)
+        g_object_set (fade->effect, "volume", volume + fade->step, NULL);
+      else
+        g_object_set (fade->effect, "volume", max, NULL);
+    }
+  if (fade->step < 0 && volume <= 0.0)
+    {
+      g_object_set (fade->effect, "volume", 0, NULL);
+      g_free (fade);
+      return FALSE;
+    }
+  if (fade->step > 0 && volume >= max)
+    {
+      g_object_set (fade->effect, "volume", max, NULL);
+      g_free (fade);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+bool Snd::play (Glib::ustring piece, int loops, bool fade)
+{
+  if (d_broken || !Configuration::s_musicenable)
+    return true;
+
+  MusicItem *item = ScenarioMedia::instance()->getSoundEffect (piece);
+  if (!item)
+    item = d_musicMap[piece];
+  printf ("item is %p\n", item);
+  // first, load the music piece
+  if (item == NULL)
+    return false;
+
+  nloops = loops;
+
+  std::string uri = Glib::filename_to_uri (File::getMusicFile (item->file));
+
+  GstElement *video_sink = gst_element_factory_make ("fakesink", NULL);
+  GstElement *audio_sink = gst_element_factory_make ("autoaudiosink", "output");
+
+  g_object_set (impl->effect,
+                "uri", uri.c_str (),
+                "video-sink", video_sink,
+                "audio-sink", audio_sink,
+                NULL);
+
+  if (fade)
+    {
+      g_object_set (impl->effect, "volume", 0.0, NULL);
+
+      FadeData *f = g_new (FadeData, 1);
+      f->effect = impl->effect;
+      f->step = 0.01;
+      g_timeout_add (10, on_effect_fade_callback, f);
+    }
+  else
+    {
+      double volume = (double)Configuration::s_musicvolume / 128.0;
+      g_object_set (impl->effect, "volume", volume, NULL);
+    }
+
+  gst_element_set_state (impl->effect, GST_STATE_PLAYING);
+
+  gst_object_unref (video_sink);
+  gst_object_unref (audio_sink);
+
+  return true;
+}
+
   
-bool Snd::halt(bool fade)
+bool Snd::halt (bool fade)
 {
   (void)fade;
   debug("stopping music")
 
-#ifdef LW_SOUND
   if (fade == false)
-    impl->effect->set_state(Gst::STATE_NULL);
+    gst_element_set_state (impl->effect, GST_STATE_NULL);
   else
-    Timing::instance().register_timer
-      (sigc::bind(sigc::mem_fun(this, &Snd::on_effect_fade), -0.02), 100);
-#endif
+    {
+      FadeData *f = g_new (FadeData, 1);
+      f->effect = impl->effect;
+      f->step = -0.02;
+      g_timeout_add (100, on_effect_fade_callback, f);
+    }
   return true;
 }
 
-bool Snd::on_effect_fade(double step)
-{
-  (void)step;
-#ifdef LW_SOUND
-  double volume = impl->effect->property_volume();
-  double max = (double)Configuration::s_musicvolume/128.0;
-  if (step < 0)
-    {
-      if (volume > std::abs(step))
-        impl->effect->property_volume() = (volume + step);
-      else
-        impl->effect->property_volume() = 0.0;
-    }
-  else if (step > 0)
-    {
-      if (volume < max-step)
-        impl->effect->property_volume() = (volume + step);
-      else
-        impl->effect->property_volume() = max;
-    }
-  if (step < 0 && impl->effect->property_volume() <= 0.0)
-    {
-      impl->effect->property_volume() = 0.0;
-      return Timing::STOP;
-    }
-  if (step > 0 && impl->effect->property_volume() >= max)
-    {
-      impl->effect->property_volume() = max;
-      return Timing::STOP;
-    }
-#endif
-  return Timing::CONTINUE;
-}
-
-void Snd::enableBackground()
+void Snd::enableBackground ()
 {
     debug("enabling background music")
     d_background = true;
-    nextPiece();
+    nextPiece ();
 }
 
-void Snd::disableBackground()
+void Snd::disableBackground ()
 {
     debug("disabling background music")
     d_background = false;
 
-#ifdef LW_SOUND
-  impl->back->set_state(Gst::STATE_NULL);
-#endif
+    gst_element_set_state (impl->back, GST_STATE_NULL);
 }
 
-void Snd::nextPiece()
+void Snd::nextPiece ()
 {
     debug("Snd::nextPiece")
-    if (!d_background || !isMusicEnabled())
+    if (!d_background || !isMusicEnabled ())
         return;
 
     std::vector<Glib::ustring> bgmap = d_bgMap;
     std::map<Glib::ustring, MusicItem*> map = d_musicMap;
-    if (ScenarioMedia::getInstance()->getBackgroundMusic().empty() == false)
+    if (ScenarioMedia::instance ()->getBackgroundMusic().empty () == false)
       {
-        bgmap = ScenarioMedia::getInstance()->getBackgroundMusic();
-        map = ScenarioMedia::getInstance()->getSounds();
+        bgmap = ScenarioMedia::instance ()->getBackgroundMusic ();
+        map = ScenarioMedia::instance ()->getSounds ();
       }
-#ifdef LW_SOUND
+
     // select a random music piece from the list of background pieces
-    while (!map.empty())
+    while (!map.empty ())
       {
-        int i = Rnd::rand() % d_bgMap.size();
-        if (!File::exists(File::getMusicFile(map[bgmap[i]]->file)))
-            continue;
-        impl->back->set_state(Gst::STATE_NULL);
-        impl->back->property_uri() = 
-          Glib::filename_to_uri(File::getMusicFile(map[bgmap[i]]->file));
-        impl->back->property_video_sink() = Gst::FakeSink::create();
-        impl->back->property_audio_sink() = Gst::ElementFactory::create_element("autoaudiosink", "output");
-        impl->back->property_volume() = (double)Configuration::s_musicvolume/128.0;
-        impl->back->set_state(Gst::STATE_PLAYING);
+        int i = Rnd::rand () % d_bgMap.size ();
+        if (!File::exists (File::getMusicFile (map[bgmap[i]]->file)))
+          continue;
+
+        std::string uri =
+          Glib::filename_to_uri (File::getMusicFile (map[bgmap[i]]->file));
+
+        GstElement *video_sink = gst_element_factory_make ("fakesink", NULL);
+        GstElement *audio_sink = gst_element_factory_make ("autoaudiosink",
+                                                           "output");
+
+        double volume = (double)Configuration::s_musicvolume / 128.0;
+
+        g_object_set (impl->back,
+                      "uri", uri.c_str (),
+                      "video-sink", video_sink,
+                      "audio-sink", audio_sink,
+                      "volume", volume,
+                      NULL);
+
+        gst_object_unref (video_sink);
+        gst_object_unref (audio_sink);
+
+        gst_element_set_state (impl->back, GST_STATE_PLAYING);
         break;
       }
-#endif
 }
 
-bool Snd::loadMusic(Glib::ustring tag, XML_Helper* helper)
+bool Snd::loadMusic (Glib::ustring tag, XML_Helper* helper)
 {
   if (tag != "piece")
     {
-      std::cerr <<"Loading music: Wrong tag name\n";
+      std::cerr << "Loading music: Wrong tag name" << std::endl;
       return false;
     }
 
   Glib::ustring tagname;
-  MusicItem* item = new MusicItem();
+  MusicItem* item = new MusicItem ();
 
   bool retval = true;
-  retval &= helper->getData(tagname, "name");
-  retval &= helper->getData(item->file, "filename");
-  retval &= helper->getData(item->background, "background");
-  retval &= helper->getData(item->alias, "alias");
+  retval &= helper->get (tagname, "name");
+  retval &= helper->get (item->file, "filename");
+  retval &= helper->get (item->background, "background");
+  retval &= helper->get (item->alias, "alias");
 
   if (retval)
     {
       d_musicMap[tagname] = item;
       if (item->background)
-        d_bgMap.push_back(tagname);
+        d_bgMap.push_back (tagname);
     }
   else
     delete item;
@@ -308,15 +361,14 @@ bool Snd::loadMusic(Glib::ustring tag, XML_Helper* helper)
   return retval;
 }
         
-void Snd::updateVolume()
+void Snd::updateVolume ()
 {
-#ifdef LW_SOUND
-  impl->effect->property_volume() = (double)Configuration::s_musicvolume/128.0;
-  impl->back->property_volume() = (double)Configuration::s_musicvolume/128.0;
-#endif
+  gdouble max = (double)Configuration::s_musicvolume / 128.0;
+  g_object_set (impl->effect, "volume", max, NULL);
+  g_object_set (impl->back, "volume", max, NULL);
 }
 
-Glib::ustring Snd::getFile(Glib::ustring piece)
+Glib::ustring Snd::getFile (Glib::ustring piece)
 {
   MusicItem *item = d_musicMap[piece];
   if (!item)

@@ -1,9 +1,9 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2002 Mark L. Amidon
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014, 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2002 Mark L. Amidon
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef CITY_H
@@ -26,10 +25,10 @@
 
 #include <list>
 #include <vector>
-#include "NamedLocation.h"
-#include "OwnerId.h"
-#include "Renamable.h"
-#include "prodslotlist.h"
+#include "named-location.h"
+#include "owner-id.h"
+#include "renamable.h"
+#include "prod-slot-list.h"
 
 class Player;
 class Stack;
@@ -256,6 +255,9 @@ class City : public OwnerId, public NamedLocation, public ProdSlotlist
 	//! Return how many armies are in the city.
 	guint32 countDefenders() const;
 
+        //! put empty production bases on the end
+        void squeezeProductionSlots ();
+
 	//! Return the stacks that are inside the city walls.
 	std::vector<Stack *> getDefenders() const;
 
@@ -285,7 +287,7 @@ class City : public OwnerId, public NamedLocation, public ProdSlotlist
 
 	//! Sort the Army production bases that this city produces by strength.
 	/**
-	 * @note Pnly use this prior to the start of game.
+	 * @note Only use this prior to the start of game.
 	 */
 	void sortProduction();
 
@@ -361,4 +363,4 @@ class City : public OwnerId, public NamedLocation, public ProdSlotlist
 };
 
 bool armyCompareStrength (const ArmyProdBase *lhs, const ArmyProdBase *rhs);
-#endif // CITY_H
+#endif

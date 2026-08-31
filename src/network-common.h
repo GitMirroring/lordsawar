@@ -1,5 +1,5 @@
-// Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2011, 2014, 2015, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef NETWORK_COMMON_H
@@ -27,7 +26,7 @@
 
 #define MESSAGE_SIZE_BYTES 4
 #define MESSAGE_PREAMBLE_EXTRA_BYTES 2
-#define MESSAGE_PROTOCOL_VERSION 1
+#define MESSAGE_PROTOCOL_VERSION 2
 #define MESSAGE_HEADER_SIZE (MESSAGE_SIZE_BYTES + MESSAGE_PREAMBLE_EXTRA_BYTES)
 
 enum LobbyActionType {
@@ -57,9 +56,17 @@ enum MessageType {
   MESSAGE_TYPE_ROUND_START = 17,
   MESSAGE_TYPE_LOBBY_ACTIVITY = 18,
   MESSAGE_TYPE_CHANGE_NICKNAME = 19,
-  MESSAGE_TYPE_GAME_MAY_BEGIN = 20,
+  MESSAGE_TYPE_GAME_BEGIN = 20,
   MESSAGE_TYPE_OFF_PLAYER = 21,
-  MESSAGE_TYPE_NEXT_PLAYER = 22
+  MESSAGE_TYPE_NEXT_PLAYER = 22,
+  MESSAGE_TYPE_SAME_PROFILE_ID = 23,
+  MESSAGE_TYPE_MOD_ID = 24,
+  MESSAGE_TYPE_SYSMSG = 25,
+  MESSAGE_TYPE_KICK = 26,
+  MESSAGE_TYPE_READY = 27,
+  MESSAGE_TYPE_GAME_CAN_BEGIN = 28,
+  MESSAGE_TYPE_WAITING_FOR_READY = 29,
+  MESSAGE_TYPE_COUNTDOWN = 30,
 };
 
 #endif

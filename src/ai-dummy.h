@@ -1,7 +1,7 @@
-// Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef AI_DUMMY_H
@@ -25,7 +24,7 @@
 #include <list>
 #include <gtkmm.h>
 
-#include "real_player.h"
+#include "real-player.h"
 
 class XML_Helper;
 class City;
@@ -45,16 +44,13 @@ class AI_Dummy : public RealPlayer
          * 
          * @param name         The name of the player.
          * @param armyset      The Id of the player's Armyset.
-         * @param colors       The player's colors.
+         * @param shield       The player's index into the Shieldset.
 	 * @param width        The width of the player's FogMap.
 	 * @param height       The height of the player's FogMap.
-	 * @param player_no    The Id of the player.  If this value is -1,
-	 *                     the next free Id it used.
          */
 	//! Default constructor.
         AI_Dummy (Glib::ustring name, guint32 armyset,
-                 std::vector<Gdk::RGBA> colors, int width, int height,
-                 int player_no = -1);
+                 Shield::Color shield, int width, int height);
 
 	//! Copy constructor.
         AI_Dummy(const Player& player, bool sync_ids = false);
@@ -65,19 +61,20 @@ class AI_Dummy : public RealPlayer
         
 	virtual bool isComputer() const {return true;};
         virtual void abortTurn();
-        virtual bool startTurn();
+        virtual void startTurn(sigc::slot<void(bool)> finish);
         virtual void invadeCity(City* c);
         virtual bool chooseHero(HeroProto *hero, City* c, int gold);
         virtual Reward *chooseReward(Ruin *ruin, Sage *sage, Stack *stack);
-        virtual void heroGainsLevel(Hero * a);
+        virtual void heroGainsLevel(Hero * a, Army::Stat stat);
 	virtual bool chooseTreachery (Stack *stack, Player *player, Vector <int> pos);
         virtual Army::Stat chooseStat(Hero *hero);
         virtual bool chooseQuest(Hero *hero);
-        virtual bool computerChooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual CityDefeatedChoice chooseCityDefeatedAction (City *c, Stack *s);
+        virtual bool chooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool choosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool chooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool chooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool chooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns);
 
 	void setDefensiveProduction(City *city);
 	void examineCities();
@@ -86,4 +83,4 @@ class AI_Dummy : public RealPlayer
 	//DATA
 };
 
-#endif // AI_DUMMY_H
+#endif

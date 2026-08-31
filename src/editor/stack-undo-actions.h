@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef STACK_EDITOR_ACTIONS_H
-#define STACK_EDITOR_ACTIONS_H
+#ifndef STACK_UNDO_ACTIONS_H
+#define STACK_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
@@ -28,13 +27,13 @@
 
 class Player;
 
-//! A record of an event in the stack editor
-/** 
+//! A record of an event in the scenario builder's stack editor
+/**
  * The purpose of these classes is to implement undo/redo in the stack
  * editor.
  */
 
-class StackEditorAction: public UndoAction
+class StackUndoAction: public UndoAction
 {
 public:
 
@@ -51,160 +50,270 @@ public:
         HERO_DETAILS = 9,
       };
 
-    StackEditorAction(Type type, bool agg = false)
-     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+    StackUndoAction (Type type, bool agg = false)
+      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                    UndoAction::AGGREGATE_NONE), m_type (type)
+        {
+        }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class StackEditorAction_Fortify: public StackEditorAction
+class StackUndoAction_Fortify: public StackUndoAction
 {
-    public:
-        StackEditorAction_Fortify (bool state)
-          : StackEditorAction (FORTIFY, false), d_active (state) {}
-        ~StackEditorAction_Fortify () {}
+public:
+    StackUndoAction_Fortify (bool state)
+      : StackUndoAction (FORTIFY, false), m_active (state)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Fortify";}
-        bool getFortify () const {return d_active;}
-    private:
-        bool d_active;
+    ~StackUndoAction_Fortify ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Fortify";
+      }
+
+    bool get_fortify () const
+      {
+        return m_active;
+      }
+private:
+    bool m_active;
 };
-class StackEditorAction_Owner: public StackEditorAction
+
+class StackUndoAction_Owner: public StackUndoAction
 {
-    public:
-        StackEditorAction_Owner (Player *o, bool fort)
-          : StackEditorAction (OWNER, false), d_owner (o), d_active (fort) {}
-        ~StackEditorAction_Owner () {}
+public:
+    StackUndoAction_Owner (Player *o)
+      : StackUndoAction (OWNER, false), m_owner (o)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Owner";}
+    ~StackUndoAction_Owner ()
+      {
+      }
 
-        Player *getOwner () const {return d_owner;}
-        bool getFortify () const {return d_active;}
-    private:
-        Player *d_owner;
-        bool d_active;
+    Glib::ustring get_action_name () const
+      {
+        return "Owner";
+      }
+
+    Player *get_owner () const
+      {
+        return m_owner;
+      }
+
+private:
+    Player *m_owner;
 };
-class StackEditorAction_Index: public StackEditorAction
+
+class StackUndoAction_Index: public StackUndoAction
 {
-    public:
-        StackEditorAction_Index (Type t, guint32 i, bool agg = false)
-          : StackEditorAction (t, agg), d_index (i) {}
-        ~StackEditorAction_Index () {}
+public:
+    StackUndoAction_Index (Type t, guint32 i, bool agg = false)
+      : StackUndoAction (t, agg), m_index (i)
+      {
+      }
 
-        guint32 getIndex () {return d_index;}
-    private:
-        guint32 d_index;
+    ~StackUndoAction_Index ()
+      {
+      }
+
+    guint32 get_index () const
+      {
+        return m_index;
+      }
+private:
+    guint32 m_index;
 };
 
-class StackEditorAction_Strength: public StackEditorAction_Index
+class StackUndoAction_Strength: public StackUndoAction_Index
 {
-    public:
-        StackEditorAction_Strength (guint32 i, guint32 s)
-          : StackEditorAction_Index (STRENGTH, i), d_strength (s) {}
-        ~StackEditorAction_Strength () {}
+public:
+    StackUndoAction_Strength (guint32 i, guint32 s)
+      : StackUndoAction_Index (STRENGTH, i), m_strength (s)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Strength";}
+    ~StackUndoAction_Strength ()
+      {
+      }
 
-        guint32 getStrength  () {return d_strength;}
+    Glib::ustring get_action_name () const
+      {
+        return "Strength";
+      }
 
-    private:
-        guint32 d_strength;
+    guint32 get_strength () const
+      {
+        return m_strength;
+      }
+
+private:
+    guint32 m_strength;
 };
 
-class StackEditorAction_Moves: public StackEditorAction_Index
+class StackUndoAction_Moves: public StackUndoAction_Index
 {
-    public:
-        StackEditorAction_Moves (guint32 i, guint32 m)
-          : StackEditorAction_Index (MOVES, i), d_moves (m) {}
-        ~StackEditorAction_Moves () {}
+public:
+    StackUndoAction_Moves (guint32 i, guint32 m)
+      : StackUndoAction_Index (MOVES, i), m_moves (m)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Moves";}
+    ~StackUndoAction_Moves ()
+      {
+      }
 
-        guint32 getMoves () {return d_moves;}
+    Glib::ustring get_action_name () const
+      {
+        return "Moves";
+      }
 
-    private:
-        guint32 d_moves;
+    guint32 get_moves () const
+      {
+        return m_moves;
+      }
+
+private:
+    guint32 m_moves;
 };
 
-class StackEditorAction_Upkeep: public StackEditorAction_Index
+class StackUndoAction_Upkeep: public StackUndoAction_Index
 {
-    public:
-        StackEditorAction_Upkeep (guint32 i, guint32 u)
-          : StackEditorAction_Index (UPKEEP, i), d_upkeep (u) {}
-        ~StackEditorAction_Upkeep () {}
+public:
+    StackUndoAction_Upkeep (guint32 i, guint32 u)
+      : StackUndoAction_Index (UPKEEP, i), m_upkeep (u)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Upkeep";}
+    ~StackUndoAction_Upkeep ()
+      {
+      }
 
-        guint32 getUpkeep () {return d_upkeep;}
+    Glib::ustring get_action_name () const
+      {
+        return "Upkeep";
+      }
 
-    private:
-        guint32 d_upkeep;
+    guint32 get_upkeep () const
+      {
+        return m_upkeep;
+      }
+
+private:
+    guint32 m_upkeep;
 };
 
-class StackEditorAction_HeroDetails: public StackEditorAction_Index
+class StackUndoAction_HeroDetails: public StackUndoAction_Index
 {
-    public:
-        StackEditorAction_HeroDetails (guint32 i, Hero *h)
-          : StackEditorAction_Index (HERO_DETAILS, i),
-          d_hero(new Hero (*h)) {}
-        ~StackEditorAction_HeroDetails () {delete d_hero;}
+public:
+    StackUndoAction_HeroDetails (guint32 i, Hero *h)
+      : StackUndoAction_Index (HERO_DETAILS, i), m_hero (new Hero (*h))
+  {
+  }
 
-        Glib::ustring getActionName () const {return "HeroDetails";}
+    ~StackUndoAction_HeroDetails ()
+      {
+        delete m_hero;
+      }
 
-        Hero *getHero () const {return d_hero;}
+    Glib::ustring get_action_name () const
+      {
+        return "HeroDetails";
+      }
 
-    private:
-        Hero *d_hero;
+    Hero *get_hero () const
+      {
+        return m_hero;
+      }
+
+private:
+    Hero *m_hero;
 };
 
-class StackEditorAction_Save : public StackEditorAction
+class StackUndoAction_Save : public StackUndoAction
 {
-    public:
-        StackEditorAction_Save (Type t, Stack *s)
-          :StackEditorAction (t, false), d_stack (s) {}
-        ~StackEditorAction_Save ()
-          {
-            delete d_stack;
-          }
+public:
+    StackUndoAction_Save (Type t, Stack *s)
+      : StackUndoAction (t, false), m_stack (new Stack (*s))
+      {
+      }
 
-        void clearStack () {d_stack = NULL;}
-        Stack* getStack () const {return d_stack;}
-    private:
-        Stack *d_stack;
+    ~StackUndoAction_Save ()
+      {
+        delete m_stack;
+      }
+
+    Stack* get_stack () const
+      {
+        return m_stack;
+      }
+private:
+    Stack *m_stack;
 };
 
-class StackEditorAction_Add: public StackEditorAction_Save
+class StackUndoAction_Add: public StackUndoAction_Save
 {
-    public:
-        StackEditorAction_Add (Stack *s)
-          :StackEditorAction_Save (ADD, s) {}
-        ~StackEditorAction_Add () {}
+public:
+    StackUndoAction_Add (Stack *s)
+      : StackUndoAction_Save (ADD, s)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Add";}
+    ~StackUndoAction_Add ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Add";
+      }
 };
 
-class StackEditorAction_Remove: public StackEditorAction_Save
+class StackUndoAction_Remove: public StackUndoAction_Save
 {
-    public:
-        StackEditorAction_Remove (Stack *s)
-          :StackEditorAction_Save (REMOVE, s) {}
-        ~StackEditorAction_Remove () {}
+public:
+    StackUndoAction_Remove (Stack *s)
+      : StackUndoAction_Save (REMOVE, s)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Remove";}
+    ~StackUndoAction_Remove ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Remove";
+      }
 };
 
-class StackEditorAction_Copy: public StackEditorAction_Save
+class StackUndoAction_Copy: public StackUndoAction_Save
 {
-    public:
-        StackEditorAction_Copy (Stack *s)
-          :StackEditorAction_Save (COPY, s) {}
-        ~StackEditorAction_Copy () {}
+public:
+    StackUndoAction_Copy (Stack *s)
+      : StackUndoAction_Save (COPY, s)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Copy";}
+    ~StackUndoAction_Copy ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Copy";
+      }
 };
-#endif //STACK_EDITOR_ACTIONS_H
+#endif

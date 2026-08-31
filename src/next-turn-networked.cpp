@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2011, 2014 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2011, 2014, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,25 +14,26 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "NextTurnNetworked.h"
+#include "next-turn-networked.h"
 
-#include "playerlist.h"
-#include "citylist.h"
-#include "ruinlist.h"
-#include "stacklist.h"
-#include "armysetlist.h"
+#include "player-list.h"
+#include "city-list.h"
+#include "ruin-list.h"
+#include "stack-list.h"
+#include "army-set-list.h"
 #include "hero.h"
-#include "vectoredunitlist.h"
-#include "FogMap.h"
+#include "vectored-unit-list.h"
+#include "fog-map.h"
 #include "history.h"
-#include "QuestsManager.h"
-#include "network_player.h"
+#include "quest-manager.h"
+#include "network-player.h"
 #include "game-server.h"
 #include "game-client.h"
-#include "GameScenarioOptions.h"
+#include "game-scenario-options.h"
+#include "configuration.h"
+#include "counter.h"
 
 #include "path.h"
 
@@ -42,9 +43,9 @@
 NextTurnNetworked::NextTurnNetworked()
     :NextTurn()
 {
-  for (auto p: *Playerlist::getInstance())
+  for (auto p: *Playerlist::instance())
     if (p->getType() != Player::NETWORKED)
-      p->ending_turn.connect(sigc::mem_fun(this, &NextTurn::endTurn));
+      p->ending_turn.connect(sigc::mem_fun(*this, &NextTurn::endTurn));
 }
 
 Player* NextTurnNetworked::next()
@@ -58,59 +59,125 @@ void NextTurnNetworked::start_player(Player *player)
 {
   if (d_stop)
     return;
-      
-  abort.disconnect();
-  abort = srequestAbort.connect(sigc::mem_fun(player, &Player::abortTurn));
-  Playerlist::getInstance()->setActiveplayer(player);
+
+  Playerlist::instance()->setActiveplayer(player);
   if (player->getType() == Player::NETWORKED)
     {
       splayerStart.emit(player);
       return;
     }
-  start();
+  start ();
 }
 
-void NextTurnNetworked::start()
+void NextTurnNetworked::end_of_round_after_player_died ()
 {
-  supdating.emit();
-
-  startTurn();
-
-  // inform everyone about the next turn 
-  snextTurn.emit(Playerlist::getActiveplayer());
-
-  if (Playerlist::getInstance()->getNoOfPlayers() <= 2)
+  if (Playerlist::instance ()->getNoOfPlayers () <= 1)
+    m_signal_game_over.emit ();
+  else
     {
-      if (Playerlist::getInstance()->checkPlayers()) //end of game detected
-        return;
+      finishRound();
+      snextRound.emit();
+      start ();
+    }
+}
+
+// this routine handles end of round and then starts the next player
+void NextTurnNetworked::check_end_of_round ()
+{
+  //if it is the first player's turn now, a new round has started
+  if (Playerlist::getActiveplayer () == Playerlist::getFirstLiving ())
+    {
+      // the end of round chain of dialogs
+      auto dead = Playerlist::instance ()->getDeadPlayers ();
+
+      if (dead.empty () == false)
+        {
+          auto finish = std::make_shared<sigc::slot<void()>>();
+
+          *finish =
+            [this, finish, dead] () mutable
+              {
+                auto player = dead.front ();
+                player->kill ();
+
+                //do the next if there is one, or end
+                dead.erase (dead.begin ());
+                if (dead.empty () == false)
+                  m_signal_player_died.emit (dead.front (), finish);
+                else
+                  {
+                    if (Playerlist::getActiveplayer ()->isDead ())
+                      nextPlayer ();
+                    end_of_round_after_player_died ();
+                  }
+              };
+          m_signal_player_died.emit (dead.front (), finish);
+        }
+      else
+        {
+          end_of_round_after_player_died ();
+        }
+    }
+  else
+    start ();
+}
+
+void NextTurnNetworked::start ()
+{
+  //set first player as active if no active player exists
+  if (!Playerlist::getActiveplayer ())
+    nextPlayer ();
+
+  supdating.emit ();
+
+  // do various start-up tasks
+  if (continuing_turn)
+    {
+      continuing_turn = false;
+      return;
     }
 
-  splayerStart.emit(Playerlist::getActiveplayer());
+  startTurn ();
+
+  // inform everyone about the next turn 
+  splayerStart.emit (Playerlist::getActiveplayer ());
 
   // let the player do his or her duties...
-  bool continue_loop = Playerlist::getActiveplayer()->startTurn();
-  if (!continue_loop)
-    return;
+  Playerlist::getActiveplayer ()->startTurn
+    ([this] (bool continue_loop)
+     {
+       if (!continue_loop)
+         return;
 
-  //Now do some cleanup at the end of the turn.
-  if (d_stop == true)
-    return;
-  finishTurn();
+       //Now do some cleanup at the end of the turn.
+       finishTurn ();
+
+       //...and initiate the next one.
+       nextPlayer ();
+
+       guint32 millisecs =  Configuration::s_displaySpeedDelay * 3;
+       if (Playerlist::getActiveplayer () == Playerlist::getNeutral ())
+         millisecs = 10;
+       Glib::signal_timeout ().connect
+         ([this] ()
+          {
+            check_end_of_round ();
+            return false;
+          }, millisecs);
+     });
 }
 
 void NextTurnNetworked::endTurn()
 {
-  Glib::ustring old_name = Playerlist::getActiveplayer()->getName();
+  printf ("%s ended turn\n", Playerlist::getActiveplayer ()->getName ().c_str ());
   // Finish off the player and transfers the control to the start function
   // again.
   finishTurn();
-  if (Playerlist::getInstance()->checkPlayers() == true)
-    {
-      if (d_stop)
-	return;
-      if (Playerlist::getInstance()->getNoOfPlayers() <= 1)
-	return;
-    }
+       
+  //...and initiate the next player.
+  nextPlayer ();
+
+  check_end_of_round ();
 }
 
 void NextTurnNetworked::startTurn()
@@ -127,13 +194,8 @@ void NextTurnNetworked::startTurn()
   //we want to prevent offering the player another hero, etc.
   if (p->hasAlreadyInitializedTurn() && p->hasAlreadyEndedTurn() == false)
     return;
+
   p->initTurn();
-
-  //calculate upkeep and income
-  p->calculateUpkeep();
-  p->calculateIncome();
-
-  QuestsManager::getInstance()->nextTurn(p);
 }
 
 void NextTurnNetworked::finishTurn()
@@ -154,38 +216,32 @@ void NextTurnNetworked::finishRound()
   //E.g. increase the round number in GameScenario. (this is done with
   //the snextRound signal, but useful for an example).
 
-  if (Playerlist::getInstance()->checkPlayers() == true)
+  for (auto p: *Playerlist::instance ())
     {
-      if (d_stop)
-        return;
-      if (Playerlist::getInstance()->getNoOfPlayers() <= 1)
-        return;
-    }
-
-
-  for (auto it: *Playerlist::getInstance())
-    {
-      if (it->isDead())
+      if (p->isDead ())
         continue;
 
-      it->collectTaxesAndPayUpkeep();
+      if (p->getType () == Player::NETWORKED)
+        continue;
+
+      p->collectTaxesAndPayUpkeep ();
 
       //reset, and heal armies
-      it->stacksReset();
+      p->stacksReset ();
 
       //vector armies (needs to preceed city's next turn)
-      VectoredUnitlist::getInstance()->nextTurn(it);
+      VectoredUnitlist::instance()->nextTurn (p);
 
       //produce new armies
-      Citylist::getInstance()->nextTurn(it);
+      Citylist::instance()->nextTurn (p);
     }
 
   // heal the stacks in the ruins
-  Playerlist::getInstance()->getNeutral()->ruinsReset();
+  Playerlist::getNeutral()->ruinsReset();
 
   if (GameScenarioOptions::s_random_turns)
     {
-      Playerlist::getInstance()->randomizeOrder();
+      Playerlist::instance()->randomizeOrder();
       nextPlayer();
     }
 

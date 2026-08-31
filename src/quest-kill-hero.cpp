@@ -1,7 +1,7 @@
-// Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2004 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
@@ -26,19 +25,19 @@
 
 #include "hero.h"
 #include "stack.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "history.h"
-#include "QKillHero.h"
-#include "QuestsManager.h"
-#include "playerlist.h"
-#include "stacklist.h"
+#include "quest-kill-hero.h"
+#include "quest-manager.h"
+#include "player-list.h"
+#include "stack-list.h"
 #include "rnd.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
-QuestKillHero::QuestKillHero(QuestsManager& mgr, guint32 hero) 
-  : Quest(mgr, hero, Quest::KILLHERO),
+QuestKillHero::QuestKillHero(guint32 hero) 
+  : Quest(hero, Quest::KILLHERO),
     d_victim (chooseToKill ()->getId ())
 {
   d_targets.push_back(Stacklist::getPosition (d_victim));
@@ -50,10 +49,10 @@ QuestKillHero::QuestKillHero (const QuestKillHero &q)
 {
 }
 
-QuestKillHero::QuestKillHero(QuestsManager& q_mgr, XML_Helper* helper) 
-  : Quest(q_mgr, helper)
+QuestKillHero::QuestKillHero(XML_Helper* helper) 
+  : Quest(helper)
 {
-  helper->getData(d_victim, "to_kill");
+  helper->get(d_victim, "to_kill");
   debug("load: hero_to_kill = " << d_victim);
 
   // double and triple check :)
@@ -67,8 +66,8 @@ QuestKillHero::QuestKillHero(QuestsManager& q_mgr, XML_Helper* helper)
     initDescription();
 }
 
-QuestKillHero::QuestKillHero(QuestsManager& q_mgr, guint32 hero, guint32 victim) 
-  : Quest(q_mgr, hero, Quest::KILLHERO), d_victim (victim)
+QuestKillHero::QuestKillHero(guint32 hero, guint32 victim) 
+  : Quest(hero, Quest::KILLHERO), d_victim (victim)
 {
   // double and triple check :)
   Hero *h = Quest::getHeroById(d_victim);
@@ -89,10 +88,10 @@ bool QuestKillHero::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(Quest::d_tag);
+  retval &= helper->open_tag(Quest::d_tag);
   retval &= Quest::save(helper);
-  retval &= helper->saveData("to_kill", d_victim);
-  retval &= helper->closeTag();
+  retval &= helper->save("to_kill", d_victim);
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -138,7 +137,7 @@ Hero* QuestKillHero::chooseToKill()
   // Collect all enemy heroes in the vector
   Player* active = Playerlist::getActiveplayer();
 
-  for (auto pit: *Playerlist::getInstance())
+  for (auto pit: *Playerlist::instance())
     {
       if (pit == active)
 	continue;
@@ -160,7 +159,7 @@ Hero* QuestKillHero::chooseToKill()
 
 void QuestKillHero::armyDied(Army *a, bool heroIsCulprit)
 {
-  if (!isPendingDeletion())
+  if (isPendingDeletion())
     return;
   Hero *h = getHero();
   if (!h || h->getHP() <= 0)
@@ -178,21 +177,21 @@ void QuestKillHero::armyDied(Army *a, bool heroIsCulprit)
     {
       /*The Hero was killed by a stack without heroes so the quest expires*/
       //debug("SORRY: YOUR QUEST 'KILL HERO' HS EXPIRED BECAUSE THE HERO TO KILL WAS KILLED BY ANOTHER ONE");
-      d_q_mgr.questExpired(d_hero);
+      QuestsManager::instance()->questExpired(d_hero);
       //hopefully this is handled by questsmanager, and not here!
       return;
     }
   else
     {
       debug("CONGRATULATIONS: QUEST 'KILL HERO' IS COMPLETED!");
-      d_q_mgr.questCompleted(d_hero);
+      QuestsManager::instance()->questCompleted(d_hero);
       return;
     }
 
   return;
 }
 
-void QuestKillHero::cityAction(City *c, CityDefeatedAction action, 
+void QuestKillHero::cityAction(City *c, CityDefeatedChoice action, 
 			       bool heroIsCulprit, int gold)
 {
   (void) c;

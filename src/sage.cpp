@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014, 2017 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2017, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,13 +12,12 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "Sage.h"
-#include "rewardlist.h"
+#include "sage.h"
+#include "reward-list.h"
 #include "rnd.h"
-#include "GameScenarioOptions.h"
+#include "game-scenario-options.h"
 
 Sage::Sage()
 {
@@ -41,7 +40,7 @@ Sage::Sage()
   while (1)
     {
       Reward_Ruin *r = 
-        dynamic_cast<Reward_Ruin*>(Rewardlist::getInstance()->pop(Reward::RUIN));
+        dynamic_cast<Reward_Ruin*>(Rewardlist::instance()->pop(Reward::RUIN));
       if (!r)
         break;
       if (r->getRuin()->isHidden() == false)
@@ -50,6 +49,7 @@ Sage::Sage()
         continue;
       if (r->getRuin()->getReward())
         {
+          printf ("plop\n");
           switch (r->getRuin()->getReward()->getType())
             {
             case Reward::ITEM:
@@ -69,11 +69,11 @@ Sage::Sage()
 
   //definitely put the ones back we don't care about
   for (auto o : other_ruins)
-    Rewardlist::getInstance()->push_back(o);
+    Rewardlist::instance()->push_back(o);
 
-  std::random_shuffle(empty_ruins.begin(), empty_ruins.end());
-  std::random_shuffle(item_ruins.begin(), item_ruins.end());
-  std::random_shuffle(allies_ruins.begin(), allies_ruins.end());
+  std::shuffle(empty_ruins.begin(), empty_ruins.end(), Rnd::gen ());
+  std::shuffle(item_ruins.begin(), item_ruins.end(), Rnd::gen ());
+  std::shuffle(allies_ruins.begin(), allies_ruins.end(), Rnd::gen ());
 
   if (allies_ruins.size())
     {
@@ -81,7 +81,7 @@ Sage::Sage()
       allies_ruins.pop_back();
       //put the rest back
       for (auto o : allies_ruins)
-        Rewardlist::getInstance()->push_back(o);
+        Rewardlist::instance()->push_back(o);
       push_back(r);
     }
   else if (empty_ruins.size())
@@ -104,13 +104,13 @@ Sage::Sage()
       item_ruins.pop_back();
       //put the rest back
       for (auto o : item_ruins)
-        Rewardlist::getInstance()->push_back(o);
+        Rewardlist::instance()->push_back(o);
       push_back(r);
     }
   else if (empty_ruins.size())
     {
       d_item_reward = 
-        dynamic_cast<Reward_Item*>(Rewardlist::getInstance()->pop(Reward::ITEM));
+        dynamic_cast<Reward_Item*>(Rewardlist::instance()->pop(Reward::ITEM));
       if (d_item_reward)
         {
           d_item_ruin = empty_ruins.back();
@@ -122,11 +122,11 @@ Sage::Sage()
     }
   //put the rest of the empty ruins back
   for (auto o: empty_ruins)
-    Rewardlist::getInstance()->push_back(o);
+    Rewardlist::instance()->push_back(o);
 
   //okay, we've handled the custom scenario case,
   //now we handle the more normal case
-  for (auto r: *Ruinlist::getInstance())
+  for (auto r: *Ruinlist::instance())
     {
       if (r->isSearched() == true)
         continue;
@@ -135,7 +135,7 @@ Sage::Sage()
       if (r->getReward() == NULL)
         more_empty_ruins.push_back(new Reward_Ruin (r));
     }
-  std::random_shuffle(more_empty_ruins.begin(), more_empty_ruins.end());
+  std::shuffle(more_empty_ruins.begin(), more_empty_ruins.end(), Rnd::gen ());
   if (!d_allies_reward && more_empty_ruins.size())
     {
       d_allies_reward =
@@ -152,7 +152,7 @@ Sage::Sage()
   if (!d_item_reward && more_empty_ruins.size())
     {
       d_item_reward = 
-        dynamic_cast<Reward_Item*>(Rewardlist::getInstance()->pop(Reward::ITEM));
+        dynamic_cast<Reward_Item*>(Rewardlist::instance()->pop(Reward::ITEM));
       if (d_item_reward)
         {
           d_item_ruin = more_empty_ruins.back();
@@ -192,7 +192,7 @@ Sage::~Sage ()
           *i != d_item_ruin &&
           *i != d_map_reward &&
           *i != d_reward)
-        Rewardlist::getInstance()->push_back(*i);
+        Rewardlist::instance()->push_back(*i);
     }
 
   //get rid of the allies reward we made, unless it's selected
@@ -201,15 +201,15 @@ Sage::~Sage ()
       Reward *reward = d_allies_ruin->getRuin()->takeReward();
       delete reward;
       if (d_allies_ruin_popped)
-        Rewardlist::getInstance()->push_back(d_allies_ruin);
+        Rewardlist::instance()->push_back(d_allies_ruin);
     }
 
   if (d_item_ruin && d_reward != d_item_ruin)
     {
       Reward *reward = d_item_ruin->getRuin()->takeReward();
-      Rewardlist::getInstance()->push_back(reward);
+      Rewardlist::instance()->push_back(reward);
       if (d_item_ruin_popped)
-        Rewardlist::getInstance()->push_back(d_item_ruin);
+        Rewardlist::instance()->push_back(d_item_ruin);
     }
 
   if (d_gold_reward && d_reward != d_gold_reward)

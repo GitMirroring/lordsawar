@@ -1,4 +1,4 @@
-// Copyright (C) 2011, 2014 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
@@ -26,26 +25,26 @@
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 
-#include "armyset.h"
-#include "tileset.h"
-#include "shieldset.h"
-#include "cityset.h"
-#include "xmlhelper.h"
-#include "Configuration.h"
+#include "army-set.h"
+#include "tile-set.h"
+#include "shield-set.h"
+#include "city-set.h"
+#include "xml-helper.h"
+#include "configuration.h"
 #include "defs.h"
-#include "File.h"
+#include "file.h"
 #include "file-compat.h"
-#include "tarhelper.h"
-#include "GameScenario.h"
+#include "tar-helper.h"
+#include "game-scenario.h"
 #include "ucompose.hpp"
-#include "Itemlist.h"
+#include "item-list.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
 FileCompat* FileCompat::s_instance = 0;
 
-FileCompat* FileCompat::getInstance()
+FileCompat* FileCompat::instance()
 {
   if (s_instance == 0)
     s_instance = new FileCompat();
@@ -71,19 +70,19 @@ bool FileCompat::contains(FileCompat::Type type) const
 
 void FileCompat::support_backward_compatibility_for_common_files()
 {
-  if (FileCompat::getInstance()->contains(CONFIGURATION) == false)
+  if (FileCompat::instance()->contains(CONFIGURATION) == false)
     Configuration::support_backward_compatibility();
-  if (FileCompat::getInstance()->contains(ITEMLIST) == false)
+  if (FileCompat::instance()->contains(ITEMLIST) == false)
     Itemlist::support_backward_compatibility();
-  if (FileCompat::getInstance()->contains(ARMYSET) == false)
+  if (FileCompat::instance()->contains(ARMYSET) == false)
     Armyset::support_backward_compatibility();
-  if (FileCompat::getInstance()->contains(TILESET) == false)
+  if (FileCompat::instance()->contains(TILESET) == false)
     Tileset::support_backward_compatibility();
-  if (FileCompat::getInstance()->contains(CITYSET) == false)
+  if (FileCompat::instance()->contains(CITYSET) == false)
     Cityset::support_backward_compatibility();
-  if (FileCompat::getInstance()->contains(SHIELDSET) == false)
+  if (FileCompat::instance()->contains(SHIELDSET) == false)
     Shieldset::support_backward_compatibility();
-  if (FileCompat::getInstance()->contains(GAMESCENARIO) == false)
+  if (FileCompat::instance()->contains(GAMESCENARIO) == false)
     GameScenario::support_backward_compatibility();
 }
 
@@ -114,11 +113,11 @@ FileCompat::Type FileCompat::getTypeByTarFileInspection(Glib::ustring filename) 
   if (broken)
     return UNKNOWN;
 
-  std::list<Glib::ustring> files = t.getFilenames();
+  std::list<std::string> files = t.getFilenames();
   t.Close();
   std::list<FileDetails> details;
   //whittle down the files it can't be
-  for (std::list<Glib::ustring>::iterator i = files.begin(); i != files.end(); 
+  for (std::list<std::string>::iterator i = files.begin(); i != files.end(); 
        ++i)
     {
       bool found = false;
@@ -676,5 +675,3 @@ std::list<Glib::ustring> FileCompat::getFileExtensions(FileCompat::Type type) co
       ext.push_back((*i).file_extension);
   return ext;
 }
-
-// End of file

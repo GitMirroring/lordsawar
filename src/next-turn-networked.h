@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2011, 2014 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2011, 2014, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,14 +14,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef NEXT_TURN_NETWORKED_H
 #define NEXT_TURN_NETWORKED_H
 
-#include "NextTurn.h"
+#include "next-turn.h"
 
 /**
    \brief The class to pass turns around the players during a networked game.
@@ -48,7 +47,7 @@ class NextTurnNetworked: public NextTurn
            if there is none active. For starting a game. This should be the
            lowest of all scenario-related functions in the stack.
          */
-        void start();
+        void start ();
 
         /**
            \brief go on to the next player
@@ -59,7 +58,7 @@ class NextTurnNetworked: public NextTurn
         void endTurn();
 
         //! Emitted when a new round begins.
-	sigc::signal<void> sroundBegins;
+	sigc::signal<void()> sroundBegins;
 
         //! Run the turn of the given player.
         void start_player(Player *p);
@@ -86,6 +85,9 @@ class NextTurnNetworked: public NextTurn
          */
         void finishTurn();
 
+        void check_end_of_round ();
+        void end_of_round_after_player_died ();
+
 };
 
-#endif //NEXT_TURN_NETWORKED_H
+#endif

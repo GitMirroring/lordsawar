@@ -1,4 +1,4 @@
-// Copyright (C) 2010, 2014, 2015, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2010, 2014, 2015, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,18 +12,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef EDITABLESMALLMAP_H
-#define EDITABLESMALLMAP_H
+#ifndef EDITABLE_SMALLMAP_H
+#define EDITABLE_SMALLMAP_H
 
 #include <sigc++/signal.h>
 #include <sigc++/connection.h>
 #include <sigc++/trackable.h>
 
-#include "overviewmap.h"
+#include "overview-map.h"
 
 #include "input-events.h"
 #include "undo-action.h"
@@ -34,53 +33,82 @@
 class EditableSmallMap: public OverviewMap
 {
 public:
-    enum Pointer {
-	POINTER = 0, 
-	TERRAIN, 
-	CITY, 
-	RUIN, 
-	TEMPLE, 
-	ERASE, 
+    enum Pointer
+      {
+        NONE = 0,
+        TERRAIN,
+        CITY,
+        RUIN,
+        TEMPLE,
+        ERASE,
         PICK_NEW_ROAD_START,
         PICK_NEW_ROAD_FINISH
-    };
+      };
 
     //! Default constructor.  Make a new EditableSmallMap.
-    EditableSmallMap();
+    EditableSmallMap ();
 
     //! Destructor.
-    ~EditableSmallMap() {}
+    ~EditableSmallMap ()
+      {
+      }
 
 
     // Get Methods
-    
+
     //! Get an image of the mouse cursor.
-    Glib::RefPtr<Gdk::Pixbuf> get_cursor(Vector<int> &hotspot) const;
+    PixMask* get_cursor (Vector<int> &hotspot) const;
 
     // Set Methods
-  
-    //! Set the pointer characteristics.
-    void set_pointer(Pointer pointer, int size, Tile::Type terrain);
 
-    void clear_road();
+    //! Set the pointer characteristics.
+    void set_pointer (Pointer pointer, int size, int terrain);
+
+    void set_pointer_size (int size)
+      {
+        m_pointer_size = size;
+      }
 
     // Methods that operate on the class data and modify the class.
- 
+
     void setRoadFinish (Vector<int> p);
 
     void setRoadStart (Vector<int> p);
 
     //! Realize the given mouse button event.
-    void mouse_button_event(MouseButtonEvent e);
+    void mouse_button_event (MouseButtonEvent e);
 
     //! Realize the given mouse motion event.
-    void mouse_motion_event(MouseMotionEvent e);
+    void mouse_motion_event (MouseMotionEvent e);
+
+    //! erase the target points
+    void clear_road ();
+
+    Vector<int> get_road_start () const
+      {
+        return m_road_start;
+      }
+
+    Vector<int> get_road_finish () const
+      {
+        return m_road_finish;
+      }
+
+    bool is_start_set () const
+      {
+        return m_road_start != Vector<int>(-1, -1);
+      }
+
+    bool is_finish_set () const
+      {
+        return m_road_finish != Vector<int>(-1, -1);
+      }
 
     //! make a road from road_start to road_finish.
-    bool create_road();
+    bool create_road ();
 
     //! check to see if the road can be made.
-    bool check_road();
+    bool check_road ();
 
     //! a hack to force a redraw
     void update ();
@@ -91,12 +119,36 @@ public:
     /**
      * Classes that use EditableSmallMap must catch this signal to display the map.
      */
-    sigc::signal<void, Cairo::RefPtr<Cairo::Surface>, Gdk::Rectangle > map_changed;
-    sigc::signal<void, Vector<int> > road_start_placed;
-    sigc::signal<void, Vector<int> > road_finish_placed;
-    sigc::signal<void, bool> road_can_be_created;
-    sigc::signal<void> map_edited;
-    sigc::signal<void, UndoAction *> undo_map;
+    sigc::signal<void(Cairo::RefPtr<Cairo::Surface>, Gdk::Rectangle)> signal_map_changed ()
+      {
+        return m_map_changed;
+      }
+                
+    sigc::signal<void()> signal_map_water_changed ()
+      {
+        return m_map_water_changed;
+      }
+
+    sigc::signal<void()> signal_map_edited ()
+      {
+        return  m_map_edited;
+      }
+
+    sigc::signal<void(UndoAction *)> signal_undo_map ()
+      {
+        return m_undo_map;
+      }
+
+    sigc::signal<void(Vector<int>)> signal_road_start_placed ()
+      {
+        return m_road_start_placed;
+      }
+
+    sigc::signal<void(Vector<int>)> signal_road_finish_placed ()
+      {
+        return m_road_finish_placed;
+      }
+
 
 private:
 
@@ -104,19 +156,27 @@ private:
     /**
      * This method is automatically called by the EditableSmallMap::draw method.
      */
-    virtual void after_draw();
+    virtual void after_draw ();
 
-    void change_map(Vector<int> pos);
+    void change_map (Vector<int> pos);
 
+    LwRectangle get_cursor_rectangle (Vector<int> current_tile);
 
-    LwRectangle get_cursor_rectangle(Vector<int> current_tile);
     // DATA
- 
-    Pointer pointer;
-    Tile::Type pointer_terrain;
-    int pointer_size;
-    Vector<int> road_start;
-    Vector<int> road_finish;
+
+    Pointer m_pointer;
+    int m_pointer_terrain;
+    int m_pointer_size;
+    Vector<int> m_road_start;
+    Vector<int> m_road_finish;
+    std::list<UndoAction*> m_undo_actions;
+
+    sigc::signal<void(Cairo::RefPtr<Cairo::Surface>, Gdk::Rectangle)> m_map_changed;
+    sigc::signal<void()> m_map_edited;
+    sigc::signal<void(UndoAction *)> m_undo_map;
+    sigc::signal<void(Vector<int>)> m_road_start_placed;
+    sigc::signal<void(Vector<int>)> m_road_finish_placed;
+    sigc::signal<void()> m_map_water_changed;
 };
 
 #endif

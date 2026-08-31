@@ -1,9 +1,9 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
-// 2021 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2020,
+//  2021, 2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
 
@@ -27,20 +26,20 @@
 #include <string.h>
 #include <string>
 #include <glibmm/fileutils.h>
-#include <glibmm/ustring.h>
 #include <glibmm/convert.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <regex>
 
-#include "File.h"
-#include "Configuration.h"
+#include "file.h"
+#include "configuration.h"
 #include "defs.h"
-#include "armyset.h"
-#include "tileset.h"
-#include "shieldset.h"
-#include "cityset.h"
+#include "army-set.h"
+#include "tile-set.h"
+#include "shield-set.h"
+#include "city-set.h"
 #include "file-compat.h"
 #include "ucompose.hpp"
 #include "rnd.h"
@@ -50,16 +49,16 @@
 
 namespace
 {
-    std::list<Glib::ustring> get_files(Glib::ustring path, Glib::ustring ext)
+    std::list<std::string> get_files(std::string path, std::string ext)
     {
-	std::list<Glib::ustring> retlist;
+	std::list<std::string> retlist;
 	Glib::Dir dir(path);
     
 	for (Glib::Dir::iterator i = dir.begin(), end = dir.end(); i != end; ++i)
           {
-	    Glib::ustring entry = *i;
-	    Glib::ustring::size_type idx = entry.rfind(ext);
-	    if (idx != Glib::ustring::npos && 
+	    std::string entry = *i;
+	    std::string::size_type idx = entry.rfind(ext);
+	    if (idx != std::string::npos && 
                 idx == entry.length() - ext.length())
               retlist.push_back(Glib::filename_to_utf8(path + entry));
           }
@@ -67,17 +66,17 @@ namespace
     }
 }
 
-bool File::nameEndsWith(Glib::ustring filename, Glib::ustring extension)
+bool File::nameEndsWith(std::string filename, std::string extension)
 {
-  Glib::ustring::size_type idx = filename.rfind(extension);
-  if (idx == Glib::ustring::npos)
+  std::string::size_type idx = filename.rfind(extension);
+  if (idx == std::string::npos)
     return false;
   if (idx == filename.length() - extension.length())
     return true;
   return false;
 }
 
-Glib::ustring File::add_ext_if_necessary(Glib::ustring file, Glib::ustring ext)
+std::string File::add_ext_if_necessary(std::string file, std::string ext)
 {
   if (nameEndsWith(file, ext) == true)
     return file;
@@ -85,191 +84,174 @@ Glib::ustring File::add_ext_if_necessary(Glib::ustring file, Glib::ustring ext)
     return file + ext;
 }
 
-Glib::ustring File::add_slash_if_necessary(Glib::ustring dir)
+std::string File::add_slash_if_necessary(std::string dir)
 {
   if (dir.c_str()[strlen(dir.c_str())-1] == '/' ||
       dir.c_str()[strlen(dir.c_str())-1] == '\\')
     return dir;
   else
     {
-      Glib::ustring d = Glib::build_filename (dir, " ");
+      std::string d = Glib::build_filename (dir, " ");
       return String::utrim(d);
     }
 }
 
-Glib::ustring File::getVariousFile(Glib::ustring filename)
+std::string File::getVariousFile(std::string filename)
 {
   return Glib::build_filename (Configuration::s_dataPath, "various", filename);
 }
 
-Glib::ustring File::getGladeFile(Glib::ustring filename)
-{
-  return Glib::build_filename (Configuration::s_dataPath, "glade", filename);
-}
-
-Glib::ustring File::getEditorGladeFile(Glib::ustring filename)
+std::string File::getEditorGladeFile(std::string filename)
 {
   return Glib::build_filename (Configuration::s_dataPath, "glade", "editor", filename);
 }
 
-Glib::ustring File::getMiscFile(Glib::ustring filename)
+std::string File::getMiscFile(std::string filename)
 {
   return Glib::build_filename (Configuration::s_dataPath, filename);
 }
 
-Glib::ustring File::getXSLTFile(guint32 type, Glib::ustring old_version, Glib::ustring new_version)
+std::string File::getXSLTFile(guint32 type, std::string old_version, std::string new_version)
 {
   FileCompat::Type t = FileCompat::Type(type);
-  Glib::ustring filename = String::ucompose("%1-%2-%3",
+  std::string filename = String::ucompose("%1-%2-%3",
                                             FileCompat::typeToCode(t), 
                                             old_version, new_version);
-  Glib::ustring file = getMiscFile(Glib::build_filename("various", "xslt", filename + ".xsl"));
+  std::string file = getMiscFile(Glib::build_filename("various", "xslt", filename + ".xsl"));
   if (File::exists(file))
     return file;
   else
     return "";
 }
 
-Glib::ustring File::getUserProfilesDescription()
+std::string File::getUserProfilesDescription()
 {
-  return Glib::build_filename (Configuration::s_savePath, PROFILE_LIST);
+  return getConfigFile (PROFILE_LIST);
 }
 
-Glib::ustring File::getUserRecentlyPlayedGamesDescription()
+std::string File::getUserRecentlyPlayedGamesDescription()
 {
-  return Glib::build_filename (Configuration::s_savePath, RECENTLY_PLAYED_LIST);
+  return getConfigFile (RECENTLY_PLAYED_LIST);
 }
 
-Glib::ustring File::getUserRecentlyHostedGamesDescription()
+std::string File::getUserRecentlyHostedGamesDescription()
 {
-  return Glib::build_filename (Configuration::s_savePath, RECENTLY_HOSTED_LIST);
+  return getConfigFile (RECENTLY_HOSTED_LIST);
 }
 
-Glib::ustring File::getUserRecentlyAdvertisedGamesDescription()
+std::string File::getUserRecentlyAdvertisedGamesDescription()
 {
-  return Glib::build_filename (Configuration::s_savePath, RECENTLY_ADVERTISED_LIST);
+  return getConfigFile (RECENTLY_ADVERTISED_LIST);
 }
 
-Glib::ustring File::getUserRecentlyEditedFilesDescription()
+std::string File::getUserRecentlyEditedFilesDescription()
 {
-  return Glib::build_filename (Configuration::s_savePath, RECENTLY_EDITED_LIST);
+  return getConfigFile (RECENTLY_EDITED_LIST);
 }
 
-Glib::ustring File::getItemDescription()
+std::string File::getItemDescription()
 {
   return Glib::build_filename (Configuration::s_dataPath, "various", "items", "items.xml");
 }
 
-Glib::ustring File::getEditorFile(Glib::ustring filename)
+std::string File::getEditorFile(std::string filename)
 {
   return Glib::build_filename (Configuration::s_dataPath,  "various", "editor", filename + ".png");
 }
 
-Glib::ustring File::getMusicFile(Glib::ustring filename)
+std::string File::getMusicFile(std::string filename)
 {
   return Glib::build_filename (Configuration::s_dataPath, "music", filename);
 }
 
-Glib::ustring File::getDataPath()
+std::string File::getPath()
 {
   return add_slash_if_necessary(Configuration::s_dataPath);
 }
 
-Glib::ustring File::getSavePath()
+std::string File::getSavePath()
 {
   return add_slash_if_necessary(Configuration::s_savePath);
 }
 
-Glib::ustring File::getSaveFile(Glib::ustring filename)
+std::string File::getSaveFile(std::string filename)
 {
   return Glib::build_filename (getSavePath(), filename);
 }
 
-Glib::ustring File::getTempFile(Glib::ustring tmpdir, Glib::ustring filename)
+std::string File::getTempFile(std::string tmpdir, std::string filename)
 {
   return Glib::build_filename (tmpdir, filename);
 }
 
-Glib::ustring File::getCacheDir ()
+std::string File::getCacheDir ()
 {
   return Glib::build_filename (Glib::get_user_cache_dir (), PACKAGE_NAME);
 }
 
-Glib::ustring File::getUserDataDir ()
+std::string File::getUserDataDir ()
 {
   return Glib::build_filename (Glib::get_user_data_dir (), PACKAGE_NAME);
 }
 
-Glib::ustring File::getConfigDir ()
+std::string File::getConfigDir ()
 {
   return Glib::build_filename (Glib::get_user_config_dir (), PACKAGE_NAME);
 }
 
-Glib::ustring File::getConfigFile(Glib::ustring filename)
+std::string File::getConfigFile(std::string filename)
 {
   return Glib::build_filename (File::getConfigDir (), filename);
 }
 
-Glib::ustring File::getTarTempDir(Glib::ustring dir)
+std::string File::getTarTempDir(std::string dir)
 {
   return Glib::build_filename (File::getCacheDir (),
                                String::ucompose("%1.%2", dir, getpid()));
 }
 
-Glib::ustring File::getUserMapDir()
+std::string File::getUserMapFile(std::string file)
 {
-  return add_slash_if_necessary(Glib::build_filename (add_slash_if_necessary(Configuration::s_savePath), MAPDIR));
+  return Glib::build_filename (get_user_map_dir (), file);
 }
 
-Glib::ustring File::getMapDir()
+std::string File::getMapFile(std::string file)
 {
-  return add_slash_if_necessary (Glib::build_filename (add_slash_if_necessary(Configuration::s_dataPath), MAPDIR));
+  return Glib::build_filename (get_map_dir (), file);
 }
 
-Glib::ustring File::getUserMapFile(Glib::ustring file)
+std::list<std::string> File::scanUserMaps()
 {
-  return Glib::build_filename (getUserMapDir(), file);
-}
+  std::string path = File::get_user_map_dir();
 
-Glib::ustring File::getMapFile(Glib::ustring file)
-{
-  return Glib::build_filename (getMapDir(), file);
-}
+  if (directory_exists(path) == false)
+    create_dir(path);
+  std::list<std::string> retlist;
+  Glib::Dir dir(path);
 
-std::list<Glib::ustring> File::scanUserMaps()
-{
-  Glib::ustring path = File::getUserMapDir();
-    
-    std::list<Glib::ustring> retlist;
-    Glib::Dir dir(path);
-    
-    for (Glib::Dir::iterator i = dir.begin(), end = dir.end(); i != end; ++i)
+  for (Glib::Dir::iterator i = dir.begin(), end = dir.end(); i != end; ++i)
     {
-      Glib::ustring entry = *i;
-      Glib::ustring::size_type idx = entry.find(".map");
-      if (idx != Glib::ustring::npos)
-	{
-	  if (entry == "random.map")
-	    continue;
-	  retlist.push_back(Glib::filename_to_utf8(entry));
-	}
+      std::string entry = *i;
+      std::string::size_type idx = entry.find(".map");
+      if (idx != std::string::npos)
+        retlist.push_back(Glib::filename_to_utf8(entry));
     }
-    
-    return retlist;
+
+  return retlist;
 }
 
-std::list<Glib::ustring> File::scanMaps()
+std::list<std::string> File::scanMaps()
 {
-  Glib::ustring path = File::getMapDir();
+  std::string path = File::get_map_dir();
     
-    std::list<Glib::ustring> retlist;
+    std::list<std::string> retlist;
     Glib::Dir dir(path);
     
     for (Glib::Dir::iterator i = dir.begin(), end = dir.end(); i != end; ++i)
     {
-      Glib::ustring entry = *i;
-      Glib::ustring::size_type idx = entry.find(".map");
-      if (idx != Glib::ustring::npos)
+      std::string entry = *i;
+      std::string::size_type idx = entry.find(".map");
+      if (idx != std::string::npos)
 	{
 	    retlist.push_back(Glib::filename_to_utf8(entry));
 	}
@@ -284,16 +266,16 @@ std::list<Glib::ustring> File::scanMaps()
     return retlist;
 }
 
-Glib::ustring File::get_dirname(Glib::ustring path)
+std::string File::get_dirname(std::string path)
 {
   return Glib::path_get_dirname(path);
 }
 
-Glib::ustring File::get_basename(Glib::ustring path, bool keep_ext)
+std::string File::get_basename(std::string path, bool keep_ext)
 {
   if (path.empty ())
     return path;
-  Glib::ustring file;
+  std::string file;
   file = Glib::path_get_basename(path);
   if (keep_ext)
     return file;
@@ -307,7 +289,8 @@ Glib::ustring File::get_basename(Glib::ustring path, bool keep_ext)
 }
 
 //copy_file taken from ardour-2.0rc2, gplv2+.
-bool File::copy (Glib::ustring from, Glib::ustring to)
+/*
+bool File::copy (std::string from, std::string to)
 {
   std::ifstream in;
   std::ofstream out;
@@ -330,44 +313,63 @@ bool File::copy (Glib::ustring from, Glib::ustring to)
 
   return true;
 }
-
-bool File::create_dir(Glib::ustring dir)
+*/
+bool File::copy (std::string from, std::string to)
 {
-  if (Glib::file_test(dir, Glib::FILE_TEST_IS_DIR) == true)
+    auto source = Gio::File::create_for_path (from);
+    auto dest = Gio::File::create_for_path (to);
+
+    try
+      {
+        return source->copy (dest, Gio::File::CopyFlags::OVERWRITE);
+      }
+    catch (const Glib::Error& ex)
+      {
+        std::cerr << "Copy from " << source->get_path () << " to " <<
+          dest->get_path () << " " << " failed: " << ex.what() << '\n';
+        return false;
+      }
+}
+
+bool File::create_dir(std::string dir)
+{
+  if (Glib::file_test(dir, Glib::FileTest::IS_DIR) == true)
     return true;
+  if (Glib::file_test(dir, Glib::FileTest::IS_REGULAR) == true)
+    File::erase (dir);
   bool retval = false;
   try
     {
       Glib::RefPtr<Gio::File> directory = Gio::File::create_for_path(dir);
       retval = directory->make_directory_with_parents();
     }
-  catch (Gio::Error::Exception &ex)
+  catch (Gio::Error &ex)
     {
       ;
     }
   return retval;
 }
 	
-bool File::directory_exists(Glib::ustring d)
+bool File::directory_exists(std::string d)
 {
-  return Glib::file_test(d, Glib::FILE_TEST_IS_DIR);
+  return Glib::file_test(d, Glib::FileTest::IS_DIR);
 }
 
-bool File::exists(Glib::ustring f)
+bool File::exists(std::string f)
 {
-  return Glib::file_test(f, Glib::FILE_TEST_EXISTS);
+  return Glib::file_test(f, Glib::FileTest::EXISTS);
 }
 
 //armysets 
 
-std::list<Glib::ustring> File::scanForFiles(Glib::ustring dir, Glib::ustring extension)
+std::list<std::string> File::scanForFiles(std::string dir, std::string extension)
 {
-  std::list<Glib::ustring> files;
+  std::list<std::string> files;
   try
     {
       files = get_files (dir, extension);
     }
-  catch(const Glib::Exception &ex)
+  catch(const Glib::Error &ex)
     {
       return files;
     }
@@ -376,9 +378,9 @@ std::list<Glib::ustring> File::scanForFiles(Glib::ustring dir, Glib::ustring ext
 
 //shieldsets
 
-Glib::ustring File::getSetDir(Glib::ustring ext, bool system)
+std::string File::getSetDir(std::string ext, bool system)
 {
-  Glib::ustring dir = add_slash_if_necessary(Configuration::s_dataPath);
+  std::string dir = add_slash_if_necessary(Configuration::s_dataPath);
   if (system == false)
     dir = getSavePath();
   if (ext == ARMYSET_EXT)
@@ -389,10 +391,12 @@ Glib::ustring File::getSetDir(Glib::ustring ext, bool system)
     return add_slash_if_necessary (Glib::build_filename (dir, TILESETDIR));
   else if (ext == SHIELDSET_EXT)
     return add_slash_if_necessary (Glib::build_filename (dir, SHIELDSETDIR));
+  else if (ext == MAP_EXT)
+    return add_slash_if_necessary (Glib::build_filename (dir, MAPDIR));
   return "";
 }
 
-bool File::erase(Glib::ustring filename)
+bool File::erase(std::string filename)
 {
   bool success = true;
   if (File::exists(filename))
@@ -413,13 +417,13 @@ bool File::erase(Glib::ustring filename)
   return success;
 }
 
-void File::erase_dir(Glib::ustring filename)
+void File::erase_dir(std::string filename)
 {
-  if (Glib::file_test(filename, Glib::FILE_TEST_IS_DIR) == true)
+  if (Glib::file_test(filename, Glib::FileTest::IS_DIR) == true)
     erase(filename);
 }
 
-void File::clean_dir(Glib::ustring dirname)
+void File::clean_dir(std::string dirname)
 {
   if (File::exists(dirname) == false)
     return;
@@ -454,37 +458,31 @@ char *File::_sanify(const char *string)
   return result;
 }
 
-Glib::ustring File::sanify (Glib::ustring s)
+std::string File::sanify (std::string s)
 {
   char *s1 = _sanify (s.c_str ());
-  Glib::ustring ret(s1);
+  std::string ret(s1);
   free (s1);
   return ret;
 }
   
-Glib::ustring File::get_tmp_file(Glib::ustring ext)
+std::string File::get_tmp_file (std::string ext)
 {
-  Glib::ustring file = "";
-  // fixme, there's a race condition here.
-  while (1)
-    {
-      file = Glib::build_filename (getCacheDir (),
-                                   "lw." + String::ucompose ("%1", Rnd::rand () % 1000000) + ext);
-      if (File::exists (file) == false)
-        break;
-    }
-  return file;
+  std::string filename;
+  int fd = Glib::file_open_tmp (filename, std::string (PACKAGE) + "-");
+  close (fd);
+  return filename + ext;
 }
 
-Glib::ustring File::get_extension(Glib::ustring filename)
+std::string File::get_extension(std::string filename)
 {
-  if (filename.rfind('.') == Glib::ustring::npos)
+  if (filename.rfind('.') == std::string::npos)
     return "";
   return filename.substr(filename.rfind('.'));
 }
 
 //this method is from http://www.cplusplus.com/reference/list/list/sort/
-bool case_insensitive (const Glib::ustring& first, const Glib::ustring& second)
+bool case_insensitive (const std::string& first, const std::string& second)
 {
   unsigned int i = 0;
   while (i < first.length () && i < second.length ())
@@ -498,7 +496,7 @@ bool case_insensitive (const Glib::ustring& first, const Glib::ustring& second)
   return (first.length() < second.length());
 }
 
-bool File::rename(Glib::ustring src, Glib::ustring dest)
+bool File::rename(std::string src, std::string dest)
 {
   bool result = false;
   if (File::exists(src) && File::exists(dest) == false)
@@ -516,9 +514,9 @@ bool File::rename(Glib::ustring src, Glib::ustring dest)
   return result;
 }
 
-bool File::add_png_if_no_ext (Glib::ustring &filename)
+bool File::add_png_if_no_ext (std::string &filename)
 {
-  Glib::ustring f = filename;
+  std::string f = filename;
   //in the old days we had filenames without the extensions in our
   //army/city/shield/tilesets.
   //now we keep the extensions, but to maintain backwards compatibility
@@ -534,8 +532,81 @@ bool File::add_png_if_no_ext (Glib::ustring &filename)
   return false;
 }
 
-goffset File::get_size (Glib::ustring file)
+goffset File::get_size (std::string file)
 {
   auto f = Gio::File::create_for_path (file);
   return f->query_info ()->get_size ();
 }
+
+std::string File::getRandomlyGeneratedMapFile ()
+{
+  char buf[32];
+  snprintf (buf, sizeof (buf), "%d", ::getpid ());
+  return "random-" + std::string (buf) + MAP_EXT;
+}
+
+bool File::is_readonly (std::string path)
+{
+  auto file = Gio::File::create_for_path (path);
+
+  try
+    {
+      auto info = file->query_info (G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE);
+      return !info->get_attribute_boolean (G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE);
+    }
+  catch (const Glib::Error&)
+    {
+      return false; // handle errors as appropriate
+    }
+}
+
+std::string File::get_user_shieldset_dir ()
+{
+  return getSetDir (SHIELDSET_EXT, false);
+}
+
+std::string File::get_user_cityset_dir ()
+{
+  return getSetDir (CITYSET_EXT, false);
+}
+
+std::string File::get_user_armyset_dir ()
+{
+  return getSetDir (ARMYSET_EXT, false);
+}
+
+std::string File::get_user_tileset_dir ()
+{
+  return getSetDir (TILESET_EXT, false);
+}
+
+std::string File::get_user_map_dir ()
+{
+  return getSetDir (MAP_EXT, false);
+}
+
+std::string File::get_shieldset_dir ()
+{
+  return getSetDir (SHIELDSET_EXT, true);
+}
+
+std::string File::get_cityset_dir ()
+{
+  return getSetDir (CITYSET_EXT, true);
+}
+
+std::string File::get_armyset_dir ()
+{
+  return getSetDir (ARMYSET_EXT, true);
+}
+
+std::string File::get_tileset_dir ()
+{
+  return getSetDir (TILESET_EXT, true);
+}
+
+std::string File::get_map_dir ()
+{
+  return getSetDir (MAP_EXT, true);
+}
+

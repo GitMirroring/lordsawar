@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,41 +12,40 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include "set.h"
-#include "tarhelper.h"
+#include "tar-helper.h"
 
 Set::Set(Glib::ustring ext, guint32 id, Glib::ustring name, guint32 ts)
   : TarFile("", "", ext), d_id(id), d_name(name), d_license(""), d_info(""),
-    d_tileSize(ts), d_scale (1.0)
+    d_tileSize(ts)
 {
 }
 
 Set::Set(const Set &s)
   : TarFile(s), d_id(s.d_id), d_name(s.d_name), d_license(s.d_license),
-    d_info(s.d_info), d_tileSize(s.d_tileSize), d_scale(s.d_scale)
+    d_info(s.d_info), d_tileSize(s.d_tileSize)
 {
 }
 
 Set::Set(Glib::ustring ext, XML_Helper* helper, Glib::ustring directory)
- :TarFile(directory, "", ext), d_scale(1.0)
+ :TarFile(directory, "", ext)
 {
-  helper->getData(d_id, "id");
-  helper->getData(d_name, "name");
-  helper->getData(d_copyright, "copyright");
-  helper->getData(d_license, "license");
-  helper->getData(d_info, "info");
+  helper->get(d_id, "id");
+  helper->get(d_name, "name");
+  helper->get(d_copyright, "copyright");
+  helper->get(d_license, "license");
+  helper->get(d_info, "info");
 }
 
 bool Set::save(XML_Helper *helper) const
 {
   bool retval = true;
-  retval &= helper->saveData("id", d_id);
-  retval &= helper->saveData("name", d_name);
-  retval &= helper->saveData("copyright", d_copyright);
-  retval &= helper->saveData("license", d_license);
-  retval &= helper->saveData("info", d_info);
+  retval &= helper->save("id", d_id);
+  retval &= helper->save("name", d_name);
+  retval &= helper->save("copyright", d_copyright);
+  retval &= helper->save("license", d_license);
+  retval &= helper->save("info", d_info);
   return retval;
 }

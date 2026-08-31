@@ -1,10 +1,10 @@
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2003, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2017,
-// 2020, 2021 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
-// Copyright (C) 2008 Janek Kozicki
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2003, 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2017, 2020,
+//  2021, 2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2008 Janek Kozicki
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sstream>
 #include <iostream>
@@ -32,40 +31,41 @@
 
 #include "ucompose.hpp"
 #include "army.h"
-#include "GameMap.h"
-#include "citylist.h"
-#include "bridgelist.h"
+#include "game-map.h"
+#include "city-list.h"
+#include "bridge-list.h"
 #include "bridge.h"
-#include "portlist.h"
+#include "port-list.h"
 #include "port.h"
-#include "roadlist.h"
+#include "road-list.h"
 #include "road.h"
-#include "stonelist.h"
+#include "stone-list.h"
 #include "stone.h"
 #include "city.h"
 #include "ruin.h"
 #include "temple.h"
-#include "playerlist.h"
-#include "stacklist.h"
-#include "ruinlist.h"
-#include "templelist.h"
-#include "signpostlist.h"
-#include "xmlhelper.h"
-#include "MapGenerator.h"
-#include "tilesetlist.h"
-#include "shieldsetlist.h"
-#include "citysetlist.h"
-#include "MapBackpack.h"
-#include "stacktile.h"
-#include "armyprodbase.h"
+#include "player-list.h"
+#include "stack-list.h"
+#include "ruin-list.h"
+#include "temple-list.h"
+#include "signpost-list.h"
+#include "xml-helper.h"
+#include "map-generator.h"
+#include "tile-set-list.h"
+#include "shield-set-list.h"
+#include "city-set-list.h"
+#include "map-backpack.h"
+#include "stack-tile.h"
+#include "army-prod-base.h"
 #include "stack.h"
-#include "armyset.h"
-#include "armysetlist.h"
-#include "CreateScenario.h"
-#include "SightMap.h"
+#include "army-set.h"
+#include "army-set-list.h"
+#include "create-scenario.h"
+#include "sight-map.h"
 #include "reward.h"
-#include "rewardlist.h"
+#include "reward-list.h"
 #include "keeper.h"
+#include "fog-map.h"
 
 Glib::ustring GameMap::d_tag = "map";
 Glib::ustring GameMap::d_itemstack_tag = "itemstack";
@@ -82,7 +82,7 @@ Cityset* GameMap::s_cityset = 0;
 Shieldset* GameMap::s_shieldset = 0;
 
 
-GameMap* GameMap::getInstance(Glib::ustring TilesetName,
+GameMap* GameMap::instance(Glib::ustring TilesetName,
 			      Glib::ustring ShieldsetName,
 			      Glib::ustring CitysetName)
 {
@@ -94,7 +94,7 @@ GameMap* GameMap::getInstance(Glib::ustring TilesetName,
     return s_instance;
 }
 
-GameMap* GameMap::getInstance(XML_Helper* helper)
+GameMap* GameMap::instance(XML_Helper* helper)
 {
     if (s_instance)
         deleteInstance();
@@ -208,23 +208,23 @@ GameMap::GameMap(XML_Helper* helper)
     Glib::ustring s_dir;
     Glib::ustring c_dir;
 
-    helper->getData(s_width, "width");
-    helper->getData(s_height, "height");
-    helper->getData(t_dir,"tileset");
-    helper->getData(s_dir,"shieldset");
-    helper->getData(c_dir,"cityset");
-    helper->getData(types, "types");
-    helper->getData(styles, "styles");
+    helper->get(s_width, "width");
+    helper->get(s_height, "height");
+    helper->get(t_dir,"tileset");
+    helper->get(s_dir,"shieldset");
+    helper->get(c_dir,"cityset");
+    helper->get(types, "types");
+    helper->get(styles, "styles");
 
     d_tileset = t_dir;
     d_shieldset = s_dir;
     d_cityset = c_dir;
 
-    Tileset *tileset = Tilesetlist::getInstance()->get(d_tileset);
+    Tileset *tileset = Tilesetlist::instance()->get(d_tileset);
     s_tileset = tileset;
-    Cityset *cityset = Citysetlist::getInstance()->get(d_cityset);
+    Cityset *cityset = Citysetlist::instance()->get(d_cityset);
     s_cityset = cityset;
-    Shieldset *shieldset = Shieldsetlist::getInstance()->get(d_shieldset);
+    Shieldset *shieldset = Shieldsetlist::instance()->get(d_shieldset);
     s_shieldset = shieldset;
     Vector<int>::setMaximumWidth(s_width);
     //create the map
@@ -250,7 +250,7 @@ GameMap::GameMap(XML_Helper* helper)
     processStyles(styles, chars_per_style);
 
     //add some callbacks for item loading
-    helper->registerTag(MapBackpack::d_mapbackpack_tag, sigc::mem_fun(this, &GameMap::loadItems));
+    helper->register_tag(MapBackpack::d_mapbackpack_tag, sigc::mem_fun(*this, &GameMap::loadItems));
 }
 
 GameMap::~GameMap()
@@ -337,14 +337,14 @@ bool GameMap::save(XML_Helper* helper) const
     }
 
 
-    retval &= helper->openTag(GameMap::d_tag);
-    retval &= helper->saveData("width", s_width);
-    retval &= helper->saveData("height", s_height);
-    retval &= helper->saveData("tileset", d_tileset);
-    retval &= helper->saveData("shieldset", d_shieldset);
-    retval &= helper->saveData("cityset", d_cityset);
-    retval &= helper->saveData("types", types.str());
-    retval &= helper->saveData("styles", styles.str());
+    retval &= helper->open_tag(GameMap::d_tag);
+    retval &= helper->save("width", s_width);
+    retval &= helper->save("height", s_height);
+    retval &= helper->save("tileset", d_tileset);
+    retval &= helper->save("shieldset", d_shieldset);
+    retval &= helper->save("cityset", d_cityset);
+    retval &= helper->save("types", types.str());
+    retval &= helper->save("styles", styles.str());
 
     // last, save all items lying around somewhere
     for (int i = 0; i < s_width; i++)
@@ -352,7 +352,7 @@ bool GameMap::save(XML_Helper* helper) const
 	if (getTile(i,j)->checkBackpack())
           retval &= getTile(i,j)->getBackpack()->save(helper);
      
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
     return retval;
 }
 
@@ -520,13 +520,13 @@ bool GameMap::isBlockedAvenue(bool mountains, int x, int y, int destx, int desty
 {
   if (offmap(destx, desty))
     return true;
-  //if (Citylist::getInstance()->empty())
+  //if (Citylist::instance()->empty())
       //return false;
   int diffx = destx - x;
   int diffy = desty - y;
   if (diffx >= -1 && diffx <= 1 && diffy >= -1 && diffy <= 1)
     {
-      //assert (Citylist::getInstance()->size());
+      //assert (Citylist::instance()->size());
       bool from_dock = isDock(Vector<int>(x,y));
       bool to_dock = isDock(Vector<int>(destx,desty));
       Maptile *from = getTile(x, y);
@@ -986,16 +986,16 @@ void GameMap::applyTileStyle (int i, int j)
 Vector<int> GameMap::findNearestObjectInDir(Vector<int> pos, Vector<int> dir)
 {
   std::vector<Vector<int> > objects;
-  Road *road = Roadlist::getInstance()->getNearestObjectInDir(pos, dir);
+  Road *road = Roadlist::instance()->getNearestObjectInDir(pos, dir);
   if (road)
     objects.push_back(road->getPos());
-  City *city = Citylist::getInstance()->getNearestObjectInDir(pos, dir);
+  City *city = Citylist::instance()->getNearestObjectInDir(pos, dir);
   if (city)
     objects.push_back(city->getPos());
-  Temple *temple = Templelist::getInstance()->getNearestObjectInDir(pos, dir);
+  Temple *temple = Templelist::instance()->getNearestObjectInDir(pos, dir);
   if (temple)
     objects.push_back(temple->getPos());
-  Ruin *ruin = Ruinlist::getInstance()->getNearestObjectInDir(pos, dir);
+  Ruin *ruin = Ruinlist::instance()->getNearestObjectInDir(pos, dir);
   if (ruin && ruin->isHidden() == false)
     objects.push_back(ruin->getPos());
   if (objects.size() == 0)
@@ -1041,16 +1041,16 @@ Vector<int> GameMap::findNearestObjectToTheWest(Vector<int> pos)
 
 City* GameMap::getCity(Vector<int> pos)
 {
-  if (getInstance()->getBuilding(pos) != Maptile::CITY)
+  if (instance()->getBuilding(pos) != Maptile::CITY)
     return NULL;
-  return Citylist::getInstance()->getObjectAt(pos);
+  return Citylist::instance()->getObjectAt(pos);
 }
 
 City* GameMap::getEnemyCity(Vector<int> pos)
 {
-  if (getInstance()->getBuilding(pos) != Maptile::CITY)
+  if (instance()->getBuilding(pos) != Maptile::CITY)
     return NULL;
-  City *c = Citylist::getInstance()->getObjectAt(pos);
+  City *c = Citylist::instance()->getObjectAt(pos);
   if (c && c->getOwner() != Playerlist::getActiveplayer())
     return c;
   return NULL;
@@ -1058,52 +1058,52 @@ City* GameMap::getEnemyCity(Vector<int> pos)
 
 Ruin* GameMap::getRuin(Vector<int> pos)
 {
-  if (getInstance()->getBuilding(pos) != Maptile::RUIN)
+  if (instance()->getBuilding(pos) != Maptile::RUIN)
     return NULL;
-  return Ruinlist::getInstance()->getObjectAt(pos);
+  return Ruinlist::instance()->getObjectAt(pos);
 }
 
 Stone* GameMap::getStone(Vector<int> pos)
 {
-  if (getInstance()->getBuilding(pos) != Maptile::STONE &&
-      getInstance()->getBuilding(pos) != Maptile::ROAD)
+  if (instance()->getBuilding(pos) != Maptile::STONE &&
+      instance()->getBuilding(pos) != Maptile::ROAD)
     return NULL;
-  return Stonelist::getInstance()->getObjectAt(pos);
+  return Stonelist::instance()->getObjectAt(pos);
 }
 
 Temple* GameMap::getTemple(Vector<int> pos)
 {
-  if (getInstance()->getBuilding(pos) != Maptile::TEMPLE)
+  if (instance()->getBuilding(pos) != Maptile::TEMPLE)
     return NULL;
-  return Templelist::getInstance()->getObjectAt(pos);
+  return Templelist::instance()->getObjectAt(pos);
 }
 
 Port* GameMap::getPort(Vector<int> pos)
 {
-  if (getInstance()->getBuilding(pos) != Maptile::PORT)
+  if (instance()->getBuilding(pos) != Maptile::PORT)
     return NULL;
-  return Portlist::getInstance()->getObjectAt(pos);
+  return Portlist::instance()->getObjectAt(pos);
 }
 
 Road* GameMap::getRoad(Vector<int> pos)
 {
-  if (getInstance()->getBuilding(pos) != Maptile::ROAD)
+  if (instance()->getBuilding(pos) != Maptile::ROAD)
     return NULL;
-  return Roadlist::getInstance()->getObjectAt(pos);
+  return Roadlist::instance()->getObjectAt(pos);
 }
 
 Bridge* GameMap::getBridge(Vector<int> pos)
 {
-  if (getInstance()->getBuilding(pos) != Maptile::BRIDGE)
+  if (instance()->getBuilding(pos) != Maptile::BRIDGE)
     return NULL;
-  return Bridgelist::getInstance()->getObjectAt(pos);
+  return Bridgelist::instance()->getObjectAt(pos);
 }
 
 Signpost* GameMap::getSignpost(Vector<int> pos)
 {
-  if (getInstance()->getBuilding(pos) != Maptile::SIGNPOST)
+  if (instance()->getBuilding(pos) != Maptile::SIGNPOST)
     return NULL;
-  return Signpostlist::getInstance()->getObjectAt(pos);
+  return Signpostlist::instance()->getObjectAt(pos);
 }
 
 Stack* GameMap::getFriendlyStack(Vector<int> pos)
@@ -1187,15 +1187,15 @@ Stack* GameMap::getStack(Vector<int> pos)
 	
 StackTile* GameMap::getStacks(Vector<int> pos)
 {
-  if (getInstance()->getTile(pos))
-    return getInstance()->getTile(pos)->getStacks();
+  if (instance()->getTile(pos))
+    return instance()->getTile(pos)->getStacks();
   else
     return NULL;
 }
 
 Stack *GameMap::groupStacks(Vector<int> pos)
 {
-  return getInstance()->groupStacks(pos, Playerlist::getActiveplayer());
+  return instance()->groupStacks(pos, Playerlist::getActiveplayer());
 }
 
 Stack *GameMap::groupStacks(Vector<int> pos, Player *player)
@@ -1214,7 +1214,7 @@ void GameMap::groupStacks(Stack *stack)
   
 void GameMap::clearStackPositions()
 {
-  for (auto i :*Playerlist::getInstance())
+  for (auto i :*Playerlist::instance())
     {
       Stacklist *sl = i->getStacklist();
       for (Stacklist::iterator s = sl->begin(); s != sl->end(); ++s)
@@ -1226,7 +1226,7 @@ void GameMap::clearStackPositions()
 }
 void GameMap::updateStackPositions()
 {
-  for (auto i: *Playerlist::getInstance())
+  for (auto i: *Playerlist::instance())
     {
       Stacklist *sl = i->getStacklist();
       for (Stacklist::iterator s = sl->begin(); s != sl->end(); ++s)
@@ -1259,7 +1259,7 @@ bool GameMap::canAddArmies(Vector<int> dest, guint32 stackSize)
 void GameMap::switchTileset(Tileset *tileset)
 {
   d_tileset = tileset->getBaseName();
-  s_tileset = Tilesetlist::getInstance()->get(d_tileset);
+  s_tileset = Tilesetlist::instance()->get(d_tileset);
   for (int i = 0; i < s_width; i++)
     for (int j = 0; j < s_height; j++)
       {
@@ -1269,7 +1269,7 @@ void GameMap::switchTileset(Tileset *tileset)
         //because "Grass" won't always be in the 0th spot in the tileset.
         d_map[j*s_width + i].setIndex(d_map[j*s_width + i].getIndex());
       }
-  applyTileStyles (0, 0, s_width, s_height,  false);
+  applyTileStyles (0, 0, s_height, s_width, false);
 }
 
 void GameMap::reloadShieldset()
@@ -1277,16 +1277,14 @@ void GameMap::reloadShieldset()
   Shieldset *shieldset = GameMap::getShieldset();
   if (shieldset)
     {
-      Shieldsetlist::getInstance()->reload(shieldset->getId());
-      Playerlist::getInstance()->setNewColors(shieldset);
+      Shieldsetlist::instance()->reload(shieldset->getId());
     }
 }
 
 void GameMap::switchShieldset(Shieldset *shieldset)
 {
-  Playerlist::getInstance()->setNewColors(shieldset);
   d_shieldset = shieldset->getBaseName();
-  s_shieldset = Shieldsetlist::getInstance()->get(d_shieldset);
+  s_shieldset = Shieldsetlist::instance()->get(d_shieldset);
 }
 
 Vector<int> GameMap::findNearestAreaForBuilding(Maptile::Building building_type, Vector<int> pos, guint32 width)
@@ -1305,37 +1303,37 @@ void GameMap::switchCityset(Cityset *cityset)
 {
   setCityset(cityset->getBaseName());
 
-  if (Templelist::getInstance()->size())
+  if (Templelist::instance()->size())
     {
       guint32 tiles =
-        GameMap::getInstance()->countBuildings(Maptile::TEMPLE) / 
-        Templelist::getInstance()->size();
+        GameMap::instance()->countBuildings(Maptile::TEMPLE) / 
+        Templelist::instance()->size();
       double old_tile_width = sqrt ((double)tiles);
       if (old_tile_width != cityset->getTempleTileWidth())
-        Templelist::getInstance()->resizeLocations
+        Templelist::instance()->resizeLocations
           (Maptile::TEMPLE, cityset->getTempleTileWidth(), old_tile_width,
            (void (*)(Location*, Maptile::Building, guint32)) changeFootprintToSmallerCityset,
            (void (*)(Location*, Maptile::Building, guint32)) relocateLocation);
     }
     
-  if (Ruinlist::getInstance()->size())
+  if (Ruinlist::instance()->size())
     {
-      guint32 tiles = GameMap::getInstance()->countBuildings(Maptile::RUIN) / 
-        Ruinlist::getInstance()->size();
+      guint32 tiles = GameMap::instance()->countBuildings(Maptile::RUIN) / 
+        Ruinlist::instance()->size();
       double old_tile_width = sqrt ((double)tiles);
       if (old_tile_width != cityset->getRuinTileWidth())
-        Ruinlist::getInstance()->resizeLocations
+        Ruinlist::instance()->resizeLocations
           (Maptile::RUIN, cityset->getRuinTileWidth(), old_tile_width,
            (void (*)(Location*, Maptile::Building, guint32)) changeFootprintToSmallerCityset,
            (void (*)(Location*, Maptile::Building, guint32)) relocateLocation);
     }
-  if (Citylist::getInstance()->size())
+  if (Citylist::instance()->size())
     {
-      guint32 tiles = GameMap::getInstance()->countBuildings(Maptile::CITY) / 
-        Citylist::getInstance()->size();
+      guint32 tiles = GameMap::instance()->countBuildings(Maptile::CITY) / 
+        Citylist::instance()->size();
       double old_tile_width = sqrt ((double)tiles);
       if (old_tile_width != cityset->getCityTileWidth())
-        Citylist::getInstance()->resizeLocations
+        Citylist::instance()->resizeLocations
           (Maptile::CITY, cityset->getCityTileWidth(), old_tile_width,
            (void (*)(Location*, Maptile::Building, guint32)) changeFootprintToSmallerCityset,
            (void (*)(Location*, Maptile::Building, guint32)) relocateLocation);
@@ -1362,7 +1360,7 @@ void GameMap::reloadCityset()
   Cityset *cityset = GameMap::getCityset();
   if (cityset)
     {
-      Citysetlist::getInstance()->reload(cityset->getId());
+      Citysetlist::instance()->reload(cityset->getId());
       switchCityset(cityset);  //is this still needed?
     }
 }
@@ -1370,9 +1368,9 @@ void GameMap::reloadCityset()
 void GameMap::switchArmysets(Player *p, Armyset *armyset)
 {
   //change the keepers in ruins
-  if (p == Playerlist::getInstance()->getNeutral ())
+  if (p == Playerlist::getNeutral ())
     {
-      for (auto i: *Ruinlist::getInstance())
+      for (auto i: *Ruinlist::instance())
         {
           Keeper *k = i->getOccupant();
           if (k == NULL)
@@ -1388,7 +1386,7 @@ void GameMap::switchArmysets(Player *p, Armyset *armyset)
     }
 
   //change the armyprodbases in cities.
-  for (auto c: *Citylist::getInstance())
+  for (auto c: *Citylist::instance())
     {
       if (c->getOwner() == p)
         {
@@ -1410,7 +1408,7 @@ void GameMap::switchArmysets(Player *p, Armyset *armyset)
       s->removeArmiesWithoutArmyType(armyset->getId());
       if (s->size() == 0)
         {
-          GameMap::getInstance()->getStacks(s->getPos())->leaving(s);
+          GameMap::instance()->getStacks(s->getPos())->leaving(s);
           j=sl->flErase(j);//this doesn't remove the stack from the map of id->stack pointer in stacklist. XXX XXX XXX
           if (sl->size() > 0)
             --j;
@@ -1428,7 +1426,7 @@ void GameMap::switchArmysets(Player *p, Armyset *armyset)
 void GameMap::switchArmysets(Armyset *armyset)
 {
   //change the keepers in ruins
-  for (auto i: *Ruinlist::getInstance())
+  for (auto i: *Ruinlist::instance())
     {
       Keeper *k = i->getOccupant();
       if (k == NULL)
@@ -1441,10 +1439,10 @@ void GameMap::switchArmysets(Armyset *armyset)
 	Armyset::switchArmysetForRuinKeeper(*j, armyset);
       k->rename();
     }
-  for (auto i: *Playerlist::getInstance())
+  for (auto i: *Playerlist::instance())
     {
       //change the armyprodbases in cities.
-      for (auto c: *Citylist::getInstance())
+      for (auto c: *Citylist::instance())
 	{
           c->removeArmyProdBasesWithoutAType(armyset->getId());
 	  for (unsigned int k = 0; k < c->getSize(); k++)
@@ -1463,7 +1461,7 @@ void GameMap::switchArmysets(Armyset *armyset)
           s->removeArmiesWithoutArmyType(armyset->getId());
           if (s->size() == 0)
             {
-              GameMap::getInstance()->getStacks(s->getPos())->leaving(s);
+              GameMap::instance()->getStacks(s->getPos())->leaving(s);
               j=sl->flErase(j);//this doesn't remove the stack from the map of id->stack pointer in stacklist. XXX XXX XXX
               if (sl->size() > 0)
                 --j;
@@ -1502,7 +1500,12 @@ bool GameMap::canPutBuilding(Maptile::Building bldg, guint32 size, Vector<int> t
 	if (offmap(pos.x, pos.y))
 	  return false;
 	if (getBuilding(pos) != Maptile::NONE)
-	  found = true;
+          {
+            if (getBuilding (pos) == Maptile::ROAD && bldg == Maptile::STONE)
+              ;
+            else
+              found = true;
+          }
       }
   if (found)
     return false;
@@ -1543,6 +1546,9 @@ bool GameMap::canPutBuilding(Maptile::Building bldg, guint32 size, Vector<int> t
 	//can't be in the water
 	if (getTerrainType(to) == Tile::WATER)
 	  return false;
+        can_move = 
+          getBuilding (to) == Maptile::STONE ||
+          getBuilding (to) == Maptile::NONE;
 	break;
       case Maptile::PORT: 
 	if (getTerrainType(to) == Tile::WATER &&
@@ -1654,10 +1660,12 @@ bool GameMap::moveBuilding(Vector<int> from, Vector<int> to, guint32 new_width)
 	{
 	  Ruin* old_ruin = getRuin(getRuin(from)->getPos());
 	  Ruin *new_ruin = new Ruin(*old_ruin, to);
-	  removeRuin(old_ruin->getPos());
+          Vector<int> old_pos = old_ruin->getPos ();
+	  removeRuin (old_pos);
           if (new_width)
             new_ruin->setSize(new_width);
 	  putRuin(new_ruin);
+          update_ruin_rewards (old_pos, new_ruin);
 	  break;
 	}
     case Maptile::TEMPLE:
@@ -1722,7 +1730,7 @@ guint32 GameMap::getBuildingSize(Vector<int> tile)
 	
 bool GameMap::canPutStack(guint32 size, Player *p, Vector<int> to)
 {
-  StackTile *stile = GameMap::getInstance()->getStacks(to);
+  StackTile *stile = GameMap::instance()->getStacks(to);
   if (!stile)
     return true;
   if (stile->canAdd(size, p) == true)
@@ -1751,11 +1759,11 @@ bool GameMap::moveStack(Stack *stack, Vector<int> to)
 
   return moved;
 }
-	
+
 MapBackpack *GameMap::getBackpack(Vector<int> pos)
 {
-  if (getInstance()->getTile(pos))
-    return getInstance()->getTile(pos)->getBackpack();
+  if (instance()->getTile(pos))
+    return instance()->getTile(pos)->getBackpack();
   else
     return NULL;
 }
@@ -1772,7 +1780,7 @@ bool GameMap::removeRuin(Vector<int> pos)
   if (r)
     {
       removeBuilding(r);
-      Ruinlist::getInstance()->subtract(r);
+      Ruinlist::instance()->subtract(r);
       return true;
     }
   return false;
@@ -1798,10 +1806,10 @@ bool GameMap::containsForest(LwRectangle rect)
 
 bool GameMap::putRuin(Ruin *r)
 {
-  Ruinlist::getInstance()->add(r);
+  Ruinlist::instance()->add(r);
   if (containsWater(r->getArea()) ||
       containsForest (r->getArea ()))
-    putTerrain(r->getArea(), Tile::GRASS);
+    putTerrain(r->getArea(), GameMap::getTileset ()->getIndex (Tile::GRASS));
   putBuilding(r, Maptile::RUIN);
   return true;
 }
@@ -1832,7 +1840,7 @@ bool GameMap::removeStone(Vector<int> pos)
       if (getBuilding(s->getPos()) == Maptile::STONE)
         setBuilding(s->getPos(), Maptile::NONE);
 
-      Stonelist::getInstance()->subtract(s);
+      Stonelist::instance()->subtract(s);
       return true;
     }
   return false;
@@ -1840,10 +1848,10 @@ bool GameMap::removeStone(Vector<int> pos)
 
 bool GameMap::putStone(Stone *s)
 {
-  Stonelist::getInstance()->add(s);
+  Stonelist::instance()->add(s);
   if (containsWater(s->getArea()) ||
       containsForest (s->getArea ()))
-    putTerrain(s->getArea(), Tile::GRASS);
+    putTerrain(s->getArea(), GameMap::getTileset ()->getIndex (Tile::GRASS));
   if (getBuilding(s->getPos()) != Maptile::ROAD)
     setBuilding(s->getPos(), Maptile::STONE);
   return true;
@@ -1855,7 +1863,7 @@ bool GameMap::removeTemple(Vector<int> pos)
   if (t)
     {
       removeBuilding(t);
-      Templelist::getInstance()->subtract(t);
+      Templelist::instance()->subtract(t);
       return true;
     }
   return false;
@@ -1863,10 +1871,10 @@ bool GameMap::removeTemple(Vector<int> pos)
 
 bool GameMap::putTemple(Temple *t)
 {
-  Templelist::getInstance()->add(t);
+  Templelist::instance()->add(t);
   if (containsWater(t->getArea()) ||
       containsForest (t->getArea ()))
-    putTerrain(t->getArea(), Tile::GRASS);
+    putTerrain(t->getArea(), GameMap::getTileset ()->getIndex (Tile::GRASS));
   putBuilding(t, Maptile::TEMPLE);
   return true;
 }
@@ -1877,7 +1885,7 @@ bool GameMap::removePort(Vector<int> pos)
   if (p)
     {
       removeBuilding(p);
-      Portlist::getInstance()->subtract(p);
+      Portlist::instance()->subtract(p);
       return true;
     }
   return false;
@@ -1885,7 +1893,7 @@ bool GameMap::removePort(Vector<int> pos)
 
 bool GameMap::putPort(Port *p)
 {
-  Portlist::getInstance()->add(p);
+  Portlist::instance()->add(p);
   putBuilding(p, Maptile::PORT);
   //is there a stack here?
   if (GameMap::getStack(p->getPos()) != NULL)
@@ -1902,7 +1910,7 @@ bool GameMap::removeSignpost(Vector<int> pos)
   if (s)
     {
       removeBuilding(s);
-      Signpostlist::getInstance()->subtract(s);
+      Signpostlist::instance()->subtract(s);
       return true;
     }
   return false;
@@ -1910,10 +1918,10 @@ bool GameMap::removeSignpost(Vector<int> pos)
 
 bool GameMap::putSignpost(Signpost *s)
 {
-  Signpostlist::getInstance()->add(s);
+  Signpostlist::instance()->add(s);
   if (containsWater(s->getArea()) ||
       containsForest (s->getArea ()))
-    putTerrain(s->getArea(), Tile::GRASS);
+    putTerrain(s->getArea(), GameMap::getTileset ()->getIndex (Tile::GRASS));
   putBuilding(s, Maptile::SIGNPOST);
   return true;
 }
@@ -1924,10 +1932,10 @@ bool GameMap::removeRoad(Vector<int> pos)
   if (r)
     {
       removeBuilding(r);
-      Roadlist::getInstance()->subtract(r);
-      Stone *s = Stonelist::getInstance()->getObjectAt(pos);
+      Roadlist::instance()->subtract(r);
+      Stone *s = Stonelist::instance()->getObjectAt(pos);
       if (s)
-        Stonelist::getInstance()->subtract(s);
+        Stonelist::instance()->subtract(s);
       return true;
     }
   return false;
@@ -1945,8 +1953,8 @@ bool GameMap::putNewRoad(Vector<int> tile)
 bool GameMap::putRoad(Road *r, bool smooth)
 {
   if (containsWater(r->getArea()))
-    putTerrain(r->getArea(), Tile::GRASS);
-  Roadlist::getInstance()->add(r);
+    putTerrain(r->getArea(), GameMap::getTileset ()->getIndex (Tile::GRASS));
+  Roadlist::instance()->add(r);
   setBuilding(r->getPos(), Maptile::ROAD);
 
   if (smooth == false)
@@ -1960,10 +1968,10 @@ bool GameMap::putRoad(Road *r, bool smooth)
           continue;
 
 	Vector<int> pos(x, y);
-	if (Roadlist::getInstance()->getObjectAt(pos))
+	if (Roadlist::instance()->getObjectAt(pos))
 	  {
-            r = Roadlist::getInstance()->getObjectAt(pos);
-	    int newtype = CreateScenario::calculateRoadType(pos);
+            r = Roadlist::instance()->getObjectAt(pos);
+	    auto newtype = CreateScenario::calculateRoadType(pos);
 	    r->setType(newtype);
 	  }
       }
@@ -1976,7 +1984,7 @@ bool GameMap::removeBridge(Vector<int> pos)
   if (b)
     {
       removeBuilding(b);
-      Bridgelist::getInstance()->subtract(b);
+      Bridgelist::instance()->subtract(b);
       updateShips(pos);
       updateTowers(pos);
       return true;
@@ -1986,7 +1994,7 @@ bool GameMap::removeBridge(Vector<int> pos)
 
 bool GameMap::putBridge(Bridge *b)
 {
-  Bridgelist::getInstance()->add(b);
+  Bridgelist::instance()->add(b);
   setBuilding(b->getPos(), Maptile::BRIDGE);
   if (GameMap::getStack(b->getPos()) != NULL)
     {
@@ -1996,13 +2004,14 @@ bool GameMap::putBridge(Bridge *b)
   return true;
 }
 
-LwRectangle GameMap::putTerrain(LwRectangle r, Tile::Type type, int tile_style_id, bool always_alter_tilestyles)
+LwRectangle GameMap::putTerrain(LwRectangle r, int tile_idx, int tile_style_id, bool always_alter_tilestyles)
 {
   bool replaced = false;
   Tileset *tileset = GameMap::getTileset();
-  int index = tileset->getIndex(type);
+  int index = tile_idx;
   if (index == -1)
     return r;
+  Tile::Type type = (*tileset)[tile_idx]->getType ();
   for (int x = r.x; x < r.x + r.w; ++x)
     for (int y = r.y; y < r.y + r.h; ++y)
       {
@@ -2086,7 +2095,7 @@ void GameMap::putBuilding(LocationBox *b, Maptile::Building building)
 	t->setBuilding(building);
         if (building == Maptile::CITY || building == Maptile::PORT || 
             building == Maptile::BRIDGE)
-          GameMap::getInstance()->calculateBlockedAvenue(x, y);
+          GameMap::instance()->calculateBlockedAvenue(x, y);
       }
 }
 
@@ -2107,7 +2116,7 @@ bool GameMap::removeCity(Vector<int> pos)
   if (c)
     {
       removeBuilding(c);
-      Citylist::getInstance()->subtract(c);
+      Citylist::instance()->subtract(c);
       return true;
     }
   return false;
@@ -2164,9 +2173,9 @@ bool GameMap::putCity(City *c, bool keep_owner)
     c->setOwner(active);
   else
     active = c->getOwner();
-  Citylist::getInstance()->add(c);
+  Citylist::instance()->add(c);
 
-  putTerrain(c->getArea(), Tile::GRASS);
+  putTerrain(c->getArea(), GameMap::getTileset ()->getIndex (Tile::GRASS));
   // notify the maptiles that a city has been placed here
   putBuilding(c, Maptile::CITY);
 
@@ -2340,10 +2349,10 @@ bool GameMap::checkCityAccessibility()
 {
   //check to see if all cities are accessible
   //check if all cities are accessible
-  if (Citylist::getInstance()->size() <= 1)
+  if (Citylist::instance()->size() <= 1)
     return true;
   Vector<int> pos = GameMap::getCenterOfMap();
-  City *center = Citylist::getInstance()->getNearestCity(pos);
+  City *center = Citylist::instance()->getNearestCity(pos);
   Stack s(NULL, center->getPos());
   ArmyProto *basearmy = ArmyProto::createScout();
   Army *a = Army::createNonUniqueArmy(*basearmy);
@@ -2351,12 +2360,12 @@ bool GameMap::checkCityAccessibility()
   s.push_back(a);
   PathCalculator pc(&s, true, 10, 10);
 
-  for (auto it: *Citylist::getInstance())
+  for (auto it: *Citylist::instance())
     {
       if (center == it)
 	continue;
 
-      int mp = pc.calculate(it->getPos());
+      int mp = pc.calculateMoves(it->getPos());
       if (mp <= 0)
 	{
 	  printf("we made a map that has an inaccessible city (%d)\n", mp);
@@ -2393,35 +2402,29 @@ int GameMap::calculateTilesPerOverviewMapTile()
 
 void GameMap::changeFootprintToSmallerCityset(Location *location, Maptile::Building building_type, guint32 old_tile_width)
 {
-  GameMap::getInstance()->clearBuilding(location->getPos(), (guint32)old_tile_width);
+  GameMap::instance()->clearBuilding(location->getPos(), (guint32)old_tile_width);
 
-  GameMap::getInstance()->putBuilding (location, building_type);
+  GameMap::instance()->putBuilding (location, building_type);
 }
 
 void GameMap::relocateLocation(Location *location, Maptile::Building building_type, guint32 tile_width)
 {
   //look for a suitable place for this building
   //remove our buildingness so it can find where we are now.
-  GameMap::getInstance()->removeBuilding(location);
+  GameMap::instance()->removeBuilding(location);
   Vector<int> dest =
-    GameMap::getInstance()->findNearestAreaForBuilding(building_type, location->getPos(), tile_width);
-  GameMap::getInstance()->putBuilding (location, building_type);
+    GameMap::instance()->findNearestAreaForBuilding(building_type, location->getPos(), tile_width);
+  GameMap::instance()->putBuilding (location, building_type);
   if (dest == Vector<int>(-1, -1))
-    GameMap::getInstance()->removeLocation (location->getPos());
+    GameMap::instance()->removeLocation (location->getPos());
   else
-    GameMap::getInstance()->moveBuilding (location->getPos(), dest, tile_width);
+    GameMap::instance()->moveBuilding (location->getPos(), dest, tile_width);
 }
         
 guint32 GameMap::getTileSize() const
 {
   Tileset *ts = GameMap::getTileset();
   return ts->getTileSize();
-}
-
-guint32 GameMap::getUnscaledTileSize() const
-{
-  Tileset *ts = GameMap::getTileset();
-  return ts->getUnscaledTileSize();
 }
 
 guint32 GameMap::getTilesetId() const
@@ -2442,7 +2445,7 @@ guint32 GameMap::getCitysetId() const
 
 guint32 GameMap::getShieldsetId() const
 {
-  return Shieldsetlist::getInstance()->getSetId(d_shieldset);
+  return Shieldsetlist::instance()->getSetId(d_shieldset);
 }
 
 Glib::ustring GameMap::getTilesetBaseName() const
@@ -2492,17 +2495,8 @@ bool GameMap::eraseTile(Vector<int> tile)
 
   // ... or a ruin ...
   if (getRuin(tile) != NULL)
-    {
-      for (auto i: *Rewardlist::getInstance())
-        {
-          if (i->getType() == Reward::RUIN)
-            {
-              Reward_Ruin *rr = static_cast<Reward_Ruin*>(i);
-              if (rr->getRuin()->getPos() == tile)
-                Rewardlist::getInstance()->remove(i);
-            }
-        }
-    }
+    update_ruin_rewards (tile, NULL);
+
   erased |= removeRuin(tile);
 
   // ... or a road ...
@@ -2532,7 +2526,7 @@ bool GameMap::eraseTile(Vector<int> tile)
 Tileset* GameMap::getTileset()
 {
   if (s_tileset == 0)
-    s_tileset = Tilesetlist::getInstance()->get(GameMap::getInstance()->getTilesetBaseName());
+    s_tileset = Tilesetlist::instance()->get(GameMap::instance()->getTilesetBaseName());
     
   return s_tileset;
 }
@@ -2540,7 +2534,7 @@ Tileset* GameMap::getTileset()
 Cityset* GameMap::getCityset()
 {
   if (s_cityset == 0)
-    s_cityset = Citysetlist::getInstance()->get(GameMap::getInstance()->getCitysetBaseName());
+    s_cityset = Citysetlist::instance()->get(GameMap::instance()->getCitysetBaseName());
     
   return s_cityset;
 }
@@ -2548,7 +2542,7 @@ Cityset* GameMap::getCityset()
 Shieldset* GameMap::getShieldset()
 {
   if (s_shieldset == 0)
-    s_shieldset = Shieldsetlist::getInstance()->get(GameMap::getInstance()->getShieldsetId());
+    s_shieldset = Shieldsetlist::instance()->get(GameMap::instance()->getShieldsetId());
     
   return s_shieldset;
 }
@@ -2556,19 +2550,19 @@ Shieldset* GameMap::getShieldset()
 void GameMap::setTileset(Glib::ustring tileset)
 {
   d_tileset = tileset;
-  s_tileset = Tilesetlist::getInstance()->get(tileset);
+  s_tileset = Tilesetlist::instance()->get(tileset);
 }
 
 void GameMap::setCityset(Glib::ustring cityset)
 {
   d_cityset = cityset;
-  s_cityset = Citysetlist::getInstance()->get(cityset);
+  s_cityset = Citysetlist::instance()->get(cityset);
 }
 
 void GameMap::setShieldset(Glib::ustring shieldset)
 {
   d_shieldset = shieldset;
-  s_shieldset = Shieldsetlist::getInstance()->get(shieldset);
+  s_shieldset = Shieldsetlist::instance()->get(shieldset);
 }
 
 bool GameMap::can_search(Stack *stack)
@@ -2629,7 +2623,7 @@ bool GameMap::can_plant_flag(Stack *stack)
                     {
                       MapBackpack *backpack;
                       Vector<int> pos = stack->getPos();
-                      backpack = getInstance()->getTile(pos)->getBackpack();
+                      backpack = instance()->getTile(pos)->getBackpack();
                       bool standard_already_planted =
                         backpack->getFirstPlantedItem() != NULL;
                       //are there any other standards here?
@@ -2649,15 +2643,15 @@ bool GameMap::burnBridge(Vector<int> pos)
   Bridge *bridge = GameMap::getBridge(pos);
   if (bridge)
     {
-      Bridge *other = Bridgelist::getInstance()->getOtherSide(bridge);
+      Bridge *other = Bridgelist::instance()->getOtherSide(bridge);
       Vector<int> src = bridge->getPos();
-      GameMap::getInstance()->removeBridge(src);
+      GameMap::instance()->removeBridge(src);
       Vector<int> dest = Vector<int>(-1, -1);
       std::vector<Stack*> stacks;
       if (other)
         {
           dest = other->getPos();
-          GameMap::getInstance()->removeBridge(dest);
+          GameMap::instance()->removeBridge(dest);
           std::vector<Stack*> s = GameMap::getStacks(src)->getStacks();
           stacks.insert(std::end(stacks), std::begin(s), std::end(s));
         }
@@ -2673,12 +2667,12 @@ bool GameMap::burnBridge(Vector<int> pos)
           (*i)->drainMovement();
         }
       std::list<Vector<int> > r =
-        Bridgelist::getInstance()->getRoadEntryPoints(bridge);
+        Bridgelist::instance()->getRoadEntryPoints(bridge);
       for (std::list<Vector<int> >::iterator i = r.begin(); i != r.end(); ++i)
         {
-          Road *rd = GameMap::getInstance()->getRoad(*i);
+          Road *rd = GameMap::instance()->getRoad(*i);
           if (rd)
-            rd->setType(Roadlist::getInstance()->calculateType(rd->getPos()));
+            rd->setType(Roadlist::instance()->calculateType(rd->getPos()));
         }
       burned = true;
     }
@@ -2687,20 +2681,20 @@ bool GameMap::burnBridge(Vector<int> pos)
 
 bool GameMap::friendlyCitiesPresent()
 {
-  return Citylist::getInstance()->countCities(Playerlist::getActiveplayer());
+  return Citylist::instance()->countCities(Playerlist::getActiveplayer());
 }
 
 bool GameMap::enemyCitiesPresent()
 {
-  for (auto i: *Playerlist::getInstance())
+  for (auto i: *Playerlist::instance())
     {
-      if (i == Playerlist::getInstance()->getNeutral())
+      if (i == Playerlist::getNeutral())
         continue;
       if (i == Playerlist::getActiveplayer())
         continue;
       if (i->isDead())
         continue;
-      if (Citylist::getInstance()->countCities(i) > 0)
+      if (Citylist::instance()->countCities(i) > 0)
         return true;
     }
   return false;
@@ -2708,8 +2702,7 @@ bool GameMap::enemyCitiesPresent()
 
 bool GameMap::neutralCitiesPresent()
 {
-  return Citylist::getInstance()->countCities
-    (Playerlist::getInstance()->getNeutral());
+  return Citylist::instance()->countCities (Playerlist::getNeutral());
 }
 
 void GameMap::addArmies(const ArmyProto *a, guint32 num_allies, Vector<int> pos)
@@ -2725,8 +2718,8 @@ void GameMap::addArmies(const ArmyProto *a, guint32 num_allies, Vector<int> pos)
 //we can't defend on cities, ruins, temples, ports, or water.
 bool GameMap::can_defend(Stack *stack)
 {
-  Tile::Type type = getInstance()->getTile(stack->getPos())->getType();
-  Maptile::Building building = getInstance()->getBuilding(stack->getPos());
+  Tile::Type type = instance()->getTile(stack->getPos())->getType();
+  Maptile::Building building = instance()->getBuilding(stack->getPos());
   if (type == Tile::WATER && building == Maptile::NONE)
     return false;
   if (building == Maptile::CITY || building == Maptile::RUIN ||
@@ -2743,16 +2736,16 @@ bool GameMap::checkBuildingTerrain(Maptile::Building b, bool land)
       for (int j = 0; j < s_height; j++)
         {
           Vector<int> tile = Vector<int>(i, j);
-          if (GameMap::getInstance()->getBuilding(tile) == b)
+          if (GameMap::instance()->getBuilding(tile) == b)
             {
               if (land)
                 {
-                  if (GameMap::getInstance()->getTerrainType(tile) != Tile::WATER)
+                  if (GameMap::instance()->getTerrainType(tile) != Tile::WATER)
                     found = true;
                 }
               else
                 {
-                  if (GameMap::getInstance()->getTerrainType(tile) == Tile::WATER)
+                  if (GameMap::instance()->getTerrainType(tile) == Tile::WATER)
                     found = true;
                 }
               if (found)
@@ -2800,8 +2793,14 @@ guint32 GameMap::countBags ()
 std::vector<Armyset*> GameMap::getArmysets ()
 {
   std::vector<Armyset*> armysets;
-  for (auto id : Playerlist::getInstance()->getArmysets ())
-    armysets.push_back (Armysetlist::getInstance ()->get(id));
+  for (guint32 i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
+    {
+      auto p = Playerlist::instance ()->get (Shield::Color (i));
+      if (p)
+        armysets.push_back (Armysetlist::instance ()->get (p->getArmyset ()));
+      else
+        armysets.push_back (NULL);
+    }
   return armysets;
 }
 
@@ -3008,7 +3007,7 @@ void GameMap::updateMaptiles (std::list<Maptile *> maptiles)
 {
   for (auto m : maptiles)
     {
-      Maptile *maptile = GameMap::getInstance ()->getTile (m->getPos ());
+      Maptile *maptile = GameMap::instance ()->getTile (m->getPos ());
       maptile->copy (m, true);
     }
 }
@@ -3020,7 +3019,7 @@ void GameMap::updateObjects (std::list<UniquelyIdentified*> objects, std::list<L
     {
       if (City *city = dynamic_cast<City*>(object))
         {
-          Citylist *cities = Citylist::getInstance ();
+          Citylist *cities = Citylist::instance ();
           City *old_city = cities->getById (city->getId ());
           if (old_city)
             cities->replace (old_city, city);
@@ -3029,7 +3028,7 @@ void GameMap::updateObjects (std::list<UniquelyIdentified*> objects, std::list<L
         }
       else if (Ruin *ruin = dynamic_cast<Ruin*>(object))
         {
-          Ruinlist *ruins = Ruinlist::getInstance ();
+          Ruinlist *ruins = Ruinlist::instance ();
           Ruin *old_ruin = ruins->getById (ruin->getId ());
           if (old_ruin)
             ruins->replace (old_ruin, ruin);
@@ -3038,7 +3037,7 @@ void GameMap::updateObjects (std::list<UniquelyIdentified*> objects, std::list<L
         }
       else if (Temple *temple = dynamic_cast<Temple*>(object))
         {
-          Templelist *temples = Templelist::getInstance ();
+          Templelist *temples = Templelist::instance ();
           Temple *old_temple = temples->getById (temple->getId ());
           if (old_temple)
             temples->replace (old_temple, temple);
@@ -3047,7 +3046,7 @@ void GameMap::updateObjects (std::list<UniquelyIdentified*> objects, std::list<L
         }
       else if (Port *port = dynamic_cast<Port*>(object))
         {
-          Portlist *ports = Portlist::getInstance ();
+          Portlist *ports = Portlist::instance ();
           Port *old_port = ports->getById (port->getId ());
           if (old_port)
             ports->replace (old_port, port);
@@ -3056,7 +3055,7 @@ void GameMap::updateObjects (std::list<UniquelyIdentified*> objects, std::list<L
         }
       else if (Stone *stone = dynamic_cast<Stone*>(object))
         {
-          Stonelist *stones = Stonelist::getInstance ();
+          Stonelist *stones = Stonelist::instance ();
           Stone *old_stone = stones->getById (stone->getId ());
           if (old_stone)
             stones->replace (old_stone, stone);
@@ -3065,7 +3064,7 @@ void GameMap::updateObjects (std::list<UniquelyIdentified*> objects, std::list<L
         }
       else if (Signpost *signpost = dynamic_cast<Signpost*>(object))
         {
-          Signpostlist *signposts = Signpostlist::getInstance ();
+          Signpostlist *signposts = Signpostlist::instance ();
           Signpost *old_signpost = signposts->getById (signpost->getId ());
           if (old_signpost)
             signposts->replace (old_signpost, signpost);
@@ -3074,7 +3073,7 @@ void GameMap::updateObjects (std::list<UniquelyIdentified*> objects, std::list<L
         }
       else if (Road *road = dynamic_cast<Road*>(object))
         {
-          Roadlist *roads = Roadlist::getInstance ();
+          Roadlist *roads = Roadlist::instance ();
           Road *old_road = roads->getById (road->getId ());
           if (old_road)
             roads->replace (old_road, road);
@@ -3083,7 +3082,7 @@ void GameMap::updateObjects (std::list<UniquelyIdentified*> objects, std::list<L
         }
       else if (Bridge *bridge = dynamic_cast<Bridge*>(object))
         {
-          Bridgelist *bridges = Bridgelist::getInstance ();
+          Bridgelist *bridges = Bridgelist::instance ();
           Bridge *old_bridge = bridges->getById (bridge->getId ());
           if (old_bridge)
             bridges->replace (old_bridge, bridge);
@@ -3097,43 +3096,43 @@ void GameMap::updateObjects (std::list<UniquelyIdentified*> objects, std::list<L
           Stack *old_stack = stacks->getStackById (stack->getId ());
           if (old_stack)
             stacks->flRemove (old_stack);
-          GameMap::getInstance ()->putStack (stack, true);
+          GameMap::instance ()->putStack (stack, true);
         }
     }
 
   //we need cities in this rect that lack a building tile
-  std::list <Vector<int>> points = GameMap::getInstance ()->getPoints (rects);
+  std::list <Vector<int>> points = GameMap::instance ()->getPoints (rects);
 
   for (auto pos : points)
     {
-      Maptile *mtile = GameMap::getInstance ()->getTile (pos);
-      City *city = Citylist::getInstance ()->getObjectAt (pos);
+      Maptile *mtile = GameMap::instance ()->getTile (pos);
+      City *city = Citylist::instance ()->getObjectAt (pos);
       if (mtile->getBuilding () != Maptile::CITY && city)
-        Citylist::getInstance ()->subtract (city);
-      Ruin *ruin = Ruinlist::getInstance ()->getObjectAt (pos);
+        Citylist::instance ()->subtract (city);
+      Ruin *ruin = Ruinlist::instance ()->getObjectAt (pos);
       if (mtile->getBuilding () != Maptile::RUIN && ruin)
-        Ruinlist::getInstance ()->subtract (ruin);
-      Temple *temple = Templelist::getInstance ()->getObjectAt (pos);
+        Ruinlist::instance ()->subtract (ruin);
+      Temple *temple = Templelist::instance ()->getObjectAt (pos);
       if (mtile->getBuilding () != Maptile::TEMPLE && temple)
-        Templelist::getInstance ()->subtract (temple);
-      Port *port = Portlist::getInstance ()->getObjectAt (pos);
+        Templelist::instance ()->subtract (temple);
+      Port *port = Portlist::instance ()->getObjectAt (pos);
       if (mtile->getBuilding () != Maptile::PORT && port)
-        Portlist::getInstance ()->subtract (port);
-      Road *road = Roadlist::getInstance ()->getObjectAt (pos);
+        Portlist::instance ()->subtract (port);
+      Road *road = Roadlist::instance ()->getObjectAt (pos);
       if (mtile->getBuilding () != Maptile::ROAD && road)
-        Roadlist::getInstance ()->subtract (road);
-      Bridge *bridge = Bridgelist::getInstance ()->getObjectAt (pos);
+        Roadlist::instance ()->subtract (road);
+      Bridge *bridge = Bridgelist::instance ()->getObjectAt (pos);
       if (mtile->getBuilding () != Maptile::BRIDGE && bridge)
-        Bridgelist::getInstance ()->subtract (bridge);
-      Stone *stone = Stonelist::getInstance ()->getObjectAt (pos);
+        Bridgelist::instance ()->subtract (bridge);
+      Stone *stone = Stonelist::instance ()->getObjectAt (pos);
       if (mtile->getBuilding () != Maptile::STONE &&
           mtile->getBuilding () != Maptile::ROAD && stone)
-        Stonelist::getInstance ()->subtract (stone);
-      Signpost *signpost = Signpostlist::getInstance ()->getObjectAt (pos);
+        Stonelist::instance ()->subtract (stone);
+      Signpost *signpost = Signpostlist::instance ()->getObjectAt (pos);
       if (mtile->getBuilding () != Maptile::SIGNPOST && signpost)
-        Signpostlist::getInstance ()->subtract (signpost);
+        Signpostlist::instance ()->subtract (signpost);
       //remove stacks that don't have a stacktile reference
-      for (auto p : *Playerlist::getInstance ())
+      for (auto p : *Playerlist::instance ())
         {
           std::list<Stack *> stacks_to_delete;
           for (auto s : *p->getStacklist ())
@@ -3144,6 +3143,133 @@ void GameMap::updateObjects (std::list<UniquelyIdentified*> objects, std::list<L
               p->getStacklist ()->on_stack_died (s);
               p->getStacklist ()->flRemove (s);
             }
+        }
+    }
+}
+
+bool GameMap::isStackDestinationEnemyCity (Stack *s)
+  {
+    if (s->hasPath () == false)
+      return false;
+    Vector<int> endpos = s->getLastPointInPath ();
+    City *c = GameMap::getEnemyCity (endpos);
+    if (!c)
+      return false;
+    return c->isBurnt () == false;
+  }
+
+bool GameMap::isVisible (Vector<int> pos)
+{
+  return FogMap::isClear (pos, Playerlist::getActiveplayer ());
+}
+
+std::list<Stack*> GameMap::getUnblessedStacksNearTemples (int dist)
+{
+  std::list<Stack*> stacks;
+  for (auto temple : *Templelist::instance ())
+    for (auto pos : GameMap::getNearbyPoints (temple->getPos (), dist))
+      for (auto s: getFriendlyStacks (pos, Playerlist::getActiveplayer ()))
+        {
+          guint32 unblessed_armies =
+            s->size () - s->countArmiesBlessedAtTemple (temple->getId ());
+          if (unblessed_armies > 0)
+            stacks.push_back (s);
+        }
+
+  //remove any duplicate stacks
+  std::set<Stack*> seen;
+
+  for (auto it = stacks.begin (); it != stacks.end (); )
+    {
+      if (seen.find (*it) != seen.end ())
+        it = stacks.erase (it);
+      else
+        {
+          seen.insert (*it);
+          ++it;
+        }
+    }
+  return stacks;
+}
+                     
+NamedLocation *GameMap::get_nearest_ruin_or_temple (Vector<int> pos)
+{
+  NamedLocation *bldg = NULL;
+  auto r = getRuin (pos);
+  if (r)
+    return r;
+  auto t = getTemple (pos);
+  if (t)
+    return t;
+  r = Ruinlist::instance ()->getNearestObject (pos);
+  if (r->isHidden () && r->getOwner () != Playerlist::getActiveplayer ())
+    r = NULL;
+  t = Templelist::instance ()->getNearestObject (pos);
+
+  guint32 max = 1000;
+  guint32 dist_to_ruin = max;
+  if (r)
+    dist_to_ruin = dist (pos, r->getPos ());
+  guint32 dist_to_temple = max;
+  if (t)
+    dist_to_temple = dist (pos, t->getPos ());
+
+  if (dist_to_ruin != max || dist_to_temple != max)
+    {
+      if (dist_to_ruin < dist_to_temple)
+        bldg = r;
+      else
+        bldg = t;
+    }
+  return bldg;
+}
+        
+std::list<Vector<int>> GameMap::on_map (std::list<Vector<int>> points)
+{
+  std::list<Vector<int>> out;
+  for (auto p : points)
+    {
+      if (offmap (p.x, p.y))
+        continue;
+      out.push_back (p);
+    }
+  return out;
+}
+
+void GameMap::update_ruin_rewards (Vector<int> pos, Ruin *r)
+{
+  std::vector<Reward_Ruin*> ruin_rewards;
+
+  for (auto ruin : *Ruinlist::instance ())
+    {
+      if (ruin->getReward ())
+        {
+          if (ruin->getReward ()->getType () == Reward::RUIN)
+            {
+              auto rr = dynamic_cast<Reward_Ruin*> (ruin->getReward ());
+              ruin_rewards.push_back (rr);
+            }
+        }
+    }
+
+  for (auto reward: *Rewardlist::instance ())
+    {
+      if (reward->getType () == Reward::RUIN)
+        {
+          auto rr = dynamic_cast<Reward_Ruin*> (reward);
+          ruin_rewards.push_back (rr);
+        }
+    }
+
+  for (auto rr : ruin_rewards)
+    {
+      if (rr->get_ruin_pos () == pos)
+        {
+          if (r == NULL)
+            rr->setRuinPos (Vector<int>(-1, -1));
+          else
+            rr->setRuinPos (r->getPos ());
+          rr->setName (rr->generate_name ());
         }
     }
 }

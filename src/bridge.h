@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,14 +12,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef BRIDGE_H
 #define BRIDGE_H
 
-#include "Location.h"
+#include "location.h"
 
 //! A bridge on the game map.
 /** 
@@ -49,7 +48,7 @@ class Bridge: public Location
          * @param pos          The location of the bridge.
          * @param type         The type of bridge.  0=e,1=n, 2=w, 3=s.
          */
-        Bridge(Vector<int> pos, int type = 0);
+        Bridge(Vector<int> pos, Type type = CONNECTS_TO_EAST);
 
 	//! Copy constructor.
         Bridge(const Bridge&, bool sync_id = false);
@@ -67,13 +66,13 @@ class Bridge: public Location
         ~Bridge() {};
 
         //! Returns the type of the bridge.
-        int getType() const {return d_type;};
+        Type getType() const {return d_type;};
 
         //! Return the point at which a road would connect to this bridge.
         Vector<int> getRoadEntryPoint() const;
 
         //! Sets the type of the bridge.
-        void setType(int type) {d_type = type;};
+        void setType(Type type) {d_type = type;};
 
         //! Save the bridge data to the opened saved-game file.
         bool save(XML_Helper* helper) const;
@@ -93,8 +92,8 @@ class Bridge: public Location
 	 * 3 = The bridge connects to a road to the north, and another bridge
 	 *     to the south.
 	 */
-	int d_type;
+	Type d_type;
 
 };
 
-#endif // BRIDGE_H
+#endif

@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2014, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,29 +12,49 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#pragma once
+#include <gtkmm.h>
+#include "lw-dialog-base.h"
 #ifndef SURRENDER_REFUSED_DIALOG_H
 #define SURRENDER_REFUSED_DIALOG_H
-
-#include <memory>
-#include <vector>
-#include <gtkmm.h>
-
-#include "lw-dialog.h"
-
-// dialog for showing the refusal of surrender
-class SurrenderRefusedDialog: public LwDialog
+class SurrenderRefusedDialog: public LwDialogBase
 {
- public:
-    SurrenderRefusedDialog(Gtk::Window &parent);
-    ~SurrenderRefusedDialog() {};
+public:
+    static std::string get_resource_name ()
+      {
+        return "surrender-refused.ui";
+      }
 
- private:
-    Gtk::Image *image;
+    SurrenderRefusedDialog (BaseObjectType* o,
+                            const Glib::RefPtr<Gtk::Builder>& xml)
+      : LwDialogBase (o, xml)
+      {
+        m_picture = load <Gtk::Picture> ("picture");
+        m_label = load <Gtk::Label> ("label");
+        m_button = load <Gtk::Button> ("continue_button");
+      }
 
+    void setup ()
+      {
+        set_response (m_button, Gtk::ResponseType::ACCEPT);
+
+        auto im = 
+          ImageCache::instance ()->getDialogPic
+           (ImageCache::DIALOG_PARLEY_REFUSED);
+        m_picture->set_paintable (im->to_texture ());
+    
+        m_label->set_text(_("Off with their heads!  I want it ALL!"));
+
+        signal_response ().connect
+          ([this](Gtk::ResponseType)
+           {
+             hide ();
+           });
+      }
+private:
+    Gtk::Picture *m_picture;
+    Gtk::Label *m_label;
+    Gtk::Button *m_button;
 };
-
 #endif

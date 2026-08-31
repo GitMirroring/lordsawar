@@ -1,8 +1,8 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2017, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2017, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef ARMY_H
@@ -27,9 +26,9 @@
 #include <sigc++/trackable.h>
 #include <sigc++/signal.h>
 
-#include "OwnerId.h"
-#include "armybase.h"
-#include "UniquelyIdentified.h"
+#include "owner-id.h"
+#include "army-base.h"
+#include "uniquely-identified.h"
 
 class Player;
 class Temple;
@@ -327,12 +326,12 @@ class Army :public ArmyBase, public UniquelyIdentified, public OwnerId, public s
 	 * @param army  The army that has died.
 	 */
 	//! Emitted when an Army has died.
-        static sigc::signal<void, Army*> sdying;
+        static sigc::signal<void(Army*)> sdying;
 
     protected:
 
         //! Generic method for saving Army data.  Useful to the Hero class.
-        bool saveData(XML_Helper* helper) const;
+        bool saveContents (XML_Helper* helper) const;
 
 	//! The index of the Army unit's type in it's Armyset.
         guint32 d_type_id;
@@ -505,4 +504,4 @@ class Army :public ArmyBase, public UniquelyIdentified, public OwnerId, public s
 
 };
 
-#endif // ARMY_H
+#endif

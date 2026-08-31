@@ -12,18 +12,18 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef CALLBACK_ENUMS_H
 #define CALLBACK_ENUMS_H
 
-enum CityDefeatedAction {
-    CITY_DEFEATED_OCCUPY = 1, CITY_DEFEATED_PILLAGE, CITY_DEFEATED_RAZE,
-    CITY_DEFEATED_SACK
+enum CityDefeatedChoice
+{
+  CITY_DEFEATED_OCCUPY = 1,
+  CITY_DEFEATED_PILLAGE,
+  CITY_DEFEATED_RAZE,
+  CITY_DEFEATED_SACK
 };
-
-
 
 #endif

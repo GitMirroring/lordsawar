@@ -1,8 +1,8 @@
-// Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2006 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,32 +16,30 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "ai_dummy.h"
-#include "playerlist.h"
-#include "armysetlist.h"
-#include "stacklist.h"
-#include "citylist.h"
+#include "ai-dummy.h"
+#include "player-list.h"
+#include "army-set-list.h"
+#include "stack-list.h"
+#include "city-list.h"
 #include "city.h"
 #include <fstream>
 #include "path.h"
 #include "action.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "history.h"
-#include "GameScenarioOptions.h"
-#include "SightMap.h"
-#include "Sage.h"
+#include "game-scenario-options.h"
+#include "sight-map.h"
+#include "sage.h"
 #include "rnd.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<endl<<flush;}
 #define debug(x)
 
 AI_Dummy::AI_Dummy(Glib::ustring name, guint32 armyset,
-                   std::vector<Gdk::RGBA> colors, int width, int height,
-                   int player_no)
-    :RealPlayer(name, armyset, colors, width, height, Player::AI_DUMMY, player_no)
+                   Shield::Color shield, int width, int height)
+    :RealPlayer(name, armyset, shield, width, height, Player::AI_DUMMY)
 {
 }
 
@@ -61,7 +59,7 @@ void AI_Dummy::abortTurn()
   abort_requested = true;
   if (surrendered)
     aborted_turn.emit();
-  else if (Playerlist::getInstance()->countPlayersAlive() == 1)
+  else if (Playerlist::instance()->countPlayersAlive() == 1)
     aborted_turn.emit();
 }
 
@@ -95,15 +93,21 @@ void AI_Dummy::setDefensiveProduction(City *city)
 void AI_Dummy::examineCities()
 {
     debug("Examinating Cities to see what we can do")
-    for (auto city: *Citylist::getInstance())
+    for (auto city: *Citylist::instance())
       {
         if ((city->isFriend(this)) && (city->isBurnt()==false))
 	  setDefensiveProduction(city);
       }
 }
 
-bool AI_Dummy::startTurn()
+void AI_Dummy::startTurn(sigc::slot<void(bool)> finish)
 {
+  //see the note in GameScenario::initialize
+  if (GameScenarioOptions::s_round == 0)
+    {
+      finish (!(Playerlist::instance()->getNoOfPlayers() <= 1));
+      return;
+    }
       
   if (GameScenarioOptions::s_neutral_cities == GameParameters::DEFENSIVE)
     {
@@ -113,7 +117,7 @@ bool AI_Dummy::startTurn()
       else
 	{
 	  // stop the presses.
-          for (auto city: *Citylist::getInstance())
+          for (auto city: *Citylist::instance())
 	    {
 	      if ((city->isFriend(this)) && (city->isBurnt()==false))
 		city->setActiveProductionSlot(-1);
@@ -125,19 +129,27 @@ bool AI_Dummy::startTurn()
   //doing anything
   if (abort_requested)
     aborted_turn.emit();
-  return !(Playerlist::getInstance()->getNoOfPlayers() <= 1);
+            
+  finish (!(Playerlist::instance()->getNoOfPlayers() <= 1));
+  return;
 }
 
 void AI_Dummy::invadeCity(City* c)
 {
+  (void) c;
   //dummy ai player should never invade an enemy city, but if it happens, we
   //make sure there is no inconsistency
-  cityOccupy(c);
 }
 
-void AI_Dummy::heroGainsLevel(Hero * a)
+CityDefeatedChoice AI_Dummy::chooseCityDefeatedAction (City *c, Stack *s)
 {
-  Army::Stat stat = Army::STRENGTH;
+  (void) c;
+  (void) s;
+  return CITY_DEFEATED_OCCUPY;
+}
+
+void AI_Dummy::heroGainsLevel(Hero * a, Army::Stat stat)
+{
   doHeroGainsLevel(a, stat);
   addAction(new Action_Level(a, stat));
 }
@@ -182,7 +194,7 @@ bool AI_Dummy::chooseQuest(Hero *hero)
   return true;
 }
 
-bool AI_Dummy::computerChooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool AI_Dummy::chooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -192,7 +204,7 @@ bool AI_Dummy::computerChooseVisitRuin(Stack *stack, Vector<int> dest, guint32 m
   return true;
 }
 
-bool AI_Dummy::computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool AI_Dummy::choosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -202,7 +214,7 @@ bool AI_Dummy::computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32 m
   return true;
 }
 
-bool AI_Dummy::computerChooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool AI_Dummy::chooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -212,7 +224,7 @@ bool AI_Dummy::computerChooseVisitTempleForBlessing(Stack *stack, Vector<int> de
   return true;
 }
 
-bool AI_Dummy::computerChooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool AI_Dummy::chooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -222,7 +234,7 @@ bool AI_Dummy::computerChooseVisitTempleForQuest(Stack *stack, Vector<int> dest,
   return true;
 }
 
-bool AI_Dummy::computerChooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns)
+bool AI_Dummy::chooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) quest;
@@ -232,4 +244,3 @@ bool AI_Dummy::computerChooseContinueQuest(Stack *stack, Quest *quest, Vector<in
   //neutrals don't have heroes
   return true;
 }
-// End of file

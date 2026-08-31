@@ -1,7 +1,7 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
-// Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2016, 2020,
-// 2021 Ben Asselstine
+//  Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
+//  Copyright (C) 2004, 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2016, 2020,
+//  2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,37 +15,37 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
+
 #include <sigc++/functors/mem_fun.h>
 #include <iostream>
-#include "ImageCache.h"
-#include "gui/image-helpers.h"
-#include "playerlist.h"
+#include "image-cache.h"
+#include "image-helpers.h"
+#include "player-list.h"
 #include "stack.h"
 #include "player.h"
-#include "tilesetlist.h"
-#include "GameMap.h"
-#include "armysetlist.h"
+#include "tile-set-list.h"
+#include "game-map.h"
+#include "army-set-list.h"
 #include "shield.h"
-#include "citysetlist.h"
-#include "shieldsetlist.h"
-#include "Configuration.h"
+#include "city-set-list.h"
+#include "shield-set-list.h"
+#include "configuration.h"
 #include "city.h"
-#include "Tile.h"
+#include "tile.h"
 #include "ruin.h"
 #include "temple.h"
 #include "road.h"
 #include "bridge.h"
-#include "FogMap.h"
-#include "shieldset.h"
-#include "ScenarioMedia.h"
-#include "TarFileMaskedImage.h"
-#include "TarFileImage.h"
+#include "fog-map.h"
+#include "shield-set.h"
+#include "scenario-media.h"
+#include "tar-file-masked-image.h"
+#include "tar-file-image.h"
 
 ImageCache* ImageCache::s_instance = 0;
 
-ImageCache* ImageCache::getInstance()
+ImageCache* ImageCache::instance()
 {
   if (!s_instance)
     s_instance = new ImageCache();
@@ -80,7 +80,7 @@ ImageCache::ImageCache(const ImageCache &c)
     defaulttilestylecache(c.defaulttilestylecache), tartancache(c.tartancache),
     emptytartancache(c.emptytartancache), statuscache(c.statuscache),
     gamebuttoncache(c.gamebuttoncache), dialogcache(c.dialogcache),
-    medalcache(c.medalcache)
+    medalcache (c.medalcache), boxcache (c.boxcache)
 {
   for (guint32 i = 0; i < 2; i++)
     for (guint32 j = 0; j < DIPLOMACY_TYPES; j++)
@@ -159,14 +159,15 @@ ImageCache::ImageCache()
     statuscache((sigc::ptr_fun(&StatusPixMaskCacheItem::generate))),
     gamebuttoncache((sigc::ptr_fun(&GameButtonPixMaskCacheItem::generate))),
     dialogcache((sigc::ptr_fun(&DialogPixMaskCacheItem::generate))),
-    medalcache((sigc::ptr_fun(&MedalPixMaskCacheItem::generate)))
+    medalcache((sigc::ptr_fun(&MedalPixMaskCacheItem::generate))),
+    boxcache((sigc::ptr_fun(&BoxPixMaskCacheItem::generate)))
 {
     d_hero_newlevel[0] =
-      new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                              PixMask::DIMENSION_ANY);
+      new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
+                              PixMask::DIMENSION_HEIGHT_IS_MARKED);
     d_hero_newlevel[1] =
-      new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                              PixMask::DIMENSION_ANY);
+      new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
+                              PixMask::DIMENSION_HEIGHT_IS_MARKED);
 
     loadDiplomacyImages();
     loadCursorImages();
@@ -253,37 +254,26 @@ ImageCache::ImageCache()
 bool ImageCache::loadDiplomacyImages()
 {
   bool broken = false;
-  int ts = 30;
   std::vector<PixMask*> diplomacy;
   diplomacy = disassemble_row(File::getVariousFile("diplomacy-small.png"),
                               DIPLOMACY_TYPES, broken);
   if (broken)
     return false;
   for (unsigned int i = 0; i < DIPLOMACY_TYPES ; i++)
-    {
-      if (diplomacy[i]->get_width() != ts)
-	PixMask::scale(diplomacy[i], ts, ts);
-      d_diplomacy[0][i] = diplomacy[i];
-    }
+    d_diplomacy[0][i] = diplomacy[i];
 
-  ts = 50;
   diplomacy = disassemble_row(File::getVariousFile("diplomacy-large.png"),
                               DIPLOMACY_TYPES, broken);
   if (broken)
     return false;
   for (unsigned int i = 0; i < DIPLOMACY_TYPES ; i++)
-    {
-      if (diplomacy[i]->get_width() != ts)
-	PixMask::scale(diplomacy[i], ts, ts);
-      d_diplomacy[1][i] = diplomacy[i];
-    }
+    d_diplomacy[1][i] = diplomacy[i];
   return true;
 }
 
 bool ImageCache::loadCursorImages()
 {
   bool broken = false;
-  int ts = 16;
 
   // load the cursor pictures
   std::vector<PixMask*> cursor;
@@ -292,11 +282,7 @@ bool ImageCache::loadCursorImages()
   if (broken)
     return false;
   for (unsigned int i = 0; i < CURSOR_TYPES ; i++)
-    {
-      if (cursor[i]->get_width() != ts)
-	PixMask::scale(cursor[i], ts, ts);
-      d_cursor[i] = cursor[i];
-    }
+    d_cursor[i] = cursor[i];
   return true;
 }
 
@@ -344,6 +330,7 @@ bool ImageCache::loadDefaultTileStyleImages()
     return false;
   for (unsigned int i = 0; i < DEFAULT_TILESTYLE_TYPES; i++)
     d_default_tilestyles[i] = images[i];
+
   return true;
 }
 
@@ -366,10 +353,6 @@ bool ImageCache::loadGameButtonImages()
     (File::getVariousFile("buttons.png"), NUM_GAME_BUTTON_IMAGES, broken);
   if (broken)
     return false;
-  int w = 0, h = 0;
-  Gtk::IconSize::lookup(Gtk::IconSize(Gtk::ICON_SIZE_BUTTON), w, h);
-  for (unsigned int i = 0; i < NUM_GAME_BUTTON_IMAGES; i++)
-    PixMask::scale(images[i], w, h);
   for (unsigned int i = 0; i < NUM_GAME_BUTTON_IMAGES; i++)
     d_gamebuttons[i] = images[i];
 
@@ -468,6 +451,7 @@ void ImageCache::reset()
   gamebuttoncache.reset();
   dialogcache.reset();
   medalcache.reset();
+  boxcache.reset();
 
   d_cachesize = 0;
   return;
@@ -486,7 +470,7 @@ void ImageCache::checkPictures()
   // given above and reduce the number of images. Let us start with the
   // cities
 
-  unsigned int num_players = Playerlist::getInstance()->countPlayersAlive();
+  unsigned int num_players = Playerlist::instance()->countPlayersAlive();
   if (armycache.size() >= 15 * num_players)
     {
       d_cachesize -= armycache.discardHalf();
@@ -717,13 +701,20 @@ void ImageCache::checkPictures()
       if (d_cachesize < maxcache)
         return;
     }
+
+  if (boxcache.size () >= 4)
+    {
+      d_cachesize -= boxcache.discardHalf();
+      if (d_cachesize < maxcache)
+        return;
+    }
 }
 
 PixMask* ImageCache::getSelectorPic(guint32 type, guint32 frame,
                                     const Player *p)
 {
   return getSelectorPic(type, frame, p,
-                        GameMap::getInstance()->getTilesetId());
+                        GameMap::instance()->getTilesetId());
 }
 
 PixMask* ImageCache::getSelectorPic(guint32 type, guint32 frame,
@@ -734,7 +725,9 @@ PixMask* ImageCache::getSelectorPic(guint32 type, guint32 frame,
   i.tileset = tileset;
   i.type = type;
   i.frame = frame;
-  i.player_id = p->getId();
+  i.shieldset = GameMap::instance ()->getShieldsetId ();
+  i.shield_id = (guint32) p->get_shield ();
+  i.armyset = p->getArmyset ();
   PixMask *s = selectorcache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -745,36 +738,36 @@ PixMask* ImageCache::getSelectorPic(guint32 type, guint32 frame,
 PixMask* ImageCache::getArmyPic(Army *a, bool greyed)
 {
   return getArmyPic(a->getOwner()->getArmyset(), a->getTypeId(),
-		    a->getOwner(), NULL, true, 0, greyed);
+		    a->getOwner()->get_shield (), NULL, true, greyed);
 }
 
-PixMask* ImageCache::getDialogArmyPic(Army *a, guint32 font_size, bool greyed)
+PixMask* ImageCache::getDialogArmyPic(Army *a, bool greyed)
 {
   return getArmyPic(a->getOwner()->getArmyset(), a->getTypeId(),
-		    a->getOwner(), NULL, false, font_size, greyed);
+		    a->getOwner()->get_shield (), NULL, false, greyed);
 }
 
 PixMask* ImageCache::getArmyPic(guint32 armyset, guint32 army_id,
-                                const Player* p, const bool *medals,
-                                bool map, guint32 font_size, bool greyed)
+                                Shield::Color shield, const bool *medals,
+                                bool map, bool greyed)
 {
   guint added = 0;
   ArmyPixMaskCacheItem i;
   i.armyset = armyset;
   i.army_id = army_id;
-  i.player_id = p->getId();
+  i.shieldset = GameMap::instance ()->getShieldsetId ();
+  i.shield_id = (guint32) shield;
   for (guint32 j = 0; j < MEDAL_TYPES; j++)
     if (medals)
       i.medals[j] = medals[j];
     else
       i.medals[j] = false;
   i.map = map;
-  i.font_size = font_size;
   i.greyed = greyed;
   PixMask *s = armycache.get(i, added);
   if (!s)
     {
-      guint32 size = Armysetlist::getInstance()->get(i.armyset)->getTileSize();
+      guint32 size = Armysetlist::instance()->get(i.armyset)->getTileSize();
       s = getDefaultTileStylePic(DEFAULT_TILESTYLE_TYPES-1, size);
     }
   d_cachesize += added;
@@ -783,13 +776,14 @@ PixMask* ImageCache::getArmyPic(guint32 armyset, guint32 army_id,
   return s;
 }
 
-PixMask* ImageCache::getFlagPic(guint32 stack_size, const Player *p, guint32 tileset)
+PixMask* ImageCache::getFlagPic(guint32 stack_size, Shield::Color shield, guint32 tileset)
 {
   guint32 added = 0;
   FlagPixMaskCacheItem i;
   i.tileset = tileset;
   i.size = stack_size;
-  i.player_id = p->getId();
+  i.shieldset = GameMap::instance ()->getShieldsetId ();
+  i.shield_id = (guint32) shield;
   PixMask *s = flagcache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -797,42 +791,65 @@ PixMask* ImageCache::getFlagPic(guint32 stack_size, const Player *p, guint32 til
   return s;
 }
 
-PixMask* ImageCache::getFlagPic(guint32 stack_size, const Player *p)
+PixMask* ImageCache::getFlagPic(guint32 stack_size, Shield::Color shield)
 {
-  return getFlagPic(stack_size, p,
-		    GameMap::getInstance()->getTilesetId());
+  return getFlagPic(stack_size, shield,
+		    GameMap::instance()->getTilesetId());
 }
 
 PixMask* ImageCache::getFlagPic(const Stack* s)
 {
-  return getFlagPic(s, GameMap::getInstance()->getTilesetId());
+  return getFlagPic(s->size (), s->getOwner ()->get_shield (),
+                    GameMap::instance()->getTilesetId());
 }
 
 PixMask* ImageCache::getFlagPic(const Stack* s, guint32 tileset)
 {
-  return getFlagPic(s->size(), s->getOwner(), tileset);
+  return getFlagPic(s->size(), s->getOwner()->get_shield (), tileset);
 }
 
 PixMask* ImageCache::getCircledArmyPic(Army *a, bool greyed,
                                        guint32 circle_color_id,
-                                       bool show_army, guint32 font_size)
+                                       bool show_army, bool dark)
 {
   return getCircledArmyPic(a->getOwner()->getArmyset(), a->getTypeId(),
-		    a->getOwner(), NULL, greyed, circle_color_id, show_army,
-                    font_size);
+		    a->getOwner()->get_shield (), NULL, greyed, circle_color_id, show_army, dark);
+}
+
+PixMask* ImageCache::getEmptyCircledArmyPic (bool dark)
+{
+  Player *p = Playerlist::getActiveplayer ();
+  guint added = 0;
+  CircledArmyPixMaskCacheItem i;
+  i.armyset = p->getArmyset();
+  i.shieldset = GameMap::instance ()->getShieldsetId ();
+  i.army_id = 0;
+  i.shield_id = 0;
+  for (guint32 j = 0; j < MEDAL_TYPES; j++)
+    i.medals[j] = false;
+  i.greyed = false;
+  i.circle_color_id = Shield::NEUTRAL;
+  i.show_army = false;
+  i.dark = dark;
+  PixMask *s = circledarmycache.get(i, added);
+  d_cachesize += added;
+  if (added)
+    checkPictures();
+  return s;
 }
 
 PixMask* ImageCache::getCircledArmyPic(guint32 armyset, guint32 army_id,
-                                             const Player* p,
+                                             Shield::Color shield,
                                              const bool *medals, bool greyed,
                                              guint32 circle_color_id,
-                                             bool show_army, guint32 font_size)
+                                             bool show_army, bool dark)
 {
   guint added = 0;
   CircledArmyPixMaskCacheItem i;
   i.armyset = armyset;
   i.army_id = army_id;
-  i.player_id = p->getId();
+  i.shield_id = (guint32) shield;
+  i.shieldset = GameMap::instance ()->getShieldsetId ();
   for (guint32 j = 0; j < MEDAL_TYPES; j++)
     if (medals)
       i.medals[j] = medals[j];
@@ -841,7 +858,7 @@ PixMask* ImageCache::getCircledArmyPic(guint32 armyset, guint32 army_id,
   i.greyed = greyed;
   i.circle_color_id = circle_color_id;
   i.show_army = show_army;
-  i.font_size = font_size;
+  i.dark = dark;
   PixMask *s = circledarmycache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -849,17 +866,18 @@ PixMask* ImageCache::getCircledArmyPic(guint32 armyset, guint32 army_id,
   return s;
 }
 
-PixMask* ImageCache::getCircledShipPic(guint32 armyset, const Player* p,
+PixMask* ImageCache::getCircledShipPic(guint32 armyset, Shield::Color shield,
                                        bool greyed, guint32 circle_color_id,
-                                       guint32 font_size)
+                                       bool dark)
 {
   guint added = 0;
   CircledShipPixMaskCacheItem i;
   i.armyset = armyset;
-  i.player_id = p->getId();
+  i.shieldset = GameMap::instance ()->getShieldsetId ();
+  i.shield_id = (guint32) shield;
   i.greyed = greyed;
   i.circle_color_id = circle_color_id;
-  i.font_size = font_size;
+  i.dark = dark;
   PixMask *s = circledshipcache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -867,18 +885,20 @@ PixMask* ImageCache::getCircledShipPic(guint32 armyset, const Player* p,
   return s;
 }
 
-PixMask* ImageCache::getCircledStandardPic(guint32 armyset, const Player* p,
+PixMask* ImageCache::getCircledStandardPic(guint32 armyset,
+                                           Shield::Color shield,
                                            bool greyed,
                                            guint32 circle_color_id,
-                                           guint32 font_size)
+                                           bool dark)
 {
   guint added = 0;
   CircledStandardPixMaskCacheItem i;
   i.armyset = armyset;
-  i.player_id = p->getId();
+  i.shieldset = GameMap::instance ()->getShieldsetId ();
+  i.shield_id = (guint32) shield;
   i.greyed = greyed;
   i.circle_color_id = circle_color_id;
-  i.font_size = font_size;
+  i.dark = dark;
   PixMask *s = circledstandardcache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -888,9 +908,9 @@ PixMask* ImageCache::getCircledStandardPic(guint32 armyset, const Player* p,
 
 PixMask* ImageCache::getTilePic(int tile_style_id, int fog_type_id, bool has_bag, int bag_player_id, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid, int stone_type)
 {
-  guint32 tileset = GameMap::getInstance()->getTilesetId();
-  guint32 cityset = GameMap::getInstance()->getCitysetId();
-  guint32 shieldset = GameMap::getInstance()->getShieldsetId();
+  guint32 tileset = GameMap::instance()->getTilesetId();
+  guint32 cityset = GameMap::instance()->getCitysetId();
+  guint32 shieldset = GameMap::instance()->getShieldsetId();
   return getTilePic(tile_style_id, fog_type_id, has_bag, bag_player_id, has_standard, standard_player_id, stack_size, stack_player_id, army_type_id, has_tower, has_ship, building_type, building_subtype, building_tile, building_player_id, tilesize, has_grid, tileset, cityset, shieldset, stone_type);
 }
 
@@ -909,7 +929,8 @@ PixMask* ImageCache::getTilePic(int tile_style_id, int fog_type_id, bool has_bag
   i.army_type_id = army_type_id;
   i.has_tower = has_tower;
   i.has_ship = has_ship;
-  i.building_type = building_type;
+  i.building_type = building_type; 
+  //building type for cities, -1 razed, 0 normal, others are their type
   i.building_subtype = building_subtype;
   i.building_tile = building_tile;
   i.building_player_id = building_player_id;
@@ -940,7 +961,7 @@ PixMask* ImageCache::getCityPic(const City* city, guint32 cityset)
 
 PixMask* ImageCache::getCityPic(const City* city)
 {
-  guint32 cityset = GameMap::getInstance()->getCitysetId();
+  guint32 cityset = GameMap::instance()->getCitysetId();
   return getCityPic(city, cityset);
 }
 
@@ -960,7 +981,7 @@ PixMask* ImageCache::getCityPic(int type, const Player* p, guint32 cityset)
 
 PixMask* ImageCache::getTowerPic(const Player* p)
 {
-  guint32 cityset = GameMap::getInstance()->getCitysetId();
+  guint32 cityset = GameMap::instance()->getCitysetId();
   return getTowerPic(p, cityset);
 }
 
@@ -979,13 +1000,13 @@ PixMask* ImageCache::getTowerPic(const Player* p, guint32 cityset)
 
 PixMask* ImageCache::getTemplePic(Temple *t)
 {
-  guint32 cityset = GameMap::getInstance()->getCitysetId();
+  guint32 cityset = GameMap::instance()->getCitysetId();
   return getTemplePic(t->getType(), cityset);
 }
 
 PixMask* ImageCache::getTemplePic(int type)
 {
-  guint32 cityset = GameMap::getInstance()->getCitysetId();
+  guint32 cityset = GameMap::instance()->getCitysetId();
   return getTemplePic(type, cityset);
 }
 
@@ -1004,12 +1025,12 @@ PixMask* ImageCache::getTemplePic(int type, guint32 cityset)
 
 PixMask* ImageCache::getRuinPic(Ruin *ruin)
 {
-  guint32 cityset = GameMap::getInstance()->getCitysetId();
+  guint32 cityset = GameMap::instance()->getCitysetId();
   return getRuinPic(ruin->getType(), cityset);
 }
 PixMask* ImageCache::getRuinPic(int type)
 {
-  guint32 cityset = GameMap::getInstance()->getCitysetId();
+  guint32 cityset = GameMap::instance()->getCitysetId();
   return getRuinPic(type, cityset);
 }
 
@@ -1026,14 +1047,12 @@ PixMask* ImageCache::getRuinPic(int type, guint32 cityset)
   return s;
 }
 
-PixMask* ImageCache::getDiplomacyPic(int type, Player::DiplomaticState state,
-                                     guint32 font_size)
+PixMask* ImageCache::getDiplomacyPic(int type, Player::DiplomaticState state)
 {
   guint added = 0;
   DiplomacyPixMaskCacheItem i;
   i.type = type;
   i.state = state;
-  i.font_size = font_size;
   PixMask *s = diplomacycache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1048,7 +1067,7 @@ PixMask* ImageCache::getRoadPic(Road *r)
 
 PixMask* ImageCache::getRoadPic(int type)
 {
-  return getRoadPic(type, GameMap::getInstance()->getTilesetId());
+  return getRoadPic(type, GameMap::instance()->getTilesetId());
 }
 
 PixMask* ImageCache::getRoadPic(int type, guint32 tileset)
@@ -1066,7 +1085,7 @@ PixMask* ImageCache::getRoadPic(int type, guint32 tileset)
 
 PixMask* ImageCache::getFogPic(int type)
 {
-  return getFogPic(type, GameMap::getInstance()->getTilesetId());
+  return getFogPic(type, GameMap::instance()->getTilesetId());
 }
 
 PixMask* ImageCache::getFogPic(int type, guint32 tileset)
@@ -1089,7 +1108,7 @@ PixMask* ImageCache::getBridgePic(Bridge *b)
 
 PixMask* ImageCache::getBridgePic(int type)
 {
-  return getBridgePic(type, GameMap::getInstance()->getTilesetId());
+  return getBridgePic(type, GameMap::instance()->getTilesetId());
 }
 
 PixMask* ImageCache::getBridgePic(int type, guint32 tileset)
@@ -1105,12 +1124,11 @@ PixMask* ImageCache::getBridgePic(int type, guint32 tileset)
   return s;
 }
 
-PixMask* ImageCache::getCursorPic(int type, guint32 font_size)
+PixMask* ImageCache::getCursorPic(int type)
 {
   guint added = 0;
   CursorPixMaskCacheItem i;
   i.type = type;
-  i.font_size = font_size;
   PixMask *s = cursorcache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1118,16 +1136,14 @@ PixMask* ImageCache::getCursorPic(int type, guint32 font_size)
   return s;
 }
 
-PixMask* ImageCache::getShieldPic(guint32 type, Player *p, bool map,
-                                  guint32 font_size)
+PixMask* ImageCache::getShieldPic(guint32 type, Player *p, bool map)
 {
-  guint32 shieldset = GameMap::getInstance()->getShieldsetId();
-  return getShieldPic(shieldset, type, p->getId(), map, font_size);
+  guint32 shieldset = GameMap::instance()->getShieldsetId();
+  return getShieldPic(shieldset, type, p->get_shield (), map);
 }
 
 PixMask* ImageCache::getShieldPic(guint32 shieldset, guint32 type,
-                                        guint32 color, bool map,
-                                        guint32 font_size)
+                                        guint32 color, bool map)
 {
   guint added = 0;
   ShieldPixMaskCacheItem i;
@@ -1135,7 +1151,6 @@ PixMask* ImageCache::getShieldPic(guint32 shieldset, guint32 type,
   i.shieldset = shieldset;
   i.color = color;
   i.map = map;
-  i.font_size = font_size;
   PixMask *s = shieldcache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1143,12 +1158,11 @@ PixMask* ImageCache::getShieldPic(guint32 shieldset, guint32 type,
   return s;
 }
 
-PixMask* ImageCache::getStatusPic(guint32 type, guint32 font_size)
+PixMask* ImageCache::getStatusPic(guint32 type)
 {
   guint added = 0;
   StatusPixMaskCacheItem i;
   i.type = type;
-  i.font_size = font_size;
   PixMask *s = statuscache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1156,12 +1170,11 @@ PixMask* ImageCache::getStatusPic(guint32 type, guint32 font_size)
   return s;
 }
 
-PixMask* ImageCache::getGameButtonPic(guint32 type, guint32 font_size)
+PixMask* ImageCache::getGameButtonPic(guint32 type)
 {
   guint added = 0;
   GameButtonPixMaskCacheItem i;
   i.type = type;
-  i.font_size = font_size;
   PixMask *s = gamebuttoncache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1182,17 +1195,17 @@ PixMask* ImageCache::getProdShieldPic(guint32 type, bool prod)
   return s;
 }
 
-
-PixMask* ImageCache::getShipPic(const Player* p)
+PixMask* ImageCache::getShipPic(guint32 armyset, Shield::Color shield)
 {
   guint added = 0;
   ShipPixMaskCacheItem i;
-  i.player_id = p->getId();
-  i.armyset = p->getArmyset();
+  i.shield_id = (guint32) shield;
+  i.armyset = armyset;
+  i.shieldset = GameMap::instance ()->getShieldsetId ();
   PixMask *s = shipcache.get(i, added);
   if (!s)
     {
-      guint32 size = Armysetlist::getInstance()->get(i.armyset)->getTileSize();
+      guint32 size = Armysetlist::instance()->get(i.armyset)->getTileSize();
       s = getDefaultTileStylePic(DEFAULT_TILESTYLE_TYPES-1, size);
     }
   d_cachesize += added;
@@ -1201,16 +1214,17 @@ PixMask* ImageCache::getShipPic(const Player* p)
   return s;
 }
 
-PixMask* ImageCache::getPlantedStandardPic(const Player* p)
+PixMask* ImageCache::getPlantedStandardPic(guint32 armyset, Shield::Color shield)
 {
   guint added = 0;
   PlantedStandardPixMaskCacheItem i;
-  i.player_id = p->getId();
-  i.armyset = p->getArmyset();
+  i.shieldset = GameMap::instance ()->getShieldsetId ();
+  i.shield_id = (guint32) shield;
+  i.armyset = armyset;
   PixMask *s = plantedstandardcache.get(i, added);
   if (!s)
     {
-      guint32 size = Armysetlist::getInstance()->get(i.armyset)->getTileSize();
+      guint32 size = Armysetlist::instance()->get(i.armyset)->getTileSize();
       s = getDefaultTileStylePic(DEFAULT_TILESTYLE_TYPES-1, size);
     }
   d_cachesize += added;
@@ -1221,7 +1235,7 @@ PixMask* ImageCache::getPlantedStandardPic(const Player* p)
 
 PixMask* ImageCache::getPortPic()
 {
-  return getPortPic(GameMap::getInstance()->getCitysetId());
+  return getPortPic(GameMap::instance()->getCitysetId());
 }
 
 PixMask* ImageCache::getPortPic(guint32 cityset)
@@ -1238,7 +1252,7 @@ PixMask* ImageCache::getPortPic(guint32 cityset)
 
 PixMask* ImageCache::getSignpostPic()
 {
-  return getSignpostPic(GameMap::getInstance()->getCitysetId());
+  return getSignpostPic(GameMap::instance()->getCitysetId());
 }
 
 PixMask* ImageCache::getSignpostPic(guint32 cityset)
@@ -1267,7 +1281,7 @@ PixMask* ImageCache::getBagPic(guint32 armyset)
   PixMask *s = bagcache.get(i, added);
   if (!s)
     {
-      guint32 size = Armysetlist::getInstance()->get(i.armyset)->getTileSize();
+      guint32 size = Armysetlist::instance()->get(i.armyset)->getTileSize();
       s = getDefaultTileStylePic(DEFAULT_TILESTYLE_TYPES-1, size);
     }
   d_cachesize += added;
@@ -1278,7 +1292,7 @@ PixMask* ImageCache::getBagPic(guint32 armyset)
 
 PixMask* ImageCache::getExplosionPic()
 {
-  return getExplosionPic(GameMap::getInstance()->getTilesetId());
+  return getExplosionPic(GameMap::instance()->getTilesetId());
 }
 
 PixMask* ImageCache::getExplosionPic(guint32 tileset)
@@ -1293,14 +1307,13 @@ PixMask* ImageCache::getExplosionPic(guint32 tileset)
   return s;
 }
 
-PixMask* ImageCache::getNewLevelPic(const Player* p, guint32 gender,
-                                    guint32 font_size)
+PixMask* ImageCache::getNewLevelPic(Shield::Color shield, guint32 gender)
 {
   guint added = 0;
   NewLevelPixMaskCacheItem i;
-  i.player_id = p->getId();
+  i.shieldset = GameMap::instance ()->getShieldsetId ();
+  i.shield_id = (guint32) shield;
   i.gender = gender;
-  i.font_size = font_size;
   PixMask *s = newlevelcache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1321,14 +1334,14 @@ PixMask* ImageCache::getDefaultTileStylePic(guint32 type, guint32 size)
   return s;
 }
 
-PixMask* ImageCache::getTartanPic(const Player *p, guint32 width, Shieldset *shieldset, guint32 font_size)
+PixMask* ImageCache::getTartanPic(Shieldset *shieldset, Shield::Color shield,
+                                  guint32 width)
 {
   guint added = 0;
   TartanPixMaskCacheItem i;
-  i.player_id = p->getId();
+  i.shield = shield;
   i.width = width;
   i.shieldset = shieldset->getId();
-  i.font_size = font_size;
   PixMask *s = tartancache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1336,14 +1349,14 @@ PixMask* ImageCache::getTartanPic(const Player *p, guint32 width, Shieldset *shi
   return s;
 }
 
-PixMask* ImageCache::getEmptyTartanPic(const Player *p, guint32 width, Shieldset *shieldset, guint32 font_size)
+PixMask* ImageCache::getEmptyTartanPic(Shieldset *shieldset,
+                                       Shield::Color shield, guint32 width)
 {
   guint added = 0;
   EmptyTartanPixMaskCacheItem i;
-  i.player_id = p->getId();
+  i.shield = shield;
   i.width = width;
   i.shieldset = shieldset->getId();
-  i.font_size = font_size;
   PixMask *s = emptytartancache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1351,12 +1364,11 @@ PixMask* ImageCache::getEmptyTartanPic(const Player *p, guint32 width, Shieldset
   return s;
 }
 
-PixMask* ImageCache::getDialogPic(guint32 type, guint32 font_size)
+PixMask* ImageCache::getDialogPic(guint32 type)
 {
   guint added = 0;
   DialogPixMaskCacheItem i;
   i.type = type;
-  i.font_size = font_size;
   PixMask *s = dialogcache.get(i, added);
   d_cachesize += added;
   if (added)
@@ -1369,13 +1381,12 @@ PixMask* ImageCache::getDiplomacyImage(int type, Player::DiplomaticState state)
   return d_diplomacy[type][state];
 }
 
-PixMask* ImageCache::getMoveBonusPic(guint32 tileset_id, guint32 bonus, guint32 font_size)
+PixMask* ImageCache::getMoveBonusPic(guint32 tileset_id, guint32 bonus)
 {
   guint added = 0;
   MoveBonusPixMaskCacheItem i;
   i.bonus = bonus;
   i.tileset = tileset_id;
-  i.font_size = font_size;
 
   PixMask *s = movebonuscache.get(i, added);
   d_cachesize += added;
@@ -1401,7 +1412,7 @@ PixMask *ImageCache::getProdShieldImage(guint32 type)
 
 PixMask* ImageCache::getMedalImage(bool large, int type)
 {
-  ScenarioMedia *sm = ScenarioMedia::getInstance ();
+  ScenarioMedia *sm = ScenarioMedia::instance ();
   if (sm->getMedalImage (large)->getName() != "")
     return sm->getMedalImage(large)->getImage (type);
   else
@@ -1411,21 +1422,37 @@ PixMask* ImageCache::getMedalImage(bool large, int type)
 TarFileMaskedImage *ImageCache::getHeroNewLevelMaskedImage (bool female)
 {
   TarFileMaskedImage *mim =
-    ScenarioMedia::getInstance()->getHeroNewLevelMaskedImage(female);
+    ScenarioMedia::instance()->getHeroNewLevelMaskedImage(female);
   if (mim->getImage ())
     return mim;
   return d_hero_newlevel[female ? 1 : 0];
 }
 
-PixMask* ImageCache::getMedalPic(bool large, guint32 type,
-                                        guint32 font_size)
+PixMask* ImageCache::getMedalPic(bool large, guint32 type)
 {
   guint added = 0;
   MedalPixMaskCacheItem i;
   i.large = large;
   i.type = type;
-  i.font_size = font_size;
   PixMask *s = medalcache.get(i, added);
+  d_cachesize += added;
+  if (added)
+    checkPictures();
+  return s;
+}
+
+PixMask* ImageCache::getBoxPic (guint32 size, Gdk::RGBA color, bool rounded,
+                                bool dashed, int line_width, bool offset)
+{
+  guint added = 0;
+  BoxPixMaskCacheItem i;
+  i.size = size;
+  i.color = color;
+  i.rounded = rounded;
+  i.dashed = dashed;
+  i.line_width = line_width;
+  i.offset = offset;
+  PixMask *s = boxcache.get(i, added);
   d_cachesize += added;
   if (added)
     checkPictures();
@@ -1516,7 +1543,7 @@ PixMask* ImageCache::greyOut(PixMask* image)
       }
   d.reset ();
   Glib::RefPtr<Gdk::Pixbuf> greyed_out =
-    Gdk::Pixbuf::create_from_data(copy, Gdk::COLORSPACE_RGB, true, 8,
+    Gdk::Pixbuf::create_from_data(copy, Gdk::Colorspace::RGB, true, 8,
 				  width, height, width * 4);
 
   result->draw_pixbuf(greyed_out, 0, 0, 0, 0, width, height);
@@ -1524,7 +1551,8 @@ PixMask* ImageCache::greyOut(PixMask* image)
 
   return result;
 }
-void ImageCache::draw_circle(Cairo::RefPtr<Cairo::Context> cr, double width_percent, int width, int height, Gdk::RGBA color, bool colored, bool mask)
+
+void ImageCache::draw_circle(Cairo::RefPtr<Cairo::Context> cr, double width_percent, int width, int height, Gdk::RGBA color, bool dark, bool colored, bool mask)
 {
   if (width_percent > 100)
     width_percent = 0;
@@ -1533,20 +1561,19 @@ void ImageCache::draw_circle(Cairo::RefPtr<Cairo::Context> cr, double width_perc
   width_percent /= 100.0;
   //i want 2 o'clock as a starting point, and 8pm as an ending point.
 
-  double dred = BEVELED_CIRCLE_DARK.get_red();
-  double dgreen = BEVELED_CIRCLE_DARK.get_green();
-  double dblue = BEVELED_CIRCLE_DARK.get_blue();
-  double lred = BEVELED_CIRCLE_LIGHT.get_red();
-  double lgreen = BEVELED_CIRCLE_LIGHT.get_green();
-  double lblue = BEVELED_CIRCLE_LIGHT.get_blue();
+  Gdk::RGBA l, d;
+  get_bevel_colors (dark, l, d);
+  double dred = d.get_red();
+  double dgreen = d.get_green();
+  double dblue = d.get_blue();
+  double lred = l.get_red();
+  double lgreen = l.get_green();
+  double lblue =  l.get_blue();
 
   double radius = (double)width * width_percent / 2.0;
   double line_width = radius * 0.2;
 
-  if (mask)
-    cr->set_line_width(line_width + 2.0);
-  else
-    cr->set_line_width(line_width + 4.0);
+  cr->set_line_width(line_width + 2.0);
   cr->set_source_rgb(((lred - dred) / 2.0) + lred,
                      ((lgreen -dgreen) / 2.0) + lgreen,
                      ((lblue - dblue) / 2.0) + lblue);
@@ -1584,31 +1611,81 @@ void ImageCache::draw_circle(Cairo::RefPtr<Cairo::Context> cr, double width_perc
     }
 }
 
-PixMask* ImageCache::circled(PixMask* image, Gdk::RGBA color, bool colored, double width_percent)
+void ImageCache::draw_circle_outline(Cairo::RefPtr<Cairo::Context> cr, double width_percent, int width, int height, bool dark)
 {
-  PixMask *copy = image->copy();
-  int width = image->get_width();
-  int height = image->get_height();
-  //here we draw a colored circle on top of the army's image
-  Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(copy->get_pixmap());
+  if (width_percent > 100)
+    width_percent = 0;
+  else if (width_percent < 0)
+    width_percent = 0;
+  width_percent /= 100.0;
+  //i want 2 o'clock as a starting point, and 8pm as an ending point.
 
-  draw_circle(cr, width_percent, width, height, color, colored, false);
+  Gdk::RGBA l, d;
+  get_bevel_colors (dark, l, d);
+  double ired = d.get_red();
+  double igreen = d.get_green();
+  double iblue = d.get_blue();
+  double ored = l.get_red();
+  double ogreen = l.get_green();
+  double oblue = l.get_blue();
+
+  double outer_radius = (double)width * width_percent / 2.0;
+  double inner_radius = (double)width * width_percent / 2.0 / 1.5;
+
+  cr->set_line_width(1.0);
+  cr->set_source_rgba(ired, igreen, iblue, 0.8);
+  cr->arc((double)width/2.0, (double)height/2.0, outer_radius, 0, 2 * M_PI);
+  cr->stroke();
+
+  cr->set_source_rgba(ored, ogreen, oblue, 0.8);
+  cr->arc((double)width/2.0, (double)height/2.0, inner_radius, 0, 2 * M_PI);
+
+  cr->stroke();
+
+}
+
+PixMask* ImageCache::circled(PixMask* image, Gdk::RGBA color, bool dark, bool colored, double width_percent)
+{
+  PixMask *copy = image->copy ();
+  int width = image->get_width ();
+  int height = image->get_height ();
+  //here we draw a colored circle on top of the army's image
+  Cairo::RefPtr<Cairo::Context> cr =
+    Cairo::Context::create (copy->get_pixmap ());
+
+  draw_circle (cr, width_percent, width, height, color, dark, colored, false);
 
   //here we draw a white circle on a copy of the image's mask.
-  Cairo::RefPtr<Cairo::Surface> mask = copy->get_mask();
+  Cairo::RefPtr<Cairo::Surface> mask = copy->get_mask ();
 
-  cr = Cairo::Context::create(mask);
-  draw_circle(cr, width_percent, width, height, Gdk::RGBA("white"), colored, true);
-  PixMask *result = PixMask::create(copy->get_pixmap(), mask);
+  cr = Cairo::Context::create (mask);
+  auto white = Gdk::RGBA ("white");
+  draw_circle (cr, width_percent, width, height, white, dark, colored,
+               true);
+  PixMask *result = PixMask::create(copy->get_pixmap (), mask);
   //draw the army on top again, to make it look like the circle is behind.
-  result->draw_pixbuf(image->to_pixbuf(), 0, 0, 0, 0, width, height);
+  result->draw_pixbuf (image->to_pixbuf (), 0, 0, 0, 0, width, height);
   delete copy;
   return result;
 }
 
+PixMask* ImageCache::circle_outline (PixMask* image, bool dark, double width_percent)
+{
+  PixMask *copy = image->copy ();
+  int width = image->get_width ();
+  int height = image->get_height ();
+  //here we draw a colored circle on top of the army's image
+  Cairo::RefPtr<Cairo::Context> cr =
+    Cairo::Context::create (copy->get_pixmap ());
+
+  draw_circle_outline (cr, width_percent, width, height, dark);
+
+  copy->draw_pixbuf (image->to_pixbuf (), 0, 0, 0, 0, width, height);
+  return copy;
+}
 TarFileImage* ImageCache::getNextTurnImage ()
 {
-  TarFileImage *im = ScenarioMedia::getInstance()->getNextTurnImage();
+  TarFileImage *im = ScenarioMedia::instance()->getNextTurnImage();
   if (im->getImage ())
     return im;
   return d_next_turn;
@@ -1616,7 +1693,7 @@ TarFileImage* ImageCache::getNextTurnImage ()
 
 TarFileImage* ImageCache::getCityDefeatedImage ()
 {
-  TarFileImage *im = ScenarioMedia::getInstance()->getCityDefeatedImage();
+  TarFileImage *im = ScenarioMedia::instance()->getCityDefeatedImage();
   if (im->getImage ())
     return im;
   return d_city_defeated;
@@ -1624,7 +1701,7 @@ TarFileImage* ImageCache::getCityDefeatedImage ()
 
 TarFileImage * ImageCache::getWinningImage ()
 {
-  TarFileImage *im = ScenarioMedia::getInstance()->getWinningImage();
+  TarFileImage *im = ScenarioMedia::instance()->getWinningImage();
   if (im->getImage ())
     return im;
   return d_winning;
@@ -1638,7 +1715,7 @@ TarFileImage* ImageCache::getHeroOfferedImage (Hero::Gender gender)
     case Hero::MALE:
         {
           TarFileImage *im =
-            ScenarioMedia::getInstance()->getHeroOfferedImage(false);
+            ScenarioMedia::instance()->getHeroOfferedImage(false);
           if (im->getImage ())
             return im;
           return d_hero[0];
@@ -1647,7 +1724,7 @@ TarFileImage* ImageCache::getHeroOfferedImage (Hero::Gender gender)
     case Hero::FEMALE:
         {
           TarFileImage *im =
-            ScenarioMedia::getInstance()->getHeroOfferedImage(true);
+            ScenarioMedia::instance()->getHeroOfferedImage(true);
           if (im->getImage ())
             return im;
           return d_hero[1];
@@ -1659,7 +1736,7 @@ TarFileImage* ImageCache::getHeroOfferedImage (Hero::Gender gender)
 
 TarFileImage *ImageCache::getRuinSuccessImage()
 {
-  TarFileImage *im = ScenarioMedia::getInstance()->getRuinSuccessImage();
+  TarFileImage *im = ScenarioMedia::instance()->getRuinSuccessImage();
   if (im->getImage ())
     return im;
   return d_ruin_success;
@@ -1667,7 +1744,7 @@ TarFileImage *ImageCache::getRuinSuccessImage()
 
 TarFileImage *ImageCache::getRuinDefeatImage()
 {
-  TarFileImage *im = ScenarioMedia::getInstance()->getRuinDefeatImage();
+  TarFileImage *im = ScenarioMedia::instance()->getRuinDefeatImage();
   if (im->getImage ())
     return im;
   return d_ruin_defeat;
@@ -1675,7 +1752,7 @@ TarFileImage *ImageCache::getRuinDefeatImage()
 
 TarFileImage * ImageCache::getParleyOfferedImage ()
 {
-  TarFileImage *im = ScenarioMedia::getInstance()->getParleyOfferedImage();
+  TarFileImage *im = ScenarioMedia::instance()->getParleyOfferedImage();
   if (im->getImage ())
     return im;
   return d_parley_offered;
@@ -1683,7 +1760,7 @@ TarFileImage * ImageCache::getParleyOfferedImage ()
 
 TarFileImage* ImageCache::getParleyRefusedImage ()
 {
-  TarFileImage *im = ScenarioMedia::getInstance()->getParleyRefusedImage();
+  TarFileImage *im = ScenarioMedia::instance()->getParleyRefusedImage();
   if (im->getImage ())
     return im;
   return d_parley_refused;
@@ -1691,7 +1768,7 @@ TarFileImage* ImageCache::getParleyRefusedImage ()
 
 TarFileImage* ImageCache::getMedalImage (bool large)
 {
-  TarFileImage *im = ScenarioMedia::getInstance()->getMedalImage(large);
+  TarFileImage *im = ScenarioMedia::instance()->getMedalImage(large);
   if (im->getImage ())
     return im;
   return d_medal[large ? 1 : 0];
@@ -1699,31 +1776,10 @@ TarFileImage* ImageCache::getMedalImage (bool large)
 
 TarFileImage* ImageCache::getCommentatorImage ()
 {
-  TarFileImage *im = ScenarioMedia::getInstance()->getCommentatorImage();
+  TarFileImage *im = ScenarioMedia::instance()->getCommentatorImage();
   if (im->getImage ())
     return im;
   return d_commentator;
-}
-
-void ImageCache::add_underline (PixMask **p, Gdk::RGBA color, guint32 font_size)
-{
-  int height = (*p)->get_height () +
-    (font_size * TURN_INDICATOR_FONT_SIZE_MULTIPLE);
-  int width = (*p)->get_width ();
-    Glib::RefPtr<Gdk::Pixbuf> pixbuf
-    = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, width, height);
-  pixbuf->fill(0x00000000);
-  PixMask *box = PixMask::create (pixbuf);
-  (*p)->blit (box->get_pixmap(), 0, 0);
-  Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(box->get_pixmap());
-  cr->set_line_width(1.0);
-  cr->set_source_rgba(color.get_red (), color.get_green(), color.get_blue (),
-                      color.get_alpha ());
-  cr->rectangle(0, (*p)->get_height (), width, height - (*p)->get_height ());
-  cr->fill ();
-  //cr->stroke();
-  delete *p;
-  *p = box;
 }
 
 int ImageCache::calculate_width_from_adjusted_height (PixMask *p, double new_height)
@@ -1735,25 +1791,24 @@ PixMask *SelectorPixMaskCacheItem::generate(const SelectorPixMaskCacheItem &i)
 {
   // armyset selectors override the tileset ones
   // we can't have a neutral selector, but just in case we change it to white
-  Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
-  Shield::Color c = Shield::Color (p->getId ());
+  Shield::Color c = Shield::Color (i.shield_id);
   if (c == Shield::NEUTRAL)
     c = Shield::WHITE;
-  Armyset *as = Armysetlist::getInstance ()->get (p->getArmyset ());
-  Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
+  Armyset *as = Armysetlist::instance ()->get (i.armyset);
+  Tileset *ts = Tilesetlist::instance()->get(i.tileset);
   if (i.type == 0)
     {
       if (as->getSelector(true, c)->getNumberOfFrames () > 0)
-        return as->getSelector(true, c)->applyMask (i.frame, p);
+        return as->getSelector(true, c)->applyMask (i.frame, i.shield_id);
       else
-        return ts->getSelector(true)->applyMask (i.frame, p);
+        return ts->getSelector(true)->applyMask (i.frame, i.shield_id);
     }
   else
     {
       if (as->getSelector(false, c)->getNumberOfFrames () > 0)
-        return as->getSelector(false, c)->applyMask (i.frame, p);
+        return as->getSelector(false, c)->applyMask (i.frame, i.shield_id);
       else
-        return ts->getSelector(false)->applyMask (i.frame, p);
+        return ts->getSelector(false)->applyMask (i.frame, i.shield_id);
     }
 }
 
@@ -1766,17 +1821,19 @@ int SelectorPixMaskCacheItem::comp(const SelectorPixMaskCacheItem &item) const
     (type > item.type) ?  1 :
     (frame < item.frame) ? -1 :
     (frame > item.frame) ?  1 :
-    (player_id < item.player_id) ? -1 :
-    (player_id > item.player_id) ?  1 :
+    (armyset < item.armyset) ? -1 :
+    (armyset > item.armyset) ?  1 :
+    (shieldset < item.shieldset) ? -1 :
+    (shieldset > item.shieldset) ?  1 :
+    (shield_id < item.shield_id) ? -1 :
+    (shield_id > item.shield_id) ?  1 :
     0;
 }
 
 PixMask *FlagPixMaskCacheItem::generate(const FlagPixMaskCacheItem &i)
 {
-  Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
+  Tileset *ts = Tilesetlist::instance()->get(i.tileset);
 
-  //when size is zero
-  Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
   /**
    * if you're here and i.size is zero it means:
    * bigmap tried to lookup the number of stacks belonging to a player on
@@ -1784,7 +1841,8 @@ PixMask *FlagPixMaskCacheItem::generate(const FlagPixMaskCacheItem &i)
    * so the ownership stuff has been messed up
    */
   // size of stack starts at 1, but we need the index, which starts at 0
-  return ts->getFlags ()->applyMask (i.size - 1, p);
+  Shield::Color shield = Shield::Color (i.shield_id);
+  return ts->getFlags (shield)->applyMask (i.size - 1, i.shield_id);
 }
 
 int FlagPixMaskCacheItem::comp(const FlagPixMaskCacheItem &item) const
@@ -1794,8 +1852,10 @@ int FlagPixMaskCacheItem::comp(const FlagPixMaskCacheItem &item) const
     (tileset > item.tileset)?  1 :
     (size < item.size) ? -1 :
     (size > item.size) ?  1 :
-    (player_id < item.player_id) ? -1 :
-    (player_id > item.player_id) ?  1 :
+    (shieldset < item.shieldset) ? -1 :
+    (shieldset > item.shieldset) ?  1 :
+    (shield_id < item.shield_id) ? -1 :
+    (shield_id > item.shield_id) ?  1 :
     0;
 }
 
@@ -1803,12 +1863,11 @@ PixMask *ArmyPixMaskCacheItem::generate(const ArmyPixMaskCacheItem &i)
 {
   PixMask *s;
   const ArmyProto * basearmy =
-    Armysetlist::getInstance()->getArmy(i.armyset, i.army_id);
+    Armysetlist::instance()->getArmy(i.armyset, i.army_id);
 
   // copy the pixmap including player colors
-  Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
-  Shield::Color c = Shield::Color(i.player_id);
-  PixMask *colored = basearmy->getMaskedImage (c)->applyMask (p);
+  PixMask *colored =
+    basearmy->getMaskedImage (Shield::Color (i.shield_id))->applyMask (i.shield_id);
   if (i.greyed)
     {
       PixMask *greyed_out = ImageCache::greyOut(colored);
@@ -1821,12 +1880,7 @@ PixMask *ArmyPixMaskCacheItem::generate(const ArmyPixMaskCacheItem &i)
   for(int j = 0; j < 3; j++)
     {
       if (i.medals[j])
-        ImageCache::getInstance()->getMedalImage(false, j)->blit(s->get_pixmap());
-    }
-  if (i.map == false)
-    {
-      int dialogsize = i.font_size * DIALOG_ARMY_PIC_FONTSIZE_MULTIPLE;
-      PixMask::scale (s, dialogsize, dialogsize);
+        ImageCache::instance()->getMedalImage(false, j)->blit(s->get_pixmap());
     }
   return s;
 }
@@ -1838,14 +1892,14 @@ int ArmyPixMaskCacheItem::comp(const ArmyPixMaskCacheItem &item) const
     (armyset > item.armyset)?  1 :
     (army_id < item.army_id) ? -1 :
     (army_id > item.army_id) ?  1 :
-    (player_id < item.player_id) ? -1 :
-    (player_id > item.player_id) ?  1 :
+    (shieldset < item.shieldset) ? -1 :
+    (shieldset > item.shieldset) ?  1 :
+    (shield_id < item.shield_id) ? -1 :
+    (shield_id > item.shield_id) ?  1 :
     (memcmp(medals,item.medals,sizeof(medals)) < 0) ? -1 :
     (memcmp(medals,item.medals,sizeof(medals)) > 0) ? 1 :
     (map < item.map) ? -1 :
     (map > item.map) ?  1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ?  1 :
     (greyed < item.greyed) ? -1 :
     (greyed > item.greyed) ?  1 :
     0;
@@ -1856,28 +1910,30 @@ PixMask *CircledArmyPixMaskCacheItem::generate(const CircledArmyPixMaskCacheItem
   PixMask *s;
   if (i.show_army)
     {
-      Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
       PixMask *pre_circle =
-        ImageCache::getInstance()->getArmyPic(i.armyset, i.army_id, p,
-                                              i.medals, false, i.font_size,
-                                              i.greyed);
-      s = ImageCache::circled(pre_circle, p->getColor(),
-                              i.circle_color_id != Shield::NEUTRAL);
+        ImageCache::instance ()->getArmyPic (i.armyset, i.army_id,
+                                             Shield::Color (i.shield_id),
+                                             i.medals, false, i.greyed);
+      if (i.shield_id != i.circle_color_id)
+        s = ImageCache::circle_outline (pre_circle, i.dark);
+      else
+        {
+          auto ssl = Shieldsetlist::instance ()->get (i.shieldset);
+          auto color = ssl->getColor (i.shield_id);
+          s = ImageCache::circled (pre_circle, color, i.dark,
+                                   i.circle_color_id != Shield::NEUTRAL);
+        }
     }
   else
     {
-      guint32 size = Armysetlist::getInstance()->get(i.armyset)->getTileSize();
-      Glib::RefPtr<Gdk::Pixbuf> pixbuf
-        = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, size, size);
-      pixbuf->fill(0x00000000);
-      PixMask *empty = PixMask::create(pixbuf);
-      s = ImageCache::circled
-        (empty, Shield::get_default_colors_for_no(i.circle_color_id)[0],
-         i.circle_color_id != Shield::NEUTRAL);
-      delete empty;
+      guint32 size = Armysetlist::instance ()->get (i.armyset)->getTileSize ();
+      Glib::RefPtr<Gdk::Pixbuf> empty_pic =
+        Gdk::Pixbuf::create (Gdk::Colorspace::RGB, true, 8, size, size);
+      empty_pic->fill (0x00000000);
+      auto pre_circle = PixMask::create (empty_pic);
+      s = ImageCache::circle_outline (pre_circle, i.dark);
+      delete pre_circle;
     }
-  int dialogsize = i.font_size * DIALOG_ARMY_PIC_FONTSIZE_MULTIPLE;
-  PixMask::scale (s, dialogsize, dialogsize);
   return s;
 }
 
@@ -1888,8 +1944,10 @@ int CircledArmyPixMaskCacheItem::comp(const CircledArmyPixMaskCacheItem &item) c
     (armyset > item.armyset)?  1 :
     (army_id < item.army_id) ? -1 :
     (army_id > item.army_id) ?  1 :
-    (player_id < item.player_id) ? -1 :
-    (player_id > item.player_id) ?  1 :
+    (shield_id < item.shield_id) ? -1 :
+    (shield_id > item.shield_id) ?  1 :
+    (shieldset < item.shieldset) ? -1 :
+    (shieldset > item.shieldset) ?  1 :
     (memcmp(medals,item.medals,sizeof(medals)) < 0) ? -1 :
     (memcmp(medals,item.medals,sizeof(medals)) > 0) ? 1 :
     (greyed < item.greyed) ?  -1 :
@@ -1898,20 +1956,18 @@ int CircledArmyPixMaskCacheItem::comp(const CircledArmyPixMaskCacheItem &item) c
     (circle_color_id > item.circle_color_id) ?  1 :
     (show_army < item.show_army) ?  -1 :
     (show_army > item.show_army) ?  1 :
-    (font_size < item.font_size) ?  -1 :
-    (font_size > item.font_size) ?  1 :
+    (dark < item.dark) ?  -1 :
+    (dark > item.dark) ?  1 :
     0;
 }
 
 PixMask *CircledShipPixMaskCacheItem::generate(const CircledShipPixMaskCacheItem &i)
 {
   PixMask *s;
-  Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
-  PixMask *pre_circle = ImageCache::getInstance ()->getShipPic (p);
-  s = ImageCache::circled(pre_circle, p->getColor(),
-                          i.circle_color_id != Shield::NEUTRAL);
-  int dialogsize = i.font_size * DIALOG_ARMY_PIC_FONTSIZE_MULTIPLE;
-  PixMask::scale (s, dialogsize, dialogsize);
+  PixMask *pre_circle =
+    ImageCache::instance ()->getShipPic (i.armyset,
+                                         Shield::Color (i.shield_id));
+  s = ImageCache::circle_outline (pre_circle, i.dark);
   return s;
 }
 
@@ -1920,26 +1976,27 @@ int CircledShipPixMaskCacheItem::comp(const CircledShipPixMaskCacheItem &item) c
   return
     (armyset < item.armyset) ? -1 :
     (armyset > item.armyset)?  1 :
-    (player_id < item.player_id) ? -1 :
-    (player_id > item.player_id) ?  1 :
+    (shieldset < item.shieldset) ? -1 :
+    (shieldset > item.shieldset)?  1 :
+    (shield_id < item.shield_id) ? -1 :
+    (shield_id > item.shield_id) ?  1 :
     (greyed < item.greyed) ?  -1 :
     (greyed > item.greyed) ?  1 :
     (circle_color_id < item.circle_color_id) ?  -1 :
     (circle_color_id > item.circle_color_id) ?  1 :
-    (font_size < item.font_size) ?  -1 :
-    (font_size > item.font_size) ?  1 :
+    (dark < item.dark) ?  -1 :
+    (dark > item.dark) ?  1 :
     0;
 }
 
 PixMask *CircledStandardPixMaskCacheItem::generate(const CircledStandardPixMaskCacheItem &i)
 {
   PixMask *s;
-  Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
-  PixMask *pre_circle = ImageCache::getInstance ()->getPlantedStandardPic(p);
-  s = ImageCache::circled(pre_circle, p->getColor(),
-                          i.circle_color_id != Shield::NEUTRAL);
-  int dialogsize = i.font_size * DIALOG_ARMY_PIC_FONTSIZE_MULTIPLE;
-  PixMask::scale (s, dialogsize, dialogsize);
+  PixMask *pre_circle =
+    ImageCache::instance ()->getPlantedStandardPic
+    (i.armyset, Shield::Color (i.shield_id));
+          
+  s = ImageCache::circle_outline (pre_circle, i.dark);
   return s;
 }
 
@@ -1948,22 +2005,24 @@ int CircledStandardPixMaskCacheItem::comp(const CircledStandardPixMaskCacheItem 
   return
     (armyset < item.armyset) ? -1 :
     (armyset > item.armyset)?  1 :
-    (player_id < item.player_id) ? -1 :
-    (player_id > item.player_id) ?  1 :
+    (shieldset < item.shieldset) ? -1 :
+    (shieldset > item.shieldset)?  1 :
+    (shield_id < item.shield_id) ? -1 :
+    (shield_id > item.shield_id) ?  1 :
     (greyed < item.greyed) ?  -1 :
     (greyed > item.greyed) ?  1 :
     (circle_color_id < item.circle_color_id) ?  -1 :
     (circle_color_id > item.circle_color_id) ?  1 :
-    (font_size < item.font_size) ?  -1 :
-    (font_size > item.font_size) ?  1 :
+    (dark < item.dark) ?  -1 :
+    (dark > item.dark) ?  1 :
     0;
 }
 
 PixMask *TilePixMaskCacheItem::generate(const TilePixMaskCacheItem &i)
 {
   PixMask *s;
-  Tileset *t = Tilesetlist::getInstance()->get(i.tileset);
-  guint32 uts = t->getUnscaledTileSize();
+  Tileset *t = Tilesetlist::instance()->get(i.tileset);
+  guint32 uts = t->getTileSize();
   if (i.fog_type_id == FogMap::ALL)
     s = t->getFog()->getImage(i.fog_type_id - 1)->copy();
   else
@@ -1977,24 +2036,41 @@ PixMask *TilePixMaskCacheItem::generate(const TilePixMaskCacheItem &i)
         {
         case Maptile::CITY:
             {
-              player = Playerlist::getInstance()->getPlayer(i.building_player_id);
-              ImageCache::getInstance()->getCityPic(i.building_subtype, player, i.cityset)->blit(i.building_tile, uts, pixmap);
+              player = Playerlist::instance()->get (i.building_player_id);
+              int span =
+                Citysetlist::instance ()->get (i.cityset)->getCityTileWidth ();
+              ImageCache::instance ()->getCityPic
+                (i.building_subtype, player, i.cityset)->blit
+                (i.building_tile, span, uts, pixmap);
             }
           break;
         case Maptile::RUIN:
-          ImageCache::getInstance()->getRuinPic(i.building_subtype, i.cityset)->blit(i.building_tile, uts, pixmap);
+            {
+              int span =
+                Citysetlist::instance ()->get (i.cityset)->getRuinTileWidth ();
+              ImageCache::instance ()->getRuinPic
+                (i.building_subtype, i.cityset)->blit
+                (i.building_tile, span, uts, pixmap);
+            }
           break;
         case Maptile::TEMPLE:
-          ImageCache::getInstance()->getTemplePic(i.building_subtype, i.cityset)->blit(i.building_tile, uts, pixmap);
+            {
+              int span =
+                Citysetlist::instance ()->get
+                (i.cityset)->getTempleTileWidth ();
+              ImageCache::instance ()->getTemplePic
+                (i.building_subtype, i.cityset)->blit
+                (i.building_tile, span, uts, pixmap);
+            }
           break;
         case Maptile::SIGNPOST:
-          ImageCache::getInstance()->getSignpostPic(i.cityset)->blit(i.building_tile, uts, pixmap);
+          ImageCache::instance()->getSignpostPic(i.cityset)->blit(i.building_tile, uts, pixmap);
           break;
         case Maptile::ROAD:
-          ImageCache::getInstance()->getRoadPic(i.building_subtype)->blit(i.building_tile, uts, pixmap);
+          ImageCache::instance()->getRoadPic(i.building_subtype)->blit(i.building_tile, uts, pixmap);
           if (i.stone_type != -1)
             {
-              Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
+              Tileset *ts = Tilesetlist::instance()->get(i.tileset);
               PixMask *p = ts->getStone()->getImage(i.stone_type);
               if (p)
                 p->blit(i.building_tile, uts, pixmap);
@@ -2002,17 +2078,17 @@ PixMask *TilePixMaskCacheItem::generate(const TilePixMaskCacheItem &i)
           break;
         case Maptile::STONE:
             {
-              Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
+              Tileset *ts = Tilesetlist::instance()->get(i.tileset);
               PixMask *p = ts->getStone()->getImage(i.stone_type);
               if (p)
                 p->blit(i.building_tile, uts, pixmap);
             }
           break;
         case Maptile::PORT:
-          ImageCache::getInstance()->getPortPic(i.cityset)->blit(i.building_tile, uts, pixmap);
+          ImageCache::instance()->getPortPic(i.cityset)->blit(i.building_tile, uts, pixmap);
           break;
         case Maptile::BRIDGE:
-          ImageCache::getInstance()->getBridgePic(i.building_subtype)->blit(i.building_tile, uts, pixmap);
+          ImageCache::instance()->getBridgePic(i.building_subtype)->blit(i.building_tile, uts, pixmap);
           break;
         case Maptile::NONE: default:
           break;
@@ -2020,29 +2096,31 @@ PixMask *TilePixMaskCacheItem::generate(const TilePixMaskCacheItem &i)
 
       if (i.has_bag)
         {
-          PixMask *pic = ImageCache::getInstance()->getBagPic();
+          PixMask *pic = ImageCache::instance()->getBagPic();
           pic->blit(pixmap);
         }
 
       if (i.has_standard)
         {
-          player = Playerlist::getInstance()->getPlayer(i.standard_player_id) ;
-          ImageCache::getInstance()->getPlantedStandardPic(player)->blit(pixmap);
+          player = Playerlist::instance()->get (i.standard_player_id) ;
+          ImageCache::instance()->getPlantedStandardPic
+            (player->getArmyset (), player->get_shield ())->blit(pixmap);
         }
 
       if (i.stack_player_id > -1)
         {
-          player = Playerlist::getInstance()->getPlayer(i.stack_player_id);
+          player = Playerlist::instance()->get (i.stack_player_id);
           if (i.has_tower)
-            ImageCache::getInstance()->getTowerPic(player)->blit(pixmap);
+            ImageCache::instance()->getTowerPic(player)->blit(pixmap);
           else
             {
               if (i.stack_size > -1)
-                ImageCache::getInstance()->getFlagPic(i.stack_size, player)->blit(pixmap);
+                ImageCache::instance()->getFlagPic(i.stack_size, player->get_shield ())->blit(pixmap);
               if (i.has_ship)
-                ImageCache::getInstance()->getShipPic(player)->blit(pixmap);
+                ImageCache::instance()->getShipPic
+                  (player->getArmyset (), player->get_shield ())->blit(pixmap);
               else
-                ImageCache::getInstance()->getArmyPic(player->getArmyset(), i.army_type_id, player, NULL, true, 0)->blit(pixmap);
+                ImageCache::instance()->getArmyPic(player->getArmyset(), i.army_type_id, player->get_shield (), NULL, true, 0)->blit(pixmap);
             }
         }
       if (i.has_grid)
@@ -2061,9 +2139,6 @@ PixMask *TilePixMaskCacheItem::generate(const TilePixMaskCacheItem &i)
       if (i.fog_type_id)
         t->getFog()->getImage(i.fog_type_id - 1)->blit(pixmap);
     }
-  int ts = t->getTileSize();
-  if (s->get_width () != ts)
-    s->scale (s, ts, ts);
   return s;
 }
 
@@ -2117,8 +2192,8 @@ int TilePixMaskCacheItem::comp(const TilePixMaskCacheItem &item) const
 
 PixMask *CityPixMaskCacheItem::generate(const CityPixMaskCacheItem &i)
 {
-  Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
-  Player *p = Playerlist::getInstance()->getPlayer(i.player_id);
+  Cityset *cs = Citysetlist::instance()->get(i.cityset);
+  Player *p = Playerlist::instance()->get (i.player_id);
   if (i.type == -1)
     return cs->getRazedCity()->getImage(p->getId())->copy();
   else
@@ -2139,7 +2214,7 @@ int CityPixMaskCacheItem::comp(const CityPixMaskCacheItem &item) const
 
 PixMask *TowerPixMaskCacheItem::generate(const TowerPixMaskCacheItem &i)
 {
-  Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
+  Cityset *cs = Citysetlist::instance()->get(i.cityset);
   return cs->getTower()->getImage(i.player_id)->copy();
 }
 
@@ -2155,7 +2230,7 @@ int TowerPixMaskCacheItem::comp(const TowerPixMaskCacheItem &item) const
 
 PixMask *TemplePixMaskCacheItem::generate(const TemplePixMaskCacheItem &i)
 {
-  Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
+  Cityset *cs = Citysetlist::instance()->get(i.cityset);
   return cs->getTemple()->getImage(i.type)->copy();
 }
 
@@ -2171,7 +2246,7 @@ int TemplePixMaskCacheItem::comp(const TemplePixMaskCacheItem &item) const
 
 PixMask *RuinPixMaskCacheItem::generate(const RuinPixMaskCacheItem &i)
 {
-  Cityset *cs = Citysetlist::getInstance()->get(i.cityset);
+  Cityset *cs = Citysetlist::instance()->get(i.cityset);
   return cs->getRuin()->getImage(i.type)->copy();
 }
 
@@ -2188,23 +2263,8 @@ int RuinPixMaskCacheItem::comp(const RuinPixMaskCacheItem &item) const
 PixMask *DiplomacyPixMaskCacheItem::generate(const DiplomacyPixMaskCacheItem &i)
 {
   PixMask *p =
-    ImageCache::getInstance()->getDiplomacyImage
+    ImageCache::instance()->getDiplomacyImage
     (i.type, Player::DiplomaticState(i.state - Player::AT_PEACE))->copy();
-  double ratio = 1;
-  switch (i.type)
-    {
-    case 0:
-      ratio = DIALOG_DIPLOMACY_TYPE_0_PIC_FONTSIZE_MULTIPLE;
-      break;
-    case 1:
-      ratio = DIALOG_DIPLOMACY_TYPE_1_PIC_FONTSIZE_MULTIPLE;
-      break;
-    }
-
-  double new_height = i.font_size * ratio;
-  int new_width =
-    ImageCache::calculate_width_from_adjusted_height (p, new_height);
-  PixMask::scale (p, new_width, new_height);
   return p;
 }
 
@@ -2215,14 +2275,12 @@ int DiplomacyPixMaskCacheItem::comp(const DiplomacyPixMaskCacheItem &item) const
     (type > item.type) ?  1 :
     (state < item.state) ? -1 :
     (state > item.state) ? 1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ? 1 :
     0;
 }
 
 PixMask *RoadPixMaskCacheItem::generate(const RoadPixMaskCacheItem &i)
 {
-  Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
+  Tileset *ts = Tilesetlist::instance()->get(i.tileset);
   return ts->getRoad()->getImage(i.type)->copy();
 }
 
@@ -2238,7 +2296,7 @@ int RoadPixMaskCacheItem::comp(const RoadPixMaskCacheItem &item) const
 
 PixMask *FogPixMaskCacheItem::generate(const FogPixMaskCacheItem &i)
 {
-  Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
+  Tileset *ts = Tilesetlist::instance()->get(i.tileset);
   return ts->getFog()->getImage(i.type - 1)->copy();
 }
 
@@ -2254,7 +2312,7 @@ int FogPixMaskCacheItem::comp(const FogPixMaskCacheItem &item) const
 
 PixMask *BridgePixMaskCacheItem::generate(const BridgePixMaskCacheItem &i)
 {
-  Tileset *ts = Tilesetlist::getInstance()->get(i.tileset);
+  Tileset *ts = Tilesetlist::instance()->get(i.tileset);
   return ts->getBridge()->getImage(i.type)->copy();
 }
 
@@ -2271,12 +2329,7 @@ int BridgePixMaskCacheItem::comp(const BridgePixMaskCacheItem &item) const
 PixMask *CursorPixMaskCacheItem::generate(const CursorPixMaskCacheItem &i)
 {
   PixMask *p =
-    ImageCache::getInstance()->getCursorImage(i.type)->copy();
-  double ratio = DIALOG_CURSOR_PIC_FONTSIZE_MULTIPLE;
-  double new_height = i.font_size * ratio;
-  int new_width =
-    ImageCache::calculate_width_from_adjusted_height (p, new_height);
-  PixMask::scale (p, new_width, new_height);
+    ImageCache::instance()->getCursorImage(i.type)->copy();
   return p;
 }
 
@@ -2285,37 +2338,17 @@ int CursorPixMaskCacheItem::comp(const CursorPixMaskCacheItem &item) const
   return
     (type < item.type) ? -1 :
     (type > item.type) ?  1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ?  1 :
     0;
 }
 
 PixMask *ShieldPixMaskCacheItem::generate(const ShieldPixMaskCacheItem &i)
 {
-  ShieldStyle *sh = Shieldsetlist::getInstance()->getShield(i.shieldset,
+  ShieldStyle *sh = Shieldsetlist::instance()->getShield(i.shieldset,
                                                             i.type, i.color);
-  PixMask *p =sh->getMaskedImage ()->applyMask
-    (Shieldsetlist::getInstance ()->getColors (i.shieldset, i.color));
+  auto colors = Shieldsetlist::instance ()->getColors (i.shieldset, i.color);
+  PixMask *p = sh->getMaskedImage ()->applyMask (colors);
   if (i.map)
     return p;
-  //okay now we size things accordingly.
-  double height_ratio = 1.0;
-  switch (i.type)
-    {
-    case 0:
-      height_ratio = DIALOG_SMALL_SHIELD_PIC_FONTSIZE_MULTIPLE;
-      break;
-    case 1:
-      height_ratio = DIALOG_MEDIUM_SHIELD_PIC_FONTSIZE_MULTIPLE;
-      break;
-    case 2:
-      height_ratio = DIALOG_LARGE_SHIELD_PIC_FONTSIZE_MULTIPLE;
-      break;
-    }
-  int new_height = i.font_size * height_ratio;
-  int new_width =
-    ImageCache::calculate_width_from_adjusted_height (p, new_height);
-  PixMask::scale (p, new_width, new_height);
   return p;
 }
 
@@ -2330,8 +2363,6 @@ int ShieldPixMaskCacheItem::comp(const ShieldPixMaskCacheItem &item) const
     (color > item.color) ?  1 :
     (map < item.map) ? -1 :
     (map > item.map) ?  1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ?  1 :
     0;
 }
 
@@ -2341,27 +2372,27 @@ PixMask *ProdShieldPixMaskCacheItem::generate(const ProdShieldPixMaskCacheItem &
     {
     case 0: //home city
       if (i.prod) //production
-        return ImageCache::getInstance()->getProdShieldImage(1)->copy();
+        return ImageCache::instance()->getProdShieldImage(1)->copy();
       else //no production
-        return ImageCache::getInstance()->getProdShieldImage(0)->copy();
+        return ImageCache::instance()->getProdShieldImage(0)->copy();
       break;
     case 1: //away city
       if (i.prod) //production
-        return ImageCache::getInstance()->getProdShieldImage(3)->copy();
+        return ImageCache::instance()->getProdShieldImage(3)->copy();
       else //no production
-        return ImageCache::getInstance()->getProdShieldImage(2)->copy();
+        return ImageCache::instance()->getProdShieldImage(2)->copy();
       break;
     case 2: //destination city
       if (i.prod) //production
-        return ImageCache::getInstance()->getProdShieldImage(5)->copy();
+        return ImageCache::instance()->getProdShieldImage(5)->copy();
       else //no production
-        return ImageCache::getInstance()->getProdShieldImage(4)->copy();
+        return ImageCache::instance()->getProdShieldImage(4)->copy();
       break;
     case 3: //source city
-      return ImageCache::getInstance()->getProdShieldImage(6)->copy();
+      return ImageCache::instance()->getProdShieldImage(6)->copy();
       break;
     case 4: //invalid
-      return ImageCache::getInstance()->getProdShieldImage(7)->copy();
+      return ImageCache::instance()->getProdShieldImage(7)->copy();
       break;
     }
   return NULL;
@@ -2433,7 +2464,7 @@ PixMask* MoveBonusPixMaskCacheItem::generateTwo (Tileset *t, guint32 bonus)
                                                   2.0/3.0);
  
   Glib::RefPtr<Gdk::Pixbuf> empty_pic =
-    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, width, height);
+    Gdk::Pixbuf::create(Gdk::Colorspace::RGB, true, 8, width, height);
   empty_pic->fill(0x00000000);
   PixMask *p = PixMask::create (empty_pic);
   if (im.size () != 2)
@@ -2447,7 +2478,7 @@ PixMask* MoveBonusPixMaskCacheItem::generateTwo (Tileset *t, guint32 bonus)
   for (auto part : parts)
     {
       part->blit (p->get_pixmap (), x, 0);
-      x += part->get_unscaled_width ();
+      x += part->get_width ();
     }
 
   for (auto part : parts)
@@ -2465,7 +2496,7 @@ PixMask* MoveBonusPixMaskCacheItem::generateThree (Tileset *t, guint32 bonus)
                                                   1.0/2.0);
 
   Glib::RefPtr<Gdk::Pixbuf> empty_pic =
-    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, width, height);
+    Gdk::Pixbuf::create(Gdk::Colorspace::RGB, true, 8, width, height);
   empty_pic->fill(0x00000000);
   PixMask *p = PixMask::create (empty_pic);
   if (im.size () != 3)
@@ -2480,7 +2511,7 @@ PixMask* MoveBonusPixMaskCacheItem::generateThree (Tileset *t, guint32 bonus)
   for (auto part : parts)
     {
       part->blit (p->get_pixmap (), x, 0);
-      x += part->get_unscaled_width ();
+      x += part->get_width ();
     }
   for (auto part : parts)
     delete part;
@@ -2496,7 +2527,7 @@ PixMask* MoveBonusPixMaskCacheItem::generateFour (Tileset *t, guint32 bonus)
                                                   1.0/2.0);
 
   Glib::RefPtr<Gdk::Pixbuf> empty_pic =
-    Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, width, height);
+    Gdk::Pixbuf::create(Gdk::Colorspace::RGB, true, 8, width, height);
   empty_pic->fill(0x00000000);
   PixMask *p = PixMask::create (empty_pic);
   if (im.size () != 4)
@@ -2512,7 +2543,7 @@ PixMask* MoveBonusPixMaskCacheItem::generateFour (Tileset *t, guint32 bonus)
   for (auto part : parts)
     {
       part->blit (p->get_pixmap (), x, 0);
-      x += part->get_unscaled_width ();
+      x += part->get_width ();
     }
 
   for (auto part : parts)
@@ -2521,8 +2552,7 @@ PixMask* MoveBonusPixMaskCacheItem::generateFour (Tileset *t, guint32 bonus)
   return p;
 }
 
-PixMask *MoveBonusPixMaskCacheItem::getMoveBonusPic(Tileset *t, guint32 bonus, guint32 font_size,
-                                                    double ratio)
+PixMask *MoveBonusPixMaskCacheItem::getMoveBonusPic(Tileset *t, guint32 bonus)
 {
   bool all = bonus == Tile::isFlying ();
   bool water = (bonus & Tile::WATER) == Tile::WATER;
@@ -2583,25 +2613,19 @@ PixMask *MoveBonusPixMaskCacheItem::getMoveBonusPic(Tileset *t, guint32 bonus, g
   if (p == NULL)
     {
       Glib::RefPtr<Gdk::Pixbuf> empty_pic =
-        Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, 32, 20);
+        Gdk::Pixbuf::create(Gdk::Colorspace::RGB, true, 8, 32, 20);
       empty_pic->fill(0x00000000);
       return PixMask::create (empty_pic);
     }
-
-  //finally, scale it
-  double new_height = font_size * ratio;
-  int new_width =
-    ImageCache::calculate_width_from_adjusted_height (p, new_height);
-  PixMask::scale (p, new_width, new_height);
 
   return p;
 }
 
 PixMask *MoveBonusPixMaskCacheItem::generate(const MoveBonusPixMaskCacheItem &i)
 {
-  Tileset *t = Tilesetlist::getInstance()->get(i.tileset);
+  Tileset *t = Tilesetlist::instance()->get(i.tileset);
   return MoveBonusPixMaskCacheItem::getMoveBonusPic
-    (t, i.bonus, i.font_size, DIALOG_MOVE_BONUS_PIC_FONTSIZE_MULTIPLE);
+    (t, i.bonus);
 }
 
 int MoveBonusPixMaskCacheItem::comp(const MoveBonusPixMaskCacheItem &item) const
@@ -2611,25 +2635,22 @@ int MoveBonusPixMaskCacheItem::comp(const MoveBonusPixMaskCacheItem &item) const
     (bonus > item.bonus) ?  1 :
     (tileset < item.tileset) ? -1 :
     (tileset > item.tileset) ?  1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ?  1 :
     0;
 }
 
 PixMask *ShipPixMaskCacheItem::generate(const ShipPixMaskCacheItem &i)
 {
   // copy the pixmap including player colors
-  if (i.player_id != MAX_PLAYERS)
+  if (i.shield_id != Shield::NEUTRAL)
     {
       TarFileMaskedImage * mim =
-        Armysetlist::getInstance()->getShipPic(i.armyset);
-      return mim->applyMask (i.player_id,
-                             Playerlist::getInstance()->getPlayer(i.player_id));
+        Armysetlist::instance()->getShipPic(i.armyset);
+      return mim->applyMask (i.shield_id);
     }
   else //we can put a neutral ship in the water in the editor
     {
       TarFileMaskedImage * mim =
-        Armysetlist::getInstance()->getShipPic(i.armyset);
+        Armysetlist::instance()->getShipPic(i.armyset);
 
       return mim->getImage ()->copy ();
     }
@@ -2638,8 +2659,10 @@ PixMask *ShipPixMaskCacheItem::generate(const ShipPixMaskCacheItem &i)
 int ShipPixMaskCacheItem::comp(const ShipPixMaskCacheItem &item) const
 {
   return
-    (player_id < item.player_id) ? -1 :
-    (player_id > item.player_id) ?  1 :
+    (shieldset < item.shieldset) ? -1 :
+    (shieldset > item.shieldset) ?  1 :
+    (shield_id < item.shield_id) ? -1 :
+    (shield_id > item.shield_id) ?  1 :
     (armyset < item.armyset) ? -1 :
     (armyset > item.armyset) ?  1 :
     0;
@@ -2647,18 +2670,17 @@ int ShipPixMaskCacheItem::comp(const ShipPixMaskCacheItem &item) const
 
 PixMask *PlantedStandardPixMaskCacheItem::generate(const PlantedStandardPixMaskCacheItem &i)
 {
-  if (i.player_id != MAX_PLAYERS)
+  if (i.shield_id != Shield::NEUTRAL)
     {
       TarFileMaskedImage *mim =
-        Armysetlist::getInstance()->getStandardPic (i.armyset);
+        Armysetlist::instance()->getStandardPic (i.armyset);
 
-      return mim->applyMask (i.player_id,
-                             Playerlist::getInstance()->getPlayer(i.player_id));
+      return mim->applyMask (i.shield_id);
     }
   else //we currently can't plant a neutral standard but just in case
     {
       TarFileMaskedImage * mim =
-        Armysetlist::getInstance()->getStandardPic(i.armyset);
+        Armysetlist::instance()->getStandardPic(i.armyset);
 
       return mim->getImage ()->copy ();
     }
@@ -2667,8 +2689,10 @@ PixMask *PlantedStandardPixMaskCacheItem::generate(const PlantedStandardPixMaskC
 int PlantedStandardPixMaskCacheItem::comp(const PlantedStandardPixMaskCacheItem &item) const
 {
   return
-    (player_id < item.player_id) ? -1 :
-    (player_id > item.player_id) ?  1 :
+    (shieldset < item.shieldset) ? -1 :
+    (shieldset > item.shieldset) ?  1 :
+    (shield_id < item.shield_id) ? -1 :
+    (shield_id > item.shield_id) ?  1 :
     (armyset < item.armyset) ? -1 :
     (armyset > item.armyset) ?  1 :
     0;
@@ -2677,7 +2701,7 @@ int PlantedStandardPixMaskCacheItem::comp(const PlantedStandardPixMaskCacheItem 
 PixMask *PortPixMaskCacheItem::generate(const PortPixMaskCacheItem &i)
 {
   return
-    Citysetlist::getInstance()->get(i.cityset)->getPort()->getImage()->copy();
+    Citysetlist::instance()->get(i.cityset)->getPort()->getImage()->copy();
 }
 
 int PortPixMaskCacheItem::comp(const PortPixMaskCacheItem &item) const
@@ -2690,7 +2714,7 @@ int PortPixMaskCacheItem::comp(const PortPixMaskCacheItem &item) const
 
 PixMask *SignpostPixMaskCacheItem::generate(const SignpostPixMaskCacheItem &i)
 {
-  return Citysetlist::getInstance()->get(i.cityset)->getSignpost ()->getImage()->copy();
+  return Citysetlist::instance()->get(i.cityset)->getSignpost ()->getImage()->copy();
 }
 
 int SignpostPixMaskCacheItem::comp(const SignpostPixMaskCacheItem &item) const
@@ -2703,7 +2727,7 @@ int SignpostPixMaskCacheItem::comp(const SignpostPixMaskCacheItem &item) const
 
 PixMask *BagPixMaskCacheItem::generate(const BagPixMaskCacheItem &i)
 {
-  return Armysetlist::getInstance()->getBag(i.armyset)->getImage ()->copy();
+  return Armysetlist::instance()->getBag(i.armyset)->getImage ()->copy();
 }
 
 int BagPixMaskCacheItem::comp(const BagPixMaskCacheItem &item) const
@@ -2716,7 +2740,7 @@ int BagPixMaskCacheItem::comp(const BagPixMaskCacheItem &item) const
 
 PixMask *ExplosionPixMaskCacheItem::generate(const ExplosionPixMaskCacheItem &i)
 {
-  return Tilesetlist::getInstance()->get(i.tileset)->getExplosion()->getImage()->copy();
+  return Tilesetlist::instance()->get(i.tileset)->getExplosion()->getImage()->copy();
 }
 
 int ExplosionPixMaskCacheItem::comp(const ExplosionPixMaskCacheItem &item) const
@@ -2731,37 +2755,30 @@ PixMask *NewLevelPixMaskCacheItem::generate(const NewLevelPixMaskCacheItem &i)
 {
   bool female = i.gender == Hero::FEMALE;
   TarFileMaskedImage *mim = 
-    ImageCache::getInstance()->getHeroNewLevelMaskedImage (female);
-  PixMask *p =
-    mim->applyMask (Playerlist::getInstance()->getPlayer(i.player_id));
+    ImageCache::instance()->getHeroNewLevelMaskedImage (female);
+  PixMask *p = mim->applyMask (i.shield_id);
 
-  double ratio = DIALOG_NEW_LEVEL_PIC_FONTSIZE_MULTIPLE;
-  double new_height = i.font_size * ratio;
-  int new_width =
-    ImageCache::calculate_width_from_adjusted_height (p, new_height);
-  PixMask::scale (p, new_width, new_height);
   return p;
 }
 
 int NewLevelPixMaskCacheItem::comp(const NewLevelPixMaskCacheItem &item) const
 {
   return
-    (player_id < item.player_id) ? -1 :
-    (player_id > item.player_id) ?  1 :
+    (shieldset < item.shieldset) ? -1 :
+    (shieldset > item.shieldset) ?  1 :
+    (shield_id < item.shield_id) ? -1 :
+    (shield_id > item.shield_id) ?  1 :
     (gender < item.gender) ? -1 :
     (gender > item.gender) ?  1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ?  1 :
     0;
 }
 
 PixMask *DefaultTileStylePixMaskCacheItem::generate(const DefaultTileStylePixMaskCacheItem &i)
 {
   PixMask *t =
-    ImageCache::getInstance()->getDefaultTileStyleImage(i.tilestyle_type);
-  PixMask *s = t->copy();
-  PixMask::scale(s, i.tilesize, i.tilesize);
-  return s;
+    ImageCache::instance()->getDefaultTileStyleImage(i.tilestyle_type);
+
+  return t->scale (i.tilesize, i.tilesize);
 }
 
 int DefaultTileStylePixMaskCacheItem::comp(const DefaultTileStylePixMaskCacheItem &item) const
@@ -2774,197 +2791,42 @@ int DefaultTileStylePixMaskCacheItem::comp(const DefaultTileStylePixMaskCacheIte
     0;
 }
 
-void TartanPixMaskCacheItem::calculateWidth(guint32 iwidth, PixMask *left, PixMask *center, PixMask *right, guint32 &width, guint32 &centers, bool &include_right)
-{
-  //calculate the width, ugh.
-  for (width = left->get_width(); width < iwidth - right->get_width();
-       width += center->get_width())
-    centers++;
-  width += right->get_width();
-  include_right = true;
-  for (guint32 j = 0; j < centers; j++)
-    {
-      if (width > iwidth)
-        {
-          width -= center->get_width();
-          if (centers)
-            centers--;
-        }
-      else
-        break;
-    }
-  if (width > iwidth)
-    {
-      width -= right->get_width();
-      include_right = false;
-    }
-}
-
 PixMask *TartanPixMaskCacheItem::generate(const TartanPixMaskCacheItem &i)
 {
-  //okay, here's where we fashion the new image.
-  //we take the leftmost tartan image for this player
-  //and then we repeat the center tartan image a bunch of times
-  //and then finally we cap it off with the rightmost tartan image
-  //the images are all masked in the player's color.
+  auto s = Shieldsetlist::instance ()->get (i.shieldset);
 
-  std::vector<Gdk::RGBA> colors =
-    Shieldsetlist::getInstance()->getColors(i.shieldset, i.player_id);
-  TarFileMaskedImage *mim =
-    Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                            Tartan::LEFT);
-  Player *player = Playerlist::getInstance ()->getPlayer (i.player_id);
-  PixMask *left = mim->applyMask (colors);
-  double ratio = DIALOG_TARTAN_PIC_FONTSIZE_MULTIPLE;
-  double new_height = i.font_size * ratio;
-  int new_width =
-    ImageCache::calculate_width_from_adjusted_height (left, new_height);
-  PixMask::scale (left, new_width, new_height);
-
-  mim = Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                                Tartan::CENTER);
-  PixMask *center = mim->applyMask (player);
-  new_width =
-    ImageCache::calculate_width_from_adjusted_height (center, new_height);
-  PixMask::scale (center, new_width, new_height);
-  mim =Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                               Tartan::RIGHT);
-  PixMask *right = mim->applyMask (player);
-  new_width =
-    ImageCache::calculate_width_from_adjusted_height (right, new_height);
-  PixMask::scale (right, new_width, new_height);
-  //okay, so we have our left, right and center images, now we need to
-  //concatenate them together
-
-  guint32 w = 0, num_centers = 0;
-  bool include_right = false;
-  calculateWidth(i.width, left, center, right, w, num_centers, include_right);
-  //okay w is the actual width of the image, which is the same or less than
-  //the width we asked for.  it has NUM_CENTERS center pieces and it may or may
-  //not have an ending piece (if we can fit it.)
-  //we always have the leftmost piece though because we have to show something.
-  Glib::RefPtr<Gdk::Pixbuf> pixbuf
-    = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, w, left->get_height());
-  pixbuf->fill(0x00000000);
-  PixMask *tartan = PixMask::create(pixbuf);
-
-  //blit the left image
-  guint32 l = 0;
-  left->blit (tartan->get_pixmap(), l, 0);
-  l += left->get_width();
-
-  //blit the center images
-  for (guint32 j = 0; j < num_centers; j++)
-    {
-      center->blit (tartan->get_pixmap(), l, 0);
-      l += center->get_width();
-    }
-
-  //blit the right image
-  if (include_right)
-    right->blit (tartan->get_pixmap(), l, 0);
-  delete left;
-  delete center;
-  delete right;
-  return tartan;
+  return Shield::get_progress_bar_completed (s, Shield::Color (i.shield),
+                                             i.width);
 }
 
 int TartanPixMaskCacheItem::comp(const TartanPixMaskCacheItem &item) const
 {
   return
-    (player_id < item.player_id) ? -1 :
-    (player_id > item.player_id) ?  1 :
+    (shield < item.shield) ? -1 :
+    (shield > item.shield) ?  1 :
     (width < item.width) ? -1 :
     (width > item.width) ?  1 :
     (shieldset < item.shieldset) ? -1 :
     (shieldset > item.shieldset) ?  1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ?  1 :
     0;
 }
 
 PixMask *EmptyTartanPixMaskCacheItem::generate(const EmptyTartanPixMaskCacheItem &i)
 {
-  //okay, here's where we fashion the new image.
-  //we take the leftmost tartan image for this player
-  //and then we repeat the center tartan image a bunch of times
-  //and then finally we cap it off with the rightmost tartan image
-  //the images are all masked in the player's color.
-
-  //the empty tartan pictures are the same as the regular tartan pictures
-  //except they're not colored in the player's color.
-
-  TarFileMaskedImage *mim =
-    Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                            Tartan::LEFT);
-  PixMask *left = mim->getImage ()->copy();
-  double ratio = DIALOG_TARTAN_PIC_FONTSIZE_MULTIPLE;
-  double new_height = i.font_size * ratio;
-  int new_width =
-    ImageCache::calculate_width_from_adjusted_height (left, new_height);
-  PixMask::scale (left, new_width, new_height);
-
-  mim = Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                                Tartan::CENTER);
-  PixMask *center = mim->getImage ()->copy();
-  new_width =
-    ImageCache::calculate_width_from_adjusted_height (center, new_height);
-  PixMask::scale (center, new_width, new_height);
-
-  mim = Shieldsetlist::getInstance()->getTartan(i.shieldset, i.player_id,
-                                                Tartan::RIGHT);
-  PixMask *right = mim->getImage ()->copy();
-  new_width =
-    ImageCache::calculate_width_from_adjusted_height (right, new_height);
-  PixMask::scale (right, new_width, new_height);
-
-  //okay, so we have our left, right and center images, now we need to
-  //concatenate them together
-
-  guint32 w = 0, num_centers = 0;
-  bool include_right = false;
-  TartanPixMaskCacheItem::calculateWidth(i.width, left, center, right, w, num_centers, include_right);
-  //okay w is the actual width of the image, which is the same or less than
-  //the width we asked for.  it has NUM_CENTERS center pieces and it may or may
-  //not have an ending piece (if we can fit it.)
-  //we always have the leftmost piece though because we have to show something.
-  Glib::RefPtr<Gdk::Pixbuf> pixbuf
-    = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, w, left->get_height());
-  pixbuf->fill(0x00000000);
-  PixMask *tartan = PixMask::create(pixbuf);
-
-  //blit the left image
-  guint32 l = 0;
-  left->blit (tartan->get_pixmap(), l, 0);
-  l += left->get_width();
-
-  //blit the center images
-  for (guint32 j = 0; j < num_centers; j++)
-    {
-      center->blit (tartan->get_pixmap(), l, 0);
-      l += center->get_width();
-    }
-
-  //blit the right image
-  if (include_right)
-    right->blit (tartan->get_pixmap(), l, 0);
-  delete left;
-  delete center;
-  delete right;
-  return tartan;
+  auto s = Shieldsetlist::instance ()->get (i.shieldset);
+  return Shield::get_progress_bar_uncompleted (s, Shield::Color (i.shield),
+                                               i.width);
 }
 
 int EmptyTartanPixMaskCacheItem::comp(const EmptyTartanPixMaskCacheItem &item) const
 {
   return
-    (player_id < item.player_id) ? -1 :
-    (player_id > item.player_id) ?  1 :
+    (shield < item.shield) ? -1 :
+    (shield > item.shield) ?  1 :
     (width < item.width) ? -1 :
     (width > item.width) ?  1 :
     (shieldset < item.shieldset) ? -1 :
     (shieldset > item.shieldset) ?  1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ?  1 :
     0;
 }
 
@@ -2992,16 +2854,6 @@ PixMask *StatusPixMaskCacheItem::generate(const StatusPixMaskCacheItem &i)
 
   bool broken = false;
   PixMask *p = PixMask::create (file, broken);
-  if (!broken)
-    {
-      double ratio = DIALOG_STATUS_PIC_FONTSIZE_MULTIPLE;
-      if (i.type == ImageCache::STATUS_DEFENSE)
-        ratio = DIALOG_DEFENSE_PIC_FONTSIZE_MULTIPLE;
-      double new_height = i.font_size * ratio;
-      int new_width =
-        ImageCache::calculate_width_from_adjusted_height (p, new_height);
-      PixMask::scale (p, new_width, new_height);
-    }
   return p;
 }
 
@@ -3010,24 +2862,14 @@ int StatusPixMaskCacheItem::comp(const StatusPixMaskCacheItem &item) const
   return
     (type < item.type) ? -1 :
     (type > item.type) ?  1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ?  1 :
     0;
 }
 
 PixMask *GameButtonPixMaskCacheItem::generate(const GameButtonPixMaskCacheItem &i)
 {
   PixMask *p =
-    ImageCache::getInstance ()->getGameButtonImage (i.type)->copy ();
+    ImageCache::instance ()->getGameButtonImage (i.type)->copy ();
 
-  if (p)
-    {
-      double ratio = DIALOG_GAME_BUTTON_PIC_FONTSIZE_MULTIPLE;
-      double new_height = i.font_size * ratio;
-      int new_width =
-        ImageCache::calculate_width_from_adjusted_height (p, new_height);
-      PixMask::scale (p, new_width, new_height);
-    }
   return p;
 }
 
@@ -3036,65 +2878,45 @@ int GameButtonPixMaskCacheItem::comp(const GameButtonPixMaskCacheItem &item) con
   return
     (type < item.type) ? -1 :
     (type > item.type) ?  1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ?  1 :
     0;
 }
 
 PixMask *DialogPixMaskCacheItem::generate(const DialogPixMaskCacheItem &i)
 {
   PixMask *p = NULL;
-  double ratio = 1;
-  ImageCache *ic = ImageCache::getInstance ();
+  ImageCache *ic = ImageCache::instance ();
   switch (i.type)
     {
     case ImageCache::DIALOG_NEXT_TURN:
       p = ic->getNextTurnImage ()->getImage ()->copy ();
-      ratio = DIALOG_NEXT_TURN_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_NEW_HERO_MALE:
       p = ic->getHeroOfferedImage(Hero::MALE)->getImage ()->copy ();
-      ratio = DIALOG_NEW_HERO_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_NEW_HERO_FEMALE:
       p = ic->getHeroOfferedImage(Hero::FEMALE)->getImage ()->copy ();
-      ratio = DIALOG_NEW_HERO_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_CONQUERED_CITY:
       p = ic->getCityDefeatedImage ()->getImage ()->copy ();
-      ratio = DIALOG_CONQUERED_CITY_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_WINNING:
       p = ic->getWinningImage()->getImage ()->copy ();
-      ratio = DIALOG_WINNING_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_RUIN_SUCCESS:
       p = ic->getRuinSuccessImage()->getImage ()->copy ();
-      ratio = DIALOG_RUIN_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_RUIN_DEFEAT:
       p = ic->getRuinDefeatImage()->getImage ()->copy ();
-      ratio = DIALOG_RUIN_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_PARLEY_OFFERED:
       p = ic->getParleyOfferedImage()->getImage ()->copy ();
-      ratio = DIALOG_PARLEY_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_PARLEY_REFUSED:
       p = ic->getParleyRefusedImage()->getImage ()->copy ();
-      ratio = DIALOG_PARLEY_PIC_FONT_SIZE_MULTIPLE;
       break;
     case ImageCache::DIALOG_COMMENTATOR:
       p = ic->getCommentatorImage()->getImage ()->copy ();
-      ratio = DIALOG_COMMENTATOR_PIC_FONT_SIZE_MULTIPLE;
       break;
-    }
-  if (p)
-    {
-      double new_height = i.font_size * ratio;
-      int new_width =
-        ImageCache::calculate_width_from_adjusted_height (p, new_height);
-      PixMask::scale (p, new_width, new_height);
     }
   return p;
 }
@@ -3104,27 +2926,17 @@ int DialogPixMaskCacheItem::comp(const DialogPixMaskCacheItem &item) const
   return
     (type < item.type) ? -1 :
     (type > item.type) ?  1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ?  1 :
     0;
 }
 
 PixMask *MedalPixMaskCacheItem::generate(const MedalPixMaskCacheItem &i)
 {
   PixMask *p =
-    ImageCache::getInstance ()->getMedalImage (i.large, i.type)->copy ();
+    ImageCache::instance ()->getMedalImage (i.large, i.type)->copy ();
 
   if (i.large == false)
     return p;
 
-  if (p)
-    {
-      double ratio = DIALOG_MEDAL_PIC_FONTSIZE_MULTIPLE;
-      double new_height = i.font_size * ratio;
-      int new_width =
-        ImageCache::calculate_width_from_adjusted_height (p, new_height);
-      PixMask::scale (p, new_width, new_height);
-    }
   return p;
 }
 
@@ -3135,7 +2947,215 @@ int MedalPixMaskCacheItem::comp(const MedalPixMaskCacheItem &item) const
     (large > item.large) ?  1 :
     (type < item.type) ? -1 :
     (type > item.type) ?  1 :
-    (font_size < item.font_size) ? -1 :
-    (font_size > item.font_size) ?  1 :
     0;
+}
+
+PixMask *BoxPixMaskCacheItem::generate(const BoxPixMaskCacheItem &i)
+{
+  auto p = PixMask::create (i.size);
+  auto cr = Cairo::Context::create (p->get_pixmap ());
+  if (!i.rounded)
+    ImageCache::draw_rectangle (cr, i.size, i.size, i.color, i.dashed,
+                                i.line_width, i.offset);
+  else
+    ImageCache::draw_rounded_rectangle (cr, i.size, i.size, i.color,
+                                        i.dashed, i.line_width,
+                                        i.offset);
+
+  return p;
+}
+
+int BoxPixMaskCacheItem::comp(const BoxPixMaskCacheItem &item) const
+{
+  return
+    (size < item.size) ? -1 :
+    (size > item.size) ?  1 :
+    (color.to_string () < item.color.to_string ()) ? -1 :
+    (color.to_string () > item.color.to_string ()) ?  1 :
+    (rounded < item.rounded) ? -1 :
+    (rounded > item.rounded) ?  1 :
+    (dashed < item.dashed) ? -1 :
+    (dashed > item.dashed) ?  1 :
+    (line_width < item.line_width) ? -1 :
+    (line_width > item.line_width) ?  1 :
+    (offset < item.offset) ? -1 :
+    (offset > item.offset) ?  1 :
+    0;
+}
+
+void ImageCache::draw_rectangle (Cairo::RefPtr<Cairo::Context> cr,
+                                 int width, int height, Gdk::RGBA color,
+                                 bool dashed, int line_width, bool offset)
+{
+  cr->set_line_width (line_width);
+  double red = color.get_red ();
+  double green = color.get_green ();
+  double blue = color.get_blue ();
+  cr->set_source_rgb (red, green, blue);
+
+  double x = 0;
+  double y = 0;
+  double w = width;
+  double h = height;
+  if (offset)
+    {
+      x += line_width;
+      y += line_width;
+      w -= (line_width * 2);
+      h -= (line_width * 2);
+    }
+  if (dashed)
+    {
+      std::vector<double> dashes;
+      dashes.push_back (width / 7);
+      dashes.push_back (width / 7);
+      cr->set_dash (dashes, 0);
+    }
+
+  cr->rectangle (x, y, w, h);
+  cr->stroke ();
+  cr->unset_dash ();
+}
+
+void ImageCache::draw_rounded_rectangle (Cairo::RefPtr<Cairo::Context> cr,
+                                         int width, int height, Gdk::RGBA color,
+                                         bool dashed, int line_width, bool offset)
+{
+  double w = width;
+  double h = height;
+  double r = w / 8;
+  const double pi = M_PI;
+
+  double x = 0;
+  double y = 0;
+  cr->set_line_width (line_width);
+
+  if (offset)
+    {
+      x += line_width;
+      y += line_width;
+      w -= (line_width * 2);
+      h -= (line_width * 2);
+    }
+  double red = color.get_red ();
+  double green = color.get_green ();
+  double blue = color.get_blue ();
+  cr->set_source_rgb (red, green, blue);
+
+  if (dashed)
+    {
+      std::vector<double> dashes;
+      dashes.push_back (width / 7);
+      dashes.push_back (width / 7);
+      cr->set_dash (dashes, 0);
+    }
+
+  cr->begin_new_sub_path ();
+
+  // top-left corner
+  cr->arc (x + r, y + r, r, pi, 3 * pi / 2);
+
+  // top edge
+  cr->line_to (x + w - r, y);
+
+  // top-right corner
+  cr->arc (x + w - r, y + r, r, 3 * pi / 2, 0);
+
+  // right edge
+  cr->line_to (x + w, y + h - r);
+
+  // bottom-right corner
+  cr->arc (x + w - r, y + h - r, r, 0, pi / 2);
+
+  // bottom edge
+  cr->line_to (x + r, y + h);
+
+  // bottom-left corner
+  cr->arc (x + r, y + h - r, r, pi / 2, pi);
+
+  // left edge
+  cr->line_to (x, y + r);
+
+  cr->close_path ();
+  cr->stroke ();
+  cr->unset_dash ();
+}
+
+void ImageCache::get_bevel_colors (bool darkmode, Gdk::RGBA &light, Gdk::RGBA &dark)
+{
+  switch (darkmode)
+    {
+    case true:
+      light = BEVELED_CIRCLE_LIGHT;
+      dark = BEVELED_CIRCLE_DARK;
+      break;
+    case false:
+      light = DARK_MODE_BEVELED_CIRCLE_LIGHT;
+      dark = DARK_MODE_BEVELED_CIRCLE_DARK;
+      break;
+    }
+}
+
+Vector<int> ImageCache::get_hotspot (CursorType c)
+{
+  Vector<int> hotspot = Vector<int>(4, 4);
+  switch (c)
+    {
+    case POINTER:
+      hotspot = Vector<int>(0, 0);
+      break;
+
+    case MAGNIFYING_GLASS:
+      hotspot = Vector<int>(8, 5);
+      break;
+
+    case SHIP:
+      hotspot = Vector<int>(7, 7);
+      break;
+
+    case ROOK:
+      hotspot = Vector<int>(7, 7);
+      break;
+
+    case HAND:
+      hotspot = Vector<int>(7, 7);
+      break;
+
+    case TARGET:
+      hotspot = Vector<int>(7, 7);
+      break;
+
+    case FEET:
+      hotspot = Vector<int>(6, 6);
+      break;
+
+    case RUIN:
+      hotspot = Vector<int>(6, 6);
+      break;
+
+    case SWORD:
+      hotspot = Vector<int>(7, 7);
+      break;
+
+    case QUESTION:
+      hotspot = Vector<int>(7, 7);
+      break;
+
+    case HEART:
+      hotspot = Vector<int>(7, 7);
+      break;
+
+    case GOTO_ARROW:
+      hotspot = Vector<int>(0, 0);
+      break;
+
+    case CLOSED_HAND:
+      hotspot = Vector<int>(7, 7);
+      break;
+
+    case HAND_POINTER:
+      hotspot = Vector<int>(4, 1);
+      break;
+    }
+  return hotspot;
 }

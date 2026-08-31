@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef REWARD_EDITOR_ACTIONS_H
-#define REWARD_EDITOR_ACTIONS_H
+#ifndef REWARD_UNDO_ACTIONS_H
+#define REWARD_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
@@ -32,185 +31,354 @@
  * editor.
  */
 
-class RewardEditorAction: public UndoAction
+class RewardUndoAction: public UndoAction
 {
-    public:
+public:
 
-        enum Type
-          {
-            TYPE = 1,
-            GOLD_PIECES = 2,
-            RANDOMIZE_GOLD = 3,
-            ITEM = 4,
-            RANDOMIZE_ITEM = 5,
-            ALLY_TYPE = 6,
-            RANDOMIZE_ALLY = 7,
-            ALLY_COUNT = 8,
-            XCOORD = 9,
-            YCOORD = 10,
-            WIDTH = 11,
-            HEIGHT = 12,
-            RANDOMIZE_MAP = 13,
-            HIDDEN_RUIN = 14,
-            RANDOM_RUIN = 15
-          };
+    enum Type
+      {
+        TYPE = 1,
+        GOLD_PIECES = 2,
+        RANDOMIZE_GOLD = 3,
+        ITEM = 4,
+        RANDOMIZE_ITEM = 5,
+        ALLY_TYPE = 6,
+        RANDOMIZE_ALLY = 7,
+        ALLY_COUNT = 8,
+        XCOORD = 9,
+        YCOORD = 10,
+        WIDTH = 11,
+        HEIGHT = 12,
+        MAP_NAME = 13,
+        RANDOMIZE_MAP = 14,
+        HIDDEN_RUIN = 15,
+        RANDOM_RUIN = 16
+      };
 
-	//! Default constructor.
-        RewardEditorAction(Type type, UndoAction::AggregateType aggregate = UndoAction::AGGREGATE_NONE) : UndoAction (aggregate), d_type(type) {}
+    //! Default constructor.
+    RewardUndoAction (Type type,
+                        UndoAction::AggregateType aggregate =
+                        UndoAction::AGGREGATE_NONE) :
+        UndoAction (aggregate), m_type (type)
+  {
+  }
 
-        Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
-    protected:
+protected:
 
-        Type d_type;
+    Type m_type;
 };
 
-class RewardEditorAction_Reward: public RewardEditorAction
+class RewardUndoAction_Reward: public RewardUndoAction
 {
-    public:
-        RewardEditorAction_Reward (Type t, Reward *r, bool agg = false)
-          : RewardEditorAction (t, agg ? UndoAction::AGGREGATE_DELAY : UndoAction::AGGREGATE_NONE), d_reward (Reward::copy (r)) { }
-        ~RewardEditorAction_Reward () { delete d_reward; }
+public:
+    RewardUndoAction_Reward (Type t, Reward *r, bool agg = false)
+      : RewardUndoAction (t, agg ? UndoAction::AGGREGATE_DELAY :
+                            UndoAction::AGGREGATE_NONE),
+      m_reward (Reward::copy (r))
+        {
+        }
 
-        Reward *getReward () const {return d_reward;}
-    private:
-        Reward *d_reward;
+    ~RewardUndoAction_Reward ()
+      {
+        delete m_reward;
+      }
+
+    Reward *get_reward () const
+      {
+        return m_reward;
+      }
+private:
+    Reward *m_reward;
 };
 
-class RewardEditorAction_Type : public RewardEditorAction_Reward
+class RewardUndoAction_Type : public RewardUndoAction_Reward
 {
-    public:
-        RewardEditorAction_Type (Reward *r)
-          :RewardEditorAction_Reward (TYPE, r, false) {}
-        ~RewardEditorAction_Type () {}
+public:
+    RewardUndoAction_Type (Reward *r)
+      : RewardUndoAction_Reward (TYPE, r, false)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Type";}
-};
-class RewardEditorAction_Gold: public RewardEditorAction_Reward
-{
-    public:
-        RewardEditorAction_Gold (Reward *r)
-          :RewardEditorAction_Reward (GOLD_PIECES, r, true) {}
-        ~RewardEditorAction_Gold () {}
+    ~RewardUndoAction_Type ()
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Gold";}
-};
-class RewardEditorAction_RandomizeGold : public RewardEditorAction_Reward
-{
-    public:
-        RewardEditorAction_RandomizeGold (Reward *r)
-          :RewardEditorAction_Reward (RANDOMIZE_GOLD, r, false) {}
-        ~RewardEditorAction_RandomizeGold () {}
-
-        Glib::ustring getActionName () const {return "RandomizeGold";}
-};
-class RewardEditorAction_Item : public RewardEditorAction_Reward
-{
-    public:
-        RewardEditorAction_Item (Reward *r)
-          :RewardEditorAction_Reward (ITEM, r, false) {}
-        ~RewardEditorAction_Item () {}
-
-        Glib::ustring getActionName () const {return "Item";}
-};
-class RewardEditorAction_RandomizeItem : public RewardEditorAction_Reward
-{
-    public:
-        RewardEditorAction_RandomizeItem (Reward *r)
-          :RewardEditorAction_Reward (RANDOMIZE_ITEM, r, false) {}
-        ~RewardEditorAction_RandomizeItem () {}
-
-        Glib::ustring getActionName () const {return "RandomizeItem";}
-};
-class RewardEditorAction_AllyType : public RewardEditorAction_Reward
-{
-    public:
-        RewardEditorAction_AllyType (Reward *r)
-          :RewardEditorAction_Reward (ALLY_TYPE, r, false) {}
-        ~RewardEditorAction_AllyType () {}
-
-        Glib::ustring getActionName () const {return "AllyType";}
-};
-class RewardEditorAction_RandomizeAlly : public RewardEditorAction_Reward
-{
-    public:
-        RewardEditorAction_RandomizeAlly (Reward *r)
-          :RewardEditorAction_Reward (RANDOMIZE_ALLY, r, false) {}
-        ~RewardEditorAction_RandomizeAlly () {}
-
-        Glib::ustring getActionName () const {return "RandomizeAlly";}
-};
-class RewardEditorAction_AllyCount : public RewardEditorAction_Reward
-{
-    public:
-        RewardEditorAction_AllyCount (Reward *r)
-          :RewardEditorAction_Reward (ALLY_COUNT, r, true) {}
-        ~RewardEditorAction_AllyCount () {}
-
-        Glib::ustring getActionName () const {return "AllyCount";}
-};
-class RewardEditorAction_XCoord : public RewardEditorAction_Reward
-{
-    public:
-        RewardEditorAction_XCoord (Reward *r)
-          :RewardEditorAction_Reward (XCOORD, r, true) {}
-        ~RewardEditorAction_XCoord () {}
-
-        Glib::ustring getActionName () const {return "XCoord";}
-};
-class RewardEditorAction_YCoord : public RewardEditorAction_Reward
-{
-    public:
-        RewardEditorAction_YCoord (Reward *r)
-          :RewardEditorAction_Reward (YCOORD, r, true) {}
-        ~RewardEditorAction_YCoord () {}
-
-        Glib::ustring getActionName () const {return "YCoord";}
-};
-class RewardEditorAction_Width : public RewardEditorAction_Reward
-{
-    public:
-        RewardEditorAction_Width (Reward *r)
-          :RewardEditorAction_Reward (WIDTH, r, true) {}
-        ~RewardEditorAction_Width () {}
-
-        Glib::ustring getActionName () const {return "Width";}
-};
-class RewardEditorAction_Height : public RewardEditorAction_Reward
-{
-    public:
-        RewardEditorAction_Height (Reward *r)
-          :RewardEditorAction_Reward (HEIGHT, r, true) {}
-        ~RewardEditorAction_Height () {}
-
-        Glib::ustring getActionName () const {return "Height";}
+    Glib::ustring get_action_name () const {return "Type";}
 };
 
-class RewardEditorAction_RandomizeMap : public RewardEditorAction_Reward
+class RewardUndoAction_Gold: public RewardUndoAction_Reward
 {
-    public:
-        RewardEditorAction_RandomizeMap (Reward *r)
-          :RewardEditorAction_Reward (RANDOMIZE_MAP, r, false) {}
-        ~RewardEditorAction_RandomizeMap () {}
+public:
+    RewardUndoAction_Gold (Reward *r)
+      : RewardUndoAction_Reward (GOLD_PIECES, r, true)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "RandomizeMap";}
+    ~RewardUndoAction_Gold ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Gold";
+      }
 };
-class RewardEditorAction_HiddenRuin : public RewardEditorAction_Reward
+
+class RewardUndoAction_RandomizeGold : public RewardUndoAction_Reward
 {
-    public:
-        RewardEditorAction_HiddenRuin (Reward *r)
-          :RewardEditorAction_Reward (HIDDEN_RUIN, r, false) {}
-        ~RewardEditorAction_HiddenRuin () {}
+public:
+    RewardUndoAction_RandomizeGold (Reward *r)
+      : RewardUndoAction_Reward (RANDOMIZE_GOLD, r, false)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "HiddenRuin";}
+    ~RewardUndoAction_RandomizeGold ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "RandomizeGold";
+      }
 };
-class RewardEditorAction_RandomRuin : public RewardEditorAction_Reward
+
+class RewardUndoAction_Item : public RewardUndoAction_Reward
 {
-    public:
-        RewardEditorAction_RandomRuin (Reward *r)
-          :RewardEditorAction_Reward (RANDOM_RUIN, r, false) {}
-        ~RewardEditorAction_RandomRuin () {}
+public:
+    RewardUndoAction_Item (Reward *r)
+      : RewardUndoAction_Reward (ITEM, r, false)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "RandomRuin";}
+    ~RewardUndoAction_Item ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Item";
+      }
 };
-#endif //REWARD_EDITOR_ACTIONS_H
+
+class RewardUndoAction_RandomizeItem : public RewardUndoAction_Reward
+{
+public:
+    RewardUndoAction_RandomizeItem (Reward *r)
+      : RewardUndoAction_Reward (RANDOMIZE_ITEM, r, false)
+      {
+      }
+
+    ~RewardUndoAction_RandomizeItem ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "RandomizeItem";
+      }
+};
+
+class RewardUndoAction_AllyType : public RewardUndoAction_Reward
+{
+public:
+    RewardUndoAction_AllyType (Reward *r)
+      : RewardUndoAction_Reward (ALLY_TYPE, r, false)
+      {
+      }
+
+    ~RewardUndoAction_AllyType ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "AllyType";
+      }
+};
+
+class RewardUndoAction_RandomizeAlly : public RewardUndoAction_Reward
+{
+public:
+    RewardUndoAction_RandomizeAlly (Reward *r)
+      : RewardUndoAction_Reward (RANDOMIZE_ALLY, r, false)
+      {
+      }
+
+    ~RewardUndoAction_RandomizeAlly ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "RandomizeAlly";
+      }
+};
+
+class RewardUndoAction_AllyCount : public RewardUndoAction_Reward
+{
+public:
+    RewardUndoAction_AllyCount (Reward *r)
+      : RewardUndoAction_Reward (ALLY_COUNT, r, true)
+      {
+      }
+
+    ~RewardUndoAction_AllyCount ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "AllyCount";
+      }
+};
+
+class RewardUndoAction_XCoord : public RewardUndoAction_Reward
+{
+public:
+    RewardUndoAction_XCoord (Reward *r)
+      : RewardUndoAction_Reward (XCOORD, r, true)
+      {
+      }
+
+    ~RewardUndoAction_XCoord ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "XCoord";
+      }
+};
+
+class RewardUndoAction_YCoord : public RewardUndoAction_Reward
+{
+public:
+    RewardUndoAction_YCoord (Reward *r)
+      : RewardUndoAction_Reward (YCOORD, r, true)
+      {
+      }
+
+    ~RewardUndoAction_YCoord ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "YCoord";
+      }
+};
+
+class RewardUndoAction_Width : public RewardUndoAction_Reward
+{
+public:
+    RewardUndoAction_Width (Reward *r)
+      : RewardUndoAction_Reward (WIDTH, r, true)
+      {
+      }
+
+    ~RewardUndoAction_Width ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Width";
+      }
+};
+
+class RewardUndoAction_Height : public RewardUndoAction_Reward
+{
+public:
+    RewardUndoAction_Height (Reward *r)
+      : RewardUndoAction_Reward (HEIGHT, r, true)
+      {
+      }
+
+    ~RewardUndoAction_Height ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Height";
+      }
+};
+
+class RewardUndoAction_MapName: public RewardUndoAction_Reward, public UndoCursor
+{
+public:
+    RewardUndoAction_MapName (Reward *r, UndoMgr *u, Gtk::Entry *e)
+      : RewardUndoAction_Reward (MAP_NAME, r, true),
+      UndoCursor (u->get_pos (e), e)
+  {
+  }
+
+    ~RewardUndoAction_MapName ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "MapName";
+      }
+};
+
+class RewardUndoAction_RandomizeMap : public RewardUndoAction_Reward
+{
+public:
+    RewardUndoAction_RandomizeMap (Reward *r)
+      : RewardUndoAction_Reward (RANDOMIZE_MAP, r, false)
+      {
+      }
+
+    ~RewardUndoAction_RandomizeMap ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "RandomizeMap";
+      }
+};
+
+class RewardUndoAction_HiddenRuin : public RewardUndoAction_Reward
+{
+public:
+    RewardUndoAction_HiddenRuin (Reward *r)
+      : RewardUndoAction_Reward (HIDDEN_RUIN, r, false)
+      {
+      }
+
+    ~RewardUndoAction_HiddenRuin ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "HiddenRuin";
+      }
+};
+
+class RewardUndoAction_RandomRuin : public RewardUndoAction_Reward
+{
+public:
+    RewardUndoAction_RandomRuin (Reward *r)
+      : RewardUndoAction_Reward (RANDOM_RUIN, r, false)
+      {
+      }
+
+    ~RewardUndoAction_RandomRuin ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "RandomRuin";
+      }
+};
+#endif

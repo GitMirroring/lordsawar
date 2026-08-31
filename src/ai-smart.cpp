@@ -1,8 +1,9 @@
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2017, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,37 +17,35 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <map>
 
-#include "ai_smart.h"
-#include "playerlist.h"
-#include "armysetlist.h"
-#include "stacklist.h"
+#include "ai-smart.h"
+#include "player-list.h"
+#include "army-set-list.h"
+#include "stack-list.h"
 #include "path.h"
-#include "AI_Analysis.h"
-#include "AI_Allocation.h"
-#include "AI_Diplomacy.h"
+#include "ai-analysis.h"
+#include "ai-allocation.h"
+#include "ai-diplomacy.h"
 #include "action.h"
-#include "xmlhelper.h"
-#include "armyprodbase.h"
-#include "armyproto.h"
+#include "xml-helper.h"
+#include "army-prod-base.h"
+#include "army-proto.h"
 #include "history.h"
-#include "citylist.h"
+#include "city-list.h"
 #include "city.h"
-#include "SightMap.h"
-#include "Sage.h"
-#include "GameMap.h"
+#include "sight-map.h"
+#include "sage.h"
+#include "game-map.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::flush<<std::endl;}
 #define debug(x)
 
 AI_Smart::AI_Smart(Glib::ustring name, unsigned int armyset,
-                   std::vector<Gdk::RGBA> colors, int width, int height,
-                   int player_no)
-  :RealPlayer(name, armyset, colors, width, height, Player::AI_SMART, player_no),
+                   Shield::Color shield, int width, int height)
+  :RealPlayer(name, armyset, shield, width, height, Player::AI_SMART),
    d_mustmakemoney(0)
 {
 }
@@ -62,84 +61,87 @@ AI_Smart::AI_Smart(XML_Helper* helper)
 {
 }
 
-bool AI_Smart::startTurn()
+void AI_Smart::startTurn (sigc::slot<void(bool)> finish)
 {
-  if (getStacklist()->getHeroes().size() == 0 &&
-      Citylist::getInstance()->countCities(this) == 1)
-    AI_maybeBuyScout(getFirstCity());
+  if (getStacklist ()->getHeroes ().size () == 0 &&
+      Citylist::instance ()->countCities (this) == 1)
+    AI_maybeBuyScout (getFirstCity ());
 
   debug("Player " << getName() << " starts a turn.");
 
   AI_Diplomacy diplomacy (this);
 
-  diplomacy.considerCuspOfWar();
+  diplomacy.considerCuspOfWar ();
 
-  if (getGold() < 500 && getUpkeep() > getIncome())
+  if (getGold () < 500 && getUpkeep () > getIncome ())
     d_mustmakemoney = 1;
   else
     d_mustmakemoney = 0;
 
   // the real stuff
-  examineCities();
+  examineCities ();
 
-  AI_setupVectoring(10, 3, 20);
+  AI_setupVectoring (10, 3, 20);
 
-  //int loopCount = 0;
+  auto next = std::make_shared<std::function<void()>>();
+  *next =
+    [this,
+    diplomacy,
+    next,
+    finish] () mutable
+      {
+        AI_Analysis *analysis = new AI_Analysis (this);
+        const Threatlist *threats = analysis->getThreatsInOrder ();
+        City *first_city = getFirstCity ();
+        bool build_capacity = false;
+        if (first_city)
+          {
+            Vector<int> pos = first_city->getPos ();
+            City *first_neutral = Citylist::instance ()->getNearestNeutralCity (pos);
+            if (first_neutral)
+              {
+                if (dist (pos, first_neutral->getPos()) <= 50)
+                  build_capacity = true;
+              }
+          }
+        if (getGold () < 30)
+          build_capacity = true;
 
-  AI_Analysis *analysis = new AI_Analysis(this);
-  const Threatlist *threats = analysis->getThreatsInOrder();
-  City *first_city = getFirstCity();
-  bool build_capacity = false;
-  if (first_city)
-    {
-      Vector<int> pos = first_city->getPos();
-      City *first_neutral = 
-        Citylist::getInstance()->getNearestNeutralCity(pos);
-      if (first_neutral)
-        {
-          if (dist (pos, first_neutral->getPos()) <= 50)
-            build_capacity = true;
-        }
-    }
-  if (getGold() < 30)
-    build_capacity = true;
-  while (true)
-    {
-      AI_Allocation *allocation = new AI_Allocation(analysis, threats, this);
-      allocation->sbusy.connect 
-        (sigc::mem_fun (sbusy, &sigc::signal<void>::emit));
-      int moveCount = allocation->move(first_city, build_capacity);
+        AI_Allocation *allocation = new AI_Allocation (analysis, threats, this);
 
-      // tidying up
-      delete allocation;
+        allocation->move
+          (first_city, build_capacity,
+           [this,
+           allocation,
+           analysis,
+           diplomacy,
+           next,
+           finish] (bool moved_a_stack) mutable
+           {
+             sbusy.emit ();
+             delete analysis;
+             if (!moved_a_stack)
+               {
+                 parkAllStacks ();
+                 analysis = NULL;
+                 stackDeselect ();
 
-      // stop when no more stacks move
-      if (moveCount == 0)
-        break;
-      if (abort_requested)
-        break;
-    }
+                 diplomacy.makeProposals ();
 
-  parkAllStacks();
-  sbusy.emit();
-  Glib::usleep (50000);
-  while (g_main_context_iteration(NULL, FALSE)); //doEvents
-  Glib::usleep (50000);
+                 finish (!(Playerlist::instance ()->getNoOfPlayers () <= 1));
+                 delete allocation;
+                 return;
+               }
+             else
+               {
+                 delete allocation;
+               (*next) ();
+               }
+           });
 
-  delete analysis;
-  analysis = NULL;
-  d_stacklist->setActivestack(0);
-
-  diplomacy.makeProposals();
-
-  if (abort_requested)
-    aborted_turn.emit();
-  else
-    {
-      if (getStacklist()->check() == false)
-        exit(1);
-    }
-  return !(Playerlist::getInstance()->getNoOfPlayers() <= 1);
+      };
+  (*next) ();
+  return;
 }
 
 void AI_Smart::abortTurn()
@@ -147,34 +149,20 @@ void AI_Smart::abortTurn()
   abort_requested = true;
   if (surrendered)
     aborted_turn.emit();
-  else if (Playerlist::getInstance()->countPlayersAlive() == 1)
+  else if (Playerlist::instance()->countPlayersAlive() == 1)
     aborted_turn.emit();
+}
+
+CityDefeatedChoice AI_Smart::chooseCityDefeatedAction (City *c, Stack *s)
+{
+  (void) s;
+  CityDefeatedChoice action = CITY_DEFEATED_OCCUPY;
+  AI_invadeCityQuestPreference(c, action);
+  return action;
 }
 
 void AI_Smart::invadeCity(City* c)
 {
-  CityDefeatedAction action = CITY_DEFEATED_OCCUPY;
-  AI_invadeCityQuestPreference(c, action);
-
-  int gold = 0;
-  int pillaged_army_type = -1;
-  std::list<guint32> sacked_army_types;
-  switch (action)
-    {
-    case CITY_DEFEATED_OCCUPY:
-      cityOccupy(c);
-      break;
-    case CITY_DEFEATED_PILLAGE:
-      cityPillage(c, gold, &pillaged_army_type);
-      break;
-    case CITY_DEFEATED_RAZE:
-      cityRaze(c);
-      break;
-    case CITY_DEFEATED_SACK:
-      citySack(c, gold, &sacked_army_types);
-      break;
-    }
-
   if (c->getNoOfProductionBases() == 0)
     maybeBuyProduction(c, true);
 
@@ -182,9 +170,8 @@ void AI_Smart::invadeCity(City* c)
   setProduction(c);
 }
 
-void AI_Smart::heroGainsLevel(Hero * a)
+void AI_Smart::heroGainsLevel(Hero * a, Army::Stat stat)
 {
-    Army::Stat stat = Army::STRENGTH;
     doHeroGainsLevel(a, stat);
     addAction(new Action_Level(a, stat));
 }
@@ -208,7 +195,7 @@ int AI_Smart::maybeBuyProduction(City *c, bool quick)
   bool buy = false;
   int slot = c->getActiveProductionSlot();
 
-  ArmyProto *army = Armysetlist::getInstance()->getArmy(getArmyset(), armytype);
+  ArmyProto *army = Armysetlist::instance()->getArmy(getArmyset(), armytype);
   if (slot == -1)
     buy = true;
   else if (scoreBestArmyType(army) > scoreBestArmyType(c->getProductionBase(slot)))
@@ -292,12 +279,12 @@ int AI_Smart::chooseArmyTypeToBuy(City *c, bool quick)
   int bestScore = -1;
   int bestTypeId = -1;
 
-  Armyset *as = Armysetlist::getInstance()->get(getArmyset());
+  Armyset *as = Armysetlist::instance()->get(getArmyset());
   for (Armyset::iterator i = as->begin(); i != as->end(); ++i)
     {
       const ArmyProto *proto = NULL;
 
-      proto=Armysetlist::getInstance()->getArmy(getArmyset(), (*i)->getId());
+      proto=Armysetlist::instance()->getArmy(getArmyset(), (*i)->getId());
 
       if (proto->getNewProductionCost() == 0)
         continue;
@@ -432,7 +419,7 @@ void AI_Smart::setProduction(City *city)
 void AI_Smart::examineCities()
 {
   debug("Examinating Cities to see what we can do");
-  for (auto city: *Citylist::getInstance())
+  for (auto city: *Citylist::instance())
     {
       if (city->getOwner() == this && city->isBurnt() == false)
         setProduction(city);
@@ -442,7 +429,7 @@ void AI_Smart::examineCities()
   int total_gp_to_spend = getGold() + profit;
   //now we get to spend this amount on the city production.
   //we'll turn off the cities we can't afford.
-  std::list<City*> cities = Citylist::getInstance()->getNearestFriendlyCities(this);
+  std::list<City*> cities = Citylist::instance()->getNearestFriendlyCities(this);
   for (std::list<City*>::iterator it = cities.begin(); it != cities.end(); ++it)
     {
       City *c = *it;
@@ -508,7 +495,7 @@ bool AI_Smart::chooseQuest(Hero *hero)
   return true;
 }
 
-bool AI_Smart::computerChooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool AI_Smart::chooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) turns;
   if (stack->isOnCity() == true)
@@ -528,7 +515,7 @@ bool AI_Smart::computerChooseVisitRuin(Stack *stack, Vector<int> dest, guint32 m
     return false;
 }
 
-bool AI_Smart::computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool AI_Smart::choosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) turns;
   City *enemy = GameMap::getEnemyCity(dest);
@@ -571,7 +558,7 @@ bool AI_Smart::computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32 m
     return false;
 }
 
-bool AI_Smart::computerChooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool AI_Smart::chooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) turns;
   if (stack->isOnCity() == true)
@@ -596,28 +583,31 @@ bool AI_Smart::computerChooseVisitTempleForBlessing(Stack *stack, Vector<int> de
   return true;
 }
 
-bool AI_Smart::computerChooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool AI_Smart::chooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) turns;
-  if (stack->size() == 1)
-    return false;
-
-  if (stack->isOnCity() == true)
+  (void) dest;
+  if (stack->isOnTemple () == false)
     {
-      if (moves <= stack->getMoves())
+      if (stack->isOnCity() == true)
+        {
+          if (moves <= stack->getMoves())
+            return true;
+          else
+            return false;
+        }
+      if (moves < stack->getMoves() + 17)
         return true;
       else
         return false;
     }
-  if (stack->getPos() == dest)
-    return true;
-  if (moves < stack->getMoves() + 17)
-    return true;
   else
-    return false;
+    {
+      return true;
+    }
 }
 
-bool AI_Smart::computerChooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns)
+bool AI_Smart::chooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) quest;
@@ -627,4 +617,3 @@ bool AI_Smart::computerChooseContinueQuest(Stack *stack, Quest *quest, Vector<in
     return false;
   return true;
 }
-// End of file

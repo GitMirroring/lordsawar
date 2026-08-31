@@ -1,6 +1,6 @@
-// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2017, 2020,
-// 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2017, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,55 +14,55 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <fstream>
 #include <assert.h>
 
-#include "network_player.h"
-#include "playerlist.h"
-#include "armysetlist.h"
-#include "stacklist.h"
-#include "citylist.h"
-#include "portlist.h"
-#include "templelist.h"
-#include "ruinlist.h"
-#include "signpostlist.h"
-#include "Itemlist.h"
-#include "SightMap.h"
-#include "rewardlist.h"
-#include "QuestsManager.h"
-#include "Quest.h"
+#include "network-player.h"
+#include "player-list.h"
+#include "army-set-list.h"
+#include "stack-list.h"
+#include "city-list.h"
+#include "port-list.h"
+#include "temple-list.h"
+#include "ruin-list.h"
+#include "signpost-list.h"
+#include "item-list.h"
+#include "sight-map.h"
+#include "reward-list.h"
+#include "quest-manager.h"
+#include "quest.h"
 #include "path.h"
-#include "GameMap.h"
+#include "game-map.h"
 #include "army.h"
-#include "armyprodbase.h"
+#include "army-prod-base.h"
 #include "hero.h"
-#include "heroproto.h"
+#include "hero-proto.h"
 #include "action.h"
-#include "MoveResult.h"
-#include "Configuration.h"
-#include "FogMap.h"
-#include "xmlhelper.h"
+#include "move-result.h"
+#include "configuration.h"
+#include "fog-map.h"
+#include "xml-helper.h"
 #include "game-parameters.h"
 #include "signpost.h"
 #include "history.h"
-#include "vectoredunit.h"
-#include "Backpack.h"
-#include "MapBackpack.h"
-#include "stackreflist.h"
+#include "vectored-unit.h"
+#include "backpack.h"
+#include "map-backpack.h"
+#include "stack-ref-list.h"
 #include "city.h"
-#include "game-actionlist.h"
+#include "game-action-list.h"
 #include "keeper.h"
+#include "lw.h"
 
 #define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 //#define debug(x)
 
 NetworkPlayer::NetworkPlayer(Glib::ustring name, guint32 armyset,
-                             std::vector<Gdk::RGBA> colors, int width,
-                             int height, Player::Type type, int player_no)
-    :Player(name, armyset, colors, width, height, type, player_no),
+                             Shield::Color shield, int width,
+                             int height, Player::Type type)
+    :Player(name, armyset, shield, width, height, type),
     d_connected(false), d_abort_requested(false)
 {
 }
@@ -85,9 +85,9 @@ bool NetworkPlayer::save(XML_Helper* helper) const
     // This may seem a bit dumb, but allows derived players (especially
     // AI's) to save additional data, such as character types or so.
     bool retval = true;
-    retval &= helper->openTag(Player::d_tag);
-    retval &= Player::save(helper);
-    retval &= helper->closeTag();
+    retval &= helper->open_tag(Player::d_tag);
+    retval &= saveContents (helper);
+    retval &= helper->close_tag();
     return retval;
 }
 
@@ -97,9 +97,10 @@ void NetworkPlayer::abortTurn()
     aborted_turn.emit();
 }
 
-bool NetworkPlayer::startTurn()
+void NetworkPlayer::startTurn(sigc::slot<void(bool)> finish)
 {
-  return false;
+  finish (false);
+  return;
 }
 
 void NetworkPlayer::endTurn()
@@ -120,6 +121,15 @@ bool NetworkPlayer::chooseHero(HeroProto *hero, City *city, int gold)
   return true;
 }
 
+CityDefeatedChoice NetworkPlayer::chooseCityDefeatedAction (City *c, Stack *s)
+{
+  (void) c;
+  (void) s;
+  //we don't do this, instead we go out to the gui to ask
+  assert(false);
+  return CityDefeatedChoice::CITY_DEFEATED_OCCUPY;
+}
+
 Reward *NetworkPlayer::chooseReward(Ruin *ruin, Sage *sage, Stack *stack)
 {
   (void) ruin;
@@ -129,9 +139,10 @@ Reward *NetworkPlayer::chooseReward(Ruin *ruin, Sage *sage, Stack *stack)
   return NULL;
 }
 
-void NetworkPlayer::heroGainsLevel(Hero * a)
+void NetworkPlayer::heroGainsLevel(Hero * a, Army::Stat stat)
 {
   (void) a;
+  (void) stat;
   assert(false);
 }
 
@@ -158,7 +169,7 @@ bool NetworkPlayer::chooseQuest(Hero *hero)
   return true;
 }
 
-bool NetworkPlayer::computerChooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool NetworkPlayer::chooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -168,7 +179,7 @@ bool NetworkPlayer::computerChooseVisitRuin(Stack *stack, Vector<int> dest, guin
   return true;
 }
 
-bool NetworkPlayer::computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool NetworkPlayer::choosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -178,7 +189,7 @@ bool NetworkPlayer::computerChoosePickupBag(Stack *stack, Vector<int> dest, guin
   return true;
 }
 
-bool NetworkPlayer::computerChooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool NetworkPlayer::chooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -188,7 +199,7 @@ bool NetworkPlayer::computerChooseVisitTempleForBlessing(Stack *stack, Vector<in
   return true;
 }
 
-bool NetworkPlayer::computerChooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
+bool NetworkPlayer::chooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) dest;
@@ -198,7 +209,7 @@ bool NetworkPlayer::computerChooseVisitTempleForQuest(Stack *stack, Vector<int> 
   return true;
 }
 
-bool NetworkPlayer::computerChooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns)
+bool NetworkPlayer::chooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns)
 {
   (void) stack;
   (void) quest;
@@ -370,13 +381,13 @@ void NetworkPlayer::decodeActionMove(const Action_Move *action)
   /*
     {
       Vector<int> dest= action->getEndingPosition();
-  Maptile::Building dst_building = GameMap::getInstance()->getBuilding(dest);
-  Maptile::Building src_building = GameMap::getInstance()->getBuilding(stack->getPos());
+  Maptile::Building dst_building = GameMap::instance()->getBuilding(dest);
+  Maptile::Building src_building = GameMap::instance()->getBuilding(stack->getPos());
   bool to_city = dst_building == Maptile::CITY;
   bool on_port = src_building == Maptile::PORT;
   bool on_bridge = src_building == Maptile::BRIDGE;
-  bool on_water = (GameMap::getInstance()->getTerrainType(stack->getPos()) == Tile::WATER);
-  bool to_water = (GameMap::getInstance()->getTerrainType(dest) == Tile::WATER);
+  bool on_water = (GameMap::instance()->getTerrainType(stack->getPos()) == Tile::WATER);
+  bool to_water = (GameMap::instance()->getTerrainType(dest) == Tile::WATER);
       printf("has ship is %d\n", stack->hasShip());
       printf("to_city is %d, on_water is %d\n", to_city, on_water);
       printf("on_port is %d, on_bridge is %d\n", on_port, on_bridge);
@@ -395,7 +406,7 @@ void NetworkPlayer::decodeActionMove(const Action_Move *action)
         }
     }
 
-  Playerlist::getActiveplayer()->setActivestack (stack);
+  setActivestack (stack);
 
   stack->moveToDest(action->getEndingPosition(), skipping);
   if (stack->hasShip() != action->getHasShip())
@@ -407,7 +418,7 @@ void NetworkPlayer::decodeActionMove(const Action_Move *action)
     {
 
       printf("expected %d moves left, but we got %d\n", action->getMovesLeft(), stack->getMoves());
-      printf("it is on a tile of type %d, with a building of %d\n", GameMap::getInstance()->getTile(action->getEndingPosition())->getType(), GameMap::getInstance()->getTile(action->getEndingPosition())->getBuilding());
+      printf("it is on a tile of type %d, with a building of %d\n", GameMap::instance()->getTile(action->getEndingPosition())->getType(), GameMap::instance()->getTile(action->getEndingPosition())->getBuilding());
     }
   assert (stack->getMoves() == action->getMovesLeft());
   supdatingStack.emit(stack);
@@ -446,7 +457,7 @@ void NetworkPlayer::decodeActionFight(const Action_Fight *action)
   std::list<guint32> defender_stack_ids = action->getDefenderStackIds();
   for (std::list<guint32>::const_iterator i = defender_stack_ids.begin(),
          end = defender_stack_ids.end(); i != end; ++i)
-    defenders.push_back(Playerlist::getInstance()->getStackById(*i));
+    defenders.push_back(Playerlist::instance()->getStackById(*i));
 
   if (action->getAttackerStackIds().empty())
     printf("expected the attacker stack to be non empty!\n");
@@ -455,45 +466,18 @@ void NetworkPlayer::decodeActionFight(const Action_Fight *action)
     printf("expected the attacker armies to be non empty!\n");
   assert (action->getAttackerArmyIds().empty() == false);
 
-  for (auto f: action->getBattleHistory())
-    {
-      bool attacker = action->is_army_id_in_stacks(f.id, attacker_stack_ids);
-      bool defender = action->is_army_id_in_stacks(f.id, defender_stack_ids);
-      if (!attacker && ! defender)
-        {
-          printf("army id %d is not in attackers or defenders.\n", f.id);
-        }
-      assert (attacker || defender);
-    }
-  for (auto f: action->getAttackerArmyIds())
-    {
-      bool attacker = action->is_army_id_in_stacks(f, attacker_stack_ids);
-      if (!attacker)
-        {
-          printf("army id %d is not in attackers!\n", f);
-        }
-      assert (action->is_army_id_in_stacks(f, attacker_stack_ids) == true);
-    }
-  for (auto f: action->getDefenderArmyIds())
-    {
-      bool defender = action->is_army_id_in_stacks(f, defender_stack_ids);
-      if (!defender)
-        {
-          printf("army id %d is not in defenders!\n", f);
-        }
-      assert (action->is_army_id_in_stacks(f, defender_stack_ids) == true);
-    }
-
   Fight fight(attackers, defenders, action->getBattleHistory());
-  Fight::Result result = fight.battleFromHistory();
-  fight_started.emit(fight);
+  FightResult::Outcome result = fight.battleFromHistory();
+  fight_started.emit(&fight, [] (Fight *)
+                     {
+                     });
 
   std::list<History*> attacker_history;
   std::list<History*> defender_history;
   cleanupAfterFight(attackers, defenders, attacker_history, defender_history);
   clearHistorylist(attacker_history);
   clearHistorylist(defender_history);
-  if (result == Fight::ATTACKER_WON)
+  if (result == FightResult::ATTACKER_WON)
     {
       debug ("there are " << (&*attackers.front())->size() << " attackers left in " << (&*attackers.front())->getId() << " at " << (&*attackers.front())->getPos().x << "," << (&*attackers.front())->getPos().y);
     }
@@ -513,16 +497,16 @@ void NetworkPlayer::decodeActionJoin(const Action_Join *action)
 void NetworkPlayer::decodeActionRuin(const Action_Ruin *action)
 {
   Stack *explorer = d_stacklist->getStackById(action->getStackId());
-  Ruin *r = Ruinlist::getInstance()->getById(action->getRuinId());
+  Ruin *r = Ruinlist::instance()->getById(action->getRuinId());
   bool searched = action->getSearchSuccessful();
   Keeper *keeper = r->getOccupant();
   Stack *stack = NULL;
   if (keeper)
     stack = keeper->getStack ();
 
-  Fight::Result result = Fight::ATTACKER_WON;
+  FightResult::Outcome result = FightResult::ATTACKER_WON;
   if (searched == false)
-    result = Fight::DEFENDER_WON;
+    result = FightResult::DEFENDER_WON;
 
   if (searched == false && keeper == NULL)
     {
@@ -532,13 +516,13 @@ void NetworkPlayer::decodeActionRuin(const Action_Ruin *action)
   // now simulate the fight that might have happened on the other side
   if (keeper) 
     {
-      if (result == Fight::ATTACKER_WON) 
+      if (result == FightResult::ATTACKER_WON) 
         {
           // whack the keeper
           for (Stack::iterator i = stack->begin(); i != stack->end(); ++i)
             (*i)->setHP(0);
         }
-      else if (result == Fight::DEFENDER_WON)
+      else if (result == FightResult::DEFENDER_WON)
         {
           // whack the hero
           explorer->getFirstHero()->setHP(0);
@@ -564,24 +548,24 @@ void NetworkPlayer::decodeActionRuin(const Action_Ruin *action)
 void NetworkPlayer::decodeActionTemple(const Action_Temple *action)
 {
   Stack *stack = d_stacklist->getStackById(action->getStackId());
-  doStackVisitTemple(stack);
+  doStackSearchTemple(stack);
 }
 
 void NetworkPlayer::decodeActionOccupy(const Action_Occupy *action)
 {
-  doCityOccupy(Citylist::getInstance()->getById(action->getCityId()));
+  doCityOccupy(Citylist::instance()->getById(action->getCityId()));
 }
 
 void NetworkPlayer::decodeActionPillage(const Action_Pillage *action)
 {
-  City *city = Citylist::getInstance()->getById(action->getCityId());
+  City *city = Citylist::instance()->getById(action->getCityId());
   int gold, pillaged_army_type;
   doCityPillage(city, gold, &pillaged_army_type);
 }
 
 void NetworkPlayer::decodeActionSack(const Action_Sack *action)
 {
-  City *city = Citylist::getInstance()->getById(action->getCityId());
+  City *city = Citylist::instance()->getById(action->getCityId());
   int gold;
   std::list<guint32> sacked_types;
   doCitySack(city, gold, &sacked_types);
@@ -591,19 +575,19 @@ void NetworkPlayer::decodeActionSack(const Action_Sack *action)
 
 void NetworkPlayer::decodeActionRaze(const Action_Raze *action)
 {
-  doCityRaze(Citylist::getInstance()->getById(action->getCityId()));
+  doCityRaze(Citylist::instance()->getById(action->getCityId()));
 }
 
 void NetworkPlayer::decodeActionBuy(const Action_Buy *action)
 {
-  City *city = Citylist::getInstance()->getById(action->getCityId());
+  City *city = Citylist::instance()->getById(action->getCityId());
   doCityBuyProduction(city, action->getProductionSlot(), 
 		      action->getBoughtArmyTypeId());
 }
 
 void NetworkPlayer::decodeActionProduction(const Action_Production *action)
 {
-  City *city = Citylist::getInstance()->getById(action->getCityId());
+  City *city = Citylist::instance()->getById(action->getCityId());
   doCityChangeProduction(city, action->getSlot());
 }
 
@@ -618,30 +602,30 @@ void NetworkPlayer::decodeActionReward(const Action_Reward *action)
 
 void NetworkPlayer::decodeActionQuest(const Action_Quest *action)
 {
-  QuestsManager *qm = QuestsManager::getInstance();
+  QuestsManager *qm = QuestsManager::instance();
   switch (Quest::Type(action->getQuestType()))
     {
     case Quest::KILLHERO: 
-      qm->createNewKillHeroQuest(action->getHeroId(), action->getData());
+      qm->createNewKillHeroQuest(action->getHeroId(), action->get());
       break;
     case Quest::KILLARMIES:
-      qm->createNewEnemyArmiesQuest(action->getHeroId(), action->getData(), 
+      qm->createNewEnemyArmiesQuest(action->getHeroId(), action->get(), 
 				    action->getVictimPlayerId());
       break;
     case Quest::CITYSACK:
-      qm->createNewCitySackQuest(action->getHeroId(), action->getData());
+      qm->createNewCitySackQuest(action->getHeroId(), action->get());
       break;
     case Quest::CITYRAZE:
-      qm->createNewCityRazeQuest(action->getHeroId(), action->getData());
+      qm->createNewCityRazeQuest(action->getHeroId(), action->get());
       break;
     case Quest::CITYOCCUPY:
-      qm->createNewCityOccupyQuest(action->getHeroId(), action->getData());
+      qm->createNewCityOccupyQuest(action->getHeroId(), action->get());
       break;
     case Quest::KILLARMYTYPE:
-      qm->createNewEnemyArmytypeQuest(action->getHeroId(), action->getData());
+      qm->createNewEnemyArmytypeQuest(action->getHeroId(), action->get());
       break;
     case Quest::PILLAGEGOLD:
-      qm->createNewPillageGoldQuest(action->getHeroId(), action->getData());
+      qm->createNewPillageGoldQuest(action->getHeroId(), action->get());
       break;
     }
 }
@@ -661,7 +645,7 @@ void NetworkPlayer::decodeActionEquip(const Action_Equip *action)
   switch (action->getToBackpackOrToGround())
   {
   case Action_Equip::BACKPACK:
-    item = GameMap::getInstance()->getTile(action->getItemPos())->getBackpack()->getItemById(action->getItemId());
+    item = GameMap::instance()->getTile(action->getItemPos())->getBackpack()->getItemById(action->getItemId());
     doHeroPickupItem(hero, item, action->getItemPos());
     break;
 
@@ -696,19 +680,19 @@ void NetworkPlayer::decodeActionDisband(const Action_Disband *action)
 
 void NetworkPlayer::decodeActionModifySignpost(const Action_ModifySignpost *act)
 {
-  Signpost *sign = Signpostlist::getInstance()->getById(act->getSignpostId());
+  Signpost *sign = Signpostlist::instance()->getById(act->getSignpostId());
   doSignpostChange(sign, act->getSignContents());
 }
 
 void NetworkPlayer::decodeActionRenameCity(const Action_RenameCity *action)
 {
-  doCityRename(Citylist::getInstance()->getById(action->getCityId()), 
+  doCityRename(Citylist::instance()->getById(action->getCityId()), 
                action->getNewCityName());
 }
 
 void NetworkPlayer::decodeActionVector(const Action_Vector *action)
 {
-  City *city = Citylist::getInstance()->getById(action->getCityId());
+  City *city = Citylist::instance()->getById(action->getCityId());
   doVectorFromCity(city, action->getVectoringDestination());
 }
 
@@ -745,7 +729,7 @@ void NetworkPlayer::decodeActionProduce(const Action_Produce *action)
     return;
     }
   //ArmyProdBase *a = action->getArmy();
-  City *c = Citylist::getInstance()->getById(action->getCityId());
+  City *c = Citylist::instance()->getById(action->getCityId());
   //Army *army = new Army (*a, this);
   //Stack *s = c->addArmy(army);
   Stack *s = NULL;
@@ -780,6 +764,7 @@ void NetworkPlayer::decodeActionProduce(const Action_Produce *action)
   assert (s != NULL);
   assert (s->getId() == action->getStackId());
   assert (s->getPos() == action->getDestination());
+  printf ("got army id %d, expected army id %d\n", army->getId(),action->getArmyId());
   assert (army->getId() == action->getArmyId());
 }
 
@@ -802,20 +787,20 @@ void NetworkPlayer::decodeActionProduceVectored(const Action_ProduceVectored *ac
 
 void NetworkPlayer::decodeActionDiplomacyState(const Action_DiplomacyState *action)
 {
-  Player *player = Playerlist::getInstance()->getPlayer(action->getOpponentId());
+  Player *player = Playerlist::instance()->get (action->getOpponentId());
   doDeclareDiplomacy(action->getDiplomaticState(), player);
 }
 
 void NetworkPlayer::decodeActionDiplomacyProposal(const Action_DiplomacyProposal *action)
 {
-  Player *player = Playerlist::getInstance()->getPlayer(action->getOpponentId());
+  Player *player = Playerlist::instance()->get (action->getOpponentId());
   doProposeDiplomacy(action->getDiplomaticProposal(), player);
 }
 
 void NetworkPlayer::decodeActionDiplomacyScore(const Action_DiplomacyScore *action)
 {
   (void) action;
-  Player *player = Playerlist::getInstance()->getPlayer(action->getOpponentId());
+  Player *player = Playerlist::instance()->get (action->getOpponentId());
   alterDiplomaticRelationshipScore(player, action->getAmountChange());
 }
 
@@ -828,15 +813,15 @@ void NetworkPlayer::decodeActionEndTurn(const Action_EndTurn *action)
 
 void NetworkPlayer::decodeActionConquerCity(const Action_ConquerCity *action)
 {
-  doConquerCity(Citylist::getInstance()->getById(action->getCityId()));
+  doConquerCity(Citylist::instance()->getById(action->getCityId()));
 }
 
 void NetworkPlayer::decodeActionRecruitHero(const Action_RecruitHero *action)
 {
-  City *city = Citylist::getInstance()->getById(action->getCityId());
+  City *city = Citylist::instance()->getById(action->getCityId());
   ArmyProto *ally = 0;
   if (action->getNumAllies())
-    ally = Armysetlist::getInstance()->getArmy(getArmyset(),
+    ally = Armysetlist::instance()->getArmy(getArmyset(),
                                                action->getAllyArmyType());
   StackReflist *stacks = new StackReflist();
   Hero *hero = doRecruitHero(action->getHero(), city, action->getCost(), 
@@ -861,19 +846,22 @@ void NetworkPlayer::decodeActionInitTurn(const Action_InitTurn*action)
 {
   (void) action;
   debug ("remote: dumping " << d_actions.size() << " actions");
-  for (std::list<Action*>::iterator i = d_actions.begin(); i != d_actions.end(); ++i)
+  if (Lw::app->m_network_debug)
     {
-      debug ("\t" << Action::actionTypeToString((*i)->getType()) << " " << (*i)->dump().c_str());
+      for (std::list<Action*>::iterator i = d_actions.begin(); i != d_actions.end(); ++i)
+        {
+          debug ("\t" << Action::actionTypeToString((*i)->getType()) << " " << (*i)->dump().c_str());
+        }
     }
 
-  GameActionlist::getInstance()->add(new TurnActionlist(this, d_actions));
+  GameActionlist::instance()->add(new TurnActionlist(this, d_actions));
   clearActionlist();
 }
 
 void NetworkPlayer::decodeActionLoot (const Action_Loot *action)
 {
   guint32 player_id = action->getLootedPlayerId();
-  Player *looted = Playerlist::getInstance()->getPlayer(player_id);
+  Player *looted = Playerlist::instance()->get (player_id);
   doLootCity(looted, action->getAmountToAdd(), action->getAmountToSubtract());
 }
 
@@ -889,15 +877,15 @@ void NetworkPlayer::decodeActionUseItem(const Action_UseItem *action)
   assert (hero != NULL);
   Item *item = hero->getBackpack()->getItemById(action->getItemId());
   assert (item != NULL);
-  Player *victim = Playerlist::getInstance()->getPlayer(action->getVictimPlayerId());
+  Player *victim = Playerlist::instance()->get (action->getVictimPlayerId());
   City *friendly_city = 
-    Citylist::getInstance()->getById(action->getFriendlyCityId());
+    Citylist::instance()->getById(action->getFriendlyCityId());
   City *enemy_city = 
-    Citylist::getInstance()->getById(action->getEnemyCityId());
+    Citylist::instance()->getById(action->getEnemyCityId());
   City *neutral_city = 
-    Citylist::getInstance()->getById(action->getNeutralCityId());
+    Citylist::instance()->getById(action->getNeutralCityId());
   City *city = 
-    Citylist::getInstance()->getById(action->getCityId());
+    Citylist::instance()->getById(action->getCityId());
   doHeroUseItem(hero, item, victim, friendly_city, enemy_city, neutral_city, 
                 city);
 }
@@ -905,7 +893,7 @@ void NetworkPlayer::decodeActionUseItem(const Action_UseItem *action)
 void NetworkPlayer::decodeActionStackOrder(const Action_ReorderArmies* action)
 {
   //sort the buggers.
-  Player *p = Playerlist::getInstance()->getPlayer(action->getPlayerId());
+  Player *p = Playerlist::instance()->get (action->getPlayerId());
   if (!p)
     {
       debug ("we don't have player id " << action->getPlayerId());
@@ -950,7 +938,7 @@ void NetworkPlayer::decodeActionStackOrder(const Action_ReorderArmies* action)
 void NetworkPlayer::decodeActionStacksReset(const Action_ResetStacks *action)
 {
   (void) action;
-  Player *p = Playerlist::getInstance()->getPlayer(action->getPlayerId());
+  Player *p = Playerlist::instance()->get (action->getPlayerId());
   if (!p)
     {
       debug ("couldn't find player " << action->getPlayerId());
@@ -982,7 +970,6 @@ void NetworkPlayer::decodeActionKillPlayer(const Action_Kill *action)
   if (isDead() == false)
     {
       doKill();
-      Playerlist::getInstance()->splayerDead.emit(this);
     }
 }
 
@@ -1048,4 +1035,3 @@ void NetworkPlayer::decodeActionDeselectStack(const Action_DeselectStack *action
   doStackDeselect();
   supdatingStack.emit(0);
 }
-// End of file

@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef HISTORY_H
@@ -88,7 +87,9 @@ class History
           //! The player has been told of the location of a hidden ruin.
           HERO_REWARD_RUIN = 21,
           //! The player has used an item
-          USE_ITEM = 22
+          USE_ITEM = 22,
+          //! The hero has had a quest expire
+	  HERO_QUEST_EXPIRED = 23
         };
 	static Glib::ustring historyTypeToString(const History::Type type);
 	static History::Type historyTypeFromString(const Glib::ustring str);
@@ -822,4 +823,33 @@ class History_HeroUseItem: public History
         guint32 d_city_id;
 };
 
-#endif //HISTORY_H
+//-----------------------------------------------------------------------------
+
+//! A permanent record of a Hero having a quest expire.
+class History_HeroQuestExpired: public History
+{
+    public:
+	//! Default constructor.
+        History_HeroQuestExpired(Hero *h);
+	//! Copy constructor.
+	History_HeroQuestExpired(const History_HeroQuestExpired &history);
+	//! Load the historical event from an opened saved-game file.
+        History_HeroQuestExpired(XML_Helper* helper);
+	//! Destructor.
+        ~History_HeroQuestExpired() {};
+
+	//! Return some debug information about this historical event.
+        Glib::ustring dump() const;
+
+	//! Save the historical event to an opened saved-game file.
+        virtual bool doSave(XML_Helper* helper) const;
+
+	//! Get the name of the Hero who had a Quest expire.
+	Glib::ustring getHeroName() const {return d_hero;}
+    
+    private:
+	//! The name of the Hero who had a quest expire.
+	Glib::ustring d_hero;
+};
+
+#endif

@@ -1,4 +1,4 @@
-//  Copyright (C) 2009, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "OwnerId.h"
-#include "playerlist.h"
-#include "xmlhelper.h"
+#include "owner-id.h"
+#include "player-list.h"
+#include "xml-helper.h"
 #include "player.h"
 
 OwnerId::OwnerId()
@@ -49,7 +48,7 @@ OwnerId OwnerId::load(XML_Helper *helper)
 {
   OwnerId result;
   int i = -1;
-  helper->getData(i, "owner");
+  helper->get(i, "owner");
   if (i == -1)
     result.setOwnerId(0);
   else
@@ -71,12 +70,12 @@ Player * OwnerId::getOwner() const
   if (owner_id_set == false)
     return NULL;
 
- return Playerlist::getInstance()->getPlayer(d_owner_id); 
+ return Playerlist::instance()->get (d_owner_id); 
 }
   
 bool OwnerId::save(XML_Helper *helper) const
 {
-  return helper->saveData("owner", d_owner_id);
+  return helper->save("owner", d_owner_id);
 }
 
 bool OwnerId::isFriend(Player *opponent) const

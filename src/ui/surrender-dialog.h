@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,25 +12,57 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
-
-#pragma once
-#ifndef SURRENDER_DIALOG_H
-#define SURRENDER_DIALOG_H
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <gtkmm.h>
-#include "lw-dialog.h"
-
-// dialog for accepting/rejecting surrender from computer players
-class SurrenderDialog: public LwDialog
+#include "lw-dialog-base.h"
+#ifndef SURRENDER_DIALOG_H
+#define SURRENDER_DIALOG_H
+class SurrenderDialog: public LwDialogBase
 {
- public:
-    SurrenderDialog(Gtk::Window &parent, int numPlayers);
-    ~SurrenderDialog() {};
+public:
+    static std::string get_resource_name ()
+      {
+        return "surrender.ui";
+      }
 
- private:
-    Gtk::Image *image;
+    SurrenderDialog (BaseObjectType* o,
+                       const Glib::RefPtr<Gtk::Builder>& xml)
+      : LwDialogBase (o, xml)
+      {
+        m_picture = load <Gtk::Picture> ("picture");
+        m_label = load <Gtk::Label> ("label");
+        m_accept_button = load <Gtk::Button> ("accept_button");
+        m_close_button = load <Gtk::Button> ("close_button");
+      }
+
+    void setup (int num_enemies)
+      {
+        set_response (m_accept_button, Gtk::ResponseType::ACCEPT);
+        set_response (m_close_button, Gtk::ResponseType::CLOSE);
+
+        auto im =
+          ImageCache::instance ()->getDialogPic
+           (ImageCache::DIALOG_PARLEY_OFFERED);
+        m_picture->set_paintable (im->to_texture ());
+
+        Glib::ustring s = ngettext("Your enemy grudgingly surrenders!\n",
+                                   "Your enemies respectfully surrender!\n",
+                                   num_enemies);
+        s += _("Do you accept?");
+
+        m_label->set_text (s);
+
+        signal_response ().connect
+          ([this](Gtk::ResponseType)
+           {
+             hide ();
+           });
+      }
+private:
+    Gtk::Picture *m_picture;
+    Gtk::Label *m_label;
+    Gtk::Button *m_accept_button;
+    Gtk::Button *m_close_button;
 };
-
 #endif

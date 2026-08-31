@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef CHAT_CLIENT_H
@@ -31,16 +30,47 @@
 class ChatClient: public sigc::trackable
 {
 public:
-  ChatClient(Glib::ustring nick = "guest");
-  ~ChatClient() {};
+  ChatClient (Glib::ustring nick = "guest");
 
-  void gotChatMessage(const Glib::ustring nickname, const Glib::ustring &payload);
-  void setNickname(Glib::ustring nick) {d_nickname = nick;};
-  Glib::ustring getNickname() {return d_nickname;};
-  sigc::signal<void, Glib::ustring, Glib::ustring> chat_message_received;
+  ~ChatClient()
+    {
+    }
+
+  void got_chat_message (const Glib::ustring profile_id,
+                         const Glib::ustring &payload);
+
+  void got_system_message (const Glib::ustring profile_id,
+                           const Glib::ustring &payload);
+
+  void set_nickname (Glib::ustring nick)
+    {
+      m_nickname = nick;
+    }
+
+  Glib::ustring get_nickname () const
+    {
+      return m_nickname;
+    }
+
+  sigc::signal<void(Glib::ustring, Glib::ustring)>
+    signal_chat_message_received ()
+    {
+      return m_chat_message_received;
+    }
+
+  sigc::signal<void(Glib::ustring)> signal_system_message_received ()
+    {
+      return m_system_message_received;
+    }
 protected:
 
-  Glib::ustring d_nickname;
+  Glib::ustring m_nickname;
+
+  /* profile id, message */
+  sigc::signal<void(Glib::ustring, Glib::ustring)> m_chat_message_received;
+
+  /* message */
+  sigc::signal<void(Glib::ustring)> m_system_message_received;
 };
 
 #endif

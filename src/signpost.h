@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef SIGNPOST_H
@@ -21,8 +20,8 @@
 
 #define DEFAULT_SIGNPOST "nowhere"
 
-#include "Location.h"
-#include "Renamable.h"
+#include "location.h"
+#include "renamable.h"
 
 //!A signpost is a map feature where a human player can read a message.
 /**
@@ -66,4 +65,4 @@ class Signpost: public Location, public Renamable
 
 };
 
-#endif // SIGNPOST_H
+#endif

@@ -1,6 +1,7 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
-// Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2006-2011, 2014, 2015, 2017, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2003, 2004, 2005, 2006, 2007 Ulf Lorenz
+//  Copyright (C) 2004, 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2017, 2020,
+//  2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef IMAGE_CACHE_H
@@ -26,11 +26,11 @@
 #include <vector>
 #include <string.h>
 #include <cairomm/context.h>
-#include "PixMaskCache.h"
+#include "pixmask-cache.h"
 
 #include "player.h"
-#include "PixMask.h"
-#include "maptile.h"
+#include "pixmask.h"
+#include "map-tile.h"
 #include "hero.h"
 
 class Road;
@@ -73,6 +73,7 @@ class StatusPixMaskCacheItem;
 class GameButtonPixMaskCacheItem;
 class DialogPixMaskCacheItem;
 class MedalPixMaskCacheItem;
+class BoxPixMaskCacheItem;
 class TarFileMaskedImage;
 class TarFileImage;
 
@@ -122,6 +123,7 @@ class ImageCache
       HEART,
       GOTO_ARROW,
       CLOSED_HAND,
+      HAND_POINTER,
     };
   enum GameButtonType
     {
@@ -162,7 +164,7 @@ class ImageCache
     };
 
         //! Method for getting/creating the soliton instance.
-        static ImageCache* getInstance();
+        static ImageCache* instance();
 
         //! Explicitly deletes the soliton instance
         static void deleteInstance();
@@ -182,31 +184,28 @@ class ImageCache
           *
           * @param armyset      the armyset to be used
           * @param army         the index of the army to be used
-          * @param player       the player owning the army
+          * @param shield       the index of the shield in shieldset for colors
           * @param medals       an array of medal types
           * @param map          whether or not this army appears on a map
-          * @param font_size    the height of the default font, if not on map
 	  * @param greyed       the image is greyed out; deselected/inactive.
           * @return the image of the unit
           */
-        PixMask* getArmyPic(guint32 armyset, guint32 army, const Player* p,
-                                const bool* medals, bool map, guint32 font_size,
+        PixMask* getArmyPic(guint32 armyset, guint32 army, Shield::Color shield,
+                                const bool* medals, bool map,
                                 bool greyed = false);
 	PixMask* getArmyPic(Army *a, bool greyed = false);
-        PixMask* getDialogArmyPic(Army *a, guint32 font_size, bool greyed = false);
+        PixMask* getDialogArmyPic(Army *a, bool greyed = false);
         PixMask* getCircledArmyPic(guint32 armyset, guint32 army, 
-                                   const Player* p, const bool* medals, 
+                                   Shield::Color shield, const bool* medals, 
                                    bool greyed, guint32 circle_color_id,
-                                   bool show_army, guint32 font_size);
+                                   bool show_army, bool dark);
         PixMask *getCircledArmyPic(Army *a, bool greyed,
-                                   guint32 circle_color_id, bool show_army,
-                                   guint32 font_size);
-        PixMask* getCircledShipPic(guint32 armyset, const Player* p,
-                                   bool greyed, guint32 circle_color_id,
-                                   guint32 font_size);
-        PixMask* getCircledStandardPic(guint32 armyset, const Player* p,
-                                       bool greyed, guint32 circle_color_id,
-                                       guint32 font_size);
+                                   guint32 circle_color_id, bool show_army, bool dark);
+        PixMask* getEmptyCircledArmyPic (bool dark);
+        PixMask* getCircledShipPic(guint32 armyset, Shield::Color shield,
+                                   bool greyed, guint32 circle_color_id, bool dark);
+        PixMask* getCircledStandardPic(guint32 armyset, Shield::Color shield,
+                                       bool greyed, guint32 circle_color_id, bool dark);
 
         /** Method for getting the shield picture from the cache
           * 
@@ -222,13 +221,11 @@ class ImageCache
 	  * @param type         the size of the shield: 0=sm, 1=med, 2=lg
           * @param color        which player the shield is for
           * @param map          whether or not this shield appears on a map
-          * @param font_size    for map=false, to calculate relative size
           * @return the image of the shield
           */
         PixMask* getShieldPic(guint32 shieldset, guint32 type, guint32 color,
-                              bool map, guint32 font_size);
-        PixMask* getShieldPic(guint32 type, Player *p, bool map,
-                              guint32 font_size);
+                              bool map);
+        PixMask* getShieldPic(guint32 type, Player *p, bool map);
 
         /** Method for getting a ruin picture
           *
@@ -243,11 +240,9 @@ class ImageCache
           *
           * @param type         0 = small, or 1 = large.
           * @param state        the diplomatic state.  e.g. peace, war, etc
-          * @font_size is the height of the default font in pixels.
           * @return image of the icon
           */
-        PixMask* getDiplomacyPic(int type, Player::DiplomaticState state,
-                                 guint32 font_size);
+        PixMask* getDiplomacyPic(int type, Player::DiplomaticState state);
 
         /** Method for getting a temple picture
           *
@@ -287,26 +282,27 @@ class ImageCache
         /** Method for getting a cursor picture
           *
           * @param type         the type of the cursor 
-          * @font_size          the height of the default font in pixels.
           * @return image of the cursor
           */
-        PixMask* getCursorPic(int type, guint32 font_size);
+        PixMask* getCursorPic(int type);
 
         /** Method for getting a ship picture.  This is the picture
 	  * that appears when the stack goes into the water.
           *
-          * @param p            the player to color the ship as
+          * @param armyset      the index of the armyset in armysetlist
+          * @param shield       the index of the shield in shieldset
           * @return image of the ship
           */
-        PixMask* getShipPic(const Player* p);
+        PixMask* getShipPic(guint32 armyset, Shield::Color shield);
 
         /** Method for getting a standard picture.  This is the picture
 	  * that appears when the hero plants a flag..
           *
-          * @param p            the player to color the flag as
+          * @param armyset      the index of the armyset in armysetlist
+          * @param shield       the index of the shield in shieldset
           * @return image of the standard
           */
-        PixMask* getPlantedStandardPic(const Player* p);
+        PixMask* getPlantedStandardPic(guint32 armyset, Shield::Color shield);
 
         /** Method for getting a port picture.  This is the picture
 	  * that appears often as an anchor on coastal regions.
@@ -344,16 +340,14 @@ class ImageCache
 	 * that appears when a hero gains a new level, and subsequently gets
 	 * to increase a stat.
 	 *
-	 * @param p the player to color the image as.
+	 * @param shield the index into the active shieldset, for colors.
          * @param gender male=1, female=2.
-         * @font_size is the height of the default font in pixels.
 	 * @return new-level image.
 	 */
-        PixMask* getNewLevelPic(const Player* p, guint32 gender,
-                                guint32 font_size);
+        PixMask* getNewLevelPic(Shield::Color shield, guint32 gender);
 
         /** Method for getting a picture that represents a type of tile style.
-         *  The parameter is related to tilestyle.h:TileStyle::Type.
+         *  The parameter is related to tile-style.h:TileStyle::Type.
          */
         PixMask* getDefaultTileStylePic(guint32 tilestyle_type, 
                                         guint32 tilesize);
@@ -361,14 +355,14 @@ class ImageCache
         /** Method for getting a picture of the tartan progess bar.
          * The image will not be any wider than width, but can be less wide.
          */
-        PixMask* getTartanPic (const Player *p, guint32 width,
-                               Shieldset *s, guint32 font_size);
+        PixMask* getTartanPic (Shieldset *s, Shield::Color shield,
+                               guint32 width);
 
         /** Method for getting a picture of the empty tartan progess bar.
          * The image will not be any wider than width, but can be less wide.
          */
-        PixMask* getEmptyTartanPic (const Player *p, guint32 width,
-                                    Shieldset *s, guint32 font_size);
+        PixMask* getEmptyTartanPic (Shieldset *s, Shield::Color shield,
+                                    guint32 width);
 
         /** Method for getting a city picture
           * 
@@ -415,8 +409,8 @@ class ImageCache
           */
         PixMask* getFlagPic(const Stack* s);
         PixMask* getFlagPic(const Stack* s, guint32 tileset);
-	PixMask* getFlagPic(guint32 stack_size, const Player *p);
-        PixMask* getFlagPic(guint32 stack_size, const Player *p, guint32 tileset);
+	PixMask* getFlagPic(guint32 stack_size, Shield::Color shield);
+        PixMask* getFlagPic(guint32 stack_size, Shield::Color shield, guint32 tileset);
 
         /** Method for getting selector pictures.
           *
@@ -427,7 +421,7 @@ class ImageCache
           * @param p the player to draw it for
           * @return image for the flag
           */
-        PixMask* getSelectorPic(guint32 type, guint32 frame, const Player* p, guint32 tileset);
+        PixMask* getSelectorPic(guint32 type, guint32 frame, const Player *p, guint32 tileset);
 
 	PixMask* getSelectorPic(guint32 type, guint32 frame, const Player *p);
 
@@ -435,7 +429,7 @@ class ImageCache
 	PixMask* getTilePic(int tile_style_id, int fog_type_id, bool has_bag, int bag_player_id, bool has_standard, int standard_player_id, int stack_size, int stack_player_id, int army_type_id, bool has_tower, bool has_ship, Maptile::Building building_type, int building_subtype, Vector<int> building_tile, int building_player_id, guint32 tilesize, bool has_grid, int stone_type);
 
 
-        //PixMask* getMoveBonusPic(guint32 bonus, bool has_ship, guint32 font_size);
+        //PixMask* getMoveBonusPic(guint32 bonus, bool has_ship);
         /** Method for getting production shield pictures.
           *
           * As with the other methods, use solely this method to get the 
@@ -452,7 +446,9 @@ class ImageCache
           */
         PixMask* getProdShieldPic(guint32 type, bool prod);
 
-        PixMask* getMedalPic(bool large, guint32 type, guint32 font_size);
+        PixMask* getMedalPic(bool large, guint32 type);
+
+        PixMask* getBoxPic(guint32 size, Gdk::RGBA color, bool rounded, bool dashed, int line_width, bool offset);
 
         //! Erase cached graphics.
         void reset();
@@ -461,7 +457,7 @@ class ImageCache
         PixMask* getDiplomacyImage(int type, Player::DiplomaticState state);
         PixMask* getCursorImage(int type);
         PixMask *getProdShieldImage(guint32 type);
-        PixMask* getMoveBonusPic(guint32 tileset_id, guint32 bonus, guint32 font_size);
+        PixMask* getMoveBonusPic(guint32 tileset_id, guint32 bonus);
         PixMask* getDefaultTileStyleImage(guint32 type);
         PixMask* getMedalImage(bool large, int type);
         TarFileMaskedImage *getHeroNewLevelMaskedImage (bool female);
@@ -474,14 +470,13 @@ class ImageCache
         PixMask* getSmallRuinUnexploredImage();
         PixMask* getSmallStrongholdUnexploredImage();
         //! get an image for one of the buttons on the main game window.
-        PixMask* getStatusPic(guint32 type, guint32 font_size);
+        PixMask* getStatusPic(guint32 type);
         /** Method for getting main screen game button pictures.
          *
          * @param type is one of the enums.
-         * @font_size is the height of the default font in pixels.
          */
-        PixMask* getGameButtonPic(guint32 type, guint32 font_size);
-        PixMask* getDialogPic(guint32 type, guint32 font_size);
+        PixMask* getGameButtonPic(guint32 type);
+        PixMask* getDialogPic(guint32 type);
         PixMask* getWaypointImage(guint32 type);
 
         TarFileImage* getNextTurnImage ();
@@ -499,12 +494,22 @@ class ImageCache
 
 	static PixMask* greyOut(PixMask* image);
 
-        static PixMask* circled(PixMask* image, Gdk::RGBA color, bool colored = true, double width_percent = 75.0);
-        static void draw_circle(Cairo::RefPtr<Cairo::Context> cr, double width_percent, int width, int height, Gdk::RGBA color, bool colored = true, bool mask = false);
+        static PixMask* circled(PixMask* image, Gdk::RGBA color, bool dark, bool colored = true, double width_percent = 75.0);
+        static PixMask* circle_outline (PixMask* image, bool dark, double width_percent = 75.0);
+        static void draw_circle(Cairo::RefPtr<Cairo::Context> cr, double width_percent, int width, int height, Gdk::RGBA color, bool dark, bool colored = true, bool mask = false);
+        static void draw_circle_outline(Cairo::RefPtr<Cairo::Context> cr, double width_percent, int width, int height, bool dark);
         static PixMask* loadMiscImage(Glib::ustring pngfile);
-
+        static void get_bevel_colors (bool darkmode, Gdk::RGBA &light, Gdk::RGBA &dark);
         static int calculate_width_from_adjusted_height (PixMask *p, double new_height);
-        static void add_underline (PixMask **p, Gdk::RGBA color, guint32 font_size);
+        static Vector<int> get_hotspot (CursorType c);
+        static void draw_rectangle (Cairo::RefPtr<Cairo::Context> cr,
+                                    int width, int height, Gdk::RGBA color,
+                                    bool dashed, int line_width, bool offset);
+        static void draw_rounded_rectangle (Cairo::RefPtr<Cairo::Context> cr,
+                                            int width, int height,
+                                            Gdk::RGBA color, bool dashed,
+                                            int line_width, bool offset);
+
     private:
         ImageCache();
         ImageCache(const ImageCache &c);
@@ -559,6 +564,7 @@ class ImageCache
         PixMaskCache<GameButtonPixMaskCacheItem> gamebuttoncache;
         PixMaskCache<DialogPixMaskCacheItem> dialogcache;
         PixMaskCache<MedalPixMaskCacheItem> medalcache;
+        PixMaskCache<BoxPixMaskCacheItem> boxcache;
 
         PixMask* d_diplomacy[2][DIPLOMACY_TYPES];
         PixMask* d_cursor[CURSOR_TYPES];
@@ -602,7 +608,9 @@ public:
     guint32 tileset;
     guint32 type;
     guint32 frame;
-    guint32 player_id;
+    guint32 shieldset;
+    guint32 shield_id;
+    guint32 armyset;
 };
 
 //! Helper class for army items in the ImageCache.
@@ -618,10 +626,10 @@ public:
     bool operator < (const ArmyPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 armyset;
     guint32 army_id;
-    guint32 player_id;
+    guint32 shieldset;
+    guint32 shield_id;
     bool medals[3];
     bool map;
-    guint32 font_size;
     bool greyed;
 };
 
@@ -638,7 +646,8 @@ public:
     bool operator < (const FlagPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 tileset;
     guint32 size;
-    guint32 player_id;
+    guint32 shieldset;
+    guint32 shield_id;
 };
 
 //! Helper class for circled army items in the ImageCache.
@@ -655,12 +664,13 @@ public:
     bool operator < (const CircledArmyPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 armyset;
     guint32 army_id;
-    guint32 player_id;
+    guint32 shieldset;
+    guint32 shield_id;
     bool medals[3];
     bool greyed;
     guint32 circle_color_id;
     bool show_army;
-    guint32 font_size;
+    bool dark;
 };
 
 //! Helper class for circled ship items in the ImageCache.
@@ -676,10 +686,11 @@ public:
     bool operator == (const CircledShipPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const CircledShipPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 armyset;
-    guint32 player_id;
+    guint32 shieldset;
+    guint32 shield_id;
     bool greyed;
     guint32 circle_color_id;
-    guint32 font_size;
+    bool dark;
 };
 
 //! Helper class for circled planted standard items in the ImageCache.
@@ -695,10 +706,11 @@ public:
     bool operator == (const CircledStandardPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const CircledStandardPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 armyset;
-    guint32 player_id;
+    guint32 shieldset;
+    guint32 shield_id;
     bool greyed;
     guint32 circle_color_id;
-    guint32 font_size;
+    bool dark;
 };
 
 //! Helper class for big map tile items in the ImageCache.
@@ -735,6 +747,7 @@ public:
   guint32 shieldset;
   int stone_type;
 };
+
 
 //! Helper class for city items in the ImageCache.
 /**
@@ -810,7 +823,6 @@ public:
     bool operator < (const DiplomacyPixMaskCacheItem &c) const {return comp(c)<0;};
     int type;
     Player::DiplomaticState state;
-    guint32 font_size;
 };
 
 //! Helper class for road items in the ImageCache.
@@ -871,7 +883,6 @@ public:
     bool operator == (const CursorPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const CursorPixMaskCacheItem &c) const {return comp(c)<0;};
     int type;
-    guint32 font_size;
 };
 
 //! Helper class for shield items in the ImageCache.
@@ -889,7 +900,6 @@ public:
     guint32 type;
     guint32 color;
     bool map;
-    guint32 font_size;
 };
 
 //! Helper class for production icon items in the ImageCache.
@@ -915,13 +925,12 @@ class MoveBonusPixMaskCacheItem
 {
 public:
     static PixMask *generate(const MoveBonusPixMaskCacheItem &item);
-    static PixMask *getMoveBonusPic(Tileset *t, guint32 bonus, guint32 font_size, double ratio);
+    static PixMask *getMoveBonusPic(Tileset *t, guint32 bonus);
     int comp(const MoveBonusPixMaskCacheItem &item) const;
     bool operator == (const MoveBonusPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const MoveBonusPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 bonus; // a movement bonus, a bitwise OR'd set of Tile::Type
     guint32 tileset;
-    guint32 font_size;
     //! Generate a movement bonus where two Tile types are featured
     static PixMask* generateTwo (Tileset *t, guint32 bonus);
     //! Generate a movement bonus where three Tile types are featured
@@ -946,7 +955,8 @@ public:
     int comp(const ShipPixMaskCacheItem &item) const;
     bool operator == (const ShipPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const ShipPixMaskCacheItem &c) const {return comp(c)<0;};
-    guint32 player_id;
+    guint32 shieldset;
+    guint32 shield_id;
     guint32 armyset;
 };
 
@@ -961,7 +971,8 @@ public:
     int comp(const PlantedStandardPixMaskCacheItem &item) const;
     bool operator == (const PlantedStandardPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const PlantedStandardPixMaskCacheItem &c) const {return comp(c)<0;};
-    guint32 player_id;
+    guint32 shieldset;
+    guint32 shield_id;
     guint32 armyset;
 };
 
@@ -1035,9 +1046,9 @@ public:
     int comp(const NewLevelPixMaskCacheItem &item) const;
     bool operator == (const NewLevelPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const NewLevelPixMaskCacheItem &c) const {return comp(c)<0;};
-    guint32 player_id;
+    guint32 shieldset;
+    guint32 shield_id;
     guint32 gender;
-    guint32 font_size;
 };
 
 //! Helper class for default tile style items in the ImageCache.
@@ -1065,14 +1076,12 @@ class TartanPixMaskCacheItem
 {
 public:
     static PixMask *generate(const TartanPixMaskCacheItem &item);
-    static void calculateWidth(guint32 iwidth, PixMask *left, PixMask *center, PixMask *right, guint32 &width, guint32 &centers, bool &include_right);
     int comp(const TartanPixMaskCacheItem &item) const;
     bool operator == (const TartanPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const TartanPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 width;
-    guint32 player_id;
+    guint32 shield;
     guint32 shieldset;
-    guint32 font_size;
 };
 
 //! Helper class for empty tartan progress bar images in the ImageCache.
@@ -1088,9 +1097,8 @@ public:
     bool operator == (const EmptyTartanPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const EmptyTartanPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 width;
-    guint32 player_id;
+    guint32 shield;
     guint32 shieldset;
-    guint32 font_size;
 };
 
 //! Helper class for status images in the ImageCache.
@@ -1105,7 +1113,6 @@ public:
     bool operator == (const StatusPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const StatusPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 type;
-    guint32 font_size;
 };
 
 //! Helper class for the main screen button images in the ImageCache.
@@ -1120,7 +1127,6 @@ public:
     bool operator == (const GameButtonPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const GameButtonPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 type;
-    guint32 font_size;
 };
 
 //! Helper class for the various images that appear on dialogs.
@@ -1135,7 +1141,6 @@ public:
     bool operator == (const DialogPixMaskCacheItem &c) {return !comp(c);};
     bool operator < (const DialogPixMaskCacheItem &c) const {return comp(c)<0;};
     guint32 type;
-    guint32 font_size;
 };
 
 //! Helper class for the medal images in the ImageCache.
@@ -1152,7 +1157,25 @@ public:
     bool operator < (const MedalPixMaskCacheItem &c) const {return comp(c)<0;};
     bool large;
     guint32 type;
-    guint32 font_size;
+};
+
+//! Helper class for the box images in the ImageCache.
+/**
+ * This is a general way to get a box of a certain size.
+ */
+class BoxPixMaskCacheItem
+{
+public:
+    static PixMask *generate(const BoxPixMaskCacheItem &item);
+    int comp(const BoxPixMaskCacheItem &item) const;
+    bool operator == (const BoxPixMaskCacheItem &c) {return !comp(c);};
+    bool operator < (const BoxPixMaskCacheItem &c) const {return comp(c)<0;};
+    guint32 size;
+    Gdk::RGBA color;
+    bool rounded;
+    bool dashed;
+    int line_width;
+    bool offset;
 };
 
 #endif

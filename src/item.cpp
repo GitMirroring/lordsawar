@@ -1,7 +1,7 @@
-// Copyright (C) 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,18 +15,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sstream>
 #include <map>
-#include "Item.h"
-#include "ItemProto.h"
-#include "File.h"
-#include "playerlist.h"
+#include "item.h"
+#include "item-proto.h"
+#include "file.h"
+#include "player-list.h"
 #include "ucompose.hpp"
-#include "maptile.h"
-#include "xmlhelper.h"
+#include "map-tile.h"
+#include "xml-helper.h"
 
 Glib::ustring Item::d_tag = "item";
 
@@ -34,12 +33,12 @@ Item::Item(XML_Helper* helper)
 	: ItemProto(helper), UniquelyIdentified(helper)
 {
     
-    helper->getData(d_plantable, "plantable");
+    helper->get(d_plantable, "plantable");
     if (d_plantable)
       {
-        helper->getData(d_plantable_owner_id, "plantable_owner");
-        helper->getData(d_planted, "planted");
-        helper->getData(d_plantable_orig_owner_id, "plantable_orig_owner");
+        helper->get(d_plantable_owner_id, "plantable_owner");
+        helper->get(d_planted, "planted");
+        helper->get(d_plantable_orig_owner_id, "plantable_orig_owner");
       }
     else
       {
@@ -48,7 +47,7 @@ Item::Item(XML_Helper* helper)
 	d_planted = false;
       }
 
-    helper->getData(d_type, "type");
+    helper->get(d_type, "type");
 
 }
 
@@ -95,18 +94,18 @@ bool Item::save(XML_Helper* helper) const
   bool retval = true;
 
   // A template is never saved, so we assume this class is a real-life item
-  retval &= helper->openTag(Item::d_tag);
+  retval &= helper->open_tag(Item::d_tag);
   retval &= saveContents(helper);
-  retval &= helper->saveData("plantable", d_plantable);
+  retval &= helper->save("plantable", d_plantable);
   if (d_plantable)
     {
-      retval &= helper->saveData("plantable_owner", d_plantable_owner_id);
-      retval &= helper->saveData("planted", d_planted);
-      retval &= helper->saveData("plantable_orig_owner", d_plantable_orig_owner_id);
+      retval &= helper->save("plantable_owner", d_plantable_owner_id);
+      retval &= helper->save("planted", d_planted);
+      retval &= helper->save("plantable_orig_owner", d_plantable_orig_owner_id);
     }
-  retval &= helper->saveData("id", d_id);
-  retval &= helper->saveData("type", d_type);
-  retval &= helper->closeTag();
+  retval &= helper->save("id", d_id);
+  retval &= helper->save("type", d_type);
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -126,10 +125,10 @@ bool Item::use()
 	
 Player *Item::getPlantableOwner() const
 {
-  return Playerlist::getInstance()->getPlayer(d_plantable_owner_id);
+  return Playerlist::instance()->get (d_plantable_owner_id);
 }
 
 Player *Item::getPlantableOriginalOwner() const
 {
-  return Playerlist::getInstance()->getPlayer(d_plantable_orig_owner_id);
+  return Playerlist::instance()->get (d_plantable_orig_owner_id);
 }

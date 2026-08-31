@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef ITEM_EDITOR_ACTIONS_H
-#define ITEM_EDITOR_ACTIONS_H
+#ifndef ITEM_EDITOR_UNDO_ACTIONS_H
+#define ITEM_EDITOR_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
@@ -30,54 +29,110 @@
  * editor.
  */
 
-class ItemEditorAction: public UndoAction
+class ItemEditorUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      NAME = 1,
-      USES = 2,
-    };
+    enum Type
+      {
+        NAME = 1,
+        USES = 2,
+        BONUS = 3,
+      };
 
-    ItemEditorAction(Type type, bool agg = false)
-     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+    ItemEditorUndoAction(Type type, bool agg = false)
+      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                    UndoAction::AGGREGATE_NONE), m_type (type)
+        {
+        }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class ItemEditorAction_Name: public ItemEditorAction, public UndoCursor
+class ItemEditorUndoAction_Name: public ItemEditorUndoAction, public UndoCursor
 {
-    public:
-        ItemEditorAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
-          : ItemEditorAction (NAME, true), UndoCursor (u, e),
-          d_name (n) {}
-        ~ItemEditorAction_Name () {}
+public:
+    ItemEditorUndoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
+      : ItemEditorUndoAction (NAME, true), UndoCursor (u->get_pos (e), e),
+      m_name (n)
+  {
+  }
 
-        Glib::ustring getActionName () const {return "Name";}
+    ~ItemEditorUndoAction_Name ()
+      {
+      }
 
-        Glib::ustring getName () {return d_name;}
+    Glib::ustring get_action_name () const
+      {
+        return "Name";
+      }
 
-    private:
-        Glib::ustring d_name;
+    Glib::ustring get_name () const
+      {
+        return m_name;
+      }
+
+private:
+    Glib::ustring m_name;
 };
 
-class ItemEditorAction_Uses: public ItemEditorAction
+class ItemEditorUndoAction_Uses: public ItemEditorUndoAction
 {
-    public:
-        ItemEditorAction_Uses (guint32 u)
-          : ItemEditorAction (USES, true), d_uses (u) {}
-        ~ItemEditorAction_Uses () {}
+public:
+    ItemEditorUndoAction_Uses (guint32 u)
+      : ItemEditorUndoAction (USES, true), m_uses (u)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Uses";}
+    ~ItemEditorUndoAction_Uses ()
+      {
+      }
 
-        guint32 getUses () {return d_uses;}
+    Glib::ustring get_action_name () const
+      {
+        return "Uses";
+      }
 
-    private:
-        guint32 d_uses;
+    guint32 get_uses () const
+      {
+        return m_uses;
+      }
+
+private:
+    guint32 m_uses;
 };
-#endif //ITEM_EDITOR_ACTIONS_H
+
+class ItemEditorUndoAction_Bonus: public ItemEditorUndoAction
+{
+public:
+    ItemEditorUndoAction_Bonus (Item *i)
+      : ItemEditorUndoAction (BONUS, false), m_item (new Item (*i, true))
+      {
+      }
+
+    ~ItemEditorUndoAction_Bonus ()
+      {
+        delete m_item;
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Bonus";
+      }
+
+    Item *get_item () const
+      {
+        return m_item;
+      }
+
+private:
+    Item *m_item;
+};
+#endif

@@ -1,14 +1,8 @@
+# Copyright (C) 2026 Ben Asselstine
+# This file is licensed under the terms of the GNU GPL version 3 or later.
 MAINTAINERCLEANFILES = Makefile.in
 
-lordsawarshielddir = $(datadir)/lordsawar/shield
-
-default.lws: default.lws.in
-	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/default.lws.in $(builddir)/default.lws && \
-	$(top_srcdir)/create-lw-file $(builddir)/default.lws $(IMAGES)
-
-DISTCLEANFILES = default.lws 
-
-lordsawarshield_DATA = default.lws
+lordsawarshielddir = $(pkgdatadir)/shields
 
 IMAGES = \
 	$(srcdir)/large-black-shield.png \
@@ -40,7 +34,19 @@ IMAGES = \
 	$(srcdir)/small-yellow-shield.png \
 	$(srcdir)/left-tartan.png \
 	$(srcdir)/center-tartan.png \
-	$(srcdir)/right-tartan.png
+	$(srcdir)/right-tartan.png \
+	$(srcdir)/black-left-tartan.png \
+	$(srcdir)/black-center-tartan.png \
+	$(srcdir)/black-right-tartan.png
+
+default.lws: default.lws.in $(IMAGES)
+	rm $(builddir)/default.lws -f 2>/dev/null && \
+	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/default.lws.in $(builddir)/default.lws && \
+	$(top_srcdir)/create-lw-file $(builddir)/default.lws $(IMAGES)
+
+CLEANFILES = default.lws 
+
+lordsawarshield_DATA = default.lws
 
 EXTRA_DIST = \
 	default.lws.in \

@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2011, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2011, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
@@ -22,13 +21,13 @@
 #include <limits.h>
 #include <fstream>
 #include <iostream>
-#include "xmlhelper.h"
-#include "Configuration.h"
+#include "xml-helper.h"
+#include "configuration.h"
 #include "defs.h"
 #include "profile.h"
-#include "profilelist.h"
+#include "profile-list.h"
 #include "file-compat.h"
-#include "File.h"
+#include "file.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
@@ -37,7 +36,7 @@ Glib::ustring RecentlyPlayedGameList::d_tag = "recentlyplayedgamelist";
 
 RecentlyPlayedGameList* RecentlyPlayedGameList::s_instance = 0;
 
-RecentlyPlayedGameList* RecentlyPlayedGameList::getInstance()
+RecentlyPlayedGameList* RecentlyPlayedGameList::instance()
 {
   if (s_instance == 0)
     s_instance = new RecentlyPlayedGameList();
@@ -61,8 +60,8 @@ bool RecentlyPlayedGameList::loadFromFile(Glib::ustring filename)
   if (in)
     {
       XML_Helper helper(filename.c_str(), std::ios::in);
-      helper.registerTag(RecentlyPlayedGame::d_tag, sigc::mem_fun(this, &RecentlyPlayedGameList::load_tag));
-      bool retval = helper.parseXML();
+      helper.register_tag(RecentlyPlayedGame::d_tag, sigc::mem_fun(*this, &RecentlyPlayedGameList::load_tag));
+      bool retval = helper.parse_XML();
       helper.close();
       if (retval == false)
 	File::erase(filename);
@@ -71,7 +70,7 @@ bool RecentlyPlayedGameList::loadFromFile(Glib::ustring filename)
   return true;
 }
 
-RecentlyPlayedGameList* RecentlyPlayedGameList::getInstance(XML_Helper* helper)
+RecentlyPlayedGameList* RecentlyPlayedGameList::instance(XML_Helper* helper)
 {
   if (s_instance)
     deleteInstance();
@@ -94,7 +93,7 @@ RecentlyPlayedGameList::RecentlyPlayedGameList()
 
 RecentlyPlayedGameList::RecentlyPlayedGameList(XML_Helper* helper)
 {
-  helper->registerTag(RecentlyPlayedGame::d_tag, sigc::mem_fun(this, &RecentlyPlayedGameList::load_tag));
+  helper->register_tag(RecentlyPlayedGame::d_tag, sigc::mem_fun(*this, &RecentlyPlayedGameList::load_tag));
 }
 
 RecentlyPlayedGameList::~RecentlyPlayedGameList()
@@ -114,19 +113,19 @@ bool RecentlyPlayedGameList::save(XML_Helper* helper) const
   bool retval = true;
 
   retval &= helper->begin(LORDSAWAR_RECENTLY_PLAYED_VERSION);
-  retval &= helper->openTag(RecentlyPlayedGameList::d_tag);
+  retval &= helper->open_tag(RecentlyPlayedGameList::d_tag);
 
   for (const_iterator it = begin(); it != end(); ++it)
     (*it)->save(helper);
 
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
 
 bool RecentlyPlayedGameList::load_tag(Glib::ustring tag, XML_Helper* helper)
 {
-  if (helper->getVersion() != LORDSAWAR_RECENTLY_PLAYED_VERSION)
+  if (helper->get_version() != LORDSAWAR_RECENTLY_PLAYED_VERSION)
     {
       return false;
     }
@@ -155,6 +154,7 @@ void RecentlyPlayedGameList::addNetworkedEntry(GameScenario *game_scenario, Prof
     }
   if (g)
     push_back(g);
+
   sort(orderByTime);
 }
 
@@ -180,10 +180,10 @@ void RecentlyPlayedGameList::addEntry(GameScenario *game_scenario, Profile *p,
 
 bool RecentlyPlayedGameList::orderByTime(RecentlyPlayedGame*rhs, RecentlyPlayedGame *lhs)
 {
-  if (rhs->getTimeOfLastPlay().as_double() > lhs->getTimeOfLastPlay().as_double())
+  if (rhs->getTimeOfLastPlay().difference (lhs->getTimeOfLastPlay()) > 0)
+  //if (rhs->getTimeOfLastPlay().to_unix () > lhs->getTimeOfLastPlay().to_unix ())
     return true;
-  else
-    return false;
+  return false;
 }
 
 void RecentlyPlayedGameList::pruneGames(int max_number_of_games)
@@ -200,7 +200,7 @@ void RecentlyPlayedGameList::pruneGamesBelongingToRemovedProfiles()
   for (RecentlyPlayedGameList::iterator it = begin(); it != end(); ++it)
     {
       Profile *p = 
-        Profilelist::getInstance()->findProfileById((*it)->getProfileId());
+        Profilelist::instance()->findProfileById((*it)->getProfileId());
       if (!p)
         {
           delete *it;
@@ -262,11 +262,10 @@ void RecentlyPlayedGameList::pruneSameNamedAndSameHostGames()
 
 void RecentlyPlayedGameList::pruneOldGames(int stale)
 {
-  Glib::TimeVal now;
-  now.assign_current_time();
+  Glib::DateTime now = Glib::DateTime::create_now_local();
   for (RecentlyPlayedGameList::iterator it = begin(); it != end();)
     {
-      if ((*it)->getTimeOfLastPlay().as_double() + stale < now.as_double())
+      if ((*it)->getTimeOfLastPlay().to_unix() + stale < now.to_unix())
 	{
 	  delete *it;
 	  it = erase (it);
@@ -282,8 +281,7 @@ void RecentlyPlayedGameList::updateEntry(GameScenario *game_scenario)
     {
       if ((*it)->getId() == game_scenario->getId())
 	{
-          Glib::TimeVal now;
-          now.assign_current_time();
+          Glib::DateTime now = Glib::DateTime::create_now_local();
 	  (*it)->setTimeOfLastPlay(now);
 	  (*it)->setRound(game_scenario->getRound());
 	}
@@ -306,30 +304,29 @@ void RecentlyPlayedGameList::removeAllNetworkedGames()
 
 bool RecentlyPlayedGameList::load()
 {
-  return loadFromFile(File::getSaveFile(RECENTLY_PLAYED_LIST));
+  return loadFromFile(File::getUserRecentlyPlayedGamesDescription());
 }
 
 bool RecentlyPlayedGameList::save() const
 {
-  return saveToFile(File::getSaveFile(RECENTLY_PLAYED_LIST));
+  return saveToFile(File::getUserRecentlyPlayedGamesDescription());
 }
 
 bool RecentlyPlayedGameList::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version)
 {
-  return FileCompat::getInstance()->upgrade(filename, old_version, new_version,
+  return FileCompat::instance()->upgrade(filename, old_version, new_version,
                                             FileCompat::RECENTLYPLAYEDGAMELIST, 
                                             d_tag);
 }
 
 void RecentlyPlayedGameList::support_backward_compatibility()
 {
-  FileCompat::getInstance()->support_type
+  FileCompat::instance()->support_type
     (FileCompat::RECENTLYPLAYEDGAMELIST, 
      File::get_extension(File::getUserRecentlyPlayedGamesDescription()), d_tag, 
      false);
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::RECENTLYPLAYEDGAMELIST, "0.2.0", 
      LORDSAWAR_RECENTLY_PLAYED_VERSION,
      sigc::ptr_fun(&RecentlyPlayedGameList::upgrade));
 }
-// End of file

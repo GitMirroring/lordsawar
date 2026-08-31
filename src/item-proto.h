@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2015, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef ITEM_PROTO_H
@@ -21,7 +20,7 @@
 
 #include <gtkmm.h>
 
-#include "Renamable.h"
+#include "renamable.h"
 class XML_Helper;
 
 //! A carryable type of thing that confers special properties on it's holder.
@@ -179,7 +178,6 @@ class ItemProto: public Renamable
         guint32 getBuildingTypeToSummonOn() const {return d_building_type_to_summon_on;}
         void setBuildingTypeToSummonOn(guint32 type) {d_building_type_to_summon_on = type;}
 
-        bool isCurrentlyUsable(guint32 building, bool bags_on_map, bool victims_left, bool ruin_has_occupant, bool friendly_cities_present, bool enemy_cities_present, bool neutral_cities_present);
         double getPercentArmiesToKill() const {return d_percent_armies_to_kill;};
         void setPercentArmiesToKill(double p) {d_percent_armies_to_kill = p;}
 
@@ -249,4 +247,4 @@ class ItemProto: public Renamable
 
 };
 
-#endif //ITEM_PROTO_H
+#endif

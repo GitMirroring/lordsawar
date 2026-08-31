@@ -1,4 +1,4 @@
-//  Copyright (C) 2017, 2021 Ben Asselstine
+//  Copyright (C) 2017, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,20 +12,19 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef STONE_H
 #define STONE_H
 
-#include "Location.h"
+#include "location.h"
 #include "road.h"
 
 //! A single tile on the map that has a standing stone on it.
 /**
  * Standing stones are purely cosmetic.  They can only be on grassy tiles
- * without buildings, except stones.
+ * without buildings, except roads.
  */
 class Stone: public Location
 {
@@ -130,7 +129,7 @@ class Stone: public Location
           * @param pos          The location of the stone.
           * @param type 	The type of stone.
           */
-        Stone(Vector<int> pos, int type = ROAD_E_AND_W_STONE_N);
+        Stone(Vector<int> pos, Type type = ROAD_E_AND_W_STONE_N);
 
 	//! Copy constructor.
         Stone(const Stone&, bool sync_id = false);
@@ -154,12 +153,12 @@ class Stone: public Location
 	// Get Methods
 
         //! Returns the type of the stone.
-        int getType() const {return d_type;};
+        Type getType() const {return d_type;};
 
 	// Set Methods
 
         //! Sets the type of the stone.
-        void setType(int type) {d_type = type;};
+        void setType(Type type) {d_type = type;};
 
 
 	// Methods that operate on class data but do not modify the class
@@ -177,10 +176,10 @@ class Stone: public Location
 	static Stone::Type stoneTypeFromString(const Glib::ustring str);
 
         //! Returns a random suitable stone type for a given road type.
-        static int getRandomType (const Road::Type type);
+        static Stone::Type getRandomType (const Road::Type type);
 
         //! Returns a random suitable stone type for the field.
-        static int getRandomType ();
+        static Stone::Type getRandomType ();
 
         //! Returns which stone types are suitable for a given road type.
         static std::vector<Stone::Type> getSuitableTypes (const Road::Type type);
@@ -198,8 +197,8 @@ class Stone: public Location
 	 * can be any one of the values found in Stone::Type.
 	 *
 	 */
-	int d_type;
+	Type d_type;
 
 };
 
-#endif // STONE_H
+#endif

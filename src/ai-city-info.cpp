@@ -1,5 +1,5 @@
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,12 +13,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "AICityInfo.h"
-#include "Threatlist.h"
-#include "Threat.h"
+#include "ai-city-info.h"
+#include "threat-list.h"
+#include "threat.h"
 #include "city.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::flush<<std::endl;}

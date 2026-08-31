@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2014, 2015, 2017, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2015, 2017, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
@@ -22,21 +21,21 @@
 #include "ucompose.hpp"
 #include "army.h"
 #include "city.h"
-#include "QCityRaze.h"
-#include "QuestsManager.h"
-#include "citylist.h"
-#include "playerlist.h"
+#include "quest-city-raze.h"
+#include "quest-manager.h"
+#include "city-list.h"
+#include "player-list.h"
 #include "stack.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "hero.h"
 #include "rnd.h"
-#include "GameScenarioOptions.h"
+#include "game-scenario-options.h"
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
 
-QuestCityRaze::QuestCityRaze (QuestsManager& mgr, guint32 hero) 
-  : Quest(mgr, hero, Quest::CITYRAZE),
+QuestCityRaze::QuestCityRaze (guint32 hero) 
+  : Quest(hero, Quest::CITYRAZE),
     d_city (chooseToRaze (getHero ()->getOwner ())->getId ())
 {
   d_targets.push_back(getCity ()->getPos());
@@ -49,16 +48,16 @@ QuestCityRaze::QuestCityRaze (const QuestCityRaze &q)
 {
 }
 
-QuestCityRaze::QuestCityRaze (QuestsManager& q_mgr, XML_Helper* helper) 
-  : Quest(q_mgr, helper)
+QuestCityRaze::QuestCityRaze (XML_Helper* helper) 
+  : Quest(helper)
 {
-  helper->getData(d_city, "city");
+  helper->get(d_city, "city");
   d_targets.push_back(getCity()->getPos());
   initDescription();
 }
 
-QuestCityRaze::QuestCityRaze (QuestsManager& mgr, guint32 hero, guint32 target) 
-  : Quest(mgr, hero, Quest::CITYRAZE), d_city (target)
+QuestCityRaze::QuestCityRaze (guint32 hero, guint32 target) 
+  : Quest(hero, Quest::CITYRAZE), d_city (target)
 {
   d_targets.push_back(getCity()->getPos());
   initDescription();
@@ -76,10 +75,10 @@ bool QuestCityRaze::save(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(Quest::d_tag);
+  retval &= helper->open_tag(Quest::d_tag);
   retval &= Quest::save(helper);
-  retval &= helper->saveData("city", d_city);
-  retval &= helper->closeTag();
+  retval &= helper->save("city", d_city);
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -98,13 +97,13 @@ void QuestCityRaze::getExpiredMsg(std::queue<Glib::ustring>& msgs) const
 {
   const City* c = getCity();
   msgs.push(String::ucompose
-	    (_("The razing of city \"%1\" could not be accomplished."), 
+	    (_("The razing of city %1 could not be accomplished."), 
 	     c->getName()));
 }
 
 City* QuestCityRaze::getCity() const
 {
-  for (auto it: *Citylist::getInstance())
+  for (auto it: *Citylist::instance())
     if (it->getId() == d_city)
       return it;
 
@@ -127,9 +126,9 @@ City* QuestCityRaze::chooseToRaze(Player *p)
   std::vector<City*> cities;
 
   // Collect all cities
-  for (auto it: *Citylist::getInstance())
+  for (auto it: *Citylist::instance())
     if (!it->isBurnt() && it->getOwner() != p && 
-        it->getOwner() != Playerlist::getInstance()->getNeutral())
+        it->getOwner() != Playerlist::getNeutral())
       cities.push_back(it);
 
   // Find a suitable city for us to raze 
@@ -146,7 +145,7 @@ void QuestCityRaze::armyDied(Army *a, bool heroIsCulprit)
   //this quest does nothing when an army dies
 }
 
-void QuestCityRaze::cityAction(City *c, CityDefeatedAction action, 
+void QuestCityRaze::cityAction(City *c, CityDefeatedChoice action, 
 			       bool heroIsCulprit, int gold)
 {
   (void) gold;
@@ -170,29 +169,29 @@ void QuestCityRaze::cityAction(City *c, CityDefeatedAction action,
     {
     case CITY_DEFEATED_OCCUPY: //somebody occupied
       if (heroIsCulprit) //quest hero did
-	d_q_mgr.questExpired(d_hero);
+	QuestsManager::instance ()->questExpired(d_hero);
       else if (c->getOwner() == getHero()->getOwner()) //our stack did
-	d_q_mgr.questExpired(d_hero);
+	QuestsManager::instance ()->questExpired(d_hero);
       break;
     case CITY_DEFEATED_RAZE: //somebody razed
       if (heroIsCulprit) // quest hero
-	d_q_mgr.questCompleted(d_hero);
+	QuestsManager::instance ()->questCompleted(d_hero);
       else if (c->getOwner() == getHero()->getOwner()) // our stack razed
-	d_q_mgr.questExpired(d_hero);
+	QuestsManager::instance ()->questExpired(d_hero);
       else // their stack did
-	d_q_mgr.questExpired(d_hero);
+	QuestsManager::instance ()->questExpired(d_hero);
       break;
     case CITY_DEFEATED_SACK: //somebody sacked
       if (heroIsCulprit) // quest hero did
-	d_q_mgr.questExpired(d_hero);
+	QuestsManager::instance ()->questExpired(d_hero);
       else if (c->getOwner() == getHero()->getOwner()) // our stack did
-	d_q_mgr.questExpired(d_hero);
+	QuestsManager::instance ()->questExpired(d_hero);
       break;
     case CITY_DEFEATED_PILLAGE: //somebody pillaged
       if (heroIsCulprit) // quest hero did
-	d_q_mgr.questExpired(d_hero);
+	QuestsManager::instance ()->questExpired(d_hero);
       else if (c->getOwner() == getHero()->getOwner()) // our stack did
-	d_q_mgr.questExpired(d_hero);
+	QuestsManager::instance ()->questExpired(d_hero);
       break;
     }
 }

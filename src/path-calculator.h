@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef PATH_CALCULATOR_H
@@ -56,12 +55,14 @@ public:
     Path* calculate(Vector<int> dest, guint32 &moves, guint32 &turns, guint32 &left, bool zigzag = true);
 
     Path* calculateToCity (City *c, guint32 &moves, guint32 &turns, guint32 &left, bool zigzag = true);
-    int calculate(Vector<int> dest, bool zigzag = true);
+    int calculateMoves(Vector<int> dest, bool zigzag = true);
 
     static bool isBlocked(const Stack *s, Vector<int> pos, bool enemy_cities_block, bool enemy_stacks_block);
 
     //! Return the positions on the map that are reachable in MP or less.
     std::list<Vector<int> > getReachablePositions(int mp = 0);
+    //of the points in position return which one is closest
+    Vector<int> getClosestPoint (std::vector<Vector<int>> positions);
 private:
     //! A PathCalculator helper struct for a weighted tile on the map.
     struct node

@@ -1,7 +1,7 @@
-// Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2004 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2004 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sstream>
 #include <sigc++/functors/mem_fun.h>
@@ -24,14 +23,14 @@
 
 #include "army.h"
 #include "stack.h"
-#include "QEnemyArmies.h"
-#include "QuestsManager.h"
-#include "playerlist.h"
-#include "stacklist.h"
-#include "GameMap.h"
+#include "quest-enemy-armies.h"
+#include "quest-manager.h"
+#include "player-list.h"
+#include "stack-list.h"
+#include "game-map.h"
 #include "player.h"
 #include "hero.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "rnd.h"
 
 //go get an existing alive player,
@@ -39,8 +38,8 @@
 Player* getVictimPlayer(Player *p)
 {
   std::vector<Player*> players;
-  for (auto i: *Playerlist::getInstance())
-    if (i != p && !i->isDead() && i != Playerlist::getInstance()->getNeutral())
+  for (auto i: *Playerlist::instance())
+    if (i != p && !i->isDead() && i != Playerlist::getNeutral())
       players.push_back(i);
 
   if (players.size() == 0)
@@ -52,7 +51,7 @@ Player* getVictimPlayer(Player *p)
 void QuestEnemyArmies::update_targets()
 {
   Stacklist::const_iterator sit ;
-  Player *p = Playerlist::getInstance()->getPlayer (d_victim_player_id);
+  Player *p = Playerlist::instance()->get (d_victim_player_id);
   Stacklist *sl = p->getStacklist();
   d_targets.clear();
   for (sit = sl->begin(); sit != sl->end(); ++sit)
@@ -65,8 +64,8 @@ void QuestEnemyArmies::update_targets()
 
 //#define debug(x) {std::cerr<<__FILE__<<": "<<__LINE__<<": "<<x<<std::endl<<std::flush;}
 #define debug(x)
-QuestEnemyArmies::QuestEnemyArmies(QuestsManager& q_mgr, guint32 hero)
-  : Quest(q_mgr, hero, Quest::KILLARMIES), d_killed(0)
+QuestEnemyArmies::QuestEnemyArmies(guint32 hero)
+  : Quest(hero, Quest::KILLARMIES), d_killed(0)
 {
   // have us be informed when hostilities break out
   d_victim_player_id = getVictimPlayer(getHero()->getOwner())->getId ();
@@ -84,20 +83,20 @@ QuestEnemyArmies::QuestEnemyArmies (const QuestEnemyArmies &q)
 {
 }
 
-QuestEnemyArmies::QuestEnemyArmies(QuestsManager& q_mgr, XML_Helper* helper) 
-  : Quest(q_mgr, helper)
+QuestEnemyArmies::QuestEnemyArmies(XML_Helper* helper) 
+  : Quest(helper)
 {
-  helper->getData(d_to_kill, "to_kill");
-  helper->getData(d_killed,  "killed");
-  helper->getData(d_victim_player_id, "victim_player");
+  helper->get(d_to_kill, "to_kill");
+  helper->get(d_killed,  "killed");
+  helper->get(d_victim_player_id, "victim_player");
 
   update_targets();
   initDescription();
 }
 
-QuestEnemyArmies::QuestEnemyArmies(QuestsManager& q_mgr, guint32 hero,
+QuestEnemyArmies::QuestEnemyArmies(guint32 hero,
 				   guint32 armies_to_kill, guint32 victim_player)
-  : Quest(q_mgr, hero, Quest::KILLARMIES), d_killed(0)
+  : Quest(hero, Quest::KILLARMIES), d_killed(0)
 {
   // have us be informed when hostilities break out
   d_victim_player_id = victim_player;
@@ -111,12 +110,12 @@ bool QuestEnemyArmies::save(XML_Helper *helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(Quest::d_tag);
+  retval &= helper->open_tag(Quest::d_tag);
   retval &= Quest::save(helper);
-  retval &= helper->saveData("to_kill", d_to_kill);
-  retval &= helper->saveData("killed",  d_killed);
-  retval &= helper->saveData("victim_player", d_victim_player_id);
-  retval &= helper->closeTag();
+  retval &= helper->save("to_kill", d_to_kill);
+  retval &= helper->save("killed",  d_killed);
+  retval &= helper->save("victim_player", d_victim_player_id);
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -129,7 +128,6 @@ Glib::ustring QuestEnemyArmies::getProgress() const
 void QuestEnemyArmies::getSuccessMsg(std::queue<Glib::ustring>& msgs) const
 {
   msgs.push(String::ucompose(_("You have managed to slaughter %1 armies."), d_killed));
-  msgs.push(_("Well done!"));
 }
 
 void QuestEnemyArmies::getExpiredMsg(std::queue<Glib::ustring>& msgs) const
@@ -140,7 +138,7 @@ void QuestEnemyArmies::getExpiredMsg(std::queue<Glib::ustring>& msgs) const
 
 void QuestEnemyArmies::initDescription()
 {
-  Player *p = Playerlist::getInstance()->getPlayer (d_victim_player_id);
+  Player *p = Playerlist::instance()->get (d_victim_player_id);
   d_description = String::ucompose(_("You shall slaughter %1 armies of the treacherous %2."),
 				   d_to_kill, p->getName());
 }
@@ -154,7 +152,7 @@ bool QuestEnemyArmies::isFeasible(guint32 heroId)
 
 void QuestEnemyArmies::armyDied(Army *a, bool heroIsCulprit)
 {
-  if (!isPendingDeletion())
+  if (isPendingDeletion())
     return;
   Hero *h = getHero();
   if (!h || h->getHP() <= 0)
@@ -169,12 +167,12 @@ void QuestEnemyArmies::armyDied(Army *a, bool heroIsCulprit)
       if (d_killed >= d_to_kill)
 	{
 	  debug("CONGRATULATIONS: QUEST 'ENEMY ARMIES' IS COMPLETED!");
-	  d_q_mgr.questCompleted(d_hero);
+          QuestsManager::instance()->questCompleted(d_hero);
 	}
     }
 }
 
-void QuestEnemyArmies::cityAction(City *c, CityDefeatedAction action, 
+void QuestEnemyArmies::cityAction(City *c, CityDefeatedChoice action, 
 				  bool heroIsCulprit, int gold)
 {
   (void) c;

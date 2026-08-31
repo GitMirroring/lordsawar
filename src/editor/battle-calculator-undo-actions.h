@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef BATTLE_CALCULATOR_ACTIONS_H
-#define BATTLE_CALCULATOR_ACTIONS_H
+#ifndef BATTLE_CALCULATOR_UNDO_ACTIONS_H
+#define BATTLE_CALCULATOR_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
@@ -26,270 +25,423 @@
 #include "army.h"
 #include "hero.h"
 
-//! A record of an event in the hero editor
-/** 
+//! A record of an event in the battle calculator
+/**
  * The purpose of these classes is to implement undo/redo in the battle
  * calculator.
  */
 
-class BattleCalculatorAction: public UndoAction
+class BattleCalculatorUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      SIDES = 1,
-      TERRAIN = 2,
-      CITY = 3,
-      FORTIFY = 4,
-      DEFENDER_OWNER = 5,
-      ATTACKER_OWNER = 6,
-      DEFENDER_ADD = 7,
-      DEFENDER_REMOVE = 8,
-      DEFENDER_COPY = 9,
-      DEFENDER_HERO_DETAILS = 10,
-      DEFENDER_STRENGTH = 11,
-      ATTACKER_ADD = 12,
-      ATTACKER_REMOVE = 13,
-      ATTACKER_COPY = 14,
-      ATTACKER_HERO_DETAILS = 15,
-      ATTACKER_STRENGTH = 16,
-    };
+    enum Type
+      {
+        SIDES = 1,
+        TERRAIN = 2,
+        CITY = 3,
+        FORTIFY = 4,
+        DEFENDER_ADD = 5,
+        DEFENDER_REMOVE = 6,
+        DEFENDER_COPY = 7,
+        DEFENDER_HERO_DETAILS = 8,
+        DEFENDER_STRENGTH = 9,
+        ATTACKER_ADD = 10,
+        ATTACKER_REMOVE = 11,
+        ATTACKER_COPY = 12,
+        ATTACKER_HERO_DETAILS = 13,
+        ATTACKER_STRENGTH = 14,
+      };
 
-    BattleCalculatorAction(Type type, bool agg = false)
+    BattleCalculatorUndoAction (Type type, bool agg = false)
      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+                   UndoAction::AGGREGATE_NONE), m_type (type)
+       {
+       }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class BattleCalculatorAction_Row
+class BattleCalculatorUndoAction_Row
 {
-    public:
-        BattleCalculatorAction_Row (int r)
-          : d_row (r) {}
-        ~BattleCalculatorAction_Row () {}
+public:
+    BattleCalculatorUndoAction_Row (int r)
+      : m_row (r)
+      {
+      }
 
-        int getRow () const {return d_row;}
-    private:
-        int d_row;
+    ~BattleCalculatorUndoAction_Row ()
+      {
+      }
+
+    int get_row () const
+      {
+        return m_row;
+      }
+private:
+    int m_row;
 };
 
-class BattleCalculatorAction_Active
+class BattleCalculatorUndoAction_Active
 {
-    public:
-        BattleCalculatorAction_Active (bool state)
-          : d_active (state) {}
-        ~BattleCalculatorAction_Active () {}
+public:
+    BattleCalculatorUndoAction_Active (bool state)
+      : m_active (state)
+      {
+      }
 
-        bool getActive() const {return d_active;}
-    private:
-        bool d_active;
+    ~BattleCalculatorUndoAction_Active ()
+      {
+      }
+
+    bool get_active () const
+      {
+        return m_active;
+      }
+private:
+    bool m_active;
 };
 
-class BattleCalculatorAction_Sides: public BattleCalculatorAction, public BattleCalculatorAction_Row
+class BattleCalculatorUndoAction_Sides: public BattleCalculatorUndoAction,
+    public BattleCalculatorUndoAction_Row
 {
-    public:
-        BattleCalculatorAction_Sides (int r)
-          : BattleCalculatorAction (SIDES), BattleCalculatorAction_Row (r) {}
-        ~BattleCalculatorAction_Sides () {}
+public:
+    BattleCalculatorUndoAction_Sides (int r)
+      : BattleCalculatorUndoAction (SIDES), BattleCalculatorUndoAction_Row (r)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Sides";}
+    ~BattleCalculatorUndoAction_Sides ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Sides";
+      }
 };
 
-class BattleCalculatorAction_Terrain: public BattleCalculatorAction, public BattleCalculatorAction_Row
+class BattleCalculatorUndoAction_Terrain: public BattleCalculatorUndoAction, public BattleCalculatorUndoAction_Row
 {
-    public:
-        BattleCalculatorAction_Terrain (int r)
-          : BattleCalculatorAction (TERRAIN), BattleCalculatorAction_Row (r) {}
-        ~BattleCalculatorAction_Terrain () {}
+public:
+    BattleCalculatorUndoAction_Terrain (int r)
+      : BattleCalculatorUndoAction (TERRAIN), BattleCalculatorUndoAction_Row (r)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Terrain";}
+    ~BattleCalculatorUndoAction_Terrain ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Terrain";
+      }
 };
 
-class BattleCalculatorAction_City: public BattleCalculatorAction, public BattleCalculatorAction_Row, public BattleCalculatorAction_Active
+class BattleCalculatorUndoAction_City: public BattleCalculatorUndoAction,
+    public BattleCalculatorUndoAction_Active
 {
-    public:
-        BattleCalculatorAction_City (bool state, int terrain_row)
-          : BattleCalculatorAction (CITY),
-          BattleCalculatorAction_Row (terrain_row),
-          BattleCalculatorAction_Active (state) {}
-        ~BattleCalculatorAction_City () {}
+public:
+    BattleCalculatorUndoAction_City (bool state)
+      : BattleCalculatorUndoAction (CITY),
+      BattleCalculatorUndoAction_Active (state)
+  {
+  }
 
-        Glib::ustring getActionName () const {return "City";}
+    ~BattleCalculatorUndoAction_City ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "City";
+      }
 };
 
-class BattleCalculatorAction_Fortify: public BattleCalculatorAction, public BattleCalculatorAction_Active
+class BattleCalculatorUndoAction_Fortify: public BattleCalculatorUndoAction,
+    public BattleCalculatorUndoAction_Active
 {
-    public:
-        BattleCalculatorAction_Fortify (bool s)
-          : BattleCalculatorAction (FORTIFY), BattleCalculatorAction_Active (s)
-          {}
-        ~BattleCalculatorAction_Fortify () {}
+public:
+    BattleCalculatorUndoAction_Fortify (bool s)
+      : BattleCalculatorUndoAction (FORTIFY),
+      BattleCalculatorUndoAction_Active (s)
+  {
+  }
 
-        Glib::ustring getActionName () const {return "Fortify";}
+    ~BattleCalculatorUndoAction_Fortify ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Fortify";
+      }
 };
 
-class BattleCalculatorAction_DefenderOwner: public BattleCalculatorAction, public BattleCalculatorAction_Row
+class BattleCalculatorUndoAction_Armies: public BattleCalculatorUndoAction
 {
-    public:
-        BattleCalculatorAction_DefenderOwner (int r)
-          : BattleCalculatorAction (DEFENDER_OWNER),
-          BattleCalculatorAction_Row (r) {}
-        ~BattleCalculatorAction_DefenderOwner () {}
-
-        Glib::ustring getActionName () const {return "DefenderOwner";}
-};
-
-class BattleCalculatorAction_AttackerOwner: public BattleCalculatorAction, public BattleCalculatorAction_Row
-{
-    public:
-        BattleCalculatorAction_AttackerOwner (int r)
-          : BattleCalculatorAction (ATTACKER_OWNER),
-          BattleCalculatorAction_Row (r) {}
-        ~BattleCalculatorAction_AttackerOwner () {}
-
-        Glib::ustring getActionName () const {return "AttackerOwner";}
-};
-
-class BattleCalculatorAction_Armies: public BattleCalculatorAction
-{
-    public:
-        BattleCalculatorAction_Armies (Type t, std::list<Army*> armies)
-          : BattleCalculatorAction (t)
+public:
+    BattleCalculatorUndoAction_Armies (Type t, std::list<Army*> armies)
+      : BattleCalculatorUndoAction (t)
+      {
+        for (auto a : armies)
           {
-            for (auto a : armies)
+            if (a->isHero ())
               {
-                if (a->isHero ())
-                  {
-                    Hero *h = dynamic_cast<Hero*>(a);
-                    d_armies.push_back (new Hero (*h));
-                  }
-                else
-                  d_armies.push_back (new Army (*a));
+                Hero *h = dynamic_cast<Hero*>(a);
+                m_armies.push_back (new Hero (*h));
               }
+            else
+              m_armies.push_back (new Army (*a));
           }
-        ~BattleCalculatorAction_Armies ()
-          {
-            for (auto a : d_armies)
-              delete a;
-            d_armies.clear ();
-          }
-        std::list<Army*> getArmies () const {return d_armies;}
-    private:
-        std::list<Army*> d_armies;
-};
+      }
 
-class BattleCalculatorAction_DefenderAdd: public BattleCalculatorAction_Armies
-{
-public:
-    BattleCalculatorAction_DefenderAdd (std::list<Army*> armies)
-          : BattleCalculatorAction_Armies (DEFENDER_ADD, armies) {}
-    ~BattleCalculatorAction_DefenderAdd () {}
-    Glib::ustring getActionName () const {return "DefenderAdd";}
-};
+    ~BattleCalculatorUndoAction_Armies ()
+      {
+        for (auto a : m_armies)
+          delete a;
+        m_armies.clear ();
+      }
 
-class BattleCalculatorAction_DefenderRemove: public BattleCalculatorAction_Armies
-{
-public:
-    BattleCalculatorAction_DefenderRemove (std::list<Army*> armies)
-          : BattleCalculatorAction_Armies (DEFENDER_REMOVE, armies) {}
-    ~BattleCalculatorAction_DefenderRemove () {}
-    Glib::ustring getActionName () const {return "DefenderRemove";}
-};
-
-class BattleCalculatorAction_DefenderCopy: public BattleCalculatorAction_Armies
-{
-public:
-    BattleCalculatorAction_DefenderCopy (std::list<Army*> armies)
-          : BattleCalculatorAction_Armies (DEFENDER_COPY, armies) {}
-    ~BattleCalculatorAction_DefenderCopy () {}
-    Glib::ustring getActionName () const {return "DefenderCopy";}
-};
-
-class BattleCalculatorAction_DefenderHeroDetails: public BattleCalculatorAction_Armies
-{
-public:
-    BattleCalculatorAction_DefenderHeroDetails (std::list<Army*> armies)
-          : BattleCalculatorAction_Armies (DEFENDER_HERO_DETAILS, armies) {}
-    ~BattleCalculatorAction_DefenderHeroDetails () {}
-    Glib::ustring getActionName () const {return "DefenderHeroDetails";}
-};
-
-class BattleCalculatorAction_AttackerAdd: public BattleCalculatorAction_Armies
-{
-public:
-    BattleCalculatorAction_AttackerAdd (std::list<Army*> armies)
-          : BattleCalculatorAction_Armies (ATTACKER_ADD, armies) {}
-    ~BattleCalculatorAction_AttackerAdd () {}
-    Glib::ustring getActionName () const {return "AttackerAdd";}
-};
-
-class BattleCalculatorAction_AttackerRemove: public BattleCalculatorAction_Armies
-{
-public:
-    BattleCalculatorAction_AttackerRemove (std::list<Army*> armies)
-          : BattleCalculatorAction_Armies (ATTACKER_REMOVE, armies) {}
-    ~BattleCalculatorAction_AttackerRemove () {}
-    Glib::ustring getActionName () const {return "AttackerRemove";}
-};
-
-class BattleCalculatorAction_AttackerCopy: public BattleCalculatorAction_Armies
-{
-public:
-    BattleCalculatorAction_AttackerCopy (std::list<Army*> armies)
-          : BattleCalculatorAction_Armies (ATTACKER_COPY, armies) {}
-    ~BattleCalculatorAction_AttackerCopy () {}
-    Glib::ustring getActionName () const {return "AttackerCopy";}
-};
-
-class BattleCalculatorAction_AttackerHeroDetails: public BattleCalculatorAction_Armies
-{
-public:
-    BattleCalculatorAction_AttackerHeroDetails (std::list<Army*> armies)
-          : BattleCalculatorAction_Armies (ATTACKER_HERO_DETAILS, armies) {}
-    ~BattleCalculatorAction_AttackerHeroDetails () {}
-    Glib::ustring getActionName () const {return "AttackerHeroDetails";}
-};
-
-class BattleCalculatorAction_Index: public BattleCalculatorAction
-{
-    public:
-        BattleCalculatorAction_Index (Type t, guint32 i, bool agg = false)
-          : BattleCalculatorAction (t, agg), d_index (i) {}
-        ~BattleCalculatorAction_Index () {}
-
-        guint32 getIndex () {return d_index;}
-    private:
-        guint32 d_index;
-};
-
-class BattleCalculatorAction_DefenderStrength: public BattleCalculatorAction_Index
-{
-public:
-    BattleCalculatorAction_DefenderStrength (guint32 i, guint32 str)
-      : BattleCalculatorAction_Index (DEFENDER_STRENGTH, i, true),
-     d_str (str) {}
-    ~BattleCalculatorAction_DefenderStrength () {}
-    Glib::ustring getActionName () const {return "DefenderStrength";}
-    guint32 getStrength () const {return d_str;}
+    std::list<Army*> get_armies () const
+      {
+        return m_armies;
+      }
 private:
-    guint32 d_str;
+    std::list<Army*> m_armies;
 };
 
-class BattleCalculatorAction_AttackerStrength: public BattleCalculatorAction_Index
+class BattleCalculatorUndoAction_DefenderAdd:
+    public BattleCalculatorUndoAction_Armies
 {
 public:
-    BattleCalculatorAction_AttackerStrength (guint32 i, guint32 str)
-      : BattleCalculatorAction_Index (ATTACKER_STRENGTH, i, true),
-     d_str (str) {}
-    ~BattleCalculatorAction_AttackerStrength () {}
-    Glib::ustring getActionName () const {return "AttackerStrength";}
-    guint32 getStrength () const {return d_str;}
-private:
-    guint32 d_str;
+    BattleCalculatorUndoAction_DefenderAdd (std::list<Army*> armies)
+      : BattleCalculatorUndoAction_Armies (DEFENDER_ADD, armies)
+      {
+      }
+
+    ~BattleCalculatorUndoAction_DefenderAdd ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "DefenderAdd";
+      }
 };
-#endif //BATTLE_CALCULATOR_ACTIONS_H
+
+class BattleCalculatorUndoAction_DefenderRemove:
+    public BattleCalculatorUndoAction_Armies
+{
+public:
+    BattleCalculatorUndoAction_DefenderRemove (std::list<Army*> armies)
+      : BattleCalculatorUndoAction_Armies (DEFENDER_REMOVE, armies)
+      {
+      }
+
+    ~BattleCalculatorUndoAction_DefenderRemove ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "DefenderRemove";
+      }
+};
+
+class BattleCalculatorUndoAction_DefenderCopy:
+    public BattleCalculatorUndoAction_Armies
+{
+public:
+    BattleCalculatorUndoAction_DefenderCopy (std::list<Army*> armies)
+      : BattleCalculatorUndoAction_Armies (DEFENDER_COPY, armies)
+      {
+      }
+
+    ~BattleCalculatorUndoAction_DefenderCopy ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "DefenderCopy";
+      }
+};
+
+class BattleCalculatorUndoAction_DefenderHeroDetails:
+    public BattleCalculatorUndoAction_Armies
+{
+public:
+    BattleCalculatorUndoAction_DefenderHeroDetails (std::list<Army*> armies)
+      : BattleCalculatorUndoAction_Armies (DEFENDER_HERO_DETAILS, armies)
+      {
+      }
+
+    ~BattleCalculatorUndoAction_DefenderHeroDetails ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "DefenderHeroDetails";
+      }
+};
+
+class BattleCalculatorUndoAction_AttackerAdd:
+    public BattleCalculatorUndoAction_Armies
+{
+public:
+    BattleCalculatorUndoAction_AttackerAdd (std::list<Army*> armies)
+      : BattleCalculatorUndoAction_Armies (ATTACKER_ADD, armies)
+      {
+      }
+
+    ~BattleCalculatorUndoAction_AttackerAdd ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "AttackerAdd";
+      }
+};
+
+class BattleCalculatorUndoAction_AttackerRemove:
+    public BattleCalculatorUndoAction_Armies
+{
+public:
+    BattleCalculatorUndoAction_AttackerRemove (std::list<Army*> armies)
+      : BattleCalculatorUndoAction_Armies (ATTACKER_REMOVE, armies)
+      {
+      }
+
+    ~BattleCalculatorUndoAction_AttackerRemove ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "AttackerRemove";
+      }
+};
+
+class BattleCalculatorUndoAction_AttackerCopy:
+    public BattleCalculatorUndoAction_Armies
+{
+public:
+    BattleCalculatorUndoAction_AttackerCopy (std::list<Army*> armies)
+      : BattleCalculatorUndoAction_Armies (ATTACKER_COPY, armies)
+      {
+      }
+
+    ~BattleCalculatorUndoAction_AttackerCopy ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "AttackerCopy";
+      }
+};
+
+class BattleCalculatorUndoAction_AttackerHeroDetails:
+    public BattleCalculatorUndoAction_Armies
+{
+public:
+    BattleCalculatorUndoAction_AttackerHeroDetails (std::list<Army*> armies)
+      : BattleCalculatorUndoAction_Armies (ATTACKER_HERO_DETAILS, armies)
+      {
+      }
+
+    ~BattleCalculatorUndoAction_AttackerHeroDetails ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "AttackerHeroDetails";
+      }
+};
+
+class BattleCalculatorUndoAction_Index: public BattleCalculatorUndoAction
+{
+public:
+    BattleCalculatorUndoAction_Index (Type t, guint32 i, bool agg = false)
+      : BattleCalculatorUndoAction (t, agg), m_index (i)
+      {
+      }
+
+    ~BattleCalculatorUndoAction_Index ()
+      {
+      }
+
+    guint32 get_index () const
+      {
+        return m_index;
+      }
+private:
+    guint32 m_index;
+};
+
+class BattleCalculatorUndoAction_DefenderStrength:
+    public BattleCalculatorUndoAction_Index
+{
+public:
+    BattleCalculatorUndoAction_DefenderStrength (guint32 i, guint32 str)
+      : BattleCalculatorUndoAction_Index (DEFENDER_STRENGTH, i, true),
+      m_str (str)
+  {
+  }
+
+    ~BattleCalculatorUndoAction_DefenderStrength ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "DefenderStrength";
+      }
+
+    guint32 get_strength () const
+      {
+        return m_str;
+      }
+private:
+    guint32 m_str;
+};
+
+class BattleCalculatorUndoAction_AttackerStrength:
+    public BattleCalculatorUndoAction_Index
+{
+public:
+    BattleCalculatorUndoAction_AttackerStrength (guint32 i, guint32 str)
+      : BattleCalculatorUndoAction_Index (ATTACKER_STRENGTH, i, true),
+      m_str (str)
+  {
+  }
+
+    ~BattleCalculatorUndoAction_AttackerStrength ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "AttackerStrength";
+      }
+
+    guint32 get_strength () const
+      {
+        return m_str;
+      }
+private:
+    guint32 m_str;
+};
+#endif

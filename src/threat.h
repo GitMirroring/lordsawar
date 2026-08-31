@@ -1,7 +1,7 @@
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2004 Ulf Lorenz
-// Copyright (C) 2004, 2005, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2004 Ulf Lorenz
+//  Copyright (C) 2004, 2005, 2006 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef THREAT_H
@@ -24,7 +23,7 @@
 
 #include <gtkmm.h>
 #include "vector.h"
-#include "OwnerId.h"
+#include "owner-id.h"
 
 class City;
 class StackReflist;
@@ -52,7 +51,7 @@ class Ruin;
   * neccessary because the AI bundles several stacks which are close together
   * or a stack which is in an enemy city to one single threat.
   *
-  * For more information about the smart AI, see ai_smart.h
+  * For more information about the smart AI, see ai-smart.h
   */
 
 class Threat: public OwnerId
@@ -154,6 +153,4 @@ class Threat: public OwnerId
         float d_strength;
 };
 
-#endif // THREAT_H
-
-// End of file
+#endif

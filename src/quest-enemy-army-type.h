@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef QUEST_ENEMY_ARMYTYPES_H
@@ -22,7 +21,7 @@
 #include <sigc++/trackable.h>
 
 #include <list>
-#include "Quest.h"
+#include "quest.h"
 #include "vector.h"
 
 class Army;
@@ -42,10 +41,9 @@ public:
     /**
      * Make a new kill-armytype quest.
      *
-     * @param q_mgr  The quests manager to associate this quest with.
      * @param hero   The Id of the Hero who is responsible for the quest.
      */
-    QuestEnemyArmytype(QuestsManager& q_mgr, guint32 hero);
+    QuestEnemyArmytype(guint32 hero);
 
     //! Copy constructor.
     QuestEnemyArmytype (const QuestEnemyArmytype &q);
@@ -55,13 +53,12 @@ public:
 
     //! Loading constructor.
     /**
-     * @param q_mgr   The quests manager to associate this quest with.
      * @param helper  The opened saved-game file to load this quest from.
      */
-    QuestEnemyArmytype(QuestsManager& q_mgr, XML_Helper* helper);
+    QuestEnemyArmytype(XML_Helper* helper);
 
     // Construct from remote action.
-    QuestEnemyArmytype(QuestsManager& q_mgr, guint32 hero, guint32 type_to_kill);
+    QuestEnemyArmytype(guint32 hero, guint32 type_to_kill);
 
     // Get Methods
 
@@ -107,7 +104,7 @@ public:
     /**
      * @note This method is not used.
      */
-    void cityAction(City *c, CityDefeatedAction action, 
+    void cityAction(City *c, CityDefeatedChoice action, 
 		    bool heroIsCulprit, int gold);
 
 

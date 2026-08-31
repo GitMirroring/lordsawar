@@ -1,8 +1,8 @@
-// Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2006 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
-// Copyright (C) 2007 Ole Laursen
+//  Copyright (C) 2000, 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2006 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2020, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef GAME_SCENARIO_H
@@ -25,9 +24,9 @@
 
 #include <list>
 #include <sigc++/trackable.h>
-#include "GameScenarioOptions.h"
+#include "game-scenario-options.h"
 
-#include "tarfile.h"
+#include "tar-file.h"
 class XML_Helper;
 class Tar_Helper;
 
@@ -51,6 +50,10 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	static Glib::ustring d_tag;
 	static Glib::ustring d_top_tag;
 
+        static void create_and_dump (const std::string file,
+                                     const GameParameters &g,
+                                     sigc::slot<void(double)> *pulse,
+                                     sigc::slot<void()> finish);
         enum PlayMode
 	  {
 	    HOTSEAT = 0,
@@ -76,8 +79,9 @@ class GameScenario: public GameScenarioOptions, public TarFile
           *
           * @param savegame     the full name of the saved-game to load
           * @param broken       set to true if something goes wrong
+          * @param err          some text that describes what went wrong
           */
-        GameScenario(Glib::ustring savegame, bool& broken);
+        GameScenario(Glib::ustring savegame, bool& broken, Glib::ustring &err);
 
         //! Copy constructor
         GameScenario (const GameScenario &g, bool unique);
@@ -157,8 +161,8 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	void inhibitAutosaveRemoval(bool i) {inhibit_autosave_removal = i;}
 
         //for progress bar
-        static sigc::signal<void> load_tick;
-        static sigc::signal<void> load_finish;
+        static sigc::signal<void(double)> load_tick;
+        static sigc::signal<void(GameScenario *)> load_finished;
 
     private:
 	  /** Callback function for loading a game. See XML_Helper for details.
@@ -174,7 +178,7 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	  bool setupCities(GameParameters::QuickStartPolicy quick_start, GameParameters::BuildProductionMode build);
 	  bool setupRewards(bool hidden_map, int difficulty);
 	  bool setupMapRewards();
-	  bool setupRuinOccupants();
+	  void setupRuins();
 	  bool setupRuinRewards(int difficulty);
 	  bool setupItemRewards();
 	  bool setupStacks(bool hidden_map);
@@ -186,7 +190,7 @@ class GameScenario: public GameScenarioOptions, public TarFile
 	  bool loadCitysets(Tar_Helper *t);
 	  bool loadShieldsets(Tar_Helper *t);
         
-          std::vector<Glib::ustring> getSetFiles () const;
+          std::vector<std::string> getSetFiles () const;
 
 	  // DATA
 	  Glib::ustring d_name;
@@ -200,6 +204,4 @@ class GameScenario: public GameScenarioOptions, public TarFile
           bool d_unique; //whether we're the main singleton controller or not
 };
 
-#endif // GAME_SCENARIO_H
-
-// End of file
+#endif

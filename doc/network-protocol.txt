@@ -1,0 +1,325 @@
+LordsAWar! Network Protocol
+
+Each message has the following structure:
+
+1. a 32-bit unsigned integer indicating the length of the message
+that length includes:
+2. an 8 bit unsigned integer indicating the version of the protocol,
+3. an 8 bit unsigned integer indicating the type of the message, and
+4. the payload (everything else, in 8-bit UTF, different content per message
+type.)
+
+In this document When we say there's an integer in the payload it's a series of
+one or more UTF-8 characters, not a binary field.
+
+Protocol version 1 is LordsAWar! 0.3.3.
+Protocol version 2 is LordsAWar! 0.4.0.
+
+Here are the message types in order of appearance.
+
+Ping
+  Type 1
+
+  The client sends this to the server, and it's the first message a client
+  sends.  It also sends pings periodically to keep alive the connection.
+
+  No payload.
+  
+Pong
+  Type 2
+
+  The server responds to pings with pongs.
+
+  Payload:
+    String, value is 'PONGOGOGO'
+
+ParticipantConnect
+  Type 6
+
+  The client sends this to the server to join.
+
+  Payload:
+    Profile Id, a guid string up to the first space character.
+    Nickname, string, the rest of the payload.
+
+ParticipantConnected
+  Type 8
+
+  The server sends this to the other clients to notify them of a new join.
+
+  Payload:
+    Update flag, either 1 or 0, followed by a space.  This flag indicates the
+    final record when many are sent succesively. e.g. it's time to update the
+    user-interface.
+    Profile Id, a guid string up to the next space character.
+    Nickname, string, the rest of the payload.
+
+ParticipantDisconnect
+  Type 9
+
+  The client sends this to the server to depart.
+
+  Payload:
+    Nickname, string.
+
+ParticipantDisconnected
+  Type 7
+
+  The server sends this to the other clients to notify them of a depart.
+
+  Payload:
+    Profile Id, a guid string up to the first space character.
+    Nickname, string, the rest of the payload.
+
+SendingMap
+  Type 3
+
+  The server sends the map to the client by way of the scenario file.  It
+  happens after they do a ParticipantConnect.
+
+  Payload:
+    A LordsAWar! scenario file.
+
+RequestSeatManifest
+  Type 13
+
+  The client sends this to the server to get user and seating information.
+  The client is notified of the users in chat, who has control of which player,
+  and who's a moderator.
+  Whereas this is a single message, it causes several messages to arrive at the
+  requesting client: ParticipantConnected, ModID, LobbyActivity, and
+  GameBegin.
+  This message is sent to the server after the map has been received.
+
+  No payload.
+
+ModID
+  Type 24
+
+  The server sends this message to the clients to tell them a particular user
+  is a moderator.
+
+  Payload:
+    Profile Id, a guid string.
+  
+ChangeNickname
+  Type 19
+
+  The server sends this to clients to update them of a nickname change. This
+  isn't the same thing as a player name (e.g. the sirians), this the name the
+  client chose to connect as.  Sometimes a disambiguation is forced because two
+  names are the same and this message sends out the new unambiguous name to
+  clients.  The server will send this message after a ParticipantConnect is
+  received.
+
+  Payload:
+    Profile Id, a guid string up to the first space character.
+    Nickname, string, the rest of the payload.
+
+LobbyActivity
+  Type 18
+
+  A multi-purpose message that client and server can send and receive, that
+  handles taking control of a player (sitting), releasing control of a player
+  (standing), changing a player's name, and changing types (e.g. human to
+  computer player.)  This message can both cause the change on the server by a
+  client that sends this message, and be reflected to the clients by the
+  server.  Changing a player's name is not supported by the ui but this
+  sub-message type still remains.
+
+  Payload:
+    Integer representing the player.  0 is white, 1 is green, 2 is yellow and
+    so forth. See shield.h. followed by a space.
+    Profile Id, a guid string up to the next space character.
+    Integer representing the subtype of this message, followed by a space.
+    Reported flag, either 1 or 0 followed by a space.  A client sends this
+    value as 0, while the server sends 1.
+    Payload, string, different per subtype.
+
+    Sub Types:
+      Sit, Type -1
+      Change Name, Type 0
+      Stand, Type 1
+      Change Type, Type 2
+
+    Sit Payload:
+      String, nickname.
+
+    Change Name Payload:
+      String, new player name.
+
+    Stand Payload:
+      String, nickname.
+
+    Change Type Payload:
+      An integer defined by GameParameters::Player::Type of game-parameters.h.
+
+Chat
+  Type 11
+
+  The client sends this to the server to say something in the chat
+
+  Payload:
+    Message, string.
+
+Chatted
+  Type 12
+
+  The server sends this to reflect the chat message to the other clients
+
+  Payload:
+    Profile Id, a guid string up to the first space character.
+    Message, string, the rest of the payload.
+
+SysMsg
+  Type 25
+
+  The server sends this System Message message to all clients when someone
+  joins/departs/takes control of a player/releases control of a player.
+
+  Payload:
+    Profile Id, a guid string up to the first space character.
+    Message, string, the rest of the payload.
+
+GameCanBegin
+  Type 28 
+
+  The server sends this message to the clients when enough players have sat
+  down.
+
+  No payload.
+
+Ready
+  Type 27
+
+  A client sends this message to the server after GameCan Begin when they're
+  ready for the game to start.
+
+  No payload.
+
+WaitingForReady
+  Type 29
+
+  The server sends this message to clients so they can know how many clients
+  have yet to indicate readiness to play.
+
+  Payload:
+    An integer representing the number of remaining players we're waiting to
+    indicate their readiness to play.
+
+GameBegin
+  Type 20
+
+  This is a message the server sends to clients when all clients who control
+  one or more players have reported that they're ready to play.
+
+  No payload.
+
+Countdown
+  Type 30
+
+   Before the game starts there's a short countdown.  This says how many
+   seconds remain before the first turn begins.  It happens after the
+   GameBegin message.
+
+  Payload:
+    An integer representing the number of seconds.  It goes to 0.
+
+OffPlayer
+  Type 21
+
+  This is a bit of a weird one, when we go to start a game the server sends
+  this message out to clients to tell them to remove the players that have
+  type 'off' from the lobby.
+
+  Payload:
+    Integer representing the player.  0 is white, 1 is green, 2 is yellow and
+    so forth. See shield.h.
+
+TurnOrder
+  Type 14
+
+  The server sends this to the clients so they know what the order of play is
+  for the players.
+
+  Payload:
+    A space separated list of integers representing the players.  0 is white,
+    etc.
+
+RoundStart
+  Type 17
+
+  The server sends this to clients when a round begins.
+
+  No payload.
+  
+NextPlayer
+  Type 22
+
+  The server sends this message to clients to tell them whose turn is starting.
+
+  Payload:
+    Integer representing the player.  0 is white, 1 is green, 2 is yellow and
+    so forth. See shield.h.
+
+RoundOver
+  Type 16
+
+  The server sends this to clients when a round ends.
+
+  No payload.
+
+SendingActions
+  Type 4
+
+  When things happen in the game they're encapsulated as actions.  Both client
+  and server send and receive actions.
+
+  Payload:
+    An xml entity relating to a list of network actions. See turn-action-list.h
+    and network-action.h.
+
+SendingHistory
+  Type 5
+
+  Similar to SendingActions but it's more like a log of what happened rather
+  than something that needs to be displayed. 
+
+  Payload:
+    An xml entity relating to a list of network history objects. See
+    network-history.h.
+
+ServerDisconnect
+  Type 10
+
+  The server sends this to the clients when it's going away.
+
+  Payload:
+    String, the word bye.
+
+KillPlayer
+  Type 15
+
+  A server sends this to clients when a player dies, causing their row to get
+  removed from the lobby.
+
+  Payload:
+    Integer representing the player.  0 is white, 1 is green, 2 is yellow and
+    so forth. See shield.h.
+
+SameProfileId
+  Type 23
+
+  The server sends this to a client when they try to connect with an identical
+  profile id.  It is a reason for disconnection.
+
+  No payload.
+  
+Kick
+  Type 26
+
+  The client sends this to a server to disconnect a particular user.  The
+  sending client must be a moderator.
+
+  Payload:
+    Profile Id, a guid string.

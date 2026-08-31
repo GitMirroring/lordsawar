@@ -1,5 +1,5 @@
-// Copyright (C) 2008, 2009, 2010, 2011, 2014, 2021 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2008, 2009, 2010, 2011, 2014, 2021, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef NETWORK_PLAYER_H
@@ -83,8 +82,8 @@ class NetworkPlayer : public Player
     public:
         // CREATORS
         NetworkPlayer(Glib::ustring name, guint32 armyset,
-                      std::vector<Gdk::RGBA> colors, int width, int height,
-                   Player::Type type = Player::HUMAN, int player_no = -1);
+                      Shield::Color shield, int width, int height,
+                   Player::Type type = Player::HUMAN);
         NetworkPlayer(const Player&, bool sync_ids = false);
         NetworkPlayer(XML_Helper* helper);
         ~NetworkPlayer() {};
@@ -96,21 +95,22 @@ class NetworkPlayer : public Player
         
         //! Actions, see player.h for explanation
 	virtual void abortTurn();
-        virtual bool startTurn();
+        virtual void startTurn(sigc::slot<void(bool)> finish);
         virtual void endTurn();
         virtual void invadeCity(City* c);
         virtual bool chooseHero(HeroProto *hero, City* c, int gold);
 
         virtual Reward *chooseReward(Ruin *ruin, Sage *sage, Stack *stack);
-        virtual void heroGainsLevel(Hero * a);
+        virtual void heroGainsLevel(Hero * a, Army::Stat stat);
 	virtual bool chooseTreachery (Stack *stack, Player *player, Vector <int> pos);
         virtual Army::Stat chooseStat(Hero *hero);
         virtual bool chooseQuest(Hero *hero);
-        virtual bool computerChooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChoosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
-        virtual bool computerChooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual CityDefeatedChoice chooseCityDefeatedAction (City *c, Stack *s);
+        virtual bool chooseVisitRuin(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool choosePickupBag(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool chooseVisitTempleForBlessing(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool chooseVisitTempleForQuest(Stack *stack, Vector<int> dest, guint32 moves, guint32 turns);
+        virtual bool chooseContinueQuest(Stack *stack, Quest *quest, Vector<int> dest, guint32 moves, guint32 turns);
 
 	void decodeAction(const Action *action);
 	void decodeActions(std::list<Action *> actions);
@@ -170,6 +170,4 @@ class NetworkPlayer : public Player
 };
 
 Stack *findStackById(guint32 id);
-#endif // NETWORK_PLAYER_H
-
-// End of file
+#endif

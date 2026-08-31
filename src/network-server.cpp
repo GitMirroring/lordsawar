@@ -1,5 +1,5 @@
-// Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2008, 2011, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2008, 2011, 2015, 2017, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <stdio.h> //benfix
 #include "network-server.h"
@@ -49,12 +48,12 @@ void NetworkServer::startListening(int port)
 {
   server = Gio::SocketService::create();
 
-  server->signal_incoming().connect(sigc::hide(sigc::mem_fun(*this, &NetworkServer::gotClientConnection)));
+  server->signal_incoming().connect(sigc::hide(sigc::mem_fun(*this, &NetworkServer::gotClientConnection)), false);
   try 
     {
       server->add_inet_port (port);
     }
-  catch(const Glib::Exception &ex)
+  catch(const Glib::Error &ex)
     {
       server->stop();
       port_in_use.emit(port);
@@ -87,14 +86,14 @@ bool NetworkServer::gotClientConnection(const Glib::RefPtr<Gio::SocketConnection
       conn->connection_lost.connect
         (sigc::bind(sigc::mem_fun
                     (connection_lost, 
-                     &sigc::signal<void, void *>::emit), conn));
+                     &sigc::signal<void(void *)>::emit), conn));
 
       connection_made.emit(conn);
       
       conn->got_message.connect
         (sigc::bind<0>(sigc::mem_fun(got_message, 
-                                     &sigc::signal<bool, void *, 
-                                     int, Glib::ustring>::emit), conn));
+                                     &sigc::signal<bool(void *, 
+                                     int, Glib::ustring)>::emit), conn));
 
       return true;
     }
@@ -108,7 +107,7 @@ void NetworkServer::onConnectionLost(void *conn)
     connections.remove(c);
 }
   
-bool NetworkServer::isListening()
+bool NetworkServer::isRunning()
 {
   return server->is_active();
 }

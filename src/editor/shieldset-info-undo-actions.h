@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef SHIELDSET_INFO_ACTIONS_H
-#define SHIELDSET_INFO_ACTIONS_H
+#ifndef SHIELDSET_INFO_UNDO_ACTIONS_H
+#define SHIELDSET_INFO_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
@@ -25,184 +24,132 @@
 
 class UndoMgr;
 
-class ShieldSetInfoAction: public UndoAction
+class ShieldSetInfoUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      DESCRIPTION = 1,
-      COPYRIGHT = 2,
-      LICENSE = 3,
-      NAME = 4,
-      SMALL_WIDTH = 5,
-      SMALL_HEIGHT = 6,
-      MEDIUM_WIDTH = 7,
-      MEDIUM_HEIGHT = 8,
-      LARGE_WIDTH = 9,
-      LARGE_HEIGHT = 10,
-      FIT = 11,
-    };
+    enum Type
+      {
+        DESCRIPTION = 1,
+        COPYRIGHT,
+        LICENSE,
+        NAME,
+      };
 
-    ShieldSetInfoAction(Type type, bool agg = true)
-     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY : UndoAction::AGGREGATE_NONE), d_type (type) {}
+    ShieldSetInfoUndoAction (Type type, bool agg = true)
+      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                    UndoAction::AGGREGATE_NONE), m_type (type)
+        {
+        }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class ShieldSetInfoAction_Message: public ShieldSetInfoAction, public UndoCursor
+class ShieldSetInfoUndoAction_Message: public ShieldSetInfoUndoAction, public UndoCursor
 {
-    public:
-        ShieldSetInfoAction_Message (Type t, Glib::ustring m, UndoMgr *u,
+public:
+    ShieldSetInfoUndoAction_Message (Type t, Glib::ustring m, UndoMgr *u,
                                      Gtk::TextView *v)
-          : ShieldSetInfoAction (t), UndoCursor (u, v), d_message (m) {}
-        Glib::ustring getMessage () {return d_message;}
-    private:
-        Glib::ustring d_message;
+      : ShieldSetInfoUndoAction (t), UndoCursor (u->get_pos (v), v), m_message (m)
+      {
+      }
+
+    Glib::ustring get_message () const
+      {
+        return m_message;
+      }
+private:
+    Glib::ustring m_message;
 };
 
-class ShieldSetInfoAction_Description: public ShieldSetInfoAction_Message
+class ShieldSetInfoUndoAction_Description: public ShieldSetInfoUndoAction_Message
 {
-    public:
-        ShieldSetInfoAction_Description (Glib::ustring m, UndoMgr *u,
+public:
+    ShieldSetInfoUndoAction_Description (Glib::ustring m, UndoMgr *u,
                                          Gtk::TextView *v)
-          : ShieldSetInfoAction_Message (DESCRIPTION, m, u, v) {}
-        ~ShieldSetInfoAction_Description () {}
+      : ShieldSetInfoUndoAction_Message (DESCRIPTION, m, u, v)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Description";}
+    ~ShieldSetInfoUndoAction_Description ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Description";
+      }
 };
 
-class ShieldSetInfoAction_Copyright: public ShieldSetInfoAction_Message
+class ShieldSetInfoUndoAction_Copyright: public ShieldSetInfoUndoAction_Message
 {
-    public:
-        ShieldSetInfoAction_Copyright (Glib::ustring m, UndoMgr *u,
+public:
+    ShieldSetInfoUndoAction_Copyright (Glib::ustring m, UndoMgr *u,
                                        Gtk::TextView *v)
-          : ShieldSetInfoAction_Message (COPYRIGHT, m, u, v) {}
-        ~ShieldSetInfoAction_Copyright () {}
+      : ShieldSetInfoUndoAction_Message (COPYRIGHT, m, u, v)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Copyright";}
+    ~ShieldSetInfoUndoAction_Copyright ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Copyright";
+      }
 };
 
-class ShieldSetInfoAction_License: public ShieldSetInfoAction_Message
+class ShieldSetInfoUndoAction_License: public ShieldSetInfoUndoAction_Message
 {
-    public:
-        ShieldSetInfoAction_License (Glib::ustring m, UndoMgr *u,
+public:
+    ShieldSetInfoUndoAction_License (Glib::ustring m, UndoMgr *u,
                                      Gtk::TextView *v)
-          : ShieldSetInfoAction_Message (LICENSE, m, u, v) {}
-        ~ShieldSetInfoAction_License () {}
+      : ShieldSetInfoUndoAction_Message (LICENSE, m, u, v)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "License";}
+    ~ShieldSetInfoUndoAction_License ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "License";
+      }
 };
 
-class ShieldSetInfoAction_Name: public ShieldSetInfoAction, public UndoCursor
+class ShieldSetInfoUndoAction_Name: public ShieldSetInfoUndoAction, public UndoCursor
 {
-    public:
-        ShieldSetInfoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
-          : ShieldSetInfoAction (NAME), UndoCursor (u, e), d_name (n) {}
-        ~ShieldSetInfoAction_Name () {}
+public:
+    ShieldSetInfoUndoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
+      : ShieldSetInfoUndoAction (NAME), UndoCursor (u->get_pos (e), e), m_name (n)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Name";}
-        Glib::ustring getName () {return d_name;}
+    ~ShieldSetInfoUndoAction_Name ()
+      {
+      }
 
-    private:
-        Glib::ustring d_name;
+    Glib::ustring get_action_name () const
+      {
+        return "Name";
+      }
+
+    Glib::ustring get_name () const
+      {
+        return m_name;
+      }
+
+private:
+    Glib::ustring m_name;
 };
 
-class ShieldSetInfoAction_Size: public ShieldSetInfoAction
-{
-    public:
-        ShieldSetInfoAction_Size (Type t, int p)
-          : ShieldSetInfoAction (t), d_size (p) {};
-
-        int getSize () {return d_size;}
-
-    private:
-        int d_size;
-};
-
-class ShieldSetInfoAction_SmallWidth: public ShieldSetInfoAction_Size
-{
-    public:
-        ShieldSetInfoAction_SmallWidth (int p)
-          : ShieldSetInfoAction_Size (SMALL_WIDTH, p) {}
-        ~ShieldSetInfoAction_SmallWidth () {}
-
-        Glib::ustring getActionName () const {return "SmallWidth";}
-};
-class ShieldSetInfoAction_SmallHeight: public ShieldSetInfoAction_Size
-{
-    public:
-        ShieldSetInfoAction_SmallHeight (int p)
-          : ShieldSetInfoAction_Size (SMALL_HEIGHT, p) {}
-        ~ShieldSetInfoAction_SmallHeight () {}
-
-        Glib::ustring getActionName () const {return "SmallHeight";}
-};
-class ShieldSetInfoAction_MediumWidth: public ShieldSetInfoAction_Size
-{
-    public:
-        ShieldSetInfoAction_MediumWidth (int p)
-          : ShieldSetInfoAction_Size (MEDIUM_WIDTH, p) {}
-        ~ShieldSetInfoAction_MediumWidth () {}
-
-        Glib::ustring getActionName () const {return "MediumWidth";}
-};
-class ShieldSetInfoAction_MediumHeight: public ShieldSetInfoAction_Size
-{
-    public:
-        ShieldSetInfoAction_MediumHeight (int p)
-          : ShieldSetInfoAction_Size (MEDIUM_HEIGHT, p) {}
-        ~ShieldSetInfoAction_MediumHeight () {}
-
-        Glib::ustring getActionName () const {return "MediumHeight";}
-};
-class ShieldSetInfoAction_LargeWidth: public ShieldSetInfoAction_Size
-{
-    public:
-        ShieldSetInfoAction_LargeWidth (int p)
-          : ShieldSetInfoAction_Size (LARGE_WIDTH, p) {}
-        ~ShieldSetInfoAction_LargeWidth () {}
-
-        Glib::ustring getActionName () const {return "LargeWidth";}
-};
-class ShieldSetInfoAction_LargeHeight: public ShieldSetInfoAction_Size
-{
-    public:
-        ShieldSetInfoAction_LargeHeight (int p)
-          : ShieldSetInfoAction_Size (LARGE_HEIGHT, p) {}
-        ~ShieldSetInfoAction_LargeHeight () {}
-
-        Glib::ustring getActionName () const {return "LargeHeight";}
-};
-
-class ShieldSetInfoAction_Fit: public ShieldSetInfoAction
-{
-    public:
-        ShieldSetInfoAction_Fit (guint32 a, guint32 b, guint32 c, guint32 d,
-                                 guint32 e, guint32 f)
-          : ShieldSetInfoAction (FIT, false), d_small_width (a),
-          d_small_height (b), d_medium_width (c), d_medium_height (d),
-          d_large_width (e), d_large_height (f) {}
-
-        ~ShieldSetInfoAction_Fit () {}
-        Glib::ustring getActionName () const {return "Fit";}
-
-        guint32 getSmallWidth () const {return d_small_width;}
-        guint32 getSmallHeight () const {return d_small_height;}
-        guint32 getMediumWidth () const {return d_medium_width;}
-        guint32 getMediumHeight () const {return d_medium_height;}
-        guint32 getLargeWidth () const {return d_large_width;}
-        guint32 getLargeHeight () const {return d_large_height;}
-    private:
-        guint32 d_small_width;
-        guint32 d_small_height;
-        guint32 d_medium_width;
-        guint32 d_medium_height;
-        guint32 d_large_width;
-        guint32 d_large_height;
-};
-
-#endif //SHIELDSET_INFO_ACTIONS_H
+#endif

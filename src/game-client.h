@@ -1,5 +1,5 @@
-// Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2011, 2014, 2015, 2017, 2021 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2011, 2014, 2015, 2017, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef GAME_CLIENT_H
@@ -41,7 +40,7 @@ class GameClient: public GameStation
 public:
         
   //! Returns the singleton instance.  Creates a new one if neccessary.
-  static GameClient* getInstance();
+  static GameClient* instance();
 
   //! Deletes the singleton instance.
   static void deleteInstance();
@@ -50,14 +49,38 @@ public:
   void disconnect();
   void request_seat_manifest();
 
-  sigc::signal<void> client_connected;
-  sigc::signal<void> client_disconnected; 
-  sigc::signal<void> client_forcibly_disconnected; //server went away
-  sigc::signal<void> client_could_not_connect;
-  sigc::signal<void, int, int> payload_progress;
+  sigc::signal<void()> signal_client_connected ()
+    {
+      return m_client_connected;
+    }
+
+  sigc::signal<void()> signal_client_disconnected ()
+    {
+      return m_client_disconnected;
+    }
+
+  sigc::signal<void()> signal_client_forcibly_disconnected ()
+    {
+      return m_client_forcibly_disconnected;
+    }
+
+  sigc::signal<void()> signal_client_could_not_connect ()
+    {
+      return m_client_could_not_connect;
+    }
+
+  sigc::signal<void(int, int)> signal_payload_progress ()
+    {
+      return m_payload_progress;
+    }
+
+  sigc::signal<void()> signal_logged_in_as_same_profile_id ()
+    {
+      return m_logged_in_as_same_profile_id;
+    }
   
-  void sit_down (Player *player);
-  void stand_up (Player *player);
+  void sit_down (Shield::Color shield);
+  void stand_up (Shield::Color shield);
   void change_name(Player *player, Glib::ustring name);
   void change_type(Player *player, int type);
   void chat(Glib::ustring message);
@@ -67,15 +90,24 @@ public:
 
   void sendRoundOver();
 
+  void kick (Glib::ustring profile_id);
+  void sendReady ();
+
 protected:
   GameClient();
   ~GameClient();
 
+  sigc::signal<void()> m_client_connected;
+  sigc::signal<void()> m_client_disconnected; 
+  sigc::signal<void()> m_client_forcibly_disconnected;
+  sigc::signal<void()> m_client_could_not_connect;
+  sigc::signal<void(int, int)> m_payload_progress;
+  sigc::signal<void()> m_logged_in_as_same_profile_id;
 private:
   NetworkConnection* network_connection;
   int player_id;
 
-  void sit_or_stand (Player *player, bool sit);
+  void sit_or_stand (Shield::Color shield, bool sit);
   void onConnected();
   void onConnectionLost();
   bool onGotMessage(int type, Glib::ustring message);
@@ -91,8 +123,8 @@ private:
   void gotKillPlayer(Player *player);
   void gotOffPlayer(Player *player);
 
-  void sat_down(Player *player, Glib::ustring nickname);
-  void stood_up(Player *player, Glib::ustring nickname);
+  void sat_down(Shield::Color shield, Glib::ustring profile_id);
+  void stood_up(Shield::Color shield, Glib::ustring profile_id);
   void name_changed (Player *player, Glib::ustring name);
   void type_changed (Player *player, int type);
 
@@ -107,6 +139,7 @@ private:
   guint32 d_port;
   sigc::connection d_ping_timer;
   bool first_ping;
+
 };
 
 #endif

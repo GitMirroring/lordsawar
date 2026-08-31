@@ -1,5 +1,5 @@
-// Copyright (C) 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2011, 2014, 2015, 2021 Ben Asselstine
+//  Copyright (C) 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,25 +13,24 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
 #include <iostream>
-#include "Itemlist.h"
+#include "item-list.h"
 
-#include "File.h"
+#include "file.h"
 #include "defs.h"
 #include "file-compat.h"
 #include "ucompose.hpp"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
 Glib::ustring Itemlist::d_tag = "itemlist";
 
 Itemlist* Itemlist::d_instance = 0;
 
-Itemlist* Itemlist::getInstance()
+Itemlist* Itemlist::instance()
 {
     if (!d_instance)
         d_instance = new Itemlist();
@@ -39,7 +38,7 @@ Itemlist* Itemlist::getInstance()
     return d_instance;
 }
 
-Itemlist* Itemlist::getInstance(XML_Helper *helper)
+Itemlist* Itemlist::instance(XML_Helper *helper)
 {
     if (d_instance)
       delete d_instance;
@@ -55,7 +54,7 @@ void Itemlist::createStandardInstance()
     XML_Helper helper(File::getItemDescription(), std::ios::in);
     d_instance = new Itemlist(&helper);
 
-    if (!helper.parseXML())
+    if (!helper.parse_XML())
     {
       std::cerr << String::ucompose(_("Could not parse item description file `%1'.  Exiting."), File::getItemDescription()) << std::endl;
         exit(-1);
@@ -74,7 +73,7 @@ void Itemlist::deleteInstance()
 
 Itemlist::Itemlist(XML_Helper* helper)
 {
-    helper->registerTag(ItemProto::d_itemproto_tag, sigc::mem_fun(*this, &Itemlist::loadItemProto));
+    helper->register_tag(ItemProto::d_itemproto_tag, sigc::mem_fun(*this, &Itemlist::loadItemProto));
 }
 
 Itemlist::Itemlist()
@@ -120,12 +119,12 @@ bool Itemlist::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(d_tag);
+    retval &= helper->open_tag(d_tag);
 
     for (const_iterator it = begin(); it != end(); ++it)
       (*it).second->save(helper);
     
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -151,17 +150,17 @@ void Itemlist::add(ItemProto *itemproto)
 
 bool Itemlist::upgrade(Glib::ustring filename, Glib::ustring old_version, Glib::ustring new_version)
 {
-  return FileCompat::getInstance()->upgrade(filename, old_version, new_version,
+  return FileCompat::instance()->upgrade(filename, old_version, new_version,
                                             FileCompat::ITEMLIST, 
                                             d_tag);
 }
 
 void Itemlist::support_backward_compatibility()
 {
-  FileCompat::getInstance()->support_type
+  FileCompat::instance()->support_type
     (FileCompat::ITEMLIST, File::get_extension(File::getItemDescription()), 
      d_tag, false);
-  FileCompat::getInstance()->support_version
+  FileCompat::instance()->support_version
     (FileCompat::ITEMLIST, "0.2.0", LORDSAWAR_ITEMS_VERSION,
      sigc::ptr_fun(&Itemlist::upgrade));
 }
@@ -169,7 +168,7 @@ void Itemlist::support_backward_compatibility()
 void Itemlist::create()
 {
     deleteInstance();
-    getInstance();
+    instance();
 }
 
 void Itemlist::reset (Itemlist *i)

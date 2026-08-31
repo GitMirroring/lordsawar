@@ -1,4 +1,4 @@
-//  Copyright (C) 2020 Ben Asselstine
+//  Copyright (C) 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef SCENARIO_DETAILS_H
@@ -24,7 +23,7 @@
 
 #include <sys/time.h>
 
-#include "GameScenario.h"
+#include "game-scenario.h"
 
 //! A single entry in the scenario list.
 /**
@@ -37,9 +36,9 @@ class ScenarioDetails
     public:
 
 	//! Default constructor.
-        ScenarioDetails(Glib::ustring id, guint32 num_cities, 
-                        guint32 num_players, Glib::ustring name,
-                        Glib::ustring desc, Glib::ustring filename);
+        ScenarioDetails (Glib::ustring id, guint32 num_cities, 
+                         guint32 num_players, Glib::ustring name,
+                         Glib::ustring desc, Glib::ustring filename);
 
         //! Loading constructor.
         /**
@@ -55,22 +54,22 @@ class ScenarioDetails
 	// Get Methods
 
         //! Get the scenario id of the recently played game entry.
-	Glib::ustring getId() const {return d_id;}
+	Glib::ustring get_id() const {return d_id;}
 
 	//! Get the number of cities in the game.
-	guint32 getNumberOfCities() const {return d_number_of_cities;}
+	guint32 get_number_of_cities () const {return d_number_of_cities;}
 
 	//! Get the number of players in the game.
-	guint32 getNumberOfPlayers() const {return d_number_of_players;}
+	guint32 get_number_of_players () const {return d_number_of_players;}
 
 	//! Get the name of the scenario.
-	Glib::ustring getName() const {return d_name;}
+	Glib::ustring get_name () const {return d_name;}
 
 	//! Get the description of the scenario.
-	Glib::ustring getDescription() const {return d_desc;}
+	Glib::ustring get_description () const {return d_desc;}
 
 	//! Get the name of the scenario.
-	Glib::ustring getFilename() const {return d_filename;}
+	Glib::ustring get_filename () const {return d_filename;}
 
     protected:
 
@@ -95,4 +94,4 @@ class ScenarioDetails
 	Glib::ustring d_filename;
 };
 
-#endif // SCENARIO_DETAILS_H
+#endif

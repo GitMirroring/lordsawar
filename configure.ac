@@ -1,59 +1,70 @@
-dnl Process this file with autoconf to produce a configure script.
-dnl This is useful to force using autoreconf 2.5.x
-dnl Copyright (C) 2015. 2016, 2020 Ben Asselstine
+dnl Copyright (C) 2015, 2016, 2020, 2026 Ben Asselstine
 dnl This file is licensed under the terms of the GNU GPL version 3 or later.
-AC_PREREQ(2.59)
-AC_INIT([lordsawar], [0.3.3-pre3], [https://savannah.nongnu.org/bugs/?group=lordsawar], [lordsawar])
-AC_CONFIG_SRCDIR([config.h.in])
-AM_CONFIG_HEADER(config.h)
+
+AC_PREREQ([2.69])
+AC_INIT([lw], [0.4.0], [https://savannah.nongnu.org/bugs/?group=lordsawar], [lw])
+AC_CONFIG_SRCDIR([src/main.cpp])
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_AUX_DIR([build-aux])
 
-AC_CANONICAL_HOST
-AC_CANONICAL_TARGET
+AM_INIT_AUTOMAKE([1.15 foreign subdir-objects])
+AM_SILENT_RULES([yes])
 
-AM_INIT_AUTOMAKE
+IT_PROG_INTLTOOL([0.35.0])
 
-IT_PROG_INTLTOOL
-
-GETTEXT_PACKAGE=lordsawar
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],
-                   [The domain to use with gettext])
-AM_GLIB_GNU_GETTEXT
-
-PROGRAMNAME_LOCALEDIR=[${datadir}/locale]
-AC_SUBST(PROGRAMNAME_LOCALEDIR)
-    
-dnl Checks for programs.
+# Check for programs
 AC_PROG_CXX
-if test -n "$CXX"; then
-  gppver=`$CXX --version 2>/dev/null | sed -e '2,$d' -e 's@^\([[^0-9.]]*\) \([[0-9.]]*\)\(.*\)@\2@'`
-else
-  AC_MSG_ERROR([*** C++ compiler not found.])
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+
+# Initialize libtool for shared libraries
+LT_INIT
+
+# ============================
+# GETTEXT / I18N SETUP
+# ============================
+
+GETTEXT_PACKAGE=AC_PACKAGE_NAME
+AC_SUBST([GETTEXT_PACKAGE])
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"], [lw])
+
+# Initialize GNU gettext - this creates po/Makefile.in from po/Makefile.in.in
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.21])
+
+# Set the directory containing po/ (default is po/)
+# This creates po/Makefile.in which becomes po/Makefile
+# DATADIRNAME is set by AM_GNU_GETTEXT (usually 'share')
+
+# ============================
+# PKG-CONFIG CHECKS
+# ============================
+
+# Check for pkg-config
+PKG_PROG_PKG_CONFIG([0.29])
+
+# GTKmm 4.0 (or adjust to 3.0 if you need legacy)
+PKG_CHECK_MODULES([GTKMM], [gtkmm-4.0 >= 4.0.0])
+AC_SUBST([GTKMM_CFLAGS])
+AC_SUBST([GTKMM_LIBS])
+
+
+AC_PATH_PROG([GLIB_COMPILE_RESOURCES], [glib-compile-resources], [no])
+if test "x$GLIB_COMPILE_RESOURCES" = "xno"; then
+  AC_MSG_ERROR([glib-compile-resources not found. Install glib2-devel.])
 fi
-AC_SUBST([gppver])
+AC_SUBST([GLIB_COMPILE_RESOURCES])
 
-AC_PROG_LIBTOOL
-
-dnl check for libxml and libxslt
 PKG_CHECK_MODULES(XSLT, [libxslt >= 1.1.20])
 AC_SUBST(XSLT_CFLAGS)
 
-dnl Check for glib
-
-PKG_CHECK_MODULES(GLIBMM, glibmm-2.4)
-
+PKG_CHECK_MODULES(GLIBMM, glibmm-2.68)
 AC_SUBST(GLIBMM_CFLAGS)
 AC_SUBST(GLIBMM_LIBS)
 
-dnl Check for gtkmm
-
-PKG_CHECK_MODULES(GTKMM, gtkmm-3.0)
-
-AC_SUBST(GTKMM_CFLAGS)
-AC_SUBST(GTKMM_LIBS)
-			     		      
-PKG_CHECK_MODULES(XMLPP, libxml++-2.6)
+PKG_CHECK_MODULES(XMLPP, libxml++-5.0)
 AC_SUBST(XMLPP_CFLAGS)
 AC_SUBST(XMLPP_LIBS)
 
@@ -62,39 +73,15 @@ AC_SUBST(ARCHIVE_CFLAGS)
 AC_SUBST(ARCHIVE_CFLAGS)
 
 dnl Finally, check for libsigc++
-PKG_CHECK_MODULES(LIBSIGC, sigc++-2.0)
-
+PKG_CHECK_MODULES(LIBSIGC, sigc++-3.0)
 AC_SUBST(LIBSIGC_CFLAGS)
 AC_SUBST(LIBSIGC_LIBS)
-AC_SUBST(HOME)
 
 AC_CHECK_LIB(pthread, pthread_create)
 
-dnl----------------------------------------------------------------------
-dnl Below here are options to modify default behaviour
-
-dnl Do we want to compile the game list server?
-AC_ARG_ENABLE(gls,
-            [  --enable-gls     compile game list server (default=yes)],
-            use_gls="$enableval", use_gls="yes")
-AM_CONDITIONAL([WANT_GLS], [test $use_gls = "yes"])
-
-dnl Do we want to compile the game host server?
-AC_ARG_ENABLE(ghs,
-            [  --enable-ghs     compile game host server (default=yes)],
-            use_ghs="$enableval", use_ghs="yes")
-AM_CONDITIONAL([WANT_GHS], [test $use_ghs = "yes"])
-
-use_sound=1
-AC_ARG_ENABLE(sound, [  --enable-sound         Enable or disable sound usage (default on)],
-                use_sound="$enableval", use_sound="yes")
-
-if test $use_sound = yes; then
-PKG_CHECK_MODULES(GSTREAMER, gstreamermm-1.0)
-AC_SUBST(GSTREAMER_CFLAGS)
-AC_SUBST(GSTREAMER_LIBS)
-AC_DEFINE([LW_SOUND], 1, [enables sound])
-fi
+PKG_CHECK_MODULES(GST, [gstreamer-1.0 >= 1.18])
+AC_SUBST(GST_CFLAGS)
+AC_SUBST(GST_LIBS)
 
 dnl ...the standard screen resolution...
 AC_ARG_WITH(resolution,
@@ -119,82 +106,68 @@ fi
 
 rm -f src/main.o
 
-eval LORDSAWAR_DATADIR="$datadir/lordsawar"
+eval LORDSAWAR_DATADIR="$datadir/lw"
 AC_SUBST(LORDSAWAR_DATADIR)
 
 eval eval DATADIR="$datadir"
 AC_SUBST(DATADIR)
 
-echo "$ac_cv_host" | grep "mingw" --quiet
-if test "x$?" = "x0"; then
-        wincheck=true
-else
-        wincheck=false
-fi
-AM_CONDITIONAL([WINDOWS_OS], [test x$wincheck = xtrue])
-
-AC_CONFIG_FILES([make-windows-zip.sh],[chmod +x make-windows-zip.sh])
+# ============================
+# OUTPUT FILES
+# ============================
 
 AC_CONFIG_FILES([
-        dat/Makefile 
-        dat/icons/Makefile 
-        dat/icons/16x16/Makefile 
-        dat/icons/22x22/Makefile 
-        dat/icons/24x24/Makefile 
-        dat/icons/32x32/Makefile 
-        dat/icons/48x48/Makefile 
-        dat/icons/64x64/Makefile 
-        dat/lordsawar.desktop.in
-        dat/army/Makefile 
-        dat/army/default/Makefile 
-        dat/army/bigdefault/Makefile 
-        dat/army/duel/Makefile 
-        dat/tilesets/Makefile
-        dat/tilesets/default/Makefile
-        dat/tilesets/bigdefault/Makefile
-        dat/tilesets/stark/Makefile
-        dat/tilesets/bigstark/Makefile
-        dat/tilesets/wesnoth/Makefile
-        dat/tilesets/bigwesnoth/Makefile
-        dat/shield/Makefile 
-        dat/shield/default/Makefile 
-        dat/shield/dol/Makefile 
-        dat/shield/plain/Makefile 
-        dat/citysets/Makefile 
-        dat/citysets/default/Makefile 
-        dat/citysets/bigdefault/Makefile 
-        dat/citysets/dol/Makefile 
-        dat/citysets/bigdol/Makefile 
-        dat/various/Makefile 
-        dat/various/items/Makefile
-        dat/various/editor/Makefile
-        dat/various/xslt/Makefile
-        dat/map/Makefile 
-        dat/map/dol/Makefile 
-        dat/map/duel/Makefile 
-        dat/music/Makefile
-        dat/glade/Makefile
-        dat/glade/editor/Makefile
-        po/Makefile.in
-        Makefile 
-        src/Makefile
-        doc/Makefile
-        help/Makefile
-        help/figures/Makefile
-        src/editor/Makefile
-        src/gls/Makefile
-        src/ghs/Makefile
-        src/utils/Makefile
-        src/gui/Makefile])
+    Makefile
+    src/Makefile
+    data/Makefile
+    po/Makefile.in
+    po/Makefile
+    data/ui/Makefile
+    data/ui/editor/Makefile
+    data/icons/Makefile 
+    data/icons/16x16/Makefile 
+    data/icons/22x22/Makefile 
+    data/icons/24x24/Makefile 
+    data/icons/32x32/Makefile 
+    data/icons/48x48/Makefile 
+    data/icons/64x64/Makefile 
+    data/lordsawar.desktop.in
+    data/armies/Makefile 
+    data/armies/default/Makefile 
+    data/armies/duel/Makefile 
+    data/terrain/Makefile
+    data/terrain/default/Makefile
+    data/terrain/stark/Makefile
+    data/terrain/wesnoth/Makefile
+    data/shields/Makefile 
+    data/shields/default/Makefile 
+    data/shields/dol/Makefile 
+    data/shields/plain/Makefile 
+    data/buildings/Makefile 
+    data/buildings/default/Makefile 
+    data/buildings/dol/Makefile 
+    data/various/Makefile 
+    data/various/items/Makefile
+    data/various/editor/Makefile
+    data/various/xslt/Makefile
+    data/maps/Makefile 
+    data/maps/dol/Makefile 
+    data/maps/duel/Makefile 
+    data/music/Makefile
+])
+
 AC_OUTPUT
-echo ""
-echo "LordsAWar! is now configured. Type 'make' to compile it."
-echo ""
-echo "Configuration:"
-echo " Installation location : $prefix"
-echo " Game-list Server      : $use_gls"
-echo " Game-host Server      : $use_ghs"
-echo " Enable Sounds         : $use_sound"
-echo ""
-echo "Extra Options:"
-echo " Compiler Optimizations: $use_opts"
+
+# Summary
+AC_MSG_NOTICE([
+==================================
+Configuration summary for $PACKAGE_NAME $PACKAGE_VERSION
+==================================
+
+C++ Compiler:        $CXX
+C++ Flags:           $CXXFLAGS
+GTKmm CFlags:        $GTKMM_CFLAGS
+GTKmm Libraries:     $GTKMM_LIBS
+
+Type 'make' to build the project.
+])

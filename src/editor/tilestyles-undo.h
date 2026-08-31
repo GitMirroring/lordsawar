@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,60 +12,186 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef TILESTYLE_ORGANIZER_ACTIONS_H
-#define TILESTYLE_ORGANIZER_ACTIONS_H
+#ifndef TILESTYLES_UNDO_H
+#define TILESTYLES_UNDO_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
+#include "tile.h"
+#include "small-tile.h"
+#include "tile-style.h"
+#include "defs.h"
 #include "undo-action.h"
-#include <vector>
-#include "tilestyle.h"
+#include "undo-mgr.h"
 
-//! A record of an event in the tilestyle organizer
+class Tileset;
+
+//! A record of an event in the tilestyles dialog
 /** 
- * The purpose of these classes is to implement undo/redo in the tilestyle
- * organizer.
+ * The purpose of these classes is to implement undo/redo in the tilestyles
+ * dialog.
  */
 
-class TileStyleOrganizerAction: public UndoAction
+class TileStylesUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      MOVE = 1,
-    };
+    //! A TileStyles Undo Action can be one of the following kinds.
+    enum Type
+      {
+        ADD_TILESTYLESET = 1,
+        REMOVE_TILESTYLESET = 2,
+        TYPE = 3,
+      };
 
-    TileStyleOrganizerAction(Type type)
-     : UndoAction (UndoAction::AGGREGATE_NONE), d_type (type) {}
+    //! Default constructor.
+    TileStylesUndoAction(Type type, bool agg = false)
+     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                   UndoAction::AGGREGATE_NONE), m_type (type)
+       {
+       }
 
-    virtual ~TileStyleOrganizerAction() {}
-
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class TileStyleOrganizerAction_Move: public TileStyleOrganizerAction
+//-----------------------------------------------------------------------------
+
+//! A helper class for events that require saving the whole tileset
+
+/**
+ * We're putting images inside the tar file, or removing them so we
+ * need to save the whole tar file.
+ */
+class TileStylesUndoAction_Save: public TileStylesUndoAction
 {
-    public:
-        TileStyleOrganizerAction_Move
-          (std::list<std::pair<guint32, TileStyle::Type> >l)
-          : TileStyleOrganizerAction (MOVE), d_list (l) {}
-        ~TileStyleOrganizerAction_Move () {}
+public:
+    TileStylesUndoAction_Save (Tileset *s, Type t)
+      :TileStylesUndoAction (t)
+      {
+        m_tileset = new Tileset (*s);
+        m_filename = File::get_tmp_file () + TILESET_EXT;
+        s->save (m_filename, TILESET_EXT);
+      }
 
-        Glib::ustring getActionName () const {return "Move";}
+    ~TileStylesUndoAction_Save ()
+      {
+        File::erase (m_filename);
+        delete m_tileset;
+      }
 
-        std::list<std::pair<guint32, TileStyle::Type> > getTileStyleTypes()
-          {return d_list;}
+    Glib::ustring get_tileset_filename () const
+      {
+        return m_filename;
+      }
 
-    private:
-        std::list<std::pair<guint32, TileStyle::Type> > d_list;
+    Tileset *get_tileset () const
+      {
+        return m_tileset;
+      }
+private:
+    Glib::ustring m_filename;
+    Tileset *m_tileset;
 };
 
-#endif //TILESTYLE_ORGANIZER_ACTIONS_H
+
+//-----------------------------------------------------------------------------
+
+//! A record of a new tile being added to the tileset
+/**
+ * The purpose of the TileStylesUndoAction_AddSet class is to record
+ * when a new blank tile has been added to the set.
+ *
+ * We take a copy of the whole tileset just to make it easy.  Our copy is a
+ * file on disk and is deleted when this class is destroyed.
+ */
+class TileStylesUndoAction_AddSet: public TileStylesUndoAction_Save
+{
+public:
+    //! Make a new add set action
+    /**
+     * Populate the add set action with the tileset.
+     */
+    TileStylesUndoAction_AddSet (Tileset *t)
+      :TileStylesUndoAction_Save (t, TileStylesUndoAction::ADD_TILESTYLESET)
+      {
+      }
+
+    //! Destroy an add set action, and delete the file.
+    ~TileStylesUndoAction_AddSet ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Add Tile Style Set";
+      }
+};
+
+//-----------------------------------------------------------------------------
+
+//! A record of a set being erased from the tileset
+/**
+ * The purpose of the TileStylesUndoAction_RemoveSet class is to record
+ * when a tile style set has been deleted from the tileset.
+ *
+ */
+class TileStylesUndoAction_RemoveSet: public TileStylesUndoAction_Save
+{
+public:
+    //! Make a new remove set action
+    /**
+     * Populate the remove set action with the tileset.
+     */
+    TileStylesUndoAction_RemoveSet (Tileset *t)
+      :TileStylesUndoAction_Save (t, TileStylesUndoAction::REMOVE_TILESTYLESET)
+      {
+      }
+
+    //! Destroy a remove tile action, and delete the file.
+    ~TileStylesUndoAction_RemoveSet ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Remove Tile Style Set";
+      }
+};
+
+//-----------------------------------------------------------------------------
+//
+class TileStylesUndoAction_Type: public TileStylesUndoAction_Save
+{
+public:
+    //! Make a new type action
+    /**
+     * Populate the type action with the tileset.
+     * this is for one or more tilestyles getting their type changed.
+     */
+    TileStylesUndoAction_Type (Tileset *t)
+      :TileStylesUndoAction_Save (t, TileStylesUndoAction::TYPE)
+      {
+      }
+
+    //! Destroy a type action, and delete the file.
+    ~TileStylesUndoAction_Type ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Type";
+      }
+};
+
+#endif

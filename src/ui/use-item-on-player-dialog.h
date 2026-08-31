@@ -1,4 +1,4 @@
-//  Copyright (C) 2010, 2012, 2014 Ben Asselstine
+//  Copyright (C) 2010, 2012, 2014, 2017, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,57 +12,160 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#pragma once
+#include <gtkmm.h>
+#include "lw-dialog-base.h"
 #ifndef USE_ITEM_ON_PLAYER_DIALOG_H
 #define USE_ITEM_ON_PLAYER_DIALOG_H
-
-#include <memory>
-#include <vector>
-#include <gtkmm.h>
-
-#include "citymap.h"
-#include "lw-dialog.h"
-
-class Player;
-
-// dialog for targetting a player when using an item.
-class UseItemOnPlayerDialog: public LwDialog
+#include "city-map.h"
+#include "player.h"
+#include "image-helpers.h"
+#include "lw-column.h"
+class UseItemOnPlayerRow: public Glib::Object
 {
- public:
-    UseItemOnPlayerDialog(Gtk::Window &parent);
-    ~UseItemOnPlayerDialog() {delete citymap;};
+public:
+    Player *m_player;
 
-    void hide() {dialog->hide();};
-    Player *run();
-    
- private:
-    CityMap* citymap;
+    static Glib::RefPtr<UseItemOnPlayerRow> create (Player *p)
+      {
+        return
+          Glib::make_refptr_for_instance<UseItemOnPlayerRow> (new UseItemOnPlayerRow (p));
+      }
 
-    Gtk::TreeView *player_treeview;
-
-    class PlayersColumns: public Gtk::TreeModelColumnRecord {
-    public:
-	PlayersColumns() 
-        { add(image); add(name); add(player);}
-	
-	Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf> > image;
-	Gtk::TreeModelColumn<Glib::ustring> name;
-        Gtk::TreeModelColumn<Player*> player;
-    };
-    const PlayersColumns players_columns;
-    Glib::RefPtr<Gtk::ListStore> players_list;
-
-    Gtk::Image *map_image;
-    Gtk::Button *continue_button;
-    
-    void on_map_changed(Cairo::RefPtr<Cairo::Surface> map);
-    void addPlayer(Player *player);
-    Player *grabSelectedPlayer();
-
-    void on_player_selected();
+protected:
+    UseItemOnPlayerRow (Player *p)
+      : m_player (p)
+      {
+      }
 };
 
+class UseItemOnPlayerDialog: public LwDialogBase
+{
+public:
+    static std::string get_resource_name ()
+      {
+        return "use-item-on-player.ui";
+      }
+
+    UseItemOnPlayerDialog (BaseObjectType* o,
+                           const Glib::RefPtr<Gtk::Builder>& xml)
+      : LwDialogBase (o, xml)
+      {
+        m_continue_button = load <Gtk::Button> ("continue_button");
+        m_map_drawing_area = load <Gtk::DrawingArea> ("map_drawing_area");
+        m_treeview = load <Gtk::ColumnView> ("treeview");
+      }
+
+    void setup ()
+      {
+        set_response (m_continue_button, Gtk::ResponseType::ACCEPT);
+
+        m_city_map = new CityMap ();
+        m_city_map->map_changed.connect
+          ([this] (Cairo::RefPtr<Cairo::Surface> map)
+           {
+             cairo_surface_to_drawing_area (map, m_map_drawing_area);
+           });
+
+        m_city_map->resize ();
+        m_city_map->draw ();
+
+        auto motion = Gtk::EventControllerMotion::create ();
+        motion->signal_motion ().connect
+          ([this](double x, double y)
+           {
+             auto c = m_city_map->get_cursor (x, y);
+             static ImageCache::CursorType prev_cursor = ImageCache::SHIP;
+             if (c != prev_cursor)
+               {
+                 auto hotspot = ImageCache::get_hotspot (c);
+                 auto im = ImageCache::instance ()->getCursorPic (c);
+                 auto cursor = Gdk::Cursor::create (im->to_texture (),
+                                                    hotspot.x, hotspot.y);
+                 m_map_drawing_area->set_cursor (cursor);
+               }
+             prev_cursor = c;
+           });
+        m_map_drawing_area->add_controller (motion);
+
+        m_store = Gio::ListStore<UseItemOnPlayerRow>::create ();
+        m_selection_model = Gtk::SingleSelection::create (m_store);
+        m_treeview->set_model (m_selection_model);
+
+        for (auto p : *Playerlist::instance ())
+          {
+            if (p == Playerlist::getActiveplayer ())
+              continue;
+            if (p == Playerlist::getNeutral ())
+              continue;
+            m_store->append (UseItemOnPlayerRow::create (p));
+          }
+        setup_shield_column ();
+        setup_name_column ();
+
+        signal_response ().connect
+          ([this](Gtk::ResponseType)
+           {
+             hide ();
+             m_player_selected.emit (get_selected_player ());
+           });
+      }
+
+    Player *get_selected_player ()
+      {
+        auto single_selection =
+          std::dynamic_pointer_cast<Gtk::SingleSelection> (m_selection_model);
+
+        auto item = single_selection->get_selected_item ();
+
+        if (item)
+          {
+            auto row = std::dynamic_pointer_cast<UseItemOnPlayerRow> (item);
+            return row->m_player;
+          }
+        return NULL;
+      }
+
+    sigc::signal<void(Player*)> signal_player_selected ()
+      {
+        return m_player_selected;
+      }
+private:
+    Gtk::Button *m_continue_button;
+    Gtk::DrawingArea *m_map_drawing_area;
+    Gtk::ColumnView *m_treeview;
+    Glib::RefPtr<Gtk::SingleSelection> m_selection_model;
+    Glib::RefPtr<Gio::ListStore<UseItemOnPlayerRow>> m_store;
+        
+    CityMap *m_city_map = NULL;
+
+    sigc::signal<void(Player*)> m_player_selected;
+
+    void setup_shield_column ()
+      {
+        LwColumn::setup_picture_column<UseItemOnPlayerRow>
+          (m_treeview, LW_BUTTON_SIZE, LW_BUTTON_SIZE, "shield_image", "",
+           [] (const auto& row)
+           {
+             auto im =
+               ImageCache::instance ()->getShieldPic
+               (GameMap::instance ()->getShieldsetId (), 2,
+                row->m_player->getId (), false);
+             return im->to_texture ();
+           });
+      }
+
+    void setup_name_column ()
+      {
+        LwColumn::setup_text_column<UseItemOnPlayerRow>
+          (m_treeview, "name_label", true, Gtk::Justification::LEFT,
+           _("Players"),
+           [] (const auto& row)
+           {
+             return row->m_player->getName ();
+           });
+      }
+
+};
 #endif

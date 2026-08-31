@@ -1,9 +1,9 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2004, 2005 Andrea Paternesi
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2007, 2008, 2009, 2010 Ben Asselstine
-// Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2004, 2005 Andrea Paternesi
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2007, 2008, 2009, 2010, 2026 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef PATH_H
@@ -125,8 +124,10 @@ class Path : public std::list<Vector<int> >
         
 	//! find which tile in the city is quickest to move to.
 	guint32 calculateToCity (Stack *s, City *c, bool zigzag = true);
-	void dump();
 	void calculate (Stack* s, Vector<int> dest, guint32 &mp, guint32 &turns, guint32 &left, bool zigzag = true);
+
+        //! return tile positions that are DIST away from a point on the path
+        std::vector<Vector<int>> getNearbyPoints (int dist) const;
     private:
 
         int pointsToMoveTo(const Stack *s, int x, int y, int destx, int desty) const;
@@ -140,4 +141,4 @@ class Path : public std::list<Vector<int> >
 
 };
 
-#endif // PATH_H
+#endif

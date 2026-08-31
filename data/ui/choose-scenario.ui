@@ -1,335 +1,197 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.96.3 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <!-- interface-name start-scenario.ui -->
+  <requires lib="gtk" version="4.0"/>
   <object class="GtkAdjustment" id="adjustment1">
-    <property name="upper">100</property>
-    <property name="step-increment">1</property>
     <property name="page-increment">10</property>
+    <property name="page-size">10.0</property>
+    <property name="step-increment">1</property>
+    <property name="upper">100</property>
   </object>
-  <object class="GtkDialog" id="dialog">
-    <property name="can-focus">False</property>
+  <object class="GtkWindow" id="dialog">
+    <property name="destroy-with-parent">1</property>
+    <property name="resizable">0</property>
     <property name="title" translatable="yes">Select Scenario To Play</property>
-    <property name="resizable">False</property>
-    <property name="window-position">center-on-parent</property>
-    <property name="destroy-with-parent">True</property>
-    <property name="type-hint">dialog</property>
-    <child internal-child="vbox">
+    <child>
       <object class="GtkBox" id="dialog-vbox">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="margin-start">6</property>
-        <property name="margin-end">6</property>
-        <property name="margin-top">6</property>
         <property name="margin-bottom">6</property>
+        <property name="margin-end">6</property>
+        <property name="margin-start">6</property>
+        <property name="margin-top">6</property>
         <property name="orientation">vertical</property>
         <property name="spacing">12</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area1">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <child>
-              <object class="GtkButton" id="cancel_button">
-                <property name="label" translatable="yes">Cancel</property>
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="receives-default">False</property>
-                <property name="use-underline">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="load_button">
-                <property name="label" translatable="yes">Select</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="has-focus">True</property>
-                <property name="can-default">True</property>
-                <property name="has-default">True</property>
-                <property name="receives-default">False</property>
-                <property name="use-underline">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack-type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
         <child>
           <object class="GtkBox" id="contents_vbox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
             <property name="orientation">vertical</property>
             <property name="spacing">18</property>
+            <property name="vexpand">1</property>
             <child>
               <object class="GtkBox" id="hbox1">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
+                <property name="homogeneous">1</property>
                 <property name="spacing">18</property>
-                <property name="homogeneous">True</property>
                 <child>
                   <object class="GtkBox" id="vbox2">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
+                    <property name="hexpand">1</property>
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkScrolledWindow" id="scrolledwindow1">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="shadow-type">in</property>
+                        <property name="hscrollbar-policy">never</property>
+                        <property name="vadjustment">adjustment1</property>
+                        <property name="vexpand">1</property>
                         <child>
-                          <object class="GtkTreeView" id="treeview">
-                            <property name="width-request">180</property>
-                            <property name="height-request">250</property>
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="headers-visible">False</property>
-                            <child internal-child="selection">
-                              <object class="GtkTreeSelection"/>
-                            </child>
+                          <object class="GtkColumnView" id="treeview">
+                            <property name="hexpand">True</property>
+                            <property name="vexpand">True</property>
                           </object>
                         </child>
                       </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkBox" id="hbox5">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">5</property>
-                        <property name="margin-end">5</property>
-                        <property name="margin-top">5</property>
                         <property name="margin-bottom">5</property>
+                        <property name="margin-end">5</property>
+                        <property name="margin-start">5</property>
+                        <property name="margin-top">5</property>
                         <property name="spacing">7</property>
                         <child>
                           <object class="GtkButton" id="add_scenario_button">
+                            <property name="focusable">1</property>
+                            <property name="halign">center</property>
                             <property name="label" translatable="yes">Add Scenario</property>
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="receives-default">False</property>
-                            <property name="use-underline">True</property>
+                            <property name="use-underline">1</property>
                           </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
                           <object class="GtkButton" id="remove_scenario_button">
+                            <property name="focusable">1</property>
+                            <property name="halign">center</property>
                             <property name="label" translatable="yes">Remove Scenario</property>
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="receives-default">False</property>
-                            <property name="use-underline">True</property>
+                            <property name="use-underline">1</property>
                           </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">1</property>
-                          </packing>
                         </child>
                       </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
                     </child>
                   </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkBox" id="vbox1">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
+                    <property name="hexpand">1</property>
                     <property name="orientation">vertical</property>
                     <property name="spacing">6</property>
                     <child>
-                      <!-- n-columns=3 n-rows=3 -->
                       <object class="GtkGrid">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                        <property name="column-homogeneous">1</property>
                         <property name="row-spacing">12</property>
-                        <property name="column-homogeneous">True</property>
                         <child>
                           <object class="GtkBox">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="orientation">vertical</property>
+                            <property name="css-classes">att-box</property>
+                            <property name="halign">center</property>
+                            <property name="hexpand">True</property>
                             <child>
                               <object class="GtkLabel" id="label4">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Number of Players</property>
-                                <attributes>
-                                  <attribute name="underline" value="True"/>
-                                </attributes>
+                                <property name="css-classes">att-title</property>
+                                <property name="label" translatable="yes">Number of Players:</property>
+                                <property name="valign">center</property>
                               </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">0</property>
-                              </packing>
                             </child>
                             <child>
                               <object class="GtkLabel" id="num_players_label">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
+                                <property name="css-classes">att-value-label</property>
+                                <property name="margin-start">6</property>
                               </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
                             </child>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="row">0</property>
+                            </layout>
                           </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">0</property>
-                          </packing>
                         </child>
                         <child>
                           <object class="GtkBox">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="orientation">vertical</property>
+                            <property name="css-classes">att-box</property>
+                            <property name="halign">center</property>
+                            <property name="hexpand">True</property>
                             <child>
                               <object class="GtkLabel" id="label5">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Number of Cities</property>
-                                <attributes>
-                                  <attribute name="underline" value="True"/>
-                                </attributes>
+                                <property name="css-classes">att-title</property>
+                                <property name="label" translatable="yes">Number of Cities:</property>
+                                <property name="valign">center</property>
                               </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">0</property>
-                              </packing>
                             </child>
                             <child>
                               <object class="GtkLabel" id="num_cities_label">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
+                                <property name="css-classes">att-value-label</property>
+                                <property name="margin-start">6</property>
                               </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
                             </child>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="row">1</property>
+                            </layout>
                           </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
                         </child>
                       </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkScrolledWindow" id="scrolledwindow2">
-                        <property name="width-request">280</property>
-                        <property name="height-request">230</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="margin-start">10</property>
-                        <property name="margin-end">10</property>
-                        <property name="margin-top">10</property>
-                        <property name="margin-bottom">10</property>
-                        <property name="vadjustment">adjustment1</property>
-                        <property name="hscrollbar-policy">never</property>
-                        <child>
+                        <property name="child">
                           <object class="GtkTextView" id="description_textview">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="editable">False</property>
+                            <property name="editable">0</property>
+                            <property name="focusable">1</property>
                             <property name="wrap-mode">word-char</property>
                           </object>
-                        </child>
+                        </property>
+                        <property name="focusable">1</property>
+                        <property name="height-request">230</property>
+                        <property name="hexpand">True</property>
+                        <property name="hscrollbar-policy">never</property>
+                        <property name="margin-bottom">10</property>
+                        <property name="margin-end">10</property>
+                        <property name="margin-start">10</property>
+                        <property name="margin-top">10</property>
+                        <property name="vadjustment">adjustment2</property>
+                        <property name="vexpand">1</property>
+                        <property name="width-request">280</property>
                       </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <placeholder/>
                     </child>
                   </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
                 </child>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
             </child>
           </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="dialog-action_area1">
+            <property name="halign">end</property>
+            <property name="margin-top">6</property>
+            <child>
+              <object class="GtkButton" id="cancel_button">
+                <property name="halign">center</property>
+                <property name="label" translatable="yes">Cancel</property>
+                <property name="margin-end">3</property>
+                <property name="margin-start">3</property>
+                <property name="use-underline">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="load_button">
+                <property name="focusable">1</property>
+                <property name="halign">center</property>
+                <property name="label" translatable="yes">Select</property>
+                <property name="margin-start">3</property>
+                <property name="use-underline">1</property>
+              </object>
+            </child>
+          </object>
         </child>
       </object>
     </child>
-    <action-widgets>
-      <action-widget response="-6">cancel_button</action-widget>
-      <action-widget response="-3">load_button</action-widget>
-    </action-widgets>
+  </object>
+  <object class="GtkAdjustment" id="adjustment2">
+    <property name="page-increment">10</property>
+    <property name="page-size">10.0</property>
+    <property name="step-increment">1</property>
+    <property name="upper">100</property>
   </object>
 </interface>

@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2015, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,19 +12,18 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <sstream>
 #include <string>
 
-#include "FogMap.h"
-#include "SightMap.h"
+#include "fog-map.h"
+#include "sight-map.h"
 
-#include "playerlist.h"
-#include "xmlhelper.h"
-#include "GameScenarioOptions.h"
+#include "player-list.h"
+#include "xml-helper.h"
+#include "game-scenario-options.h"
 
 Glib::ustring FogMap::d_tag = "fogmap";
 
@@ -48,9 +47,9 @@ FogMap::FogMap(XML_Helper* helper)
 {
     Glib::ustring t;
     
-    helper->getData(d_width, "width");
-    helper->getData(d_height, "height");
-    helper->getData(t, "map");
+    helper->get(d_width, "width");
+    helper->get(d_height, "height");
+    helper->get(t, "map");
     std::string types = t.raw();
     types.erase (std::remove(types.begin(), types.end(), '\n'), types.end());
     types.erase (std::remove(types.begin(), types.end(), '\r'), types.end());
@@ -113,9 +112,9 @@ bool FogMap::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(FogMap::d_tag);
-    retval &= helper->saveData("width", d_width);
-    retval &= helper->saveData("height", d_height);
+    retval &= helper->open_tag(FogMap::d_tag);
+    retval &= helper->save("width", d_width);
+    retval &= helper->save("height", d_height);
 
     std::stringstream types;
     types << std::endl;
@@ -128,8 +127,8 @@ bool FogMap::save(XML_Helper* helper) const
         types << std::endl;
     }
 
-    retval &= helper->saveData("map", types.str());
-    retval &= helper->closeTag();
+    retval &= helper->save("map", types.str());
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -470,4 +469,3 @@ void FogMap::calculateShadeMap()
       if (isFogged(Vector<int>(i,j)) == false)
 	  shademap[j * d_width + i] = NONE;
 }
-// End of file

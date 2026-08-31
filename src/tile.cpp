@@ -1,6 +1,7 @@
-// Copyright (C) 2001, 2002, 2003 Michael Bartl
-// Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2001, 2002, 2003 Michael Bartl
+//  Copyright (C) 2002, 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2010, 2011, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,17 +15,16 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <iostream>
 #include <list>
-#include "Tile.h"
-#include "SmallTile.h"
-#include "File.h"
-#include "tileset.h"
-#include "tarhelper.h"
-#include "xmlhelper.h"
+#include "tile.h"
+#include "small-tile.h"
+#include "file.h"
+#include "tile-set.h"
+#include "tar-helper.h"
+#include "xml-helper.h"
 #include "rnd.h"
 
 Glib::ustring Tile::d_tag = "tile";
@@ -50,10 +50,10 @@ Tile::Tile(const Tile &t)
 
 Tile::Tile(XML_Helper* helper)
 {
-    helper->getData(d_name, "name");
-    helper->getData(d_moves, "moves");
+    helper->get(d_name, "name");
+    helper->get(d_moves, "moves");
     Glib::ustring type_str;
-    helper->getData(type_str, "type");
+    helper->get(type_str, "type");
     d_type = Tile::Type(tileTypeFromString(type_str));
 }
 
@@ -61,15 +61,15 @@ bool Tile::save(XML_Helper *helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(d_tag);
-  retval &= helper->saveData("name", d_name);
-  retval &= helper->saveData("moves", d_moves);
+  retval &= helper->open_tag(d_tag);
+  retval &= helper->save("name", d_name);
+  retval &= helper->save("moves", d_moves);
   Glib::ustring type_str = tileTypeToString(Tile::Type(d_type));
-  retval &= helper->saveData("type", type_str);
+  retval &= helper->save("type", type_str);
   retval &= d_smalltile->save(helper);
   for (Tile::const_iterator i = begin(); i != end(); ++i)
     retval &= (*i)->save(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -243,8 +243,7 @@ void Tile::uninstantiateImages()
     (*it)->uninstantiateImages();
 }
 
-void Tile::instantiateImages(int tilesize, Tar_Helper *t, bool scale,
-                             bool &broken)
+void Tile::instantiateImages(Tar_Helper *t, bool &broken)
 {
   broken = false;
   for (iterator it = begin(); it != end(); ++it)
@@ -254,7 +253,7 @@ void Tile::instantiateImages(int tilesize, Tar_Helper *t, bool scale,
         {
           file = t->getFile((*it)->getName(), broken);
           if (!broken)
-            (*it)->loadImages(tilesize, file, scale, broken);
+            (*it)->loadImages(file, broken);
           if (file.empty() == false)
             File::erase(file);
         }
@@ -335,4 +334,15 @@ std::list<std::pair<guint32, TileStyle::Type> >Tile::getAllTileStyleTypes () con
                                                              j->getType ()));
   return result;
 }
-// End of file
+
+std::vector<Tile::Type> Tile::getTypes ()
+{
+  std::vector<Tile::Type> v;
+  v.push_back (Tile::GRASS);
+  v.push_back (Tile::WATER);
+  v.push_back (Tile::FOREST);
+  v.push_back (Tile::HILLS);
+  v.push_back (Tile::SWAMP);
+  v.push_back (Tile::MOUNTAIN);
+  return v;
+}

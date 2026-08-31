@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef HERO_EDITOR_ACTIONS_H
-#define HERO_EDITOR_ACTIONS_H
+#ifndef HERO_EDITOR_UNDO_ACTIONS_H
+#define HERO_EDITOR_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
@@ -30,86 +29,137 @@
  * editor.
  */
 
-class HeroEditorAction: public UndoAction
+class HeroEditorUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      NAME = 1,
-      GENDER = 2,
-      BACKPACK = 3,
-      CHARACTER = 4,
-    };
+    enum Type
+      {
+        NAME = 1,
+        GENDER = 2,
+        BACKPACK = 3,
+        CHARACTER = 4,
+      };
 
-    HeroEditorAction(Type type, bool agg = false)
-     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+    HeroEditorUndoAction(Type type, bool agg = false)
+      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                    UndoAction::AGGREGATE_NONE), m_type (type)
+        {
+        }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class HeroEditorAction_Name: public HeroEditorAction, public UndoCursor
+class HeroEditorUndoAction_Name: public HeroEditorUndoAction, public UndoCursor
 {
-    public:
-        HeroEditorAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
-          : HeroEditorAction (NAME, true), UndoCursor (u, e),
-          d_name (n) {}
-        ~HeroEditorAction_Name () {}
+public:
+    HeroEditorUndoAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
+      : HeroEditorUndoAction (NAME, true), UndoCursor (u->get_pos (e), e),
+      m_name (n)
+  {
+  }
 
-        Glib::ustring getActionName () const {return "Name";}
+    ~HeroEditorUndoAction_Name ()
+      {
+      }
 
-        Glib::ustring getName () {return d_name;}
+    Glib::ustring get_action_name () const
+      {
+        return "Name";
+      }
 
-    private:
-        Glib::ustring d_name;
+    Glib::ustring get_name () const
+      {
+        return m_name;
+      }
+
+private:
+    Glib::ustring m_name;
 };
 
-class HeroEditorAction_Gender: public HeroEditorAction
+class HeroEditorUndoAction_Gender: public HeroEditorUndoAction
 {
-    public:
-        HeroEditorAction_Gender (Hero::Gender g)
-          : HeroEditorAction (GENDER), d_gender (g) {}
-        ~HeroEditorAction_Gender () {}
+public:
+    HeroEditorUndoAction_Gender (Hero::Gender g)
+      : HeroEditorUndoAction (GENDER), m_gender (g)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Gender";}
+    ~HeroEditorUndoAction_Gender ()
+      {
+      }
 
-        Hero::Gender getGender () {return d_gender;}
+    Glib::ustring get_action_name () const
+      {
+        return "Gender";
+      }
 
-    private:
-        Hero::Gender d_gender;
+    Hero::Gender get_gender () const
+      {
+        return m_gender;
+      }
+
+private:
+    Hero::Gender m_gender;
 };
 
-class HeroEditorAction_Backpack: public HeroEditorAction
+class HeroEditorUndoAction_Backpack: public HeroEditorUndoAction
 {
-    public:
-        HeroEditorAction_Backpack (Backpack *b)
-          : HeroEditorAction (BACKPACK), d_backpack (new Backpack (*b)) {}
-        ~HeroEditorAction_Backpack () {delete d_backpack;}
+public:
+    HeroEditorUndoAction_Backpack (Backpack *b)
+      : HeroEditorUndoAction (BACKPACK), m_backpack (new Backpack (*b))
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Backpack";}
+    ~HeroEditorUndoAction_Backpack ()
+      {
+        delete m_backpack;
+      }
 
-        Backpack * getBackpack () {return d_backpack;}
+    Glib::ustring get_action_name () const
+      {
+        return "Backpack";
+      }
 
-    private:
-        Backpack *d_backpack;
+    Backpack * get_backpack () const
+      {
+        return m_backpack;
+      }
+
+private:
+    Backpack *m_backpack;
 };
 
-class HeroEditorAction_Character: public HeroEditorAction
+class HeroEditorUndoAction_Character: public HeroEditorUndoAction
 {
-    public:
-        HeroEditorAction_Character (guint32 id)
-          : HeroEditorAction (CHARACTER), d_hero_type_id (id) {}
-        ~HeroEditorAction_Character () {}
+public:
+    HeroEditorUndoAction_Character (guint32 id)
+      : HeroEditorUndoAction (CHARACTER), m_character_id (id)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Character";}
+    ~HeroEditorUndoAction_Character ()
+      {
+      }
 
-        guint32 getHeroTypeId () {return d_hero_type_id;}
+    Glib::ustring get_action_name () const
+      {
+        return "Character";
+      }
 
-    private:
-        guint32 d_hero_type_id;
+    guint32 get_character_id () const
+      {
+        return m_character_id;
+      }
+
+private:
+    guint32 m_character_id;
 };
-#endif //HERO_EDITOR_ACTIONS_H
+#endif

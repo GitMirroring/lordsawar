@@ -1,4 +1,4 @@
-// Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include "port.h"
-#include "GameMap.h"
-#include "xmlhelper.h"
+#include "game-map.h"
+#include "xml-helper.h"
 
 Glib::ustring Port::d_tag = "port";
 
@@ -25,14 +24,14 @@ Port::Port(Vector<int> pos)
   :Location(pos)
 {
     //mark the location on the game map as occupied by a port
-    GameMap::getInstance()->getTile(getPos())->setBuilding(Maptile::PORT);
+    GameMap::instance()->getTile(getPos())->setBuilding(Maptile::PORT);
 }
 
 Port::Port(XML_Helper* helper)
     :Location(helper)
 {
     //mark the location on the game map as occupied by a port
-    GameMap::getInstance()->getTile(getPos())->setBuilding(Maptile::PORT);
+    GameMap::instance()->getTile(getPos())->setBuilding(Maptile::PORT);
 }
 
 Port::Port(const Port& s, bool sync_id)
@@ -49,11 +48,11 @@ bool Port::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Port::d_tag);
-    retval &= helper->saveData("id", d_id);
-    retval &= helper->saveData("x", getPos().x);
-    retval &= helper->saveData("y", getPos().y);
-    retval &= helper->closeTag();
+    retval &= helper->open_tag(Port::d_tag);
+    retval &= helper->save("id", d_id);
+    retval &= helper->save("x", getPos().x);
+    retval &= helper->save("y", getPos().y);
+    retval &= helper->close_tag();
     
     return retval;
 }

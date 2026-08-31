@@ -1,7 +1,7 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2000, 2001, 2002, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2000, 2001, 2002, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2014, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,20 +15,19 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "LocationBox.h"
+#include "location-box.h"
 #include "army.h"
 #include "player.h"
-#include "playerlist.h"
-#include "stacklist.h"
+#include "player-list.h"
+#include "stack-list.h"
 #include "stack.h"
-#include "FogMap.h"
-#include "GameMap.h"
-#include "stacktile.h"
+#include "fog-map.h"
+#include "game-map.h"
+#include "stack-tile.h"
 
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
 LocationBox::LocationBox(Vector<int> pos, guint32 size)
     :Immovable(pos), d_size(size)
@@ -100,7 +99,7 @@ bool LocationBox::isFull(Player *p) const
     for (unsigned int j = 0; j < d_size; j++)
       {
 	Vector<int> pos = getPos() + Vector<int>(j,i);
-	StackTile *stile = GameMap::getInstance()->getTile(pos)->getStacks();
+	StackTile *stile = GameMap::instance()->getTile(pos)->getStacks();
 	if (stile->canAdd(1, p) == true)
 	  return false;
       }
@@ -115,7 +114,7 @@ Stack* LocationBox::getFreeStack(Player *p, Vector<int> &tile) const
 	Vector<int> pos = getPos() + Vector<int>(j,i);
 	if (GameMap::canAddArmy(pos) == false)
 	  continue;
-	StackTile *stile = GameMap::getInstance()->getTile(pos)->getStacks();
+	StackTile *stile = GameMap::instance()->getTile(pos)->getStacks();
 	Stack *stack = stile->getFriendlyStack(p);
 	if (stack == NULL)
 	  {
@@ -198,4 +197,20 @@ Vector<int> LocationBox::getNearestPos(Vector<int> pos) const
 Vector<int> LocationBox::getTopLeftBoundingBox(Vector<int> p1, Vector<int> p2)
 {
   return Vector<int>(std::min (p1.x, p2.x), std::min (p1.y, p2.y));
+}
+
+bool LocationBox::has_backpack () const
+{
+  bool found = false;
+  for (unsigned int i = 0; i < d_size; i++)
+    for (unsigned int j = 0; j < d_size; j++)
+      {
+        Vector<int> target = Vector<int>(i,j) + getPos ();
+        if (GameMap::getBackpack (target)->size () > 0)
+          {
+            found = true;
+            break;
+          }
+      }
+  return found;
 }

@@ -1,4 +1,4 @@
-// Copyright (C) 2015, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2015, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,64 +12,62 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <config.h>
 
+#include "lw.h"
 #include <iostream>
 #include <algorithm>
-#include "Configuration.h"
-#include "File.h"
+#include "configuration.h"
+#include "file.h"
 #include "vector.h"
 #include "ucompose.hpp"
-#include "GameScenario.h"
-#include "GameMap.h"
-#include "Itemlist.h"
-#include "playerlist.h"
+#include "game-scenario.h"
+#include "game-map.h"
+#include "item-list.h"
+#include "player-list.h"
 #include "counter.h"
-#include "armysetlist.h"
-#include "armyset.h"
-#include "shieldsetlist.h"
-#include "shieldset.h"
-#include "ai_dummy.h"
-#include "CreateScenarioRandomize.h"
-#include "tileset.h"
+#include "army-set-list.h"
+#include "army-set.h"
+#include "shield-set-list.h"
+#include "shield-set.h"
+#include "ai-dummy.h"
+#include "create-scenario-randomize.h"
+#include "tile-set.h"
 #include "bridge.h"
-#include "bridgelist.h"
+#include "bridge-list.h"
 #include "road.h"
-#include "roadlist.h"
+#include "road-list.h"
 #include "player.h"
-#include "ruinlist.h"
-#include "templelist.h"
+#include "ruin-list.h"
+#include "temple-list.h"
 #include "temple.h"
 #include "ruin.h"
-#include "citylist.h"
+#include "city-list.h"
 #include "city.h"
-#include "signpostlist.h"
+#include "signpost-list.h"
 #include "signpost.h"
-#include "portlist.h"
+#include "port-list.h"
 #include "port.h"
-#include "ItemProto.h"
-#include "Itemlist.h"
-#include "armyprodbase.h"
-#include "TarFileMaskedImage.h"
-#include "TarFileImage.h"
+#include "item-proto.h"
+#include "item-list.h"
+#include "army-prod-base.h"
+#include "tar-file-masked-image.h"
+#include "tar-file-image.h"
 
-int max_vector_width;
-      
 static GameScenario *
 setup_new_map (Glib::ustring name)
 {
   GameMap::setWidth(112);
   GameMap::setHeight(156);
-  GameMap::getInstance("default", "default", "default");
+  GameMap::instance("default", "default", "default");
   Itemlist::createStandardInstance();
 
   GameScenario *g =
     new GameScenario (name, String::ucompose(_("a scenario called %1 converted by lordsawar-import version %2"), name, VERSION));
   for (unsigned int i = 0; i < MAX_PLAYERS + 1; i++)
-    fl_counter->getNextId();
+    id_counter->get_next_id();
 
   // fill the map with tile type
   Tileset *tset = GameMap::getTileset();
@@ -77,11 +75,11 @@ setup_new_map (Glib::ustring name)
     {
       if ((*tset)[i]->getType() == 0)
         {
-          GameMap::getInstance()->fill(i);
+          GameMap::instance()->fill(i);
           break;
         }
     }
-  GameMap::getInstance()->calculateBlockedAvenues();
+  GameMap::instance()->calculateBlockedAvenues();
   return g;
 }
 
@@ -461,6 +459,12 @@ convert_terrain_code (unsigned char code, guint32 *t, guint32 *ts)
   return true;
 }
 
+void
+start_errmsg ()
+{
+  fprintf (stderr, "%s: ", Lw::get_prgname ().c_str ());
+}
+
 static void
 import_terrain (FILE *map)
 {
@@ -479,22 +483,27 @@ import_terrain (FILE *map)
           bool success = convert_terrain_code (code, &type, &tilestyle);
           if (!success)
             {
-              fprintf(stderr, 
-                      _("Error: Terrain code %02hhx at %d,%d is unknown\n").c_str(), 
-                      code, j, i);
+              start_errmsg ();
+              fprintf
+                (stderr, 
+                 _("Terrain code %02hhx at %d,%d is unknown\n").c_str (), 
+                 code, j, i);
             }
           else if (tilestyle == TileStyle::UNKNOWN)
-            fprintf(stderr, 
-                    _("Error: Terrain code %02hhx at %d,%d "
-                      "is unknown type %s\n").c_str(), 
-                    code, j, i, Tile::tileTypeToString(Tile::Type(type)).c_str());
+            {
+              start_errmsg ();
+              fprintf
+                (stderr, 
+                 _("Terrain code %02hhx at %d,%d is unknown type %s\n").c_str (),
+                 code, j, i, Tile::tileTypeToString (Tile::Type (type)).c_str ());
+            }
           if (success)
             {
               Tileset *tileset = GameMap::getTileset();
               TileStyle *style = 
                 tileset->getRandomTileStyle(tileset->getIndex(Tile::Type(type)), TileStyle::Type(tilestyle));
 
-              Maptile *mtile = GameMap::getInstance()->getTile(Vector<int>(j,i));
+              Maptile *mtile = GameMap::instance()->getTile(Vector<int>(j,i));
               mtile->setIndex(tileset->getIndex(Tile::Type(type)));
               mtile->setTileStyleId(style->getId ());
             }
@@ -504,7 +513,7 @@ import_terrain (FILE *map)
           if (port == (char)0x80)
             {
               Port *p = new Port (Vector<int>(j, i));
-              Portlist::getInstance()->add(p);
+              Portlist::instance()->add(p);
             }
         }
     }
@@ -544,7 +553,7 @@ import_bridges (FILE *map)
           memcpy (&code, &tile, 1);
           guint32 type = 0;
           if (convert_bridge_code(code, &type))
-            Bridgelist::getInstance()->add(new Bridge(Vector<int>(j, i), type));
+            Bridgelist::instance()->add(new Bridge(Vector<int>(j, i), type));
         }
     }
 }
@@ -607,7 +616,7 @@ import_roads(FILE *rd)
           unsigned char road = roads[i][j];
           guint32 type = 0;
           if (convert_road_code(road, &type))
-            Roadlist::getInstance()->add(new Road(Vector<int>(j, i), type));
+            Roadlist::instance()->add(new Road(Vector<int>(j, i), type));
         }
     }
 }
@@ -644,26 +653,27 @@ import_players (FILE *scn, Armyset *armyset)
       fread (&names[i][0], sizeof(char), 20, scn);
       if (strcmp (names[i], "Not Used") == 0)
         continue;
-  std::cout << String::ucompose (_("Importing player %1."), Glib::ustring(names[i])) << std::endl;
+      std::cout <<
+        String::ucompose (_("%1: Importing player %2."), Lw::get_prgname (),
+                          Glib::ustring(names[i])) << std::endl;
       Player *player = 
         new RealPlayer(Glib::ustring(names[i]),
                        armyset->getId(),
-                       Shield::get_default_colors_for_no(convert_player_id(i)),
-                       GameMap::getWidth(), GameMap::getHeight(), Player::HUMAN,
-                       convert_player_id(i));
+                       Shield::Color(convert_player_id(i)),
+                       GameMap::getWidth(), GameMap::getHeight(), Player::HUMAN);
       int gold = 0;
       d_random->getBaseGold(100, &gold);
       gold = d_random->adjustBaseGold(gold);
       player->setGold(gold);
-      Playerlist::getInstance()->add(player);
+      Playerlist::instance()->add(player);
     }
   Glib::ustring neutral_name = d_random->getPlayerName(Shield::NEUTRAL);
   Player* neutral = 
     new AI_Dummy(neutral_name, armyset->getId(),
-                 Shield::get_default_colors_for_neutral(), 
-                 GameMap::getWidth(), GameMap::getHeight(), MAX_PLAYERS);
-  Playerlist::getInstance()->add(neutral);
-  Playerlist::getInstance()->setNeutral(neutral);
+                 Shield::NEUTRAL, 
+                 GameMap::getWidth(), GameMap::getHeight());
+  Playerlist::instance()->add(neutral);
+  Playerlist::instance()->setNeutral(neutral);
   delete d_random;
 }
 
@@ -673,7 +683,9 @@ import_ruins_and_temples (FILE *scn, FILE *spc)
   fseek (scn, 0x80f, SEEK_CUR);
   unsigned short num_ruins = 0;
   fread (&num_ruins, sizeof (unsigned short), 1, scn);
-  std::cout << String::ucompose (_("Importing %1 ruins & temples."), num_ruins) << std::endl;
+  std::cout <<
+    String::ucompose (_("%1: Importing %2 ruins & temples."),
+                      Lw::get_prgname (), num_ruins) << std::endl;
   unsigned int i;
   for (i = 0; i < num_ruins; i++)
     {
@@ -697,25 +709,31 @@ import_ruins_and_temples (FILE *scn, FILE *spc)
         {
           Temple *t = new Temple (Vector<int>(x,y), 1, Glib::ustring(name));
           t->setDescription(m);
-          Templelist::getInstance()->add(t);
+          Templelist::instance()->add(t);
         }
       else if (type == 2)
         {
           Ruin *r = new Ruin (Vector<int>(x,y), 1, Glib::ustring(name));
           r->setDescription(m);
-          Ruinlist::getInstance()->add(r);
+          Ruinlist::instance()->add(r);
         }
       else
-        std::cerr << String::ucompose(_("Error: We got an unknown temple/ruin type of %1 for %2 at %3,%4"), type, Glib::ustring(name),x,y) << std::endl;
+        {
+          start_errmsg ();
+          std::cerr <<
+            String::ucompose
+            (_("%1: We got an unknown temple/ruin type of %2 for %3 at %4,%5"),
+             Lw::get_prgname (), type, Glib::ustring (name),x,y) << std::endl;
+        }
     }
 }
 
 int
 compare_army_strengths(const void *lhs, const void *rhs)
 {
-  guint as = Playerlist::getInstance()->getNeutral()->getId();
-  ArmyProto *left = Armysetlist::getInstance()->getArmy(as, *((char*)lhs));
-  ArmyProto *right = Armysetlist::getInstance()->getArmy(as, *((char*)rhs));
+  guint as = Playerlist::getNeutral()->getId();
+  ArmyProto *left = Armysetlist::instance()->getArmy(as, *((char*)lhs));
+  ArmyProto *right = Armysetlist::instance()->getArmy(as, *((char*)rhs));
   guint32 left_str = 9999;
   if (left)
     left->getStrength();
@@ -731,7 +749,9 @@ import_cities (FILE *scn)
   fseek (scn, 0x157b, SEEK_CUR);
   unsigned short num_cities = 0;
   fread (&num_cities, sizeof (unsigned short), 1, scn);
-  std::cout << String::ucompose (_("Importing %1 cities."), num_cities) << std::endl;
+  std::cout <<
+    String::ucompose (_("%1: Importing %2 cities."),
+                      Lw::get_prgname (), num_cities) << std::endl;
   for (unsigned int i = 0; i < num_cities; i++)
     {
       short x, y;
@@ -752,7 +772,7 @@ import_cities (FILE *scn)
       fread (&unused3, sizeof (char), 21, scn);
       City *city = new City (Vector<int>(x,y), 2, Glib::ustring(name), income);
 
-      guint32 as = Playerlist::getInstance()->getNeutral()->getArmyset();
+      guint32 as = Playerlist::getNeutral()->getArmyset();
       if (as != 1)
         {
           // only bring in the armies if we also have an armyset.
@@ -762,7 +782,7 @@ import_cities (FILE *scn)
               if (armies[j] != (char) 0xff)
                 {
                   ArmyProto *army = 
-                    Armysetlist::getInstance()->getArmy(as, armies[j]);
+                    Armysetlist::instance()->getArmy(as, armies[j]);
                   if (army)
                     {
                       ArmyProdBase *prodbase = new ArmyProdBase(*army);
@@ -772,8 +792,8 @@ import_cities (FILE *scn)
                 }
             }
         }
-      city->setOwner(Playerlist::getInstance()->getNeutral());
-      Citylist::getInstance()->add(city);
+      city->setOwner(Playerlist::getNeutral());
+      Citylist::instance()->add(city);
     }
 }
 
@@ -789,7 +809,7 @@ set_capital_cities (FILE *scn)
       fread (&y, sizeof (y), 1, scn);
       fread (unused, sizeof (char), 16, scn);
 
-      Player *player = Playerlist::getInstance()->getPlayer(convert_player_id(i));
+      Player *player = Playerlist::instance()->get (convert_player_id(i));
       if (player == NULL)
         continue;
       City *c = GameMap::getCity(Vector<int>(x,y));
@@ -804,7 +824,9 @@ import_signposts (FILE *sg)
 {
   unsigned short num_signs = 0;
   fread (&num_signs, sizeof (unsigned short), 1, sg);
-  std::cout << String::ucompose (_("Importing %1 signposts."), num_signs) << std::endl;
+  std::cout <<
+    String::ucompose (_("%1: Importing %2 signposts."), Lw::get_prgname (),
+                      num_signs) << std::endl;
   for (unsigned int i = 0; i < num_signs; i++)
     {
       short x, y;
@@ -819,7 +841,7 @@ import_signposts (FILE *sg)
       Signpost *s = 
         new Signpost (Vector<int>(x, y), 
                       Glib::ustring(line1) + "\n" + Glib::ustring(line2));
-      Signpostlist::getInstance()->add(s);
+      Signpostlist::instance()->add(s);
     }
 }
 
@@ -930,7 +952,9 @@ import_items (FILE *it)
   Itemlist::create();
   int num_items;
   fscanf (it, "%d", &num_items);
-  std::cout << String::ucompose (_("Importing %1 items."), num_items) << std::endl;
+  std::cout <<
+    String::ucompose (_("%1: Importing %2 items."), Lw::get_prgname (),
+                      num_items) << std::endl;
   for (int i = 0; i < num_items; i++)
     {
       char name[21];
@@ -945,10 +969,16 @@ import_items (FILE *it)
         {
           ItemProto *item = new ItemProto(Glib::ustring(item_name));
           item->addBonus(bonus);
-          Itemlist::getInstance()->add(item);
+          Itemlist::instance()->add(item);
         }
       else
-        std::cerr << String::ucompose(_("Error: couldn't convert item number %1"), i) << std::endl;
+        {
+          start_errmsg ();
+          std::cerr <<
+            String::ucompose
+            (_("%1: couldn't convert item number %1"),
+             Lw::get_prgname (), i) << std::endl;
+        }
     }
 }
 
@@ -991,10 +1021,11 @@ copy_armyset_images (Armyset *armyset, Armyset *default_armyset, ArmyProto *army
 {
   for (int i = Shield::WHITE; i <= Shield::NEUTRAL; i++)
     {
-      Glib::ustring f =
+      std::string f =
         default_armyset->getFileFromConfigurationFile(default_army->getMaskedImage(Shield::Color(i))->getName ());
-      Glib::ustring outfile = "";
-      armyset->addFileInCfgFile(f, outfile);
+      std::string outfile = "";
+      Glib::ustring err = "";
+      armyset->addFileInCfgFile(f, outfile, err);
       army->getMaskedImage(Shield::Color(i))->setName (outfile);
     }
 }
@@ -1040,28 +1071,31 @@ sort_by_index (ArmyProto *lhs, ArmyProto *rhs)
 static void
 copy_other_armyset_images (Armyset *default_armyset, Armyset *armyset)
 {
-  Glib::ustring f =
+  std::string f =
     default_armyset->getFileFromConfigurationFile(default_armyset->getBag()->getName());
-  Glib::ustring outfile = "";
-  armyset->addFileInCfgFile(f, outfile);
+  std::string outfile = "";
+  Glib::ustring err = "";
+  armyset->addFileInCfgFile(f, outfile, err);
   armyset->getBag ()->setName(outfile);
 
   f = default_armyset->getFileFromConfigurationFile(default_armyset->getShip()->getName ());
   outfile = "";
-  armyset->addFileInCfgFile(f, outfile);
+  armyset->addFileInCfgFile(f, outfile, err);
   armyset->getShip()->setName(outfile);
 
   f = default_armyset->getFileFromConfigurationFile(default_armyset->getStandard()->getName());
   outfile = "";
-  armyset->addFileInCfgFile(f, outfile);
+  armyset->addFileInCfgFile(f, outfile, err);
   armyset->getStandard()->setName(outfile);
 }
 
 static Armyset* 
 import_armyset (FILE *a, Glib::ustring name)
 {
-  std::cout << String::ucompose(_("Importing armyset %1."), name) << std::endl;
-  Armyset * default_armyset = Armysetlist::getInstance()->get(1);
+  std::cout <<
+    String::ucompose (_("%1: Importing armyset %2."), Lw::get_prgname (),
+                      name) << std::endl;
+  Armyset * default_armyset = Armysetlist::instance()->get(1);
   Armyset *armyset = new Armyset(Armysetlist::getNextAvailableId(1), name);
   struct army_t armies[29];
   fread (armies, sizeof (struct army_t), 29, a);
@@ -1107,7 +1141,10 @@ import_armyset (FILE *a, Glib::ustring name)
         case 2: army_bonus |= ArmyBase::ADD2STRINCITY; break;
         case 3: army_bonus |= ArmyBase::ADD1STRINCITY | ArmyBase::ADD2STRINCITY; break;
         default:
-          std::cerr << String::ucompose(_("Warning: unrecognized city bonus of %1 for %2"), ar.cityplus, ar.name) << std::endl;
+          std::cerr <<
+            String::ucompose
+            (_("%1: unrecognized city bonus of %2 for %3"),
+             Lw::get_prgname (), ar.cityplus, ar.name) << std::endl;
           army_bonus |= ArmyBase::ADD1STRINCITY;
           break;
         }
@@ -1118,7 +1155,10 @@ import_armyset (FILE *a, Glib::ustring name)
         case 2: army_bonus |= ArmyBase::ADD2STRINOPEN; break;
         case 3: army_bonus |= ArmyBase::ADD1STRINOPEN | ArmyBase::ADD2STRINOPEN; break;
         default:
-          std::cerr << String::ucompose(_("Warning: unrecognized open bonus of %1 for %2"), ar.plainsplus, ar.name) << std::endl;
+          std::cerr <<
+            String::ucompose
+            (_("%1: unrecognized open bonus of %2 for %3"),
+             Lw::get_prgname (), ar.plainsplus, ar.name) << std::endl;
           army_bonus |= ArmyBase::ADD1STRINOPEN;
           break;
         }
@@ -1129,7 +1169,10 @@ import_armyset (FILE *a, Glib::ustring name)
         case 2: army_bonus |= ArmyBase::ADD2STRINFOREST; break;
         case 3: army_bonus |= ArmyBase::ADD1STRINFOREST | ArmyBase::ADD2STRINFOREST; break;
         default:
-          std::cerr << String::ucompose(_("Warning: unrecognized forest bonus of %1 for %2"), ar.woodsplus, ar.name) << std::endl;
+          std::cerr <<
+            String::ucompose
+            (_("%1: unrecognized forest bonus of %2 for %3"),
+             Lw::get_prgname (), ar.woodsplus, ar.name) << std::endl;
           army_bonus |= ArmyBase::ADD1STRINFOREST;
           break;
         }
@@ -1140,7 +1183,10 @@ import_armyset (FILE *a, Glib::ustring name)
         case 2: army_bonus |= ArmyBase::ADD2STRINHILLS; break;
         case 3: army_bonus |= ArmyBase::ADD1STRINHILLS | ArmyBase::ADD2STRINHILLS; break;
         default:
-          std::cerr << String::ucompose(_("Warning: unrecognized hills bonus of %1 for %2"), ar.hillsplus, ar.name) << std::endl;
+          std::cerr <<
+            String::ucompose
+            (_("%1: unrecognized hills bonus of %2 for %3"),
+             Lw::get_prgname (), ar.hillsplus, ar.name) << std::endl;
           army_bonus |= ArmyBase::ADD1STRINHILLS;
           break;
         }
@@ -1154,7 +1200,10 @@ import_armyset (FILE *a, Glib::ustring name)
             case 2: army_bonus |= ArmyBase::SUB2ENEMYSTACK; break;
             case 3: army_bonus |= ArmyBase::SUB1ENEMYSTACK | ArmyBase::SUB2ENEMYSTACK; break;
             default:
-              std::cerr << String::ucompose(_("Warning: unrecognized enemy minus bonus of %1 for %2"), minus, ar.name) << std::endl;
+              std::cerr <<
+                String::ucompose
+                (_("%1: unrecognized enemy minus bonus of %2 for %3"),
+                 Lw::get_prgname (), minus, ar.name) << std::endl;
               break;
             }
         }
@@ -1166,7 +1215,10 @@ import_armyset (FILE *a, Glib::ustring name)
         case 3: army_bonus |= ArmyBase::SUBALLNONHEROBONUS; break;
         case 4: army_bonus |= ArmyBase::FORTIFY; break;
         default:
-          std::cerr << String::ucompose(_("Warning: unrecognized cancel bonus of %1 for %2"), ar.cancel, ar.name) << std::endl;
+          std::cerr <<
+            String::ucompose
+            (_("%1: unrecognized cancel bonus of %2 for %3"),
+             Lw::get_prgname (), ar.cancel, ar.name) << std::endl;
           break;
         }
       int allplus = ar.allplus | ar.allplus2 | ar.allplus3 | ar.allplus4;
@@ -1177,7 +1229,10 @@ import_armyset (FILE *a, Glib::ustring name)
         case 2: army_bonus |= ArmyBase::ADD2STACK; break;
         case 3: army_bonus |= ArmyBase::ADD1STACK | ArmyBase::ADD2STACK; break;
         default:
-          std::cerr << String::ucompose(_("Warning: unrecognized city plus flag of %1 for %2"), allplus, ar.name) << std::endl;
+          std::cerr <<
+            String::ucompose
+            (_("%1: unrecognized city plus flag of %2 for %3"),
+             Lw::get_prgname (), allplus, ar.name) << std::endl;
           break;
         }
       army->setArmyBonus(army_bonus);
@@ -1196,7 +1251,10 @@ import_armyset (FILE *a, Glib::ustring name)
           //army->setDefendsRuins(true); //not the best, but what the hey.
           break;
         default:
-          std::cerr << String::ucompose(_("Warning: unrecognized ally flag of %1 for %2"), ar.ally, ar.name) << std::endl;
+          std::cerr <<
+            String::ucompose
+            (_("%1: unrecognized ally flag of %2 for %3"),
+             Lw::get_prgname (), ar.ally, ar.name) << std::endl;
           break;
         }
 
@@ -1244,7 +1302,7 @@ import_fight_order (FILE *scn, Armyset *armyset)
   for (unsigned int i = 0; i < order.capacity(); i++)
     if (order[i] != -1)
       order_list.push_back(order[i]);
-  Playerlist *pl = Playerlist::getInstance();
+  Playerlist *pl = Playerlist::instance();
   for (Playerlist::iterator i = pl->begin(); i != pl->end(); ++i)
     (*i)->setFightOrder(order_list);
 }
@@ -1277,7 +1335,7 @@ import_initial_gold (FILE *scn)
   for (int i = 0; i < 8; i++)
     {
       int id = convert_player_id (recs[i].player_id);
-      Player *p = Playerlist::getInstance()->getPlayer(id);
+      Player *p = Playerlist::instance()->get (id);
       if (p)
         p->setGold(recs[i].gold);
     }
@@ -1299,12 +1357,15 @@ importer (FILE *map, FILE *scn, FILE *rd, FILE *sg, FILE *it, FILE *sp, FILE *a,
     {
       armyset = import_armyset (a, name);
       armyset->save(File::getTempFile (File::getCacheDir(), name), ARMYSET_EXT);
-      Armysetlist::getInstance()->add(armyset, File::getTempFile(File::getCacheDir(), name + ARMYSET_EXT));
+      Armysetlist::instance()->add(armyset, File::getTempFile(File::getCacheDir(), name + ARMYSET_EXT));
     }
   if (!armyset)
     {
-      std::cerr << _("Warning: no army file found.  Using default armyset.") << std::endl;
-      armyset = Armysetlist::getInstance()->get(1);
+      std::cerr <<
+        String::ucompose
+        (_("%1: no army file found.  Using default armyset."),
+         Lw::get_prgname ()) << std::endl;
+      armyset = Armysetlist::instance()->get(1);
     }
 
   at = ftell (scn);
@@ -1319,7 +1380,7 @@ importer (FILE *map, FILE *scn, FILE *rd, FILE *sg, FILE *it, FILE *sp, FILE *a,
       //we can sort it before we do fight order
       armyset->sort(compare_strength);
       armyset->save(File::getTempFile (File::getCacheDir(), name), ARMYSET_EXT);
-      Armysetlist::getInstance()->add(armyset, File::getTempFile (File::getCacheDir(), name + ARMYSET_EXT));
+      Armysetlist::instance()->add(armyset, File::getTempFile (File::getCacheDir(), name + ARMYSET_EXT));
     }
   fseek (scn, at, SEEK_SET);
   import_ruins_and_temples (scn, sp);
@@ -1333,7 +1394,13 @@ importer (FILE *map, FILE *scn, FILE *rd, FILE *sg, FILE *it, FILE *sp, FILE *a,
 
   bool success = g->saveGame(name, MAP_EXT);
   if (!success)
-    std::cerr << String::ucompose(_("Error: Could not save `%1%2'"), name, MAP_EXT) << std::endl;
+    {
+      start_errmsg ();
+      std::cerr <<
+        String::ucompose
+        (_("%1: Could not save `%2%3'"),
+         Lw::get_prgname (), name, MAP_EXT) << std::endl;
+    }
   else
     std::cout << String::ucompose(_("Saved to %1.map."), name) << std::endl;
   delete g;
@@ -1403,103 +1470,70 @@ get_armyset_offset (Glib::ustring filename)
   return get_offset (filename, name, false);
 }
 
-void show_help(Glib::ustring progname)
+int import_file (std::string armyset_filename, std::string filename)
 {
-  std::cout << String::ucompose(_("Usage: %1 [OPTION]... FILE"), progname) << std::endl;
-  std::cout << String::ucompose("  or:  %1 [OPTION]... DIRECTORY", progname) << std::endl << std::endl;
-  std::cout << "LordsAWar! Warlords 2 Scenario Importing Tool " << _("version") << 
-    " " << VERSION << std::endl << std::endl;
-  std::cout << _("Options:") << std::endl << std::endl; 
-  std::cout << "  -?, --help                 " << _("Display this help and exit") <<std::endl;
-  std::cout << "  -a, --army-file FILE       " << _("Use this WL2 army file") <<std::endl;
-  std::cout << std::endl;
-  std::cout << _("Report bugs to") << " <" << PACKAGE_BUGREPORT ">." << std::endl;
-}
-
-int
-main (int argc, char* argv[])
-{
-  Glib::ustring armyset_filename;
-  Glib::ustring filename;
   initialize_configuration();
-  Vector<int>::setMaximumWidth(1000);
-
-  Glib::init();
-  #if ENABLE_NLS
-  setlocale(LC_ALL, Configuration::s_lang.c_str());
-  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
-  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
-  textdomain (GETTEXT_PACKAGE);
-  #endif
-
-  if (argc == 1)
-    {
-      show_help(argv[0]);
-      exit (0);
-    }
-
-  if (argc > 1)
-    {
-      for (int i = 2; i <= argc; i++)
-	{
-          Glib::ustring parameter(argv[i-1]); 
-	  if (parameter == "--help" || parameter == "-?")
-	    {
-              show_help(argv[0]);
-	      exit(0);
-	    }
-          else if (parameter == "--army-file" || parameter == "-a")
-            {
-              i++;
-              armyset_filename = argv[i-1];
-              if (!File::exists (armyset_filename))
-                {
-                  std::cerr << String::ucompose(_("Error: Couldn't open `%1' for reading."), armyset_filename) << std::endl;
-                  exit (EXIT_FAILURE);
-                }
-            }
-	  else
-	    filename = parameter;
-	}
-    }
 
   if (File::directory_exists (filename) == true)
     {
       //look for the files we need.
-      std::list<Glib::ustring> map = File::scanForFiles(filename, ".MAP");
+      std::list<std::string> map = File::scanForFiles(filename, ".MAP");
       if (map.size() == 0)
         {
-          std::cerr << String::ucompose (_("Error: Could not find a .MAP file in %1"), filename) << std::endl;
+          start_errmsg ();
+          std::cerr <<
+            String::ucompose
+            (_("%1: Could not find a .MAP file in %2"),
+             Lw::get_prgname (), filename) << std::endl;
           exit (EXIT_FAILURE);
         }
-      std::list<Glib::ustring> scn = File::scanForFiles(filename, ".SCN");
+      std::list<std::string> scn = File::scanForFiles(filename, ".SCN");
       if (scn.size() == 0)
         {
-          std::cerr << String::ucompose (_("Error: Could not find a .SCN file in `%1'"), filename) << std::endl;
+          start_errmsg ();
+          std::cerr <<
+            String::ucompose
+            (_("%1: Could not find a .SCN file in `%2'"),
+             Lw::get_prgname (), filename) << std::endl;
           exit (EXIT_FAILURE);
         }
-      std::list<Glib::ustring> rd = File::scanForFiles(filename, ".RD");
+      std::list<std::string> rd = File::scanForFiles(filename, ".RD");
       if (rd.size() == 0)
         {
-          std::cerr << String::ucompose (_("Error: Could not find a .RD file in `%1'"), filename) << std::endl;
+          start_errmsg ();
+          std::cerr <<
+            String::ucompose
+            (_("%1: Could not find a .RD file in `%2'"),
+             Lw::get_prgname (), filename) << std::endl;
           exit (EXIT_FAILURE);
         }
-      std::list<Glib::ustring> signs = File::scanForFiles(filename, ".SGN");
+      std::list<std::string> signs = File::scanForFiles(filename, ".SGN");
       if (signs.size() == 0)
         {
-          std::cerr << String::ucompose (_("Error: Could not find a .SGN file in `%1'"), filename) << std::endl;
+          start_errmsg ();
+          std::cerr <<
+            String::ucompose
+            (_("%1: Could not find a .SGN file in `%2'"),
+             Lw::get_prgname (), filename) << std::endl;
           exit (EXIT_FAILURE);
         }
-      std::list<Glib::ustring> items = File::scanForFiles(filename, ".ITM");
+      std::list<std::string> items = File::scanForFiles(filename, ".ITM");
       if (items.size() == 0)
         {
-          std::cerr << String::ucompose (_("Error: Could not find a .ITM file in `%1'"), filename) << std::endl;
+          start_errmsg ();
+          std::cerr <<
+            String::ucompose
+            (_("%1: Could not find a .ITM file in `%2'"),
+             Lw::get_prgname (), filename) << std::endl;
           exit (EXIT_FAILURE);
         }
-      std::list<Glib::ustring> spc = File::scanForFiles(filename, ".SPC");
+      std::list<std::string> spc = File::scanForFiles(filename, ".SPC");
       if (spc.size() == 0)
         {
-          std::cerr << String::ucompose (_("Error: Could not find a .SPC file in `%1'"), filename) << std::endl;
+          start_errmsg ();
+          std::cerr << String::ucompose
+            (_("%1: Could not find a .SPC file in `%2'"),
+             Lw::get_prgname (), filename) << std::endl;
           exit (EXIT_FAILURE);
         }
       FILE *m = fopen (map.front().c_str(), "rb");
@@ -1576,8 +1610,11 @@ main (int argc, char* argv[])
     }
   else
     {
-      std::cerr << String::ucompose (_("Error: Could not open `%1'"), filename) << std::endl;
+      start_errmsg ();
+      std::cerr <<
+        String::ucompose (_("%1: Could not open `%2'"),
+                          Lw::get_prgname (), filename) << std::endl;
       exit (EXIT_FAILURE);
     }
-  return EXIT_SUCCESS;
+  return 0;
 }

@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2009, 2011, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2011, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef SHIELD_H
@@ -23,7 +22,7 @@
 #include <sigc++/trackable.h>
 #include <sigc++/signal.h>
 
-#include "shieldstyle.h"
+#include "shield-style.h"
 #include "tartan.h"
 
 class XML_Helper;
@@ -42,8 +41,18 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 	static Glib::ustring d_tag; 
 
 	//! The notional player that the Shield goes with.
-	enum Color {WHITE = 0, GREEN = 1, YELLOW = 2, DARK_BLUE = 3, ORANGE = 4,
-	  LIGHT_BLUE = 5, RED = 6, BLACK = 7, NEUTRAL = 8};
+	enum Color
+          {
+            WHITE = 0,
+            GREEN = 1,
+            YELLOW = 2,
+            DARK_BLUE = 3,
+            ORANGE = 4,
+            LIGHT_BLUE = 5,
+            RED = 6,
+            BLACK = 7,
+            NEUTRAL = 8
+          };
 
 	//! Loading constructor.
         /**
@@ -68,7 +77,7 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 	// Get Methods
 
         //! Returns the player that this shield will belong to.
-	guint32 getOwner() const {return d_owner;}
+        Shield::Color getOwner() const {return d_owner;}
 
         //! Returns the color of the player shield.
 	Gdk::RGBA getColor() const {return d_colors[0];}
@@ -103,12 +112,12 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 	 *
 	 * @note This is not used to obtain the Neutral player's color.
 	 *
-	 * @param player_no  The player's Id for which we want the color.
+	 * @param shield  The index of the shield for which we want the color.
 	 *
 	 * @return The default colors associated with the player.
 	 */
 	//! Get standard color for a player.
-	static std::vector<Gdk::RGBA> get_default_colors_for_no(int player_no);
+	static std::vector<Gdk::RGBA> get_default_colors (int shield);
 
 	//! Get standard color for the neutral player.
 	static std::vector<Gdk::RGBA> get_default_colors_for_neutral();
@@ -116,19 +125,36 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 	//! Convert the Shield::Color enumerated value to a string.
 	static Glib::ustring colorToString(const Shield::Color c);
 
+        //! Convert from a string into the enumerated Shield::Color
+        static Shield::Color colorFromString(const Glib::ustring str);
+
         //! Convert Shield::Color into a string suitable for display.
         static Glib::ustring colorToFriendlyName (const Shield::Color c);
 
+        //~ Convert a shield name suitable for display back to a Shield::Color
+        static Shield::Color colorFromFriendlyName (const Glib::ustring str);
+
         static guint32 get_next_shield(guint32 type);
+
+        static void calculate_progress_width (guint32 iwidth, PixMask *left,
+                                              PixMask *center, PixMask *right,
+                                              guint32 &width, guint32 &centers,
+                                              bool &include_right);
+
+        static PixMask * get_progress_bar_completed (Shieldset *shieldset,
+                                                     Shield::Color shield,
+                                                     guint32 width);
+        static PixMask * get_progress_bar_uncompleted (Shieldset *shieldset,
+                                                       Shield::Color shield,
+                                                       guint32 width);
     protected:
 
 	//! The player of the shield.
 	/**
 	 * Equates to the shieldset.shield.d_color XML entities in the 
 	 * shieldset configuration file.
-	 * Equates to the Shield::Color enumeration.
 	 */
-	guint32 d_owner;
+        Shield::Color d_owner;
 
 	//! The player's colors.
 	/**
@@ -138,4 +164,4 @@ class Shield : public std::list<ShieldStyle*>, public Tartan, public sigc::track
 
 };
 
-#endif // SHIELD_H
+#endif

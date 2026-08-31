@@ -1,12 +1,15 @@
+# Copyright (C) 2026 Ben Asselstine
+# This file is licensed under the terms of the GNU GPL version 3 or later.
 MAINTAINERCLEANFILES = Makefile.in
 
-lordsawartilesetdir = $(datadir)/lordsawar/tilesets
+lordsawartilesetdir = $(pkgdatadir)/terrain
 
 default.lwt: default.lwt.in
+	rm $(builddir)/default.lwt -f 2>/dev/null && \
 	LC_ALL=C $(INTLTOOL_MERGE) -x -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $(srcdir)/default.lwt.in $(builddir)/default.lwt && \
 	$(top_srcdir)/create-lw-file $(builddir)/default.lwt $(IMAGES)
 
-DISTCLEANFILES = default.lwt 
+CLEANFILES = default.lwt 
 
 lordsawartileset_DATA = default.lwt
 

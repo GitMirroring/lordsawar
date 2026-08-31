@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef PLANTED_STANDARD_EDITOR_ACTIONS_H
-#define PLANTED_STANDARD_EDITOR_ACTIONS_H
+#ifndef PLANTED_STANDARD_UNDO_ACTIONS_H
+#define PLANTED_STANDARD_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
@@ -25,75 +24,116 @@
 #include "undo-mgr.h"
 
 //! A record of an event in the planted standard editor
-/** 
+/**
  * The purpose of these classes is to implement undo/redo in the planted
  * standard editor.
  */
 
-class PlantedStandardEditorAction: public UndoAction
+class PlantedStandardUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      NAME = 1,
-      OWNER = 2,
-      ORIG_OWNER = 3,
-    };
+    enum Type
+      {
+        NAME = 1,
+        OWNER = 2,
+        ORIG_OWNER = 3,
+      };
 
-    PlantedStandardEditorAction(Type type, bool agg = false)
+    PlantedStandardUndoAction(Type type, bool agg = false)
      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+                   UndoAction::AGGREGATE_NONE), m_type (type)
+       {
+       }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class PlantedStandardEditorAction_Name: public PlantedStandardEditorAction, public UndoCursor
+class PlantedStandardUndoAction_Name: public PlantedStandardUndoAction,
+    public UndoCursor
 {
     public:
-        PlantedStandardEditorAction_Name (Glib::ustring n, UndoMgr *u, Gtk::Entry *e)
-          : PlantedStandardEditorAction (NAME, true), UndoCursor (u, e),
-          d_name (n) {}
-        ~PlantedStandardEditorAction_Name () {}
+        PlantedStandardUndoAction_Name (Glib::ustring n, UndoMgr *u,
+                                          Gtk::Entry *e)
+          : PlantedStandardUndoAction (NAME, true),
+          UndoCursor (u->get_pos (e), e), m_name (n)
+  {
+  }
 
-        Glib::ustring getActionName () const {return "Name";}
+        ~PlantedStandardUndoAction_Name ()
+          {
+          }
 
-        Glib::ustring getName () {return d_name;}
+        Glib::ustring get_action_name () const
+          {
+            return "Name";
+          }
+
+        Glib::ustring get_name ()
+          {
+            return m_name;
+          }
 
     private:
-        Glib::ustring d_name;
+        Glib::ustring m_name;
 };
 
-class PlantedStandardEditorAction_Owner: public PlantedStandardEditorAction
+class PlantedStandardUndoAction_Owner: public PlantedStandardUndoAction
 {
     public:
-        PlantedStandardEditorAction_Owner (guint32 u)
-          : PlantedStandardEditorAction (OWNER), d_owner_id (u) {}
-        ~PlantedStandardEditorAction_Owner () {}
+        PlantedStandardUndoAction_Owner (guint32 u)
+          : PlantedStandardUndoAction (OWNER), m_owner_id (u)
+          {
+          }
 
-        Glib::ustring getActionName () const {return "Owner";}
+        ~PlantedStandardUndoAction_Owner ()
+          {
+          }
 
-        guint32 getOwnerId () {return d_owner_id;}
+        Glib::ustring get_action_name () const
+          {
+            return "Owner";
+          }
+
+        guint32 get_owner_id () const
+          {
+            return m_owner_id;
+          }
 
     private:
-        guint32 d_owner_id;
+        guint32 m_owner_id;
 };
 
-class PlantedStandardEditorAction_OrigOwner: public PlantedStandardEditorAction
+class PlantedStandardUndoAction_OrigOwner: public PlantedStandardUndoAction
 {
     public:
-        PlantedStandardEditorAction_OrigOwner (guint32 u)
-          : PlantedStandardEditorAction (ORIG_OWNER), d_owner_id (u) {}
-        ~PlantedStandardEditorAction_OrigOwner () {}
+        PlantedStandardUndoAction_OrigOwner (guint32 u)
+          : PlantedStandardUndoAction (ORIG_OWNER), m_owner_id (u)
+          {
+          }
 
-        Glib::ustring getActionName () const {return "OrigOwner";}
+        ~PlantedStandardUndoAction_OrigOwner ()
+          {
+          }
 
-        guint32 getOwnerId () {return d_owner_id;}
+        Glib::ustring get_action_name () const
+          {
+            return "OrigOwner";
+          }
+
+        guint32 get_owner_id () const
+          {
+            return m_owner_id;
+          }
 
     private:
-        guint32 d_owner_id;
+        guint32 m_owner_id;
 };
-#endif //PLANTED_STANDARD_EDITOR_ACTIONS_H
+#endif

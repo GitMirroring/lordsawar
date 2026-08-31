@@ -1,4 +1,4 @@
-//  Copyright (C) 2011, 2014 Ben Asselstine
+//  Copyright (C) 2011, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,15 +12,14 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 //#include <iostream>
 #include <fstream>
 #include <sstream>
 #include "hosted-game.h"
 #include "advertised-game.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "profile.h"
 
 
@@ -38,8 +37,8 @@ HostedGame::HostedGame(AdvertisedGame *advertised_game)
 HostedGame::HostedGame(XML_Helper *helper)
 {
   unresponsive = false;
-  helper->getData(d_pid, "pid");
-  helper->registerTag(AdvertisedGame::d_tag_name, 
+  helper->get(d_pid, "pid");
+  helper->register_tag(AdvertisedGame::d_tag_name, 
 		      sigc::mem_fun(*this, &HostedGame::loadAdvertisedGame));
 }
 
@@ -51,10 +50,10 @@ HostedGame::~HostedGame()
 bool HostedGame::save(XML_Helper* helper) const
 {
   bool retval = true;
-  retval &= helper->openTag(d_tag);
-  retval &= helper->saveData("pid", d_pid);
+  retval &= helper->open_tag(d_tag);
+  retval &= helper->save("pid", d_pid);
   retval &= d_advertised_game->saveEntry(helper);
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
   return retval;
 }
 

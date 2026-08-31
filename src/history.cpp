@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2011, 2014, 2015 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2011, 2014, 2015, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,19 +12,18 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <sigc++/functors/mem_fun.h>
 
 #include "army.h"
 #include "history.h"
 #include "hero.h"
-#include "heroproto.h"
+#include "hero-proto.h"
 #include "city.h"
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "ruin.h"
-#include "Item.h"
+#include "item.h"
 #include "player.h"
 #include "ucompose.hpp"
 
@@ -41,7 +40,7 @@ History::History(Type type)
 History* History::handle_load(XML_Helper* helper)
 {
   Glib::ustring type_str;
-  helper->getData(type_str, "type");
+  helper->get(type_str, "type");
   History::Type t = historyTypeFromString(type_str);
 
   switch (t)
@@ -90,6 +89,8 @@ History* History::handle_load(XML_Helper* helper)
       return (new History_HeroRewardRuin(helper));
     case USE_ITEM:
       return (new History_HeroUseItem(helper));
+    case HERO_QUEST_EXPIRED:
+      return (new History_HeroQuestExpired(helper));
     }
 
   return 0;
@@ -178,6 +179,10 @@ History* History::copy(const History* a)
       return 
 	(new History_HeroUseItem
          (*dynamic_cast<const History_HeroUseItem*>(a)));
+    case HERO_QUEST_EXPIRED:
+      return 
+	(new History_HeroQuestExpired
+          (*dynamic_cast<const History_HeroQuestExpired*>(a)));
     }
 
   return 0;
@@ -186,7 +191,7 @@ History* History::copy(const History* a)
 History::History (XML_Helper *helper)
 {
   Glib::ustring type_str;
-  helper->getData(type_str, "type");
+  helper->get(type_str, "type");
   d_type = historyTypeFromString(type_str);
 }
 
@@ -194,9 +199,9 @@ bool History::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(History::d_tag);
+    retval &= helper->open_tag(History::d_tag);
     retval &= saveContents(helper);
-    retval &= helper->closeTag();
+    retval &= helper->close_tag();
 
     return retval;
 }
@@ -206,7 +211,7 @@ bool History::saveContents(XML_Helper* helper) const
     bool retval = true;
 
     Glib::ustring type_str = historyTypeToString(History::Type(d_type));
-    retval &= helper->saveData("type", type_str);
+    retval &= helper->save("type", type_str);
     retval &= doSave(helper);
 
     return retval;
@@ -258,7 +263,7 @@ History_FoundSage::History_FoundSage(const History_FoundSage &history)
 History_FoundSage::History_FoundSage(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_hero, "hero");
+  helper->get(d_hero, "hero");
 }
 
 Glib::ustring History_FoundSage::dump() const
@@ -268,7 +273,7 @@ Glib::ustring History_FoundSage::dump() const
 
 bool History_FoundSage::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("hero", d_hero);
+  return helper->save("hero", d_hero);
 }
 
 //-----------------------------------------------------------------------------
@@ -287,7 +292,7 @@ History_GoldTotal::History_GoldTotal(const History_GoldTotal &history)
 History_GoldTotal::History_GoldTotal(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_gold, "gold");
+  helper->get(d_gold, "gold");
 }
 
 Glib::ustring History_GoldTotal::dump() const
@@ -297,7 +302,7 @@ Glib::ustring History_GoldTotal::dump() const
 
 bool History_GoldTotal::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("gold", d_gold);
+  return helper->save("gold", d_gold);
 }
 
 //-----------------------------------------------------------------------------
@@ -317,9 +322,9 @@ History_HeroEmerges::History_HeroEmerges(const History_HeroEmerges &h)
 History_HeroEmerges::History_HeroEmerges(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_hero, "hero");
-  helper->getData(d_city, "city");
-  helper->getData(d_hero_id, "hero_id");
+  helper->get(d_hero, "hero");
+  helper->get(d_city, "city");
+  helper->get(d_hero_id, "hero_id");
 }
 
 Glib::ustring History_HeroEmerges::dump() const
@@ -331,9 +336,9 @@ bool History_HeroEmerges::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("hero", d_hero);
-  retval &= helper->saveData("city", d_city);
-  retval &= helper->saveData("hero_id", d_hero_id);
+  retval &= helper->save("hero", d_hero);
+  retval &= helper->save("city", d_city);
+  retval &= helper->save("hero_id", d_hero_id);
 
   return retval;
 }
@@ -354,7 +359,7 @@ History_CityWon::History_CityWon(const History_CityWon &history)
 History_CityWon::History_CityWon(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_city, "city");
+  helper->get(d_city, "city");
 }
 
 Glib::ustring History_CityWon::dump() const
@@ -364,7 +369,7 @@ Glib::ustring History_CityWon::dump() const
 
 bool History_CityWon::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("city", d_city);
+  return helper->save("city", d_city);
 }
 
 //-----------------------------------------------------------------------------
@@ -383,8 +388,8 @@ History_HeroCityWon::History_HeroCityWon(const History_HeroCityWon &history)
 History_HeroCityWon::History_HeroCityWon(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_city, "city");
-  helper->getData(d_hero, "hero");
+  helper->get(d_city, "city");
+  helper->get(d_hero, "hero");
 }
 
 Glib::ustring History_HeroCityWon::dump() const
@@ -396,8 +401,8 @@ bool History_HeroCityWon::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("city", d_city);
-  retval &= helper->saveData("hero", d_hero);
+  retval &= helper->save("city", d_city);
+  retval &= helper->save("hero", d_hero);
 
   return retval;
 }
@@ -418,7 +423,7 @@ History_CityRazed::History_CityRazed(const History_CityRazed &history)
 History_CityRazed::History_CityRazed(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_city, "city");
+  helper->get(d_city, "city");
 }
 
 Glib::ustring History_CityRazed::dump() const
@@ -428,7 +433,7 @@ Glib::ustring History_CityRazed::dump() const
 
 bool History_CityRazed::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("city", d_city);
+  return helper->save("city", d_city);
 }
 
 //-----------------------------------------------------------------------------
@@ -447,7 +452,7 @@ History_HeroQuestStarted::History_HeroQuestStarted(const History_HeroQuestStarte
 History_HeroQuestStarted::History_HeroQuestStarted(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_hero, "hero");
+  helper->get(d_hero, "hero");
 }
 
 Glib::ustring History_HeroQuestStarted::dump() const
@@ -457,7 +462,7 @@ Glib::ustring History_HeroQuestStarted::dump() const
 
 bool History_HeroQuestStarted::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("hero", d_hero);
+  return helper->save("hero", d_hero);
 }
 
 //-----------------------------------------------------------------------------
@@ -476,7 +481,7 @@ History_HeroQuestCompleted::History_HeroQuestCompleted(const History_HeroQuestCo
 History_HeroQuestCompleted::History_HeroQuestCompleted(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_hero, "hero");
+  helper->get(d_hero, "hero");
 }
 
 Glib::ustring History_HeroQuestCompleted::dump() const
@@ -486,7 +491,7 @@ Glib::ustring History_HeroQuestCompleted::dump() const
 
 bool History_HeroQuestCompleted::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("hero", d_hero);
+  return helper->save("hero", d_hero);
 }
 
 //-----------------------------------------------------------------------------
@@ -505,8 +510,8 @@ History_HeroKilledInCity::History_HeroKilledInCity(const History_HeroKilledInCit
 History_HeroKilledInCity::History_HeroKilledInCity(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_hero, "hero");
-  helper->getData(d_city, "city");
+  helper->get(d_hero, "hero");
+  helper->get(d_city, "city");
 }
 
 Glib::ustring History_HeroKilledInCity::dump() const
@@ -518,8 +523,8 @@ bool History_HeroKilledInCity::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("hero", d_hero);
-  retval &= helper->saveData("city", d_city);
+  retval &= helper->save("hero", d_hero);
+  retval &= helper->save("city", d_city);
 
   return retval;
 }
@@ -540,7 +545,7 @@ History_HeroKilledInBattle::History_HeroKilledInBattle(const History_HeroKilledI
 History_HeroKilledInBattle::History_HeroKilledInBattle(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_hero, "hero");
+  helper->get(d_hero, "hero");
 }
 
 Glib::ustring History_HeroKilledInBattle::dump() const
@@ -550,7 +555,7 @@ Glib::ustring History_HeroKilledInBattle::dump() const
 
 bool History_HeroKilledInBattle::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("hero", d_hero);
+  return helper->save("hero", d_hero);
 }
 
 //-----------------------------------------------------------------------------
@@ -569,7 +574,7 @@ History_HeroKilledSearching::History_HeroKilledSearching(const History_HeroKille
 History_HeroKilledSearching::History_HeroKilledSearching(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_hero, "hero");
+  helper->get(d_hero, "hero");
 }
 
 Glib::ustring History_HeroKilledSearching::dump() const
@@ -579,7 +584,7 @@ Glib::ustring History_HeroKilledSearching::dump() const
 
 bool History_HeroKilledSearching::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("hero", d_hero);
+  return helper->save("hero", d_hero);
 }
 
 //-----------------------------------------------------------------------------
@@ -598,7 +603,7 @@ History_Score::History_Score(const History_Score &history)
 History_Score::History_Score(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_score, "score");
+  helper->get(d_score, "score");
 }
 
 Glib::ustring History_Score::dump() const
@@ -608,7 +613,7 @@ Glib::ustring History_Score::dump() const
 
 bool History_Score::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("score", d_score);
+  return helper->save("score", d_score);
 }
 
 //-----------------------------------------------------------------------------
@@ -657,7 +662,7 @@ History_DiplomacyPeace::History_DiplomacyPeace(const History_DiplomacyPeace &his
 History_DiplomacyPeace::History_DiplomacyPeace(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_opponent_id, "opponent_id");
+  helper->get(d_opponent_id, "opponent_id");
 }
 
 Glib::ustring History_DiplomacyPeace::dump() const
@@ -667,7 +672,7 @@ Glib::ustring History_DiplomacyPeace::dump() const
 
 bool History_DiplomacyPeace::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("opponent_id", d_opponent_id);
+  return helper->save("opponent_id", d_opponent_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -686,7 +691,7 @@ History_DiplomacyWar::History_DiplomacyWar(const History_DiplomacyWar &history)
 History_DiplomacyWar::History_DiplomacyWar(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_opponent_id, "opponent_id");
+  helper->get(d_opponent_id, "opponent_id");
 }
 
 Glib::ustring History_DiplomacyWar::dump() const
@@ -696,7 +701,7 @@ Glib::ustring History_DiplomacyWar::dump() const
 
 bool History_DiplomacyWar::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("opponent_id", d_opponent_id);
+  return helper->save("opponent_id", d_opponent_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -715,7 +720,7 @@ History_DiplomacyTreachery::History_DiplomacyTreachery(const History_DiplomacyTr
 History_DiplomacyTreachery::History_DiplomacyTreachery(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_opponent_id, "opponent_id");
+  helper->get(d_opponent_id, "opponent_id");
 }
 
 Glib::ustring History_DiplomacyTreachery::dump() const
@@ -725,7 +730,7 @@ Glib::ustring History_DiplomacyTreachery::dump() const
 
 bool History_DiplomacyTreachery::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("opponent_id", d_opponent_id);
+  return helper->save("opponent_id", d_opponent_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -744,7 +749,7 @@ History_HeroFindsAllies::History_HeroFindsAllies(const History_HeroFindsAllies &
 History_HeroFindsAllies::History_HeroFindsAllies(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_hero, "hero");
+  helper->get(d_hero, "hero");
 }
 
 Glib::ustring History_HeroFindsAllies::dump() const
@@ -754,7 +759,7 @@ Glib::ustring History_HeroFindsAllies::dump() const
 
 bool History_HeroFindsAllies::doSave(XML_Helper* helper) const
 {
-  return helper->saveData("hero", d_hero);
+  return helper->save("hero", d_hero);
 }
 
 //-----------------------------------------------------------------------------
@@ -803,8 +808,8 @@ History_HeroRuinExplored::History_HeroRuinExplored(const History_HeroRuinExplore
 History_HeroRuinExplored::History_HeroRuinExplored(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_ruin, "ruin");
-  helper->getData(d_hero, "hero");
+  helper->get(d_ruin, "ruin");
+  helper->get(d_hero, "hero");
 }
 
 Glib::ustring History_HeroRuinExplored::dump() const
@@ -816,8 +821,8 @@ bool History_HeroRuinExplored::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("ruin", d_ruin);
-  retval &= helper->saveData("hero", d_hero);
+  retval &= helper->save("ruin", d_ruin);
+  retval &= helper->save("hero", d_hero);
 
   return retval;
 }
@@ -838,8 +843,8 @@ History_HeroRewardRuin::History_HeroRewardRuin(const History_HeroRewardRuin &his
 History_HeroRewardRuin::History_HeroRewardRuin(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_ruin, "ruin");
-  helper->getData(d_hero, "hero");
+  helper->get(d_ruin, "ruin");
+  helper->get(d_hero, "hero");
 }
 
 Glib::ustring History_HeroRewardRuin::dump() const
@@ -852,8 +857,8 @@ bool History_HeroRewardRuin::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("ruin", d_ruin);
-  retval &= helper->saveData("hero", d_hero);
+  retval &= helper->save("ruin", d_ruin);
+  retval &= helper->save("hero", d_hero);
 
   return retval;
 }
@@ -893,14 +898,14 @@ History_HeroUseItem::History_HeroUseItem(const History_HeroUseItem &h)
 History_HeroUseItem::History_HeroUseItem(XML_Helper* helper)
 :History(helper)
 {
-  helper->getData(d_hero_name, "hero_name");
-  helper->getData(d_item_name, "item_name");
-  helper->getData(d_item_bonus, "item_bonus");
-  helper->getData(d_opponent_id, "opponent_id");
-  helper->getData(d_friendly_city_id, "friendly_city_id");
-  helper->getData(d_enemy_city_id, "enemy_city_id");
-  helper->getData(d_neutral_city_id, "neutral_city_id");
-  helper->getData(d_city_id, "city_id");
+  helper->get(d_hero_name, "hero_name");
+  helper->get(d_item_name, "item_name");
+  helper->get(d_item_bonus, "item_bonus");
+  helper->get(d_opponent_id, "opponent_id");
+  helper->get(d_friendly_city_id, "friendly_city_id");
+  helper->get(d_enemy_city_id, "enemy_city_id");
+  helper->get(d_neutral_city_id, "neutral_city_id");
+  helper->get(d_city_id, "city_id");
 }
 
 Glib::ustring History_HeroUseItem::dump() const
@@ -912,16 +917,45 @@ bool History_HeroUseItem::doSave(XML_Helper* helper) const
 {
   bool retval = true;
 
-  retval &= helper->saveData("hero_name", d_hero_name);
-  retval &= helper->saveData("item_name", d_item_name);
-  retval &= helper->saveData("item_bonus", d_item_bonus);
-  retval &= helper->saveData("opponent_id", d_opponent_id);
-  retval &= helper->saveData("friendly_city_id", d_friendly_city_id);
-  retval &= helper->saveData("enemy_city_id", d_enemy_city_id);
-  retval &= helper->saveData("neutral_city_id", d_neutral_city_id);
-  retval &= helper->saveData("city_id", d_city_id);
+  retval &= helper->save("hero_name", d_hero_name);
+  retval &= helper->save("item_name", d_item_name);
+  retval &= helper->save("item_bonus", d_item_bonus);
+  retval &= helper->save("opponent_id", d_opponent_id);
+  retval &= helper->save("friendly_city_id", d_friendly_city_id);
+  retval &= helper->save("enemy_city_id", d_enemy_city_id);
+  retval &= helper->save("neutral_city_id", d_neutral_city_id);
+  retval &= helper->save("city_id", d_city_id);
 
   return retval;
+}
+
+//-----------------------------------------------------------------------------
+//History_HeroQuestExpired
+
+History_HeroQuestExpired::History_HeroQuestExpired(Hero *h)
+:History(History::HERO_QUEST_COMPLETED), d_hero(h->getName())
+{
+}
+
+History_HeroQuestExpired::History_HeroQuestExpired(const History_HeroQuestExpired &history)
+:History(history), d_hero(history.d_hero)
+{
+}
+
+History_HeroQuestExpired::History_HeroQuestExpired(XML_Helper* helper)
+:History(helper)
+{
+  helper->get(d_hero, "hero");
+}
+
+Glib::ustring History_HeroQuestExpired::dump() const
+{
+  return String::ucompose("Hero %1 has had a quest expire.\n", d_hero);
+}
+
+bool History_HeroQuestExpired::doSave(XML_Helper* helper) const
+{
+  return helper->save("hero", d_hero);
 }
 
 Glib::ustring History::historyTypeToString(const History::Type type)
@@ -950,6 +984,7 @@ Glib::ustring History::historyTypeToString(const History::Type type)
     case History::HERO_RUIN_EXPLORED: return "History::HERO_RUIN_EXPLORED";
     case History::HERO_REWARD_RUIN: return "History::HERO_REWARD_RUIN";
     case History::USE_ITEM: return "History::USE_ITEM";
+    case History::HERO_QUEST_EXPIRED: return "History::HERO_QUEST_EXPIRED";
     }
   return "History::START_TURN";
 }
@@ -980,5 +1015,6 @@ History::Type History::historyTypeFromString(const Glib::ustring str)
   else if (str == "History::HERO_RUIN_EXPLORED") return History::HERO_RUIN_EXPLORED;
   else if (str == "History::HERO_REWARD_RUIN") return History::HERO_REWARD_RUIN;
   else if (str == "History::USE_ITEM") return History::USE_ITEM;
+  else if (str == "History::HERO_QUEST_EXPIRED") return History::HERO_QUEST_EXPIRED;
   return History::START_TURN;
 }

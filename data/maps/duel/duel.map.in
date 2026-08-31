@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<lordsawar version="0.3.3">
+<lordsawar version="0.4.0">
 	<counter>
 		<d_curID>1739</d_curID>
 	</counter>
@@ -167,7 +167,7 @@
 		<player>
 			<d_id>0</d_id>
 			<d_name>Yahweh</d_name>
-			<d_color>#FCFCFC</d_color>
+			<d_shield>Shield::WHITE</d_shield>
 			<d_armyset>3</d_armyset>
 			<d_gold>13000</d_gold>
 			<d_dead>false</d_dead>
@@ -358,7 +358,7 @@
 		<player>
 			<d_id>2</d_id>
 			<d_name>Zeus</d_name>
-			<d_color>#FCEC20</d_color>
+			<d_shield>Shield::YELLOW</d_shield>
 			<d_armyset>3</d_armyset>
 			<d_gold>13000</d_gold>
 			<d_dead>false</d_dead>
@@ -549,7 +549,7 @@
 		<player>
 			<d_id>3</d_id>
 			<d_name>Man</d_name>
-			<d_color>#165CFC</d_color>
+			<d_shield>Shield::DARK_BLUE</d_shield>
 			<d_armyset>3</d_armyset>
 			<d_gold>13000</d_gold>
 			<d_dead>false</d_dead>
@@ -740,7 +740,7 @@
 		<player>
 			<d_id>6</d_id>
 			<d_name>Ra</d_name>
-			<d_color>#C41C00</d_color>
+			<d_shield>Shield::RED</d_shield>
 			<d_armyset>3</d_armyset>
 			<d_gold>13000</d_gold>
 			<d_dead>false</d_dead>
@@ -931,7 +931,7 @@
 		<player>
 			<d_id>8</d_id>
 			<d_name>Neutrals</d_name>
-			<d_color>#CCCCCC</d_color>
+			<d_shield>Shield::NEUTRAL</d_shield>
 			<d_armyset>3</d_armyset>
 			<d_gold>1000</d_gold>
 			<d_dead>false</d_dead>
@@ -12761,6 +12761,7 @@ Copyright (C) 2015 Ben Asselstine</d_copyright>
 		<d_intense_combat>false</d_intense_combat>
 		<d_military_advisor>false</d_military_advisor>
 		<d_random_turns>false</d_random_turns>
+		<d_cities_can_produce_allies>false</d_cities_can_produce_allies>
 		<d_surrender_already_offered>false</d_surrender_already_offered>
 		<d_playmode>GameScenario::HOTSEAT</d_playmode>
 	</scenario>

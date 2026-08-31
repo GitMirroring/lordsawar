@@ -1,4 +1,4 @@
-//  Copyright (C) 2007, 2008, 2009, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2007, 2008, 2009, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef QUEST_CITY_OCCUPY_H
@@ -22,7 +21,7 @@
 #include <sigc++/trackable.h>
 
 #include <list>
-#include "Quest.h"
+#include "quest.h"
 
 class City;
 class XML_Helper;
@@ -40,10 +39,9 @@ public:
     /**
      * Make a new city occupation quest.
      *
-     * @param q_mgr  The quests manager to associate this quest with.
      * @param hero   The Id of the Hero who is responsible for the quest.
      */
-    QuestCityOccupy(QuestsManager& q_mgr, guint32 hero);
+    QuestCityOccupy(guint32 hero);
 
     //! Copy constructor.
     QuestCityOccupy (const QuestCityOccupy &q);
@@ -53,13 +51,12 @@ public:
 
     //! Loading constructor.
     /**
-     * @param q_mgr   The quests manager to associate this quest with.
      * @param helper  The opened saved-game file to load this quest from.
      */
-    QuestCityOccupy(QuestsManager& q_mgr, XML_Helper* helper);
+    QuestCityOccupy(XML_Helper* helper);
 
     // Construct from remote action.
-    QuestCityOccupy(QuestsManager& q_mgr, guint32 hero, guint32 target);
+    QuestCityOccupy(guint32 hero, guint32 target);
 
 
     // Get Methods
@@ -106,14 +103,14 @@ public:
      *
      * @param city           The City object that has been conquered.
      * @param action         What action was taken by the Player.  See
-     *                       CityDefeatedAction for more information.
+     *                       CityDefeatedChoice for more information.
      * @param heroIsCulprit  Whether or not the Hero object associated with
      *                       this Quest object is responsible for 
      *                       conquering the given City object.
      * @param gold           How many gold pieces were taken as a result
      *                       of the action.
      */
-    void cityAction(City *city, CityDefeatedAction action, 
+    void cityAction(City *city, CityDefeatedChoice action, 
 		    bool heroIsCulprit, int gold);
 
 

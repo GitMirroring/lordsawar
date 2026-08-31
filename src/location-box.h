@@ -1,7 +1,7 @@
-// Copyright (C) 2000, 2001, 2003 Michael Bartl
-// Copyright (C) 2000, 2001, 2002, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2014, 2020 Ben Asselstine
+//  Copyright (C) 2000, 2001, 2003 Michael Bartl
+//  Copyright (C) 2000, 2001, 2002, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2014, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef LOCATION_BOX_H
@@ -24,7 +23,7 @@
 
 #include <gtkmm.h>
 #include "vector.h"
-#include "Immovable.h"
+#include "immovable.h"
 #include "rectangle.h"
 
 
@@ -120,6 +119,9 @@ class LocationBox : public Immovable
     //! Unobscures the view of this location in the given player's FogMap.
     void deFog(Player *p) const;
 
+    //! Checks if a bag of stuff is somewhere in this location
+    bool has_backpack () const;
+
     //! Which tile of the location is the fewest number of tiles away from pos.
     Vector<int> getNearestPos(Vector<int> pos) const;
 
@@ -158,6 +160,17 @@ class LocationBox : public Immovable
      * This value is always 1, except for City objects which are always 2.
      */
     guint32 d_size;
+
+ public:
+    LocationBox& operator=(const LocationBox& other)
+      {
+        if (this != &other)
+          {
+            Immovable::operator=(other);
+            d_size = other.d_size;
+          }
+        return *this;
+      }
 };
 
 #endif

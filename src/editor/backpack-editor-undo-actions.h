@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,19 +12,18 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef BACKPACK_EDITOR_ACTIONS_H
-#define BACKPACK_EDITOR_ACTIONS_H
+#ifndef BACKPACK_EDITOR_UNDO_ACTIONS_H
+#define BACKPACK_EDITOR_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include "undo-action.h"
-#include "Backpack.h"
+#include "backpack.h"
 #include "undo-mgr.h"
-#include "Item.h"
+#include "item.h"
 
 //! A record of an event in the backpack editor
 /** 
@@ -32,84 +31,133 @@
  * editor.
  */
 
-class BackpackEditorAction: public UndoAction
+class BackpackEditorUndoAction: public UndoAction
 {
 public:
 
-    enum Type {
-      ADD = 1,
-      REMOVE = 2,
-      EDIT = 3,
-    };
+    enum Type
+      {
+        ADD = 1,
+        REMOVE = 2,
+        EDIT = 3,
+      };
 
-    BackpackEditorAction(Type type, bool agg = false)
-     : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+    BackpackEditorUndoAction(Type type, bool agg = false)
+      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
+                    UndoAction::AGGREGATE_NONE), m_type (type)
+        {
+        }
 
-    Type getType() const {return d_type;}
+    Type get_type() const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
-class BackpackEditorAction_Index: public BackpackEditorAction
+class BackpackEditorUndoAction_Index: public BackpackEditorUndoAction
 {
-    public:
-        BackpackEditorAction_Index (Type t, guint32 i, bool agg = false)
-          : BackpackEditorAction (t, agg), d_index (i) {}
-        ~BackpackEditorAction_Index () {}
+public:
+    BackpackEditorUndoAction_Index (Type t, guint32 i, bool agg = false)
+      : BackpackEditorUndoAction (t, agg), m_index (i)
+      {
+      }
 
-        guint32 getIndex () {return d_index;}
-    private:
-        guint32 d_index;
+    ~BackpackEditorUndoAction_Index ()
+      {
+      }
+
+    guint32 get_index ()
+      {
+        return m_index;
+      }
+private:
+    guint32 m_index;
 };
 
-class BackpackEditorAction_Edit: public BackpackEditorAction_Index
+class BackpackEditorUndoAction_Edit: public BackpackEditorUndoAction_Index
 {
-    public:
-        BackpackEditorAction_Edit (guint32 i, Item *item)
-          : BackpackEditorAction_Index (EDIT, i), d_item (new Item (*item)) {}
-        ~BackpackEditorAction_Edit () {delete d_item;}
+public:
+    BackpackEditorUndoAction_Edit (guint32 i, Item *item)
+      : BackpackEditorUndoAction_Index (EDIT, i), m_item (new Item (*item))
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Edit";}
-        Item *getItem () const {return d_item;}
-    private:
-        Item *d_item;
+    ~BackpackEditorUndoAction_Edit ()
+      {
+        delete m_item;
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Edit";
+      }
+
+    Item *get_item () const
+      {
+        return m_item;
+      }
+private:
+    Item *m_item;
 };
 
-class BackpackEditorAction_Save : public BackpackEditorAction
+class BackpackEditorUndoAction_Save : public BackpackEditorUndoAction
 {
-    public:
-        BackpackEditorAction_Save (Type t, Backpack *b)
-          :BackpackEditorAction (t, false), d_backpack (new Backpack (*b)) {}
-        ~BackpackEditorAction_Save ()
-          {
-            delete d_backpack;
-          }
+public:
+    BackpackEditorUndoAction_Save (Type t, Backpack *b)
+      :BackpackEditorUndoAction (t, false), m_backpack (new Backpack (*b))
+      {
+      }
 
-        Backpack *getBackpack() const {return d_backpack;}
-    private:
-        Backpack *d_backpack;
+    ~BackpackEditorUndoAction_Save ()
+      {
+        delete m_backpack;
+      }
+
+    Backpack *get_backpack() const
+      {
+        return m_backpack;
+      }
+private:
+    Backpack *m_backpack;
 };
 
-class BackpackEditorAction_Add: public BackpackEditorAction_Save
+class BackpackEditorUndoAction_Add: public BackpackEditorUndoAction_Save
 {
-    public:
-        BackpackEditorAction_Add (Backpack *b)
-          :BackpackEditorAction_Save (ADD, b) {}
-        ~BackpackEditorAction_Add () {}
+public:
+    BackpackEditorUndoAction_Add (Backpack *b)
+      :BackpackEditorUndoAction_Save (ADD, b)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Add";}
+    ~BackpackEditorUndoAction_Add ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Add";
+      }
 };
 
-class BackpackEditorAction_Remove: public BackpackEditorAction_Save
+class BackpackEditorUndoAction_Remove: public BackpackEditorUndoAction_Save
 {
-    public:
-        BackpackEditorAction_Remove (Backpack *b)
-          :BackpackEditorAction_Save (REMOVE, b) {}
-        ~BackpackEditorAction_Remove () {}
+public:
+    BackpackEditorUndoAction_Remove (Backpack *b)
+      :BackpackEditorUndoAction_Save (REMOVE, b)
+      {
+      }
 
-        Glib::ustring getActionName () const {return "Remove";}
+    ~BackpackEditorUndoAction_Remove ()
+      {
+      }
+
+    Glib::ustring get_action_name () const
+      {
+        return "Remove";
+      }
 };
-#endif //BACKPACK_EDITOR_ACTIONS_H
+#endif

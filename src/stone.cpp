@@ -1,4 +1,4 @@
-//  Copyright (C) 2017, 2021 Ben Asselstine
+//  Copyright (C) 2017, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,34 +12,33 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include "stone.h"
-#include "GameMap.h"
-#include "xmlhelper.h"
+#include "game-map.h"
+#include "xml-helper.h"
 #include "rnd.h"
 
 Glib::ustring Stone::d_tag = "stone";
 
-Stone::Stone(Vector<int> pos, int type)
+Stone::Stone(Vector<int> pos, Type type)
   :Location(pos), d_type(type)
 {
     //mark the location on the game map as occupied by a stone
-    if (GameMap::getInstance()->getTile(getPos())->getBuilding() !=
+    if (GameMap::instance()->getTile(getPos())->getBuilding() !=
         Maptile::ROAD)
-      GameMap::getInstance()->getTile(getPos())->setBuilding(Maptile::STONE);
+      GameMap::instance()->getTile(getPos())->setBuilding(Maptile::STONE);
 }
 
 Stone::Stone(XML_Helper* helper)
     :Location(helper)
 {
   Glib::ustring type_str;
-  helper->getData(type_str, "type");
+  helper->get(type_str, "type");
   d_type = stoneTypeFromString(type_str);
     
   //mark the location on the game map as occupied by a stone
-  Maptile *mtile = GameMap::getInstance()->getTile(getPos());
+  Maptile *mtile = GameMap::instance()->getTile(getPos());
   if (mtile->getBuilding() != Maptile::ROAD)
     mtile->setBuilding(Maptile::STONE);
 }
@@ -58,13 +57,13 @@ bool Stone::save(XML_Helper* helper) const
 {
     bool retval = true;
 
-    retval &= helper->openTag(Stone::d_tag);
-    retval &= helper->saveData("id", d_id);
-    retval &= helper->saveData("x", getPos().x);
-    retval &= helper->saveData("y", getPos().y);
-    Glib::ustring type_str = stoneTypeToString(Stone::Type(d_type));
-    retval &= helper->saveData("type", type_str);
-    retval &= helper->closeTag();
+    retval &= helper->open_tag(Stone::d_tag);
+    retval &= helper->save("id", d_id);
+    retval &= helper->save("x", getPos().x);
+    retval &= helper->save("y", getPos().y);
+    Glib::ustring type_str = stoneTypeToString(d_type);
+    retval &= helper->save("type", type_str);
+    retval &= helper->close_tag();
     
     return retval;
 }
@@ -245,7 +244,7 @@ std::vector<Stone::Type> Stone::getSuitableTypes ()
   return stones;
 }
 
-int Stone::getRandomType (const Road::Type type)
+Stone::Type Stone::getRandomType (const Road::Type type)
 {
   std::vector<Stone::Type> stones = Stone::getSuitableTypes(type);
 
@@ -254,7 +253,7 @@ int Stone::getRandomType (const Road::Type type)
   return stones[Rnd::rand() % stones.size()];
 }
 
-int Stone::getRandomType ()
+Stone::Type Stone::getRandomType ()
 {
   std::vector<Stone::Type> stones = Stone::getSuitableTypes();
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2017, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2017, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,24 +12,24 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "ScenarioMedia.h"
+#include "scenario-media.h"
 #include "defs.h"
-#include "gui/image-helpers.h"
-#include "xmlhelper.h"
-#include "File.h"
+#include "image-helpers.h"
+#include "xml-helper.h"
+#include "file.h"
 #include "snd.h"
-#include "tarfile.h"
-#include "TarFileMaskedImage.h"
-#include "TarFileImage.h"
+#include "tar-file.h"
+#include "tar-file-masked-image.h"
+#include "tar-file-image.h"
+#include "tar-file-sound.h"
 
 ScenarioMedia* ScenarioMedia::d_instance = 0;
 
 Glib::ustring ScenarioMedia::d_tag = "media";
 
-ScenarioMedia* ScenarioMedia::getInstance()
+ScenarioMedia* ScenarioMedia::instance()
 {
   if (!d_instance)
     d_instance = new ScenarioMedia();
@@ -37,7 +37,7 @@ ScenarioMedia* ScenarioMedia::getInstance()
   return d_instance;
 }
 
-ScenarioMedia* ScenarioMedia::getInstance(XML_Helper* helper)
+ScenarioMedia* ScenarioMedia::instance(XML_Helper* helper)
 {
   if (d_instance)
     deleteInstance();
@@ -55,14 +55,12 @@ void ScenarioMedia::deleteInstance()
 }
 
 ScenarioMedia::ScenarioMedia()
- : d_bless_name(""), d_hero_name(""), d_battle_name(""), d_defeat_name(""),
-    d_victory_name(""), d_back_name ("")
 {
   d_hero_newlevel[0] =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
                             PixMask::DIMENSION_ANY);
   d_hero_newlevel[1] =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
                             PixMask::DIMENSION_ANY);
   d_next_turn = new TarFileImage (1, PixMask::DIMENSION_ANY);
   d_city_defeated = new TarFileImage (1, PixMask::DIMENSION_ANY);
@@ -80,6 +78,12 @@ ScenarioMedia::ScenarioMedia()
     new TarFileImage (MEDAL_TYPES,
                       PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
   d_commentator = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_bless_sound = new TarFileSound ();
+  d_hero_sound = new TarFileSound ();
+  d_battle_sound = new TarFileSound ();
+  d_defeat_sound = new TarFileSound ();
+  d_victory_sound = new TarFileSound ();
+  d_back_sound = new TarFileSound ();
 }
 
 ScenarioMedia::ScenarioMedia(const ScenarioMedia &m)
@@ -91,9 +95,12 @@ ScenarioMedia::ScenarioMedia(const ScenarioMedia &m)
     d_parley_offered (new TarFileImage (*m.d_parley_offered)),
     d_parley_refused (new TarFileImage (*m.d_parley_refused)),
     d_commentator (new TarFileImage (*m.d_commentator)),
-    d_bless_name (m.d_bless_name), d_hero_name (m.d_hero_name),
-    d_battle_name (m.d_battle_name), d_defeat_name (m.d_defeat_name),
-    d_victory_name (m.d_victory_name),
+    d_bless_sound (new TarFileSound (*m.d_bless_sound)),
+    d_hero_sound (new TarFileSound (*m.d_hero_sound)),
+    d_battle_sound (new TarFileSound (*m.d_battle_sound)),
+    d_defeat_sound (new TarFileSound (*m.d_defeat_sound)),
+    d_victory_sound (new TarFileSound (*m.d_victory_sound)),
+    d_back_sound (new TarFileSound (*m.d_back_sound)),
     d_musicMap (std::map<Glib::ustring, MusicItem*>()),
     d_bgMap (std::vector<Glib::ustring>())
 {
@@ -111,15 +118,13 @@ ScenarioMedia::ScenarioMedia(const ScenarioMedia &m)
 }
 
 ScenarioMedia::ScenarioMedia(XML_Helper *helper)
- : d_bless_name(""), d_hero_name(""), d_battle_name(""), d_defeat_name(""),
-    d_victory_name(""), d_back_name ("")
 {
   d_hero_newlevel[0] =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_ANY);
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
+                            PixMask::DIMENSION_HEIGHT_IS_MARKED);
   d_hero_newlevel[1] =
-    new TarFileMaskedImage (TarFileMaskedImage::HORIZONTAL_MASK,
-                            PixMask::DIMENSION_ANY);
+    new TarFileMaskedImage (TarFileMaskedImage::VERTICAL_MASK,
+                            PixMask::DIMENSION_HEIGHT_IS_MARKED);
   d_next_turn = new TarFileImage (1, PixMask::DIMENSION_ANY);
   d_city_defeated = new TarFileImage (1, PixMask::DIMENSION_ANY);
   d_winning = new TarFileImage (1, PixMask::DIMENSION_ANY);
@@ -136,6 +141,12 @@ ScenarioMedia::ScenarioMedia(XML_Helper *helper)
     new TarFileImage (MEDAL_TYPES,
                       PixMask::DIMENSION_WIDTH_IS_MULTIPLE_OF_HEIGHT);
   d_commentator = new TarFileImage (1, PixMask::DIMENSION_ANY);
+  d_bless_sound = new TarFileSound ();
+  d_hero_sound = new TarFileSound ();
+  d_battle_sound = new TarFileSound ();
+  d_defeat_sound = new TarFileSound ();
+  d_victory_sound = new TarFileSound ();
+  d_back_sound = new TarFileSound ();
   d_next_turn->load_name (helper, "next_turn_image");
   d_city_defeated->load_name (helper, "city_defeated_image");
   d_winning->load_name (helper, "winning_image");
@@ -145,17 +156,18 @@ ScenarioMedia::ScenarioMedia(XML_Helper *helper)
   d_ruin_defeat->load_name (helper, "ruin_defeat_image");
   d_parley_offered->load_name (helper, "parley_offered_image");
   d_parley_refused->load_name (helper, "parley_refused_image");
-  d_hero_newlevel[0]->load (helper, "hero_newlevel_male_image", "hero_newlevel_male_image_num_masks");
-  d_hero_newlevel[1]->load (helper, "hero_newlevel_female_image", "hero_newlevel_female_image_num_masks");
+  d_hero_newlevel[0]->load (helper, "hero_newlevel_male_image");
+  d_hero_newlevel[1]->load (helper, "hero_newlevel_female_image");
   d_medal[0]->load_name (helper, "small_medals_image");
   d_medal[1]->load_name (helper, "big_medals_image");
   d_commentator->load_name (helper, "commentator_image");
-  helper->getData(d_bless_name, "bless_sound");
-  helper->getData(d_hero_name,"d_hero_name");
-  helper->getData(d_battle_name,"d_battle_name");
-  helper->getData(d_defeat_name,"d_defeat_name");
-  helper->getData(d_victory_name,"d_victory_name");
-  helper->getData(d_back_name,"d_back_name");
+
+  d_bless_sound->load_name (helper, "bless_sound");
+  d_hero_sound->load_name (helper, "hero_sound");
+  d_battle_sound->load_name (helper, "battle_sound");
+  d_defeat_sound->load_name (helper, "defeat_sound");
+  d_victory_sound->load_name (helper, "victory_sound");
+  d_back_sound->load_name (helper, "back_sound");
 }
 
 bool ScenarioMedia::anyValueSet() const
@@ -174,12 +186,12 @@ bool ScenarioMedia::anyValueSet() const
       d_medal[0]->getName () != "" ||
       d_medal[1]->getName () != "" ||
       d_commentator->getName () != "" ||
-      d_bless_name != "" ||
-      d_hero_name != "" ||
-      d_battle_name != "" ||
-      d_defeat_name != "" ||
-      d_victory_name != "" ||
-      d_back_name != "")
+      d_bless_sound->get_name () != "" ||
+      d_hero_sound->get_name () != "" ||
+      d_battle_sound->get_name () != "" ||
+      d_defeat_sound->get_name () != "" ||
+      d_victory_sound->get_name () != "" ||
+      d_back_sound->get_name () != "")
     return true;
   return false;
 }
@@ -189,28 +201,28 @@ bool ScenarioMedia::save(XML_Helper* helper) const
   if (!anyValueSet())
     return true;
   bool retval = true;
-  retval &= helper->openTag(ScenarioMedia::d_tag);
-  retval &= helper->saveData("next_turn_image", d_next_turn->getName ());
-  retval &= helper->saveData("city_defeated_image", d_city_defeated->getName ());
-  retval &= helper->saveData("winning_image", d_winning->getName ());
-  retval &= helper->saveData("male_hero_image", d_hero[0]->getName ());
-  retval &= helper->saveData("female_hero_image", d_hero[1]->getName ());
-  retval &= helper->saveData("ruin_success_image", d_ruin_success->getName ());
-  retval &= helper->saveData("ruin_defeat_image", d_ruin_defeat->getName ());
-  retval &= helper->saveData("parley_offered_image", d_parley_offered->getName ());
-  retval &= helper->saveData("parley_refused_image", d_parley_refused->getName ());
-  retval &= d_hero_newlevel[0]->save (helper, "hero_newlevel_male_image", "hero_newlevel_male_image_num_masks");
-  retval &= d_hero_newlevel[1]->save (helper, "hero_newlevel_female_image", "hero_newlevel_female_image_num_masks");
-  retval &= helper->saveData("small_medals_image", d_medal[0]->getName ());
-  retval &= helper->saveData("big_medals_image", d_medal[1]->getName ());
-  retval &= helper->saveData("commentator_image", d_commentator->getName ());
-  retval &= helper->saveData("bless_sound", d_bless_name);
-  retval &= helper->saveData("d_hero_name", d_hero_name);
-  retval &= helper->saveData("d_battle_name", d_battle_name);
-  retval &= helper->saveData("d_defeat_name", d_defeat_name);
-  retval &= helper->saveData("d_victory_name", d_victory_name);
-  retval &= helper->saveData("d_back_name", d_back_name);
-  retval &= helper->closeTag();
+  retval &= helper->open_tag(ScenarioMedia::d_tag);
+  retval &= helper->save("next_turn_image", d_next_turn->getName ());
+  retval &= helper->save("city_defeated_image", d_city_defeated->getName ());
+  retval &= helper->save("winning_image", d_winning->getName ());
+  retval &= helper->save("male_hero_image", d_hero[0]->getName ());
+  retval &= helper->save("female_hero_image", d_hero[1]->getName ());
+  retval &= helper->save("ruin_success_image", d_ruin_success->getName ());
+  retval &= helper->save("ruin_defeat_image", d_ruin_defeat->getName ());
+  retval &= helper->save("parley_offered_image", d_parley_offered->getName ());
+  retval &= helper->save("parley_refused_image", d_parley_refused->getName ());
+  retval &= d_hero_newlevel[0]->save (helper, "hero_newlevel_male_image");
+  retval &= d_hero_newlevel[1]->save (helper, "hero_newlevel_female_image");
+  retval &= helper->save("small_medals_image", d_medal[0]->getName ());
+  retval &= helper->save("big_medals_image", d_medal[1]->getName ());
+  retval &= helper->save("commentator_image", d_commentator->getName ());
+  retval &= helper->save("bless_sound", d_bless_sound->get_name ());
+  retval &= helper->save("hero_name", d_hero_sound->get_name ());
+  retval &= helper->save("battle_name", d_battle_sound->get_name ());
+  retval &= helper->save("defeat_name", d_defeat_sound->get_name ());
+  retval &= helper->save("victory_name", d_victory_sound->get_name ());
+  retval &= helper->save("back_name", d_back_sound->get_name ());
+  retval &= helper->close_tag();
   return retval;
 }
 
@@ -230,6 +242,13 @@ ScenarioMedia::~ScenarioMedia()
     delete i;
   for (auto i : getImages ())
     delete i;
+
+  delete d_bless_sound;
+  delete d_hero_sound;
+  delete d_battle_sound;
+  delete d_defeat_sound;
+  delete d_victory_sound;
+  delete d_back_sound;
 }
 
 void ScenarioMedia::uninstantiateImages()
@@ -240,9 +259,12 @@ void ScenarioMedia::uninstantiateImages()
     i->uninstantiateImages ();
 }
 
-void ScenarioMedia::copySound(Tar_Helper &t, Glib::ustring name, Glib::ustring piece, bool &broken)
+void ScenarioMedia::copySound(Tar_Helper &t, TarFileSound *s, Glib::ustring piece, bool &broken)
 {
-  Glib::ustring n = t.getFile (name + ".ogg", broken);
+  std::string name = s->get_name ();
+  if (name.empty ())
+    return;
+  Glib::ustring n = t.getFile (name, broken);
   if (!broken && n != "")
     {
       Glib::ustring tmpfile = File::get_tmp_file(".ogg");
@@ -260,13 +282,13 @@ void ScenarioMedia::copySound(Tar_Helper &t, Glib::ustring name, Glib::ustring p
 
 void ScenarioMedia::copySounds(Tar_Helper &t, bool &broken)
 {
-  copySound(t, d_bless_name, "bless", broken);
-  copySound(t, d_hero_name, "hero", broken);
-  copySound(t, d_battle_name, "battle", broken);
-  copySound(t, d_defeat_name, "defeat", broken);
-  copySound(t, d_victory_name, "victory", broken);
+  copySound(t, d_bless_sound, "bless", broken);
+  copySound(t, d_hero_sound, "hero", broken);
+  copySound(t, d_battle_sound, "battle", broken);
+  copySound(t, d_defeat_sound, "defeat", broken);
+  copySound(t, d_victory_sound, "victory", broken);
 
-  copySound(t, d_back_name, "back", broken);
+  copySound(t, d_back_sound, "back", broken);
 
   MusicItem *back = getSoundEffect("back");
   if (back)
@@ -340,18 +362,18 @@ void ScenarioMedia::getFilenames(std::list<Glib::ustring> &files)
     if (i->getName ().empty () == false)
       files.push_back (i->getName ());
 
-  if (getBlessSoundName() != "")
-    files.push_back (getBlessSoundName() + ".ogg");
-  if (getHeroSoundName() != "")
-    files.push_back (getHeroSoundName() + ".ogg");
-  if (getBattleSoundName() != "")
-    files.push_back (getBattleSoundName() + ".ogg");
-  if (getDefeatSoundName() != "")
-    files.push_back (getDefeatSoundName() + ".ogg");
-  if (getVictorySoundName() != "")
-    files.push_back (getVictorySoundName() + ".ogg");
-  if (getBackSoundName() != "")
-    files.push_back (getBackSoundName() + ".ogg");
+  if (getBlessSound ()->get_name() != "")
+    files.push_back (getBlessSound ()->get_name());
+  if (getHeroSound ()->get_name () != "")
+    files.push_back (getHeroSound ()->get_name());
+  if (getBattleSound ()->get_name () != "")
+    files.push_back (getBattleSound ()->get_name());
+  if (getDefeatSound ()->get_name () != "")
+    files.push_back (getDefeatSound ()->get_name());
+  if (getVictorySound ()->get_name () != "")
+    files.push_back (getVictorySound ()->get_name());
+  if (getBackSound ()->get_name () != "")
+    files.push_back (getBackSound ()->get_name());
 }
 
 void ScenarioMedia::uninstantiateSameNamedImages (Glib::ustring name)

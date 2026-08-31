@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Ben Asselstine
+//  Copyright (C) 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
-#ifndef SIGNPOST_EDITOR_ACTIONS_H
-#define SIGNPOST_EDITOR_ACTIONS_H
+#ifndef SIGNPOST_UNDO_ACTIONS_H
+#define SIGNPOST_UNDO_ACTIONS_H
 
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
@@ -25,63 +24,82 @@
 #include "undo-mgr.h"
 
 //! A record of an event in the signpost editor
-/** 
+/**
  * The purpose of these classes is to implement undo/redo in the signpost
  * editor.
  */
 
-class SignpostEditorAction: public UndoAction
+class SignpostUndoAction: public UndoAction
 {
 public:
 
-    //! A Signpost Editor Action can be one of the following kinds.
-    enum Type {
-      MESSAGE = 1,
-    };
+    //! A Signpost Editor Action can be just one kind.
+    enum Type
+      {
+        MESSAGE = 1,
+      };
 
     //! Default constructor.
-    SignpostEditorAction(Type type, bool agg = false)
+    SignpostUndoAction (Type type, bool agg = false)
      : UndoAction (agg ? UndoAction::AGGREGATE_DELAY :
-                   UndoAction::AGGREGATE_NONE), d_type (type) {}
+                   UndoAction::AGGREGATE_NONE), m_type (type)
+       {
+       }
 
     //! Destructor.
-    virtual ~SignpostEditorAction() {}
+    virtual ~SignpostUndoAction ()
+      {
+      }
 
-    Type getType() const {return d_type;}
+    Type get_type () const
+      {
+        return m_type;
+      }
 
 protected:
 
-    Type d_type;
+    Type m_type;
 };
 
 //-----------------------------------------------------------------------------
 
 //! A record of a signpost's text being changed
 /**
- * The purpose of the SignpostEditorAction_Name class is to record
+ * The purpose of the SignpostUndoAction_Name class is to record
  * when we change the text changes.  This happens letter by letter.
  *
  */
-class SignpostEditorAction_Message: public SignpostEditorAction, public UndoCursor
+class SignpostUndoAction_Message: public SignpostUndoAction, public UndoCursor
 {
     public:
 	//! Make a new message action
 	/**
          * Populate the action with the sign's message.
          */
-        SignpostEditorAction_Message (Glib::ustring m, UndoMgr *u,
-                                      Gtk::TextView *v)
-          : SignpostEditorAction (MESSAGE, true), UndoCursor (u, v),
-          d_message (m) {}
+        SignpostUndoAction_Message (Glib::ustring m, UndoMgr *u,
+                                    Gtk::TextView *v)
+          : SignpostUndoAction (MESSAGE, true),
+          UndoCursor (u->get_pos (v), v), m_message (m)
+  {
+  }
+
 	//! Destroy a message action.
-        ~SignpostEditorAction_Message () {}
+        ~SignpostUndoAction_Message ()
+          {
+          }
 
-        Glib::ustring getActionName () const {return "Message";}
+        Glib::ustring get_action_name () const
+          {
+            return "Message";
+          }
 
-        Glib::ustring getMessage () {return d_message;}
+        Glib::ustring get_message () const
+          {
+            return m_message;
+          }
 
     private:
-        Glib::ustring d_message;
+        Glib::ustring m_message;
 };
 
-#endif //SIGNPOST_EDITOR_ACTIONS_H
+#endif

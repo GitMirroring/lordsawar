@@ -30,7 +30,7 @@ The version number can contain double digits.  e.g. 0.1.10.
 Some of these xslt files operate on xml files found in ~/.local/share/lordsawar/.  Some xml files also appear inside of armyset, tileset, cityset, shieldset, map and saved-game files.  (These files are all implemented as tar files, and are normally found in ~/.local/share/lordsawar/, and ${PREFIX}/share/lordsawar/).
 The primary configuration file refers to the xml file located at ~/.config/lordsawar/lordsawarrc.
 
-See the lordsawar-upgrade-file program for more information on how to upgrade files.
+See the upgrade-file command for more information on how to upgrade files.
 
 All xslt files in this directory are Copyright (C) 2011 Ben Asselstine.
 Each xslt file is licensed under the terms of the GNU General Public License version 3, or (at your option) any later version of the GPL.

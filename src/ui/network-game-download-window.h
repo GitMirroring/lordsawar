@@ -1,4 +1,4 @@
-//  Copyright (C) 2008, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,43 +12,49 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#pragma once
-#ifndef NEW_NETWORK_GAME_DOWNLOAD_WINDOW_H
-#define NEW_NETWORK_GAME_DOWNLOAD_WINDOW_H
-
-#include "game-parameters.h"
 #include <gtkmm.h>
+#ifndef NETWORK_GAME_DOWNLOAD_WINDOW_H
+#define NETWORK_GAME_DOWNLOAD_WINDOW_H
 
-class NewNetworkGameDownloadWindow : public sigc::trackable
+class NetworkGameDownloadWindow: public Gtk::ApplicationWindow
 {
-  public:
-    NewNetworkGameDownloadWindow(Glib::ustring title = "",
-                                 Gtk::Window *parent = NULL);
-    ~NewNetworkGameDownloadWindow() {delete window;}
+public:
 
-    int run();
-    void hide();
-    void pulse (int amt, int total);
-    void setFileSize (goffset s) {file_size = s;}
-
-  private:
-    Gtk::Window * window;
-    Gtk::TreeView *progress_treeview;
-    class ProgressModelColumns : public Gtk::TreeModel::ColumnRecord
+    NetworkGameDownloadWindow ()
       {
-    public:
-        ProgressModelColumns ()
-          { add (perc);}
-        Gtk::TreeModelColumn<int> perc;
-      };
-    ProgressModelColumns progress_columns;
-    Glib::RefPtr<Gtk::ListStore> progress_liststore;
-    Gtk::TreeModel::Row row;
-    Gtk::CellRendererProgress *pbar;
-    goffset file_size;
-};
+        set_decorated (false);
+      }
 
+    void setup ()
+      {
+        populate ();
+      }
+
+    void set_fraction (double fraction)
+      {
+        m_progress->set_fraction (fraction);
+      }
+
+private:
+    Gtk::ProgressBar *m_progress;
+
+    void populate ()
+      {
+        set_margin (0);
+        auto box = Gtk::make_managed<Gtk::Box> (Gtk::Orientation::VERTICAL);
+        add_css_class ("clearbox");
+        //box->set_margin (12);
+        box->set_spacing (3);
+        auto hbox = Gtk::make_managed<Gtk::Box> (Gtk::Orientation::HORIZONTAL);
+        m_progress = Gtk::make_managed<Gtk::ProgressBar> ();
+        m_progress->set_text (_("Downloading..."));
+        m_progress->set_hexpand (true);
+        m_progress->add_css_class ("progressmodal");
+        hbox->append (*m_progress);
+        box->append (*hbox);
+        set_child (*box);
+      }
+};
 #endif

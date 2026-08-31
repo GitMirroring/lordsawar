@@ -1,5 +1,5 @@
-// Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2008, 2014, 2015, 2017, 2021 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2008, 2014, 2015, 2017, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include "network-common.h"
 #include "network-connection.h"
@@ -22,9 +21,10 @@
 #include <cstring>
 #include <cstdlib>
 #include <giomm.h>
+#include <giomm/socket.h>
+#include <glibmm/iochannel.h>
 #include <stdio.h>
-#include "timing.h"
-#include "File.h"
+#include "file.h"
 #include "defs.h"
 #include "connection-manager.h"
 
@@ -35,7 +35,8 @@ void NetworkConnection::setup_connection()
   source = 
     Gio::SocketSource::create
     (conn->property_socket(),
-     Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL);
+       Glib::IOCondition::IO_IN | Glib::IOCondition::IO_PRI | Glib::IOCondition::IO_ERR | Glib::IOCondition::IO_HUP | Glib::IOCondition::IO_NVAL);
+
   d_in_cb =
     source->connect(sigc::mem_fun(*this, &NetworkConnection::on_got_input));
   header_size = MESSAGE_SIZE_BYTES;
@@ -77,8 +78,8 @@ bool NetworkConnection::on_got_input(Glib::IOCondition cond)
   gssize len = -1;
   switch (cond)
     {
-    case Glib::IO_IN:
-    case Glib::IO_PRI:
+    case Glib::IOCondition::IO_IN:
+    case Glib::IOCondition::IO_PRI:
       try
         {
       if (header_left > 0)
@@ -97,9 +98,9 @@ bool NetworkConnection::on_got_input(Glib::IOCondition cond)
           return false;
         }
       break;
-    case Glib::IO_ERR:
-    case Glib::IO_HUP:
-    case Glib::IO_NVAL:
+    case Glib::IOCondition::IO_ERR:
+    case Glib::IOCondition::IO_HUP:
+    case Glib::IOCondition::IO_NVAL:
       if (len <= 0)
         {
           tear_down_connection();
@@ -120,7 +121,7 @@ NetworkConnection::NetworkConnection(const Glib::RefPtr<Gio::SocketConnection> &
     d_cancellable(Gio::Cancellable::create())
 {
   //okay, i've been asked to create a SERVER side network connection.
-  client->set_protocol(Gio::SOCKET_PROTOCOL_TCP);
+  client->set_protocol(Gio::Socket::Protocol::TCP);
   if (c)
     {
       c->reference();
@@ -135,7 +136,7 @@ NetworkConnection::NetworkConnection()
     d_port(0), d_stop(false), d_bail (false),
     d_cancellable(Gio::Cancellable::create())
 {
-  client->set_protocol(Gio::SOCKET_PROTOCOL_TCP);
+  client->set_protocol(Gio::Socket::Protocol::TCP);
 }
 
 NetworkConnection::~NetworkConnection()
@@ -154,7 +155,7 @@ void NetworkConnection::on_connect_connected(Glib::RefPtr<Gio::AsyncResult> &res
     {
       conn = client->connect_to_host_finish (result);
     }
-  catch(const Glib::Exception &ex)
+  catch(const Glib::Error &ex)
     {
       connection_failed.emit();
       return;
@@ -237,8 +238,8 @@ void NetworkConnection::connectToHost(Glib::ustring host, int port)
   d_host = host;
   d_port = port;
   d_connect_timer = 
-    Timing::instance().register_timer
-    (sigc::mem_fun(this, &NetworkConnection::on_connect_timeout), 5000);
+    Glib::signal_timeout ().connect
+    (sigc::mem_fun(*this, &NetworkConnection::on_connect_timeout), 5000);
   client->connect_to_host_async 
     (host, port, d_cancellable,
      sigc::mem_fun(*this, &NetworkConnection::on_connect_connected));
@@ -317,7 +318,7 @@ bool NetworkConnection::on_connect_timeout()
   d_stop = true;
   d_cancellable->cancel();
   connection_failed.emit();
-  return Timing::STOP;
+  return false;
 }
 
 Glib::ustring NetworkConnection::get_peer_hostname()

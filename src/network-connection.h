@@ -1,5 +1,5 @@
-// Copyright (C) 2008 Ole Laursen
-// Copyright (C) 2011, 2014, 2015, 2017 Ben Asselstine
+//  Copyright (C) 2008 Ole Laursen
+//  Copyright (C) 2011, 2014, 2015, 2017, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef NETWORK_CONNECTION_H
@@ -27,7 +26,6 @@
 #include <glibmm.h>
 #include <giomm.h>
 #include <gtkmm.h>
-#include <glibmm/threads.h>
 #include "network-common.h"
 #include <mutex>
 #include <condition_variable>
@@ -43,14 +41,14 @@ public:
 
   void connectToHost(Glib::ustring host, int port);
 
-  sigc::signal<void> connected;
-  sigc::signal<void> connection_lost;
-  sigc::signal<void> connection_failed;
-  sigc::signal<void> connection_received_data;
-  sigc::signal<bool, int, Glib::ustring> got_message;
-  sigc::signal<void> queue_flushed;
-  sigc::signal<void> torn_down;
-  sigc::signal<void, int, int> payload_progress;
+  sigc::signal<void()> connected;
+  sigc::signal<void()> connection_lost;
+  sigc::signal<void()> connection_failed;
+  sigc::signal<void()> connection_received_data;
+  sigc::signal<bool(int, Glib::ustring)> got_message;
+  sigc::signal<void()> queue_flushed;
+  sigc::signal<void()> torn_down;
+  sigc::signal<void(int, int)> payload_progress;
 
   void send(int type, const Glib::ustring &payload);
   void sendFile(int type, const Glib::ustring &filename);
@@ -62,6 +60,131 @@ public:
   guint32 getPort() const {return d_port;};
 
   void send_queued_messages();
+
+  static Glib::ustring lobbyActionTypeToString (int type)
+    {
+      enum LobbyActionType t = (enum LobbyActionType) type;
+      switch  (t)
+        {
+        case LOBBY_MESSAGE_TYPE_SIT:
+          return "Sit";
+
+        case LOBBY_MESSAGE_TYPE_CHANGE_NAME:
+          return "ChangeName";
+
+        case LOBBY_MESSAGE_TYPE_STAND:
+          return "Stand";
+
+        case LOBBY_MESSAGE_TYPE_CHANGE_TYPE:
+          return "ChangeType";
+
+        default:
+          return "Unknown";
+        }
+      return "Unknown";
+    }
+
+  static Glib::ustring typeToString (int type)
+    {
+      enum MessageType t = (enum MessageType) type;
+      switch (t)
+        {
+        case MESSAGE_TYPE_PING:
+          return "Ping";
+
+        case MESSAGE_TYPE_PONG:
+          return "Pong";
+
+        case MESSAGE_TYPE_SENDING_MAP:
+          return "SendingMap";
+
+        case MESSAGE_TYPE_SENDING_ACTIONS:
+          return "SendingActions";
+
+        case MESSAGE_TYPE_SENDING_HISTORY:
+          return "SendingHistory";
+
+        case MESSAGE_TYPE_PARTICIPANT_CONNECT:
+          return "ParticipantConnect";
+
+        case MESSAGE_TYPE_PARTICIPANT_DISCONNECTED:
+          return "ParticipantDisconnected";
+
+        case MESSAGE_TYPE_PARTICIPANT_CONNECTED:
+          return "ParticipantConnected";
+
+        case MESSAGE_TYPE_PARTICIPANT_DISCONNECT:
+          return "ParticipantDisconnect";
+
+        case MESSAGE_TYPE_SERVER_DISCONNECT:
+          return "ServerDisconnect";
+
+        case MESSAGE_TYPE_CHAT:
+          return "Chat";
+
+        case MESSAGE_TYPE_CHATTED:
+          return "Chatted";
+
+        case MESSAGE_TYPE_REQUEST_SEAT_MANIFEST:
+          return "RequestSeatManifest";
+
+        case MESSAGE_TYPE_TURN_ORDER:
+          return "TurnOrder";
+
+        case MESSAGE_TYPE_KILL_PLAYER:
+          return "KillPlayer";
+
+        case MESSAGE_TYPE_ROUND_OVER:
+          return "RoundOver";
+
+        case MESSAGE_TYPE_ROUND_START:
+          return "RoundStart";
+
+        case MESSAGE_TYPE_LOBBY_ACTIVITY:
+          return "LobbyActivity";
+
+        case MESSAGE_TYPE_CHANGE_NICKNAME:
+          return "ChangeNickname";
+
+        case MESSAGE_TYPE_GAME_BEGIN:
+          return "GameBegin";
+
+        case MESSAGE_TYPE_OFF_PLAYER:
+          return "OffPlayer";
+
+        case MESSAGE_TYPE_NEXT_PLAYER:
+          return "NextPlayer";
+
+        case MESSAGE_TYPE_SAME_PROFILE_ID:
+          return "SameProfileId";
+
+        case MESSAGE_TYPE_MOD_ID:
+          return "ModId";
+
+        case MESSAGE_TYPE_SYSMSG:
+          return "SysMsg";
+
+        case MESSAGE_TYPE_KICK:
+          return "Kick";
+
+        case MESSAGE_TYPE_READY:
+          return "Ready";
+
+        case MESSAGE_TYPE_GAME_CAN_BEGIN:
+          return "GameCanBegin";
+
+        case MESSAGE_TYPE_WAITING_FOR_READY:
+          return "WaitingForReady";
+
+        case MESSAGE_TYPE_COUNTDOWN:
+          return "Countdown";
+
+        default:
+          return "Unknown";
+        }
+
+      return "Unknown";
+    }
 
 private:
   Glib::RefPtr<Gio::SocketClient> client; //this is client-side connections.

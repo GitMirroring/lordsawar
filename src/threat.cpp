@@ -1,7 +1,7 @@
-// Copyright (C) 2004 John Farrell
-// Copyright (C) 2004, 2005 Ulf Lorenz
-// Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2020, 2021 Ben Asselstine
+//  Copyright (C) 2004 John Farrell
+//  Copyright (C) 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2005 Andrea Paternesi
+//  Copyright (C) 2007, 2008, 2009, 2010, 2014, 2015, 2020, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,17 +15,16 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "Threat.h"
-#include "stackreflist.h"
+#include "threat.h"
+#include "stack-ref-list.h"
 #include <iostream>
 #include "city.h"
 #include "ruin.h"
 #include "stack.h"
-#include "playerlist.h"
-#include "AI_Analysis.h"
+#include "player-list.h"
+#include "ai-analysis.h"
 #include "player.h"
 
 Threat::Threat (const Threat &t)
@@ -68,20 +67,15 @@ Threat::~Threat()
   delete d_stacks;
 }
 
-Glib::ustring Threat::toString() const
+Glib::ustring Threat::toString () const
 {
-    if (d_city)
-    {
-        return d_city->getName() + " owned by " + getOwner ()->getName();
-    }
-    else if (d_ruin)
-    {
-        return d_ruin->getName();
-    }
-    else
-    {
-        return "stack owned by " + getOwner ()->getName();
-    }
+  if (d_city)
+    return "City: " +
+      d_city->getName () + " owned by " + getOwner ()->getName ();
+  else if (d_ruin)
+    return "Ruin: " + d_ruin->getName ();
+  else
+    return "Stack owned by " + getOwner ()->getName ();
 }
 
 bool Threat::Near(Vector<int> pos, Player *p) const
@@ -112,7 +106,7 @@ bool Threat::Near(Vector<int> pos, Player *p) const
 void Threat::addStack(Stack *stack)
 {
     d_stacks->addStack(new Stack (*stack));
-    if (d_city && d_city->getOwner() != Playerlist::getInstance()->getNeutral())
+    if (d_city && d_city->getOwner() != Playerlist::getNeutral())
       d_strength += AI_Analysis::assessStackStrength(stack);
 }
 
@@ -121,7 +115,7 @@ void Threat::calculateStrength()
 {
   // neutral cities poses a small threat
   if (d_city)
-    if (d_city->getOwner() == Playerlist::getInstance()->getNeutral())
+    if (d_city->getOwner() == Playerlist::getNeutral())
       {
         d_strength = 0.3;
         return;
@@ -181,7 +175,7 @@ void Threat::deleteStack(guint32 id)
   Stack *s = d_stacks->getStackById(id);
   d_stacks->removeStack(id);
   delete s;
-  if (d_city && d_city->getOwner() != Playerlist::getInstance()->getNeutral())
+  if (d_city && d_city->getOwner() != Playerlist::getNeutral())
     calculateStrength();
 }
 
@@ -190,7 +184,7 @@ void Threat::deleteStack(Stack* s)
   Stack *ss = d_stacks->getStackById(s->getId());
   d_stacks->removeStack(s->getId());
   delete ss;
-  if (d_city && d_city->getOwner() != Playerlist::getInstance()->getNeutral())
+  if (d_city && d_city->getOwner() != Playerlist::getNeutral())
     calculateStrength();
 }
 

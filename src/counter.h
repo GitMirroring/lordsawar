@@ -1,6 +1,6 @@
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2003, 2004, 2005 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2014, 2021 Ben Asselstine
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2003, 2004, 2005 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2014, 2021, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,8 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef FL_COUNTER_H
@@ -37,40 +36,45 @@ class XML_Helper;
   * static functions...
   */
 
-class FL_Counter : public sigc::trackable
+class ID_Counter : public sigc::trackable
 {
-    public:
-	//! The xml tag of this object in a saved-game file.
-	static Glib::ustring d_tag; 
+public:
+    //! The xml tag of this object in a saved-game file.
+    static Glib::ustring d_tag; 
 
-        //! Makes a copy of the counter.
-        FL_Counter* copy () {return new FL_Counter (*this);}
+    //! Makes a copy of the counter.
+    ID_Counter* copy ()
+      {
+        return new ID_Counter (*this);
+      }
 
-        //! Initialise the counter with a start value
-        FL_Counter(guint32 start = 0);
+    //! Initialize the counter with a start value
+    ID_Counter ();
 
-        //! Load the counter. See XML_Helper for details.
-        FL_Counter(XML_Helper* helper);
+    //! Load the counter. See XML_Helper for details.
+    ID_Counter (XML_Helper* helper);
 
-        //! Copy constructor.
-        FL_Counter (const FL_Counter &f);
+    //! Copy constructor.
+    ID_Counter (const ID_Counter &f);
 
-        //! Destructor.
-        ~FL_Counter() {};
+    //! Destructor.
+    ~ID_Counter ()
+      {
+      }
 
-        //! Returns a unique id
-        guint32 getNextId();
+    //! Returns a unique id
+    guint32 get_next_id ();
 
-	void syncToId(guint32 id);
+    void sync_to_id (guint32 id);
 
-        //! Saves the current counter position
-        bool save(XML_Helper* helper);
+    //! Saves the current counter position
+    bool save (XML_Helper* helper);
 
-        //! Replace the current counter with another.
-        static void reset (FL_Counter *f);
-    private:
-        guint32 d_curID;
+    //! Replace the current counter with another.
+    static void reset (ID_Counter *f);
+private:
+    guint32 m_current_id;
 };
 
-extern FL_Counter* fl_counter;
+extern ID_Counter* id_counter;
 #endif

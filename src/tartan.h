@@ -1,4 +1,4 @@
-//  Copyright (C) 2017, 2020 Ben Asselstine
+//  Copyright (C) 2017, 2020, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef TARTAN_H
@@ -22,7 +21,7 @@
 #include <gtkmm.h>
 #include <sigc++/trackable.h>
 #include <sigc++/signal.h>
-#include "PixMask.h"
+#include "pixmask.h"
 
 class XML_Helper;
 class Shieldset;
@@ -78,6 +77,7 @@ class Tartan
         //! Get the masked image object of a section of the tartan.
         TarFileMaskedImage * getTartanMaskedImage (Tartan::Type type) const;
 
+        int get_tallest_tartan_component () const;
 
 	// Methods that operate on class data and do not modify the class.
 
@@ -94,4 +94,4 @@ class Tartan
         TarFileMaskedImage *d_right_mimage;
 };
 
-#endif // TARTAN_H
+#endif

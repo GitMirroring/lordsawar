@@ -2,7 +2,8 @@
 //  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
 //  Copyright (C) 2004, 2005, 2006 Andrea Paternesi
 //  Copyright (C) 2005 Josef Spillner
-//  Copyright (C) 2006, 2007, 2008, 2011, 2014, 2015, 2017, 2020 Ben Asselstine
+//  Copyright (C) 2006, 2007, 2008, 2011, 2014, 2015, 2017, 2020,
+//  2026 Ben Asselstine
 //  Copyright (C) 2007 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -17,19 +18,18 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #include <fstream>
 #include <iostream>
 #include <sys/stat.h>
 #include <sigc++/functors/mem_fun.h>
 
-#include "Configuration.h"
+#include "configuration.h"
 
-#include "xmlhelper.h"
+#include "xml-helper.h"
 #include "defs.h"
-#include "File.h"
+#include "file.h"
 #include "file-compat.h"
 #include "ucompose.hpp"
 
@@ -42,17 +42,14 @@ Glib::ustring Configuration::d_tag = "lordsawarrc";
 Glib::ustring Configuration::s_configuration_file_path;
 Glib::ustring Configuration::s_dataPath = LORDSAWAR_DATADIR;
 Glib::ustring Configuration::s_savePath;
-Glib::ustring Configuration::s_lang = "";
 int Configuration::s_displaySpeedDelay = SPEED_DELAY;
 int Configuration::s_displayFightRoundDelayFast = 250;
 int Configuration::s_displayFightRoundDelaySlow = 500;
 bool Configuration::s_displayCommentator = true;
 guint32 Configuration::s_cacheSize = MINIMUM_CACHE_SIZE;
-bool Configuration::s_zipfiles = false;
 int Configuration::s_autosave_policy = 1;
 bool Configuration::s_musicenable = false;
 guint32 Configuration::s_musicvolume = 64;
-guint32 Configuration::s_musiccache = 10000000;
 Glib::ustring Configuration::s_filename = "";
 bool Configuration::s_see_opponents_stacks = false;
 bool Configuration::s_see_opponents_production = false;
@@ -69,7 +66,7 @@ bool Configuration::s_military_advisor = false;
 bool Configuration::s_random_turns = false;
 GameParameters::QuickStartPolicy Configuration::s_quick_start = GameParameters::NO_QUICK_START;
 bool Configuration::s_cusp_of_war = false;
-bool Configuration::s_decorated = false;
+bool Configuration::s_cities_can_produce_allies = false;
 bool Configuration::s_remember_recent_games = true;
 bool Configuration::s_remember_recently_edited_files = true;
 guint32 Configuration::s_double_click_threshold = 400; //milliseconds
@@ -77,7 +74,6 @@ Glib::ustring Configuration::s_gamelist_server_hostname = "";//lordsawar.com";
 guint32 Configuration::s_gamelist_server_port = LORDSAWAR_GAMELIST_PORT;
 Glib::ustring Configuration::s_gamehost_server_hostname = "";//lordsawar.com";
 guint32 Configuration::s_gamehost_server_port = LORDSAWAR_GAMEHOST_PORT;
-guint32 Configuration::s_font_size_override = 0;
 
 Configuration::Configuration()
 {
@@ -89,9 +85,6 @@ Configuration::Configuration()
   if (s_savePath == "")
     s_savePath = File::add_slash_if_necessary (File::getUserDataDir ());
 
-  char *s = setlocale(LC_ALL, "");
-  if (s)
-    Configuration::s_lang = s;
 }
 
 // check if file exists and parse it
@@ -108,13 +101,19 @@ bool Configuration::loadConfigurationFile(Glib::ustring fileName)
 
         //parse the file
         XML_Helper helper(fileName.c_str(), std::ios::in);
-        helper.registerTag(d_tag,
+        helper.register_tag(d_tag,
 	    sigc::hide<0>(sigc::mem_fun(*this, &Configuration::parseConfiguration)));
     
-        bool ret = helper.parseXML();
+        bool ret = helper.parse_XML();
         helper.close();
         if (ret == false)
-          std::cerr << String::ucompose(_("Okay, we're throwing your config file %1 away"), fileName) << std::endl;
+          {
+            Glib::ustring backup = fileName + ".bak";
+            File::copy (fileName, backup);
+            std::cerr <<
+              String::ucompose(_("Okay, we're saving your broken config file to %1"),
+                               backup) << std::endl;
+          }
         return ret;
     }
     else return false;
@@ -128,61 +127,56 @@ bool Configuration::saveConfigurationFile(Glib::ustring filename)
 
     //start writing
     retval &= helper.begin(LORDSAWAR_CONFIG_VERSION);
-    retval &= helper.openTag(d_tag);
+    retval &= helper.open_tag(d_tag);
     
     //save the values 
-    retval &= helper.saveData("datapath",s_dataPath);
-    retval &= helper.saveData("savepath", s_savePath);
-    retval &= helper.saveData("lang", s_lang);
-    retval &= helper.saveData("cachesize", s_cacheSize);
-    retval &= helper.saveData("zipfiles", s_zipfiles);
+    retval &= helper.save("datapath",s_dataPath);
+    retval &= helper.save("savepath", s_savePath);
+    retval &= helper.save("cachesize", s_cacheSize);
     Glib::ustring autosave_policy_str = savingPolicyToString(SavingPolicy(s_autosave_policy));
-    retval &= helper.saveData("autosave_policy", autosave_policy_str);
-    retval &= helper.saveData("speeddelay", s_displaySpeedDelay);
-    retval &= helper.saveData("fightrounddelayfast", s_displayFightRoundDelayFast);
-    retval &= helper.saveData("fightrounddelayslow", s_displayFightRoundDelaySlow);
-    retval &= helper.saveData("commentator", s_displayCommentator);
-    retval &= helper.saveData("musicenable", s_musicenable);
-    retval &= helper.saveData("musicvolume", s_musicvolume);
-    retval &= helper.saveData("musiccache", s_musiccache);
-    retval &= helper.saveData("view_enemies", s_see_opponents_stacks);
-    retval &= helper.saveData("view_production", s_see_opponents_production);
+    retval &= helper.save("autosave_policy", autosave_policy_str);
+    retval &= helper.save("speeddelay", s_displaySpeedDelay);
+    retval &= helper.save("fightrounddelayfast", s_displayFightRoundDelayFast);
+    retval &= helper.save("fightrounddelayslow", s_displayFightRoundDelaySlow);
+    retval &= helper.save("commentator", s_displayCommentator);
+    retval &= helper.save("musicenable", s_musicenable);
+    retval &= helper.save("musicvolume", s_musicvolume);
+    retval &= helper.save("view_enemies", s_see_opponents_stacks);
+    retval &= helper.save("view_production", s_see_opponents_production);
     Glib::ustring quest_policy_str = questPolicyToString(GameParameters::QuestPolicy(s_play_with_quests));
-    retval &= helper.saveData("quests", quest_policy_str);
+    retval &= helper.save("quests", quest_policy_str);
     Glib::ustring vectoring_mode_str = vectoringModeToString(GameParameters::VectoringMode(s_vectoring_mode));
-    retval &= helper.saveData("vectoring_mode", vectoring_mode_str);
+    retval &= helper.save("vectoring_mode", vectoring_mode_str);
     Glib::ustring build_prod_mode_str = buildProductionModeToString(GameParameters::BuildProductionMode(s_build_production_mode));
-    retval &= helper.saveData("build_production_mode", build_prod_mode_str);
+    retval &= helper.save("build_production_mode", build_prod_mode_str);
     Glib::ustring sack_mode_str = sackingModeToString(GameParameters::SackingMode(s_sacking_mode));
-    retval &= helper.saveData("sacking_mode", sack_mode_str);
-    retval &= helper.saveData("hidden_map", s_hidden_map);
-    retval &= helper.saveData("diplomacy", s_diplomacy);
+    retval &= helper.save("sacking_mode", sack_mode_str);
+    retval &= helper.save("hidden_map", s_hidden_map);
+    retval &= helper.save("diplomacy", s_diplomacy);
     Glib::ustring neutral_cities_str = neutralCitiesToString(GameParameters::NeutralCities(s_neutral_cities));
-    retval &= helper.saveData("neutral_cities", neutral_cities_str);
+    retval &= helper.save("neutral_cities", neutral_cities_str);
     Glib::ustring razing_cities_str = razingCitiesToString(GameParameters::RazingCities(s_razing_cities));
-    retval &= helper.saveData("razing_cities", razing_cities_str);
-    retval &= helper.saveData("intense_combat", s_intense_combat);
-    retval &= helper.saveData("military_advisor", s_military_advisor);
-    retval &= helper.saveData("random_turns", s_random_turns);
+    retval &= helper.save("razing_cities", razing_cities_str);
+    retval &= helper.save("intense_combat", s_intense_combat);
+    retval &= helper.save("military_advisor", s_military_advisor);
+    retval &= helper.save("random_turns", s_random_turns);
     Glib::ustring quick_start_str = quickStartPolicyToString(GameParameters::QuickStartPolicy(s_quick_start));
-    retval &= helper.saveData("quick_start", quick_start_str);
-    retval &= helper.saveData("cusp_of_war", s_cusp_of_war);
-    retval &= helper.saveData("decorated", s_decorated);
-    retval &= helper.saveData("remember_recent_games", s_remember_recent_games);
-    retval &= helper.saveData("remember_recently_edited_files", s_remember_recently_edited_files);
-    retval &= helper.saveData("double_click_threshold", 
+    retval &= helper.save("quick_start", quick_start_str);
+    retval &= helper.save("cusp_of_war", s_cusp_of_war);
+    retval &= helper.save("cities_can_produce_allies", s_cities_can_produce_allies);
+    retval &= helper.save("remember_recent_games", s_remember_recent_games);
+    retval &= helper.save("remember_recently_edited_files", s_remember_recently_edited_files);
+    retval &= helper.save("double_click_threshold", 
 			      s_double_click_threshold);
-    retval &= helper.saveData("gamelist_server_hostname", 
+    retval &= helper.save("gamelist_server_hostname", 
 			      s_gamelist_server_hostname);
-    retval &= helper.saveData("gamelist_server_port", 
+    retval &= helper.save("gamelist_server_port", 
 			      s_gamelist_server_port);
-    retval &= helper.saveData("gamehost_server_hostname", 
+    retval &= helper.save("gamehost_server_hostname", 
 			      s_gamehost_server_hostname);
-    retval &= helper.saveData("gamehost_server_port", 
+    retval &= helper.save("gamehost_server_port", 
 			      s_gamehost_server_port);
-    retval &= helper.saveData("font_size_override",
-			      s_font_size_override);
-    retval &= helper.closeTag();
+    retval &= helper.close_tag();
     
     if (!retval)
     {
@@ -202,11 +196,11 @@ bool Configuration::parseConfiguration(XML_Helper* helper)
     debug("parseConfiguration()");
     
     Glib::ustring temp;
-    bool retval, zipping;
+    bool retval;
     
-    if (helper->getVersion() != LORDSAWAR_CONFIG_VERSION)
+    if (helper->get_version() != LORDSAWAR_CONFIG_VERSION)
     {
-      std::cerr << String::ucompose(_("Configuration file has wrong version.  Expected %1, but got %2"), LORDSAWAR_CONFIG_VERSION, helper->getVersion()) << std::endl;
+      std::cerr << String::ucompose(_("Configuration file has wrong version.  Expected %1, but got %2"), LORDSAWAR_CONFIG_VERSION, helper->get_version()) << std::endl;
             Glib::ustring orig = s_filename;
             Glib::ustring dest = s_filename+".OLD";
             std::cerr << String::ucompose(_("backing up config file `%1' to `%2'."), orig, dest) << std::endl;
@@ -219,85 +213,74 @@ bool Configuration::parseConfiguration(XML_Helper* helper)
     }
    
     //get the paths
-    retval = helper->getData(temp, "datapath");
+    retval = helper->get(temp, "datapath");
     if (retval)
       s_dataPath = temp;
         
-    retval = helper->getData(temp, "savepath");
+    retval = helper->get(temp, "savepath");
     if (retval)
       s_savePath = temp;
 
-    if (helper->getData(temp, "lang"))
-        s_lang = temp;
-    
     //parse cache size
-    retval = helper->getData(temp, "cachesize");
+    retval = helper->get(temp, "cachesize");
     if (retval)
         s_cacheSize = atoi(temp.c_str());
 
-    //parse if savefiles should be zipped
-    retval = helper->getData(zipping, "zipfiles");
-    if (retval)
-        s_zipfiles = zipping;
-
     //parse when and how to save autosave files
     Glib::ustring autosave_policy_str;
-    helper->getData(autosave_policy_str, "autosave_policy");
+    helper->get(autosave_policy_str, "autosave_policy");
     s_autosave_policy = savingPolicyFromString(autosave_policy_str);
 
     //parse the speed delays
-    helper->getData(s_displaySpeedDelay, "speeddelay");
-    helper->getData(s_displayFightRoundDelayFast, "fightrounddelayfast");
-    helper->getData(s_displayFightRoundDelaySlow, "fightrounddelayslow");
+    helper->get(s_displaySpeedDelay, "speeddelay");
+    helper->get(s_displayFightRoundDelayFast, "fightrounddelayfast");
+    helper->get(s_displayFightRoundDelaySlow, "fightrounddelayslow");
 
     //parse whether or not the commentator should be shown
-    helper->getData(s_displayCommentator, "commentator");
+    helper->get(s_displayCommentator, "commentator");
 
     // parse musicsettings
-    helper->getData(s_musicenable, "musicenable");
-    helper->getData(s_musicvolume, "musicvolume");
-    helper->getData(s_musiccache, "musiccache");
+    helper->get(s_musicenable, "musicenable");
+    helper->get(s_musicvolume, "musicvolume");
     
-    helper->getData(s_see_opponents_stacks, "view_enemies");
-    helper->getData(s_see_opponents_production, "view_production");
+    helper->get(s_see_opponents_stacks, "view_enemies");
+    helper->get(s_see_opponents_production, "view_production");
     Glib::ustring quest_policy_str;
-    helper->getData(quest_policy_str, "quests");
+    helper->get(quest_policy_str, "quests");
     s_play_with_quests = questPolicyFromString(quest_policy_str);
     Glib::ustring vectoring_mode_str;
-    helper->getData(vectoring_mode_str, "vectoring_mode");
+    helper->get(vectoring_mode_str, "vectoring_mode");
     s_vectoring_mode = vectoringModeFromString(vectoring_mode_str);
     Glib::ustring build_prod_mode_str;
-    helper->getData(build_prod_mode_str, "build_production_mode");
+    helper->get(build_prod_mode_str, "build_production_mode");
     s_build_production_mode =
       buildProductionModeFromString(build_prod_mode_str);
     Glib::ustring sack_mode_str;
-    helper->getData(sack_mode_str, "sacking_mode");
+    helper->get(sack_mode_str, "sacking_mode");
     s_sacking_mode = sackingModeFromString(sack_mode_str);
-    helper->getData(s_hidden_map, "hidden_map");
-    helper->getData(s_diplomacy, "diplomacy");
+    helper->get(s_hidden_map, "hidden_map");
+    helper->get(s_diplomacy, "diplomacy");
     Glib::ustring neutral_cities_str;
-    helper->getData(neutral_cities_str, "neutral_cities");
+    helper->get(neutral_cities_str, "neutral_cities");
     s_neutral_cities = neutralCitiesFromString(neutral_cities_str);
     Glib::ustring razing_cities_str;
-    helper->getData(razing_cities_str, "razing_cities");
+    helper->get(razing_cities_str, "razing_cities");
     s_razing_cities = razingCitiesFromString(razing_cities_str);
-    helper->getData(s_intense_combat, "intense_combat");
-    helper->getData(s_military_advisor, "military_advisor");
-    helper->getData(s_random_turns, "random_turns");
+    helper->get(s_intense_combat, "intense_combat");
+    helper->get(s_military_advisor, "military_advisor");
+    helper->get(s_random_turns, "random_turns");
     Glib::ustring quick_start_str;
-    helper->getData(quick_start_str, "quick_start");
+    helper->get(quick_start_str, "quick_start");
     s_quick_start = quickStartPolicyFromString(quick_start_str);
-    helper->getData(s_cusp_of_war, "cusp_of_war");
-    helper->getData(s_decorated, "decorated");
-    s_decorated = false;
-    helper->getData(s_remember_recent_games, "remember_recent_games");
-    helper->getData(s_remember_recently_edited_files, "remember_recently_edited_files");
-    helper->getData(s_double_click_threshold, "double_click_threshold");
-    helper->getData(s_gamelist_server_hostname, "gamelist_server_hostname");
-    helper->getData(s_gamelist_server_port, "gamelist_server_port");
-    helper->getData(s_gamehost_server_hostname, "gamehost_server_hostname");
-    helper->getData(s_gamehost_server_port, "gamehost_server_port");
-    helper->getData(s_font_size_override, "font_size_override");
+    helper->get(s_cusp_of_war, "cusp_of_war");
+    helper->get(s_cities_can_produce_allies, "cities_can_produce_allies");
+    helper->get(s_remember_recent_games, "remember_recent_games");
+    helper->get(s_remember_recently_edited_files, "remember_recently_edited_files");
+    helper->get(s_double_click_threshold, "double_click_threshold");
+    helper->get(s_gamelist_server_hostname, "gamelist_server_hostname");
+    helper->get(s_gamelist_server_port, "gamelist_server_port");
+    helper->get(s_gamehost_server_hostname, "gamehost_server_hostname");
+    helper->get(s_gamehost_server_port, "gamehost_server_port");
     return true;
 }
 
@@ -312,7 +295,7 @@ void initialize_configuration()
       Glib::ustring tmpfile = File::get_tmp_file(".tmp");
       File::copy(cfgfile, tmpfile);
       bool same_version = false;
-      bool upgraded = FileCompat::getInstance()->upgrade(tmpfile, 
+      bool upgraded = FileCompat::instance()->upgrade(tmpfile, 
                                                          same_version);
       if (upgraded)
         File::copy(tmpfile, cfgfile);
@@ -341,36 +324,36 @@ void initialize_configuration()
       exit(-1);
     }
   //Check if the personal armyset directory exists. If not, try to create it.
-  if (File::create_dir(File::getSetDir(ARMYSET_EXT, false)) == false)
+  if (File::create_dir(File::get_user_armyset_dir ()) == false)
     {
-      std::cerr << String::ucompose(_("Error!  Couldn't create armyset directory `%1'.  Exiting."), File::getSetDir(ARMYSET_EXT, false)) << std::endl;
+      std::cerr << String::ucompose(_("Error!  Couldn't create armyset directory `%1'.  Exiting."), File::get_user_armyset_dir ()) << std::endl;
       exit(-1);
     }
   //Check if the personal tileset directory exists. If not, try to create it.
-  if (File::create_dir(File::getSetDir(TILESET_EXT, false)) == false)
+  if (File::create_dir(File::get_user_tileset_dir ()) == false)
     {
-      std::cerr << String::ucompose(_("Error!  Couldn't create tileset directory `%1'.  Exiting."), File::getSetDir(TILESET_EXT, false)) << std::endl;
+      std::cerr << String::ucompose(_("Error!  Couldn't create tileset directory `%1'.  Exiting."), File::get_user_tileset_dir()) << std::endl;
       exit(-1);
     }
 
   //Check if the personal maps directory exists. If not, try to create it.
-  if (File::create_dir(File::getUserMapDir()) == false)
+  if (File::create_dir(File::get_user_map_dir ()) == false)
     {
-      std::cerr << String::ucompose(_("Error!  Couldn't create map directory `%1'.  Exiting."), File::getUserMapDir()) << std::endl;
+      std::cerr << String::ucompose(_("Error!  Couldn't create map directory `%1'.  Exiting."), File::get_user_map_dir ()) << std::endl;
       exit(-1);
     }
 
   //Check if the personal shieldset directory exists. If not, try to make it.
-  if (File::create_dir(File::getSetDir(SHIELDSET_EXT, false)) == false)
+  if (File::create_dir(File::get_user_shieldset_dir ()) == false)
     {
-      std::cerr << String::ucompose(_("Error!  Couldn't create shieldset directory `%1'.  Exiting."), File::getSetDir(SHIELDSET_EXT, false)) << std::endl;
+      std::cerr << String::ucompose(_("Error!  Couldn't create shieldset directory `%1'.  Exiting."), File::get_user_shieldset_dir ()) << std::endl;
       exit(-1);
     }
 
   //Check if the personal cityset directory exists. If not, try to make it.
-  if (File::create_dir(File::getSetDir(CITYSET_EXT, false)) == false)
+  if (File::create_dir(File::get_user_cityset_dir ()) == false)
     {
-      std::cerr << String::ucompose(_("Error!  Couldn't create cityset directory `%1'.  Exiting."), File::getSetDir(CITYSET_EXT, false)) << std::endl;
+      std::cerr << String::ucompose(_("Error!  Couldn't create cityset directory `%1'.  Exiting."), File::get_user_cityset_dir ()) << std::endl;
       exit(-1);
     }
 }
@@ -439,22 +422,22 @@ Glib::ustring Configuration::savingPolicyToString(const Configuration::SavingPol
 {
   switch (policy)
     {
-    case Configuration::NO_SAVING:
-      return "Configuration::NO_SAVING";
+    case Configuration::NO_AUTOSAVING:
+      return "Configuration::NO_AUTOSAVING";
     case Configuration::WRITE_UNNUMBERED_AUTOSAVE_FILE:
       return "Configuration::WRITE_UNNUMBERED_AUTOSAVE_FILE";
     case Configuration::WRITE_NUMBERED_AUTOSAVE_FILE:
       return "Configuration::WRITE_NUMBERED_AUTOSAVE_FILE";
     }
-  return "Configuration::NO_SAVING";
+  return "Configuration::NO_AUTOSAVING";
 }
 
 Configuration::SavingPolicy Configuration::savingPolicyFromString(Glib::ustring str)
 {
   if (str.size() > 0 && isdigit(str.c_str()[0]))
     return Configuration::SavingPolicy(atoi(str.c_str()));
-  if (str == "Configuration::NO_SAVING")
-    return Configuration::NO_SAVING;
+  if (str == "Configuration::NO_AUTOSAVING")
+    return Configuration::NO_AUTOSAVING;
   else if (str == "Configuration::WRITE_UNNUMBERED_AUTOSAVE_FILE")
     return Configuration::WRITE_UNNUMBERED_AUTOSAVE_FILE;
   else if (str == "Configuration::WRITE_NUMBERED_AUTOSAVE_FILE")
@@ -610,16 +593,19 @@ GameParameters::SackingMode Configuration::sackingModeFromString(Glib::ustring s
 bool Configuration::upgrade(Glib::ustring filename, Glib::ustring old_version,
                             Glib::ustring new_version)
 {
-  return FileCompat::getInstance()->upgrade(filename, old_version, new_version,
+  return FileCompat::instance()->upgrade(filename, old_version, new_version,
                                             FileCompat::CONFIGURATION, 
                                             d_tag);
 }
 
 void Configuration::support_backward_compatibility()
 {
-  FileCompat::getInstance()->support_type (FileCompat::CONFIGURATION, "rc",
+  FileCompat::instance()->support_type (FileCompat::CONFIGURATION, "rc",
                                            d_tag, false);
-  FileCompat::getInstance()->support_version
-    (FileCompat::CONFIGURATION, "0.2.1", LORDSAWAR_CONFIG_VERSION,
+  FileCompat::instance()->support_version
+    (FileCompat::CONFIGURATION, "0.2.1", "0.2.2",
+     sigc::ptr_fun(&Configuration::upgrade));
+  FileCompat::instance()->support_version
+    (FileCompat::CONFIGURATION, "0.2.2", LORDSAWAR_CONFIG_VERSION,
      sigc::ptr_fun(&Configuration::upgrade));
 }

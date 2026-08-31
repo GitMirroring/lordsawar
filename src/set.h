@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2014 Ben Asselstine
+//  Copyright (C) 2009, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,16 +12,15 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef SET_H
 #define SET_H
-#include "File.h"
+#include "file.h"
 #include "defs.h"
-#include "xmlhelper.h"
-#include "tarfile.h"
+#include "xml-helper.h"
+#include "tar-file.h"
 
 //! Base class for Armyset, Tileset, Shieldset, and Cityset objects.
 class Set: public TarFile
@@ -33,8 +32,7 @@ public:
     Set(const Set &s);
 
     //! Returns the width and height in pixels of a square on the map.
-    guint32 getTileSize() const {return d_tileSize * (double)d_scale;}
-    guint32 getUnscaledTileSize() const {return d_tileSize;}
+    guint32 getTileSize() const {return d_tileSize;}
 
     void setTileSize(guint32 tile_size) {d_tileSize = tile_size;}
 
@@ -86,11 +84,6 @@ public:
 
     bool save(XML_Helper *helper) const;
 
-    //!Get the zoom level.
-    double get_scale () const {return d_scale;};
-
-    //!Set the zoom level.
-    void set_scale (double d) {d_scale = d;};
 private:
 
     //! The unique Id of this set.
@@ -126,12 +119,25 @@ private:
      * Equates to the tileset.d_tilesize XML entity in the tileset
      * configuration file.
      * It represents the size in pixels of the width and height of tile
-     * imagery onscreen (but then it is multipled by scale).
+     * imagery onscreen.
      */
     guint32 d_tileSize;
 
-    //! The zoom level of tiles.  A number between 0 and 1.
-    double d_scale;
+public:
+    Set& operator=(const Set& other)
+      {
+        if (this != &other)
+          {
+            TarFile::operator=(other);
+            d_id = other.d_id;
+            d_name = other.d_name;
+            d_copyright = other.d_copyright;
+            d_license = other.d_license;
+            d_info = other.d_info;
+            d_tileSize = other.d_tileSize;
+          }
+        return *this;
+      }
 };
 
 #endif

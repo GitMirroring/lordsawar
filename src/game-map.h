@@ -1,9 +1,9 @@
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2003, 2006 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2020,
-// 2021 Ben Asselstine
-// Copyright (C) 2008 Janek Kozicki
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2003, 2006 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
+//  Copyright (C) 2008 Janek Kozicki
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef GAMEMAP_H
@@ -31,7 +30,7 @@
 #include <gtkmm.h>
 #include "vector.h"
 #include "rectangle.h"
-#include "maptile.h"
+#include "map-tile.h"
 
 class ArmyProto;
 class Movable;
@@ -51,6 +50,7 @@ class Ruin;
 class Armyset;
 class Signpost;
 class LocationBox;
+class NamedLocation;
 class Tileset;
 class Army;
 
@@ -79,8 +79,8 @@ class GameMap: public sigc::trackable
           * 
           * @return singleton instance
           */
-        static GameMap* getInstance() {
-          return s_instance ? s_instance : getInstance("", "", ""); };
+        static GameMap* instance() {
+          return s_instance ? s_instance : instance("", "", ""); };
 
 
         /** Returns singleton instance or creates a new one using the tileset
@@ -88,7 +88,7 @@ class GameMap: public sigc::trackable
           * @param TilesetName      the name of the tileset to be used
           * @return singleton instance
           */
-        static GameMap* getInstance(Glib::ustring TilesetName,
+        static GameMap* instance(Glib::ustring TilesetName,
 				    Glib::ustring Shieldsetname,
 				    Glib::ustring Citysetname);
 
@@ -98,7 +98,7 @@ class GameMap: public sigc::trackable
           *
           * \note This function deletes an existing instance!
           */
-        static GameMap* getInstance(XML_Helper* helper);
+        static GameMap* instance(XML_Helper* helper);
 
         //! Explicitly deletes the singleton instance
         static void deleteInstance();
@@ -134,6 +134,7 @@ class GameMap: public sigc::trackable
         //! Returns a pointer to the current Shieldset for the map.
         static Shieldset* getShieldset();
 
+        static bool isStackDestinationEnemyCity (Stack *s);
         /** Change the map's Tileset.
           * 
           * @param tileset The name of the Tileset to change to.
@@ -143,11 +144,8 @@ class GameMap: public sigc::trackable
           */
         void setTileset(Glib::ustring tileset);
 
-        //! Return the width of a tile on the BigMap in pixels after scaling.
+        //! Return the width of a tile on the BigMap in pixels.
         guint32 getTileSize() const;
-
-        //! Return the width of a tile on the BigMap in pixels before scaling.
-        guint32 getUnscaledTileSize() const;
 
         //! Return the id of the current Tileset.  Returns zero if a valid tileset hasn't been set yet.
         guint32 getTilesetId() const;
@@ -560,6 +558,9 @@ class GameMap: public sigc::trackable
 
         //! Return how many bags of stuff there are on the map.
         static guint32 countBags ();
+
+        //! Return true if the map is POS isn't completely obscured by fog.
+        static bool isVisible (Vector<int> pos);
 
         /** Check if the given Stack is able to search the Maptile it is on.
          *
@@ -1025,6 +1026,9 @@ class GameMap: public sigc::trackable
             return t ? t->getBuilding() : Maptile::NONE;
           }
 
+        NamedLocation *get_nearest_ruin_or_temple (Vector<int> pos);
+
+        std::list<Stack*> getUnblessedStacksNearTemples (int dist);
         /** Count the number of tiles occupied by buildings of a given type.
          *
          * @param building_type A Maptile::Building representing the kind of 
@@ -1401,7 +1405,7 @@ class GameMap: public sigc::trackable
         /** Change the terrain on a region of the map.
          *
          * @param r The region of the map to alter.
-         * @param type  The type of terrain to change it to.
+         * @param tile_idx  The index into the tileset of the tile.
          * @param tile_style_id  The TileStyle id to change it to.  -1 means 
          * automatically pick the id of a suitable TileStyle.
          * @param always_alter_tilestyles Reassign TileStyle ids even if the
@@ -1413,10 +1417,15 @@ class GameMap: public sigc::trackable
          *
          * @return Returns the region altered as a Rectangle.
          */
-        LwRectangle putTerrain(LwRectangle r, Tile::Type type, 
+        LwRectangle putTerrain(LwRectangle r, int type_idx, 
                              int tile_style_id = -1, 
                              bool always_alter_tilestyles = false);
 
+
+        /** When we update a ruin that happens to be a reward, we need to
+         * update the reward.
+         */
+        void update_ruin_rewards (Vector<int> pos, Ruin *r);
 
         std::list<UniquelyIdentified*> copyObjects(std::list<LwRectangle> rects);
         std::list<Maptile*> copyMaptiles (std::list<LwRectangle> rects);
@@ -1440,6 +1449,9 @@ class GameMap: public sigc::trackable
         static void resetCityset ();
         static void resetTileset ();
         static void resetShieldset ();
+
+        //! take a list of points and return the ones that are on the map
+        static std::list<Vector<int>> on_map (std::list<Vector<int>> points);
         //! Destructor
         ~GameMap();
         
@@ -1506,5 +1518,3 @@ class GameMap: public sigc::trackable
 };
 
 #endif
-
-// End of file

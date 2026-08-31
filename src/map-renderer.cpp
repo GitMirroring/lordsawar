@@ -1,8 +1,8 @@
-// Copyright (C) 2003 Michael Bartl
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2005 Andrea Paternesi
-// Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2020,
-// 2021 Ben Asselstine
+//  Copyright (C) 2003 Michael Bartl
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2005 Andrea Paternesi
+//  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2014, 2015, 2020, 2021,
+//  2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,18 +16,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "MapRenderer.h"
+#include "map-renderer.h"
 #include "army.h"
-#include "GameMap.h"
+#include "game-map.h"
 #include "player.h"
-#include "FogMap.h"
-#include "ImageCache.h"
-#include "playerlist.h"
-#include "File.h"
-#include "tileset.h"
+#include "fog-map.h"
+#include "image-cache.h"
+#include "player-list.h"
+#include "file.h"
+#include "tile-set.h"
 
 MapRenderer::MapRenderer(Cairo::RefPtr<Cairo::Surface> surface)
  : d_surface (surface), gc (Cairo::Context::create(surface))
@@ -48,7 +47,7 @@ void MapRenderer::render_tile(Vector<int> draw, Vector<int> tile,
     return;
 
   // get correct tile
-  Maptile *mtile = GameMap::getInstance()->getTile(tile);
+  Maptile *mtile = GameMap::instance()->getTile(tile);
 
   TileStyle *style = mtile->getTileStyle(GameMap::getTileset ());
   bool use_default_pic = false;
@@ -73,10 +72,9 @@ void MapRenderer::render_tile(Vector<int> draw, Vector<int> tile,
       guint32 type = TileStyle::OTHER;
       if (style)
         type = style->getType();
-      int tilesize = GameMap::getInstance()->getTileSize();
-      PixMask *img = 
-        ImageCache::getInstance()->getDefaultTileStylePic(type,
-                                                             tilesize);
+      int tilesize = GameMap::instance()->getTileSize();
+      PixMask *img =
+        ImageCache::instance()->getDefaultTileStylePic (type, tilesize);
       if (img)
         img->blit(surface, draw.x, draw.y);
     }
@@ -89,7 +87,7 @@ void MapRenderer::render(int x, int y, int tileStartX, int tileStartY,
 {
   int width = GameMap::getWidth();
   int height = GameMap::getHeight();
-  int tilesize = GameMap::getInstance()->getTileSize();
+  int tilesize = GameMap::instance()->getTileSize();
   int drawY = y;
 
   for (int tileY = tileStartY; tileY < (tileStartY + rows); tileY++)
@@ -114,4 +112,3 @@ void MapRenderer::render(int x, int y, int tileStartX, int tileStartY,
     }
 
 }
-// End of file

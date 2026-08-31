@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009, 2010, 2011, 2012, 2014 Ben Asselstine
+//  Copyright (C) 2008, 2009, 2010, 2011, 2012, 2014, 2026 Ben Asselstine
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -12,12 +12,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
-#include "SmallTile.h"
+#include "small-tile.h"
 #include <iostream>
-#include "xmlhelper.h"
+#include "xml-helper.h"
 
 Glib::ustring SmallTile::d_tag = "smallmap";
 
@@ -45,18 +44,18 @@ SmallTile::SmallTile(XML_Helper* helper)
   d_color.set_rgba (0, 0, 0);
   d_second_color.set_rgba(0, 0, 0);
   d_third_color.set_rgba(0, 0, 0);
-  helper->getData(d_color, "color");
+  helper->get(d_color, "color");
 
   guint32 i;
-  helper->getData(i, "pattern");
+  helper->get(i, "pattern");
   SmallTile::Pattern pattern = static_cast<SmallTile::Pattern>(i);
   setPattern(pattern);
 
   if (pattern != SOLID)
     {
-      helper->getData(d_second_color, "2nd_color");
+      helper->get(d_second_color, "2nd_color");
       if (pattern != STIPPLED && pattern != SUNKEN)
-	helper->getData(d_third_color, "3rd_color");
+	helper->get(d_third_color, "3rd_color");
     }
 }
 
@@ -64,28 +63,28 @@ bool SmallTile::save(XML_Helper *helper) const
 {
   bool retval = true;
 
-  retval &= helper->openTag(d_tag);
-  retval &= helper->saveData("pattern", d_pattern);
+  retval &= helper->open_tag(d_tag);
+  retval &= helper->save("pattern", d_pattern);
   switch (d_pattern)
     {
       //patterns with a single color
     case SOLID:
-      retval &= helper->saveData("color", d_color);
+      retval &= helper->save("color", d_color);
       break;
       //patterns with two colors
     case STIPPLED: case SUNKEN:
-      retval &= helper->saveData("color", d_color);
-      retval &= helper->saveData("2nd_color", d_second_color);
+      retval &= helper->save("color", d_color);
+      retval &= helper->save("2nd_color", d_second_color);
       break;
       //patterns with three colors
     case RANDOMIZED: case TABLECLOTH: case DIAGONAL: case CROSSHATCH:
     case SUNKEN_STRIPED: case SUNKEN_RADIAL:
-      retval &= helper->saveData("color", d_color);
-      retval &= helper->saveData("2nd_color", d_second_color);
-      retval &= helper->saveData("3rd_color", d_third_color);
+      retval &= helper->save("color", d_color);
+      retval &= helper->save("2nd_color", d_second_color);
+      retval &= helper->save("3rd_color", d_third_color);
       break;
     }
-  retval &= helper->closeTag();
+  retval &= helper->close_tag();
 
   return retval;
 }
@@ -125,4 +124,3 @@ SmallTile* SmallTile::get_default_swamp()
   return new SmallTile(SmallTile::TABLECLOTH, Gdk::RGBA("#005CD0"),
                        Gdk::RGBA("#2CB8FC"), Gdk::RGBA("#50AC1C"));
 }
-// End of file

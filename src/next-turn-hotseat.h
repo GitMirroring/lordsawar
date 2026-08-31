@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
-// Copyright (C) 2007, 2008, 2014 Ben Asselstine
-// Copyright (C) 2007, 2008 Ole Laursen
+//  Copyright (C) 2003, 2004, 2005, 2006 Ulf Lorenz
+//  Copyright (C) 2007, 2008, 2014, 2026 Ben Asselstine
+//  Copyright (C) 2007, 2008 Ole Laursen
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,14 +14,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
-//  02110-1301, USA.
+//  Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
 
 #pragma once
 #ifndef NEXT_TURN_HOTSEAT_H
 #define NEXT_TURN_HOTSEAT_H
 
-#include "NextTurn.h"
+#include "next-turn.h"
 
 /**
    \brief The class to pass turns around the players during a hotseat game.
@@ -56,7 +55,7 @@ class NextTurnHotseat: public NextTurn
            if there is none active. For starting a game. This should be the
            lowest of all scenario-related functions in the stack.
          */
-        void start();
+        void start ();
 
         /**
            \brief go on to the next player
@@ -69,13 +68,13 @@ class NextTurnHotseat: public NextTurn
     private:
         /**
            \brief The function for all actions which are taken at the beginning
-           of a player's turn
+           of a player's turn.
           */
         void startTurn();
         
         /**
            \brief The function for all actions which are taken at the end of a
-           player's turn
+           player's turn.
          */
         void finishTurn();
 
@@ -84,6 +83,14 @@ class NextTurnHotseat: public NextTurn
            Game Turn.
          */
         void finishRound();
+        
+        /**
+           \brief Do the end of round stuff if we need to, and start the next
+           player's turn.
+         */
+        void end_of_round_after_player_died ();
+
+        void check_end_of_round ();
 };
 
-#endif //NEXT_TURN_HOTSEAT_H
+#endif

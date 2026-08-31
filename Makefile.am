@@ -1,13 +1,17 @@
-SUBDIRS = src dat po doc help
-MAINTAINERCLEANFILES = Makefile.in
-CLEANFILES = *~
+# Copyright (C) 2015, 2016, 2020, 2026 Ben Asselstine
+# This file is licensed under the terms of the GNU GPL version 3 or later.
 
-lordsawarconfigdir = $(LORDSAWAR_DATADIR)
-
-EXTRA_DIST = DEPENDENCIES README ${top_builddir}/po/lordsawar.pot \
-	     autogen.sh create-lw-file copy-gnome-icons.sh WINDOWS \
-	     make-windows-installer.sh
-
-DISTCLEANFILES = po/.intltool-merge-cache
-
+SUBDIRS=src po data
 ACLOCAL_AMFLAGS = -I m4
+EXTRA_DIST = build-aux/config.rpath create-lw-file # config.rpath needed by gettext
+
+update-pot:
+	cd po && \
+	cat POTFILES.in | sort > POTFILES.in.sorted && \
+        cp POTFILES.in.sorted POTFILES.in && \
+        rm POTFILES.in.sorted && \
+	touch $(PACKAGE).pot && \
+	rm $(PACKAGE).pot \
+	&& $(MAKE) $(PACKAGE).pot
+
+CLEANFILES = ./po/.intltool-merge-cache.lock
