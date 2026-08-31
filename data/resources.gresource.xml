@@ -74,9 +74,6 @@ This file is licensed under the terms of the GNU GPL version 3 or later.
     <file alias="setup-new-game.ui">../data/ui/setup-new-game.ui</file>
   </gresource>
   <gresource prefix="/com/gitlab/benhorst/lw">
-    <file alias="game-quit.ui">../data/ui/game-quit.ui</file>
-  </gresource>
-  <gresource prefix="/com/gitlab/benhorst/lw">
     <file alias="hero-brings-allies.ui">../data/ui/hero-brings-allies.ui</file>
   </gresource>
   <gresource prefix="/com/gitlab/benhorst/lw">
@@ -153,9 +150,6 @@ This file is licensed under the terms of the GNU GPL version 3 or later.
   </gresource>
   <gresource prefix="/com/gitlab/benhorst/lw">
     <file alias="ruin-report.ui">../data/ui/ruin-report.ui</file>
-  </gresource>
-  <gresource prefix="/com/gitlab/benhorst/lw">
-    <file alias="ruin-rewarded.ui">../data/ui/ruin-rewarded.ui</file>
   </gresource>
   <gresource prefix="/com/gitlab/benhorst/lw">
     <file alias="ruin-searched.ui">../data/ui/ruin-searched.ui</file>

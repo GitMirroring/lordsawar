@@ -444,7 +444,6 @@ resource_files=\
 ../data/ui/game-lobby.ui \
 ../data/ui/game-options.ui \
 ../data/ui/game-over.ui \
-../data/ui/game-quit.ui \
 ../data/ui/gold-stolen.ui \
 ../data/ui/hero-brings-allies.ui \
 ../data/ui/hero-gains-level.ui \
@@ -478,7 +477,6 @@ resource_files=\
 ../data/ui/ruinfight-finished.ui \
 ../data/ui/ruinfight-started.ui \
 ../data/ui/ruin-report.ui \
-../data/ui/ruin-rewarded.ui \
 ../data/ui/ruin-searched.ui \
 ../data/ui/sage.ui \
 ../data/ui/scenario-info.ui \
@@ -501,7 +499,6 @@ resource_files=\
 ../data/ui/use-item.ui \
 ../data/ui/worms-killed.ui  \
 ../data/ui/editor/armyset-info.ui \
-../data/ui/editor/armyset-selector-editor.ui \
 ../data/ui/editor/backpack-editor.ui \
 ../data/ui/editor/battle-calculator.ui \
 ../data/ui/editor/city-editor.ui \
@@ -528,18 +525,12 @@ resource_files=\
 ../data/ui/editor/shieldset-info.ui \
 ../data/ui/editor/signpost-editor.ui \
 ../data/ui/editor/stack-editor.ui \
-../data/ui/editor/stone-editor.ui \
 ../data/ui/editor/select-strategy.ui \
 ../data/ui/editor/switch-sets.ui \
 ../data/ui/editor/masked-image-editor.ui \
 ../data/ui/editor/temple-editor.ui \
 ../data/ui/editor/tile-preview.ui \
-../data/ui/editor/tileset-explosion-picture-editor.ui \
-../data/ui/editor/tileset-flag-editor.ui \
 ../data/ui/editor/tileset-info.ui \
-../data/ui/editor/tileset-move-bonus-image.ui \
-../data/ui/editor/tileset-selector-editor.ui \
-../data/ui/editor/tileset-smallmap-building-colors.ui \
 ../data/ui/editor/tilestyles.ui \
 ../data/ui/editor/validation.ui \
 ../data/ui/editor/tartan-preview.ui \

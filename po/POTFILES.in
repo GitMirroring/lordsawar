@@ -76,7 +76,6 @@ data/ui/game-loaded.ui
 data/ui/game-lobby.ui
 data/ui/game-options.ui
 data/ui/game-over.ui
-data/ui/game-quit.ui
 data/ui/hero-brings-allies.ui
 data/ui/hero-gains-level.ui
 data/ui/hero-levels.ui
@@ -104,7 +103,6 @@ data/ui/report.ui
 data/ui/ruinfight-finished.ui
 data/ui/ruinfight-started.ui
 data/ui/ruin-report.ui
-data/ui/ruin-rewarded.ui
 data/ui/ruin-searched.ui
 data/ui/sage.ui
 data/ui/search-temple.ui

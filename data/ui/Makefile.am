@@ -25,7 +25,6 @@ game-lobby.ui \
 game-options.ui \
 game-over.ui \
 setup-new-game.ui \
-game-quit.ui \
 gold-stolen.ui \
 hero-brings-allies.ui \
 hero-gains-level.ui \
@@ -56,7 +55,6 @@ report.ui \
 ruinfight-finished.ui \
 ruinfight-started.ui \
 ruin-report.ui \
-ruin-rewarded.ui \
 ruin-searched.ui \
 sage.ui \
 scenario-info.ui \
