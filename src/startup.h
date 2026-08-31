@@ -26,11 +26,11 @@
 #include "game-lobby-dialog.h"
 #include "network-game-download-window.h"
 
-//#include "startup-editor.h" //compiletimefix
-//#include "startup-tools.h" //compiletimefix
+#include "startup-editor.h" //compiletimefix
+#include "startup-tools.h" //compiletimefix
 
-//class Startup: public StartupEditor, public StartupTools //compiletimefix
-class Startup
+class Startup: public StartupEditor, public StartupTools //compiletimefix
+//class Startup
 {
 public:
 

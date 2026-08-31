@@ -1,13 +1,13 @@
 # Copyright (C) 2009, 2010, 2011, 2015, 2017, 2021, 2026 Ben Asselstine
 # This file is licensed under the terms of the GNU GPL version 3 or later.
 
-# startup-tools.cpp startup-tools.h 
-# startup-editor.cpp startup-editor.h 
 bin_PROGRAMS=lw
 lw_SOURCES = \
 	main.cpp \
 	lw.cpp lw.h \
 	startup.cpp startup.h \
+ 	startup-tools.cpp startup-tools.h \
+ 	startup-editor.cpp startup-editor.h \
 	\
 	action.cpp action.h \
 	advertised-game.cpp advertised-game.h \
