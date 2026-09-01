@@ -1,6 +1,6 @@
 upload to dl.sv.gnu.org.  cd /releases/lordsawar
 
- scp lordsawar-0.3.3.tar.gz benasselstine@dl.sv.nongnu.org:/releases/lordsawar/
+ scp lordsawar-0.4.0.tar.gz benasselstine@dl.sv.nongnu.org:/releases/lordsawar/
 
 
 when next to an enemy city, just attack it
@@ -15,12 +15,7 @@ often, we can take the same number of moves to get to a different tile beside a 
 
 ---
 
-gtk 4, use Gtk::Overlay with Gtk::Image to make our tiles.
-
-
-in the editor, images that we supply for graphics often need to have a width that is a multiple of the height.  we're only doing that for tilestylesets right now but the policy could be more widely applied to prevent garbage in garbage out.
-
-when we get a networked game and add the tilesets, etc to our personal collection, we need to ensure a unique name
+when we get a networked game and add the tilesets (et al) to our personal collection, we need to ensure a unique name
 
 3x3 forests in the editor can cause crazy tiles.  not being smoothed properly.
 
@@ -44,8 +39,6 @@ the military advisor is somewhat medieval sounding , might want to make it more 
   maybe move the text of it into the scenario editor.
   this business of making it more neutral is probably a bad idea because my users expect a medieval tone.
 
-switch from gstreamermm to gstreamer
-
 are ai players limited by gold? do they just keep making more armies despite having 0gp treasury?
 
 editor needs to be able to handle tilesets with two different water tiles and so on.  we can only select the first 'water'.
@@ -63,3 +56,61 @@ it would be nice if the lobby messages, join/depart, etc were xmlized
 it would be nice if the editor showed a progress bar when opening a map, or importing a saved game
 
 need recently opened files in file menus
+
+add a picture of the map to start scenario.
+  it gets saved in the scenario itself, not constantly drawn/rebuilt.
+  you can make it any image you want in the editor, but by default it's an image of the map.
+  one problem is that tiny and small maps have different dimensions
+
+rethink how to do a campaign.
+  one scenario, many maps.
+  a scenario data member named 'next' says 'foo' which means load map file named foo after we win this one.
+  we bring over heroes i guess and objects.
+
+do more warlords 2 conversion, it would be nice if we could pull in the terrain and armies
+so we don't ship those graphics but we could write an extractor so anyone could do it themselves.
+we can even supply a URL
+
+
+to change project from lw to lordsawar
+  configure.ac ac_init PACKAGE, gettext
+  configure.ac LORDSAWAR_DATADIR
+  defs.h APP_ID
+  defs.h RESOURCE
+  resources.gresource.xml prefix
+
+
+try again with doxygen
+
+mini map preview in tileset editor
+
+no window manager icon appears in the windows at a glance view
+
+making loading of set images (e.g. instantiating images) asynchronous
+
+bring stacktile to the editor, get rid of special grouping code to cope without it
+
+validation in item list editor, item bonus editor, item editor
+
+undoing text in an entry doesn't always work the best, for example in hero editor dialog, name
+
+maybe undo should remember where a scrolled window was
+
+move roads in maptile to its own thing, allow for more than one kind of road.
+  makes signs on roads and stones on roads easier.
+
+fortified (stack in defensive mode) needs to take a whole round to go into effect, and it needs to cost more.
+  so if you do it on turn 1, it becomes a tower on turn 3.
+
+enumerate the editor dialogs that do not operate on copies
+  item editor dialog
+  hero editor dialog
+  smallmap editor window
+  media dialog
+  fight order editor dialog
+    e.g. closing the dialog with a delete event leaves a changed state
+
+
+dragging off the edge of the editor map should scroll it, like if we're putting down terrain
+
+have a way for a connecting client to safeguard their seat so another player can't sit down.
