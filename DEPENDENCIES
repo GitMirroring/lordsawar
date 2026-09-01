@@ -29,7 +29,7 @@ Requirements:
 
 
 on Ubuntu you need the following packages:
-sudo apt-get install automake autoconf libtool m4 autotools-dev autopoint g++ libsigc++-2.0-dev libglibmm-2.4-dev libgtkmm-4.0-dev gettext git libgstreamer-1.0-dev intltool libarchive-dev libxslt1-dev libxml++5.0-dev
+sudo apt-get install automake autoconf libtool m4 autotools-dev autopoint g++ libsigc++-3.0-dev libglibmm-2.68-dev libgtkmm-4.0-dev gettext git gstreamer1.0-dev intltool libarchive-dev libxslt1-dev libxml++-5.0-dev make
 
 on Fedora you need the following packages:
 sudo dnf install gtkmm4.0-devel gettext gstreamer1-devel libxml++50-devel libsigc++30-devel intltool automake autoconf m4 git libarchive-devel libxslt-devel gcc-c++ libtool
