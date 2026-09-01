@@ -30,8 +30,8 @@
 #include <glibmm.h>
 #include <libintl.h>
 
-#define LW_APP_ID "com.gitlab.benhorst.lw"
-#define RESOURCE "/com/gitlab/benhorst/lw/"
+#define LW_APP_ID "org.nongnu.savannah.lordsawar"
+#define RESOURCE "/org/nongnu/savannah/lordsawar/"
 #define LORDSAWAR_SAVEGAME_VERSION "0.4.0"
 #define LORDSAWAR_TILESET_VERSION "0.4.0"
 #define LORDSAWAR_ARMYSET_VERSION "0.4.0"

@@ -3,43 +3,35 @@ a list of the dependencies.
 
 Requirements:
 
-- libgtkmm >= 3.0
+- libgtkmm >= 4.0
 
-- libglibmm >= 2.4
+- libglibmm >= 2.68
 
-- gstreamermm >= 1.0   (used for sound)
-        to be found at: https://git.gnome.org/browse/gstreamermm
+- gstreamer >= 1.0
 
-- libxml++ >= 2.6
-        an XML parser to be found at: http://libxmlplusplus.sourceforge.net
+- libxml++ >= 5.0
+        an XML parser.  Found at: http://libxmlplusplus.sourceforge.net
 
 - libarchive >= 0.28
-    a library for managing tar files.  Found at: http:/www.libarchive.org
+        a library for managing tar files.  Found at: http:/www.libarchive.org
 
-- libsigc++ >= 2.0
-	to be found at http://libsigc.sf.net
+- libsigc++ >= 3.0
+	Found at http://libsigc.sf.net
 
 - libxslt >= 1.1.20
-        to be found at http://xmlsoft.org/
+        Found at http://xmlsoft.org/
 
 - pkg-config
-    Should be distributed with the Linux distribution. Required for detecting
-    the libsigc++-package and -flags
+        Generally distributed with the Linux distribution.
 
 - GNU gettext 
-    Should be distributed with the Linux distribution.
+        Generally distributed with the Linux distribution.
 
 
 on Ubuntu you need the following packages:
-sudo apt-get install automake autoconf libtool m4 autotools-dev autopoint g++ libsigc++-2.0-dev libglibmm-2.4-dev libgtkmm-3.0-dev gettext git libgstreamermm-1.0-dev intltool libarchive-dev libxslt1-dev libxml++2.6-dev
-
-on Mageia you need the following packages:
-sudo urpmi automake autoconf libtool m4 gettext gcc-c++ libsigc++2.0-devel lib64glibmm2.4-devel lib64gtkmm3.0-devel git lib64gstreamermm1.0-devel intltool libarchive-devel libxslt-devel libxml++2.6-devel make libtool
-
-on Manjaro you need the following packages:
-sudo pacman -Syu gtkmm3 glibmm gstreamermm libxml++2.6 libarchive libsigc++ libxslt pkgconf gettext automake autoconf libtool git intltool gcc
+sudo apt-get install automake autoconf libtool m4 autotools-dev autopoint g++ libsigc++-2.0-dev libglibmm-2.4-dev libgtkmm-4.0-dev gettext git libgstreamer-1.0-dev intltool libarchive-dev libxslt1-dev libxml++5.0-dev
 
 on Fedora you need the following packages:
-sudo dnf install libglademm24-devel gtkmm30-devel gettext gstreamermm-devel libxml++-devel libsigc++20-devel intltool automake autoconf m4 git libarchive-devel glade3 libxslt-devel gcc-c++ libtool
+sudo dnf install gtkmm4.0-devel gettext gstreamer1-devel libxml++50-devel libsigc++30-devel intltool automake autoconf m4 git libarchive-devel libxslt-devel gcc-c++ libtool
 
 Please report changes in these package installation commands if they fail to work for you.  Use the bug-tracker at https://sv.nongnu.org/bugs/?group=lordsawar.
