@@ -17,6 +17,7 @@
 #include <gtkmm.h>
 #ifndef LW_DIALOG_BASE_H
 #define LW_DIALOG_BASE_H
+#include "ucompose.hpp"
 class LwDialogBase: public Gtk::Window
 {
 public:

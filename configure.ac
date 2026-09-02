@@ -2,7 +2,7 @@ dnl Copyright (C) 2015, 2016, 2020, 2026 Ben Asselstine
 dnl This file is licensed under the terms of the GNU GPL version 3 or later.
 
 AC_PREREQ([2.69])
-AC_INIT([lw], [0.4.0], [https://savannah.nongnu.org/bugs/?group=lordsawar], [lw])
+AC_INIT([lw], [0.4.0], [https://savannah.nongnu.org/bugs/?group=lordsawar], [lordsawar])
 AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -131,7 +131,7 @@ AC_CONFIG_FILES([
     data/icons/32x32/Makefile 
     data/icons/48x48/Makefile 
     data/icons/64x64/Makefile 
-    data/lordsawar.desktop.in
+    data/org.nongnu.lordsawar.desktop.in
     data/armies/Makefile 
     data/armies/default/Makefile 
     data/armies/duel/Makefile 

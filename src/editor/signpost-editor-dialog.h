@@ -21,6 +21,7 @@
 #define SIGNPOST_EDITOR_DIALOG_H
 #include "item.h"
 #include "signpost-undo-actions.h"
+#include "rnd.h"
 class SignpostEditorDialog: public LwDialogBase
 {
 public:

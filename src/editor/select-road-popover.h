@@ -19,6 +19,7 @@
 
 #ifndef SELECT_ROAD_POPOVER_H
 #define SELECT_ROAD_POPOVER_H
+#include "tar-file-image.h"
 class SelectRoadPopover : public Gtk::Popover
 {
 public:

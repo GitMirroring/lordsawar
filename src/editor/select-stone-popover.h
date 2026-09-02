@@ -19,6 +19,7 @@
 
 #ifndef SELECT_STONE_POPOVER_H
 #define SELECT_STONE_POPOVER_H
+#include "tar-file-image.h"
 class SelectStonePopover : public Gtk::Popover
 {
 public:

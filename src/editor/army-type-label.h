@@ -21,6 +21,7 @@
 #define ARMY_TYPE_LABEL_H
 #include <string>
 #include "select-army-dialog.h"
+#include "lw-dialog.h"
 
 /**
  * in the editors we often have buttons that choose army types.

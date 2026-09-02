@@ -21,6 +21,7 @@
 #ifndef LW_COLUMN_H
 #define LW_COLUMN_H
 
+#include "ucompose.hpp"
 template<typename RowType>
 class NumberCell : public Gtk::Box
 {

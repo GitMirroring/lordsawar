@@ -18,6 +18,11 @@
 #define STARTUP_EDITOR_H
 #include "lw.h"
 
+class Cityset;
+class Shieldset;
+class Tileset;
+class Armyset;
+
 class StartupEditor
 {
   friend class Startup;

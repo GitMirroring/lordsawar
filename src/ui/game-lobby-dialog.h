@@ -29,6 +29,8 @@
 #include "game-server.h"
 #include "game-client.h"
 #include "ruin-list.h"
+#include "image-helpers.h"
+#include "player-list.h"
 
 class ChatPersonRow: public Glib::Object
 {

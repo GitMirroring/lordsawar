@@ -21,6 +21,8 @@
 #include "file-filter.h"
 #include "image-undo-actions.h"
 #include "file-label.h"
+#include "lw-dialog.h"
+#include "image-helpers.h"
 class ImageEditorDialog: public LwDialogBase
 {
 public:
@@ -208,7 +210,8 @@ private:
 
     void open_file (std::string p)
       {
-        if (FileFilter ({".png", ".svg"}).has_invalid_ext (p))
+        FileFilter filter ({".png", ".svg"});
+        if (filter.has_invalid_ext (p))
           {
             Glib::ustring msg =
               _("Bad file extension, "

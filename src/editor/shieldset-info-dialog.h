@@ -20,6 +20,7 @@
 #define SHIELDSET_INFO_DIALOG_H
 #include "undo-mgr.h"
 #include "shieldset-info-undo-actions.h"
+#include "shield-set-list.h"
 
 class ShieldSetInfoDialog: public LwDialogBase
 {

@@ -28,6 +28,8 @@
 #include "army-set-list.h"
 #include "player-list.h"
 #include "shield.h"
+#include "army-info-tip.h"
+#include "lw-combo.h"
 class SelectArmyDialog: public LwDialogBase
 {
 public:

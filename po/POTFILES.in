@@ -3,7 +3,7 @@ data/buildings/default/default.lwc.in
 data/buildings/dol/dol.lwc.in
 data/citynames.xml.in
 data/heronames.xml.in
-data/lordsawar.desktop.in.in
+data/org.nongnu.lordsawar.desktop.in.in
 data/maps/dol/dol.map.in
 data/ruinnames.xml.in
 data/shields/default/default.lws.in
@@ -184,6 +184,7 @@ src/ui/destination-dialog.h
 src/ui/game-button-box.h
 src/ui/game-over-dialog.h
 src/ui/game-window.h
+src/ui/game-window.cpp
 src/ui/hero-gains-level-dialog.h
 src/ui/hero-offer-dialog.h
 src/ui/new-random-map-dialog.h
@@ -259,6 +260,7 @@ src/ui/quest-report-dialog.h
 src/ui/diplomacy-dialog.h
 src/ui/preferences-dialog.h
 src/editor/cityset-window.h
+src/editor/cityset-window.cpp
 src/editor/cityset-info-dialog.h
 src/editor/image-editor-dialog.h
 src/editor/file-label.h
@@ -266,16 +268,20 @@ src/editor/file-filter.h
 src/ui/lw-dialog.h
 src/editor/shieldset-info-dialog.h
 src/editor/shieldset-window.h
+src/editor/shieldset-window.cpp
 src/editor/masked-image-editor-dialog.h
 src/editor/armyset-info-dialog.h
 src/editor/armyset-window.h
+src/editor/armyset-window.cpp
 src/editor/armies-preview-dialog.h
 src/ui/triumphs-dialog.h
 src/editor/tileset-info-dialog.h
 src/editor/tileset-window.h
+src/editor/tileset-window.cpp
 src/editor/tilestyles-dialog.h
 src/editor/tile-preview-dialog.h
 src/editor/scenario-builder-window.h
+src/editor/scenario-builder-window.cpp
 src/editor/editor-splash-window.h
 src/editor/editor-load-window.h
 src/editor/map-info-dialog.h
@@ -317,3 +323,5 @@ src/ui/scenario-info-dialog.h
 src/game-client.cpp
 src/ui/network-game-download-window.h
 src/ui/new-net-game-dialog.h
+src/startup-editor.cpp
+src/startup-tools.cpp

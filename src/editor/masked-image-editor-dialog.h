@@ -21,6 +21,9 @@
 #include "file-filter.h"
 #include "masked-image-undo-actions.h"
 #include "file-label.h"
+#include "lw-combo.h"
+#include "shield-set-list.h"
+#include "lw-dialog.h"
 
 class MaskedImageEditorDialog: public LwDialogBase
 {
@@ -545,7 +548,8 @@ private:
 
     void open_file (std::string p)
       {
-        if (FileFilter ({".png", ".svg"}).has_invalid_ext (p))
+        FileFilter filter ({".png", ".svg"});
+        if (filter.has_invalid_ext (p))
           {
             Glib::ustring msg =
               _("Bad file extension, "

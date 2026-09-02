@@ -15,25 +15,25 @@ lordsawardata_DATA = \
     ruinnames.xml \
     signposts.xml
 
-DISTCLEANFILES = citynames.xml heronames.xml templenames.xml ruinnames.xml signposts.xml lordsawar.desktop lordsawar.desktop.in
+DISTCLEANFILES = citynames.xml heronames.xml templenames.xml ruinnames.xml signposts.xml org.nongnu.lordsawar.desktop org.nongnu.lordsawar.desktop.in
 
-CLEANFILES=desktop-foo desktop-bar lordsawar.o
+CLEANFILES=desktop-foo desktop-bar
 
-lordsawar.desktop: lordsawar.desktop.in
-		sed -e 's|.[{]prefix[}]|${prefix}|' lordsawar.desktop.in > desktop-foo \
+org.nongnu.lordsawar.desktop: org.nongnu.lordsawar.desktop.in
+		sed -e 's|.[{]prefix[}]|${prefix}|' org.nongnu.lordsawar.desktop.in > desktop-foo \
 		&& $(INTLTOOL_MERGE) $(top_srcdir)/po desktop-foo $(@) -d -u -c $(top_builddir)/po/.intltool-merge-cache \
 		&& rm -r desktop-foo
 
 lwdesktopdir= $(datadir)/applications
-lwdesktop_DATA= lordsawar.desktop
+lwdesktop_DATA= org.nongnu.lordsawar.desktop
 
 appdatadir=$(datadir)/appdata
-appdata_DATA=lordsawar-appdata.xml
+appdata_DATA=org.nongnu.lordsawar-appdata.xml
 
 EXTRA_DIST = \
     README \
-    lordsawar-appdata.xml \
-    lordsawar.desktop.in.in \
+    org.nongnu.lordsawar-appdata.xml \
+    org.nongnu.lordsawar.desktop.in.in \
     resources.gresource.xml \
     citynames.xml.in \
     heronames.xml.in \

@@ -19,6 +19,7 @@
 #ifndef ARMIES_PREVIEW_DIALOG_H
 #define ARMIES_PREVIEW_DIALOG_H
 #include "image-cache.h"
+#include "shield-set.h"
 class ArmiesPreviewDialog: public LwDialogBase
 {
 public:

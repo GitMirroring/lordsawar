@@ -10,8 +10,8 @@ int
 main (int argc, char *argv[])
 {
   setlocale (LC_ALL, "");
-  bindtextdomain ("lw", "/usr/share/locale");
-  textdomain ("lw");
+  bindtextdomain ("lordsawar", "/usr/share/locale");
+  textdomain ("lordsawar");
 
   auto lw = Lw::create ();
   lw->run (argc, argv);

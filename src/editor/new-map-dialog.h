@@ -25,6 +25,7 @@
 #include "shield-set-list.h"
 #include "tile-set-list.h"
 #include "new-map-undo-actions.h"
+#include "create-scenario-randomize.h"
 
 class NewMapDialog: public LwDialogBase
 {

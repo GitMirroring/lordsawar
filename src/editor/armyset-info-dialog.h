@@ -20,6 +20,7 @@
 #define ARMYSET_INFO_DIALOG_H
 #include "undo-mgr.h"
 #include "armyset-info-undo-actions.h"
+#include "army-set-list.h"
 
 class ArmySetInfoDialog: public LwDialogBase
 {

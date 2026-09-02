@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "input-events.h"
+#include "image-cache.h"
 
 struct tile_model
 {

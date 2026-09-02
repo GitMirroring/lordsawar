@@ -48,6 +48,14 @@
 #include "lobby.h"
 #include "network-game-download-window.h"
 #include "editor-load-window.h"
+#include "fight-window.h"
+#include "temple-list.h"
+#include "city-list.h"
+
+#include "game-window.h"
+#include "game-lobby-dialog.h"
+#include "splash-window.h"
+#include "network-game-download-window.h"
 
 Startup* Startup::s_instance = NULL;
 
@@ -758,7 +766,7 @@ void Startup::setup_splash_window ()
     ([this] ()
      {
        m_splash_window->hide ();
-       //editor (""); compiletimefix
+       editor ("");
      });
 
   m_splash_window->signal_load_game ().connect

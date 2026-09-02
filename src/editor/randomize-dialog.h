@@ -18,6 +18,7 @@
 #include "lw-dialog-base.h"
 #ifndef RANDOMIZE_DIALOG_H
 #define RANDOMIZE_DIALOG_H
+#include "rnd.h"
 class RandomizeDialog: public LwDialogBase
 {
 public:

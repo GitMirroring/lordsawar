@@ -235,7 +235,7 @@ lw_SOURCES = \
 	ui/game-loaded-dialog.h \
 	ui/game-options-dialog.h \
 	ui/game-over-dialog.h \
-	ui/game-window.h \
+	ui/game-window.cpp ui/game-window.h \
 	ui/gold-stolen-dialog.h \
 	ui/hero-brings-allies-dialog.h \
 	ui/hero-dialog.h \
@@ -351,23 +351,23 @@ lw_SOURCES = \
 	editor/army-type-label.h \
 	editor/scenario.h \
 	\
-	editor/cityset-window.h \
+	editor/cityset-window.cpp editor/cityset-window.h \
 	editor/image-editor-dialog.h \
 	editor/masked-image-editor-dialog.h \
 	editor/cityset-info-dialog.h \
 	editor/shieldset-info-dialog.h \
-	editor/shieldset-window.h \
+	editor/shieldset-window.cpp editor/shieldset-window.h \
 	editor/preview-tartan-progress-bar.h \
 	editor/tartan-preview-dialog.h \
-	editor/armyset-window.h \
+	editor/armyset-window.cpp editor/armyset-window.h \
 	editor/armyset-info-dialog.h \
 	editor/armies-preview-dialog.h \
-	editor/tileset-window.h \
+	editor/tileset-window.cpp editor/tileset-window.h \
 	editor/tileset-info-dialog.h \
 	editor/tilestyles-dialog.h \
 	editor/tile-preview-dialog.h \
 	editor/tile-preview-scene.h \
-	editor/scenario-builder-window.h \
+	editor/scenario-builder-window.cpp editor/scenario-builder-window.h \
 	editor/editor-splash-window.h \
 	editor/editor-load-window.h \
 	editor/map-info-dialog.h \

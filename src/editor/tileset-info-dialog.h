@@ -20,6 +20,7 @@
 #define TILESET_INFO_DIALOG_H
 #include "undo-mgr.h"
 #include "tileset-info-undo-actions.h"
+#include "tile-set-list.h"
 
 class TileSetInfoDialog: public LwDialogBase
 {

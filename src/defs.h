@@ -30,8 +30,8 @@
 #include <glibmm.h>
 #include <libintl.h>
 
-#define LW_APP_ID "org.nongnu.savannah.lordsawar"
-#define RESOURCE "/org/nongnu/savannah/lordsawar/"
+#define LW_APP_ID "org.nongnu.lordsawar"
+#define RESOURCE "/org/nongnu/lordsawar/"
 #define LORDSAWAR_SAVEGAME_VERSION "0.4.0"
 #define LORDSAWAR_TILESET_VERSION "0.4.0"
 #define LORDSAWAR_ARMYSET_VERSION "0.4.0"

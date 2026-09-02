@@ -1,5 +1,5 @@
 <application>
-  <id type="desktop">lordsawar.desktop</id>
+  <id type="desktop">org.nongnu.lordsawar.desktop</id>
   <metadata_license>GFDL-1.3</metadata_license>
   <summary>Turn-based war game similar to Warlords II</summary>
   <description>

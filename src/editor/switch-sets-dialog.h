@@ -23,6 +23,7 @@
 #include "shield-set-list.h"
 #include "tile-set-list.h"
 #include "switch-sets-undo-actions.h"
+#include "lw-combo.h"
 
 class SwitchSetsDialog: public LwDialogBase
 {

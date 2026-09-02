@@ -59,26 +59,26 @@ void Lw::on_activate ()
     Lw::exit_code =
       start->game_host_client (m_ghc_profile, m_ghc_host, m_ghc_file,
                                m_ghc_unhost, m_ghc_show_list, m_ghc_reload,
-                               m_ghc_terminate, m_ghc_port); //compiletimefix
+                               m_ghc_terminate, m_ghc_port);
   else if (m_start_game_list_client)
     Lw::exit_code =
       start->game_list_client (m_glc_profile, m_glc_host, m_glc_advertise,
                                m_glc_show_list, m_glc_reload, m_glc_terminate,
-                               m_glc_port, m_glc_unadvertise, m_glc_remove_all); //compiletimefix
+                               m_glc_port, m_glc_unadvertise, m_glc_remove_all);
   else if (m_start_game_list_server)
     Lw::exit_code =
-      start->game_list_server (m_gls_port, m_gls_foreground); //compiletimefix
+      start->game_list_server (m_gls_port, m_gls_foreground);
   else if (m_start_game_host_server)
     Lw::exit_code =
       start->game_host_server (m_ghs_hostname, m_ghs_port, m_ghs_foreground,
-                               m_ghs_members); //compiletimefix
+                               m_ghs_members);
   else if (m_start_upgrade_tool)
     Lw::exit_code =
       start->upgrade_tool (m_upgrade_identify_file, m_upgrade_rewrite,
-                           m_upgrade_filename); //compiletimefix
+                           m_upgrade_filename);
   else if (m_start_import_tool)
     Lw::exit_code =
-      start->import_tool (m_import_armyset_filename, m_import_filename); //compiletimefix
+      start->import_tool (m_import_armyset_filename, m_import_filename);
   else if (m_start_test_scenario)
     start->test_scenario ();
   else if (m_start_net_test_scenario)
@@ -88,15 +88,15 @@ void Lw::on_activate ()
   else if (m_start_headless_server)
     start->server (m_load_filename);
   else if (m_start_editor)
-    start->editor (m_load_filename); //compiletimefix
+    start->editor (m_load_filename);
   else if (m_start_cityset_editor)
-    start->cityset_editor (m_load_filename); //compiletimefix
+    start->cityset_editor (m_load_filename);
   else if (m_start_shieldset_editor)
-    start->shieldset_editor (m_load_filename); //compiletimefix
+    start->shieldset_editor (m_load_filename);
   else if (m_start_armyset_editor)
-    start->armyset_editor (m_shieldset_theme, m_load_filename); //compiletimefix
+    start->armyset_editor (m_shieldset_theme, m_load_filename);
   else if (m_start_tileset_editor)
-    start->tileset_editor (m_shieldset_theme, m_load_filename); //compiletimefix
+    start->tileset_editor (m_shieldset_theme, m_load_filename);
   else if (File::nameEndsWith (m_load_filename, MAP_EXT))
     start->load_map (m_load_filename);
   else if (File::nameEndsWith (m_load_filename, SAVE_EXT))

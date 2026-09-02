@@ -26,6 +26,8 @@
 #include "defs.h"
 #include "undo-action.h"
 #include "undo-mgr.h"
+#include "tile-set.h"
+#include "file.h"
 
 class Tileset;
 

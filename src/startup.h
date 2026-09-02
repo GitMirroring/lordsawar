@@ -19,18 +19,17 @@
 #ifndef STARTUP_H
 #define STARTUP_H
 #include "lw.h"
-#include "game-window.h"
-#include "splash-window.h"
 #include "game-parameters.h"
 #include "game-scenario.h"
-#include "game-lobby-dialog.h"
-#include "network-game-download-window.h"
 
-#include "startup-editor.h" //compiletimefix
-#include "startup-tools.h" //compiletimefix
+class SplashWindow;
+class GameWindow;
+class GameLobbyDialog;
+class NetworkGameDownloadWindow;
+#include "startup-editor.h"
+#include "startup-tools.h"
 
-class Startup: public StartupEditor, public StartupTools //compiletimefix
-//class Startup
+class Startup: public StartupEditor, public StartupTools
 {
 public:
 

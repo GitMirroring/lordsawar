@@ -22,6 +22,10 @@
 #include "game-host-client-tool.h"
 #include "game-list-client-tool.h"
 #include "import.h"
+#include "army-set.h"
+#include "tile-set.h"
+#include "shield-set.h"
+#include "city-set.h"
 
 int StartupTools::game_host_server (std::string hostname, int port,
                                     bool foreground,

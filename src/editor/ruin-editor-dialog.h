@@ -21,6 +21,7 @@
 #ifndef RUIN_EDITOR_DIALOG_H
 #define RUIN_EDITOR_DIALOG_H
 #include "item.h"
+#include "keeper.h"
 #include "ruin-undo-actions.h"
 #include "army-type-label.h"
 #include "keeper-editor-dialog.h"

@@ -26,7 +26,7 @@
 #include "defs.h"
 #include "undo-action.h"
 #include "undo-mgr.h"
-class Armyset;
+#include "army-set.h"
 
 //! A record of an event in the armyset editor
 /**

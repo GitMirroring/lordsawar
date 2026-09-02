@@ -24,6 +24,7 @@
 #include "undo-action.h"
 #include "ruin.h"
 #include "undo-mgr.h"
+#include "keeper.h"
 
 //! A record of an event in the keeper editor
 /** 

@@ -23,6 +23,7 @@
 
 // shows a tooltip like window
 
+#include "map-tip-position.h"
 class InfoTip : public Gtk::Popover
 {
 public:

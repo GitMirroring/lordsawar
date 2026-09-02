@@ -20,6 +20,7 @@
 #define CITYSET_INFO_DIALOG_H
 #include "undo-mgr.h"
 #include "cityset-info-undo-actions.h"
+#include "city-set-list.h"
 
 class CitySetInfoDialog: public LwDialogBase
 {

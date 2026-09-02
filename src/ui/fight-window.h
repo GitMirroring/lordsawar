@@ -25,6 +25,8 @@
 #include "army.h"
 #include "game-map.h"
 #include "fight.h"
+#include "hero-gains-level-dialog.h"
+#include "army-awarded-medal-dialog.h"
 class FightWindow : public Gtk::Window
 {
 public:

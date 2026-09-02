@@ -21,6 +21,9 @@
 #include "media-undo-actions.h"
 #include "file-label.h"
 #include "tar-file-sound.h"
+#include "lw-dialog.h"
+#include "image-editor-dialog.h"
+#include "masked-image-editor-dialog.h"
 class MediaDialog: public LwDialogBase
 {
 public:

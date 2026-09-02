@@ -74,6 +74,7 @@
 #include "game-server.h"
 #include "map-widget.h"
 #include "move-result.h"
+#include "quest-manager.h"
 
 Game *Game::current_game = 0;
 
