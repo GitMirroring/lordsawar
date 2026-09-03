@@ -20,8 +20,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this file; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
- * 02110-1301, USA.
+ * Foundation, Inc., 31 Milk Street #960789, Boston, MA 02196, USA.
  */
 
 //
@@ -113,7 +112,7 @@ namespace UStringPrivate
     case '6':
     case '7':
       return true;
-    
+
     default:
       return false;
     }
@@ -125,7 +124,7 @@ namespace UStringPrivate
     os << obj;
 
     std::wstring s = os.str();
-    
+
     return Glib::convert(std::string(reinterpret_cast<const char *>(s.data()),
 				     s.size() * sizeof(wchar_t)),
 			 "UTF-8", "WCHAR_T");
@@ -138,41 +137,41 @@ namespace UStringPrivate
   {
     return obj;
   }
-  
+
   template <>
   inline std::string
   Composition::stringify<Glib::ustring>(Glib::ustring obj)
   {
     return obj;
   }
-  
+
   template <>
   inline std::string
   Composition::stringify<const char *>(const char *obj)
   {
     return obj;
   }
-  
+
   // implementation of class Composition
   template <typename T>
   inline Composition &Composition::arg(const T &obj)
   {
     Glib::ustring rep = stringify(obj);
-    
+
     if (!rep.empty()) {		// manipulators don't produce output
       for (specification_map::const_iterator i = specs.lower_bound(arg_no),
 	     end = specs.upper_bound(arg_no); i != end; ++i) {
 	output_list::iterator pos = i->second;
 	++pos;
-      
+
 	output.insert(pos, rep);
       }
-    
+
       os.str(std::wstring());
       //os.clear();
       ++arg_no;
     }
-  
+
     return *this;
   }
 
@@ -183,7 +182,7 @@ namespace UStringPrivate
     //os.imbue(std::locale("")); // use the user's locale for the stream
 //#endif
     std::string::size_type b = 0, i = 0;
-  
+
     // fill in output with the strings between the %1 %2 %3 etc. and
     // fill in specs with the positions
     while (i < fmt.length()) {
@@ -221,7 +220,7 @@ namespace UStringPrivate
       else
 	++i;
     }
-  
+
     if (i - b > 0)		// add the rest of the string
       output.push_back(fmt.substr(b, i - b));
   }
@@ -230,39 +229,56 @@ namespace UStringPrivate
   {
     // assemble string
     std::string s;
-  
+
     for (output_list::const_iterator i = output.begin(), end = output.end();
 	 i != end; ++i)
       s += *i;
-  
+
     return s;
   }
 }
 
 
-namespace String 
+namespace String
 {
+  template<typename T>
+  auto compose_value(T&& value)
+  {
+    using U = std::decay_t<T>;
+
+    if constexpr (std::is_arithmetic_v<U>)
+    {
+        return Glib::ustring(std::to_string(value));
+    }
+    else
+    {
+        return std::forward<T>(value);
+    }
+  }
   // a series of functions which accept a format string on the form "text %1
   // more %2 less %3" and a number of templated parameters and spits out the
   // composited string
   template <typename T1>
   inline Glib::ustring ucompose(const Glib::ustring &fmt, const T1 &o1)
   {
-    return Glib::ustring::compose(fmt, o1);
+    return Glib::ustring::compose(fmt, compose_value (o1));
   }
 
   template <typename T1, typename T2>
   inline Glib::ustring ucompose(const Glib::ustring &fmt,
 				const T1 &o1, const T2 &o2)
   {
-    return Glib::ustring::compose(fmt, o1, o2);
+    return Glib::ustring::compose(fmt, compose_value (o1), compose_value (o2));
   }
 
   template <typename T1, typename T2, typename T3>
   inline Glib::ustring ucompose(const Glib::ustring &fmt,
 				const T1 &o1, const T2 &o2, const T3 &o3)
   {
-    return Glib::ustring::compose(fmt, o1, o2, o3);
+    return Glib::ustring::compose(fmt,
+                                  compose_value (o1),
+                                  compose_value (o2),
+                                  compose_value (o3));
   }
 
   template <typename T1, typename T2, typename T3, typename T4>
@@ -270,7 +286,11 @@ namespace String
 				const T1 &o1, const T2 &o2, const T3 &o3,
 				const T4 &o4)
   {
-    return Glib::ustring::compose(fmt, o1, o2, o3, o4);
+    return Glib::ustring::compose(fmt,
+                                  compose_value (o1),
+                                  compose_value (o2),
+                                  compose_value (o3),
+                                  compose_value (o4));
   }
 
   template <typename T1, typename T2, typename T3, typename T4, typename T5>
@@ -278,7 +298,12 @@ namespace String
 				const T1 &o1, const T2 &o2, const T3 &o3,
 				const T4 &o4, const T5 &o5)
   {
-    return Glib::ustring::compose(fmt, o1, o2, o3, o4, o5);
+    return Glib::ustring::compose(fmt,
+                                  compose_value (o1),
+                                  compose_value (o2),
+                                  compose_value (o3),
+                                  compose_value (o4),
+                                  compose_value (o5));
   }
 
   template <typename T1, typename T2, typename T3, typename T4, typename T5,
@@ -287,7 +312,13 @@ namespace String
 				const T1 &o1, const T2 &o2, const T3 &o3,
 				const T4 &o4, const T5 &o5, const T6 &o6)
   {
-    return Glib::ustring::compose(fmt, o1, o2, o3, o4, o5, o6);
+    return Glib::ustring::compose(fmt,
+                                  compose_value (o1),
+                                  compose_value (o2),
+                                  compose_value (o3),
+                                  compose_value (o4),
+                                  compose_value (o5),
+                                  compose_value (o6));
   }
 
   template <typename T1, typename T2, typename T3, typename T4, typename T5,
@@ -297,10 +328,17 @@ namespace String
 				const T4 &o4, const T5 &o5, const T6 &o6,
 				const T7 &o7)
   {
-    return Glib::ustring::compose(fmt, o1, o2, o3, o4, o5, o6, o7);
+    return Glib::ustring::compose(fmt,
+                                  compose_value (o1),
+                                  compose_value (o2),
+                                  compose_value (o3),
+                                  compose_value (o4),
+                                  compose_value (o5),
+                                  compose_value (o6),
+                                  compose_value (o7));
   }
 
-  inline Glib::ustring utrim(Glib::ustring str) 
+  inline Glib::ustring utrim(Glib::ustring str)
   {
     Glib::ustring white = " \n\t\r\v\a\b\f";
 
@@ -361,4 +399,4 @@ namespace String
     }
 }
 
-#endif // STRING_UCOMPOSE_HPP
+#endif
