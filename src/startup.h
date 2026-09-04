@@ -84,9 +84,10 @@ private:
     void setup_splash_window ();
 
     void hotseat_game (GameScenario *g);
+    void network_game (GameScenario *gs, Profile *p, Gtk::Window *parent, GameParameters g);
 
     void setup_scenario (std::string map_filename, GameScenario::PlayMode mode,
-                         Gtk::Window *parent);
+                         Profile *profile, Gtk::Window *parent);
 
     void setup_hotseat_game (Gtk::ApplicationWindow *parent);
 
@@ -100,5 +101,6 @@ private:
     void hide_download_window ();
 
     void start_game_lobby_for_client (Gtk::ApplicationWindow *parent, GameScenario *game_scenario);
+    void start_game_lobby_for_server (Gtk::Window *parent, GameScenario *game_scenario);
 };
 #endif

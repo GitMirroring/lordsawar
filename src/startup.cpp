@@ -211,7 +211,7 @@ void Startup::setup_hotseat_game (Gtk::ApplicationWindow *parent)
     ([this, d] (ScenarioDetails *scen)
      {
        if (scen)
-         setup_scenario (scen->get_filename (), GameScenario::HOTSEAT, d);
+         setup_scenario (scen->get_filename (), GameScenario::HOTSEAT, NULL, d);
        else
          {
            //if scenario is null it means we want a random map
@@ -220,7 +220,7 @@ void Startup::setup_hotseat_game (Gtk::ApplicationWindow *parent)
            dd->signal_scenario_generated ().connect
              ([this, d, dd] (std::string filename, GameScenario::PlayMode m)
               {
-                setup_scenario (filename, m, d);
+                setup_scenario (filename, m, NULL ,d);
               });
            dd->signal_response ().connect
              ([d] (Gtk::ResponseType resp)
@@ -460,14 +460,17 @@ void Startup::stress_test (bool view_stress_test, GameParameters::Player::Type t
   Lw::loop->run ();
 }
 
-void Startup::setup_scenario (std::string map_filename, GameScenario::PlayMode mode, Gtk::Window *parent)
+void Startup::setup_scenario (std::string map_filename, GameScenario::PlayMode mode, Profile *p, Gtk::Window *parent)
 {
   auto d = LwDialog::build<SetupNewGameDialog>(parent);
   d->setup (map_filename, mode);
   d->signal_game_setup ().connect
-    ([this, d] (GameScenario *g)
+    ([this, d, mode, parent, p] (GameScenario *game_scenario, GameParameters g)
      {
-       hotseat_game (g);
+       if (mode == GameScenario::HOTSEAT)
+         hotseat_game (game_scenario);
+       else
+         network_game (game_scenario, p, parent, g);
      });
   d->signal_response ().connect
     ([d] (Gtk::ResponseType resp)
@@ -588,7 +591,7 @@ void Startup::load_saved_game (std::string load_filename)
 void Startup::load_map (std::string load_filename)
 {
   splash ();
-  setup_scenario (load_filename, GameScenario::HOTSEAT, m_splash_window);
+  setup_scenario (load_filename, GameScenario::HOTSEAT, NULL, m_splash_window);
 }
 
 void Startup::client (Gtk::ApplicationWindow *parent, Glib::ustring host,
@@ -950,6 +953,8 @@ void Startup::start_game_lobby_for_client (Gtk::ApplicationWindow *parent,
                m_game_lobby_dialog->hide ();
                game_client->disconnect ();
                GameClient::deleteInstance ();
+               delete m_game_window;
+               m_game_window = NULL;
                break;
              }
          }
@@ -958,4 +963,115 @@ void Startup::start_game_lobby_for_client (Gtk::ApplicationWindow *parent,
 
 void Startup::server (Gtk::ApplicationWindow *parent, Profile *profile)
 {
+  auto d = LwDialog::build<ChooseScenarioDialog> (parent);
+  d->setup ();
+  d->signal_scenario_selected ().connect
+    ([this, d, profile] (ScenarioDetails *scen)
+     {
+       if (scen)
+         setup_scenario (scen->get_filename (), GameScenario::NETWORKED,
+                         profile, d);
+       else
+         {
+           //if scenario is null it means we want a random map
+           auto dd = LwDialog::build<NewRandomMapDialog> (d);
+           dd->setup ();
+           dd->signal_scenario_generated ().connect
+             ([this, d, dd, profile] (std::string filename,
+                                      GameScenario::PlayMode)
+              {
+                setup_scenario (filename, GameScenario::NETWORKED, profile, d);
+              });
+           dd->signal_response ().connect
+             ([d] (Gtk::ResponseType resp)
+              {
+                if (resp != Gtk::ResponseType::ACCEPT)
+                  delete d;
+                // otherwise this dialog gets deleted when the game window is
+                // coming up
+              });
+         }
+     });
+  d->signal_response ().connect
+    ([d] (Gtk::ResponseType resp)
+     {
+       if (resp != Gtk::ResponseType::ACCEPT)
+         delete d;
+       //otherwise we delete when the game window is coming up
+     });
+}
+
+//we're bringing up a network game that we're hosting but also playing
+void Startup::network_game (GameScenario *game_scenario, Profile *profile, Gtk::Window *parent, GameParameters g)
+{
+  parent->hide ();
+  int port = Lw::app->m_port ? Lw::app->m_port : LORDSAWAR_PORT;
+  serve (game_scenario, g, port, profile, false);
+
+  start_game_lobby_for_server (parent, game_scenario);
+}
+
+void Startup::start_game_lobby_for_server (Gtk::Window *parent,
+                                           GameScenario *game_scenario)
+{
+  auto game_server = GameServer::instance ();
+
+  int city_count = Citylist::instance ()->size ();
+  int ruin_count = Ruinlist::instance ()->countUnhiddenRuins ();
+  int temple_count = Templelist::instance ()->size ();
+  Glib::ustring city = ngettext ("city", "cities", city_count);
+  Glib::ustring ruin = ngettext ("ruin", "ruins", ruin_count);
+  Glib::ustring temple = ngettext ("temple", "temples", temple_count);
+  Lobby::instance ()->add_chat_message
+    ("",
+     String::ucompose
+     (_("The scenario has %1 %2, %3 %4 and %5 %6."),
+      city_count, city, ruin_count, ruin, temple_count, temple));
+
+  NextTurnNetworked *next_turn = new NextTurnNetworked ();
+  // game_client signal_start_player_turn -> next turn start_player
+  // happens in game-window
+
+  setup_game_window (false);
+
+  m_game_window->new_network_game (game_scenario, next_turn);
+
+  m_game_window->signal_show_lobby ().connect
+    ([this] ()
+     {
+       m_game_lobby_dialog->show ();
+     });
+
+  GameServer::instance ()->signal_game_begin ().connect
+    ([this] ()
+     {
+       m_game_lobby_dialog->set_transient_for (*m_game_window);
+       m_game_window->show ();
+       m_game_lobby_dialog->set_modal (false);
+       m_game_lobby_dialog->hide ();
+       m_game_lobby_dialog->start_game ();
+       m_signal_game_window_coming_up.emit ();
+     });
+
+  m_game_lobby_dialog = LwDialog::build<GameLobbyDialog> (parent);
+  m_game_lobby_dialog->setup (game_scenario, true);
+  m_game_lobby_dialog->present ();
+  m_game_lobby_dialog->signal_response ().connect
+    ([this, game_scenario, game_server](Gtk::ResponseType resp)
+     {
+       if (game_scenario->getRound () == 0)
+         {
+          switch (resp)
+             {
+             case Gtk::ResponseType::CANCEL: // either cancel or close
+             case Gtk::ResponseType::DELETE_EVENT:
+             default:
+               m_game_lobby_dialog->hide ();
+               GameServer::deleteInstance ();
+               delete m_game_window;
+               m_game_window = NULL;
+               break;
+             }
+         }
+     });
 }

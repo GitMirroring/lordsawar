@@ -73,7 +73,10 @@ MapWidget::MapWidget ()
     Glib::signal_timeout ().connect
     ([this] () -> bool
      {
-       if (Playerlist::getActiveplayer ()->getActivestack ())
+       auto p = Playerlist::getActiveplayer ();
+       if (!p)
+         return false;
+       if (p->getActivestack ())
          {
            m_current_large_selector_image++;
            if (m_current_large_selector_image >= m_num_large_selector_images)

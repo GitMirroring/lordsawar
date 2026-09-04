@@ -47,8 +47,9 @@ public:
         set_default_widget (*m_start_game_button);
         m_edit_options_button = load <Gtk::Button> ("edit_options_button");
         m_characters_button = load <Gtk::Button> ("characters_button");
-        m_game_name_label = load <Gtk::Label> ("game_name_label");
-        m_game_name_entry = load <Gtk::Entry> ("game_name_entry");
+        m_scenario_name_entry = load <Gtk::Entry> ("scenario_name_entry");
+        m_scenario_description_entry = load <Gtk::Entry> ("scenario_description_entry");
+        m_network_game_box = load <Gtk::Box> ("network_game_box");
         m_difficulty_label = load <Gtk::Label> ("difficulty_label");
         auto combobox = load <Gtk::ComboBox> ("difficulty_combobox");
         m_difficulty_combobox = LwCombo::replace (combobox);
@@ -72,6 +73,10 @@ public:
         m_load_map_parameters =
           GameScenario::loadGameParameters (m_filename, broken);
 
+        m_scenario_name_entry->set_text (m_load_map_parameters.name);
+        m_scenario_description_entry->set_text (m_load_map_parameters.comment);
+        m_network_game_box->set_visible (m == GameScenario::NETWORKED);
+
         m_coming_up =
           Startup::instance ()->signal_game_window_coming_up ().connect
           ([this] ()
@@ -89,9 +94,6 @@ public:
         m_overlay->set_clip_overlay (*m_revealer, false);
 
         m_mode = m;
-
-        if (m_mode != GameScenario::NETWORKED)
-          m_game_name_label->get_parent ()->set_visible (false);
 
         m_max_players = 0;
 
@@ -292,7 +294,7 @@ public:
         m_start_game_button->grab_focus ();
       }
 
-    sigc::signal<void(GameScenario*)> signal_game_setup ()
+    sigc::signal<void(GameScenario*, GameParameters)> signal_game_setup ()
       {
         return m_game_setup;
       }
@@ -304,8 +306,9 @@ private:
     Gtk::Box *m_dialog_vbox;
     Gtk::Button *m_edit_options_button;
     Gtk::Button *m_characters_button;
-    Gtk::Label *m_game_name_label;
-    Gtk::Entry *m_game_name_entry;
+    Gtk::Box *m_network_game_box;
+    Gtk::Entry *m_scenario_name_entry;
+    Gtk::Entry *m_scenario_description_entry;
     Gtk::Label *m_difficulty_label;
     LwCombo *m_difficulty_combobox;
     Gtk::Box *m_players_vbox;
@@ -325,7 +328,7 @@ private:
     std::list<Gtk::Entry *> m_player_names;
     std::list<Gtk::Image *> m_player_shields;
 
-    sigc::signal<void(GameScenario*)> m_game_setup;
+    sigc::signal<void(GameScenario*, GameParameters)> m_game_setup;
 
     void add_player (GameParameters::Player::Type type,
                      const Glib::ustring &name, int i)
@@ -599,11 +602,11 @@ private:
 
         g.difficulty = GameScenario::calculate_difficulty_rating(g);
           
-        if (m_game_name_entry->get_text () != "")
-          g.name = String::utrim (m_game_name_entry->get_text ());
+        if (m_scenario_name_entry->get_text () != "")
+          g.name = String::utrim (m_scenario_name_entry->get_text ());
+        if (m_scenario_description_entry->get_text () != "")
+          g.comment = String::utrim (m_scenario_description_entry->get_text ());
 
-        //auto progress = Gtk::make_managed<Gtk::ProgressBar> ();
-        //m_dialog_vbox->append (*progress);
         m_revealer->set_reveal_child (true);
         m_dialog_vbox->set_sensitive (false);
         Lw::do_events ();
@@ -615,7 +618,9 @@ private:
            });
         GameScenario *game_scenario = create_new_scenario (g, m_mode);
         if (m_mode == GameScenario::HOTSEAT)
-          m_game_setup.emit (game_scenario);
+          m_game_setup.emit (game_scenario, g);
+        else if (m_mode == GameScenario::NETWORKED)
+          m_game_setup.emit (game_scenario, g);
       }
 
     GameScenario *create_new_scenario (GameParameters &g,
